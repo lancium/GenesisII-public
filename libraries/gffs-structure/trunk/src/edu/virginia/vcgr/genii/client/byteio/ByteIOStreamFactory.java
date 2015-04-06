@@ -14,9 +14,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 /**
- * Because there are so many flavors of ByteIO stream that can be created (and so many ways to
- * create them), I try and collect the most popular ways into this one factory class. This class
- * should generally be used for creating MOST ByteIO streams.
+ * Because there are so many flavors of ByteIO stream that can be created (and so many ways to create them), I try and collect the most
+ * popular ways into this one factory class. This class should generally be used for creating MOST ByteIO streams.
  * 
  * @author mmm2a
  */
@@ -65,15 +64,14 @@ public class ByteIOStreamFactory
 	 * @param createBuffered
 	 *            Whether or not the stream should be buffered.
 	 * 
-	 * @return A newly created Java InputStream to use for reading bytes from the target ByteIO with
-	 *         the default preferred transfer mechanism.
+	 * @return A newly created Java InputStream to use for reading bytes from the target ByteIO with the default preferred transfer mechanism.
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 */
-	static public InputStream createInputStream(EndpointReferenceType target, boolean createBuffered)
-		throws FileNotFoundException, RemoteException, IOException
+	static public InputStream createInputStream(EndpointReferenceType target, boolean createBuffered) throws FileNotFoundException,
+		RemoteException, IOException
 	{
 		return createInputStream(target, null, createBuffered);
 	}
@@ -84,15 +82,14 @@ public class ByteIOStreamFactory
 	 * @param target
 	 *            The target resource to read bytes from (can be streamable or random).
 	 * 
-	 * @return A newly created, buffered, Java InputStream to use for reading bytes from the target
-	 *         ByteIO using the default transfer mechanism.
+	 * @return A newly created, buffered, Java InputStream to use for reading bytes from the target ByteIO using the default transfer
+	 *         mechanism.
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 */
-	static public InputStream createInputStream(EndpointReferenceType target) throws FileNotFoundException, RemoteException,
-		IOException
+	static public InputStream createInputStream(EndpointReferenceType target) throws FileNotFoundException, RemoteException, IOException
 	{
 		return createInputStream(target, null, true);
 	}
@@ -114,16 +111,15 @@ public class ByteIOStreamFactory
 	 * @param createBuffered
 	 *            Whether or not the stream should be buffered.
 	 * 
-	 * @return A newly created Java InputStream to use for reading bytes from the target ByteIO
-	 *         using the preferred transfer mechanism.
+	 * @return A newly created Java InputStream to use for reading bytes from the target ByteIO using the preferred transfer mechanism.
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
-	static public InputStream createInputStream(RNSPath target, boolean createBuffered) throws FileNotFoundException,
-		RemoteException, RNSException, IOException
+	static public InputStream createInputStream(RNSPath target, boolean createBuffered) throws FileNotFoundException, RemoteException,
+		RNSException, IOException
 	{
 		return createInputStream(target, null, createBuffered);
 	}
@@ -134,16 +130,15 @@ public class ByteIOStreamFactory
 	 * @param target
 	 *            The target resource to read bytes from (can be streamable or random).
 	 * 
-	 * @return A newly created buffered Java InputStream to use for reading bytes from the target
-	 *         ByteIO using the preferred transfer mechanism.
+	 * @return A newly created buffered Java InputStream to use for reading bytes from the target ByteIO using the preferred transfer
+	 *         mechanism.
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
-	static public InputStream createInputStream(RNSPath target) throws FileNotFoundException, RemoteException, RNSException,
-		IOException
+	static public InputStream createInputStream(RNSPath target) throws FileNotFoundException, RemoteException, RNSException, IOException
 	{
 		return createInputStream(target, null, true);
 	}
@@ -164,9 +159,8 @@ public class ByteIOStreamFactory
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 */
-	static public OutputStream
-		createOutputStream(EndpointReferenceType target, URI desiredTransferType, boolean createBuffered)
-			throws FileNotFoundException, RemoteException, IOException
+	static public OutputStream createOutputStream(EndpointReferenceType target, URI desiredTransferType, boolean createBuffered)
+		throws FileNotFoundException, RemoteException, IOException
 	{
 		TypeInformation tInfo = new TypeInformation(target);
 		if (tInfo.isRByteIO()) {
@@ -192,15 +186,14 @@ public class ByteIOStreamFactory
 	 * @param createBuffered
 	 *            Whether or not the stream should be buffered.
 	 * 
-	 * @return A newly created Java OutputStream to use for writing bytes to the target ByteIO using
-	 *         the preferred transfer mechanism.
+	 * @return A newly created Java OutputStream to use for writing bytes to the target ByteIO using the preferred transfer mechanism.
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 */
-	static public OutputStream createOutputStream(EndpointReferenceType target, boolean createBuffered)
-		throws FileNotFoundException, RemoteException, IOException
+	static public OutputStream createOutputStream(EndpointReferenceType target, boolean createBuffered) throws FileNotFoundException,
+		RemoteException, IOException
 	{
 		return createOutputStream(target, null, createBuffered);
 	}
@@ -211,15 +204,14 @@ public class ByteIOStreamFactory
 	 * @param target
 	 *            The target resource to write bytes to (can be streamable or random).
 	 * 
-	 * @return A newly created, buffered Java OutputStream to use for writing bytes to the target
-	 *         ByteIO using the preferred transfer mechanism.
+	 * @return A newly created, buffered Java OutputStream to use for writing bytes to the target ByteIO using the preferred transfer
+	 *         mechanism.
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 */
-	static public OutputStream createOutputStream(EndpointReferenceType target) throws FileNotFoundException, RemoteException,
-		IOException
+	static public OutputStream createOutputStream(EndpointReferenceType target) throws FileNotFoundException, RemoteException, IOException
 	{
 		return createOutputStream(target, null, true);
 	}
@@ -258,16 +250,15 @@ public class ByteIOStreamFactory
 	 * @param createBuffered
 	 *            Whether or not the stream should be buffered.
 	 * 
-	 * @return A newly created Java OutputStream to use for writing bytes to the target ByteIO using
-	 *         the preferred transfer mechanism.
+	 * @return A newly created Java OutputStream to use for writing bytes to the target ByteIO using the preferred transfer mechanism.
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
-	static public OutputStream createOutputStream(RNSPath target, boolean createBuffered) throws FileNotFoundException,
-		RemoteException, RNSException, IOException
+	static public OutputStream createOutputStream(RNSPath target, boolean createBuffered) throws FileNotFoundException, RemoteException,
+		RNSException, IOException
 	{
 		return createOutputStream(target, null, createBuffered);
 	}
@@ -277,16 +268,15 @@ public class ByteIOStreamFactory
 	 * 
 	 * @param target
 	 *            The target resource to write bytes to (can be streamable or random).
-	 * @return A newly created, buffered Java OutputStream to use for writing bytes to the target
-	 *         ByteIO using the preferred transfer mechanism.
+	 * @return A newly created, buffered Java OutputStream to use for writing bytes to the target ByteIO using the preferred transfer
+	 *         mechanism.
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
-	static public OutputStream createOutputStream(RNSPath target) throws FileNotFoundException, RemoteException, RNSException,
-		IOException
+	static public OutputStream createOutputStream(RNSPath target) throws FileNotFoundException, RemoteException, RNSException, IOException
 	{
 		return createOutputStream(target, null, true);
 	}

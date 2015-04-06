@@ -1,8 +1,8 @@
 /**
  * @author kkk5z
  * 
- *         This class creates the XQuery string used to query the XML database for BES containers
- *         that have the properties required by the user.
+ *         This class creates the XQuery string used to query the XML database for BES containers that have the properties required by the
+ *         user.
  */
 package edu.virginia.vcgr.genii.client.informationService;
 
@@ -33,14 +33,13 @@ public class QueryBuilder
 		String isAcceptingNewActivitiesQuery = "";
 
 		/*
-		 * Determining the conditions and forming the partial queries Dependion on what values the
-		 * user has entered in the GUI a corresponding XQuery query is formed.
+		 * Determining the conditions and forming the partial queries Dependion on what values the user has entered in the GUI a corresponding
+		 * XQuery query is formed.
 		 */
 		if (!GUIStructure.getOSTypeValue().equals("")) {
 			OSTypeQuery =
 				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/"
-					+ "ns2:OperatingSystem/ns3:OperatingSystemType[ns3:OperatingSystemName = '" + GUIStructure.getOSTypeValue()
-					+ "'] ";
+					+ "ns2:OperatingSystem/ns3:OperatingSystemType[ns3:OperatingSystemName = '" + GUIStructure.getOSTypeValue() + "'] ";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(OSTypeQuery);
 			else
@@ -50,8 +49,7 @@ public class QueryBuilder
 		if (!GUIStructure.getOSVersionValue().equals("")) {
 			OSVersionQuery =
 				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/"
-					+ "ns2:OperatingSystem/ns3:OperatingSystemType[ns3:OperatingSystemVersion = '"
-					+ GUIStructure.getOSVersionValue() + "'] ";
+					+ "ns2:OperatingSystem/ns3:OperatingSystemType[ns3:OperatingSystemVersion = '" + GUIStructure.getOSVersionValue() + "'] ";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(OSVersionQuery);
 			else
@@ -60,8 +58,8 @@ public class QueryBuilder
 
 		if (!GUIStructure.getCPUArchitectureNameValue().equals("")) {
 			CPUArchitectureNameQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/"
-					+ "ns2:CPUArchitecture[ns4:CPUArchitectureName= '" + GUIStructure.getCPUArchitectureNameValue() + "'] ";
+				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/" + "ns2:CPUArchitecture[ns4:CPUArchitectureName= '"
+					+ GUIStructure.getCPUArchitectureNameValue() + "'] ";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(CPUArchitectureNameQuery);
 			else

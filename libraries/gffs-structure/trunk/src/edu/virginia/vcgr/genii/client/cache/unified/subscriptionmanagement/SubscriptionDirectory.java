@@ -20,10 +20,9 @@ import edu.virginia.vcgr.genii.client.notification.NotificationBrokerConstants;
 import edu.virginia.vcgr.genii.notification.broker.IndirectSubscriptionEntryType;
 
 /*
- * This tracks all the subscriptions the client has created in different resource containers. If the
- * client lost any resource configuration object from cache because of capacity limitation, it
- * queries this directory to determine the lifetime of cached contents. Furthermore, this protects
- * the system from creating multiple subscriptions for the same resource.
+ * This tracks all the subscriptions the client has created in different resource containers. If the client lost any resource configuration
+ * object from cache because of capacity limitation, it queries this directory to determine the lifetime of cached contents. Furthermore, this
+ * protects the system from creating multiple subscriptions for the same resource.
  */
 public class SubscriptionDirectory
 {
@@ -36,9 +35,8 @@ public class SubscriptionDirectory
 		new ConcurrentHashMap<String, SubscriptionReferenceList>();
 
 	/*
-	 * This tracks the set of resources for which subscription requests have been failed previously.
-	 * We adopt the pessimistic approach that if the subscription request fails for a resource once
-	 * it is not subscribable.
+	 * This tracks the set of resources for which subscription requests have been failed previously. We adopt the pessimistic approach that if
+	 * the subscription request fails for a resource once it is not subscribable.
 	 */
 	static final Set<String> UNSUBSCRIBABLE_RESOURCES = new HashSet<String>();
 
@@ -65,12 +63,10 @@ public class SubscriptionDirectory
 	}
 
 	/*
-	 * When we have subscribed a resource we can expect to receive notifications for any update
-	 * performed on that resource as long as our subscription dosn't expire. This means, we can
-	 * safely cache any information related to the concerned resource until that time -- this
-	 * assumes that we are always able to interpret the notification message correctly. So this
-	 * method update the cache configuration of items related to the subscribed resource along with
-	 * updating the subscription directory.
+	 * When we have subscribed a resource we can expect to receive notifications for any update performed on that resource as long as our
+	 * subscription dosn't expire. This means, we can safely cache any information related to the concerned resource until that time -- this
+	 * assumes that we are always able to interpret the notification message correctly. So this method update the cache configuration of items
+	 * related to the subscribed resource along with updating the subscription directory.
 	 */
 	public static void notifySubscriptionCreation(EndpointReferenceType EPR, Date subscriptionEndTime,
 		IndirectSubscriptionEntryType[] subscriptionResponse)
@@ -85,8 +81,7 @@ public class SubscriptionDirectory
 		SubscriptionReferenceList referenceList = createSubscriptionReferenceList(subscriptionResponse);
 		SUBSCRIBED_RESOURCE_TO_SUBSCRIPTION_REFERENCE_MAP.put(EPI, referenceList);
 
-		WSResourceConfig resourceConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifier, WSResourceConfig.class);
+		WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifier, WSResourceConfig.class);
 		if (resourceConfig == null) {
 			resourceConfig = new WSResourceConfig(wsName);
 		}

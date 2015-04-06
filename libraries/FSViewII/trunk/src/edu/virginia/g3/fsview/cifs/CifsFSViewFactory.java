@@ -19,21 +19,19 @@ final public class CifsFSViewFactory extends AbstractFSViewFactory
 
 	public CifsFSViewFactory()
 	{
-		super(new CifsViewInformationManager(), SUPPORTED_URI_SCHEMES, DESCRIPTION,
-			FSViewAuthenticationInformationTypes.UsernamePassword, FSViewAuthenticationInformationTypes.DomainUsernamePassword);
+		super(new CifsViewInformationManager(), SUPPORTED_URI_SCHEMES, DESCRIPTION, FSViewAuthenticationInformationTypes.UsernamePassword,
+			FSViewAuthenticationInformationTypes.DomainUsernamePassword);
 	}
 
 	@Override
-	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly)
-		throws IOException
+	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly) throws IOException
 	{
 		DomainUsernamePassswordAuthenticationInformation dup;
 
 		switch (authInfo.authenticationType()) {
 			case UsernamePassword:
 				authInfo =
-					new DomainUsernamePassswordAuthenticationInformation(
-						((UsernamePasswordAuthenticationInformation) authInfo).username(),
+					new DomainUsernamePassswordAuthenticationInformation(((UsernamePasswordAuthenticationInformation) authInfo).username(),
 						((UsernamePasswordAuthenticationInformation) authInfo).password());
 
 			case DomainUsernamePassword:

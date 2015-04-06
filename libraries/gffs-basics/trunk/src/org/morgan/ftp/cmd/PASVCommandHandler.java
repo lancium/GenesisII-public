@@ -29,12 +29,10 @@ public class PASVCommandHandler extends AbstractCommandHandler implements Closea
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
+	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out) throws FTPException
 	{
 		try {
-			_dataChannel =
-				DataChannelManager.acquireDataChannel(sessionState.getConfiguration().getDataConnectionTimeoutSeconds());
+			_dataChannel = DataChannelManager.acquireDataChannel(sessionState.getConfiguration().getDataConnectionTimeoutSeconds());
 
 			out.println("227 " + _dataChannel.getServerSocketDescription());
 		} catch (IOException ioe) {

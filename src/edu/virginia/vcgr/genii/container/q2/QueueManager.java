@@ -53,26 +53,24 @@ import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
 /**
- * This class is called directly from the queue service. Mostly, it acts as a conduit between the
- * service impl, and the three managers underneath (the BESManager, JobManager, and Scheduler). The
- * one wrinkle is that it also implements a factory pattern to automatically load a QueueManager for
- * every queue registered in the system. It also maintains threaded workers such that there are only
- * the minimum necessary per queue.
+ * This class is called directly from the queue service. Mostly, it acts as a conduit between the service impl, and the three managers
+ * underneath (the BESManager, JobManager, and Scheduler). The one wrinkle is that it also implements a factory pattern to automatically load
+ * a QueueManager for every queue registered in the system. It also maintains threaded workers such that there are only the minimum necessary
+ * per queue.
  * 
  * @author mmm2a
  */
 public class QueueManager implements Closeable
 {
 	/**
-	 * To optimize hash table size, we assume a small number of managers to allocate space for. If
-	 * we have more, the table will grow appropriately, but there's no reason to waste memory.
+	 * To optimize hash table size, we assume a small number of managers to allocate space for. If we have more, the table will grow
+	 * appropriately, but there's no reason to waste memory.
 	 */
 	static private final int _DEFAULT_MANAGER_COUNT = 4;
 
 	/**
-	 * The maximum number of simultaneous outcalls the queue will allow. This is reflected as
-	 * threads in a thread pool. This number of threads is shared by ALL queue instances on a
-	 * server.
+	 * The maximum number of simultaneous outcalls the queue will allow. This is reflected as threads in a thread pool. This number of threads
+	 * is shared by ALL queue instances on a server.
 	 */
 	static private final int _MAX_SIMULTANEOUS_OUTCALLS = 8;
 
@@ -95,8 +93,8 @@ public class QueueManager implements Closeable
 		if (_informationPortal == null) {
 			InformationContainerService service = ContainerServices.findService(InformationContainerService.class);
 			_informationPortal =
-				service.createNewPortal(new InMemoryPersister<BESInformation>(), new BESInformationResolver(_connectionPool),
-					new Duration(30, TimeUnit.SECONDS), new Duration(10, TimeUnit.MINUTES));
+				service.createNewPortal(new InMemoryPersister<BESInformation>(), new BESInformationResolver(_connectionPool), new Duration(
+					30, TimeUnit.SECONDS), new Duration(10, TimeUnit.MINUTES));
 		}
 
 		return _informationPortal;
@@ -134,20 +132,17 @@ public class QueueManager implements Closeable
 			connection = _connectionPool.acquire(true);
 
 			/*
-			 * We look through the resources table to find all queueid's indicated. We could equally
-			 * have used the jobs table, but there will generally be less entries in the resources
-			 * table. This means that a queue which has no resources won't get started by default,
-			 * but then again, it has no need to get started. It also means that if someone creates
-			 * a brand new system (bootstraps) but doesn't clean up the DB from the old one, we may
-			 * have unnecessary queues running, but that is a very unlikely case.
+			 * We look through the resources table to find all queueid's indicated. We could equally have used the jobs table, but there will
+			 * generally be less entries in the resources table. This means that a queue which has no resources won't get started by default,
+			 * but then again, it has no need to get started. It also means that if someone creates a brand new system (bootstraps) but
+			 * doesn't clean up the DB from the old one, we may have unnecessary queues running, but that is a very unlikely case.
 			 */
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT queueid FROM q2resources");
 
 			while (rs.next()) {
 				/*
-				 * Simply accessing the manager in question causes it to get created and started if
-				 * it isn't already.
+				 * Simply accessing the manager in question causes it to get created and started if it isn't already.
 				 */
 				String rsName = rs.getString(1);
 				getManager(rsName);
@@ -184,9 +179,9 @@ public class QueueManager implements Closeable
 	}
 
 	/**
-	 * Destroy an active queue manager. Destroy is a misnomer here -- actually it simply stops the
-	 * threads and shuts it down. If there is still data in the database, the manager may get loaded
-	 * again the next time the container restarts. This is mostly for shutting down a queue.
+	 * Destroy an active queue manager. Destroy is a misnomer here -- actually it simply stops the threads and shuts it down. If there is
+	 * still data in the database, the manager may get loaded again the next time the container restarts. This is mostly for shutting down a
+	 * queue.
 	 * 
 	 * @param queueid
 	 */
@@ -224,15 +219,12 @@ public class QueueManager implements Closeable
 
 		boolean isAccepting = (info == null) ? false : info.isAcceptingNewActivities();
 		ProcessorArchitecture arch =
-			(info == null) ? ProcessorArchitecture.other : ProcessorArchitecture.valueOf(info.getProcessorArchitecture()
-				.toString());
+			(info == null) ? ProcessorArchitecture.other : ProcessorArchitecture.valueOf(info.getProcessorArchitecture().toString());
 		OperatingSystemNames osName =
-			(info == null) ? OperatingSystemNames.Unknown : OperatingSystemNames.valueOf(info.getOperatingSystemType()
-				.toString());
+			(info == null) ? OperatingSystemNames.Unknown : OperatingSystemNames.valueOf(info.getOperatingSystemType().toString());
 		String osVersion = (info == null) ? null : info.getOperatingSystemVersion();
 		Double physicalMemory = (info == null) ? null : info.getPhysicalMemory();
-		ResourceManagerType mgrType =
-			(info == null) ? ResourceManagerType.Unknown : ResourceManagerType.fromURI(info.resourceManagerType());
+		ResourceManagerType mgrType = (info == null) ? ResourceManagerType.Unknown : ResourceManagerType.fromURI(info.resourceManagerType());
 
 		boolean isAvailable = (updateInfo == null) ? false : updateInfo.isAvailable();
 		Date lastUpdated = (updateInfo == null) ? null : updateInfo.lastUpdated();
@@ -241,12 +233,11 @@ public class QueueManager implements Closeable
 		HashMap<Long, SlotSummary> slots = new HashMap<Long, SlotSummary>();
 		slots.put(new Long(data.getID()), new SlotSummary(data.getTotalSlots(), 0));
 		_jobManager.recordUsedSlots(slots);
-		return new CurrentResourceInformation(data.getTotalSlots(), (int) (slots.get(data.getID()).slotsUsed()), isAccepting,
-			arch, osName, osVersion, physicalMemory, mgrType, isAvailable, lastUpdated, nextUpdate);
+		return new CurrentResourceInformation(data.getTotalSlots(), (int) (slots.get(data.getID()).slotsUsed()), isAccepting, arch, osName,
+			osVersion, physicalMemory, mgrType, isAvailable, lastUpdated, nextUpdate);
 	}
 
-	private Collection<LegacyEntryType> addInCurrentResourceInformation(Collection<LegacyEntryType> entries)
-		throws JAXBException
+	private Collection<LegacyEntryType> addInCurrentResourceInformation(Collection<LegacyEntryType> entries) throws JAXBException
 	{
 		JAXBContext context = JAXBContext.newInstance(CurrentResourceInformation.class);
 		Marshaller m = context.createMarshaller();
@@ -267,8 +258,7 @@ public class QueueManager implements Closeable
 				any[any.length - 1] = new MessageElement(((Document) result.getNode()).getDocumentElement());
 				entry.set_any(any);
 			} catch (Throwable cause) {
-				_logger.warn(String.format("Unable to marshall current resource information for %s.", entry.getEntry_name()),
-					cause);
+				_logger.warn(String.format("Unable to marshall current resource information for %s.", entry.getEntry_name()), cause);
 			}
 		}
 
@@ -276,8 +266,8 @@ public class QueueManager implements Closeable
 	}
 
 	/**
-	 * Private constructor used to create a new active queue manager. This instance will start up
-	 * all of the sub-managers like the BESManager, JobManager, and Scheduler.
+	 * Private constructor used to create a new active queue manager. This instance will start up all of the sub-managers like the BESManager,
+	 * JobManager, and Scheduler.
 	 * 
 	 * @param queueid
 	 *            The ID for the queue.
@@ -296,8 +286,7 @@ public class QueueManager implements Closeable
 		try {
 			connection = _connectionPool.acquire(true);
 			_besManager = new BESManager(_database, _schedulingEvent, connection, informationPortal(), _connectionPool);
-			_jobManager =
-				new JobManager(_outcallThreadPool, _database, _schedulingEvent, _besManager, connection, _connectionPool);
+			_jobManager = new JobManager(_outcallThreadPool, _database, _schedulingEvent, _besManager, connection, _connectionPool);
 			_scheduler = new Scheduler(_queueid, _schedulingEvent, _connectionPool, _jobManager, _besManager);
 		} catch (GenesisIISecurityException gse) {
 			throw new ResourceException("Unable to create BES Manager.", gse);
@@ -337,8 +326,7 @@ public class QueueManager implements Closeable
 	/* through to the back-end methods. */
 	/************************************************************************/
 
-	public void addNewBES(String name, EndpointReferenceType epr) throws SQLException, ResourceException,
-		GenesisIISecurityException
+	public void addNewBES(String name, EndpointReferenceType epr) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 
@@ -465,14 +453,12 @@ public class QueueManager implements Closeable
 		_jobManager.checkJobStatus(jobID);
 	}
 
-	public JobInformationType getStatusFromID(Long jobID, Connection conn) throws ResourceException,
-		GenesisIISecurityException, SQLException
+	public JobInformationType getStatusFromID(Long jobID, Connection conn) throws ResourceException, GenesisIISecurityException, SQLException
 	{
 		return (_jobManager.getStatusFromID(conn, jobID));
 	}
 
-	public QueueInMemoryIteratorEntry getIterableJobStatus(String[] jobs) throws SQLException, ResourceException,
-		GenesisIISecurityException
+	public QueueInMemoryIteratorEntry getIterableJobStatus(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 
@@ -484,8 +470,7 @@ public class QueueManager implements Closeable
 		}
 	}
 
-	public Collection<JobInformationType> getJobStatus(String[] jobs) throws SQLException, ResourceException,
-		GenesisIISecurityException
+	public Collection<JobInformationType> getJobStatus(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 
@@ -502,8 +487,7 @@ public class QueueManager implements Closeable
 		return _jobManager.getBESActivityStatus(ticket);
 	}
 
-	public JobErrorPacket[] queryErrorInformation(String job) throws SQLException, ResourceException,
-		GenesisIISecurityException
+	public JobErrorPacket[] queryErrorInformation(String job) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 

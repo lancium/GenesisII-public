@@ -34,12 +34,10 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 	static private final String _RETRIEVE_FILE_INFO = "SELECT path, parentIds, isReplicated FROM exportedfile WHERE fileid = ?";
 	static private final String _DELETE_EXPORTED_FILE_STMT = "DELETE FROM exportedfile WHERE fileid = ?";
 
-	static private final String _RETRIEVE_ALL_FILE_IDS_FOR_PARENT_STMT =
-		"SELECT fileid FROM exportedfile WHERE parentIds LIKE ?";
+	static private final String _RETRIEVE_ALL_FILE_IDS_FOR_PARENT_STMT = "SELECT fileid FROM exportedfile WHERE parentIds LIKE ?";
 	static private final String _DESTROY_ALL_FILES_FOR_PARENT_STMT = "DELETE FROM exportedfile WHERE parentIds LIKE ?";
 
-	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT = "SELECT endpoint " + "FROM exporteddirentry "
-		+ "WHERE dirid = ?";
+	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT = "SELECT endpoint " + "FROM exporteddirentry " + "WHERE dirid = ?";
 
 	private String _parentIds = null;
 	private String _filePath = null;
@@ -136,11 +134,9 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 				throw new ResourceException("\"" + IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM
 					+ "\" construction parameter MUST be set.");
 			if (_filePath == null)
-				throw new ResourceException("\"" + IExportedFileResource.PATH_CONSTRUCTION_PARAM
-					+ "\" construction parameter MUST be set.");
+				throw new ResourceException("\"" + IExportedFileResource.PATH_CONSTRUCTION_PARAM + "\" construction parameter MUST be set.");
 			if (_isReplicated == null)
-				throw new ResourceException("\"" + IExportedFileResource.REPLICATION_INDICATOR
-					+ "\" construction parameter MUST be set.");
+				throw new ResourceException("\"" + IExportedFileResource.REPLICATION_INDICATOR + "\" construction parameter MUST be set.");
 		}
 
 		super.initialize(constructionParams);
@@ -172,8 +168,7 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 	{
 		String path = (String) constructionParams.get(IExportedFileResource.PATH_CONSTRUCTION_PARAM);
 		if (path == null)
-			throw new ResourceException("Couldn't find \"" + IExportedFileResource.PATH_CONSTRUCTION_PARAM
-				+ "\" construction parameter.");
+			throw new ResourceException("Couldn't find \"" + IExportedFileResource.PATH_CONSTRUCTION_PARAM + "\" construction parameter.");
 
 		return new File(path);
 	}
@@ -325,9 +320,7 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 			file.delete();
 		} catch (Exception e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug(
-					"Exception occurred while deleting file in ExportFileResource.destroyFile(" + file.getAbsolutePath() + ")",
-					e);
+				_logger.debug("Exception occurred while deleting file in ExportFileResource.destroyFile(" + file.getAbsolutePath() + ")", e);
 		}
 	}
 

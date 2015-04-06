@@ -222,8 +222,7 @@ public class JobDocument implements PostUnmarshallListener
 		return null;
 	}
 
-	private Resources generateResources(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
-		Set<FilesystemType> filesystemSet)
+	private Resources generateResources(XPathBuilder builder, Map<String, List<SweepParameter>> variables, Set<FilesystemType> filesystemSet)
 	{
 		Resources resources = null;
 
@@ -610,8 +609,7 @@ public class JobDocument implements PostUnmarshallListener
 		builder.pop();
 
 		/*
-		 * We don't actually have to deal with the builder or variables for these elements as they
-		 * can't have variables inside of them
+		 * We don't actually have to deal with the builder or variables for these elements as they can't have variables inside of them
 		 */
 		application.spmdVariation(_spmdVariation.variationURI());
 		application.numberOfProcesses(NumberOfProcesses.numberOfProccesses(_numberOfProcesses.value()));
@@ -646,8 +644,8 @@ public class JobDocument implements PostUnmarshallListener
 		return new SourceTarget(results.first());
 	}
 
-	private DataStaging generateSingleDataStage(DataStage dataStage, XPathBuilder builder,
-		Map<String, List<SweepParameter>> variables, Set<FilesystemType> filesystemSet, boolean isStageIn)
+	private DataStaging generateSingleDataStage(DataStage dataStage, XPathBuilder builder, Map<String, List<SweepParameter>> variables,
+		Set<FilesystemType> filesystemSet, boolean isStageIn)
 	{
 		String filename = dataStage.filename();
 
@@ -959,18 +957,15 @@ public class JobDocument implements PostUnmarshallListener
 		}
 
 		if (!_standardInput.isEmpty() && !stageInFilenames.contains(_standardInput.get())) {
-			analysis.addWarning("No input data stage defined that matches the "
-				+ "standard input redirection.  Is this intentional?");
+			analysis.addWarning("No input data stage defined that matches the " + "standard input redirection.  Is this intentional?");
 		}
 
 		if (!_standardOutput.isEmpty() && !stageOutFilenames.contains(_standardOutput.get())) {
-			analysis.addWarning("No output data stage defined that matches the "
-				+ "standard output redirection.  Is this intentional?");
+			analysis.addWarning("No output data stage defined that matches the " + "standard output redirection.  Is this intentional?");
 		}
 
 		if (!_standardError.isEmpty() && !stageOutFilenames.contains(_standardError.get())) {
-			analysis.addWarning("No output data stage defined that matches the "
-				+ "standard error redirection.  Is this intentional?");
+			analysis.addWarning("No output data stage defined that matches the " + "standard error redirection.  Is this intentional?");
 		}
 
 		if (!_operatingSystemVersion.isEmpty()) {

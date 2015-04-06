@@ -19,12 +19,10 @@ public class NotificationBrokerConstructionParams extends ConstructionParameters
 
 	private static final long serialVersionUID = 0L;
 
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "notification-broker-mode", nillable = false,
-		required = false)
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "notification-broker-mode", nillable = false, required = false)
 	private Boolean mode;
 
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "broker-notification-forwarding-port", nillable = false,
-		required = false)
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "broker-notification-forwarding-port", nillable = false, required = false)
 	@XmlJavaTypeAdapter(EPRAdapter.class)
 	private EndpointReferenceType forwardingPort;
 
@@ -35,8 +33,7 @@ public class NotificationBrokerConstructionParams extends ConstructionParameters
 	{
 	}
 
-	public NotificationBrokerConstructionParams(Boolean mode, EndpointReferenceType forwardingPort,
-		long scheduledTerminationTime)
+	public NotificationBrokerConstructionParams(Boolean mode, EndpointReferenceType forwardingPort, long scheduledTerminationTime)
 	{
 		this.mode = mode;
 		this.forwardingPort = forwardingPort;

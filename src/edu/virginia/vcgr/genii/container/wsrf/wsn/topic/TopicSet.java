@@ -50,8 +50,7 @@ public class TopicSet
 		EndpointReferenceType source = null;
 
 		try {
-			source =
-				(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
+			source = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		} catch (ContextException e) {
 			source = null;
 		}

@@ -31,8 +31,7 @@ public class EC2TypicaController implements CloudController
 	private String _keyPair;
 	private int _backoff = 20;
 
-	public EC2TypicaController(String publicKey, String secretKey, String endpoint, int port, boolean https, boolean euca,
-		String keyPair)
+	public EC2TypicaController(String publicKey, String secretKey, String endpoint, int port, boolean https, boolean euca, String keyPair)
 	{
 
 		_publicKey = publicKey;

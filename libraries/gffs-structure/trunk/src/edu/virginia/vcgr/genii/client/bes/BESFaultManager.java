@@ -40,8 +40,7 @@ public class BESFaultManager
 	static public Fault constructFault(Throwable... causes) throws RemoteException
 	{
 		try {
-			return new Fault(FAULT_QNAME, "Fault occurred in activity.", new URI("http://somefault-actor"),
-				constructDetail(causes));
+			return new Fault(FAULT_QNAME, "Fault occurred in activity.", new URI("http://somefault-actor"), constructDetail(causes));
 		} catch (Throwable cc) {
 			throw new RemoteException("Unable to create soap fault.", cc);
 		}

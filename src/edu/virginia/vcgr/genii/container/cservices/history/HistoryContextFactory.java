@@ -99,10 +99,9 @@ public class HistoryContextFactory
 	}
 
 	/**
-	 * This factory method is somewhat complicated. I need a bunch of things which usually the
-	 * default is fine. However, because the defaults may not be fine, the choices are to have a
-	 * dozen constructors, have constructors that take nulls, or to allow folks to pass in arbitrary
-	 * objects like this. The objects that may be given in the constructor are as follows:
+	 * This factory method is somewhat complicated. I need a bunch of things which usually the default is fine. However, because the defaults
+	 * may not be fine, the choices are to have a dozen constructors, have constructors that take nulls, or to allow folks to pass in
+	 * arbitrary objects like this. The objects that may be given in the constructor are as follows:
 	 * <UL>
 	 * <LI>An IResource or a ResourceKey, or a String</LI>
 	 * <LI>An ICallingContext</LI>
@@ -147,8 +146,8 @@ public class HistoryContextFactory
 			else if (contextObject instanceof InMemoryHistoryEventSink)
 				sink = (InMemoryHistoryEventSink) contextObject;
 			else
-				_logger.warn(String.format("Don't know what to do with a "
-					+ "%s while constructing a HistoryContext.  Ignoring it.", contextObject.getClass()));
+				_logger.warn(String.format("Don't know what to do with a " + "%s while constructing a HistoryContext.  Ignoring it.",
+					contextObject.getClass()));
 		}
 
 		if (resourceID == null) {

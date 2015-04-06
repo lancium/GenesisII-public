@@ -71,8 +71,8 @@ public class TerminateActivitiesTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 
 		GeniiPath factoryPath = new GeniiPath(besFactory);
@@ -128,8 +128,8 @@ public class TerminateActivitiesTool extends BaseGridTool
 			List<EndpointReferenceType> currActivityEprs = activityEprs.subList(start, end);
 
 			TerminateActivitiesResponseType resp =
-				bes.terminateActivities(new TerminateActivitiesType(currActivityEprs
-					.toArray(new EndpointReferenceType[currActivityEprs.size()]), null));
+				bes.terminateActivities(new TerminateActivitiesType(currActivityEprs.toArray(new EndpointReferenceType[currActivityEprs
+					.size()]), null));
 
 			if (resp != null) {
 				TerminateActivityResponseType[] resps = resp.getResponse();
@@ -159,8 +159,7 @@ public class TerminateActivitiesTool extends BaseGridTool
 		if (besFactory == null || besFactory.trim().length() == 0) {
 			throw new InvalidToolUsageException("No BES container specified.");
 		}
-		if ((activities == null || activities.trim().length() == 0)
-			&& (activityFolders == null || activityFolders.trim().length() == 0)) {
+		if ((activities == null || activities.trim().length() == 0) && (activityFolders == null || activityFolders.trim().length() == 0)) {
 			throw new InvalidToolUsageException("No activities specified.");
 		}
 	}

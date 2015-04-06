@@ -48,8 +48,7 @@ public class ApplicationDescriptionAttributeHandler extends AbstractAttributeHan
 
 	public MessageElement getApplicationDescriptionAttr() throws ResourceUnknownFaultType, ResourceException
 	{
-		return new MessageElement(ApplicationDescriptionConstants.APPLICATION_DESCRIPTION_ATTR_QNAME,
-			getApplicationDescription());
+		return new MessageElement(ApplicationDescriptionConstants.APPLICATION_DESCRIPTION_ATTR_QNAME, getApplicationDescription());
 	}
 
 	public MessageElement getApplicationVersionAttr() throws ResourceUnknownFaultType, ResourceException

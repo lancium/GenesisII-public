@@ -108,11 +108,10 @@ public class Histogram<DataRangeType> implements Iterable<Pair<String, Integer>>
 	}
 
 	/**
-	 * Returns a multi-line string with no line having more than the specified number of columns.
-	 * Each line will correspond to an item in the histo gram with the following format: <label>:
-	 * {marks} [<value>] Where {marks} is some number of minuses, or pluses (or a 0) indicating the
-	 * scaled size of the value for that label. An example output for values of -10, 0, and 10 might
-	 * be Minus 10: ----- [-10] Zero : 0 [ 0] Plus 10 : +++++ [ 10]
+	 * Returns a multi-line string with no line having more than the specified number of columns. Each line will correspond to an item in the
+	 * histo gram with the following format: <label>: {marks} [<value>] Where {marks} is some number of minuses, or pluses (or a 0) indicating
+	 * the scaled size of the value for that label. An example output for values of -10, 0, and 10 might be Minus 10: ----- [-10] Zero : 0 [
+	 * 0] Plus 10 : +++++ [ 10]
 	 * 
 	 * @param columns
 	 * @return

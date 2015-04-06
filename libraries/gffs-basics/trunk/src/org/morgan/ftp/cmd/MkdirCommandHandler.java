@@ -15,8 +15,7 @@ public class MkdirCommandHandler extends AbstractCommandHandler
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
+	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out) throws FTPException
 	{
 		String result = sessionState.getBackend().mkdir(parameters);
 		out.println("257 \"" + result + "\"");

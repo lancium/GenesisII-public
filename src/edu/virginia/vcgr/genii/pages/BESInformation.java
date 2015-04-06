@@ -49,8 +49,8 @@ public class BESInformation extends GenesisIIStyledPage
 		ps.println("<CAPTION>BES Activities</CAPTION>");
 		ps.println("<TR bgcolor=\"#7FFFD4\"><TH>Activity Name</TH><TH>Activity CWD</TH><TH>State</TH><TH>Num. Faults</TH></TR>");
 		for (BESActivity activity : bes.getContainedActivities()) {
-			ps.format("<TR><TD>%s</TD><TD>%s</TD><TD>%s</TD><TD>%s</TD></TR>", activity.getJobName(),
-				activity.getActivityCWD(), activity.getState(), getFaultCount(activity));
+			ps.format("<TR><TD>%s</TD><TD>%s</TD><TD>%s</TD><TD>%s</TD></TR>", activity.getJobName(), activity.getActivityCWD(),
+				activity.getState(), getFaultCount(activity));
 		}
 		ps.println("</TABLE>");
 	}

@@ -23,9 +23,8 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 
 /*
  * 
- * String ContainerPath=null; String TargetPath=null; ExportDirDialog dialog = new
- * ExportDirDialog(ContainerPath,TargetPath); dialog.pack(); GuiUtils.centerComponent(dialog);
- * dialog.setVisible(true);
+ * String ContainerPath=null; String TargetPath=null; ExportDirDialog dialog = new ExportDirDialog(ContainerPath,TargetPath); dialog.pack();
+ * GuiUtils.centerComponent(dialog); dialog.setVisible(true);
  */
 
 public class CreateExportPlugin extends AbstractCombinedUIMenusPlugin

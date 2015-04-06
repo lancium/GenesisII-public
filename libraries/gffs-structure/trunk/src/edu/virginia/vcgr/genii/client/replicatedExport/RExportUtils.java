@@ -122,8 +122,7 @@ public class RExportUtils
 	 * 
 	 * @param path Path to new file
 	 * 
-	 * @return boolean Return true if file does not exist and could be created. False if file
-	 * exists. Pass through IOExceptions from create.
+	 * @return boolean Return true if file does not exist and could be created. False if file exists. Pass through IOExceptions from create.
 	 */
 	static public boolean createLocalFile(String path) throws IOException
 	{
@@ -137,8 +136,7 @@ public class RExportUtils
 	 * 
 	 * @param path Path to new directory
 	 * 
-	 * @return boolean Return true if dir does not exist and could be created. False if dir exists.
-	 * Pass through IOExceptions from create.
+	 * @return boolean Return true if dir does not exist and could be created. False if dir exists. Pass through IOExceptions from create.
 	 */
 	static public boolean createLocalDir(String path)
 	{

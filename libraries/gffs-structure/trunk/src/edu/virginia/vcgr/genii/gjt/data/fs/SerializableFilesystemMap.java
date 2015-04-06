@@ -16,11 +16,9 @@ import edu.virginia.vcgr.genii.gjt.data.fs.scratch.ScratchFilesystem;
 public class SerializableFilesystemMap
 {
 	@XmlElements({
-		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "default-filesystem",
-			type = DefaultFilesystem.class),
+		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "default-filesystem", type = DefaultFilesystem.class),
 		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "grid-filesystem", type = GridFilesystem.class),
-		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "scratch-filesystem",
-			type = ScratchFilesystem.class) })
+		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "scratch-filesystem", type = ScratchFilesystem.class) })
 	private List<Filesystem> _filesystems;
 
 	public SerializableFilesystemMap(Map<FilesystemType, Filesystem> map)

@@ -14,11 +14,9 @@ public interface POSIXApplicationFacet extends PersonalityFacet
 
 	public void consumeError(Object currentUnderstanding, String filesystemName, String error) throws JSDLException;
 
-	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory)
-		throws JSDLException;
+	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory) throws JSDLException;
 
-	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment)
-		throws JSDLException;
+	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment) throws JSDLException;
 
 	public void consumeWallTimeLimit(Object currentUnderstanding, long wallTimeLimit) throws JSDLException;
 

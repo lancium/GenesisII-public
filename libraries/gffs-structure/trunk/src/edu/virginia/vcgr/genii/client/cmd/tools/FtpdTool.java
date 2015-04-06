@@ -71,9 +71,8 @@ public class FtpdTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		String arg = getArgument(0);
 

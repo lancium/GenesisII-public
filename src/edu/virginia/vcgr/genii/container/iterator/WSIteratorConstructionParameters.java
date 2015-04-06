@@ -19,8 +19,7 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 {
 	static final long serialVersionUID = 0L;
 
-	static private Map<String, WSIteratorConstructionParameters> _originalConsParms =
-		new HashMap<String, WSIteratorConstructionParameters>();
+	static private Map<String, WSIteratorConstructionParameters> _originalConsParms = new HashMap<String, WSIteratorConstructionParameters>();
 
 	transient private int _preferredBatchSize;
 
@@ -68,8 +67,7 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 		this(contentsIterator, preferredBlockSize, null);
 	}
 
-	public WSIteratorConstructionParameters(Iterator<MessageElement> contentsIterator, int preferredBlockSize,
-		InMemoryIteratorWrapper imiw)
+	public WSIteratorConstructionParameters(Iterator<MessageElement> contentsIterator, int preferredBlockSize, InMemoryIteratorWrapper imiw)
 	{
 		// List<InMemoryIteratorEntry> indices
 		synchronized (this) {

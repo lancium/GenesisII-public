@@ -46,8 +46,7 @@ class WinLinGridJobToolFrame extends GridJobToolFrame
 			super("Preferences");
 
 			putValue(Action.MNEMONIC_KEY, KeyEvent.VK_P);
-			putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
 
 		@Override

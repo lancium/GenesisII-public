@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.context;
 
@@ -128,8 +127,7 @@ public class AxisBasedContextResolver implements IContextResolver
 		}
 
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		CallingContextImpl resourceContext =
-			(CallingContextImpl) resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+		CallingContextImpl resourceContext = (CallingContextImpl) resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
 
 		if (resourceContext == null) {
 			retval = new CallingContextImpl(ct);
@@ -145,14 +143,13 @@ public class AxisBasedContextResolver implements IContextResolver
 		if (privateKey != null) {
 			if (_logger.isDebugEnabled()) {
 				_logger.debug("Using resource's own private key " + ResourceManager.getCurrentResource().getServiceName());
-				_logger.debug("...epi for that resource is "
-					+ resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME));
+				_logger.debug("...epi for that resource is " + resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME));
 			}
 		}
 		Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 		if ((targetCertChain != null) && (targetCertChain.length > 0)) {
-			retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain,
-				(privateKey != null) ? privateKey : Container.getContainerPrivateKey()));
+			retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain, (privateKey != null) ? privateKey
+				: Container.getContainerPrivateKey()));
 		}
 
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);

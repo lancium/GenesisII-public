@@ -126,10 +126,9 @@ public class TrashDialog extends UIFrame
 		public void actionPerformed(ActionEvent e)
 		{
 			dispose();
-			_uiContext
-				.progressMonitorFactory()
-				.createMonitor(_widget, "Emptying Trash", "Emptying trash", 1000L, new TrashCanEnactorTask(),
-					new TrashCanEnactorCompleter()).start();
+			_uiContext.progressMonitorFactory()
+				.createMonitor(_widget, "Emptying Trash", "Emptying trash", 1000L, new TrashCanEnactorTask(), new TrashCanEnactorCompleter())
+				.start();
 		}
 	}
 
@@ -174,8 +173,7 @@ public class TrashDialog extends UIFrame
 
 				try {
 					TrashCanEntry tce = new TrashCanEntry(wrapper.pair().second());
-					GeniiCommon common =
-						ClientUtils.createProxy(GeniiCommon.class, tce.path().getEndpoint(), tce.callingContext());
+					GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, tce.path().getEndpoint(), tce.callingContext());
 					common.destroy(new Destroy());
 					_uiContext.trashCan().remove(wrapper.pair().second());
 				} catch (Throwable cause) {
@@ -313,8 +311,8 @@ public class TrashDialog extends UIFrame
 
 					_uiContext.trashCan().remove(wrapper.pair().second());
 				} catch (RNSPathAlreadyExistsException rpaee) {
-					JOptionPane.showMessageDialog(_unsortedList, String.format("Path \"%s\" already exists!", wrapper),
-						"Unable to Undelete", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(_unsortedList, String.format("Path \"%s\" already exists!", wrapper), "Unable to Undelete",
+						JOptionPane.ERROR_MESSAGE);
 				} catch (Throwable cause) {
 					ErrorHandler.handleError(_uiContext, _unsortedList, cause);
 				} finally {

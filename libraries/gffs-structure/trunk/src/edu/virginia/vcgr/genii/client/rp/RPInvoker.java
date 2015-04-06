@@ -32,8 +32,8 @@ import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 
 /**
- * This is the invoker handler that handles ALL resource property interactions. It is used as part
- * of the {@link java.lang.reflect.Proxy} proxying mechanism.
+ * This is the invoker handler that handles ALL resource property interactions. It is used as part of the {@link java.lang.reflect.Proxy}
+ * proxying mechanism.
  * 
  * @author mmm2a
  */
@@ -42,9 +42,8 @@ public class RPInvoker implements InvocationHandler
 	static private Log _logger = LogFactory.getLog(RPInvoker.class);
 
 	/**
-	 * The RP invoker is essentially a collection of "handlers" that handle RP interactions for both
-	 * single and multi-value properties. Further, these handlers can be getters or setters. THis
-	 * interface represents that common ability.
+	 * The RP invoker is essentially a collection of "handlers" that handle RP interactions for both single and multi-value properties.
+	 * Further, these handlers can be getters or setters. THis interface represents that common ability.
 	 * 
 	 * @author mmm2a
 	 */
@@ -56,9 +55,8 @@ public class RPInvoker implements InvocationHandler
 		 * @param method
 		 *            The method that as called on an RP interface
 		 * @param args
-		 *            The arguments passed to that method (should be empty for a getter, and a
-		 *            single argument (which could be a collection for a multi-valued RP, or not for
-		 *            a single-value RP) for a setter).
+		 *            The arguments passed to that method (should be empty for a getter, and a single argument (which could be a collection
+		 *            for a multi-valued RP, or not for a single-value RP) for a setter).
 		 * 
 		 * @return The results of the RP get/set.
 		 * 
@@ -148,17 +146,14 @@ public class RPInvoker implements InvocationHandler
 		{
 			Class<?> retType = method.getReturnType();
 			if (!Collection.class.isAssignableFrom(retType))
-				throw new IllegalArgumentException(String.format("The return type for property \"%s\" is not a collection.",
-					_propName));
+				throw new IllegalArgumentException(String.format("The return type for property \"%s\" is not a collection.", _propName));
 
 			Type gRetType = method.getGenericReturnType();
 			if (!(gRetType instanceof ParameterizedType))
-				throw new IllegalArgumentException(String.format("Unable to determine actual type for property \"%s\".",
-					_propName));
+				throw new IllegalArgumentException(String.format("Unable to determine actual type for property \"%s\".", _propName));
 			Type actualType = ((ParameterizedType) gRetType).getActualTypeArguments()[0];
 			if (!(actualType instanceof Class<?>))
-				throw new IllegalArgumentException(String.format("Unable to determine actual type for property \"%s\".",
-					_propName));
+				throw new IllegalArgumentException(String.format("Unable to determine actual type for property \"%s\".", _propName));
 
 			return _translator.deserialize((Class<?>) actualType, getProperties(_propName));
 		}
@@ -252,8 +247,7 @@ public class RPInvoker implements InvocationHandler
 	}
 
 	/**
-	 * This is the method that represents the request to refresh the cache. We store it as a
-	 * performance optimization.
+	 * This is the method that represents the request to refresh the cache. We store it as a performance optimization.
 	 */
 	static private Method _refreshMethod;
 
@@ -273,8 +267,7 @@ public class RPInvoker implements InvocationHandler
 	private HashMap<QName, Collection<MessageElement>> _propertiesCache = new HashMap<QName, Collection<MessageElement>>();
 
 	/**
-	 * Update a list of resource properties (by making the appropriate outcalls and updating the
-	 * cache.
+	 * Update a list of resource properties (by making the appropriate outcalls and updating the cache.
 	 * 
 	 * @param properties
 	 *            The resource properties to set.
@@ -283,8 +276,7 @@ public class RPInvoker implements InvocationHandler
 	 * 
 	 * @throws ResourcePropertyException
 	 */
-	synchronized private void setProperties(QName properties, Collection<MessageElement> values)
-		throws ResourcePropertyException
+	synchronized private void setProperties(QName properties, Collection<MessageElement> values) throws ResourcePropertyException
 	{
 		try {
 			_stub.updateResourceProperties(new UpdateResourceProperties(new UpdateType(Elementals.toArray(values))));
@@ -347,8 +339,8 @@ public class RPInvoker implements InvocationHandler
 	}
 
 	/**
-	 * A singleton version of getting a resource property (singleton in the sense of the number of
-	 * RPs retrieve, not their value cardinalities).
+	 * A singleton version of getting a resource property (singleton in the sense of the number of RPs retrieve, not their value
+	 * cardinalities).
 	 * 
 	 * @param properties
 	 *            The resource property to get.
@@ -534,9 +526,8 @@ public class RPInvoker implements InvocationHandler
 	}
 
 	/**
-	 * Create a new handler for the given method. This method is responsible for reflecting on the
-	 * method and it's annotations and determining which kind of handler is appropriate, what the
-	 * name of the RP is, what translators to use, etc.
+	 * Create a new handler for the given method. This method is responsible for reflecting on the method and it's annotations and determining
+	 * which kind of handler is appropriate, what the name of the RP is, what translators to use, etc.
 	 * 
 	 * @param method
 	 *            The method to create a handler for.
@@ -549,8 +540,7 @@ public class RPInvoker implements InvocationHandler
 	{
 		ResourceProperty rp = method.getAnnotation(ResourceProperty.class);
 		if (rp == null)
-			throw new ResourcePropertyException("Unable to find a ResourceProperty annotation on the method "
-				+ method.toGenericString());
+			throw new ResourcePropertyException("Unable to find a ResourceProperty annotation on the method " + method.toGenericString());
 
 		QName propertyName = new QName(rp.namespace(), rp.localname());
 		Class<? extends ResourcePropertyTranslator> transClass = rp.translator();
@@ -573,8 +563,7 @@ public class RPInvoker implements InvocationHandler
 				translator = new DefaultMultiResourcePropertyTranslator();
 
 			if (translator instanceof SingleResourcePropertyTranslator)
-				throw new ResourcePropertyException("Attempt to use a singleton RP translator on a "
-					+ "multi-valued resource property.");
+				throw new ResourcePropertyException("Attempt to use a singleton RP translator on a " + "multi-valued resource property.");
 
 			return createMultiHandler(propertyName, (MultiResourcePropertyTranslator) translator, method);
 		} else {
@@ -583,16 +572,14 @@ public class RPInvoker implements InvocationHandler
 				translator = new DefaultSingleResourcePropertyTranslator();
 
 			if (translator instanceof MultiResourcePropertyTranslator)
-				throw new ResourcePropertyException("Attempt to use a multi-value RP translator on a "
-					+ "singleton resource property.");
+				throw new ResourcePropertyException("Attempt to use a multi-value RP translator on a " + "singleton resource property.");
 
 			return createSingleHandler(propertyName, (SingleResourcePropertyTranslator) translator, method);
 		}
 	}
 
 	/**
-	 * Get the handler registered for a given method. THis is called at run time to handle an RP
-	 * request.
+	 * Get the handler registered for a given method. THis is called at run time to handle an RP request.
 	 * 
 	 * @param method
 	 *            The method that we are getting the handler for.
@@ -626,8 +613,8 @@ public class RPInvoker implements InvocationHandler
 	 * 
 	 * @throws ConfigurationException
 	 */
-	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target, ICallingContext callingContext)
-		throws FileNotFoundException, IOException
+	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target, ICallingContext callingContext) throws FileNotFoundException,
+		IOException
 	{
 		_likelyRPs = likelyRPs;
 		if (callingContext == null)

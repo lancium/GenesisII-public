@@ -61,9 +61,9 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		process.cancel();
 	}
 
-	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
-		File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
-		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters)
+	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost, File commonDirectory,
+		File executable, String[] arguments, Map<String, String> environment, PassiveStreamRedirectionDescription redirects,
+		BESConstructionParameters constructionParameters)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
 
@@ -118,8 +118,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				_environment = new HashMap<String, String>();
 
 			setExportedEnvironment(_environment);
-			history.createDebugWriter("Activity Environment Set").format("Activity environment set to %s", _environment)
-				.close();
+			history.createDebugWriter("Activity Environment Set").format("Activity environment set to %s", _environment).close();
 
 			if (_environment != null) {
 				String ogrshConfig = _environment.get("OGRSH_CONFIG");
@@ -157,8 +156,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			if (_logger.isDebugEnabled())
 				_logger.debug("Trying to call cmdLine manipulators.");
 			newCmdLine =
-				CmdLineManipulatorUtils.callCmdLineManipulators(jobProperties,
-					_constructionParameters.getCmdLineManipulatorConfiguration());
+				CmdLineManipulatorUtils.callCmdLineManipulators(jobProperties, _constructionParameters.getCmdLineManipulatorConfiguration());
 
 			// for testing only - use default cmdLine format to compare to transform
 			String[] arguments = new String[command.size() - 1];
@@ -166,8 +164,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				arguments[lcv - 1] = command.get(lcv);
 
 			Vector<String> testCmdLine =
-				wrapper.formCommandLine(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(),
-					_redirects.stdoutSink(), stderrFile, resourceUsageFile, command.get(0), arguments);
+				wrapper.formCommandLine(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), _redirects.stdoutSink(),
+					stderrFile, resourceUsageFile, command.get(0), arguments);
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Previous cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
 
@@ -180,9 +178,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				hWriter.format(" %s", arg);
 			hWriter.close();
 
-			token =
-				wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile,
-					newCmdLine);
+			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, newCmdLine);
 		}
 
 		try {
@@ -214,9 +210,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 				AccountingService acctService = ContainerServices.findService(AccountingService.class);
 				if (acctService != null) {
-					acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), null, null, null,
-						newCmdLine, results.exitCode(), results.userTime(), results.kernelTime(), results.wallclockTime(),
-						results.maximumRSS());
+					acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), null, null, null, newCmdLine,
+						results.exitCode(), results.userTime(), results.kernelTime(), results.wallclockTime(), results.maximumRSS());
 				}
 			}
 

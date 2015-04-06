@@ -50,9 +50,8 @@ public class ResourceHistoryTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException
 	{
 		OutputStream out = null;
 		List<HistoryEvent> events = new LinkedList<HistoryEvent>();

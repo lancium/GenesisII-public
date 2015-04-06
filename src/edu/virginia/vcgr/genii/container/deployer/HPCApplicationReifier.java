@@ -32,8 +32,7 @@ public class HPCApplicationReifier
 		return application;
 	}
 
-	static private Environment_Type[] reifyEnvironment(File deployDirectory, AbstractReifier reifier,
-		Environment_Type[] original)
+	static private Environment_Type[] reifyEnvironment(File deployDirectory, AbstractReifier reifier, Environment_Type[] original)
 	{
 		boolean isWindows = isWindows();
 		boolean handledPath = false;

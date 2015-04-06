@@ -47,9 +47,8 @@ public class NotificationMessageOutcallContent implements Serializable
 		throw new StreamCorruptedException();
 	}
 
-	public NotificationMessageOutcallContent(EndpointReferenceType subscriptionReference, TopicPath topic,
-		EndpointReferenceType publisher, NotificationMessageContents contents, AdditionalUserData additionalUserData)
-		throws JAXBException
+	public NotificationMessageOutcallContent(EndpointReferenceType subscriptionReference, TopicPath topic, EndpointReferenceType publisher,
+		NotificationMessageContents contents, AdditionalUserData additionalUserData) throws JAXBException
 	{
 		_subscriptionReference = subscriptionReference;
 		_topic = topic;

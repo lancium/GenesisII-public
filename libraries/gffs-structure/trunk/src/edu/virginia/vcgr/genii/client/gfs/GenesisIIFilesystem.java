@@ -100,8 +100,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 		try {
 			if (typeInfo.isRByteIO()) {
 				try {
-					RandomByteIORP rp =
-						(RandomByteIORP) ResourcePropertyManager.createRPInterface(target, RandomByteIORP.class);
+					RandomByteIORP rp = (RandomByteIORP) ResourcePropertyManager.createRPInterface(target, RandomByteIORP.class);
 					size = toNonNull(rp.getSize());
 					created = toMillis(rp.getCreateTime());
 					modified = toMillis(rp.getModificationTime());
@@ -113,8 +112,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 				}
 			} else if (typeInfo.isSByteIO()) {
 				try {
-					StreamableByteIORP rp =
-						(StreamableByteIORP) ResourcePropertyManager.createRPInterface(target, StreamableByteIORP.class);
+					StreamableByteIORP rp = (StreamableByteIORP) ResourcePropertyManager.createRPInterface(target, StreamableByteIORP.class);
 					size = toNonNull(rp.getSize());
 					created = toMillis(rp.getCreateTime());
 					modified = toMillis(rp.getModificationTime());
@@ -126,8 +124,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 				}
 			} else if (typeInfo.isSByteIOFactory()) {
 				try {
-					StreamableByteIORP rp =
-						(StreamableByteIORP) ResourcePropertyManager.createRPInterface(target, StreamableByteIORP.class);
+					StreamableByteIORP rp = (StreamableByteIORP) ResourcePropertyManager.createRPInterface(target, StreamableByteIORP.class);
 					size = toNonNull(rp.getSize());
 					created = toMillis(rp.getCreateTime());
 					modified = toMillis(rp.getModificationTime());
@@ -165,8 +162,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 		return stat(target.getName(), target.getEndpoint());
 	}
 
-	public GenesisIIFilesystem(RNSPath root, String sandbox) throws IOException, RNSPathDoesNotExistException,
-		AuthZSecurityException
+	public GenesisIIFilesystem(RNSPath root, String sandbox) throws IOException, RNSPathDoesNotExistException, AuthZSecurityException
 	{
 		ICallingContext callingContext = ContextManager.getExistingContext();
 
@@ -312,8 +308,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 		}
 	}
 
-	private long open(String[] path, boolean wasCreated, RNSPath target, EndpointReferenceType epr, OpenFlags flags,
-		OpenModes mode) throws FSException, ResourceException, GenesisIISecurityException, RemoteException, IOException
+	private long open(String[] path, boolean wasCreated, RNSPath target, EndpointReferenceType epr, OpenFlags flags, OpenModes mode)
+		throws FSException, ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
 		GeniiOpenFile gof;
 
@@ -326,9 +322,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 			gof = new StreamableByteIOFactoryOpenFile(path, epr, true, mode == OpenModes.READ_WRITE, flags.isAppend());
 		else {
 			String eprString = ObjectSerializer.toString(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"), false);
-			gof =
-				new GenericGeniiOpenFile(path, ByteBuffer.wrap(eprString.getBytes()), true, mode == OpenModes.READ_WRITE,
-					flags.isAppend());
+			gof = new GenericGeniiOpenFile(path, ByteBuffer.wrap(eprString.getBytes()), true, mode == OpenModes.READ_WRITE, flags.isAppend());
 		}
 
 		return _fileTable.allocate(gof);
@@ -406,8 +400,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 			TypeInformation info = new TypeInformation(target.getEndpoint());
 			if (info.isRByteIO()) {
 				RandomByteIOTransferer transferer =
-					RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(
-						RandomByteIOPortType.class, target.getEndpoint()));
+					RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class,
+						target.getEndpoint()));
 				transferer.truncAppend(newSize, new byte[0]);
 
 			} else if (info.isSByteIO()) {
@@ -449,14 +443,12 @@ public class GenesisIIFilesystem implements FSFilesystem
 		try {
 			TypeInformation info = new TypeInformation(target.getEndpoint());
 			if (info.isRByteIO()) {
-				RandomByteIORP rp =
-					(RandomByteIORP) ResourcePropertyManager.createRPInterface(target.getEndpoint(), RandomByteIORP.class);
+				RandomByteIORP rp = (RandomByteIORP) ResourcePropertyManager.createRPInterface(target.getEndpoint(), RandomByteIORP.class);
 				rp.setAccessTime(toCalendar(accessTime));
 				rp.setModificationTime(toCalendar(modificationTime));
 			} else if (info.isSByteIO()) {
 				StreamableByteIORP rp =
-					(StreamableByteIORP) ResourcePropertyManager.createRPInterface(target.getEndpoint(),
-						StreamableByteIORP.class);
+					(StreamableByteIORP) ResourcePropertyManager.createRPInterface(target.getEndpoint(), StreamableByteIORP.class);
 				rp.setAccessTime(toCalendar(accessTime));
 				rp.setModificationTime(toCalendar(modificationTime));
 			}

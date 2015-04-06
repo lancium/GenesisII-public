@@ -44,9 +44,8 @@ public class SudoExportUtils
 	}
 
 	/**
-	 * similar to doGridMapping above, but operates on a list of possible users. we support this in
-	 * order to map both a regular grid user and an appropriate TLS identity, depending on which one
-	 * is found in grid map file.
+	 * similar to doGridMapping above, but operates on a list of possible users. we support this in order to map both a regular grid user and
+	 * an appropriate TLS identity, depending on which one is found in grid map file.
 	 */
 	public static String doGridMapping(List<String> dnsToFind)
 	{
@@ -65,8 +64,8 @@ public class SudoExportUtils
 	}
 
 	/**
-	 * reports the unix user that owns the export, for sudo-based exports. this checks the creation
-	 * properties for the export to find the info.
+	 * reports the unix user that owns the export, for sudo-based exports. this checks the creation properties for the export to find the
+	 * info.
 	 */
 	public static String getExportOwnerUser(ResourceKey key) throws IOException
 	{
@@ -128,8 +127,7 @@ public class SudoExportUtils
 			try {
 				int waitResult = p.waitFor();
 				if (waitResult != 0) {
-					_logger.error("received a failure code of " + waitResult + " when running gffschown to user '" + unixUser
-						+ "'");
+					_logger.error("received a failure code of " + waitResult + " when running gffschown to user '" + unixUser + "'");
 				}
 			} catch (InterruptedException e) {
 				_logger.warn("exception occurred while awaiting gffs chown call", e);
@@ -140,8 +138,8 @@ public class SudoExportUtils
 	}
 
 	/**
-	 * changes ownership of a file to the owning unix user, if we can intuit / deduce that owner
-	 * using the existing credentials and the grid-mapfile.
+	 * changes ownership of a file to the owning unix user, if we can intuit / deduce that owner using the existing credentials and the
+	 * grid-mapfile.
 	 */
 	public static void chownFileToDeducedUser(File localPath) throws IOException
 	{
@@ -178,8 +176,8 @@ public class SudoExportUtils
 	}
 
 	/**
-	 * checks to see if regular or exported byteio files should be chowned to their unix user on
-	 * creation. if so, this function does the chown.
+	 * checks to see if regular or exported byteio files should be chowned to their unix user on creation. if so, this function does the
+	 * chown.
 	 * 
 	 * @throws IOException
 	 */
@@ -192,8 +190,8 @@ public class SudoExportUtils
 	}
 
 	/**
-	 * checks to see if regular or exported byteio files should be chowned to their unix user on
-	 * creation. if so, this function does the chown.
+	 * checks to see if regular or exported byteio files should be chowned to their unix user on creation. if so, this function does the
+	 * chown.
 	 * 
 	 * @throws IOException
 	 */
@@ -208,8 +206,7 @@ public class SudoExportUtils
 			expMech = ExportMechanisms.EXPORT_MECH_ACL;
 		}
 		/*
-		 * if we're in the right export mode, we'll chown the file to the user we have recorded as
-		 * export owner.
+		 * if we're in the right export mode, we'll chown the file to the user we have recorded as export owner.
 		 */
 		if (expMech.equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
 			if (_logger.isDebugEnabled())

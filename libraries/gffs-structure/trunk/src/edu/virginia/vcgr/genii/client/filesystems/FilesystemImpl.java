@@ -25,12 +25,10 @@ class FilesystemImpl implements Filesystem
 		File root = new File(conf.path());
 
 		/*
-		 * Mark Morgan -- We're not ready to do this yet. We need to fully go down this root first.
-		 * if (!root.exists()) root.mkdirs();
+		 * Mark Morgan -- We're not ready to do this yet. We need to fully go down this root first. if (!root.exists()) root.mkdirs();
 		 * 
-		 * if (!root.exists()) throw new FileNotFoundException(String.format(
-		 * "Unable to find directory \"%s\".", root)); else if (!root.isDirectory()) throw new
-		 * FileNotFoundException(String.format( "Unable to find directory \"%s\".", root));
+		 * if (!root.exists()) throw new FileNotFoundException(String.format( "Unable to find directory \"%s\".", root)); else if
+		 * (!root.isDirectory()) throw new FileNotFoundException(String.format( "Unable to find directory \"%s\".", root));
 		 */
 
 		_filesystemRoot = root;
@@ -68,8 +66,8 @@ class FilesystemImpl implements Filesystem
 	}
 
 	@Override
-	public FilesystemWatchRegistration addWatch(Integer callLimit, long checkPeriod, TimeUnit checkPeriodUnits,
-		FilesystemWatchFilter filter, FilesystemWatchHandler handler)
+	public FilesystemWatchRegistration addWatch(Integer callLimit, long checkPeriod, TimeUnit checkPeriodUnits, FilesystemWatchFilter filter,
+		FilesystemWatchHandler handler)
 	{
 		return _manager.addWatch(_filesystemName, this, callLimit, checkPeriod, checkPeriodUnits, filter, handler);
 	}

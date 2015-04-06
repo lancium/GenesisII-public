@@ -101,9 +101,8 @@ public class LogReaderTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		List<String> args = getArguments();
 		List<GeniiCommon> loggers = new LinkedList<GeniiCommon>();

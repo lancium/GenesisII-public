@@ -61,8 +61,7 @@ public class QueueTableModel extends AbstractTableModel
 				resetList(info);
 			} catch (Throwable cause) {
 				_logger.warn("Unable to update queue contents.", cause);
-				JOptionPane.showMessageDialog(null, "Unable to update queue contents.", "Queue Update Failed",
-					JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Unable to update queue contents.", "Queue Update Failed", JOptionPane.ERROR_MESSAGE);
 			} finally {
 				_amRefreshing = false;
 				fireRefreshState(false);

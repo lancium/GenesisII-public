@@ -97,8 +97,8 @@ public class ReplicateTool extends BaseGridTool
 	 * Create a replica of the given resource in the given container.
 	 */
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		if (_destroy) {
 			return destroyReplica();
@@ -162,9 +162,8 @@ public class ReplicateTool extends BaseGridTool
 		CacheManager.removeItemFromCache(newEPR, RNSConstants.ELEMENT_COUNT_QNAME, MessageElement.class);
 
 		/*
-		 * if (ADD_RESOURCES_TO_ACLS) { // Allow the new resource to modify the old resource, and
-		 * vice versa, // even if the user did not delegate his identity to the resource.
-		 * newSP.addResource(oldSP); oldSP.addResource(newSP); }
+		 * if (ADD_RESOURCES_TO_ACLS) { // Allow the new resource to modify the old resource, and vice versa, // even if the user did not
+		 * delegate his identity to the resource. newSP.addResource(oldSP); oldSP.addResource(newSP); }
 		 */
 		return 0;
 	}
@@ -207,8 +206,7 @@ public class ReplicateTool extends BaseGridTool
 				int axisIndex = temp.indexOf("/axis");
 				int containerID = temp.indexOf("container-id");
 				if (axisIndex >= 0 && containerID >= 0)
-					stdout.println("Replica " + list[j] + ": " + temp.substring(0, axisIndex) + ": "
-						+ temp.substring(containerID));
+					stdout.println("Replica " + list[j] + ": " + temp.substring(0, axisIndex) + ": " + temp.substring(containerID));
 			}
 		} else {
 			stdout.println("There are no replicas of resource " + replicaPath);
@@ -217,16 +215,14 @@ public class ReplicateTool extends BaseGridTool
 	}
 
 	/**
-	 * Destroy a single replica without destroying the entire virtual resource. (Note -- "rm file"
-	 * destroys all replicas.)
+	 * Destroy a single replica without destroying the entire virtual resource. (Note -- "rm file" destroys all replicas.)
 	 * 
-	 * Be careful! If you specify a pathname that refers to an EPR with a resolver element, then
-	 * this may failover and destroy the wrong replica.
+	 * Be careful! If you specify a pathname that refers to an EPR with a resolver element, then this may failover and destroy the wrong
+	 * replica.
 	 * 
 	 * Ideally, specify a pathname of an EPR with no resolver.
 	 * 
-	 * Recursive destroy replica is not supported because of the risk of destroying replicas on
-	 * other containers or unreplicated resources.
+	 * Recursive destroy replica is not supported because of the risk of destroying replicas on other containers or unreplicated resources.
 	 * 
 	 * @throws ToolException
 	 */
@@ -261,18 +257,15 @@ public class ReplicateTool extends BaseGridTool
 			if (index >= 0) {
 				/*
 				 * stdout.println(":replicaEPR data:\n" + replicaEPR.getAddress().toString()+"\n" +
-				 * replicaEPR.getReferenceParameters().get_any()[0].toString());
-				 * stdout.println(":selected entry data:\n" +
-				 * dir.getEntryResponse(index).getEndpoint().getAddress().toString()+"\n" +
-				 * dir.getEntryResponse
+				 * replicaEPR.getReferenceParameters().get_any()[0].toString()); stdout.println(":selected entry data:\n" +
+				 * dir.getEntryResponse(index).getEndpoint().getAddress().toString()+"\n" + dir.getEntryResponse
 				 * (index).getEndpoint().getReferenceParameters().get_any()[0].toString());
 				 */
 				// To determine if the two replica instances are the same we check if their
 				// container address and resource key are the same.
 				// The EPR equals operator does not do it correctly.
 				sameEPR =
-					replicaEPR.getAddress().toString()
-						.compareTo(dir.getEntryResponse(index).getEndpoint().getAddress().toString()) == 0
+					replicaEPR.getAddress().toString().compareTo(dir.getEntryResponse(index).getEndpoint().getAddress().toString()) == 0
 						&& replicaEPR.getReferenceParameters().get_any()[0].toString().compareTo(
 							dir.getEntryResponse(index).getEndpoint().getReferenceParameters().get_any()[0].toString()) == 0;
 
@@ -289,8 +282,7 @@ public class ReplicateTool extends BaseGridTool
 					// reference to the resource. Soooo, instead we
 					// fist create a new link with the old, soon-to-be-removed-epr, then unlink,
 					// link the new, unlink the old.
-					RNSPath tempLink =
-						current.lookup(replicaPath + "-warning-removal-replica-failed", RNSPathQueryFlags.MUST_NOT_EXIST);
+					RNSPath tempLink = current.lookup(replicaPath + "-warning-removal-replica-failed", RNSPathQueryFlags.MUST_NOT_EXIST);
 					try {
 						EndpointReferenceType replacementEPR = ResolverUtils.resolve(replicaEPR);
 						tempLink.link(replicaEPR); // We will unlink this in just a moment, just

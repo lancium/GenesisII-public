@@ -20,8 +20,7 @@ public class JSDLGenerator
 		return (filesystemType != null) && (filesystemType != FilesystemType.Default);
 	}
 
-	static public String generate(ParameterizableString string, XPathBuilder builder,
-		Map<String, List<SweepParameter>> variables)
+	static public String generate(ParameterizableString string, XPathBuilder builder, Map<String, List<SweepParameter>> variables)
 	{
 		if (string == null)
 			return null;
@@ -60,8 +59,7 @@ public class JSDLGenerator
 		return new Duple<String, FilesystemType>(stringReturn, source.getFilesystemType());
 	}
 
-	static public List<String> generate(ParameterizableStringList strings, XPathBuilder builder,
-		Map<String, List<SweepParameter>> variables)
+	static public List<String> generate(ParameterizableStringList strings, XPathBuilder builder, Map<String, List<SweepParameter>> variables)
 	{
 		if (strings == null)
 			return null;
@@ -142,8 +140,7 @@ public class JSDLGenerator
 				parameters.add(builder.toSubstringParameter(info.offset() + 1, info.variable().length()));
 			}
 
-			ret.add(new Triple<String, String, FilesystemType>(keyResults.first(), valueResults.first(), item
-				.getFilesystemType()));
+			ret.add(new Triple<String, String, FilesystemType>(keyResults.first(), valueResults.first(), item.getFilesystemType()));
 
 			builder.iterate();
 		}

@@ -41,8 +41,7 @@ public class GffsExportConfiguration
 	private static FileChangeTracker _GridmapChangeTracker = null;
 
 	/**
-	 * consumes a line of text from a grid-mapfile and breaks it down into the DN specified and the
-	 * list of users associated with the DN.
+	 * consumes a line of text from a grid-mapfile and breaks it down into the DN specified and the list of users associated with the DN.
 	 */
 	public static String parseGridMapLine(String line, GridMapUserList addTo)
 	{
@@ -105,8 +104,7 @@ public class GffsExportConfiguration
 	}
 
 	/**
-	 * returns true if the time stamp for the grid-mapfile has changed since the last time we
-	 * checked.
+	 * returns true if the time stamp for the grid-mapfile has changed since the last time we checked.
 	 */
 	private static synchronized boolean gridmapFileChanged()
 	{
@@ -182,18 +180,16 @@ public class GffsExportConfiguration
 	}
 
 	/**
-	 * a helpful method for the server side (container) that finds the preferred identity in the
-	 * user's credentials, if possible. if not possible, then this just falls back to the first USER
-	 * type credential available, if any. and if none of those are available, this will return null.
-	 * this returns a full DN for the preferred identity or null.
+	 * a helpful method for the server side (container) that finds the preferred identity in the user's credentials, if possible. if not
+	 * possible, then this just falls back to the first USER type credential available, if any. and if none of those are available, this will
+	 * return null. this returns a full DN for the preferred identity or null.
 	 */
 	public static X509Certificate findPreferredIdentityServerSide(ICallingContext context, String ownerDN)
 	{
 		ArrayList<NuCredential> credSet = new ArrayList<NuCredential>();
 		credSet.addAll(TransientCredentials.getTransientCredentials(context).getCredentials());
 
-		X509Certificate clientCert =
-			(X509Certificate) context.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
+		X509Certificate clientCert = (X509Certificate) context.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
 		if (clientCert != null) {
 			credSet.add(new X509Identity(new X509Certificate[] { clientCert }, IdentityType.CONNECTION));
 		} else {
@@ -201,17 +197,15 @@ public class GffsExportConfiguration
 		}
 
 		if (_logger.isDebugEnabled()) {
-			_logger.debug("got a credential set to search of:\n"
-				+ TrustCredential.showCredentialList(credSet, VerbosityLevel.HIGH));
+			_logger.debug("got a credential set to search of:\n" + TrustCredential.showCredentialList(credSet, VerbosityLevel.HIGH));
 			_logger.debug("searching for owner as: " + ownerDN);
 		}
 
 		X509Certificate owner = PreferredIdentity.findIdentityPatternInCredentials(ownerDN, credSet);
 		if (owner == null) {
 			/*
-			 * there was no match for the owner, so let's just try handing out the first USER
-			 * credential we can find. we expect that the caller has *some* credential, otherwise
-			 * most operations will fail due to lack of permissions.
+			 * there was no match for the owner, so let's just try handing out the first USER credential we can find. we expect that the
+			 * caller has *some* credential, otherwise most operations will fail due to lack of permissions.
 			 */
 			if (_logger.isDebugEnabled())
 				_logger.debug("could not resolve preferred identity, using first USER credential instead");

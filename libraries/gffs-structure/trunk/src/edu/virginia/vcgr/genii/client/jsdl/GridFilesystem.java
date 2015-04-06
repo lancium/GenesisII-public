@@ -21,8 +21,7 @@ public class GridFilesystem extends Filesystem
 
 		Matcher matcher = MOUNT_SOURCE_PATTERN.matcher(mountSourceURI);
 		if (!matcher.matches())
-			throw new IllegalArgumentException(String.format("Mount source \"%s\" is not a valid grid mount source.",
-				mountSourceURI));
+			throw new IllegalArgumentException(String.format("Mount source \"%s\" is not a valid grid mount source.", mountSourceURI));
 
 		_mountSourcePath = matcher.group(1);
 	}

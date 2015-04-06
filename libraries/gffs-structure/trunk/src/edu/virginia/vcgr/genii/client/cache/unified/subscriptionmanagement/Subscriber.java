@@ -14,10 +14,9 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.LightweightNotificationServer;
 
 /*
- * This is a singleton class for collecting requests for subscription from the RPC interceptors --
- * kind of a facet between the subscription management module and the rest of the system. As it is a
- * singleton, for convenience, we have delegated to it the responsibility of initiating the
- * subscription-management module too.
+ * This is a singleton class for collecting requests for subscription from the RPC interceptors -- kind of a facet between the subscription
+ * management module and the rest of the system. As it is a singleton, for convenience, we have delegated to it the responsibility of
+ * initiating the subscription-management module too.
  */
 public class Subscriber
 {
@@ -26,8 +25,8 @@ public class Subscriber
 	private static Subscriber subscriber;
 
 	/*
-	 * This is producer-consumer type queue for managing subscription requests. The subscriber acts
-	 * as a producer while the SubscriptionOutcallHandler acts as a consumer.
+	 * This is producer-consumer type queue for managing subscription requests. The subscriber acts as a producer while the
+	 * SubscriptionOutcallHandler acts as a consumer.
 	 */
 	private LinkedBlockingQueue<PendingSubscription> queue;
 
@@ -35,9 +34,8 @@ public class Subscriber
 	{
 
 		/*
-		 * We need to create an SSL server to get the notifications in a secure way. Current
-		 * HTTPServer is a makeshift implementation as I don't know the standard way of accessing
-		 * and creating SSL certificates.
+		 * We need to create an SSL server to get the notifications in a secure way. Current HTTPServer is a makeshift implementation as I
+		 * don't know the standard way of accessing and creating SSL certificates.
 		 */
 		LightweightNotificationServer notificationServer = LightweightNotificationServer.createStandardServer();
 		ClientSideNotificationManager notificationMultiplexer = new ClientSideNotificationManager();
@@ -52,12 +50,10 @@ public class Subscriber
 			serverStartedSuccessfully = false;
 		}
 		/*
-		 * If we cannot start the notification server then none of the feature related to
-		 * subscription will work. However, we are not going to propagate the problem to the caller
-		 * method. Instead the subscription mechanism should fail silently. This is done to keep the
-		 * rest of the code unaffected by the failure of subscription system. Note that if you did
-		 * not completely isolate the logic of caching from the rest of the system this would not be
-		 * a good idea.
+		 * If we cannot start the notification server then none of the feature related to subscription will work. However, we are not going to
+		 * propagate the problem to the caller method. Instead the subscription mechanism should fail silently. This is done to keep the rest
+		 * of the code unaffected by the failure of subscription system. Note that if you did not completely isolate the logic of caching from
+		 * the rest of the system this would not be a good idea.
 		 */
 		if (serverStartedSuccessfully) {
 			queue = new LinkedBlockingQueue<PendingSubscription>();
@@ -83,8 +79,8 @@ public class Subscriber
 			return;
 
 		EndpointReferenceType newsSource = request.getNewsSource();
-		if (SubscriptionDirectory.isResourceAlreadySubscribed(newsSource)
-			|| !SubscriptionDirectory.isResourceSubscribable(newsSource) || !isSubscribableTarget(newsSource))
+		if (SubscriptionDirectory.isResourceAlreadySubscribed(newsSource) || !SubscriptionDirectory.isResourceSubscribable(newsSource)
+			|| !isSubscribableTarget(newsSource))
 			return;
 
 		try {

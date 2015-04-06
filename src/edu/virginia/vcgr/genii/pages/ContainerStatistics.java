@@ -30,9 +30,9 @@ public class ContainerStatistics extends GenesisIIStyledPage
 		for (TimeInterval ti : map.keySet()) {
 			MethodStatisticsReport mReport = map.get(ti);
 			MethodStatisticsReportPoint point = mReport.classTotals().get(className);
-			ps.format("<TR><TD>%s</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%.2f %%</TD><TD>%d</TD></TR>\n",
-				ti.longDescription(), point.totalCallsStarted(), point.totalCompleted(), point.totalSucceeded(),
-				point.totalFailed(), point.failureRate() * 100.0, point.averageDuration());
+			ps.format("<TR><TD>%s</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%.2f %%</TD><TD>%d</TD></TR>\n", ti.longDescription(),
+				point.totalCallsStarted(), point.totalCompleted(), point.totalSucceeded(), point.totalFailed(), point.failureRate() * 100.0,
+				point.averageDuration());
 		}
 		ps.println("</TABLE>");
 	}
@@ -45,8 +45,7 @@ public class ContainerStatistics extends GenesisIIStyledPage
 	@Override
 	protected void generateContent(PrintStream ps) throws IOException
 	{
-		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats =
-			edu.virginia.vcgr.genii.client.stats.ContainerStatistics.instance();
+		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats = edu.virginia.vcgr.genii.client.stats.ContainerStatistics.instance();
 
 		DatabaseStatistics dbStats = stats.getDatabaseStatistics();
 		MethodStatistics mStats = stats.getMethodStatistics();
@@ -57,8 +56,8 @@ public class ContainerStatistics extends GenesisIIStyledPage
 		Map<TimeInterval, DatabaseStatisticsReport> reports = dbStats.report();
 		for (TimeInterval ti : reports.keySet()) {
 			DatabaseStatisticsReport report = reports.get(ti);
-			ps.format("<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td></tr>", ti.longDescription(), report.numOpened(),
-				report.numClosed(), report.averageDuration());
+			ps.format("<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td></tr>", ti.longDescription(), report.numOpened(), report.numClosed(),
+				report.averageDuration());
 		}
 		ps.println("</TABLE>");
 
@@ -75,9 +74,9 @@ public class ContainerStatistics extends GenesisIIStyledPage
 		for (TimeInterval ti : mReports.keySet()) {
 			MethodStatisticsReport mReport = mReports.get(ti);
 			MethodStatisticsReportPoint point = mReport.totals();
-			ps.format("<TR><TD>%s</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%.2f %%</TD><TD>%d</TD></TR>\n",
-				ti.longDescription(), point.totalCallsStarted(), point.totalCompleted(), point.totalSucceeded(),
-				point.totalFailed(), point.failureRate() * 100.0, point.averageDuration());
+			ps.format("<TR><TD>%s</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%.2f %%</TD><TD>%d</TD></TR>\n", ti.longDescription(),
+				point.totalCallsStarted(), point.totalCompleted(), point.totalSucceeded(), point.totalFailed(), point.failureRate() * 100.0,
+				point.averageDuration());
 		}
 		ps.println("</TABLE>");
 

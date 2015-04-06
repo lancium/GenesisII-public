@@ -19,11 +19,9 @@ import edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPor
 import edu.virginia.vcgr.genii.notification.broker.TestNotificationRequest;
 
 /*
- * This is a wrapper class around the notification broker port-type that keep tracks of broker
- * end-point's properties and manage periodic polling of notification messages when there is some
- * NAT or firewall in the network. Apart from active or passive-polling modes, broker resource
- * properties are stored to determine the lifetime of subscriptions made via the broker and to
- * handle loss of messages.
+ * This is a wrapper class around the notification broker port-type that keep tracks of broker end-point's properties and manage periodic
+ * polling of notification messages when there is some NAT or firewall in the network. Apart from active or passive-polling modes, broker
+ * resource properties are stored to determine the lifetime of subscriptions made via the broker and to handle loss of messages.
  */
 public class NotificationBrokerWrapper
 {
@@ -48,8 +46,8 @@ public class NotificationBrokerWrapper
 	// A flag to stop the notification poller thread safely when the broker is in polling mode.
 	private boolean brokerDestroyed = false;
 
-	public NotificationBrokerWrapper(EnhancedNotificationBrokerPortType brokerPortType, String containerId,
-		long brokerResourceLifeTime, boolean mode, NotificationMultiplexer multiplexer)
+	public NotificationBrokerWrapper(EnhancedNotificationBrokerPortType brokerPortType, String containerId, long brokerResourceLifeTime,
+		boolean mode, NotificationMultiplexer multiplexer)
 	{
 		this.brokerInActiveMode = mode;
 		this.containerId = containerId;

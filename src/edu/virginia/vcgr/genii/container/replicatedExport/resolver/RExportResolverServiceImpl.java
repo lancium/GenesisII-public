@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.replicatedExport.resolver;
 
@@ -81,8 +80,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	static public QName REXPORT_RESOLVER_RESOLVER_EPI_CONSTRUCTION_PARAMETER = new QName(GenesisIIConstants.GENESISII_NS,
 		"rexport-resolver-resolver-epi");
 	static public QName REXPORT_PATH_ELEM_NAME = new QName(GenesisIIConstants.GENESISII_NS, "path");
-	static public QName REXPORT_RESOLVER_SERVICE_EPR_NAME = new QName(GenesisIIConstants.GENESISII_NS,
-		"rexport-resolver-service-epr");
+	static public QName REXPORT_RESOLVER_SERVICE_EPR_NAME = new QName(GenesisIIConstants.GENESISII_NS, "rexport-resolver-service-epr");
 	static public QName REXPORT_RESOLVER_TYPE = new QName(GenesisIIConstants.GENESISII_NS, "rexport-resolver-type");
 
 	public RExportResolverServiceImpl() throws RemoteException
@@ -109,20 +107,18 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 
 	@Override
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		super.postCreate(rKey, myEPR, cParams, constructionParameters, resolverCreationParams);
 
 		// grab targetEPR construction parameter
-		EndpointReferenceType primaryEPR =
-			(EndpointReferenceType) constructionParameters.get(REXPORT_RESOLVER_TARGET_CONSTRUCTION_PARAMETER);
+		EndpointReferenceType primaryEPR = (EndpointReferenceType) constructionParameters.get(REXPORT_RESOLVER_TARGET_CONSTRUCTION_PARAMETER);
 		if (primaryEPR == null)
 			throw new ResourceException("Invalid construction parameters for RExportResolverDBResource.initialize()");
 
 		// grab resolverServiceEPR construction parameter
-		EndpointReferenceType resolverServiceEPR =
-			(EndpointReferenceType) constructionParameters.get(REXPORT_RESOLVER_SERVICE_EPR_NAME);
+		EndpointReferenceType resolverServiceEPR = (EndpointReferenceType) constructionParameters.get(REXPORT_RESOLVER_SERVICE_EPR_NAME);
 		if (resolverServiceEPR == null)
 			throw new ResourceException("Invalid construction parameters for RExportResolverDBResource.initialize()");
 
@@ -148,8 +144,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	 * @return EPR of replica
 	 */
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType resolve(Object resolveRequest) throws RemoteException, ResourceUnknownFaultType,
-		ResolveFailedFaultType
+	public EndpointReferenceType resolve(Object resolveRequest) throws RemoteException, ResourceUnknownFaultType, ResolveFailedFaultType
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Entered resolve method in RExportResolver.");
@@ -167,8 +162,8 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	}
 
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType resolveEPI(org.apache.axis.types.URI resolveEPI) throws RemoteException,
-		ResourceUnknownFaultType, ResolveFailedFaultType
+	public EndpointReferenceType resolveEPI(org.apache.axis.types.URI resolveEPI) throws RemoteException, ResourceUnknownFaultType,
+		ResolveFailedFaultType
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Entered resolveEPI method in RExportResolver.");
@@ -198,8 +193,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	}
 
 	/**
-	 * Update target EPR associated with entry and return new resolution epr If null target EPR,
-	 * just return resolution epr as is currently.
+	 * Update target EPR associated with entry and return new resolution epr If null target EPR, just return resolution epr as is currently.
 	 * 
 	 * Currently only called from ResolverFactory createResolver to get resolution epr
 	 */
@@ -237,13 +231,12 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 		}
 
 		// return new epr with updated targetEPR and corresponding resolver
-		return new UpdateResponseType(RExportResolverUtils.createResolutionEPR(thisEntry.getPrimaryEPR(),
-			thisEntry.getResolverEPR()));
+		return new UpdateResponseType(RExportResolverUtils.createResolutionEPR(thisEntry.getPrimaryEPR(), thisEntry.getResolverEPR()));
 	}
 
 	/**
-	 * Initiate replica creation (EPR, data, and subscriptions) Store replica epr info in resolver
-	 * db entry First ensure this is correct resolver for passed primary
+	 * Initiate replica creation (EPR, data, and subscriptions) Store replica epr info in resolver db entry First ensure this is correct
+	 * resolver for passed primary
 	 * 
 	 * @param primaryEPR
 	 *            : epr of new export entry on primary
@@ -253,8 +246,8 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	 *            : true if new export entry is dir; false if file
 	 * 
 	 */
-	private EndpointReferenceType updateReplica(EndpointReferenceType primaryEPR, EndpointReferenceType dataStreamEPR,
-		String replicaName, String entryType) throws RemoteException, ResourceException, InvalidWSNameFaultType
+	private EndpointReferenceType updateReplica(EndpointReferenceType primaryEPR, EndpointReferenceType dataStreamEPR, String replicaName,
+		String entryType) throws RemoteException, ResourceException, InvalidWSNameFaultType
 	{
 		/* get this resolver's entry and compare that info matches what was passed */
 
@@ -334,8 +327,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 		}
 	}
 
-	private class LegacyByteIOContentsChangedNotificationHandler extends
-		AbstractNotificationHandler<ByteIOContentsChangedContents>
+	private class LegacyByteIOContentsChangedNotificationHandler extends AbstractNotificationHandler<ByteIOContentsChangedContents>
 	{
 		private LegacyByteIOContentsChangedNotificationHandler()
 		{
@@ -421,8 +413,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	 * Query for resolver associated with current resource epi in table
 	 */
 	@RWXMapping(RWXCategory.WRITE)
-	public ResolverQueryResponse resolverQuery(ResolverQueryRequest resolverQuery) throws ResourceException,
-		ResourceUnknownFaultType
+	public ResolverQueryResponse resolverQuery(ResolverQueryRequest resolverQuery) throws ResourceException, ResourceUnknownFaultType
 	{
 		// extract EPI of resource from request
 		String resourceEPI = resolverQuery.getResource_EPI();
@@ -448,8 +439,8 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	 * 
 	 */
 	@RWXMapping(RWXCategory.WRITE)
-	public CreateRootReplicaResponse createRootReplica(CreateRootReplicaRequest request) throws ResourceUnknownFaultType,
-		ResourceException, InvalidWSNameFaultType, RemoteException
+	public CreateRootReplicaResponse createRootReplica(CreateRootReplicaRequest request) throws ResourceUnknownFaultType, ResourceException,
+		InvalidWSNameFaultType, RemoteException
 	{
 		// extract EPR of primary from request
 		// checked to match against resolver's DB entry
@@ -501,8 +492,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
-		WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("setMetadata operation not supported in rexport resolver.");
 	}

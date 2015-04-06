@@ -182,14 +182,14 @@ public class HistoryContainerService extends AbstractContainerService
 				number = nextSequenceNumber(connection, resourceID);
 
 			long ret =
-				HistoryDatabase.addRecord(connection, resourceID, number, createTimestamp, category, level, properties,
-					eventSource, eventData, expirationTime);
+				HistoryDatabase.addRecord(connection, resourceID, number, createTimestamp, category, level, properties, eventSource,
+					eventData, expirationTime);
 			connection.commit();
 			return new HistoryEventTokenImpl(ret);
 		} catch (SQLException sqe) {
 			if (!sqe.getSQLState().equals("23505"))
-				_logger.warn(String.format("Error trying to add history event record id.  " + "SQL error code is %s.",
-					sqe.getSQLState()), sqe);
+				_logger.warn(String.format("Error trying to add history event record id.  " + "SQL error code is %s.", sqe.getSQLState()),
+					sqe);
 
 			return new NullHistoryEventToken();
 		} finally {

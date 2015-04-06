@@ -34,8 +34,8 @@ public class ApplicationDescription
 	static final private String FAKE_UPDATER_CLASS_VALUE = "edu.virginia.vcgr.appmgr.update.UpdaterClass";
 
 	/*
-	 * the optional environment variable that points at the installation location. this becomes
-	 * required if one is running the software under eclipse.
+	 * the optional environment variable that points at the installation location. this becomes required if one is running the software under
+	 * eclipse.
 	 */
 	static public final String INSTALLATION_DIR_ENVIRONMENT_VARIABLE = "GENII_INSTALL_DIR";
 
@@ -68,8 +68,7 @@ public class ApplicationDescription
 		}
 	}
 
-	private void initialize(String applicationClassName, HierarchicalProperties properties) throws IOException,
-		CertificateException
+	private void initialize(String applicationClassName, HierarchicalProperties properties) throws IOException, CertificateException
 	{
 		_applicationName = PropertyUtilities.getRequiredProperty(properties, APPLICATION_NAME_PROPERTY);
 		if (_logger.isTraceEnabled())
@@ -110,8 +109,7 @@ public class ApplicationDescription
 		initialize(applicationClassName, properties);
 	}
 
-	public ApplicationDescription(String applicationClassName, String propertiesFileName) throws IOException,
-		CertificateException
+	public ApplicationDescription(String applicationClassName, String propertiesFileName) throws IOException, CertificateException
 	{
 		this(applicationClassName, new File(propertiesFileName));
 	}
@@ -157,10 +155,9 @@ public class ApplicationDescription
 	}
 
 	/**
-	 * returns the location where the code is running, as best as can be determined. this uses the
-	 * GENII_INSTALL_DIR if set, but it also can find the running location based on jar files. this
-	 * cannot use the properties to look up the path, because this function needs to operate before
-	 * anything else is loaded (for OSGi usage).
+	 * returns the location where the code is running, as best as can be determined. this uses the GENII_INSTALL_DIR if set, but it also can
+	 * find the running location based on jar files. this cannot use the properties to look up the path, because this function needs to
+	 * operate before anything else is loaded (for OSGi usage).
 	 */
 	static public String getInstallationDirectory()
 	{
@@ -203,8 +200,8 @@ public class ApplicationDescription
 	}
 
 	/*
-	 * this provides a way for the osgi support to know we're running inside eclipse, which imposes
-	 * a different structure on the locations of files.
+	 * this provides a way for the osgi support to know we're running inside eclipse, which imposes a different structure on the locations of
+	 * files.
 	 */
 	static public String getEclipseTrunkFromEnvironment()
 	{

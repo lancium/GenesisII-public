@@ -22,8 +22,7 @@ public class ContainerProperties extends Properties
 	static private final String DEPLOYMENTS_DIRECTORY_NAME = "deployments";
 
 	static final private String GENII_USER_DIR_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.user-dir";
-	static final private String GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME =
-		"edu.virginia.vcgr.genii.container.deployment-directory";
+	static final private String GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.deployment-directory";
 	static final public String GENII_DEPLOYMENT_NAME_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.deployment-name";
 	static final public String GRID_CONNECTION_COMMAND_PROPERTY = "edu.virginia.vcgr.genii.gridInitCommand";
 
@@ -79,8 +78,8 @@ public class ContainerProperties extends Properties
 	}
 
 	/**
-	 * Intended only for use by ApplicationBase.getUserDir. This loads the user directory setting
-	 * from container.properties if it exists or returns null.
+	 * Intended only for use by ApplicationBase.getUserDir. This loads the user directory setting from container.properties if it exists or
+	 * returns null.
 	 */
 	public String getUserDirectoryProperty()
 	{
@@ -88,8 +87,7 @@ public class ContainerProperties extends Properties
 	}
 
 	/**
-	 * returns the configured deployments directory, if one is defined. otherwise returns the
-	 * default location.
+	 * returns the configured deployments directory, if one is defined. otherwise returns the default location.
 	 */
 	public String getDeploymentsDirectory()
 	{
@@ -122,9 +120,8 @@ public class ContainerProperties extends Properties
 	}
 
 	/**
-	 * returns the command line for a grid connect command (minus 'grid' and 'connect'). if this
-	 * property has not been set, then this returns null. this will also first consult our
-	 * installation properties in case we can locate an override there.
+	 * returns the command line for a grid connect command (minus 'grid' and 'connect'). if this property has not been set, then this returns
+	 * null. this will also first consult our installation properties in case we can locate an override there.
 	 */
 	public String getConnectionCommand()
 	{

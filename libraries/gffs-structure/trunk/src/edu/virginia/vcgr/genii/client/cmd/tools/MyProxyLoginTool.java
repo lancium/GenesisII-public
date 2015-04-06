@@ -83,9 +83,8 @@ public class MyProxyLoginTool extends BaseLoginTool
 	protected void verify() throws ToolException
 	{
 		/*
-		 * cannot check this here, since verify is called before runCommand, which gathers this
-		 * argument. if ((_username == null) || (_username.length() == 0)) throw new
-		 * InvalidToolUsageException("The username cannot be blank.");
+		 * cannot check this here, since verify is called before runCommand, which gathers this argument. if ((_username == null) ||
+		 * (_username.length() == 0)) throw new InvalidToolUsageException("The username cannot be blank.");
 		 */
 
 		if (_durationString != null) {
@@ -105,9 +104,9 @@ public class MyProxyLoginTool extends BaseLoginTool
 	/**
 	 * assumes that the username and password have already been set.
 	 */
-	public int doMyproxyLogin(ICallingContext callContext) throws ReloadShellException, ToolException, UserCancelException,
-		RNSException, AuthZSecurityException, IOException, ResourcePropertyException, CreationException,
-		InvalidToolUsageException, ClassNotFoundException, DialogException
+	public int doMyproxyLogin(ICallingContext callContext) throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException,
+		DialogException
 	{
 		String pass = new String(_password);
 
@@ -142,12 +141,10 @@ public class MyProxyLoginTool extends BaseLoginTool
 		mp.setPassphrase(pass);
 
 		/*
-		 * Myproxy trust root can be overriden with either environment variable GLOBUS_LOCATION or
-		 * X509_CERT_DIR, although at our level we are defining the location in the security
-		 * property file.
+		 * Myproxy trust root can be overriden with either environment variable GLOBUS_LOCATION or X509_CERT_DIR, although at our level we are
+		 * defining the location in the security property file.
 		 */
-		String myProxyDirectory =
-			getSecurityProperties().getProperty(KeystoreSecurityConstants.Client.MYPROXY_CERTIFICATES_LOCATION_PROP);
+		String myProxyDirectory = getSecurityProperties().getProperty(KeystoreSecurityConstants.Client.MYPROXY_CERTIFICATES_LOCATION_PROP);
 		// default to old location if the property is not set.
 		if (myProxyDirectory == null)
 			myProxyDirectory = "myproxy-certs";
@@ -176,8 +173,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 		}
 
 		/*
-		 * clear any existing credentials because we want to replace our session cert with the
-		 * myproxy cert.
+		 * clear any existing credentials because we want to replace our session cert with the myproxy cert.
 		 */
 		ClientUtils.invalidateCredentials(callContext);
 
@@ -188,8 +184,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 		X509Certificate[] keyMat = new X509Certificate[1];
 		keyMat[0] = mp.getCertificate();
 
-		String msg =
-			"Replacing client tool identity with MyProxy credentials for \"" + keyMat[0].getSubjectDN().getName() + "\".";
+		String msg = "Replacing client tool identity with MyProxy credentials for \"" + keyMat[0].getSubjectDN().getName() + "\".";
 		stdout.println(msg);
 		_logger.info(msg);
 
@@ -219,9 +214,8 @@ public class MyProxyLoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		// make sure username/password are set
 		aquireUsername();
@@ -248,8 +242,7 @@ public class MyProxyLoginTool extends BaseLoginTool
 			ret.load(fin);
 			return ret;
 		} catch (IOException ioe) {
-			throw new InvalidDeploymentException(deployment.getName().toString(),
-				"Unable to load myproxy  properties from deployment.");
+			throw new InvalidDeploymentException(deployment.getName().toString(), "Unable to load myproxy  properties from deployment.");
 		} finally {
 			StreamUtils.close(fin);
 		}

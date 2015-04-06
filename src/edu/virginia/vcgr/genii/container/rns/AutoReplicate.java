@@ -42,9 +42,8 @@ public class AutoReplicate
 	static private Log _logger = LogFactory.getLog(AutoReplicate.class);
 
 	/**
-	 * If "resource" is a directory with an auto-replicate policy, and "primaryEPR" is a non-local
-	 * resource that can be replicated, then quickly create and return a local replica. Otherwise,
-	 * return null.
+	 * If "resource" is a directory with an auto-replicate policy, and "primaryEPR" is a non-local resource that can be replicated, then
+	 * quickly create and return a local replica. Otherwise, return null.
 	 */
 	@SuppressWarnings("unchecked")
 	public static ReplicationItem autoReplicate(IResource resource, EndpointReferenceType primaryEPR) throws RemoteException
@@ -108,8 +107,7 @@ public class AutoReplicate
 		List<MessageElement> attributes = new ArrayList<MessageElement>();
 		attributes.addAll(runner.getDefaultAttributes(primaryEPR));
 		attributes.add(new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, endpointIdentifier));
-		EndpointReferenceType localEPR =
-			service.CreateEPR(attributes.toArray(new MessageElement[attributes.size()]), serviceURL);
+		EndpointReferenceType localEPR = service.CreateEPR(attributes.toArray(new MessageElement[attributes.size()]), serviceURL);
 		AddressingParameters ap = new AddressingParameters(localEPR.getReferenceParameters());
 		String rkString = ap.getResourceKey();
 
@@ -131,8 +129,8 @@ public class AutoReplicate
 	}
 
 	/**
-	 * Optimization: Don't ask the resolver about this resource unless the local database indicates
-	 * that we have a local instance of this resource.
+	 * Optimization: Don't ask the resolver about this resource unless the local database indicates that we have a local instance of this
+	 * resource.
 	 * 
 	 * This breaks abstraction barriers and it may be removed.
 	 */
@@ -154,8 +152,7 @@ public class AutoReplicate
 		return false;
 	}
 
-	private static EndpointReferenceType getLocalReplicaEPR(List<ResolverDescription> resolverList, GUID containerID)
-		throws RemoteException
+	private static EndpointReferenceType getLocalReplicaEPR(List<ResolverDescription> resolverList, GUID containerID) throws RemoteException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("AutoReplicate.getLocalReplica");

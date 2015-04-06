@@ -37,11 +37,11 @@ public interface GenesisIIBaseRP
 		translator = PermissionsStringTranslator.class)
 	public Permissions getPermissions();
 
-	@ResourceProperty(namespace = GenesisIIConstants.GENESISII_NS,
-		localname = GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_NAME, translator = DurationTranslator.class)
+	@ResourceProperty(namespace = GenesisIIConstants.GENESISII_NS, localname = GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_NAME,
+		translator = DurationTranslator.class)
 	public Duration getCacheCoherenceWindow();
 
-	@ResourceProperty(namespace = GenesisIIConstants.GENESISII_NS,
-		localname = GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_NAME, translator = DurationTranslator.class)
+	@ResourceProperty(namespace = GenesisIIConstants.GENESISII_NS, localname = GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_NAME,
+		translator = DurationTranslator.class)
 	public void setCacheCoherenceWindow(Duration aDur);
 }

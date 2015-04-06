@@ -29,8 +29,7 @@ public class MakeFilePlugin extends AbstractCombinedUIMenusPlugin
 			try {
 				assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
-				String answer =
-					JOptionPane.showInputDialog(context.ownerComponent(), "What would you like to call the new file?");
+				String answer = JOptionPane.showInputDialog(context.ownerComponent(), "What would you like to call the new file?");
 				if (answer == null)
 					return;
 
@@ -55,8 +54,8 @@ public class MakeFilePlugin extends AbstractCombinedUIMenusPlugin
 			return false;
 
 		/*
-		 * ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS
-		 * and NOT (isContainer, isBES ... Perhaps should be even more selective,
+		 * ASG: 9-13-2013. Modified to be more selective. Not just is it an RNS, but is it an RNS and NOT (isContainer, isBES ... Perhaps
+		 * should be even more selective,
 		 */
 		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
 		return (tp.isRNS() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP()));

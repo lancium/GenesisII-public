@@ -38,8 +38,7 @@ public class ConcreteTopicQueryExpressionFactory implements TopicQueryExpression
 	public TopicQueryExpression createFromElement(Element e) throws TopicNotSupportedFaultType
 	{
 		/*
-		 * This is SO stupid, but somehow Apache Axis doesn't actually implement the correct
-		 * functionallity.
+		 * This is SO stupid, but somehow Apache Axis doesn't actually implement the correct functionallity.
 		 */
 		if (e instanceof MessageElement) {
 			try {

@@ -33,8 +33,7 @@ public class PortTypeAdministrator
 	public static final String KNOWN_PORT_TYPES_RESOURCE = "config/known-porttypes.xml";
 
 	/**
-	 * the constructor that sets up all the static objects. this should only be called from the
-	 * PortType.portTypeFactory method.
+	 * the constructor that sets up all the static objects. this should only be called from the PortType.portTypeFactory method.
 	 */
 	public PortTypeAdministrator()
 	{
@@ -117,8 +116,7 @@ public class PortTypeAdministrator
 		}
 
 		if (rankString == null)
-			throw new IOException("Error parsing known-porttypes -- couldn't find a " + "display rank for port type \"" + name
-				+ "\".");
+			throw new IOException("Error parsing known-porttypes -- couldn't find a " + "display rank for port type \"" + name + "\".");
 
 		return new PortType(QName.valueOf(name), Integer.parseInt(rankString), description);
 	}
@@ -165,10 +163,9 @@ public class PortTypeAdministrator
 		PortType pt = _knownPortTypes.get(portType);
 		if ((pt == null) && portType.getLocalPart().endsWith("JNDIAuthnPortType")) {
 			/*
-			 * skipping the error message for grids that are missing the jndi auth port type. only
-			 * the sdiact-123 (xsede activity 123) grid had an issue with this, due to when it came
-			 * online. this should never be triggered in any other grid, which is why we have it set
-			 * to log at warning level.
+			 * skipping the error message for grids that are missing the jndi auth port type. only the sdiact-123 (xsede activity 123) grid
+			 * had an issue with this, due to when it came online. this should never be triggered in any other grid, which is why we have it
+			 * set to log at warning level.
 			 */
 			_logger.warn("unexpectedly providing alternative jndi auth port type return.");
 			return TTYConstants.TTY_PORT_TYPE();

@@ -28,8 +28,8 @@ public class OnErrorTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		// if no previous error, then no harm no foul and no error now.
 		if (getLastExit() == 0)

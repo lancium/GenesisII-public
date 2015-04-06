@@ -53,8 +53,8 @@ public class CurrentResourceInformation
 	protected CurrentResourceInformation()
 	{
 		// This is for JAXB Only
-		this(-1, -1, false, ProcessorArchitecture.other, OperatingSystemNames.other, "<unknown>", null,
-			ResourceManagerType.Unknown, false, null, null);
+		this(-1, -1, false, ProcessorArchitecture.other, OperatingSystemNames.other, "<unknown>", null, ResourceManagerType.Unknown, false,
+			null, null);
 	}
 
 	public CurrentResourceInformation(int maxSlots, int currentSlotsUsed, boolean isAcceptingActivities,

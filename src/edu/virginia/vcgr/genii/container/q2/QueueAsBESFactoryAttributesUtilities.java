@@ -54,8 +54,8 @@ class QueueAsBESFactoryAttributesUtilities
 		if (osVersion == null)
 			osVersion = "";
 
-		return new OperatingSystem_Type(new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(osName.name()),
-			null), osVersion, null, null);
+		return new OperatingSystem_Type(new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(osName.name()), null),
+			osVersion, null, null);
 	}
 
 	private CPUArchitecture_Type cpuArchitecture()
@@ -222,16 +222,14 @@ class QueueAsBESFactoryAttributesUtilities
 			throw new IllegalArgumentException("Resource overrides cannot be null!");
 	}
 
-	FactoryResourceAttributesDocumentType factoryResourceAttributes(boolean isAcceptingNewActivities,
-		long totalNumberOfActivities)
+	FactoryResourceAttributesDocumentType factoryResourceAttributes(boolean isAcceptingNewActivities, long totalNumberOfActivities)
 	{
 		URI[] namingProfiles = null;
 		URI[] besExtensions = null;
 		URI localResourceManagerType = ResourceManagerType.GridQueue.toApacheAxisURI();
 
 		try {
-			namingProfiles =
-				new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING), new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
+			namingProfiles = new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING), new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
 		} catch (MalformedURIException e) {
 			namingProfiles = new URI[0];
 		}
@@ -253,8 +251,8 @@ class QueueAsBESFactoryAttributesUtilities
 			new BasicResourceAttributesDocumentType(machineName, operatingSystem(), cpuArchitecture(), cpuCount(), cpuSpeed(),
 				physicalMemory(), virtualMemory(), Elementals.toArray(any));
 
-		return new FactoryResourceAttributesDocumentType(basicResourceAttributesDocument, isAcceptingNewActivities,
-			machineName, machineName, totalNumberOfActivities, null, _allBESInformation.size(), null, namingProfiles,
-			besExtensions, localResourceManagerType, Elementals.toArray(any));
+		return new FactoryResourceAttributesDocumentType(basicResourceAttributesDocument, isAcceptingNewActivities, machineName, machineName,
+			totalNumberOfActivities, null, _allBESInformation.size(), null, namingProfiles, besExtensions, localResourceManagerType,
+			Elementals.toArray(any));
 	}
 }

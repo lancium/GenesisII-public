@@ -35,8 +35,7 @@ public class TryStatement implements ParseStatement
 	private ParseStatement _finallyBlock;
 	private Collection<CatchStructure> _catches;
 
-	public TryStatement(ParseStatement tryBlock, Map<String, ParseStatement> catches, ParseStatement finallyBlock)
-		throws ScriptException
+	public TryStatement(ParseStatement tryBlock, Map<String, ParseStatement> catches, ParseStatement finallyBlock) throws ScriptException
 	{
 		_tryBlock = tryBlock;
 		_finallyBlock = finallyBlock;

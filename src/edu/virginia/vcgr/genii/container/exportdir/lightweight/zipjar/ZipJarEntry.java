@@ -80,8 +80,7 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir, VExportFil
 		return _file;
 	}
 
-	ZipJarEntry(File zipFileTarget, ZipFile zipFile, Map<String, Map<String, ZipEntry>> directoryMap, String forkPath)
-		throws IOException
+	ZipJarEntry(File zipFileTarget, ZipFile zipFile, Map<String, Map<String, ZipEntry>> directoryMap, String forkPath) throws IOException
 	{
 		super(getName(forkPath), isDirectory(directoryMap, forkPath));
 

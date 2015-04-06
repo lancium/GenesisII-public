@@ -49,8 +49,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 	private EndpointReferenceType _activityEPR;
 	private LoggingContext _context;
 
-	public BESActivityTerminatorActor(String historyKey, HistoryEventToken historyToken, String besName,
-		EndpointReferenceType activityEPR)
+	public BESActivityTerminatorActor(String historyKey, HistoryEventToken historyToken, String besName, EndpointReferenceType activityEPR)
 	{
 		_historyKey = historyKey;
 		_historyToken = historyToken;
@@ -64,8 +63,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 	}
 
 	@Override
-	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment)
-		throws Throwable
+	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment) throws Throwable
 	{
 		LoggingContext.adoptExistingContext(_context);
 
@@ -91,8 +89,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 					if (parentNumber != null) {
 						HistoryContainerService service = ContainerServices.findService(HistoryContainerService.class);
 
-						IterateHistoryEventsResponseType resp =
-							common.iterateHistoryEvents(new IterateHistoryEventsRequestType());
+						IterateHistoryEventsResponseType resp = common.iterateHistoryEvents(new IterateHistoryEventsRequestType());
 						if (resp != null) {
 							iter = WSIterable.axisIterable(HistoryEventBundleType.class, resp.getResult(), 25);
 							for (HistoryEventBundleType bundle : iter) {
@@ -100,13 +97,10 @@ public class BESActivityTerminatorActor implements OutcallActor
 
 								HistoryEventSource source = event.eventSource();
 								if (_besName != null)
-									source =
-										new SimpleStringHistoryEventSource(String.format("BES Resource %s", _besName), null,
-											source);
+									source = new SimpleStringHistoryEventSource(String.format("BES Resource %s", _besName), null, source);
 
-								service.addRecord(_historyKey, event.eventNumber().wrapWith(parentNumber),
-									event.eventTimestamp(), event.eventCategory(), event.eventLevel(), event.eventProperties(),
-									source, event.eventData(), null);
+								service.addRecord(_historyKey, event.eventNumber().wrapWith(parentNumber), event.eventTimestamp(),
+									event.eventCategory(), event.eventLevel(), event.eventProperties(), source, event.eventData(), null);
 							}
 						}
 					}

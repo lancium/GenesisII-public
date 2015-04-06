@@ -46,10 +46,9 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 	static private Log _logger = LogFactory.getLog(LightWeightExportServiceImpl.class);
 
 	/**
-	 * checks whether the user's current credentials from the calling context is sufficient to make
-	 * them an admin on the current resource port type. this can be checked during export creation
-	 * on the parent resource, *before* we create a new resource, so we can decide whether to let
-	 * the user force a particular credential as the export owner.
+	 * checks whether the user's current credentials from the calling context is sufficient to make them an admin on the current resource port
+	 * type. this can be checked during export creation on the parent resource, *before* we create a new resource, so we can decide whether to
+	 * let the user force a particular credential as the export owner.
 	 */
 	private boolean testForAdministrativeRights()
 	{
@@ -83,8 +82,8 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 
 		if (ownerDN == null) {
 			/*
-			 * they didn't give us any hints about which identity to use as the owner/creator of the
-			 * export, so we'll go with the current preferred identity.
+			 * they didn't give us any hints about which identity to use as the owner/creator of the export, so we'll go with the current
+			 * preferred identity.
 			 */
 			PreferredIdentity prefId = PreferredIdentity.getCurrent();
 			if (prefId != null) {
@@ -96,9 +95,8 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 			}
 		} else {
 			/*
-			 * check if the user creating the export wants the owner / creator of the export to be
-			 * set forcibly. this only works if they are admin of the port (i.e. they have write
-			 * permission on it, not just execute).
+			 * check if the user creating the export wants the owner / creator of the export to be set forcibly. this only works if they are
+			 * admin of the port (i.e. they have write permission on it, not just execute).
 			 */
 			if (ownerDN.contains("force:")) {
 				ownerDN = ownerDN.substring(6);
@@ -120,14 +118,12 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 			hasAdminAccess = testForAdministrativeRights();
 			if (hasAdminAccess) {
 				/*
-				 * they passed the check as an admin. ownerDN will stay at what it is already set
-				 * to...
+				 * they passed the check as an admin. ownerDN will stay at what it is already set to...
 				 */
 				_logger.debug("ownerDN set by 'force' to: '" + ownerDN + "'");
 			} else {
 				// no go, hoser. you don't have the rights to force the owner.
-				throw new ResourceException(
-					"permission was denied for WRITE access as admin on export port type; cannot force ownership.");
+				throw new ResourceException("permission was denied for WRITE access as admin on export port type; cannot force ownership.");
 			}
 		} else {
 			// need to look the supposed creator up.
@@ -158,9 +154,8 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 				ExportControlsList ecl = ExportControlsList.getExportControlsList();
 				Set<ModeAllowance> modes;
 				/*
-				 * future: how to pick the right modes for the export based on the export's
-				 * read-only or read-write nature? currently impossible since exports are just
-				 * exports without a sense of read-only. need to add this feature in future.
+				 * future: how to pick the right modes for the export based on the export's read-only or read-write nature? currently
+				 * impossible since exports are just exports without a sense of read-only. need to add this feature in future.
 				 */
 				modes = ModeAllowance.getReadWriteMode();
 				if (!ecl.checkCreationOkay(initInfo.getPath(), owningUnixUser, modes)) {
@@ -183,8 +178,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 		key.dereference().setProperty(LightWeightExportConstants.EXPORT_MECHANISM,
 			ExportProperties.getExportProperties().getExportMechanism().toString());
 		if (_logger.isDebugEnabled())
-			_logger.debug("setting export's creation mode to: "
-				+ key.dereference().getProperty(LightWeightExportConstants.EXPORT_MECHANISM));
+			_logger.debug("setting export's creation mode to: " + key.dereference().getProperty(LightWeightExportConstants.EXPORT_MECHANISM));
 
 		// now use the fruits of our efforts on calculating the user name, if there were any.
 		if (owningUnixUser != null) {
@@ -208,8 +202,8 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 					isCompatibleOS = true;
 
 					/*
-					 * this is a very simple decision currently. if we had another OS that didn't
-					 * support sudo, we would want to exclude it here.
+					 * this is a very simple decision currently. if we had another OS that didn't support sudo, we would want to exclude it
+					 * here.
 					 */
 
 					// } else if (osName.contains("OS X") || osName.contains("")) {
@@ -218,10 +212,8 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 				}
 
 				if (!isCompatibleOS) {
-					throw FaultManipulator
-						.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Sudo export "
-								+ "unsupported on this OS") }, null));
+					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Sudo export " + "unsupported on this OS") }, null));
 				}
 
 				if (!SudoExportUtils.dirReadable(initInfo.getPath(), key)) {

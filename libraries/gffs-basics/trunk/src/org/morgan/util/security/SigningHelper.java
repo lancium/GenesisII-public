@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package org.morgan.util.security;
 
@@ -42,8 +41,8 @@ import org.morgan.util.io.StreamUtils;
  */
 public class SigningHelper
 {
-	static public byte[] signStream(InputStream in, PrivateKey k) throws NoSuchAlgorithmException, InvalidKeyException,
-		IOException, SignatureException
+	static public byte[] signStream(InputStream in, PrivateKey k) throws NoSuchAlgorithmException, InvalidKeyException, IOException,
+		SignatureException
 	{
 		Signature signer = Signature.getInstance(k.getAlgorithm());
 		signer.initSign(k);
@@ -57,8 +56,7 @@ public class SigningHelper
 	}
 
 	static public byte[] signStream(InputStream in, String keystoreAlias, String keystorePassword) throws KeyStoreException,
-		UnrecoverableKeyException, NoSuchAlgorithmException, IOException, InvalidKeyException, SignatureException,
-		CertificateException
+		UnrecoverableKeyException, NoSuchAlgorithmException, IOException, InvalidKeyException, SignatureException, CertificateException
 	{
 		FileInputStream fin = null;
 		KeyStore store = KeyStore.getInstance("JKS");
@@ -71,9 +69,8 @@ public class SigningHelper
 		return signStream(in, (PrivateKey) store.getKey(keystoreAlias, keystorePassword.toCharArray()));
 	}
 
-	static public void signFile(File input, File signatureFile, String keystoreAlias, String keystorePassword)
-		throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, InvalidKeyException,
-		SignatureException, CertificateException
+	static public void signFile(File input, File signatureFile, String keystoreAlias, String keystorePassword) throws KeyStoreException,
+		UnrecoverableKeyException, NoSuchAlgorithmException, IOException, InvalidKeyException, SignatureException, CertificateException
 	{
 		FileInputStream fin = null;
 		FileOutputStream fout = null;
@@ -89,8 +86,8 @@ public class SigningHelper
 		}
 	}
 
-	static public void signFile(File input, File signatureFile, PrivateKey key) throws KeyStoreException,
-		UnrecoverableKeyException, NoSuchAlgorithmException, IOException, InvalidKeyException, SignatureException
+	static public void signFile(File input, File signatureFile, PrivateKey key) throws KeyStoreException, UnrecoverableKeyException,
+		NoSuchAlgorithmException, IOException, InvalidKeyException, SignatureException
 	{
 		FileInputStream fin = null;
 		FileOutputStream fout = null;
@@ -106,8 +103,8 @@ public class SigningHelper
 		}
 	}
 
-	static public boolean verifySignature(InputStream in, byte[] signature, Certificate cert) throws SignatureException,
-		IOException, NoSuchAlgorithmException, InvalidKeyException
+	static public boolean verifySignature(InputStream in, byte[] signature, Certificate cert) throws SignatureException, IOException,
+		NoSuchAlgorithmException, InvalidKeyException
 	{
 		PublicKey key = cert.getPublicKey();
 		Signature signer = Signature.getInstance(key.getAlgorithm());
@@ -122,8 +119,7 @@ public class SigningHelper
 	}
 
 	static public boolean verifySignature(InputStream in, byte[] signature, String keystoreAlias, String keyStorepassword)
-		throws SignatureException, IOException, NoSuchAlgorithmException, KeyStoreException, CertificateException,
-		InvalidKeyException
+		throws SignatureException, IOException, NoSuchAlgorithmException, KeyStoreException, CertificateException, InvalidKeyException
 	{
 		FileInputStream fin = null;
 
@@ -152,8 +148,7 @@ public class SigningHelper
 	}
 
 	static public boolean verifySignature(File inputFile, File signatureFile, String keystoreAlias, String keystorePassword)
-		throws SignatureException, IOException, NoSuchAlgorithmException, KeyStoreException, CertificateException,
-		InvalidKeyException
+		throws SignatureException, IOException, NoSuchAlgorithmException, KeyStoreException, CertificateException, InvalidKeyException
 	{
 		FileInputStream fin = null;
 
@@ -166,8 +161,8 @@ public class SigningHelper
 		}
 	}
 
-	static public boolean verifySignature(File inputFile, File signatureFile, Certificate cert) throws SignatureException,
-		IOException, NoSuchAlgorithmException, InvalidKeyException
+	static public boolean verifySignature(File inputFile, File signatureFile, Certificate cert) throws SignatureException, IOException,
+		NoSuchAlgorithmException, InvalidKeyException
 	{
 		FileInputStream fin = null;
 

@@ -24,12 +24,10 @@ public class ByteIORPCache extends CommonAttributeCache
 	static private Log _logger = LogFactory.getLog(ByteIORPCache.class);
 
 	/*
-	 * When a byteIO is blocked because of rapid write/append operations, we don't want to client to
-	 * cache attributes. However, we are replacing each get-attribute call with an aggregate call
-	 * for all attributes. So if you don't cache information at least momentarily, we will miss the
-	 * opportunity to utilize the call aggregation and issue RPC for individual attributes of a
-	 * blocked ByteIO. To circumvent this problem, we use a small non-zero cache-life-time interval
-	 * for blocked byteIOs.
+	 * When a byteIO is blocked because of rapid write/append operations, we don't want to client to cache attributes. However, we are
+	 * replacing each get-attribute call with an aggregate call for all attributes. So if you don't cache information at least momentarily, we
+	 * will miss the opportunity to utilize the call aggregation and issue RPC for individual attributes of a blocked ByteIO. To circumvent
+	 * this problem, we use a small non-zero cache-life-time interval for blocked byteIOs.
 	 */
 	private static final long BLOCKED_BYTEIO_ATTRIBUTE_LIFETIME = 1000L;
 
@@ -162,10 +160,10 @@ public class ByteIORPCache extends CommonAttributeCache
 		if (cacheKey instanceof QName) {
 			QName qName = (QName) cacheKey;
 			return (qName.equals(ByteIOConstants.rxferMechs) || qName.equals(ByteIOConstants.sxferMechs)
-				|| qName.equals(ByteIOConstants.rsize) || qName.equals(ByteIOConstants.ssize)
-				|| qName.equals(ByteIOConstants.rcreatTime) || qName.equals(ByteIOConstants.screatTime)
-				|| qName.equals(ByteIOConstants.rmodTime) || qName.equals(ByteIOConstants.smodTime)
-				|| qName.equals(ByteIOConstants.raccessTime) || qName.equals(ByteIOConstants.saccessTime));
+				|| qName.equals(ByteIOConstants.rsize) || qName.equals(ByteIOConstants.ssize) || qName.equals(ByteIOConstants.rcreatTime)
+				|| qName.equals(ByteIOConstants.screatTime) || qName.equals(ByteIOConstants.rmodTime)
+				|| qName.equals(ByteIOConstants.smodTime) || qName.equals(ByteIOConstants.raccessTime) || qName
+					.equals(ByteIOConstants.saccessTime));
 		}
 		return false;
 	}
@@ -198,8 +196,7 @@ public class ByteIORPCache extends CommonAttributeCache
 	@Override
 	protected long getCacheLifeTime(URI endpointIdentifierURI)
 	{
-		WSResourceConfig resourceConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifierURI, WSResourceConfig.class);
+		WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifierURI, WSResourceConfig.class);
 		if (resourceConfig == null)
 			return cacheLifeTime;
 		if (resourceConfig.isCacheAccessBlocked())

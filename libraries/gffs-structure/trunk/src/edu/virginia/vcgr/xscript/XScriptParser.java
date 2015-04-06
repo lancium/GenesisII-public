@@ -36,8 +36,8 @@ public class XScriptParser
 		_handler.put(GridParseHandler.GRID_NS, new GridParseHandler());
 	}
 
-	static public XScript parse(XScriptEngine engine, InputSource source) throws ParserConfigurationException, SAXException,
-		IOException, ScriptException
+	static public XScript parse(XScriptEngine engine, InputSource source) throws ParserConfigurationException, SAXException, IOException,
+		ScriptException
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -61,14 +61,14 @@ public class XScriptParser
 		return new XScript(engine, handler.parse(context, element));
 	}
 
-	static public XScript parse(XScriptEngine engine, Reader reader) throws ParserConfigurationException, SAXException,
-		IOException, ScriptException
+	static public XScript parse(XScriptEngine engine, Reader reader) throws ParserConfigurationException, SAXException, IOException,
+		ScriptException
 	{
 		return parse(engine, new InputSource(reader));
 	}
 
-	static public XScript parse(XScriptEngine engine, File inputFile) throws ParserConfigurationException, SAXException,
-		IOException, ScriptException
+	static public XScript parse(XScriptEngine engine, File inputFile) throws ParserConfigurationException, SAXException, IOException,
+		ScriptException
 	{
 		FileInputStream inputStream = null;
 
@@ -84,8 +84,8 @@ public class XScriptParser
 		}
 	}
 
-	static public XScript parse(XScriptEngine engine, String script) throws ParserConfigurationException, SAXException,
-		IOException, ScriptException
+	static public XScript parse(XScriptEngine engine, String script) throws ParserConfigurationException, SAXException, IOException,
+		ScriptException
 	{
 		StringReader reader = null;
 

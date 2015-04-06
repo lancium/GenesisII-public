@@ -61,8 +61,7 @@ public abstract class AbstractContainerService implements ContainerService
 	final synchronized public void start() throws Throwable
 	{
 		if (_connectionPool == null)
-			throw new ConfigurationException("Attempt to start service \"" + _serviceName
-				+ "\" without datbase connection pool.");
+			throw new ConfigurationException("Attempt to start service \"" + _serviceName + "\" without datbase connection pool.");
 		if (_started)
 			throw new ConfigurationException("Service \"" + _serviceName + "\" has already been started.");
 

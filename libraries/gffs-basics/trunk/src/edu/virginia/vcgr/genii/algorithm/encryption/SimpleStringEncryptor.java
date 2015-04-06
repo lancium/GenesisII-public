@@ -13,8 +13,7 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 /**
- * A class that allows strings to be encrypted and decrypted using a certificate and the
- * corresponding private key.
+ * A class that allows strings to be encrypted and decrypted using a certificate and the corresponding private key.
  * 
  * @author Chris Koeritz
  */

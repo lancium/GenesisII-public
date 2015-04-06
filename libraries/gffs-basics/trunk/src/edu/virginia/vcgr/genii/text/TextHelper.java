@@ -49,8 +49,7 @@ public class TextHelper
 	static String passwdSourceChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-+=_:;<>?/~!@#$%^&*";
 
 	/**
-	 * creates a random string of numbers, letters in both cases, and a few choice special
-	 * characters.
+	 * creates a random string of numbers, letters in both cases, and a few choice special characters.
 	 */
 	public static String randomPasswordString(Random rng, int length)
 	{

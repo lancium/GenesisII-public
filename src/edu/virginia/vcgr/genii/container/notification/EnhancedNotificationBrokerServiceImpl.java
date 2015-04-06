@@ -115,34 +115,30 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 	@Override
 	public UpdateModeResponse updateMode(boolean updateModeRequest) throws RemoteException
 	{
-		NotificationBrokerDBResource resource =
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 		resource.updateModeInDB(updateModeRequest);
 		return null;
 	}
 
 	/*
-	 * The purpose of test notifications is to verify whether or not the client can directly receive
-	 * notification messages from the broker through its forwarding port. That is why the Notify
-	 * message is created directly, instead of going through subscriptions and usual publication
-	 * oriented notification mechanism. If you have used that process than it will both increase the
-	 * number of verification related RPCs, and create the chance of race condition where the client
-	 * will poll an test notification message and change its mode to direct notification.
+	 * The purpose of test notifications is to verify whether or not the client can directly receive notification messages from the broker
+	 * through its forwarding port. That is why the Notify message is created directly, instead of going through subscriptions and usual
+	 * publication oriented notification mechanism. If you have used that process than it will both increase the number of verification
+	 * related RPCs, and create the chance of race condition where the client will poll an test notification message and change its mode to
+	 * direct notification.
 	 */
 	@RWXMapping(RWXCategory.EXECUTE)
 	@Override
 	public TestNotificationResponse testNotification(TestNotificationRequest testNotificationRequest) throws RemoteException
 	{
 
-		NotificationBrokerDBResource resource =
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 
 		resource.initializeResourceFromDB();
 		EndpointReferenceType forwardingPort = resource.getForwardingPort();
 		if (forwardingPort != null) {
 			NotificationMessageHolder holder =
-				new NotificationMessageHolder(forwardingPort, getMyEPR(false), TEST_NOTIFICAION_TOPIC,
-					new TestNotificationMessageContents());
+				new NotificationMessageHolder(forwardingPort, getMyEPR(false), TEST_NOTIFICAION_TOPIC, new TestNotificationMessageContents());
 			try {
 				ICallingContext callingContext = ContextManager.getExistingContext();
 				Notify notification = new Notify(new NotificationMessageHolderType[] { holder.toAxisType() }, null);
@@ -177,8 +173,8 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			EndpointReferenceType subscriptionReference = subscription.subscriptionReference();
 			response[0] =
 				new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
-					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
-					NotificationBrokerConstants.RNS_CONTENT_CHANGE_SUBSCRIPTION) }, subscriptionReference);
+					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE, NotificationBrokerConstants.RNS_CONTENT_CHANGE_SUBSCRIPTION) },
+					subscriptionReference);
 
 			// Subscribe to attributes update on byteIOs that are children of the directory
 			// represented by the
@@ -188,15 +184,13 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			subscriptionReference = subscription.subscriptionReference();
 			response[1] =
-				new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
-					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
-					NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION) }, subscriptionReference);
+				new IndirectSubscriptionEntryType(
+					new MessageElement[] { new MessageElement(NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+						NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 
 			/*
-			 * Subscribe to authorization parameter update on the RNS resources and byteIOs that are
-			 * children of the directory represented by the RNS resource. For byteIOs this
-			 * subscription works for only those that are in the same container as this RNS
-			 * resource.
+			 * Subscribe to authorization parameter update on the RNS resources and byteIOs that are children of the directory represented by
+			 * the RNS resource. For byteIOs this subscription works for only those that are in the same container as this RNS resource.
 			 */
 			topicFilter = GenesisIIBaseTopics.AUTHZ_CONFIG_UPDATE_TOPIC.asConcreteQueryExpression();
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
@@ -213,8 +207,7 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			throw subscriptionFault;
 		}
 
-		NotificationBrokerDBResource resource =
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 
 		long subscriptionEndTime = System.currentTimeMillis() + subscriptionLifeTime + SUBSCRIPTION_TERMINATION_SAFETY_INTERVAL;
 		resource.storeSubscriptionTracesInDB(extractSubscriptionEPIs(response), publisher, subscriptionEndTime);
@@ -224,11 +217,9 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 
 	@RWXMapping(RWXCategory.READ)
 	@Override
-	public GetMessagesResponse getUnreadMessages(BigInteger getUnreadMessagesRequest) throws RemoteException,
-		MessageMissedFaultType
+	public GetMessagesResponse getUnreadMessages(BigInteger getUnreadMessagesRequest) throws RemoteException, MessageMissedFaultType
 	{
-		NotificationBrokerDBResource resource =
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 		resource.loadMessageIndexFromDB();
 		int messageIndex = resource.getMessageIndex();
 		int clientsMessageIndex = getUnreadMessagesRequest.intValue();
@@ -262,12 +253,11 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 
 	@RWXMapping(RWXCategory.READ)
 	@Override
-	public GetMessagesResponse getMessages(GetMessages getMessagesRequest) throws RemoteException,
-		UnableToGetMessagesFaultType, ResourceUnknownFaultType
+	public GetMessagesResponse getMessages(GetMessages getMessagesRequest) throws RemoteException, UnableToGetMessagesFaultType,
+		ResourceUnknownFaultType
 	{
 
-		NotificationBrokerDBResource resource =
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 		NotificationBrokerMessageManager manager = NotificationBrokerMessageManager.getManager();
 		List<OnHoldNotificationMessage> unsentMessages = manager.getMessageQueueOfBroker(resource.getKey());
 		resource.loadMessageIndexFromDB();
@@ -294,8 +284,7 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 	public void notify(Notify msg) throws RemoteException
 	{
 
-		NotificationBrokerDBResource resource =
-			(NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
+		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();
 		resource.initializeResourceFromDB();
 
 		EndpointReferenceType forwardingPort = resource.getForwardingPort();

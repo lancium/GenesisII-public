@@ -5,8 +5,8 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 
 /**
- * This is a resource property translator interface that is used for any translator that can
- * translate single XML elements to and from resource property objects.
+ * This is a resource property translator interface that is used for any translator that can translate single XML elements to and from
+ * resource property objects.
  * 
  * @author mmm2a
  */

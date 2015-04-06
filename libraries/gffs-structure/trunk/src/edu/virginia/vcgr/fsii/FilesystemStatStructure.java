@@ -17,8 +17,8 @@ public class FilesystemStatStructure
 
 	private Permissions _permissions;
 
-	public FilesystemStatStructure(int inode, String name, FilesystemEntryType entryType, long size, long created,
-		long lastModified, long lastAcceessed, Permissions permissions)
+	public FilesystemStatStructure(int inode, String name, FilesystemEntryType entryType, long size, long created, long lastModified,
+		long lastAcceessed, Permissions permissions)
 	{
 		_inode = inode;
 		_name = name;

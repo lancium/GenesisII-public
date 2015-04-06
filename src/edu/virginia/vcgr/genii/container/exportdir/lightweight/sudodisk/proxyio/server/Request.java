@@ -36,13 +36,12 @@ public class Request
 		System.arraycopy(args, 0, _args, 0, args.length);
 
 		/*
-		 * PSFileWriter.writeToFile("Creating request with type : " + type + " cmd = " + cmd +
-		 * " path = " + path + " write buf len = " + _writeBufLen) ; for (int ii=0; ii< args.length;
-		 * ii++) { PSFileWriter.writeToFile("arg["+ii+"] : " + args[ii]); }
+		 * PSFileWriter.writeToFile("Creating request with type : " + type + " cmd = " + cmd + " path = " + path + " write buf len = " +
+		 * _writeBufLen) ; for (int ii=0; ii< args.length; ii++) { PSFileWriter.writeToFile("arg["+ii+"] : " + args[ii]); }
 		 */
 
 	}
-	
+
 	public String toString()
 	{
 		StringBuilder toReturn = new StringBuilder();
@@ -54,7 +53,7 @@ public class Request
 		toReturn.append(_path);
 		return toReturn.toString();
 	}
-	
+
 	public int getWriteBufSize()
 	{
 		return _writeBufLen;
@@ -115,8 +114,7 @@ public class Request
 	private void handleFileOp(Socket socket)
 	{
 		if (_cmd == null) {
-			DefaultResponse.send(socket, ErrorCode.INVALID_CMD_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_CMD_CODE));
+			DefaultResponse.send(socket, ErrorCode.INVALID_CMD_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_CMD_CODE));
 		}
 
 		// PSFileWriter.writeToFile("Proxy Server: Handling file operation");
@@ -140,8 +138,7 @@ public class Request
 		} else if (_cmd.equalsIgnoreCase(Constants.FILE_DOESEXIST_CMD)) {
 			FileHandler.isExists(_path, socket);
 		} else {
-			DefaultResponse.send(socket, ErrorCode.INVALID_CMD_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_CMD_CODE));
+			DefaultResponse.send(socket, ErrorCode.INVALID_CMD_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_CMD_CODE));
 		}
 	}
 
@@ -154,8 +151,7 @@ public class Request
 	private void handleDirOp(Socket socket)
 	{
 		if (_cmd == null) {
-			DefaultResponse.send(socket, ErrorCode.INVALID_CMD_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_CMD_CODE));
+			DefaultResponse.send(socket, ErrorCode.INVALID_CMD_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_CMD_CODE));
 		}
 
 		// PSFileWriter.writeToFile("Proxy Server: Handling dir operation");
@@ -175,8 +171,7 @@ public class Request
 		} else if (_cmd.equalsIgnoreCase(Constants.DIR_DOESEXIST_CMD)) {
 			DirHandler.isExists(_path, socket);
 		} else {
-			DefaultResponse.send(socket, ErrorCode.INVALID_CMD_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_CMD_CODE));
+			DefaultResponse.send(socket, ErrorCode.INVALID_CMD_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.INVALID_CMD_CODE));
 		}
 
 	}

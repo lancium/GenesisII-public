@@ -52,8 +52,7 @@ public class BESConstants
 	static public final String LOCAL_RESOURCE_MANAGER_TYPE_GRID_QUEUE = LOCAL_RESOURCE_MANAGER_TYPE_BASE + "grid-queue";
 
 	public final String CONFIG_PROPERTY_WORKER_DIR = "edu.virginia.vcgr.genii.container.bes.worker-dir";
-	public final String CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE =
-		"edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override";
+	public final String CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE = "edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override";
 
 	static public final String POLICY_RESOURCE_PROPERTY_NAME = "Policy";
 	static public final String THRESHOLD_RESOURCE_PROPERTY_NAME = "Threshold";

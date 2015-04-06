@@ -25,14 +25,12 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 public class FileDisplayPlugin extends AbstractUITabPlugin
 {
 	/*
-	 * how large of a text chunk we will fling at the window for display. this is carefully chosen
-	 * to avoid swamping the UI.
+	 * how large of a text chunk we will fling at the window for display. this is carefully chosen to avoid swamping the UI.
 	 */
 	static final private int BUFFER_SIZE = 32 * 1024; // 32k chunks.
 
 	/*
-	 * interval between blasts of text updates. these are also carefully chosen to avoid swamping
-	 * the UI.
+	 * interval between blasts of text updates. these are also carefully chosen to avoid swamping the UI.
 	 */
 	static final private int LAUNCHER_SNOOZE_DURATION = 100;
 	static final private int UPDATER_SNOOZE_DURATION = 10;
@@ -92,8 +90,7 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 			// start the busy spinner since app is going to block on IO.
 			GuiStatusTools.showApplicationIsBusy(_widget);
 
-			SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.UPDATING_STYLE, "Reading file contents...", _widget,
-				false));
+			SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.UPDATING_STYLE, "Reading file contents...", _widget, false));
 
 			StringBuilder builder = new StringBuilder();
 			char[] data = new char[BUFFER_SIZE];
@@ -113,8 +110,7 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 							SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.PLAIN_STYLE, "", _widget, false));
 							readAnything = true; // now we have.
 						}
-						SwingUtilities.invokeLater(new DocumentUpdater(true, _widget.PLAIN_STYLE, builder.toString(), _widget,
-							false));
+						SwingUtilities.invokeLater(new DocumentUpdater(true, _widget.PLAIN_STYLE, builder.toString(), _widget, false));
 						builder.delete(0, builder.length());
 					}
 					if (!reader.ready()) {
@@ -142,8 +138,8 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 					SwingUtilities.invokeLater(new DocumentUpdater(true, _widget.PLAIN_STYLE, "", _widget, true));
 				}
 			} catch (Throwable e) {
-				SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.ERROR_STYLE, "Unable to read file contents:  "
-					+ e, _widget, true));
+				SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.ERROR_STYLE, "Unable to read file contents:  " + e, _widget,
+					true));
 			} finally {
 				StreamUtils.close(reader);
 				StreamUtils.close(in);
@@ -172,9 +168,8 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 		public void run()
 		{
 			/*
-			 * it seems like the busy spinner can still disappear before the app is responsive
-			 * again, so this is intended to keep the busy cursor turned on until all the updates
-			 * are finished.
+			 * it seems like the busy spinner can still disappear before the app is responsive again, so this is intended to keep the busy
+			 * cursor turned on until all the updates are finished.
 			 */
 			GuiStatusTools.showApplicationIsBusy(_widget);
 
@@ -204,8 +199,7 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 					// ensure that we're trashing our temporaries.
 					System.gc();
 					/*
-					 * snooze to yield the processor here also, which should allow some of the
-					 * queued updates to occur.
+					 * snooze to yield the processor here also, which should allow some of the queued updates to occur.
 					 */
 					Thread.sleep(UPDATER_SNOOZE_DURATION);
 				} catch (InterruptedException e) {

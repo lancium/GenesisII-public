@@ -47,8 +47,8 @@ public class GuiCheckBoxDialog extends AbstractGuiDialog implements CheckBoxDial
 				GridBagConstraints.NONE, new Insets(1, 1, 1, 1), 1, 1));
 		}
 
-		panel.add(new JLabel(prompt), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JLabel(prompt), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0, GridBagConstraints.WEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}

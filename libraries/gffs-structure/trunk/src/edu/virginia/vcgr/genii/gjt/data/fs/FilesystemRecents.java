@@ -26,8 +26,7 @@ public class FilesystemRecents
 	static private final String KEY_FORMAT = "recent-filesystem.%d";
 	static private final int MAX_RECENTS = 8;
 
-	static private Map<FilesystemType, FilesystemRecents> _recents = new EnumMap<FilesystemType, FilesystemRecents>(
-		FilesystemType.class);
+	static private Map<FilesystemType, FilesystemRecents> _recents = new EnumMap<FilesystemType, FilesystemRecents>(FilesystemType.class);
 
 	static private byte[] toBytes(Duple<Calendar, Filesystem> entry) throws IOException
 	{
@@ -88,8 +87,7 @@ public class FilesystemRecents
 
 		for (int lcv = 0; lcv < MAX_RECENTS; lcv++) {
 			try {
-				Duple<Calendar, Filesystem> entry =
-					fromBytes(_preferenceNode.getByteArray(String.format(KEY_FORMAT, lcv), null));
+				Duple<Calendar, Filesystem> entry = fromBytes(_preferenceNode.getByteArray(String.format(KEY_FORMAT, lcv), null));
 				if (entry == null)
 					break;
 

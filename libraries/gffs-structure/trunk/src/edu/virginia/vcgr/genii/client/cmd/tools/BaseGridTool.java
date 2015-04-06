@@ -59,8 +59,8 @@ public abstract class BaseGridTool implements ITool
 	protected static long _credentialValidMillis = SecurityConstants.defaultCredentialExpirationMillis;
 
 	/*
-	 * tracks the last command's exit value. this is managed per-program instance. zero implies
-	 * success of last operation; any other value implies a failure.
+	 * tracks the last command's exit value. this is managed per-program instance. zero implies success of last operation; any other value
+	 * implies a failure.
 	 */
 	private static int _lastExit = 0;
 
@@ -75,8 +75,7 @@ public abstract class BaseGridTool implements ITool
 		_isHidden = isHidden;
 	}
 
-	protected BaseGridTool(LoadFileResource descriptionResource, LoadFileResource usageResource, boolean isHidden,
-		ToolCategory cat)
+	protected BaseGridTool(LoadFileResource descriptionResource, LoadFileResource usageResource, boolean isHidden, ToolCategory cat)
 	{
 		this(readResource(descriptionResource), readResource(usageResource), isHidden);
 		_category = cat;
@@ -91,9 +90,8 @@ public abstract class BaseGridTool implements ITool
 
 	// future: ugly, but true. the set of exceptions returned here should be reduced.
 	protected abstract int runCommand() throws ReloadShellException /* necessary */, ToolException /* necessary */,
-		UserCancelException /* necessary */, RNSException /* necessary */, GenesisIISecurityException,
-		IOException /* necessary */, ResourcePropertyException, CreationException, ClassNotFoundException /* necessary */,
-		DialogException;
+		UserCancelException /* necessary */, RNSException /* necessary */, GenesisIISecurityException, IOException /* necessary */,
+		ResourcePropertyException, CreationException, ClassNotFoundException /* necessary */, DialogException;
 
 	protected boolean useGui()
 	{
@@ -118,8 +116,8 @@ public abstract class BaseGridTool implements ITool
 		return lookup(RNSPath.getCurrent(), path);
 	}
 
-	static protected RNSPath lookup(RNSPath parent, GeniiPath path, RNSPathQueryFlags queryFlags)
-		throws InvalidToolUsageException, RNSPathDoesNotExistException, RNSPathAlreadyExistsException
+	static protected RNSPath lookup(RNSPath parent, GeniiPath path, RNSPathQueryFlags queryFlags) throws InvalidToolUsageException,
+		RNSPathDoesNotExistException, RNSPathAlreadyExistsException
 	{
 		if (path.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException(String.format("%s is not a grid path!", path));
@@ -218,9 +216,7 @@ public abstract class BaseGridTool implements ITool
 			String failedAsset = PermissionDeniedException.extractAssetDenied(e.getMessage());
 			String msg;
 			if ((operation != null) && (failedAsset != null))
-				msg =
-					e.getLocalizedMessage() + "; permission denied on \"" + failedAsset + "\" (in method \"" + operation
-						+ "\")";
+				msg = e.getLocalizedMessage() + "; permission denied on \"" + failedAsset + "\" (in method \"" + operation + "\")";
 			else
 				msg = "an odd permission denied exception occurred: " + e.getLocalizedMessage();
 			_logger.info(msg);
@@ -285,8 +281,7 @@ public abstract class BaseGridTool implements ITool
 	}
 
 	/**
-	 * returns a Date object representing when our self-signed credentials should expire, if they
-	 * are not created yet.
+	 * returns a Date object representing when our self-signed credentials should expire, if they are not created yet.
 	 */
 	static public Date credsValidUntil()
 	{
@@ -394,8 +389,7 @@ public abstract class BaseGridTool implements ITool
 		return expandSingleton(current, pathExpression, null);
 	}
 
-	protected RNSPath expandSingleton(RNSPath current, String pathExpression, FilterFactory factoryType)
-		throws InvalidToolUsageException
+	protected RNSPath expandSingleton(RNSPath current, String pathExpression, FilterFactory factoryType) throws InvalidToolUsageException
 	{
 		if (current == null)
 			current = RNSPath.getCurrent();

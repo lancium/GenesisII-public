@@ -12,8 +12,8 @@ import org.morgan.util.io.DataTransferStatistics;
 
 public class ScpUtility
 {
-	static public DataTransferStatistics put(File localFile, String user, String password, String host, int port,
-		String remotePath, boolean useSFTP) throws IOException
+	static public DataTransferStatistics put(File localFile, String user, String password, String host, int port, String remotePath,
+		boolean useSFTP) throws IOException
 	{
 		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
 
@@ -33,8 +33,8 @@ public class ScpUtility
 
 	static private Pattern FNF_PATTERN = Pattern.compile("scp: .*: No such file or directory");
 
-	static public DataTransferStatistics get(File localFile, String user, String password, String host, int port,
-		String remotePath, boolean useSFTP) throws IOException
+	static public DataTransferStatistics get(File localFile, String user, String password, String host, int port, String remotePath,
+		boolean useSFTP) throws IOException
 	{
 		try {
 			DataTransferStatistics stats = DataTransferStatistics.startTransfer();

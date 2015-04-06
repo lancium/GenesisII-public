@@ -17,8 +17,8 @@ class DefaultHistoryContext extends AbstractHistoryContext
 	private HistoryEventSource _source;
 	private Long _ttl = null;
 
-	DefaultHistoryContext(String resourceID, Map<String, String> properties, HistoryEventCategory category,
-		HistoryEventSource source, Long ttl)
+	DefaultHistoryContext(String resourceID, Map<String, String> properties, HistoryEventCategory category, HistoryEventSource source,
+		Long ttl)
 	{
 		super(properties, category);
 

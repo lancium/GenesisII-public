@@ -30,8 +30,8 @@ public class GeniiFileSyncRunner implements ResourceSyncRunner
 	static private Log _logger = LogFactory.getLog(GeniiFileSyncRunner.class);
 	static private final int _DEFAULT_BUFFER_SIZE = 1024 * 8;
 
-	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR,
-		ReplicationThread replicator) throws Throwable
+	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR, ReplicationThread replicator)
+		throws Throwable
 	{
 		IRByteIOResource resource = (IRByteIOResource) vResource;
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, primaryEPR);

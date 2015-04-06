@@ -64,12 +64,10 @@ public class EPRUtils
 		Pattern.quote(GENII_SHORT_PARAMETER_NAME)));
 
 	/**
-	 * Generates a temporary EPR to (hopefully) obtain the full (incl. porttypes, certs, etc.) EPR
-	 * from the service's attributes. The full one is returned if available, otherwise the temporary
-	 * one is returned.
+	 * Generates a temporary EPR to (hopefully) obtain the full (incl. porttypes, certs, etc.) EPR from the service's attributes. The full one
+	 * is returned if available, otherwise the temporary one is returned.
 	 * 
-	 * Some checking of URIs may be required to ensure that a man-in-the-middle attack has not
-	 * occured
+	 * Some checking of URIs may be required to ensure that a man-in-the-middle attack has not occured
 	 * 
 	 * @param serviceURL
 	 * @return The EPR for the service indicated.
@@ -99,12 +97,10 @@ public class EPRUtils
 	}
 
 	/**
-	 * Generates a temporary EPR to (hopefully) obtain the full (incl. porttypes, certs, etc.) EPR
-	 * from the service's attributes. The full one is returned if available, otherwise the temporary
-	 * one is returned.
+	 * Generates a temporary EPR to (hopefully) obtain the full (incl. porttypes, certs, etc.) EPR from the service's attributes. The full one
+	 * is returned if available, otherwise the temporary one is returned.
 	 * 
-	 * Some checking of URIs may be required to ensure that a man-in-the-middle attack has not
-	 * occured
+	 * Some checking of URIs may be required to ensure that a man-in-the-middle attack has not occured
 	 * 
 	 * @param serviceURL
 	 * @return The EPR for the service indicated.
@@ -168,8 +164,7 @@ public class EPRUtils
 		return null;
 	}
 
-	static public MessageLevelSecurityRequirements extractMinMessageSecurity(EndpointReferenceType epr)
-		throws AuthZSecurityException
+	static public MessageLevelSecurityRequirements extractMinMessageSecurity(EndpointReferenceType epr) throws AuthZSecurityException
 	{
 
 		MetadataType mdt = epr.getMetadata();
@@ -181,8 +176,7 @@ public class EPRUtils
 
 		for (MessageElement element : elements) {
 
-			if (element.getQName().equals(
-				new QName(PolicyAttachment.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyAttachment"))) {
+			if (element.getQName().equals(new QName(PolicyAttachment.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyAttachment"))) {
 
 				// OGSA Secure Addressing compliant security requirements
 				try {
@@ -209,21 +203,15 @@ public class EPRUtils
 						if (attachmentElement.getQName().equals(
 							new QName(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference"))) {
 
-							PolicyReference policyReference =
-								(PolicyReference) attachmentElement.getObjectValue(PolicyReference.class);
-							if (policyReference.getURI().equals(
-								new org.apache.axis.types.URI(SecurityConstants.MUTUAL_X509_URI))) {
-								retval =
-									retval.computeUnion(new MessageLevelSecurityRequirements(
-										MessageLevelSecurityRequirements.SIGN));
+							PolicyReference policyReference = (PolicyReference) attachmentElement.getObjectValue(PolicyReference.class);
+							if (policyReference.getURI().equals(new org.apache.axis.types.URI(SecurityConstants.MUTUAL_X509_URI))) {
+								retval = retval.computeUnion(new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.SIGN));
 							}
 
 						} else if (attachmentElement.getQName().equals(
 							new QName(SePartsType.getTypeDesc().getXmlType().getNamespaceURI(), "EncryptedParts"))) {
 
-							retval =
-								retval.computeUnion(new MessageLevelSecurityRequirements(
-									MessageLevelSecurityRequirements.ENCRYPT));
+							retval = retval.computeUnion(new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.ENCRYPT));
 						}
 					}
 
@@ -306,8 +294,8 @@ public class EPRUtils
 		try {
 			Blob blob = new SerialBlob(toBytes(epr));
 			if (_logger.isTraceEnabled())
-				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a "
-					+ "max length of %d bytes.", blob.length(), tableName, columnName, maxLength));
+				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a " + "max length of %d bytes.",
+					blob.length(), tableName, columnName, maxLength));
 			if (blob.length() > maxLength) {
 				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
 					+ "but the maximum length for that column is %d bytes.", blob.length(), tableName, columnName, maxLength));
@@ -406,14 +394,14 @@ public class EPRUtils
 
 	static public boolean isUnboundEPR(EndpointReferenceType epr)
 	{
-		return ((epr.getAddress() == null) || (epr.getAddress().get_value() == null) || (epr.getAddress().get_value()
-			.toString().equals(WSName.UNBOUND_ADDRESS)));
+		return ((epr.getAddress() == null) || (epr.getAddress().get_value() == null) || (epr.getAddress().get_value().toString()
+			.equals(WSName.UNBOUND_ADDRESS)));
 	}
 
 	static public EndpointReferenceType makeUnboundEPR(EndpointReferenceType epr)
 	{
-		return new EndpointReferenceType(new org.ws.addressing.AttributedURIType(WSName.UNBOUND_ADDRESS),
-			epr.getReferenceParameters(), epr.getMetadata(), epr.get_any());
+		return new EndpointReferenceType(new org.ws.addressing.AttributedURIType(WSName.UNBOUND_ADDRESS), epr.getReferenceParameters(),
+			epr.getMetadata(), epr.get_any());
 	}
 
 	static public boolean isCommunicable(EndpointReferenceType epr)

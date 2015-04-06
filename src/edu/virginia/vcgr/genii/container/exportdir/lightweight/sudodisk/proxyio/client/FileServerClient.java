@@ -33,8 +33,7 @@ public class FileServerClient
 {
 	static private Log _logger = LogFactory.getLog(FileServerClient.class);
 
-	public static ReadResponse read(String path, long offset, long numBytes, byte[] nonce, int port)
-		throws UnknownHostException, IOException
+	public static ReadResponse read(String path, long offset, long numBytes, byte[] nonce, int port) throws UnknownHostException, IOException
 	{
 
 		if (path == null) {
@@ -63,8 +62,7 @@ public class FileServerClient
 		return rr;
 	}
 
-	public static DefaultResponse write(String path, byte[] wb, long offset, byte[] nonce, int port)
-		throws UnknownHostException, IOException
+	public static DefaultResponse write(String path, byte[] wb, long offset, byte[] nonce, int port) throws UnknownHostException, IOException
 	{
 
 		if (path == null) {
@@ -91,8 +89,8 @@ public class FileServerClient
 		}
 	}
 
-	public static DefaultResponse truncAppend(String path, byte[] wb, long offset, byte[] nonce, int port)
-		throws UnknownHostException, IOException
+	public static DefaultResponse truncAppend(String path, byte[] wb, long offset, byte[] nonce, int port) throws UnknownHostException,
+		IOException
 	{
 
 		if (path == null) {
@@ -284,8 +282,7 @@ public class FileServerClient
 		}
 	}
 
-	public static DefaultResponse canRead(String path, byte[] nonce, int port, PathType pt) throws UnknownHostException,
-		IOException
+	public static DefaultResponse canRead(String path, byte[] nonce, int port, PathType pt) throws UnknownHostException, IOException
 	{
 
 		if (path == null) {
@@ -321,8 +318,7 @@ public class FileServerClient
 
 	}
 
-	public static DefaultResponse exists(String path, byte[] nonce, int port, PathType pt) throws UnknownHostException,
-		IOException
+	public static DefaultResponse exists(String path, byte[] nonce, int port, PathType pt) throws UnknownHostException, IOException
 	{
 
 		if (path == null) {
@@ -358,8 +354,7 @@ public class FileServerClient
 
 	}
 
-	public static DefaultResponse canWrite(String path, byte[] nonce, int port, PathType pt) throws UnknownHostException,
-		IOException
+	public static DefaultResponse canWrite(String path, byte[] nonce, int port, PathType pt) throws UnknownHostException, IOException
 	{
 
 		if (path == null) {

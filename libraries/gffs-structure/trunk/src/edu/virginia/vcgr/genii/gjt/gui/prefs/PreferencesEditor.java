@@ -41,25 +41,24 @@ public class PreferencesEditor extends JDialog
 		_paramSweepLimit.setValue(preferences.preference(ToolPreference.ParameterSweepPopupLimit));
 		_limitOperatingSystemChoices.setSelected(((Boolean) preferences.preference(ToolPreference.LimitOperatingSystemChoices))
 			.booleanValue());
-		_limitProcessorChoices.setSelected(((Boolean) preferences.preference(ToolPreference.LimitProcessorArchitectures))
-			.booleanValue());
+		_limitProcessorChoices.setSelected(((Boolean) preferences.preference(ToolPreference.LimitProcessorArchitectures)).booleanValue());
 
-		container.add(_popupForWarnings, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST,
+		container.add(_popupForWarnings, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JLabel("Parameter Sweep Warning Limit"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(new JLabel("Parameter Sweep Warning Limit"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		container.add(_paramSweepLimit, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		container.add(_limitOperatingSystemChoices, new GridBagConstraints(0, 2, 2, 1, 1.0, 0.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(_limitProcessorChoices, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_limitProcessorChoices, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		JButton button = new JButton(new OKAction(preferences));
 		getRootPane().setDefaultButton(button);
 
-		container.add(ButtonPanel.createHorizontalPanel(button, new CancelAction()), new GridBagConstraints(0, 4, 2, 1, 1.0,
-			1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(ButtonPanel.createHorizontalPanel(button, new CancelAction()), new GridBagConstraints(0, 4, 2, 1, 1.0, 1.0,
+			GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	private class OKAction extends AbstractAction

@@ -78,8 +78,7 @@ public class IDPLoginTool extends BaseLoginTool
 		overrideCategory(ToolCategory.SECURITY);
 	}
 
-	public static ArrayList<NuCredential> extractAssertions(RequestSecurityTokenResponseType reponseMessage)
-		throws ToolException
+	public static ArrayList<NuCredential> extractAssertions(RequestSecurityTokenResponseType reponseMessage) throws ToolException
 	{
 		ArrayList<NuCredential> toReturn = new ArrayList<NuCredential>();
 
@@ -121,11 +120,11 @@ public class IDPLoginTool extends BaseLoginTool
 	}
 
 	/**
-	 * Calls requestSecurityToken2() on the specified idp. If delegateAttribute is non-null, the
-	 * returned tokens are delegated to that identity (the common-case).
+	 * Calls requestSecurityToken2() on the specified idp. If delegateAttribute is non-null, the returned tokens are delegated to that
+	 * identity (the common-case).
 	 */
-	public static ArrayList<NuCredential> doIdpLogin(EndpointReferenceType idpEpr, long validMillis,
-		X509Certificate[] delegateeIdentity) throws AuthZSecurityException, IOException, ToolException
+	public static ArrayList<NuCredential> doIdpLogin(EndpointReferenceType idpEpr, long validMillis, X509Certificate[] delegateeIdentity)
+		throws AuthZSecurityException, IOException, ToolException
 	{
 
 		// get the calling context (or create one if necessary)
@@ -141,8 +140,8 @@ public class IDPLoginTool extends BaseLoginTool
 
 		// Add RequestType element
 		MessageElement element =
-			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestType"),
-				new RequestTypeOpenEnum(RequestTypeEnum._value1));
+			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestType"), new RequestTypeOpenEnum(
+				RequestTypeEnum._value1));
 		element.setType(RequestTypeOpenEnum.getTypeDesc().getXmlType());
 		elements.add(element);
 
@@ -151,35 +150,32 @@ public class IDPLoginTool extends BaseLoginTool
 		zulu.setTimeZone(TimeZone.getTimeZone("ZULU"));
 		element =
 			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "Lifetime"), new LifetimeType(
-				new AttributedDateTime(zulu.format(new Date(System.currentTimeMillis()
-					- SecurityConstants.CredentialGoodFromOffset))), new AttributedDateTime(zulu.format(new Date(System
-					.currentTimeMillis() + validMillis)))));
+				new AttributedDateTime(zulu.format(new Date(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset))),
+				new AttributedDateTime(zulu.format(new Date(System.currentTimeMillis() + validMillis)))));
 		element.setType(LifetimeType.getTypeDesc().getXmlType());
 		elements.add(element);
 
 		/*
-		 * add the x509 session certificate here that the container should delegate to so we can get
-		 * work done. this is our identity on the network.
+		 * add the x509 session certificate here that the container should delegate to so we can get work done. this is our identity on the
+		 * network.
 		 */
 		if (delegateeIdentity != null) {
 			try {
 				MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
-				binaryToken.setAttributeNS(null, "ValueType",
-					edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE);
+				binaryToken.setAttributeNS(null, "ValueType", edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE);
 				binaryToken.addTextNode("");
 				BinarySecurity bstToken = new X509Security(binaryToken);
 				((X509Security) bstToken).setX509Certificate(delegateeIdentity[0]);
 
-				MessageElement embedded =
-					new MessageElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+				MessageElement embedded = new MessageElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
 				embedded.addChild(binaryToken);
 
 				MessageElement wseTokenRef = new MessageElement(GenesisIIConstants.WSSE11_NS_SECURITY_QNAME);
 				wseTokenRef.addChild(embedded);
 
 				element =
-					new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "DelegateTo"),
-						new DelegateToType(new MessageElement[] { wseTokenRef }));
+					new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "DelegateTo"), new DelegateToType(
+						new MessageElement[] { wseTokenRef }));
 				element.setType(DelegateToType.getTypeDesc().getXmlType());
 				elements.add(element);
 				if (_logger.isDebugEnabled())
@@ -208,8 +204,7 @@ public class IDPLoginTool extends BaseLoginTool
 			}
 
 			/*
-			 * set the preferred identity based on any new USER credential that was found, but only
-			 * if there is no current preferred identity.
+			 * set the preferred identity based on any new USER credential that was found, but only if there is no current preferred identity.
 			 */
 			if (!PreferredIdentity.existsInCurrent()) {
 				CredentialWallet tempWallet = new CredentialWallet(retval);
@@ -228,8 +223,8 @@ public class IDPLoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		_authnUri = getArgument(0);
 		URI authnSource;
@@ -248,13 +243,11 @@ public class IDPLoginTool extends BaseLoginTool
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 
 		/*
-		 * we're going to use the WS-TRUST token-issue operation to log in to a security tokens
-		 * service.
+		 * we're going to use the WS-TRUST token-issue operation to log in to a security tokens service.
 		 */
 		KeyAndCertMaterial clientKeyMaterial =
 			ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
-		RNSPath authnPath =
-			callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
+		RNSPath authnPath = callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
 		EndpointReferenceType epr = authnPath.getEndpoint();
 
 		// log in

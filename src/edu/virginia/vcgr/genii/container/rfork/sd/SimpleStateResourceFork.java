@@ -13,32 +13,29 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.rwx.RWXMappingResolver;
 
 /**
- * The SimpleStateResourceFork is an implementation of the StreamableByteIOFactory fork which can
- * automatically get and or set a piece of state information based off of having data cat'ted into
- * it or from it.
+ * The SimpleStateResourceFork is an implementation of the StreamableByteIOFactory fork which can automatically get and or set a piece of
+ * state information based off of having data cat'ted into it or from it.
  * 
- * This class has a further restriction in that when a user inherits from this class, he or she MUST
- * supply a StateDescription annotation describing this piece of state.
+ * This class has a further restriction in that when a user inherits from this class, he or she MUST supply a StateDescription annotation
+ * describing this piece of state.
  * 
  * @author mmm2a
  * 
  * @param <StateType>
- *            This is any state type that you want. The only restriction is that you must have a
- *            translater that can translate to and from this state type.
+ *            This is any state type that you want. The only restriction is that you must have a translater that can translate to and from
+ *            this state type.
  */
 public abstract class SimpleStateResourceFork<StateType> extends AbstractStreamableByteIOFactoryResourceFork
 {
 	static private Log _logger = LogFactory.getLog(SimpleStateResourceFork.class);
 
 	/**
-	 * The user overrides this method to implement the get version of the state variable. If the
-	 * user describes this state fork as non-readable, then this method is guaranteed never to be
-	 * called.
+	 * The user overrides this method to implement the get version of the state variable. If the user describes this state fork as
+	 * non-readable, then this method is guaranteed never to be called.
 	 * 
 	 * @return The state variable as it currently exists.
 	 * @throws Throwable
-	 *             We allow the user to throw anything he or she wishes and we translate for them
-	 *             later.
+	 *             We allow the user to throw anything he or she wishes and we translate for them later.
 	 */
 	protected abstract StateType get() throws Throwable;
 
@@ -50,8 +47,7 @@ public abstract class SimpleStateResourceFork<StateType> extends AbstractStreama
 	{
 		StateDescription description = getClass().getAnnotation(StateDescription.class);
 		if (description == null)
-			throw new IOException("Missing required annotation \"StateDescription\" " + "on class \"" + getClass().getName()
-				+ "\".");
+			throw new IOException("Missing required annotation \"StateDescription\" " + "on class \"" + getClass().getName() + "\".");
 
 		return description;
 	}

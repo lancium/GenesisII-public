@@ -22,8 +22,8 @@ public class RandomByteIOFileDescriptor extends AbstractFileDescriptor
 	private RandomByteIOTransferer _transferer;
 	private long _offset = 0;
 
-	public RandomByteIOFileDescriptor(EndpointReferenceType epr, boolean isReadable, boolean isWriteable, boolean isAppend,
-		boolean isTruncate) throws OGRSHException
+	public RandomByteIOFileDescriptor(EndpointReferenceType epr, boolean isReadable, boolean isWriteable, boolean isAppend, boolean isTruncate)
+		throws OGRSHException
 	{
 		super(isReadable, isWriteable, isAppend);
 

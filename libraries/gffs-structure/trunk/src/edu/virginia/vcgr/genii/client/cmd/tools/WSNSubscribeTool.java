@@ -56,8 +56,7 @@ public class WSNSubscribeTool extends BaseGridTool
 	private SimpleNamespaceContext _context = new SimpleNamespaceContext();
 	private TopicQueryExpression _filter = null;
 
-	private void subscribe(GeniiPath publisher, GeniiPath subscriber) throws SubscribeException, RNSPathAlreadyExistsException,
-		RNSException
+	private void subscribe(GeniiPath publisher, GeniiPath subscriber) throws SubscribeException, RNSPathAlreadyExistsException, RNSException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath publisherPath = current.lookup(publisher.path());
@@ -129,8 +128,8 @@ public class WSNSubscribeTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 		GeniiPath publisher = new GeniiPath(getArgument(0));
 		if (publisher.pathType() != GeniiPathType.Grid)

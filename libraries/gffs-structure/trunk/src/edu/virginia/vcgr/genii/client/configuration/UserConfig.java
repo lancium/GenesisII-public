@@ -126,8 +126,8 @@ public class UserConfig
 	{
 		QName rootNodeQName = XMLConfiguration.getQName(node);
 		if (!rootNodeQName.equals(USER_CONFIG_QNAME))
-			throw new ConfigurationException("Invalid root element.  Root element must be " + USER_CONFIG_ELEMENT
-				+ ".  Name is " + rootNodeQName.toString());
+			throw new ConfigurationException("Invalid root element.  Root element must be " + USER_CONFIG_ELEMENT + ".  Name is "
+				+ rootNodeQName.toString());
 
 		NodeList children = node.getChildNodes();
 		int length = children.getLength();
@@ -159,8 +159,7 @@ public class UserConfig
 		int length = children.getLength();
 
 		if (length != 1)
-			throw new ConfigurationException("Invalid format for " + DEPLOYMENT_NAME_ELEMENT
-				+ " element in user config XML file");
+			throw new ConfigurationException("Invalid format for " + DEPLOYMENT_NAME_ELEMENT + " element in user config XML file");
 		Node deployText = children.item(0);
 		if (deployText.getNodeType() != Node.TEXT_NODE)
 			throw new ConfigurationException("Element " + DEPLOYMENT_NAME_ELEMENT + " must be a TEXT_NODE");
@@ -191,16 +190,14 @@ public class UserConfig
 	}
 
 	/*
-	 * static public void main(String [] args) throws ConfigurationException, FileNotFoundException,
-	 * IOException { System.out.print("Trying to parse file " + args[0] + "\n"); File userConfigFile
-	 * = new File(args[0]); UserConfig testInConfig = new UserConfig(userConfigFile);
-	 * System.out.print("Done parsing file " + args[0] + ".  Deployment path is " +
-	 * testInConfig.getDeploymentPath() + "\n"); File testFile = new
-	 * File(testInConfig.getDeploymentPath()); if (testFile.exists())
+	 * static public void main(String [] args) throws ConfigurationException, FileNotFoundException, IOException {
+	 * System.out.print("Trying to parse file " + args[0] + "\n"); File userConfigFile = new File(args[0]); UserConfig testInConfig = new
+	 * UserConfig(userConfigFile); System.out.print("Done parsing file " + args[0] + ".  Deployment path is " +
+	 * testInConfig.getDeploymentPath() + "\n"); File testFile = new File(testInConfig.getDeploymentPath()); if (testFile.exists())
 	 * System.out.print("File path works");
 	 * 
-	 * UserConfig testOutConfig = new UserConfig(testInConfig.getDeploymentPath()); File outFile =
-	 * new File("C:\\workspace\\GenesisII\\testUserConfigOut.xml"); testOutConfig.store(outFile); }
+	 * UserConfig testOutConfig = new UserConfig(testInConfig.getDeploymentPath()); File outFile = new
+	 * File("C:\\workspace\\GenesisII\\testUserConfigOut.xml"); testOutConfig.store(outFile); }
 	 */
 
 }

@@ -9,8 +9,8 @@ public class VersionVector implements Serializable
 	private static final long serialVersionUID = 1035761061083900662L;
 
 	/**
-	 * Version vectors are very short (usually one to four items) so we use a linear search. They
-	 * are made to be sent across a network, so we use a compact data structure.
+	 * Version vectors are very short (usually one to four items) so we use a linear search. They are made to be sent across a network, so we
+	 * use a compact data structure.
 	 */
 	public VersionItem[] vector;
 

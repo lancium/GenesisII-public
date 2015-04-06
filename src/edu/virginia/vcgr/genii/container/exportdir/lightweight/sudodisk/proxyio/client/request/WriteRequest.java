@@ -15,8 +15,7 @@ public class WriteRequest
 	 * Forms a write request and sends it to the proxyserver. A write request is of the form:
 	 * |nonce|file/dir|command|path-len|path|seekoffset| len of buffer to write|write buffer
 	 */
-	public static void send(Socket clientSocket, String path, byte[] wb, long offset, byte[] nonce)
-		throws UnknownHostException, IOException
+	public static void send(Socket clientSocket, String path, byte[] wb, long offset, byte[] nonce) throws UnknownHostException, IOException
 	{
 
 		BufferedOutputStream bos = null;

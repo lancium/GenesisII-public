@@ -47,8 +47,8 @@ public class TestDerbyTimestamps
 			conn.commit();
 
 			queryStmt =
-				conn.prepareStatement("SELECT ts, CURRENT_TIMESTAMP, "
-					+ "{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND, CURRENT_TIMESTAMP, ts)} " + "FROM test1 WHERE ID = 0");
+				conn.prepareStatement("SELECT ts, CURRENT_TIMESTAMP, " + "{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND, CURRENT_TIMESTAMP, ts)} "
+					+ "FROM test1 WHERE ID = 0");
 			rs = queryStmt.executeQuery();
 			rs.next();
 
@@ -69,8 +69,7 @@ public class TestDerbyTimestamps
 	{
 		Properties props = new Properties();
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name", "org.apache.derby.jdbc.EmbeddedDriver");
-		props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string",
-			"jdbc:derby:/Users/morgan/test-database;create=true");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string", "jdbc:derby:/Users/morgan/test-database;create=true");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-user", "sa");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");

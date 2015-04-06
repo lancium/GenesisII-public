@@ -90,16 +90,14 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 		protected void modifyImpl(QueueResourceInformation row, Integer column)
 		{
 			int answer =
-				JOptionPane.showConfirmDialog(row.parent(),
-					String.format("Change Max Slots for %s to %d?", row.name(), column), "Confirm Slot Change",
-					JOptionPane.YES_NO_OPTION);
+				JOptionPane.showConfirmDialog(row.parent(), String.format("Change Max Slots for %s to %d?", row.name(), column),
+					"Confirm Slot Change", JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
 				_uiContext
 					.uiContext()
 					.progressMonitorFactory()
-					.createMonitor(row.parent(), "Modifying Slot Count",
-						String.format("Changing %s's slots to %d", row.name(), column), 100L, new SlotChangerTask(row, column),
-						new RefreshCompletionListener(row.parent())).start();
+					.createMonitor(row.parent(), "Modifying Slot Count", String.format("Changing %s's slots to %d", row.name(), column),
+						100L, new SlotChangerTask(row, column), new RefreshCompletionListener(row.parent())).start();
 			}
 		}
 
@@ -121,9 +119,9 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 		}
 	}
 
-	private RowTableColumnDefinition<?, ?>[] COLUMNS = { new ResourceNameColumn(), new ResourceTypeColumn(),
-		new OperatingSystemTypeColumn(), new ProcessorArchitectureTypeColumn(), new AcceptingActivitiesColumn(),
-		new AvailabilityColumn(), new LastUpdatedColumn(), new NextUpdateColumn(), new ResourceSlotsColumn() };
+	private RowTableColumnDefinition<?, ?>[] COLUMNS = { new ResourceNameColumn(), new ResourceTypeColumn(), new OperatingSystemTypeColumn(),
+		new ProcessorArchitectureTypeColumn(), new AcceptingActivitiesColumn(), new AvailabilityColumn(), new LastUpdatedColumn(),
+		new NextUpdateColumn(), new ResourceSlotsColumn() };
 
 	private class QueueResourcesFetcherTask extends AbstractTask<Collection<QueueResourceInformation>>
 	{
@@ -132,8 +130,7 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 		{
 			Collection<QueueResourceInformation> resourceInfo = new LinkedList<QueueResourceInformation>();
 			RNSIterable iterable =
-				new RNSIterable(_rnsFuture.get().lookup(null), _uiContext.uiContext().callingContext(),
-					QueueConstants.PREFERRED_BATCH_SIZE);
+				new RNSIterable(_rnsFuture.get().lookup(null), _uiContext.uiContext().callingContext(), QueueConstants.PREFERRED_BATCH_SIZE);
 			for (RNSEntryResponseType entry : iterable)
 				resourceInfo.add(new QueueResourceInformation(_uiContext, entry));
 
@@ -195,14 +192,13 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 				new QueueResourcesFetcherTask(), new QueueResourcesCompletionListener(parentComponent)).start();
 	}
 
-	ResourcesTableModel(UIPluginContext uiContext) throws ResourceException, GenesisIISecurityException,
-		RNSPathDoesNotExistException
+	ResourcesTableModel(UIPluginContext uiContext) throws ResourceException, GenesisIISecurityException, RNSPathDoesNotExistException
 	{
 		_uiContext = uiContext;
 		_rnsFuture = uiContext.uiContext().executor().submit(new AsynchronousQueueResourcesExtractor(uiContext));
 		_queue =
-			ClientUtils.createProxy(QueuePortType.class, _uiContext.endpointRetriever().getTargetEndpoints().iterator().next()
-				.getEndpoint(), _uiContext.uiContext().callingContext());
+			ClientUtils.createProxy(QueuePortType.class, _uiContext.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint(),
+				_uiContext.uiContext().callingContext());
 	}
 
 	@Override

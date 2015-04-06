@@ -29,14 +29,14 @@ final class UsernamePasswordLoginPanel extends LoginPanel
 	{
 		setName(NAME);
 
-		add(new JLabel("Username"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_username, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+		add(new JLabel("Username"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(new JLabel("Password"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_password, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+		add(_username, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+			5, 5), 5, 5));
+		add(new JLabel("Password"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
+		add(_password, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+			5, 5), 5, 5));
 
 		_username.addCaretListener(new UsernameListener());
 	}

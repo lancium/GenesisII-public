@@ -23,9 +23,7 @@ public enum ProcessorArchitecture {
 	static {
 		InputStream in = null;
 		try {
-			in =
-				Thread.currentThread().getContextClassLoader()
-					.getResourceAsStream("edu/virginia/vcgr/appmgr/os/arch-map.properties");
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream("edu/virginia/vcgr/appmgr/os/arch-map.properties");
 			_propertyMap = new Properties();
 			_propertyMap.load(in);
 		} catch (Exception e) {

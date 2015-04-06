@@ -90,8 +90,7 @@ public class GeniiWSNBrokerServiceImpl extends GenesisIIBase implements GeniiWSN
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreatePullPointResponse createPullPoint(CreatePullPoint_Element arg0) throws RemoteException,
-		UnableToCreatePullPointFaultType
+	public CreatePullPointResponse createPullPoint(CreatePullPoint_Element arg0) throws RemoteException, UnableToCreatePullPointFaultType
 	{
 		throw FaultManipulator.fillInFault(new UnableToCreatePullPointFaultType());
 	}

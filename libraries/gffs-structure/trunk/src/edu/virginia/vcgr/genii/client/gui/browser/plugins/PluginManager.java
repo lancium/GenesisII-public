@@ -25,9 +25,8 @@ import edu.virginia.vcgr.genii.client.utils.xml.NodeIterable;
 import edu.virginia.vcgr.genii.web.xml.XMLUtilities;
 
 /**
- * The PluginManager is the central point from which plugins are obtained. It is responsible for
- * parsing configuration files and organizing plugins into convenient structures for use by the GUI
- * browser.
+ * The PluginManager is the central point from which plugins are obtained. It is responsible for parsing configuration files and organizing
+ * plugins into convenient structures for use by the GUI browser.
  * 
  * @author mmm2a
  */
@@ -72,9 +71,8 @@ public class PluginManager
 	/**
 	 * Retrieve the main menu plugins registered with this plugin manager.
 	 * 
-	 * @return The main menu plugins registered with this plugin. This is a HashMap which maps the
-	 *         menu name to another HashMap which maps the group name to the menu item plugin
-	 *         description.
+	 * @return The main menu plugins registered with this plugin. This is a HashMap which maps the menu name to another HashMap which maps the
+	 *         group name to the menu item plugin description.
 	 */
 	public HashMap<String, HashMap<String, Collection<MainMenuDescriptor>>> getMainMenuPlugins()
 	{
@@ -84,8 +82,8 @@ public class PluginManager
 	/**
 	 * Retrieve the context menu plugins registered with this plugin manager.
 	 * 
-	 * @return The context menu plugins registered with this plugin. This is a HashMap which maps
-	 *         the group names to the context menu plugin descriptions.
+	 * @return The context menu plugins registered with this plugin. This is a HashMap which maps the group names to the context menu plugin
+	 *         descriptions.
 	 */
 	public HashMap<String, Collection<ContextMenuDescriptor>> getContextMenuPlugins()
 	{
@@ -103,8 +101,7 @@ public class PluginManager
 	}
 
 	/**
-	 * An internal method for parsing a plugin descriptor XML element into the correct data
-	 * structures.
+	 * An internal method for parsing a plugin descriptor XML element into the correct data structures.
 	 * 
 	 * @param pluginElement
 	 *            The XML element describing the plugin.
@@ -118,10 +115,9 @@ public class PluginManager
 	 * @throws PluginException
 	 * @throws SAXException
 	 */
-	static private void parsePlugin(Element pluginElement,
-		HashMap<String, HashMap<String, Collection<MainMenuDescriptor>>> mainMenuPlugins,
-		HashMap<String, Collection<ContextMenuDescriptor>> contextMenuPlugins, TreeSet<TabPluginDescriptor> tabs)
-		throws PluginException, SAXException
+	static private void parsePlugin(Element pluginElement, HashMap<String, HashMap<String, Collection<MainMenuDescriptor>>> mainMenuPlugins,
+		HashMap<String, Collection<ContextMenuDescriptor>> contextMenuPlugins, TreeSet<TabPluginDescriptor> tabs) throws PluginException,
+		SAXException
 	{
 		/* First, get attributes from the element that describe the plugin */
 		String name = XMLUtilities.getRequiredAttribute(pluginElement, PLUGIN_NAME_ATTR, null);
@@ -129,34 +125,30 @@ public class PluginManager
 		IPlugin plugin = null;
 
 		/*
-		 * Iterate through the child XML elements of this one, looking for configuration information
-		 * about the plugin.
+		 * Iterate through the child XML elements of this one, looking for configuration information about the plugin.
 		 */
 		for (Element child : new NodeIterable(pluginElement)) {
 			String nodeName = child.getNodeName();
 
 			/*
-			 * If it is the constructor params element, then we are parsing out an XML element that
-			 * will be passed into the target plugin classes constructor.
+			 * If it is the constructor params element, then we are parsing out an XML element that will be passed into the target plugin
+			 * classes constructor.
 			 */
 			if (nodeName.equals(CONSTRUCTOR_PARAMS_ELEMENT)) {
 				/*
-				 * If the plugin has already been instantiated, then it's too late to give
-				 * constructor params.
+				 * If the plugin has already been instantiated, then it's too late to give constructor params.
 				 */
 				if (plugin != null)
 					throw new PluginException("Saw a \"" + nodeName + "\" element after the plugin was configured.");
 
 				/*
-				 * Otherwise, we go ahead and use the construction params to instantiate the new
-				 * plugin instance.
+				 * Otherwise, we go ahead and use the construction params to instantiate the new plugin instance.
 				 */
 				plugin = Instantiater.instantiate(implementingClass, child);
 			} else {
 				/*
-				 * We don't have a plugin, and it's not a constructor params element which means
-				 * that the configuration describes a plugin that takes not construction parameters.
-				 * Go ahead and instantiate the plugin with no construction params.
+				 * We don't have a plugin, and it's not a constructor params element which means that the configuration describes a plugin
+				 * that takes not construction parameters. Go ahead and instantiate the plugin with no construction params.
 				 */
 				if (plugin == null)
 					plugin = Instantiater.instantiate(implementingClass, null);
@@ -166,17 +158,15 @@ public class PluginManager
 				 */
 				if (nodeName.equals(MAIN_MENU_ELEMENT)) {
 					if (!(plugin instanceof IMenuPlugin))
-						throw new PluginException("Plugin \"" + name
-							+ "\" does not appear to implement the IMenuPlugin interface.");
+						throw new PluginException("Plugin \"" + name + "\" does not appear to implement the IMenuPlugin interface.");
 
 					MainMenuDescriptor descriptor =
-						new MainMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child,
-							MENU_NAME_ATTR, null), XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null),
-							XMLUtilities.getRequiredAttribute(child, MENU_GROUP_ATTR, null));
+						new MainMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child, MENU_NAME_ATTR, null),
+							XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null), XMLUtilities.getRequiredAttribute(child,
+								MENU_GROUP_ATTR, null));
 
 					/*
-					 * Let's see if the menu already exists (i.e., another plugin is also in the
-					 * same menu).
+					 * Let's see if the menu already exists (i.e., another plugin is also in the same menu).
 					 */
 					HashMap<String, Collection<MainMenuDescriptor>> menu = mainMenuPlugins.get(descriptor.getMenuName());
 					if (menu == null) {
@@ -186,8 +176,7 @@ public class PluginManager
 					}
 
 					/*
-					 * Now, let's see if the group exists yet. Again, if it doesn't, we'll create
-					 * it.
+					 * Now, let's see if the group exists yet. Again, if it doesn't, we'll create it.
 					 */
 					Collection<MainMenuDescriptor> group = menu.get(descriptor.getMenuGroup());
 					if (group == null) {
@@ -200,12 +189,12 @@ public class PluginManager
 				} else if (nodeName.equals(CONTEXT_MENU_ELEMENT)) {
 					/* Now we'll take care of a context menu element. */
 					if (!(plugin instanceof IMenuPlugin))
-						throw new PluginException("Plugin \"" + name
-							+ "\" does not appear to implement the IMenuPlugin interface.");
+						throw new PluginException("Plugin \"" + name + "\" does not appear to implement the IMenuPlugin interface.");
 
 					ContextMenuDescriptor descriptor =
-						new ContextMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child,
-							MENU_LABEL_ATTR, null), XMLUtilities.getRequiredAttribute(child, MENU_GROUP_ATTR, null));
+						new ContextMenuDescriptor(name, (IMenuPlugin) plugin,
+							XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null), XMLUtilities.getRequiredAttribute(child,
+								MENU_GROUP_ATTR, null));
 
 					/* See if another plugin already registered the group */
 					Collection<ContextMenuDescriptor> group = contextMenuPlugins.get(descriptor.getMenuGroup());
@@ -220,13 +209,12 @@ public class PluginManager
 				} else if (nodeName.equals(TAB_ELEMENT)) {
 					/* Finally, if it's a tab plugin... */
 					if (!(plugin instanceof ITabPlugin))
-						throw new PluginException("Plugin \"" + name
-							+ "\" does not appear to implement the ITabPlugin interface.");
+						throw new PluginException("Plugin \"" + name + "\" does not appear to implement the ITabPlugin interface.");
 
 					/* Just go ahead and add the tab plugin descriptor to the collection */
-					tabs.add(new TabPluginDescriptor(name, (ITabPlugin) plugin, XMLUtilities.getRequiredAttribute(child,
-						TAB_NAME_ATTR, null),
-						Integer.parseInt(XMLUtilities.getRequiredAttribute(child, TAB_PRIORITY_ATTR, "0"))));
+					tabs.add(new TabPluginDescriptor(name, (ITabPlugin) plugin,
+						XMLUtilities.getRequiredAttribute(child, TAB_NAME_ATTR, null), Integer.parseInt(XMLUtilities.getRequiredAttribute(
+							child, TAB_PRIORITY_ATTR, "0"))));
 				} else
 					throw new PluginException("Unrecognized element \"" + nodeName + " in plugin configuration.");
 			}
@@ -234,8 +222,7 @@ public class PluginManager
 	}
 
 	/**
-	 * This is an internal method which searches through the configuration document looking for
-	 * plugin descriptions to configure.
+	 * This is an internal method which searches through the configuration document looking for plugin descriptions to configure.
 	 * 
 	 * @param configuration
 	 *            The root XML document to look for plugins inside of.
@@ -265,16 +252,15 @@ public class PluginManager
 				/*
 				 * Otherwise, it's an error -- plugins is all the document should have.
 				 */
-				throw new PluginException("Unexpected element \"" + name + "\" in configuration while looking for \""
-					+ PLUGIN_ELEMENT + "\".");
+				throw new PluginException("Unexpected element \"" + name + "\" in configuration while looking for \"" + PLUGIN_ELEMENT
+					+ "\".");
 		}
 
 		return new PluginManager(mainMenuPlugins, contextMenuPlugins, tabs);
 	}
 
 	/**
-	 * Configure a new plugin manager based off of a input stream (assumed to have a valid XML
-	 * configuration file embedded.
+	 * Configure a new plugin manager based off of a input stream (assumed to have a valid XML configuration file embedded.
 	 * 
 	 * @param configuration
 	 *            The configuration stream.
@@ -302,8 +288,7 @@ public class PluginManager
 	}
 
 	/**
-	 * Configure a new plugin manager based off of an input file (assumed to have a valid XML
-	 * configuration embedded).
+	 * Configure a new plugin manager based off of an input file (assumed to have a valid XML configuration embedded).
 	 * 
 	 * @param configurationFile
 	 *            The configuration file.
@@ -319,16 +304,14 @@ public class PluginManager
 			in = new FileInputStream(configurationFile);
 			return loadPlugins(in);
 		} catch (FileNotFoundException fnfe) {
-			throw new PluginException("Unable to locate configuration file \"" + configurationFile.getAbsolutePath() + "\".",
-				fnfe);
+			throw new PluginException("Unable to locate configuration file \"" + configurationFile.getAbsolutePath() + "\".", fnfe);
 		} finally {
 			StreamUtils.close(in);
 		}
 	}
 
 	/**
-	 * Configure a new plugin manager based off of an input resource (assumed to be a valid XML
-	 * configuration resource).
+	 * Configure a new plugin manager based off of an input resource (assumed to be a valid XML configuration resource).
 	 * 
 	 * @param configurationResource
 	 *            The configuration resource path.

@@ -34,8 +34,7 @@ public class SecurityPolicy
 
 		// construct AppliesTo
 		org.w3.www.ns.ws_policy.URI appliesToUri = new org.w3.www.ns.ws_policy.URI("urn:wsaaction:*");
-		MessageElement[] appliesToAny =
-			{ new MessageElement(org.w3.www.ns.ws_policy.URI.getTypeDesc().getXmlType(), appliesToUri) };
+		MessageElement[] appliesToAny = { new MessageElement(org.w3.www.ns.ws_policy.URI.getTypeDesc().getXmlType(), appliesToUri) };
 
 		AppliesTo appliesTo = new AppliesTo(appliesToAny);
 
@@ -56,8 +55,7 @@ public class SecurityPolicy
 			PolicyReference usernameTokenReference = new PolicyReference();
 			usernameTokenReference.setURI(usernameTokenUri);
 			MessageElement usernameTokenMel =
-				new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
-					usernameTokenReference);
+				new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference", usernameTokenReference);
 
 			if (isOptional)
 				usernameTokenMel.setAttribute(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Optional", "true");
@@ -85,8 +83,7 @@ public class SecurityPolicy
 			PolicyReference serverTlsReference = new PolicyReference();
 			serverTlsReference.setURI(serverTlsUri);
 			MessageElement tlsMel =
-				new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
-					serverTlsReference);
+				new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference", serverTlsReference);
 			return tlsMel;
 		} catch (MalformedURIException e) {
 			// This can't happen
@@ -104,8 +101,7 @@ public class SecurityPolicy
 			PolicyReference mutualX509Reference = new PolicyReference();
 			mutualX509Reference.setURI(mutualX509Uri);
 			MessageElement x509Mel =
-				new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
-					mutualX509Reference);
+				new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference", mutualX509Reference);
 			policyComponents.add(x509Mel);
 
 			// add our optional blend of Credentials
@@ -120,8 +116,7 @@ public class SecurityPolicy
 			// create saml token
 			TokenAssertionType samlToken = new TokenAssertionType();
 			samlToken.setIncludeToken(includeToken);
-			MessageElement[] samlSubEls =
-				{ new MessageElement(ClaimsType.getTypeDesc().getXmlType().getNamespaceURI(), "Claims", claims) };
+			MessageElement[] samlSubEls = { new MessageElement(ClaimsType.getTypeDesc().getXmlType().getNamespaceURI(), "Claims", claims) };
 			samlToken.set_any(samlSubEls);
 
 			// create policy
@@ -132,11 +127,9 @@ public class SecurityPolicy
 
 			// create SignedSupporting Tokens
 			MessageElement signedSupportingTokensMel =
-				new MessageElement(new QName(NestedPolicyType.getTypeDesc().getXmlType().getNamespaceURI(),
-					"SignedSupportingTokens"));
+				new MessageElement(new QName(NestedPolicyType.getTypeDesc().getXmlType().getNamespaceURI(), "SignedSupportingTokens"));
 			signedSupportingTokensMel.setAttribute(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Optional", "true");
-			signedSupportingTokensMel.addChild(new MessageElement(Policy.getTypeDesc().getXmlType().getNamespaceURI(),
-				"Policy", samlPolicy));
+			signedSupportingTokensMel.addChild(new MessageElement(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Policy", samlPolicy));
 
 			policyComponents.add(signedSupportingTokensMel);
 		} catch (MalformedURIException e) {

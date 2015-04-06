@@ -59,8 +59,7 @@ final public class FilesystemUsageInformation
 	@Override
 	final public String toString()
 	{
-		return String.format(
-			"FS Size = %d, FS Used = %d, FS Available = %d, FS Usable = %d, Percent Used = %.2f%%, Percent Avail = %.2f%%",
+		return String.format("FS Size = %d, FS Used = %d, FS Available = %d, FS Usable = %d, Percent Used = %.2f%%, Percent Avail = %.2f%%",
 			_totalSpace, _totalUsed, _totalAvailable, _totalUsable, _percentUsed, _percentAvailable);
 	}
 }

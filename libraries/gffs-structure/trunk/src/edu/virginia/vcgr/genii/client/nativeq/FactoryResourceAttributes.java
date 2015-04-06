@@ -10,8 +10,8 @@ public class FactoryResourceAttributes extends ResourceAttributes
 	private Collection<ResourceAttributes> _containedResources;
 	private URI _localResourceManagerType;
 
-	public FactoryResourceAttributes(BasicResourceAttributes basicResourceAttributes,
-		Collection<ResourceAttributes> containedResources, URI localResourceManagerType)
+	public FactoryResourceAttributes(BasicResourceAttributes basicResourceAttributes, Collection<ResourceAttributes> containedResources,
+		URI localResourceManagerType)
 	{
 		if (containedResources == null)
 			containedResources = new ArrayList<ResourceAttributes>();

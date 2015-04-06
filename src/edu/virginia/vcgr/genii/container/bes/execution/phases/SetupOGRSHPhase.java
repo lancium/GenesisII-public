@@ -77,8 +77,7 @@ public class SetupOGRSHPhase extends AbstractExecutionPhase
 		config.println("</ogrsh:fs-provider>");
 	}
 
-	static private void writeMount(PrintStream config, String mountLocation, String mountProvider, String mountSession,
-		String rootDirectory)
+	static private void writeMount(PrintStream config, String mountLocation, String mountProvider, String mountSession, String rootDirectory)
 	{
 		config.format("<ogrsh:mount location=\"%s\" provider=\"%s\"\n", mountLocation, mountProvider);
 		config.format("session=\"%s\">\n", mountSession);

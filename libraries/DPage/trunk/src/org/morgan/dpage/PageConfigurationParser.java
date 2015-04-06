@@ -17,8 +17,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 class PageConfigurationParser extends DefaultHandler
 {
-	static public Map<String, PageContextDescription> parse(InputStream in) throws ParserConfigurationException, SAXException,
-		IOException
+	static public Map<String, PageContextDescription> parse(InputStream in) throws ParserConfigurationException, SAXException, IOException
 	{
 		PageConfigurationParser handler = new PageConfigurationParser();
 
@@ -58,8 +57,7 @@ class PageConfigurationParser extends DefaultHandler
 				throw new SAXParseException("Page element missing required \"resourceBase\" attribute.", _locator);
 
 			try {
-				_pageDescriptions.put(context, new PageContextDescription(context, resourceBase,
-					injectionHandlerFactoryClassName));
+				_pageDescriptions.put(context, new PageContextDescription(context, resourceBase, injectionHandlerFactoryClassName));
 			} catch (ClassNotFoundException e) {
 				throw new SAXParseException(String.format("Unable to create injection handler factory \"%s\".",
 					injectionHandlerFactoryClassName), _locator, e);

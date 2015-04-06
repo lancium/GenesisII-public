@@ -6,8 +6,7 @@ public interface KeystoreSecurityConstants
 
 	public interface Client
 	{
-		static public final String CLIENT_RSA_KEY_LENGTH_PROP =
-			"edu.virginia.vcgr.genii.client.security.message.rsa-key-length";
+		static public final String CLIENT_RSA_KEY_LENGTH_PROP = "edu.virginia.vcgr.genii.client.security.message.rsa-key-length";
 		static public final String MESSAGE_MIN_CONFIG_PROP = "edu.virginia.vcgr.genii.client.security.message.min-config";
 		static public final String RESOURCE_IDENTITY_TRUST_STORE_LOCATION_PROP =
 			"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-location";
@@ -17,12 +16,10 @@ public interface KeystoreSecurityConstants
 			"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-password";
 		static public final String RESOURCE_TRUSTED_CERTIFICATES_LOCATION_PROP =
 			"edu.virginia.vcgr.genii.client.security.resource-identity.trusted-certificates.location";
-		
-		static public final String SSL_TRUST_STORE_LOCATION_PROP =
-			"edu.virginia.vcgr.genii.client.security.ssl.trust-store-location";
+
+		static public final String SSL_TRUST_STORE_LOCATION_PROP = "edu.virginia.vcgr.genii.client.security.ssl.trust-store-location";
 		static public final String SSL_TRUST_STORE_TYPE_PROP = "edu.virginia.vcgr.genii.client.security.ssl.trust-store-type";
-		static public final String SSL_TRUST_STORE_PASSWORD_PROP =
-			"edu.virginia.vcgr.genii.client.security.ssl.trust-store-password";
+		static public final String SSL_TRUST_STORE_PASSWORD_PROP = "edu.virginia.vcgr.genii.client.security.ssl.trust-store-password";
 		static public final String SSL_TRUSTED_CERTIFICATES_LOCATION_PROP =
 			"edu.virginia.vcgr.genii.client.security.ssl.trusted-certificates.location";
 		static public final String SSL_GRID_CERTIFICATES_LOCATION_PROP =
@@ -50,8 +47,7 @@ public interface KeystoreSecurityConstants
 		static public final String SSL_KEY_STORE_PROP = "edu.virginia.vcgr.genii.container.security.ssl.key-store";
 		static public final String SSL_KEY_STORE_TYPE_PROP = "edu.virginia.vcgr.genii.container.security.ssl.key-store-type";
 		static public final String SSL_KEY_PASSWORD_PROP = "edu.virginia.vcgr.genii.container.security.ssl.key-password";
-		static public final String SSL_KEY_STORE_PASSWORD_PROP =
-			"edu.virginia.vcgr.genii.container.security.ssl.key-store-password";
+		static public final String SSL_KEY_STORE_PASSWORD_PROP = "edu.virginia.vcgr.genii.container.security.ssl.key-store-password";
 	}
 
 	public class Kerberos
@@ -60,8 +56,7 @@ public interface KeystoreSecurityConstants
 		static public final String KERBEROS_KEYTAB_STRING = "gffs-sts.kerberos.keytab.";
 
 		/**
-		 * generates the appropriate configuration item name for looking up the keytab for a
-		 * particular Kerberos realm.
+		 * generates the appropriate configuration item name for looking up the keytab for a particular Kerberos realm.
 		 */
 		static public String keytabPropertyForRealm(String realm)
 		{
@@ -72,8 +67,8 @@ public interface KeystoreSecurityConstants
 		static public final String KERBEROS_PRINCIPAL_STRING = "gffs-sts.kerberos.principal.";
 
 		/**
-		 * generates the appropriate configuration item name for looking up the principal for
-		 * authorization within a particular Kerberos realm.
+		 * generates the appropriate configuration item name for looking up the principal for authorization within a particular Kerberos
+		 * realm.
 		 */
 		static public String principalPropertyForRealm(String realm)
 		{

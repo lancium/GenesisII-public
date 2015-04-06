@@ -33,8 +33,8 @@ public class RNSOperationContents extends NotificationMessageContents
 	{
 	}
 
-	public RNSOperationContents(RNSOperations operation, String entryName, EndpointReferenceType entryReference,
-		VersionVector versionVector) throws ResourceException
+	public RNSOperationContents(RNSOperations operation, String entryName, EndpointReferenceType entryReference, VersionVector versionVector)
+		throws ResourceException
 	{
 		_operation = operation;
 		_entryName = entryName;

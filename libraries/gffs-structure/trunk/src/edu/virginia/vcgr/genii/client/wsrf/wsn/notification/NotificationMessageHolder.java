@@ -28,8 +28,8 @@ public class NotificationMessageHolder
 	private NotificationMessageContents _contents = null;
 	private TopicPath _topic;
 
-	public NotificationMessageHolder(EndpointReferenceType subscriptionReference, EndpointReferenceType publisherReference,
-		TopicPath topic, NotificationMessageContents contents)
+	public NotificationMessageHolder(EndpointReferenceType subscriptionReference, EndpointReferenceType publisherReference, TopicPath topic,
+		NotificationMessageContents contents)
 	{
 		_subscriptionReference = subscriptionReference;
 		_publisherReference = publisherReference;
@@ -37,8 +37,8 @@ public class NotificationMessageHolder
 		_topic = topic;
 	}
 
-	public NotificationMessageHolder(Class<? extends NotificationMessageContents> contentsType,
-		NotificationMessageHolderType axisHolder) throws JAXBException, InvalidFilterFaultType, TopicNotSupportedFaultType
+	public NotificationMessageHolder(Class<? extends NotificationMessageContents> contentsType, NotificationMessageHolderType axisHolder)
+		throws JAXBException, InvalidFilterFaultType, TopicNotSupportedFaultType
 	{
 		_subscriptionReference = axisHolder.getSubscriptionReference();
 		_publisherReference = axisHolder.getProducerReference();
@@ -49,8 +49,8 @@ public class NotificationMessageHolder
 			if (any != null) {
 				if (any.length > 0) {
 					if (any.length > 1)
-						throw new IllegalArgumentException(String.format(
-							"Expected a message contents of size 0 or 1, but got %d.", any.length));
+						throw new IllegalArgumentException(String.format("Expected a message contents of size 0 or 1, but got %d.",
+							any.length));
 
 					if (contentsType != null) {
 						JAXBContext context = JAXBContext.newInstance(contentsType);
@@ -101,7 +101,7 @@ public class NotificationMessageHolder
 			me = _contents.toAxisType();
 
 		return new NotificationMessageHolderType(_subscriptionReference, _publisherReference, me == null ? null
-			: new NotificationMessageHolderTypeMessage(new MessageElement[] { me }), _topic == null ? null
-			: new MessageElement[] { _topic.asConcreteQueryExpression().toTopicExpressionElement(TOPIC_QNAME, "ts%d") });
+			: new NotificationMessageHolderTypeMessage(new MessageElement[] { me }), _topic == null ? null : new MessageElement[] { _topic
+			.asConcreteQueryExpression().toTopicExpressionElement(TOPIC_QNAME, "ts%d") });
 	}
 }

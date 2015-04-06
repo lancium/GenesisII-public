@@ -17,8 +17,7 @@ class CompositeGenesisIIServiceConfiguration implements GenesisIIServiceConfigur
 		Class<?> lastJAXBClassOverride = null;
 		Class<?> lastJAXBClassOverrideService = null;
 
-		for (Class<?> newServiceClass = serviceClass; newServiceClass != Object.class; newServiceClass =
-			newServiceClass.getSuperclass()) {
+		for (Class<?> newServiceClass = serviceClass; newServiceClass != Object.class; newServiceClass = newServiceClass.getSuperclass()) {
 			GeniiServiceConfiguration serviceConf = newServiceClass.getAnnotation(GeniiServiceConfiguration.class);
 
 			if (serviceConf != null) {
@@ -27,8 +26,8 @@ class CompositeGenesisIIServiceConfiguration implements GenesisIIServiceConfigur
 				if (!jaxbOverride.isInterface()) {
 					if ((lastJAXBClassOverride != null) && !jaxbOverride.isAssignableFrom(lastJAXBClassOverride)) {
 						throw new ConfigurationException(String.format("JAXBServiceConfigurationClass %s on %s is "
-							+ "not compatible with previous declaration %s " + "on service class %s.", jaxbOverride,
-							newServiceClass, lastJAXBClassOverride, lastJAXBClassOverrideService));
+							+ "not compatible with previous declaration %s " + "on service class %s.", jaxbOverride, newServiceClass,
+							lastJAXBClassOverride, lastJAXBClassOverrideService));
 					}
 
 					lastJAXBClassOverride = jaxbOverride;

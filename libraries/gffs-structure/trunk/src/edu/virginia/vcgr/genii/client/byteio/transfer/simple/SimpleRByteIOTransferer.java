@@ -44,8 +44,7 @@ public class SimpleRByteIOTransferer extends AbstractByteIOTransferer<RandomByte
 	public void append(byte[] data) throws RemoteException
 	{
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[] { createByteBundle(data) },
-				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI);
+			new TransferInformationType(new MessageElement[] { createByteBundle(data) }, ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI);
 		_clientStub.append(new Append(transType));
 	}
 
@@ -82,8 +81,7 @@ public class SimpleRByteIOTransferer extends AbstractByteIOTransferer<RandomByte
 	public void truncAppend(long offset, byte[] data) throws RemoteException
 	{
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[] { createByteBundle(data) },
-				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI);
+			new TransferInformationType(new MessageElement[] { createByteBundle(data) }, ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI);
 		_clientStub.truncAppend(new TruncAppend(offset, transType));
 	}
 
@@ -94,8 +92,7 @@ public class SimpleRByteIOTransferer extends AbstractByteIOTransferer<RandomByte
 	public void write(long startOffset, int bytesPerBlock, long stride, byte[] data) throws RemoteException
 	{
 		TransferInformationType transType =
-			new TransferInformationType(new MessageElement[] { createByteBundle(data) },
-				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI);
+			new TransferInformationType(new MessageElement[] { createByteBundle(data) }, ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI);
 		_clientStub.write(new Write(startOffset, bytesPerBlock, stride, transType));
 	}
 

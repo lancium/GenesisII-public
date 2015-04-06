@@ -67,8 +67,7 @@ public abstract class GeniiCachedResource
 	{
 		_statStructure =
 			new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(),
-				_statStructure.getSize(), _statStructure.getCreated(), modificationTime, accessTime,
-				_statStructure.getPermissions());
+				_statStructure.getSize(), _statStructure.getCreated(), modificationTime, accessTime, _statStructure.getPermissions());
 		_fs.updateTimes(_path, accessTime, modificationTime);
 	}
 }

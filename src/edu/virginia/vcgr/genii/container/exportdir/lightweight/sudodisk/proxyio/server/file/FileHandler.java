@@ -39,8 +39,7 @@ public class FileHandler
 			DefaultResponse.send(socket, ErrorCode.SUCCESS_CODE, null);
 			return ErrorCode.SUCCESS_CODE;
 		} else {
-			DefaultResponse.send(socket, ErrorCode.DELETE_FAIL_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.DELETE_FAIL_CODE));
+			DefaultResponse.send(socket, ErrorCode.DELETE_FAIL_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.DELETE_FAIL_CODE));
 			return ErrorCode.DELETE_FAIL_CODE;
 		}
 	}
@@ -150,8 +149,7 @@ public class FileHandler
 
 		if (attr == null) {
 			// couldn't retrieve file attributes
-			DefaultResponse.send(socket, ErrorCode.ATTR_FETCH_FAIL_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.ATTR_FETCH_FAIL_CODE));
+			DefaultResponse.send(socket, ErrorCode.ATTR_FETCH_FAIL_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.ATTR_FETCH_FAIL_CODE));
 			return ErrorCode.ATTR_FETCH_FAIL_CODE;
 		}
 
@@ -268,8 +266,7 @@ public class FileHandler
 			DefaultResponse.send(socket, ErrorCode.SUCCESS_CODE, null);
 			return ErrorCode.SUCCESS_CODE;
 		} else {
-			DefaultResponse.send(socket, ErrorCode.CREATE_FAIL_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.CREATE_FAIL_CODE));
+			DefaultResponse.send(socket, ErrorCode.CREATE_FAIL_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.CREATE_FAIL_CODE));
 
 			return ErrorCode.CREATE_FAIL_CODE;
 		}

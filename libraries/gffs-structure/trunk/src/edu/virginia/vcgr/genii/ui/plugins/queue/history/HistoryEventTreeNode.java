@@ -98,16 +98,15 @@ class HistoryEventTreeNode
 		return (_event == null) ? "null" : _event.eventNumber().toString();
 	}
 
-	static private HistoryEventTreeNode findParent(HistoryEventTreeNode root,
-		Map<SequenceNumber, HistoryEventTreeNode> nodeMap, SequenceNumber childNumber)
+	static private HistoryEventTreeNode findParent(HistoryEventTreeNode root, Map<SequenceNumber, HistoryEventTreeNode> nodeMap,
+		SequenceNumber childNumber)
 	{
 		SequenceNumber parentNumber = childNumber.parent();
 		HistoryEventTreeNode parentNode = nodeMap.get(parentNumber);
 		if (parentNode == null) {
 			HistoryEvent parentEvent =
 				new HistoryEvent(parentNumber, Calendar.getInstance(), new SimpleStringHistoryEventSource("Faux Source", null),
-					HistoryEventLevel.Trace, HistoryEventCategory.Default, new HashMap<String, String>(), new HistoryEventData(
-						"Faux Event"));
+					HistoryEventLevel.Trace, HistoryEventCategory.Default, new HashMap<String, String>(), new HistoryEventData("Faux Event"));
 
 			if (parentNumber.isRootLevel()) {
 				nodeMap.put(parentNumber, parentNode = root.addChild(parentEvent));
@@ -119,8 +118,7 @@ class HistoryEventTreeNode
 		return parentNode;
 	}
 
-	static private void addFilteredChildren(HistoryEventTreeNode originalRoot, HistoryEventFilter filter,
-		HistoryEventTreeNode newRoot)
+	static private void addFilteredChildren(HistoryEventTreeNode originalRoot, HistoryEventFilter filter, HistoryEventTreeNode newRoot)
 	{
 		for (HistoryEventTreeNode child : originalRoot._children.values()) {
 			Set<HistoryEventCategory> childSet = child.branchCategories();

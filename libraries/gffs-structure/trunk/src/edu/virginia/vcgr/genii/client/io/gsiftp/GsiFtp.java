@@ -63,8 +63,7 @@ public class GsiFtp
 			FileWriter fstream = new FileWriter(workingDirectory.getAbsolutePath() + "/gsiftp.sh");
 
 			BufferedWriter out = new BufferedWriter(fstream);
-			out.write("export X509_USER_PROXY=" + workingDirectory.getAbsolutePath() + GenesisIIConstants.myproxyFilenameSuffix
-				+ " \n");
+			out.write("export X509_USER_PROXY=" + workingDirectory.getAbsolutePath() + GenesisIIConstants.myproxyFilenameSuffix + " \n");
 			out.write("chmod 600 " + workingDirectory.getAbsolutePath() + GenesisIIConstants.myproxyFilenameSuffix + " \n");
 			out.write("globus-url-copy " + sourceFile + " " + destinationFile + "\n");
 			out.close();

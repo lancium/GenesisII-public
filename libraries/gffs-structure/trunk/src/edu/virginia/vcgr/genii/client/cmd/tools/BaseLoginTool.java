@@ -49,8 +49,7 @@ public abstract class BaseLoginTool extends BaseGridTool
 	}
 
 	/*
-	 * flag that indicates that no password will be given, to support using only the TLS identity as
-	 * credential.
+	 * flag that indicates that no password will be given, to support using only the TLS identity as credential.
 	 */
 	boolean _bogusPassword = false;
 

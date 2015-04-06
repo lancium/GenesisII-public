@@ -57,11 +57,10 @@ public class KeystoreLoginTool extends BaseLoginTool
 	}
 
 	/**
-	 * Prompts the user to select an identity from the specified keystore, delegating the selected
-	 * credential to the delegatee.
+	 * Prompts the user to select an identity from the specified keystore, delegating the selected credential to the delegatee.
 	 * 
-	 * If delegatee is null, the credential is delegated to the calling context's current client key
-	 * material, in which case it will be self-renewing.
+	 * If delegatee is null, the credential is delegated to the calling context's current client key material, in which case it will be
+	 * self-renewing.
 	 * 
 	 * @param keystoreInput
 	 * @param callContext
@@ -94,9 +93,7 @@ public class KeystoreLoginTool extends BaseLoginTool
 			// force new credentials to be created with our preferred lifetime.
 			ClientUtils.invalidateCredentials(callContext);
 
-			String msg =
-				"Replacing client tool identity with credentials for \"" + certEntry._certChain[0].getSubjectDN().getName()
-					+ "\".";
+			String msg = "Replacing client tool identity with credentials for \"" + certEntry._certChain[0].getSubjectDN().getName() + "\".";
 			stdout.println(msg);
 			_logger.info(msg);
 
@@ -116,9 +113,8 @@ public class KeystoreLoginTool extends BaseLoginTool
 		if (delegateeIdentity == null) {
 			// Delegate the identity assertion to the temporary client identity.
 			TrustCredential assertion =
-				new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, certEntry._certChain,
-					IdentityType.USER, new BasicConstraints(System.currentTimeMillis()
-						- SecurityConstants.CredentialGoodFromOffset, _credentialValidMillis,
+				new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, certEntry._certChain, IdentityType.USER,
+					new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset, _credentialValidMillis,
 						SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 			assertion.signAssertion(certEntry._privateKey);
 			retval.add(assertion);
@@ -127,8 +123,8 @@ public class KeystoreLoginTool extends BaseLoginTool
 			// create a static attribute delegated to the specified party
 			TrustCredential assertion =
 				new TrustCredential(delegateeIdentity, IdentityType.CONNECTION, certEntry._certChain, IdentityType.USER,
-					new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset,
-						_credentialValidMillis, SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+					new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset, _credentialValidMillis,
+						SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 			assertion.signAssertion(certEntry._privateKey);
 			retval.add(assertion);
 		}
@@ -137,8 +133,8 @@ public class KeystoreLoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		if (_storeType == null)
 			_storeType = "PKCS12";

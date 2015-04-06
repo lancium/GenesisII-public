@@ -10,9 +10,8 @@ import edu.virginia.vcgr.genii.client.lease.LeaseeAgreement;
 public class AppendableBuffer implements Closeable
 {
 	/**
-	 * Any IO exceptions that may occur during a flush. This is stored so that if the exception
-	 * occurs during an asynchronous operation, it can be thrown later when a synchronous one
-	 * occurs.
+	 * Any IO exceptions that may occur during a flush. This is stored so that if the exception occurs during an asynchronous operation, it
+	 * can be thrown later when a synchronous one occurs.
 	 */
 	private IOException _ioe = null;
 
@@ -33,8 +32,8 @@ public class AppendableBuffer implements Closeable
 	private AppendResolver _resolver;
 
 	/**
-	 * Ensure that the given file offset can be written to the buffer. If the current state of the
-	 * buffer does not allow this, then flush what we currently have and reset.
+	 * Ensure that the given file offset can be written to the buffer. If the current state of the buffer does not allow this, then flush what
+	 * we currently have and reset.
 	 * 
 	 * @throws IOException
 	 */

@@ -22,9 +22,8 @@ public abstract class AbstractFilesystemPathRepresentation implements Filesystem
 	abstract protected String toStringImpl(String[] path);
 
 	/**
-	 * Given a path string, split that string into its constituant parts. This is NOT the same as
-	 * converting it into a rooted path array for two reasons. One, the path doesn't have to be
-	 * rooted. And two, the array can contain empty strings (often the case when using the
+	 * Given a path string, split that string into its constituant parts. This is NOT the same as converting it into a rooted path array for
+	 * two reasons. One, the path doesn't have to be rooted. And two, the array can contain empty strings (often the case when using the
 	 * String.split function) as well as . and .. elements.
 	 * 
 	 * @param path

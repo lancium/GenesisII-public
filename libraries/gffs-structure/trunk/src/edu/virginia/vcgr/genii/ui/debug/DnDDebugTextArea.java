@@ -30,10 +30,9 @@ public class DnDDebugTextArea extends JTextArea
 		DnDDebugTextArea area = new DnDDebugTextArea(uiContext);
 		JScrollPane scroller = new JScrollPane(area);
 		JPanel panel = new JPanel(new GridBagLayout());
-		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-			"DnD Debug Area"));
-		panel.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "DnD Debug Area"));
+		panel.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5,
+			5, 5), 5, 5));
 		return panel;
 	}
 }

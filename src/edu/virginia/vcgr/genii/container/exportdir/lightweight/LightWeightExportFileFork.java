@@ -27,11 +27,11 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork 
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public void read(long offset, ByteBuffer dest) throws IOException
-	
+
 	{
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("LightWeightExport: File Read from "+caller);
+		StatsLogger.logStats("LightWeightExport: File Read from " + caller);
 		// End logging
 		getTarget().read(offset, dest);
 	}
@@ -42,7 +42,7 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork 
 	{
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("LightWeightExport: File TruncAppend  from "+caller);
+		StatsLogger.logStats("LightWeightExport: File TruncAppend  from " + caller);
 		// End logging
 		getTarget().truncAppend(offset, source);
 	}
@@ -53,7 +53,7 @@ public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork 
 	{
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("LightWeightExport: File Write from "+caller);
+		StatsLogger.logStats("LightWeightExport: File Write from " + caller);
 		// End logging
 		getTarget().write(offset, source);
 	}

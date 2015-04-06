@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.container.cservices.infomgr;
 import edu.virginia.vcgr.genii.client.utils.Duration;
 
 /**
- * An interface that represents the ability to acquire information about an endpoint. Usually this
- * will involve making a SOAP outcall though that is not in fact required.
+ * An interface that represents the ability to acquire information about an endpoint. Usually this will involve making a SOAP outcall though
+ * that is not in fact required.
  * 
  * @author mmm2a
  * 

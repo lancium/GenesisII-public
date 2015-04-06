@@ -141,9 +141,8 @@ public class ExportTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException
 	{
 		int numArgs = numArguments();
 
@@ -168,8 +167,8 @@ public class ExportTool extends BaseGridTool
 			} else {
 				NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
 				exportServiceEPR =
-					RNSUtilities.findService(nsd.getRootContainer(), _portTypeString, new PortType[] { _portTypeObj },
-						serviceLocation).getEndpoint();
+					RNSUtilities.findService(nsd.getRootContainer(), _portTypeString, new PortType[] { _portTypeObj }, serviceLocation)
+						.getEndpoint();
 			}
 
 			/* get local directory path to be exported */
@@ -183,16 +182,15 @@ public class ExportTool extends BaseGridTool
 				owner = PreferredIdentity.resolveIdentityPatternInCredentials(_exportCreatorFilter, creds);
 			} else {
 				/*
-				 * --force flag is set, so just pack the owner as specified in the creator flag. the
-				 * container will have to do additional checks to ensure that the 'forced' creator
-				 * is actually allowable.
+				 * --force flag is set, so just pack the owner as specified in the creator flag. the container will have to do additional
+				 * checks to ensure that the 'forced' creator is actually allowable.
 				 */
 				owner = "force:" + _exportCreatorFilter;
 			}
 
 			EndpointReferenceType epr =
-				createExportedRoot(targetRNSName, exportServiceEPR, localPath, _svnUser, _svnPass, _svnRevision, targetRNSName,
-					_replicate, owner);
+				createExportedRoot(targetRNSName, exportServiceEPR, localPath, _svnUser, _svnPass, _svnRevision, targetRNSName, _replicate,
+					owner);
 
 			if (targetRNSName == null) {
 				stdout.println(ObjectSerializer.toString(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint")));
@@ -312,10 +310,9 @@ public class ExportTool extends BaseGridTool
 		}
 	}
 
-	static public EndpointReferenceType createExportedRoot(String humanName, EndpointReferenceType exportServiceEPR,
-		String localPath, String svnUser, String svnPass, Long svnRevision, String RNSPath, boolean isReplicated, String owner)
-		throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException,
-		InvalidToolUsageException
+	static public EndpointReferenceType createExportedRoot(String humanName, EndpointReferenceType exportServiceEPR, String localPath,
+		String svnUser, String svnPass, Long svnRevision, String RNSPath, boolean isReplicated, String owner) throws ResourceException,
+		ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 
@@ -329,8 +326,7 @@ public class ExportTool extends BaseGridTool
 			localPath = localPath.substring(5);
 
 		MessageElement[] createProps =
-			ExportedDirUtils.createCreationProperties(humanName, localPath, svnUser, svnPass, svnRevision, "",
-				replicationIndicator, owner);
+			ExportedDirUtils.createCreationProperties(humanName, localPath, svnUser, svnPass, svnRevision, "", replicationIndicator, owner);
 
 		ICallingContext origContext = ContextManager.getExistingContext();
 		ICallingContext createContext = origContext.deriveNewContext();
@@ -360,9 +356,9 @@ public class ExportTool extends BaseGridTool
 	 * @throws IOException
 	 * @throws InvalidToolUsageException
 	 */
-	static public EndpointReferenceType createInstance(EndpointReferenceType service, String optTargetName,
-		MessageElement[] createProperties) throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException,
-		CreationException, IOException, InvalidToolUsageException
+	static public EndpointReferenceType
+		createInstance(EndpointReferenceType service, String optTargetName, MessageElement[] createProperties) throws ResourceException,
+			ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType epr = ResourceCreator.createNewResource(service, createProperties, null);
 
@@ -379,8 +375,8 @@ public class ExportTool extends BaseGridTool
 	}
 
 	static public EndpointReferenceType createReplicatedExportedRoot(EndpointReferenceType exportServiceEPR, String localPath,
-		String RNSPath, boolean isReplicated, EndpointReferenceType replicationService) throws ResourceException,
-		ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
+		String RNSPath, boolean isReplicated, EndpointReferenceType replicationService) throws ResourceException, ResourceCreationFaultType,
+		RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 		String replicationIndicator = "false";

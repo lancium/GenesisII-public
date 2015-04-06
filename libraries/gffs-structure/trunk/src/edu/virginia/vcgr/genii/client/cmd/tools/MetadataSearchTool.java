@@ -147,14 +147,12 @@ public class MetadataSearchTool extends BaseGridTool
 				// printEntryforXquery(stdout, type, path, isLong, isAll, isexistence, isXquery,
 				// isCompare, isAttributes, isDisplay, xpathq);
 				else
-					printEntry(stdout, type, path, isLong, isAll, isexistence, isXquery, isCompare, isAttributes, isDisplay,
-						xpathq);
+					printEntry(stdout, type, path, isLong, isAll, isexistence, isXquery, isCompare, isAttributes, isDisplay, xpathq);
 			} else
 				dirs.add(path);
 		}
 		for (RNSPath path : dirs) {
-			listDirectory(stdout, null, path, isLong, isAll, isexistence, isXquery, isCompare, isRecursive, isAttributes,
-				isDisplay, xpathq);
+			listDirectory(stdout, null, path, isLong, isAll, isexistence, isXquery, isCompare, isRecursive, isAttributes, isDisplay, xpathq);
 		}
 
 		// Third, output the local files specified on the command line.
@@ -212,41 +210,34 @@ public class MetadataSearchTool extends BaseGridTool
 	}
 
 	/*
-	 * static private void printEntryforXquery(PrintWriter out, TypeInformation type, RNSPath path,
-	 * boolean isLong, boolean isAll, boolean isexistence, boolean isXquery, boolean isCompare,
-	 * boolean isAttributes, boolean isDisplay, String xpath1) throws RNSException,
-	 * ResourceException { try{ XQDataSource xqs = new SednaXQDataSource();
-	 * xqs.setProperty("serverName", "localhost"); xqs.setProperty("databaseName", "tempdb");
+	 * static private void printEntryforXquery(PrintWriter out, TypeInformation type, RNSPath path, boolean isLong, boolean isAll, boolean
+	 * isexistence, boolean isXquery, boolean isCompare, boolean isAttributes, boolean isDisplay, String xpath1) throws RNSException,
+	 * ResourceException { try{ XQDataSource xqs = new SednaXQDataSource(); xqs.setProperty("serverName", "localhost");
+	 * xqs.setProperty("databaseName", "tempdb");
 	 * 
-	 * XQConnection conn = xqs.getConnection("SYSTEM", "MANAGER"); XQExpression xqe =
-	 * conn.createExpression(); _count++; String xpathq = "", second = ""; RNSPath rpath = null;
-	 * String name = path.getName(); //System.out.println(name); if (name.startsWith(".") && !isAll)
-	 * return; GeniiPath gPath = new GeniiPath(path); try{ if ( gPath.pathType() !=
-	 * GeniiPathType.Grid) throw new InvalidToolUsageException("<target> must be a grid path. ");
-	 * rpath = lookup(gPath, RNSPathQueryFlags.MUST_EXIST); GeniiCommon common =
-	 * ClientUtils.createProxy(GeniiCommon.class, rpath.getEndpoint());
-	 * GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument( new
-	 * GetResourcePropertyDocument()); MessageElement document = new MessageElement( new
-	 * QName(GenesisIIConstants.GENESISII_NS, "attributes")); for (MessageElement child :
-	 * resp.get_any()) {
+	 * XQConnection conn = xqs.getConnection("SYSTEM", "MANAGER"); XQExpression xqe = conn.createExpression(); _count++; String xpathq = "",
+	 * second = ""; RNSPath rpath = null; String name = path.getName(); //System.out.println(name); if (name.startsWith(".") && !isAll)
+	 * return; GeniiPath gPath = new GeniiPath(path); try{ if ( gPath.pathType() != GeniiPathType.Grid) throw new
+	 * InvalidToolUsageException("<target> must be a grid path. "); rpath = lookup(gPath, RNSPathQueryFlags.MUST_EXIST); GeniiCommon common =
+	 * ClientUtils.createProxy(GeniiCommon.class, rpath.getEndpoint()); GetResourcePropertyDocumentResponse resp =
+	 * common.getResourcePropertyDocument( new GetResourcePropertyDocument()); MessageElement document = new MessageElement( new
+	 * QName(GenesisIIConstants.GENESISII_NS, "attributes")); for (MessageElement child : resp.get_any()) {
 	 * 
 	 * document.addChild(child);
 	 * 
-	 * } DocumentBuilderFactory xmlFact = DocumentBuilderFactory.newInstance();
-	 * xmlFact.setNamespaceAware(true); DocumentBuilder builder = xmlFact.newDocumentBuilder();
-	 * //org.w3c.dom.Document docs = builder.parse(ctxtTemplate); Document docs =
-	 * document.getAsDocument(); try{ TransformerFactory tFactory =
-	 * TransformerFactory.newInstance(); Transformer transformer = tFactory.newTransformer();
+	 * } DocumentBuilderFactory xmlFact = DocumentBuilderFactory.newInstance(); xmlFact.setNamespaceAware(true); DocumentBuilder builder =
+	 * xmlFact.newDocumentBuilder(); //org.w3c.dom.Document docs = builder.parse(ctxtTemplate); Document docs = document.getAsDocument(); try{
+	 * TransformerFactory tFactory = TransformerFactory.newInstance(); Transformer transformer = tFactory.newTransformer();
 	 * 
 	 * DOMSource source = new DOMSource(document); StreamResult stresult = new StreamResult(new
-	 * File("/home/anindya/"+gPath.getName()+"RP.xml")); transformer.transform(source, stresult);
-	 * }catch(Exception ex){ ex.printStackTrace(); }
+	 * File("/home/anindya/"+gPath.getName()+"RP.xml")); transformer.transform(source, stresult); }catch(Exception ex){ ex.printStackTrace();
+	 * }
 	 * 
 	 * }catch(Exception ex){ ex.printStackTrace(); } }catch(Exception ex){ ex.printStackTrace(); } }
 	 */
-	static private void printEntry(PrintWriter out, TypeInformation type, RNSPath path, boolean isLong, boolean isAll,
-		boolean isexistence, boolean isMultiline, boolean isCompare, boolean isAttributes, boolean isDisplay, String xpath1)
-		throws RNSException, ResourceException
+	static private void printEntry(PrintWriter out, TypeInformation type, RNSPath path, boolean isLong, boolean isAll, boolean isexistence,
+		boolean isMultiline, boolean isCompare, boolean isAttributes, boolean isDisplay, String xpath1) throws RNSException,
+		ResourceException
 	{
 		_count++;
 		String xpathq = "", second = "";
@@ -263,8 +254,7 @@ public class MetadataSearchTool extends BaseGridTool
 					throw new InvalidToolUsageException("<target> must be a grid path. ");
 				rpath = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, rpath.getEndpoint());
-				GetResourcePropertyDocumentResponse resp =
-					common.getResourcePropertyDocument(new GetResourcePropertyDocument());
+				GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument(new GetResourcePropertyDocument());
 				MessageElement document = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
 				for (MessageElement child : resp.get_any()) {
 
@@ -340,13 +330,12 @@ public class MetadataSearchTool extends BaseGridTool
 
 						if (nodes.item(i).getTextContent().equals("")) {
 							if (isDisplay)
-								out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName()
-									+ ") = nil");
+								out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName() + ") = nil");
 							continue;
 						}
 						if (isDisplay)
-							out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName()
-								+ ") = " + nodes.item(i).getTextContent());
+							out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName() + ") = "
+								+ nodes.item(i).getTextContent());
 						// out.println("result is =" + result);
 
 						StringTokenizer str = new StringTokenizer(nodes.item(i).getTextContent(), "TZ");
@@ -360,26 +349,22 @@ public class MetadataSearchTool extends BaseGridTool
 						if (isCompare) {
 							if (xpath1.contains("<>")) {
 								if (milis != milis2)
-									out.println(rpath.getParent() + "/" + rpath.getName() + ": "
-										+ nodes.item(i).getTextContent());
+									out.println(rpath.getParent() + "/" + rpath.getName() + ": " + nodes.item(i).getTextContent());
 								return;
 							}
 							if (xpath1.contains("=")) {
 								if (milis == milis2)
-									out.println(rpath.getParent() + "/" + rpath.getName() + ": "
-										+ nodes.item(i).getTextContent());
+									out.println(rpath.getParent() + "/" + rpath.getName() + ": " + nodes.item(i).getTextContent());
 								return;
 							}
 							if (xpath1.contains("<")) {
 								if (milis < milis2)
-									out.println(rpath.getParent() + "/" + rpath.getName() + ": "
-										+ nodes.item(i).getTextContent());
+									out.println(rpath.getParent() + "/" + rpath.getName() + ": " + nodes.item(i).getTextContent());
 								return;
 							}
 							if (xpath1.contains(">")) {
 								if (milis < milis2)
-									out.println(rpath.getParent() + "/" + rpath.getName() + ": "
-										+ nodes.item(i).getTextContent());
+									out.println(rpath.getParent() + "/" + rpath.getName() + ": " + nodes.item(i).getTextContent());
 							}
 						}
 
@@ -391,37 +376,33 @@ public class MetadataSearchTool extends BaseGridTool
 							if (isCompare) {
 								if (xpath1.contains("<>")) {
 									if (_param != _result)
-										out.println(rpath.getParent() + "/" + rpath.getName() + ": "
-											+ nodes.item(i).getTextContent());
+										out.println(rpath.getParent() + "/" + rpath.getName() + ": " + nodes.item(i).getTextContent());
 									return;
 								}
 								if (xpath1.contains("=")) {
 									if (_param == _result)
-										out.println(rpath.getParent() + "/" + rpath.getName() + ": "
-											+ nodes.item(i).getTextContent());
+										out.println(rpath.getParent() + "/" + rpath.getName() + ": " + nodes.item(i).getTextContent());
 									return;
 								}
 								if (xpath1.contains("<")) {
 									if (_param < _result)
-										out.println(rpath.getParent() + "/" + rpath.getName() + ": "
-											+ nodes.item(i).getTextContent());
+										out.println(rpath.getParent() + "/" + rpath.getName() + ": " + nodes.item(i).getTextContent());
 									return;
 								}
 								if (xpath1.contains(">")) {
 									if (_param < _result)
-										out.println(rpath.getParent() + "/" + rpath.getName() + ": "
-											+ nodes.item(i).getTextContent());
+										out.println(rpath.getParent() + "/" + rpath.getName() + ": " + nodes.item(i).getTextContent());
 								}
 							}
 						} catch (Exception ex) {
 							// Not an integer
 							if (isDisplay)
 								if (!nodes.item(i).getTextContent().equals(""))
-									out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/"
-										+ rpath.getName() + ") = " + nodes.item(i).getTextContent());
+									out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName() + ") = "
+										+ nodes.item(i).getTextContent());
 								else
-									out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/"
-										+ rpath.getName() + ") = nil");
+									out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName()
+										+ ") = nil");
 							if (isCompare) {
 								if (xpath1.contains("=")) {
 									if (nodes.item(i).getTextContent().equals(second)) {
@@ -446,15 +427,14 @@ public class MetadataSearchTool extends BaseGridTool
 	}
 
 	/*
-	 * static private long getSecondVal(String str){ StringTokenizer stok = new
-	 * StringTokenizer(str,":"); long val[] = {0,0,0,0,0}; int i = 0; while(stok.hasMoreTokens()){
-	 * val[i++] = Long.parseLong(stok.nextToken()); } return val[0]*24*60*60*1000 +
-	 * val[1]*60*60*1000 + val[2]*60*1000 + val[3]*1000 + val[4]; }
+	 * static private long getSecondVal(String str){ StringTokenizer stok = new StringTokenizer(str,":"); long val[] = {0,0,0,0,0}; int i = 0;
+	 * while(stok.hasMoreTokens()){ val[i++] = Long.parseLong(stok.nextToken()); } return val[0]*24*60*60*1000 + val[1]*60*60*1000 +
+	 * val[2]*60*1000 + val[3]*1000 + val[4]; }
 	 */
 
-	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll,
-		boolean isexistence, boolean isMultiline, boolean isCompare, boolean isRecursive, boolean isAttributes,
-		boolean isDisplay, String xpathq) throws RNSException, ResourceException
+	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll, boolean isexistence,
+		boolean isMultiline, boolean isCompare, boolean isRecursive, boolean isAttributes, boolean isDisplay, String xpathq)
+		throws RNSException, ResourceException
 	{
 		String name = path.getName();
 		if (name == null)
@@ -485,8 +465,8 @@ public class MetadataSearchTool extends BaseGridTool
 		// out.println();
 		if (isRecursive) {
 			for (RNSPath entry : subdirs) {
-				listDirectory(out, name, entry, isLong, isAll, isexistence, isMultiline, isCompare, isRecursive, isAttributes,
-					isDisplay, xpathq);
+				listDirectory(out, name, entry, isLong, isAll, isexistence, isMultiline, isCompare, isRecursive, isAttributes, isDisplay,
+					xpathq);
 			}
 		}
 	}

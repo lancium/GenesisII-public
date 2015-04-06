@@ -24,8 +24,8 @@ public class TabPluginDescriptor extends PluginDescriptor<ITabPlugin>
 	 * @param tabName
 	 *            The name that the tab should have.
 	 * @param priority
-	 *            The priority that the tab should have. Priorities affect the order in which tabs
-	 *            are displayed and go from lower numbers to higher numbers.
+	 *            The priority that the tab should have. Priorities affect the order in which tabs are displayed and go from lower numbers to
+	 *            higher numbers.
 	 */
 	public TabPluginDescriptor(String pluginName, ITabPlugin plugin, String tabName, int priority)
 	{
@@ -66,8 +66,7 @@ public class TabPluginDescriptor extends PluginDescriptor<ITabPlugin>
 	}
 
 	/**
-	 * This internal class implements the Comparator interface so that tab plugins can easily be
-	 * sorted by priority.
+	 * This internal class implements the Comparator interface so that tab plugins can easily be sorted by priority.
 	 * 
 	 * @author mmm2a
 	 */

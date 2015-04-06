@@ -42,8 +42,7 @@ public class RWXManager
 		}
 	}
 
-	static private HashMap<String, HashMap<String, ClassMapEntry>> _cachedValues =
-		new HashMap<String, HashMap<String, ClassMapEntry>>();
+	static private HashMap<String, HashMap<String, ClassMapEntry>> _cachedValues = new HashMap<String, HashMap<String, ClassMapEntry>>();
 
 	static private HashMap<String, ClassMapEntry> retrieveClassMap(Class<?> service)
 	{
@@ -110,13 +109,11 @@ public class RWXManager
 
 		ClassMapEntry resolver = classMap.get(methodName);
 		if (resolver == null)
-			throw new RWXMappingException("Couldn't find RWX mapping for method \"" + methodName + "\" in class \"" + cl
-				+ "\".");
+			throw new RWXMappingException("Couldn't find RWX mapping for method \"" + methodName + "\" in class \"" + cl + "\".");
 
 		RWXCategory category = resolver.resolve(cl);
 		if (category == null)
-			throw new RWXMappingException("Couldn't find RWX mapping for method \"" + methodName + "\" in class \"" + cl
-				+ "\".");
+			throw new RWXMappingException("Couldn't find RWX mapping for method \"" + methodName + "\" in class \"" + cl + "\".");
 
 		return category;
 	}
@@ -128,13 +125,11 @@ public class RWXManager
 
 		ClassMapEntry resolver = classMap.get(methodName);
 		if (resolver == null)
-			throw new RWXMappingException("Couldn't find RWX mapping for method \"" + methodName + "\" in class \"" + service
-				+ "\".");
+			throw new RWXMappingException("Couldn't find RWX mapping for method \"" + methodName + "\" in class \"" + service + "\".");
 
 		RWXCategory category = resolver.resolve(service);
 		if (category == null)
-			throw new RWXMappingException("Couldn't find RWX mapping for method \"" + methodName + "\" in class \"" + service
-				+ "\".");
+			throw new RWXMappingException("Couldn't find RWX mapping for method \"" + methodName + "\" in class \"" + service + "\".");
 
 		return category;
 	}

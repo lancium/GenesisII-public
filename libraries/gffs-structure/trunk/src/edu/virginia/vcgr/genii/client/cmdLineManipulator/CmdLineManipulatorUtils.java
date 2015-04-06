@@ -25,16 +25,15 @@ public class CmdLineManipulatorUtils
 {
 	static private Log _logger = LogFactory.getLog(CmdLineManipulatorUtils.class);
 
-	static public void
-		addBasicJobProperties(Map<String, Object> jobProperties, String executable, Collection<String> arguments)
+	static public void addBasicJobProperties(Map<String, Object> jobProperties, String executable, Collection<String> arguments)
 	{
 		jobProperties.put(CmdLineManipulatorConstants.JOB_EXECUTABLE_NAME, executable);
 		jobProperties.put(CmdLineManipulatorConstants.JOB_ARGUMENTS, arguments);
 		return;
 	}
 
-	static public void addSPMDJobProperties(Map<String, Object> jobProperties, URI variation, Integer numProcesses,
-		Integer numProcessesPeHost)
+	static public void
+		addSPMDJobProperties(Map<String, Object> jobProperties, URI variation, Integer numProcesses, Integer numProcessesPeHost)
 	{
 		if (variation != null) {
 			jobProperties.put(CmdLineManipulatorConstants.SPMD_VARIATION, variation);
@@ -43,9 +42,8 @@ public class CmdLineManipulatorUtils
 		}
 	}
 
-	static public void addEnvProperties(Map<String, Object> jobProperties, File fuseMountPoint,
-		Map<String, String> environment, File workingDirectory, File stdinRedirect, File stdoutRedirect, File stderrRedirect,
-		File resourceUsagePath, File pathToWrapper)
+	static public void addEnvProperties(Map<String, Object> jobProperties, File fuseMountPoint, Map<String, String> environment,
+		File workingDirectory, File stdinRedirect, File stdoutRedirect, File stderrRedirect, File resourceUsagePath, File pathToWrapper)
 	{
 		if (fuseMountPoint != null)
 			jobProperties.put(CmdLineManipulatorConstants.FUSE_MOUNT_POINT, fuseMountPoint);
@@ -124,14 +122,12 @@ public class CmdLineManipulatorUtils
 				}
 			}
 			if (!foundManipulator)
-				throw new CmdLineManipulatorException(String.format("Construction params lack a manipulator named \"%s\".",
-					manipulatorName));
+				throw new CmdLineManipulatorException(String.format("Construction params lack a manipulator named \"%s\".", manipulatorName));
 			if (manipulatorCount > 1)
-				throw new IllegalArgumentException("Construction params contain "
-					+ "mulitple manipulator variations with same name.");
+				throw new IllegalArgumentException("Construction params contain " + "mulitple manipulator variations with same name.");
 			if (spmdJob && (!mpiManipulatorCalled))
-				throw new IllegalArgumentException("No MPI manipulator "
-					+ "in manipulator call chain: Attempting to run SPMD job " + "on BES with no SPMD support.");
+				throw new IllegalArgumentException("No MPI manipulator " + "in manipulator call chain: Attempting to run SPMD job "
+					+ "on BES with no SPMD support.");
 
 		}
 

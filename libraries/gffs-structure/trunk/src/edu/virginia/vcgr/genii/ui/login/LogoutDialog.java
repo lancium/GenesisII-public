@@ -76,8 +76,8 @@ class LogoutDialog extends JDialog
 		final public void actionPerformed(ActionEvent e)
 		{
 			int answer =
-				JOptionPane.showConfirmDialog((Component) e.getSource(), "Log out from selected credentials?",
-					"Logout Confirmation", JOptionPane.YES_NO_OPTION);
+				JOptionPane.showConfirmDialog((Component) e.getSource(), "Log out from selected credentials?", "Logout Confirmation",
+					JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
 				Object[] values = _credentialList.getSelectedValues();
 				NuCredential[] logoutItems = new NuCredential[values.length];

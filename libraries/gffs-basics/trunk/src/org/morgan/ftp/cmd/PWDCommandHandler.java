@@ -15,8 +15,7 @@ public class PWDCommandHandler extends AbstractCommandHandler
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
+	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out) throws FTPException
 	{
 		out.println("257 \"" + sessionState.getBackend().pwd() + "\".");
 	}

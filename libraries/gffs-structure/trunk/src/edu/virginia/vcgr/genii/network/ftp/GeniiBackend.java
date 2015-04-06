@@ -115,8 +115,8 @@ public class GeniiBackend implements IBackend
 				} else {
 					RedirectFile rd = new RedirectFile(paths[lcv].getEndpoint());
 					ret[lcv] =
-						new ListEntry(paths[lcv].getName() + ".html", new Date(), rd.getSize(), _username, "genii",
-							new FilePermissions(0x5, 0x5, 0x5), 1, false);
+						new ListEntry(paths[lcv].getName() + ".html", new Date(), rd.getSize(), _username, "genii", new FilePermissions(0x5,
+							0x5, 0x5), 1, false);
 				}
 			}
 

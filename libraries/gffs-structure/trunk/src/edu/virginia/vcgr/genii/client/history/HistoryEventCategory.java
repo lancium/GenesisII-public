@@ -5,8 +5,7 @@ import edu.virginia.vcgr.genii.client.utils.icon.StandardIconProvider;
 public enum HistoryEventCategory {
 	Default(new DefaultHistoryCategoryInformation("Default")),
 	CreatingJob(new DefaultHistoryCategoryInformation("Creating Job", new StandardIconProvider("create-job.png"))),
-	CreatingActivity(
-		new DefaultHistoryCategoryInformation("Creating Activity", new StandardIconProvider("create-activity.png"))),
+	CreatingActivity(new DefaultHistoryCategoryInformation("Creating Activity", new StandardIconProvider("create-activity.png"))),
 	Scheduling(new DefaultHistoryCategoryInformation("Scheduling", new StandardIconProvider("scheduling.png"))),
 	StageIn(new DefaultHistoryCategoryInformation("Stage-In", new StandardIconProvider("stage-in.png"))),
 	StageOut(new DefaultHistoryCategoryInformation("Stage-Out", new StandardIconProvider("stage-out.png"))),

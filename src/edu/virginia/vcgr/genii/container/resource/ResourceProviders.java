@@ -9,9 +9,8 @@ import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigura
 import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigurationFactory;
 
 /**
- * This class is simply a repository for providers for given services. Each service will have
- * associated with it it's own resource provider. This allows each one to have its own key
- * translaters and resource types.
+ * This class is simply a repository for providers for given services. Each service will have associated with it it's own resource provider.
+ * This allows each one to have its own key translaters and resource types.
  * 
  * @author Mark Morgan (mmm2a@cs.virginia.edu)
  */
@@ -48,8 +47,8 @@ class ResourceProviders
 		provider = conf.resourceProvider();
 
 		if (provider == null)
-			throw new ResourceException(String.format("Unable to find resource provider for service %s "
-				+ "(implemented by class %s).", serviceName, serviceClass));
+			throw new ResourceException(String.format("Unable to find resource provider for service %s " + "(implemented by class %s).",
+				serviceName, serviceClass));
 
 		synchronized (_providerCache) {
 			_providerCache.put(serviceName, provider);

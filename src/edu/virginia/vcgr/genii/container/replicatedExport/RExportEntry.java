@@ -15,8 +15,7 @@ class RExportEntry
 	static public String _FILE_TYPE = "F";
 	static public String _DIR_TYPE = "D";
 
-	RExportEntry(String dirId, String name, EndpointReferenceType entryReference, String id, String type,
-		MessageElement[] attributes)
+	RExportEntry(String dirId, String name, EndpointReferenceType entryReference, String id, String type, MessageElement[] attributes)
 	{
 		_dirId = dirId;
 		_name = name;

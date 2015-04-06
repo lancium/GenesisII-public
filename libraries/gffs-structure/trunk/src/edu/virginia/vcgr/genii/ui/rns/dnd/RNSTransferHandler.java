@@ -233,25 +233,18 @@ public class RNSTransferHandler extends TransferHandler
 				JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
 
 				if (support.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
-					RNSListTransferData data =
-						(RNSListTransferData) t.getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+					RNSListTransferData data = (RNSListTransferData) t.getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
 
 					int action = support.getDropAction();
 					switch (action) {
 						case MOVE:
-							operator =
-								RNSTreeMover
-									.move(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(), data.paths());
+							operator = RNSTreeMover.move(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(), data.paths());
 							break;
 						case LINK:
-							operator =
-								RNSTreeLinker.link(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(),
-									data.paths());
+							operator = RNSTreeLinker.link(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(), data.paths());
 							break;
 						case COPY:
-							operator =
-								RNSTreeCopier.copy(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(),
-									data.paths());
+							operator = RNSTreeCopier.copy(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(), data.paths());
 							break;
 						default:
 							return false;

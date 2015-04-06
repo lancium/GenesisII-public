@@ -31,8 +31,7 @@ public class SslInformation
 			(Installation.getDeployment(new DeploymentName()).security().getSecurityFile(_keystoreFilename)).getAbsolutePath();
 		_keystoreType = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP);
 		if (_keystoreType == null) {
-			String msg =
-				"Required ssl property \"" + KeystoreSecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP + "\" not found.";
+			String msg = "Required ssl property \"" + KeystoreSecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP + "\" not found.";
 			_logger.error(msg);
 			throw new ConfigurationException(msg);
 		}

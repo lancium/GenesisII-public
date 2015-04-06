@@ -12,8 +12,7 @@ public class VMStatusRPTranslater implements SingleResourcePropertyTranslator
 	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
 	{
 		if (!(obj instanceof VMStats))
-			throw new ResourcePropertyException("Unable to translate from type \"" + obj.getClass().getName()
-				+ "\" to VMStats.");
+			throw new ResourcePropertyException("Unable to translate from type \"" + obj.getClass().getName() + "\" to VMStats.");
 
 		return ((VMStats) obj).toMessageElement(name);
 	}

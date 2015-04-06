@@ -90,8 +90,8 @@ public class PatternComponent extends DraggableImageComponent
 
 		_context
 			.progressMonitorFactory()
-			.createMonitor(this, "Reading Grid Identity", "Reading grid identity", 1000L,
-				new RemoteIdentityLookupTask(targets), new RemoteLookupCompletionListener()).start();
+			.createMonitor(this, "Reading Grid Identity", "Reading grid identity", 1000L, new RemoteIdentityLookupTask(targets),
+				new RemoteLookupCompletionListener()).start();
 	}
 
 	private void doImport(File file)
@@ -105,11 +105,9 @@ public class PatternComponent extends DraggableImageComponent
 			X509Certificate[] chain = { cert };
 			doImport(new X509Identity(chain));
 		} catch (IOException ioe) {
-			JOptionPane.showMessageDialog(this, "Unable to read certificate file.", "Certificate Read Error",
-				JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Unable to read certificate file.", "Certificate Read Error", JOptionPane.ERROR_MESSAGE);
 		} catch (CertificateException e) {
-			JOptionPane.showMessageDialog(this, "Unable to read certificate from file.", "Certificate Read Error",
-				JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Unable to read certificate from file.", "Certificate Read Error", JOptionPane.ERROR_MESSAGE);
 		} finally {
 			StreamUtils.close(in);
 		}
@@ -196,8 +194,7 @@ public class PatternComponent extends DraggableImageComponent
 					return true;
 				} else if (support.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
 					RNSListTransferData data =
-						(RNSListTransferData) support.getTransferable().getTransferData(
-							RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+						(RNSListTransferData) support.getTransferable().getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
 
 					if (data.paths().size() != 1)
 						return false;
@@ -238,8 +235,7 @@ public class PatternComponent extends DraggableImageComponent
 					return true;
 				} else if (support.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
 					RNSListTransferData data =
-						(RNSListTransferData) support.getTransferable().getTransferData(
-							RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+						(RNSListTransferData) support.getTransferable().getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
 
 					if (data.paths().size() != 1)
 						return false;

@@ -28,8 +28,8 @@ public class SetUserConfigTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 		DeploymentName deploymentName = new DeploymentName(getArgument(0));
 		UserConfig userConfig = new UserConfig(deploymentName);

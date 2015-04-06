@@ -59,8 +59,7 @@ public class BESActivityCleanupHandler extends BasicResourceCleanupHandler
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT propertyvalue FROM besactivitypropertiestable " + "WHERE activityid = ?");
+			stmt = connection.prepareStatement("SELECT propertyvalue FROM besactivitypropertiestable " + "WHERE activityid = ?");
 			stmt.setString(1, resourceID);
 			rs = stmt.executeQuery();
 
@@ -74,9 +73,8 @@ public class BESActivityCleanupHandler extends BasicResourceCleanupHandler
 		}
 	}
 
-	private void evaluate(Connection connection, CleanupContext context, String activityID, String besID, Blob jsdlBlob,
-		Blob ownersBlob, Blob callCtxtBlob, Blob stateBlob, Blob execPlanBlob, Blob actEprBlob, String jobName)
-		throws SQLException
+	private void evaluate(Connection connection, CleanupContext context, String activityID, String besID, Blob jsdlBlob, Blob ownersBlob,
+		Blob callCtxtBlob, Blob stateBlob, Blob execPlanBlob, Blob actEprBlob, String jobName) throws SQLException
 	{
 		if (besID == null)
 			context.addResource(activityID, "No BES associated with activity.");
@@ -112,8 +110,8 @@ public class BESActivityCleanupHandler extends BasicResourceCleanupHandler
 		try {
 			stmt = connection.createStatement();
 			rs =
-				stmt.executeQuery("SELECT activityid, besid, jsdl, owners, callingcontext, "
-					+ "state, executionplan, activityepr, jobname " + "FROM besactivitiestable");
+				stmt.executeQuery("SELECT activityid, besid, jsdl, owners, callingcontext, " + "state, executionplan, activityepr, jobname "
+					+ "FROM besactivitiestable");
 
 			while (rs.next()) {
 				try {
@@ -127,11 +125,10 @@ public class BESActivityCleanupHandler extends BasicResourceCleanupHandler
 					Blob actEprBlob = rs.getBlob(8);
 					String jobName = rs.getString(9);
 
-					_logger.info(String.format("Evaluating whether or not activity %s with job name %s is good.", activityID,
-						jobName));
+					_logger.info(String.format("Evaluating whether or not activity %s with job name %s is good.", activityID, jobName));
 
-					evaluate(connection, context, activityID, besID, jsdlBlob, ownersBlob, callCtxtBlob, stateBlob,
-						execPlanBlob, actEprBlob, jobName);
+					evaluate(connection, context, activityID, besID, jsdlBlob, ownersBlob, callCtxtBlob, stateBlob, execPlanBlob, actEprBlob,
+						jobName);
 				} catch (Throwable cause) {
 					_logger.error("Couldn't evaluate a bes activity resource -- " + "threw an exception.", cause);
 				}
@@ -151,10 +148,8 @@ public class BESActivityCleanupHandler extends BasicResourceCleanupHandler
 
 		super.enactCleanup(connection, resourceID);
 
-		removeRowsFromTable(connection, new Triple<String, String, String>("besactivityfaultstable", "besactivityid",
-			resourceID));
+		removeRowsFromTable(connection, new Triple<String, String, String>("besactivityfaultstable", "besactivityid", resourceID));
 		removeRowsFromTable(connection, new Triple<String, String, String>("besactivitiestable", "activityid", resourceID));
-		removeRowsFromTable(connection, new Triple<String, String, String>("besactivitypropertiestable", "activityid",
-			resourceID));
+		removeRowsFromTable(connection, new Triple<String, String, String>("besactivitypropertiestable", "activityid", resourceID));
 	}
 }

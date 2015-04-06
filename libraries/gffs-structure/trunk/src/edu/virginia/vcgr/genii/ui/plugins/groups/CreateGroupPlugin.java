@@ -188,7 +188,6 @@ public class CreateGroupPlugin extends AbstractCombinedUIMenusPlugin
 		// and NOT (isContainer, isBES ...
 		// Perhaps should be even more selective,
 		TypeInformation tp = selectedDescriptions.iterator().next().typeInformation();
-		return (tp.isRNS() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP() || tp.isExport() || tp
-			.isFSProxy()));
+		return (tp.isRNS() && !(tp.isContainer() || tp.isBESContainer() || tp.isQueue() || tp.isIDP() || tp.isExport() || tp.isFSProxy()));
 	}
 }

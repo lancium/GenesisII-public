@@ -18,8 +18,7 @@ import edu.virginia.vcgr.genii.ui.Icons;
 
 public class RNSIcons extends Icons
 {
-	private EnumMap<EndpointType, Pair<Icon, Icon>> _endpointIcons = new EnumMap<EndpointType, Pair<Icon, Icon>>(
-		EndpointType.class);
+	private EnumMap<EndpointType, Pair<Icon, Icon>> _endpointIcons = new EnumMap<EndpointType, Pair<Icon, Icon>>(EndpointType.class);
 	private Icon _questionIcon = null;
 	private Icon _errorIcon = null;
 	static private RNSIcons singleton = null;

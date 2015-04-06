@@ -11,8 +11,7 @@ import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 public class ResourceMatcher
 {
 	/**
-	 * This operation indicates whether or not the given job can be run on the indicated bes
-	 * container.
+	 * This operation indicates whether or not the given job can be run on the indicated bes container.
 	 * 
 	 * @param jobID
 	 *            The job to match against.

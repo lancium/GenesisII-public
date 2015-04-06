@@ -50,10 +50,10 @@ public class GuiSingleSelectionListDialog extends AbstractGuiDialog implements C
 		JScrollPane scroller = new JScrollPane(_list);
 
 		JPanel panel = new JPanel(new GridBagLayout());
-		panel.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+		panel.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5,
+			5, 5), 5, 5));
+		panel.add(new JLabel(prompt), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(new JLabel(prompt), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		if (defaultItem != null)
 			_list.setSelectedValue(defaultItem, true);

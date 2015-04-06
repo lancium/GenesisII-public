@@ -34,8 +34,9 @@ public class XScriptParseHandler implements ParseHandler
 			replacement = XScriptParser.getRequiredAttribute(element, "replacement");
 		}
 
-		return new DefineStatement(XScriptParser.getRequiredAttribute(element, "name"), XScriptParser.getRequiredAttribute(
-			element, "source"), pattern, replacement, XScriptParser.getAttribute(element, "global", "true"));
+		return new DefineStatement(XScriptParser.getRequiredAttribute(element, "name"),
+			XScriptParser.getRequiredAttribute(element, "source"), pattern, replacement,
+			XScriptParser.getAttribute(element, "global", "true"));
 	}
 
 	private ParseStatement parseIf(ParseContext context, Element element) throws ScriptException
@@ -55,28 +56,26 @@ public class XScriptParseHandler implements ParseHandler
 
 				if (!ns.equals(XScriptConstants.XSCRIPT_NS) || !(name.equals("then") || name.equals("else")))
 					throw new ScriptException(String.format("Only <{%s}:%s> and <{%s}:%s> elements are "
-						+ "allowed as children of a <{%s}:%s> node.", XScriptConstants.XSCRIPT_NS, "then",
-						XScriptConstants.XSCRIPT_NS, "else", XScriptConstants.XSCRIPT_NS, element.getLocalName()));
+						+ "allowed as children of a <{%s}:%s> node.", XScriptConstants.XSCRIPT_NS, "then", XScriptConstants.XSCRIPT_NS,
+						"else", XScriptConstants.XSCRIPT_NS, element.getLocalName()));
 
 				if (name.equals("then")) {
 					if (thenBlock != null)
-						throw new ScriptException(String.format("Only one <{%s}:%s> is allowed as a child "
-							+ "of a <{%s}:%s> element.", XScriptConstants.XSCRIPT_NS, name, XScriptConstants.XSCRIPT_NS,
-							element.getLocalName()));
+						throw new ScriptException(String.format("Only one <{%s}:%s> is allowed as a child " + "of a <{%s}:%s> element.",
+							XScriptConstants.XSCRIPT_NS, name, XScriptConstants.XSCRIPT_NS, element.getLocalName()));
 					thenBlock = child;
 				} else {
 					if (elseBlock != null)
-						throw new ScriptException(String.format("Only one <{%s}:%s> is allowed as a child "
-							+ "of a <{%s}:%s> element.", XScriptConstants.XSCRIPT_NS, name, XScriptConstants.XSCRIPT_NS,
-							element.getLocalName()));
+						throw new ScriptException(String.format("Only one <{%s}:%s> is allowed as a child " + "of a <{%s}:%s> element.",
+							XScriptConstants.XSCRIPT_NS, name, XScriptConstants.XSCRIPT_NS, element.getLocalName()));
 					elseBlock = child;
 				}
 			}
 		}
 
 		if (thenBlock == null)
-			throw new ScriptException(String.format("A <{%s}:%s> element must have a <{%s}:then> sub-element.",
-				XScriptConstants.XSCRIPT_NS, element.getLocalName()));
+			throw new ScriptException(String.format("A <{%s}:%s> element must have a <{%s}:then> sub-element.", XScriptConstants.XSCRIPT_NS,
+				element.getLocalName()));
 
 		ParseStatement thenStmt = parseBlock(context, thenBlock.getChildNodes());
 		ParseStatement elseStmt = null;
@@ -101,8 +100,8 @@ public class XScriptParseHandler implements ParseHandler
 
 				if (!ns.equals(XScriptConstants.XSCRIPT_NS) || !(name.equals("case") || name.equals("default")))
 					throw new ScriptException(String.format("Only <{%s}:%s> and <{%s}:%s> elements are "
-						+ "allowed as children of a <{%s}:%s> node.", XScriptConstants.XSCRIPT_NS, "case",
-						XScriptConstants.XSCRIPT_NS, "default", XScriptConstants.XSCRIPT_NS, element.getLocalName()));
+						+ "allowed as children of a <{%s}:%s> node.", XScriptConstants.XSCRIPT_NS, "case", XScriptConstants.XSCRIPT_NS,
+						"default", XScriptConstants.XSCRIPT_NS, element.getLocalName()));
 
 				if (name.equals("case")) {
 					String casePattern = XScriptParser.getRequiredAttribute(child, "pattern");
@@ -131,30 +130,26 @@ public class XScriptParseHandler implements ParseHandler
 				String ns = child.getNamespaceURI();
 				String name = child.getLocalName();
 
-				if (!ns.equals(XScriptConstants.XSCRIPT_NS)
-					|| !(name.equals("block") || name.equals("catch") || name.equals("finally")))
+				if (!ns.equals(XScriptConstants.XSCRIPT_NS) || !(name.equals("block") || name.equals("catch") || name.equals("finally")))
 					throw new ScriptException(String.format("Only <{%s}:%s>, <{%s}:%s>, and <{%s}:%s> elements are "
-						+ "allowed as children of a <{%s}:%s> node.", XScriptConstants.XSCRIPT_NS, "block",
-						XScriptConstants.XSCRIPT_NS, "catch", XScriptConstants.XSCRIPT_NS, "finally",
-						XScriptConstants.XSCRIPT_NS, element.getLocalName()));
+						+ "allowed as children of a <{%s}:%s> node.", XScriptConstants.XSCRIPT_NS, "block", XScriptConstants.XSCRIPT_NS,
+						"catch", XScriptConstants.XSCRIPT_NS, "finally", XScriptConstants.XSCRIPT_NS, element.getLocalName()));
 
 				if (name.equals("block")) {
 					if (tryBlock != null)
-						throw new ScriptException(String.format("Only one <{%s}:%s> is allowed as a child "
-							+ "of a <{%s}:%s> element.", XScriptConstants.XSCRIPT_NS, name, XScriptConstants.XSCRIPT_NS,
-							element.getLocalName()));
+						throw new ScriptException(String.format("Only one <{%s}:%s> is allowed as a child " + "of a <{%s}:%s> element.",
+							XScriptConstants.XSCRIPT_NS, name, XScriptConstants.XSCRIPT_NS, element.getLocalName()));
 					tryBlock = parseBlock(context, child.getChildNodes());
 				} else if (name.equals("catch")) {
 					String property = XScriptParser.getAttribute(child, "property", null);
 					String message = XScriptParser.getAttribute(child, "message", null);
 
-					catches.put(XScriptParser.getRequiredAttribute(child, "class"),
-						new CatchBlock(parseBlock(context, child.getChildNodes()), property, message));
+					catches.put(XScriptParser.getRequiredAttribute(child, "class"), new CatchBlock(
+						parseBlock(context, child.getChildNodes()), property, message));
 				} else {
 					if (finallyBlock != null)
-						throw new ScriptException(String.format("Only one <{%s}:%s> is allowed as a child "
-							+ "of a <{%s}:%s> element.", XScriptConstants.XSCRIPT_NS, name, XScriptConstants.XSCRIPT_NS,
-							element.getLocalName()));
+						throw new ScriptException(String.format("Only one <{%s}:%s> is allowed as a child " + "of a <{%s}:%s> element.",
+							XScriptConstants.XSCRIPT_NS, name, XScriptConstants.XSCRIPT_NS, element.getLocalName()));
 					finallyBlock = parseBlock(context, child.getChildNodes());
 				}
 			}
@@ -169,8 +164,8 @@ public class XScriptParseHandler implements ParseHandler
 
 	static private ParseStatement parseThrow(ParseContext context, Element element) throws ScriptException
 	{
-		return new ThrowStatement(XScriptParser.getRequiredAttribute(element, "class"), XScriptParser.getRequiredAttribute(
-			element, "message"));
+		return new ThrowStatement(XScriptParser.getRequiredAttribute(element, "class"),
+			XScriptParser.getRequiredAttribute(element, "message"));
 	}
 
 	static private ParseStatement parseCondition(ParseContext context, Element element) throws ScriptException
@@ -182,8 +177,8 @@ public class XScriptParseHandler implements ParseHandler
 		if (stmt instanceof ConditionExpression) {
 			return new ConditionStatement(property, (ConditionExpression) stmt);
 		} else
-			throw new ScriptException(String.format("Children of a <{%s}:%s> element MUST be conditions.",
-				element.getNamespaceURI(), element.getLocalName()));
+			throw new ScriptException(String.format("Children of a <{%s}:%s> element MUST be conditions.", element.getNamespaceURI(),
+				element.getLocalName()));
 	}
 
 	static private ConditionExpression parseEquals(ParseContext context, Element element) throws ScriptException
@@ -195,8 +190,7 @@ public class XScriptParseHandler implements ParseHandler
 		return new EqualsExpression(arg1, arg2, isCaseSensitive);
 	}
 
-	static private ConditionExpression parseIsTrueFalse(ParseContext context, Element element, boolean isTrue)
-		throws ScriptException
+	static private ConditionExpression parseIsTrueFalse(ParseContext context, Element element, boolean isTrue) throws ScriptException
 	{
 		String value = XScriptParser.getRequiredAttribute(element, "value");
 		return new IsTrueFalseExpression(value, isTrue);
@@ -247,8 +241,8 @@ public class XScriptParseHandler implements ParseHandler
 				if (stmt instanceof ConditionExpression) {
 					ret.addConditionExpression((ConditionExpression) stmt);
 				} else
-					throw new ScriptException(String.format("Children of a <{%s}:%s> element MUST be conditions.",
-						element.getNamespaceURI(), element.getLocalName()));
+					throw new ScriptException(String.format("Children of a <{%s}:%s> element MUST be conditions.", element.getNamespaceURI(),
+						element.getLocalName()));
 			}
 		}
 
@@ -262,8 +256,8 @@ public class XScriptParseHandler implements ParseHandler
 		if (stmt instanceof ConditionExpression) {
 			return new NotExpression((ConditionExpression) stmt);
 		} else
-			throw new ScriptException(String.format("Children of a <{%s}:%s> element MUST be conditions.",
-				element.getNamespaceURI(), element.getLocalName()));
+			throw new ScriptException(String.format("Children of a <{%s}:%s> element MUST be conditions.", element.getNamespaceURI(),
+				element.getLocalName()));
 	}
 
 	static private ParseStatement parseExit(ParseContext context, Element element) throws ScriptException
@@ -317,8 +311,7 @@ public class XScriptParseHandler implements ParseHandler
 
 		ParseStatement innerStatement = parseBlock(context, element.getChildNodes());
 
-		return new ScopeStatement(new ForStatement(paramName, initialValue, inclusiveLimit, exclusiveLimit, incrementValue,
-			innerStatement));
+		return new ScopeStatement(new ForStatement(paramName, initialValue, inclusiveLimit, exclusiveLimit, incrementValue, innerStatement));
 	}
 
 	private ParseStatement parseForeach(ParseContext context, Element element) throws ScriptException
@@ -338,9 +331,9 @@ public class XScriptParseHandler implements ParseHandler
 			numNonNull++;
 
 		if (numNonNull != 1)
-			throw new ScriptException(String.format("Exactly one of \"source-dir\", \"source-file\", or "
-				+ "\"source-rns\" is required as an attribute of the " + "<{%s}:%s> node.", element.getNamespaceURI(),
-				element.getLocalName()));
+			throw new ScriptException(
+				String.format("Exactly one of \"source-dir\", \"source-file\", or " + "\"source-rns\" is required as an attribute of the "
+					+ "<{%s}:%s> node.", element.getNamespaceURI(), element.getLocalName()));
 
 		ParseStatement innerStatement = parseBlock(context, element.getChildNodes());
 
@@ -370,15 +363,14 @@ public class XScriptParseHandler implements ParseHandler
 
 	static private ParseStatement parseFunction(ParseContext context, Element element) throws ScriptException
 	{
-		return new FunctionDefinitionStatement(XScriptParser.getRequiredAttribute(element, "name"), new ScopeStatement(
-			parseBlock(context, element.getChildNodes())));
+		return new FunctionDefinitionStatement(XScriptParser.getRequiredAttribute(element, "name"), new ScopeStatement(parseBlock(context,
+			element.getChildNodes())));
 	}
 
 	static private ParseStatement parseCall(ParseContext context, Element element) throws ScriptException
 	{
 		CallStatement ret =
-			new CallStatement(XScriptParser.getRequiredAttribute(element, "function"), XScriptParser.getAttribute(element,
-				"property", null));
+			new CallStatement(XScriptParser.getRequiredAttribute(element, "function"), XScriptParser.getAttribute(element, "property", null));
 
 		NodeList children = element.getChildNodes();
 		int length = children.getLength();

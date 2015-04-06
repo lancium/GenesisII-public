@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.security.wincrypto;
 
@@ -31,9 +30,8 @@ public class WinCryptoLibTest
 {
 
 	/**
-	 * Initializes an object output stream that encrypts using a freshly generated 3DES session key.
-	 * This session key is wrapped using the supplied asymmetric key and placed at the beginning of
-	 * the output
+	 * Initializes an object output stream that encrypts using a freshly generated 3DES session key. This session key is wrapped using the
+	 * supplied asymmetric key and placed at the beginning of the output
 	 * 
 	 * @param asymmetricKey
 	 * @param baseOutput
@@ -81,9 +79,8 @@ public class WinCryptoLibTest
 	}
 
 	/**
-	 * Initializes an object input stream that decrypts input from the base input. Decryption is
-	 * done with a session key that is unwrapped from the beginning of the stream with the supplied
-	 * assymetric key
+	 * Initializes an object input stream that decrypts input from the base input. Decryption is done with a session key that is unwrapped
+	 * from the beginning of the stream with the supplied assymetric key
 	 * 
 	 * @param asymmetricKey
 	 * @param baseInput
@@ -150,8 +147,7 @@ public class WinCryptoLibTest
 
 		// create a decryption stream, wrap it with a stream that
 		// verifies the sender's identity
-		ObjectInputStream cipherIn =
-			new ObjectInputStream(initCipherInputStream(pubKey, initCipherInputStream(privKey, dummyInput)));
+		ObjectInputStream cipherIn = new ObjectInputStream(initCipherInputStream(pubKey, initCipherInputStream(privKey, dummyInput)));
 
 		// read the message from the stream
 		String receivedMessage = cipherIn.readUTF();
@@ -163,8 +159,7 @@ public class WinCryptoLibTest
 	}
 
 	/**
-	 * Iterates through the personal certificates, looking for a public/private keypair to test
-	 * encryption with
+	 * Iterates through the personal certificates, looking for a public/private keypair to test encryption with
 	 * 
 	 * @throws Exception
 	 */
@@ -230,8 +225,7 @@ public class WinCryptoLibTest
 		WinX509KeyManager km = new WinX509KeyManager();
 		String[] a = km.getClientAliases(null, null);
 		for (int i = 0; i < a.length; i++) {
-			System.out.println("km alias: "
-				+ ((X509Certificate) km.getCertificateChain(a[i])[0]).getSubjectX500Principal().getName());
+			System.out.println("km alias: " + ((X509Certificate) km.getCertificateChain(a[i])[0]).getSubjectX500Principal().getName());
 			if (km.getPrivateKey(a[i]) != null) {
 				System.out.println("Contains exportable private key");
 			}

@@ -175,8 +175,8 @@ public class UsernamePasswordIdentity implements Identity, NuCredential, XMLComp
 		if (!BCrypt.checkpw(((UsernamePasswordIdentity) identity)._password, _password)) {
 			return false;
 		}
-		_logger.debug("user is permitted on ACL due to valid password: " + ((UsernamePasswordIdentity)identity)._userName );
-		
+		_logger.debug("user is permitted on ACL due to valid password: " + ((UsernamePasswordIdentity) identity)._userName);
+
 		return true;
 	}
 

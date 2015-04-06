@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package org.morgan.util.io;
 
@@ -24,8 +23,7 @@ import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 /**
- * A utility class which acts like a file, but upon successful creation guarantees that the names
- * path is an existing directory.
+ * A utility class which acts like a file, but upon successful creation guarantees that the names path is an existing directory.
  * 
  * @author Mark Morgan (mark@mark-morgan.org)
  */
@@ -49,12 +47,10 @@ public class GuaranteedDirectory extends File
 				// if we were asked to give only the owner permission, we do it here.
 
 				/*
-				 * for now, since we need to keep supporting java 6, we're going with the ugly but
-				 * working approach.
+				 * for now, since we need to keep supporting java 6, we're going with the ugly but working approach.
 				 */
 				/*
-				 * CAK: note, we no longer support java 6. this could be updated if there were
-				 * better ways in java 7.
+				 * CAK: note, we no longer support java 6. this could be updated if there were better ways in java 7.
 				 */
 				OperatingSystemTypes osType = OperatingSystemType.getCurrent();
 				if (!((osType == OperatingSystemTypes.Windows_XP) || (osType == OperatingSystemTypes.Windows_VISTA)

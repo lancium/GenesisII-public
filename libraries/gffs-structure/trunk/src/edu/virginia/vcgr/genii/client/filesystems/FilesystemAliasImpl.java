@@ -12,8 +12,7 @@ public class FilesystemAliasImpl implements Filesystem
 
 	private Filesystem _trueFS = null;
 
-	FilesystemAliasImpl(FilesystemManager manager, String filesystemName, FilesystemAliasConfiguration conf)
-		throws FileNotFoundException
+	FilesystemAliasImpl(FilesystemManager manager, String filesystemName, FilesystemAliasConfiguration conf) throws FileNotFoundException
 	{
 		_manager = manager;
 		_filesystemName = filesystemName;
@@ -25,8 +24,8 @@ public class FilesystemAliasImpl implements Filesystem
 	}
 
 	@Override
-	public FilesystemWatchRegistration addWatch(Integer callLimit, long checkPeriod, TimeUnit checkPeriodUnits,
-		FilesystemWatchFilter filter, FilesystemWatchHandler handler)
+	public FilesystemWatchRegistration addWatch(Integer callLimit, long checkPeriod, TimeUnit checkPeriodUnits, FilesystemWatchFilter filter,
+		FilesystemWatchHandler handler)
 	{
 		return _manager.addWatch(_filesystemName, this, callLimit, checkPeriod, checkPeriodUnits, filter, handler);
 	}

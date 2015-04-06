@@ -34,8 +34,7 @@ public class ExportCreationDialog extends JDialog
 	private JRadioButton _standardExportService = null;
 	private JRadioButton _lightweightExportService = null;
 
-	public ExportCreationDialog(JDialog owner, String ContainerPath, String TargetPath) throws FileLockException,
-		NoContainersException
+	public ExportCreationDialog(JDialog owner, String ContainerPath, String TargetPath) throws FileLockException, NoContainersException
 	{
 		super(owner);
 
@@ -46,16 +45,15 @@ public class ExportCreationDialog extends JDialog
 
 		container.setLayout(new GridBagLayout());
 		/*
-		 * container.add(_deployments = new DeploymentsWidget(), new GridBagConstraints(0,
-		 * GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-		 * GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		 * container.add(_deployments = new DeploymentsWidget(), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0,
+		 * GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		 */
-		container.add(_standardExportService = new JRadioButton("Standard Export"), new GridBagConstraints(0, 0, 2, 1, 1.0,
-			0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-		container.add(_lightweightExportService = new JRadioButton("Light-weight Export"), new GridBagConstraints(0, 1, 2, 1,
-			1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(_paths = new ResourcePathsWidget(true, true, ContainerPath, TargetPath), new GridBagConstraints(0, 2, 2,
-			1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_standardExportService = new JRadioButton("Standard Export"), new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0,
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+		container.add(_lightweightExportService = new JRadioButton("Light-weight Export"), new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0,
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_paths = new ResourcePathsWidget(true, true, ContainerPath, TargetPath), new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0,
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		_lightweightExportService.setSelected(true);
 		_standardExportService.setSelected(false);
@@ -75,15 +73,12 @@ public class ExportCreationDialog extends JDialog
 	{
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 		panel.add(new JButton(new CancelAction()), new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(
-			new JButton(
-				new GuiHelpAction(owner, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.EXPORT_CREATION_HELP))),
-			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5,
-				5), 5, 5));
+		panel.add(new JButton(new GuiHelpAction(owner, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.EXPORT_CREATION_HELP))),
+			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}
@@ -94,8 +89,8 @@ public class ExportCreationDialog extends JDialog
 		String rnsPath = _paths.getRNSPath();
 		String containerPath = _paths.getContainerPath();
 
-		return localPath != null && localPath.trim().length() > 0 && rnsPath != null && rnsPath.trim().length() > 0
-			&& containerPath != null && containerPath.trim().length() > 0;
+		return localPath != null && localPath.trim().length() > 0 && rnsPath != null && rnsPath.trim().length() > 0 && containerPath != null
+			&& containerPath.trim().length() > 0;
 	}
 
 	public ExportCreationInformation getExportCreationInformation()

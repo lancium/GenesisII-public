@@ -13,6 +13,6 @@ public interface BESActivityTopics
 		"ActivityStateChanged", "genii-bes"));
 
 	@WSNTopic(contentsType = BESActivityStateChangedContents.class)
-	static final public TopicPath ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC = TopicPath.createTopicPath(
-		ACTIVITY_STATE_CHANGED_TOPIC, "ReachedFinalState");
+	static final public TopicPath ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC = TopicPath.createTopicPath(ACTIVITY_STATE_CHANGED_TOPIC,
+		"ReachedFinalState");
 }

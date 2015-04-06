@@ -87,8 +87,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 
 	public MessageElement getFinalResourceInterface() throws SOAPException
 	{
-		return new MessageElement(OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME, _baseService
-			.getFinalWSResourceInterface().getQName());
+		return new MessageElement(OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME, _baseService.getFinalWSResourceInterface()
+			.getQName());
 	}
 
 	public MessageElement getScheduledTerminationTimeAttr() throws ResourceUnknownFaultType, ResourceException
@@ -148,8 +148,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getPermissionsString() throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		IAuthZProvider authZHandler =
-			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
@@ -161,8 +160,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getAuthZConfig() throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		IAuthZProvider authZHandler =
-			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null) {
 			config = authZHandler.getAuthZConfig(resource);
@@ -191,8 +189,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 		}
 
 		// get the authZ handler
-		IAuthZProvider authZHandler =
-			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		if (authZHandler == null) {
 			throw new ResourceException("Resource does not have an AuthZ module");
 		}
@@ -219,8 +216,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 			propertyNames.add(manipulator.getAttributeQName());
 		}
 
-		for (QName e : _baseService.getAttributePackage()
-			.getUnknownAttributes(ResourceManager.getCurrentResource().dereference()).keySet()) {
+		for (QName e : _baseService.getAttributePackage().getUnknownAttributes(ResourceManager.getCurrentResource().dereference()).keySet()) {
 			propertyNames.add(e);
 		}
 
@@ -236,10 +232,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 	public Collection<MessageElement> getTopicExpressionDialect() throws SOAPException, MalformedURIException
 	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(2);
-		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP(), new URI(TopicQueryDialects.Simple.dialect()
-			.toString())));
-		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP(), new URI(TopicQueryDialects.Concrete.dialect()
-			.toString())));
+		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP(), new URI(TopicQueryDialects.Simple.dialect().toString())));
+		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP(), new URI(TopicQueryDialects.Concrete.dialect().toString())));
 		return ret;
 	}
 
@@ -281,8 +275,7 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 
 		addHandler(OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME, "getResourceEndpoint");
 
-		addHandler(OGSAWSRFBPConstants.TERMINATION_TIME_ATTR_QNAME, "getScheduledTerminationTimeAttr",
-			"setScheduledTerminationTimeAttr");
+		addHandler(OGSAWSRFBPConstants.TERMINATION_TIME_ATTR_QNAME, "getScheduledTerminationTimeAttr", "setScheduledTerminationTimeAttr");
 
 		addHandler(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, "getImplementedPortTypes");
 

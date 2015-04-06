@@ -73,8 +73,8 @@ class AttemptNumberBorder extends AbstractBorder
 			if (number == null) {
 				if (_currentAttempt != null) {
 					Rectangle r = tree.getRowBounds(row);
-					boxes.add(new Pair<Integer, Rectangle>(_currentAttempt, new Rectangle(_currentStart.x, _currentStart.y,
-						insets.left, r.y - _currentStart.y - 1)));
+					boxes.add(new Pair<Integer, Rectangle>(_currentAttempt, new Rectangle(_currentStart.x, _currentStart.y, insets.left, r.y
+						- _currentStart.y - 1)));
 					_currentAttempt = null;
 					_currentStart = null;
 				}
@@ -84,8 +84,8 @@ class AttemptNumberBorder extends AbstractBorder
 						continue;
 
 					Rectangle r = tree.getRowBounds(row);
-					boxes.add(new Pair<Integer, Rectangle>(_currentAttempt, new Rectangle(_currentStart.x, _currentStart.y,
-						insets.left, r.y - _currentStart.y - 1)));
+					boxes.add(new Pair<Integer, Rectangle>(_currentAttempt, new Rectangle(_currentStart.x, _currentStart.y, insets.left, r.y
+						- _currentStart.y - 1)));
 					_currentAttempt = null;
 					_currentStart = null;
 				}
@@ -100,8 +100,8 @@ class AttemptNumberBorder extends AbstractBorder
 
 		if (_currentAttempt != null) {
 			Rectangle r = tree.getRowBounds(tree.getRowCount() - 1);
-			boxes.add(new Pair<Integer, Rectangle>(_currentAttempt, new Rectangle(_currentStart.x, _currentStart.y,
-				insets.left, r.y - _currentStart.y - 1 + r.height)));
+			boxes.add(new Pair<Integer, Rectangle>(_currentAttempt, new Rectangle(_currentStart.x, _currentStart.y, insets.left, r.y
+				- _currentStart.y - 1 + r.height)));
 		}
 
 		g2.setFont(getFont(c));

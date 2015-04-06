@@ -14,7 +14,6 @@ public interface NativeQueue
 
 	public ResourceManagerType resourceManagerType();
 
-	public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorCon, File workingDirectory,
-		NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException;
+	public NativeQueueConnection connect(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorCon,
+		File workingDirectory, NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException;
 }

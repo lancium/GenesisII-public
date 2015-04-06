@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
@@ -35,14 +34,12 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 		"CREATE TABLE besactivityfaultstable (" + "faultid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
 			+ "besactivityid VARCHAR(256) NOT NULL," + "fault BLOB(2G))",
 		"CREATE TABLE besactivitiestable (" + "activityid VARCHAR(256) NOT NULL PRIMARY KEY," + "besid VARCHAR(256) NOT NULL,"
-			+ "jsdl BLOB(2G) NOT NULL," + "owners BLOB(2G) NOT NULL," + "callingcontext BLOB(2G) NOT NULL,"
-			+ "state BLOB(2G) NOT NULL," + "submittime TIMESTAMP NOT NULL," + "suspendrequested SMALLINT NOT NULL,"
-			+ "terminaterequested SMALLINT NOT NULL," + "activitycwd VARCHAR(256) NOT NULL,"
-			+ "executionplan BLOB(2G) NOT NULL," + "nextphase INTEGER NOT NULL," + "activityepr BLOB(2G) NOT NULL,"
-			+ "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL)",
-		"CREATE TABLE besactivitypropertiestable (" + "activityid VARCHAR(256) NOT NULL,"
-			+ "propertyname VARCHAR(256) NOT NULL," + "propertyvalue BLOB(2G),"
-			+ "CONSTRAINT besactivitypropertiesconstraint1 " + "PRIMARY KEY (activityid, propertyname))",
+			+ "jsdl BLOB(2G) NOT NULL," + "owners BLOB(2G) NOT NULL," + "callingcontext BLOB(2G) NOT NULL," + "state BLOB(2G) NOT NULL,"
+			+ "submittime TIMESTAMP NOT NULL," + "suspendrequested SMALLINT NOT NULL," + "terminaterequested SMALLINT NOT NULL,"
+			+ "activitycwd VARCHAR(256) NOT NULL," + "executionplan BLOB(2G) NOT NULL," + "nextphase INTEGER NOT NULL,"
+			+ "activityepr BLOB(2G) NOT NULL," + "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL)",
+		"CREATE TABLE besactivitypropertiestable (" + "activityid VARCHAR(256) NOT NULL," + "propertyname VARCHAR(256) NOT NULL,"
+			+ "propertyvalue BLOB(2G)," + "CONSTRAINT besactivitypropertiesconstraint1 " + "PRIMARY KEY (activityid, propertyname))",
 		"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",
 		"CREATE INDEX besactivitiestableindex ON besactivitiestable(besid)" };
 

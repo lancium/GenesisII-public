@@ -46,11 +46,10 @@ class QueueManipulation
 			_jobTickets = jobTickets;
 		}
 
-		final protected QueuePortType queue() throws ResourceException, GenesisIISecurityException,
-			RNSPathDoesNotExistException
+		final protected QueuePortType queue() throws ResourceException, GenesisIISecurityException, RNSPathDoesNotExistException
 		{
-			return ClientUtils.createProxy(QueuePortType.class, _context.endpointRetriever().getTargetEndpoints().iterator()
-				.next().getEndpoint(), _context.uiContext().callingContext());
+			return ClientUtils.createProxy(QueuePortType.class, _context.endpointRetriever().getTargetEndpoints().iterator().next()
+				.getEndpoint(), _context.uiContext().callingContext());
 		}
 	}
 
@@ -173,8 +172,8 @@ class QueueManipulation
 		public void taskCancelled(Task<Integer> task)
 		{
 			JOptionPane.showMessageDialog(_ownerComponent,
-				"This task runs asynchronously and results from executing it may not appear immediately.",
-				"Delayed Results Warning", JOptionPane.WARNING_MESSAGE);
+				"This task runs asynchronously and results from executing it may not appear immediately.", "Delayed Results Warning",
+				JOptionPane.WARNING_MESSAGE);
 			_model.refresh(_ownerComponent);
 		}
 
@@ -182,8 +181,8 @@ class QueueManipulation
 		public void taskCompleted(Task<Integer> task, Integer result)
 		{
 			JOptionPane.showMessageDialog(_ownerComponent,
-				"This task runs asynchronously and results from executing it may not appear immediately.",
-				"Delayed Results Warning", JOptionPane.WARNING_MESSAGE);
+				"This task runs asynchronously and results from executing it may not appear immediately.", "Delayed Results Warning",
+				JOptionPane.WARNING_MESSAGE);
 			_model.refresh(_ownerComponent);
 		}
 	}
@@ -213,8 +212,8 @@ class QueueManipulation
 		private String _ticket;
 		private OutputStream _dumpTarget;
 
-		private JobHistoryCompletionListener(Component ownerComponent, UIPluginContext context, String ticket,
-			QueueManagerTableModel model, OutputStream dumpTarget)
+		private JobHistoryCompletionListener(Component ownerComponent, UIPluginContext context, String ticket, QueueManagerTableModel model,
+			OutputStream dumpTarget)
 		{
 			super(ownerComponent, context, model);
 
@@ -222,8 +221,7 @@ class QueueManipulation
 			_dumpTarget = dumpTarget;
 		}
 
-		private JobHistoryCompletionListener(Component ownerComponent, UIPluginContext context, String ticket,
-			QueueManagerTableModel model)
+		private JobHistoryCompletionListener(Component ownerComponent, UIPluginContext context, String ticket, QueueManagerTableModel model)
 		{
 			this(ownerComponent, context, ticket, model, null);
 		}
@@ -246,8 +244,8 @@ class QueueManipulation
 					oos.close();
 				} else {
 					JobHistoryFrame frame =
-						new JobHistoryFrame(_context.uiContext(), _context.endpointRetriever().getTargetEndpoints().iterator()
-							.next(), _ticket, result);
+						new JobHistoryFrame(_context.uiContext(), _context.endpointRetriever().getTargetEndpoints().iterator().next(),
+							_ticket, result);
 					frame.pack();
 					GUIUtils.centerWindow(frame);
 					frame.setVisible(true);
@@ -271,8 +269,8 @@ class QueueManipulation
 	{
 		private Collection<String> _jobTickets;
 
-		private OpenJobHistoryDumpTargetCompletionListener(Component ownerComponent, UIPluginContext context,
-			Collection<String> jobTickets, QueueManagerTableModel model)
+		private OpenJobHistoryDumpTargetCompletionListener(Component ownerComponent, UIPluginContext context, Collection<String> jobTickets,
+			QueueManagerTableModel model)
 		{
 			super(ownerComponent, context, model);
 
@@ -287,8 +285,7 @@ class QueueManipulation
 				.progressMonitorFactory()
 				.createMonitor(_ownerComponent, "Getting Job History", "Getting job history events", 1000L,
 					new JobHistoryTask(_context, _jobTickets),
-					new JobHistoryCompletionListener(_ownerComponent, _context, _jobTickets.iterator().next(), _model, result))
-				.start();
+					new JobHistoryCompletionListener(_ownerComponent, _context, _jobTickets.iterator().next(), _model, result)).start();
 		}
 
 		@Override
@@ -298,30 +295,25 @@ class QueueManipulation
 		}
 	}
 
-	static void killJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model,
-		Collection<String> jobTickets)
+	static void killJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
 	{
 		context
 			.uiContext()
 			.progressMonitorFactory()
-			.createMonitor(ownerComponent, "Killing Jobs", "Asking queue to terminate jobs", 1000L,
-				new JobKillerTask(context, jobTickets), new JobKillerCompletionListener(ownerComponent, context, model))
-			.start();
+			.createMonitor(ownerComponent, "Killing Jobs", "Asking queue to terminate jobs", 1000L, new JobKillerTask(context, jobTickets),
+				new JobKillerCompletionListener(ownerComponent, context, model)).start();
 	}
 
-	static void completeJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model,
-		Collection<String> jobTickets)
+	static void completeJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
 	{
 		context
 			.uiContext()
 			.progressMonitorFactory()
-			.createMonitor(ownerComponent, "Removing Jobs", "Asking queue to remove jobs", 1000L,
-				new JobCompleterTask(context, jobTickets), new JobCompleterCompletionListener(ownerComponent, context, model))
-			.start();
+			.createMonitor(ownerComponent, "Removing Jobs", "Asking queue to remove jobs", 1000L, new JobCompleterTask(context, jobTickets),
+				new JobCompleterCompletionListener(ownerComponent, context, model)).start();
 	}
 
-	static void jobHistory(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model,
-		Collection<String> jobTickets)
+	static void jobHistory(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
 	{
 		context
 			.uiContext()

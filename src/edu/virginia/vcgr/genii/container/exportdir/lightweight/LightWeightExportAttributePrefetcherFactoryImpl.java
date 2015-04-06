@@ -22,8 +22,7 @@ public class LightWeightExportAttributePrefetcherFactoryImpl implements Attribut
 	static private Log _logger = LogFactory.getLog(LightWeightExportAttributePrefetcherFactoryImpl.class);
 
 	@Override
-	public AttributePreFetcher getPreFetcher(EndpointReferenceType epr, ResourceKey rKey, ResourceForkService service)
-		throws Throwable
+	public AttributePreFetcher getPreFetcher(EndpointReferenceType epr, ResourceKey rKey, ResourceForkService service) throws Throwable
 	{
 		ResourceFork fork = null;
 

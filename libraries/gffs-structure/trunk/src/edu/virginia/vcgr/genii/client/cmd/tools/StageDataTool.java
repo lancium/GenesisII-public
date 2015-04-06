@@ -66,9 +66,8 @@ public class StageDataTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException
 	{
 
 		// get the local identity's key material (or create one if necessary)
@@ -92,8 +91,7 @@ public class StageDataTool extends BaseGridTool
 		JobRequest tJob = null;
 
 		if (_type.equals("jsdl")) {
-			JobDefinition_Type jsdl =
-				(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
+			JobDefinition_Type jsdl = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 			PersonalityProvider provider = new ExecutionProvider();
 			try {
 				tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
@@ -114,8 +112,7 @@ public class StageDataTool extends BaseGridTool
 			if (_direction.equals("in")) {
 				for (ContainerDataStage tStage : tJob.getStageIns()) {
 					try {
-						stageIN(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getSourceURI()),
-							tStage.getCredentials());
+						stageIN(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getSourceURI()), tStage.getCredentials());
 					} catch (URISyntaxException e) {
 						throw new ToolException("failure to create URI: " + e.getLocalizedMessage(), e);
 					}
@@ -123,8 +120,7 @@ public class StageDataTool extends BaseGridTool
 			} else if (_direction.equals("out")) {
 				for (ContainerDataStage tStage : tJob.getStageOuts()) {
 					try {
-						stageOUT(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getTargetURI()),
-							tStage.getCredentials());
+						stageOUT(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getTargetURI()), tStage.getCredentials());
 					} catch (URISyntaxException e) {
 						throw new ToolException("failure to create URI: " + e.getLocalizedMessage(), e);
 					}

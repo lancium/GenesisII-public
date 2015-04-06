@@ -57,8 +57,7 @@ public class CleanupPhase extends AbstractExecutionPhase implements Serializable
 		} catch (Throwable cause) {
 			history.error(cause, "Unable to Cleanup %s", _fileToCleanup.getName());
 			_logger.error("Unable to clean up file.", cause);
-			throw new ContinuableExecutionException("A continuable exception has occurred while " + "running a BES activity.",
-				cause);
+			throw new ContinuableExecutionException("A continuable exception has occurred while " + "running a BES activity.", cause);
 		}
 	}
 }

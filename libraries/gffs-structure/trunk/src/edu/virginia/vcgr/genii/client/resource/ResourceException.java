@@ -13,8 +13,7 @@ public class ResourceException extends BaseFaultType
 
 	public ResourceException(String msg)
 	{
-		super(null, Calendar.getInstance(), null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(msg) },
-			null);
+		super(null, Calendar.getInstance(), null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(msg) }, null);
 		this.setFaultString(msg);
 	}
 

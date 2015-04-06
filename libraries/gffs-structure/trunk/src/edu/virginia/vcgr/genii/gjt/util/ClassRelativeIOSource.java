@@ -20,8 +20,7 @@ public class ClassRelativeIOSource implements IOSource
 	{
 		InputStream in = _class.getResourceAsStream(_resourceName);
 		if (in == null)
-			throw new FileNotFoundException(String.format("Unable to load resource \"%s\" from class \"%s\".", _resourceName,
-				_class));
+			throw new FileNotFoundException(String.format("Unable to load resource \"%s\" from class \"%s\".", _resourceName, _class));
 
 		return in;
 	}

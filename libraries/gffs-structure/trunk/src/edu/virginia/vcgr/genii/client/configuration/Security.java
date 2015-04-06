@@ -39,8 +39,7 @@ public class Security
 		_securityProperties = new Properties();
 
 		if (!_securityDirectory.exists())
-			throw new InvalidDeploymentException(deploymentDirectory.getName(),
-				"Couldn't find security directory in deployment.");
+			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Couldn't find security directory in deployment.");
 		if (!_securityPropertiesFile.exists())
 			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Couldn't find security properties file \""
 				+ SECURITY_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
@@ -51,8 +50,7 @@ public class Security
 			_securityProperties.load(fin);
 		} catch (IOException ioe) {
 			_logger.fatal("Unable to load security properties from deployment.", ioe);
-			throw new InvalidDeploymentException(deploymentDirectory.getName(),
-				"Unable to load security properties from deployment.");
+			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Unable to load security properties from deployment.");
 		} finally {
 			StreamUtils.close(fin);
 		}
@@ -91,11 +89,10 @@ public class Security
 	{
 		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
 		String keyProp = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
-		String keystoreLoc =
-			Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyProp).getAbsolutePath();
+		String keystoreLoc = Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keyProp).getAbsolutePath();
 		return keystoreLoc;
 	}
-	
+
 	public File getAdminCertFile()
 	{
 		return getSecurityFile(ADMIN_CERTIFICATE_FILE);

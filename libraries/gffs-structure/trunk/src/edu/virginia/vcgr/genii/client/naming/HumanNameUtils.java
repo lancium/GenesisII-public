@@ -38,8 +38,7 @@ public class HumanNameUtils
 		ArrayList<String> taken = new ArrayList<String>();
 
 		/*
-		 * taken.add("Mark Morgan"); taken.add("Mark Morgan 1"); taken.add("Mark Morgan (1)");
-		 * taken.add("Mark Morgan (3)");
+		 * taken.add("Mark Morgan"); taken.add("Mark Morgan 1"); taken.add("Mark Morgan (1)"); taken.add("Mark Morgan (3)");
 		 */
 
 		System.err.println("Unique name is \"" + generateUniqueName("Mark Morgan", taken) + "\".");

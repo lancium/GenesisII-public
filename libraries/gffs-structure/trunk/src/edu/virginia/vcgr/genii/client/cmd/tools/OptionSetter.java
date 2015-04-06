@@ -46,8 +46,7 @@ public class OptionSetter
 				if (callsMade == null)
 					callsMade = new Integer(0);
 				if (maxCalls.compareTo(callsMade) <= 0)
-					throw new ToolException("Invalid Usage.  Option \"" + option + "\" can only be given "
-						+ maxCalls.intValue() + " times.");
+					throw new ToolException("Invalid Usage.  Option \"" + option + "\" can only be given " + maxCalls.intValue() + " times.");
 				callsMade = new Integer(callsMade.intValue() + 1);
 				_callsMade.put(option, callsMade);
 			}

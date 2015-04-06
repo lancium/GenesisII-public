@@ -38,8 +38,8 @@ public class ManTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		Map<String, ToolDescription> _tools =
 			CommandLineRunner.getToolList(ConfigurationManager.getCurrentConfiguration().getClientConfiguration());

@@ -46,8 +46,7 @@ public class DimeRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.DIME);
 
 		/* Create the SOAP body for the message */
-		TransferInformationType transType =
-			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+		TransferInformationType transType = new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
 
 		_clientStub.append(new Append(transType));
 	}
@@ -85,8 +84,7 @@ public class DimeRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.DIME);
 
 		/* Create the SOAP message content for the out call */
-		TransferInformationType transType =
-			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+		TransferInformationType transType = new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
 		_clientStub.truncAppend(new TruncAppend(offset, transType));
 	}
 
@@ -100,8 +98,7 @@ public class DimeRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.DIME);
 
 		/* Create the SOAP message content for the out call */
-		TransferInformationType transType =
-			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+		TransferInformationType transType = new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_DIME_URI);
 		_clientStub.write(new Write(startOffset, bytesPerBlock, stride, transType));
 	}
 

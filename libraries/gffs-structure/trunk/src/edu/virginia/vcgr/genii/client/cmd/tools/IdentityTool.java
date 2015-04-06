@@ -94,18 +94,16 @@ public class IdentityTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		ICallingContext context = ContextManager.getCurrentContext();
 
 		/*
-		 * the scheme here is actually logical, despite it seeming like a big bag of code. we will
-		 * handle any of the three major command line flags, even if all are provided. but we
-		 * interpret this in a particular order that makes sense to us; we do a reset first, if it
-		 * was requested. then we do a setting operation if it was requested. then we do the listing
-		 * operation. by doing things in that order, even someone who passes in all the flags will
-		 * get something reasonable out of the tool, as long as their pattern/exact string
+		 * the scheme here is actually logical, despite it seeming like a big bag of code. we will handle any of the three major command line
+		 * flags, even if all are provided. but we interpret this in a particular order that makes sense to us; we do a reset first, if it was
+		 * requested. then we do a setting operation if it was requested. then we do the listing operation. by doing things in that order,
+		 * even someone who passes in all the flags will get something reasonable out of the tool, as long as their pattern/exact string
 		 * parameters make sense (in conjunction with the fixate flag).
 		 */
 
@@ -141,11 +139,9 @@ public class IdentityTool extends BaseGridTool
 				PreferredIdentity.setInContext(context, toStore);
 			} else {
 				/*
-				 * if fixate is false, check resulting exact string is listed in credentials. we
-				 * know this might be checking the string twice, since the pattern could have been
-				 * used to find the string, but we are not worried about a simple string compare
-				 * done in human scale of time. we definitely care if a non-fixated identity was not
-				 * actually in the credentials though.
+				 * if fixate is false, check resulting exact string is listed in credentials. we know this might be checking the string twice,
+				 * since the pattern could have been used to find the string, but we are not worried about a simple string compare done in
+				 * human scale of time. we definitely care if a non-fixated identity was not actually in the credentials though.
 				 */
 				identityToUse = PreferredIdentity.resolveIdentityPatternInCredentials(identityToUse, clump);
 				if (identityToUse == null) {
@@ -211,7 +207,7 @@ public class IdentityTool extends BaseGridTool
 		}
 		if (!_resetting && !_settingId && !_showIdentity && !_listAllIdentities && !_resolveIdentity) {
 			// we don't want to goof if they provided _some_ info but forgot the main tag...
-			if ( (_patternString != null ) || (_exactString != null) ) {
+			if ((_patternString != null) || (_exactString != null)) {
 				throw new ToolException("This tool cannot accept DN strings without a --set operation.");
 			}
 			// if they didn't pick an action, then we just show the current identity.

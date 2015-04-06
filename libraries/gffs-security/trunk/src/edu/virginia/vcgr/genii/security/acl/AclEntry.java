@@ -15,8 +15,8 @@ public interface AclEntry extends Serializable, Describable
 {
 
 	/**
-	 * Returns false if policy does not yield access to the given Identity. Throws an exception if
-	 * there is an issue with the validity of the identity validity checking.
+	 * Returns false if policy does not yield access to the given Identity. Throws an exception if there is an issue with the validity of the
+	 * identity validity checking.
 	 */
 	public boolean isPermitted(Identity identity) throws GeneralSecurityException;
 

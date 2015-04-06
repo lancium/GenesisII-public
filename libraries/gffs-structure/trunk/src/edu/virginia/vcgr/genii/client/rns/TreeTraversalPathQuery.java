@@ -3,10 +3,9 @@ package edu.virginia.vcgr.genii.client.rns;
 import java.util.Collection;
 
 /**
- * A helper interface that lets the recurser know whether the path is considered to be a file or a
- * directory. It's possible neither could be true also. This also supports a sanity test that is
- * important for deciding whether the node can be entered or not. This will govern whether we
- * descend into the path.
+ * A helper interface that lets the recurser know whether the path is considered to be a file or a directory. It's possible neither could be
+ * true also. This also supports a sanity test that is important for deciding whether the node can be entered or not. This will govern whether
+ * we descend into the path.
  */
 public interface TreeTraversalPathQuery<nodeType>
 {

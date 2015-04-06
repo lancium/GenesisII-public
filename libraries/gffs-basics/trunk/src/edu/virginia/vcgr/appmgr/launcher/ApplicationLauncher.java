@@ -18,8 +18,7 @@ public class ApplicationLauncher
 	static private String _appNameFound = null;
 	static private Version _appVersionFound = null;
 
-	static private InheritableThreadLocal<ApplicationLauncherConsole> _console =
-		new InheritableThreadLocal<ApplicationLauncherConsole>();
+	static private InheritableThreadLocal<ApplicationLauncherConsole> _console = new InheritableThreadLocal<ApplicationLauncherConsole>();
 
 	static public ApplicationLauncherConsole getConsole()
 	{

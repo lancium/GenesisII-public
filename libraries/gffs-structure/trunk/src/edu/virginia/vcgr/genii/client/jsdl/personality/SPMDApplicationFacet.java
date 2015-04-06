@@ -16,11 +16,9 @@ public interface SPMDApplicationFacet extends PersonalityFacet
 
 	public void consumeError(Object currentUnderstanding, String filesystemName, String error) throws JSDLException;
 
-	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory)
-		throws JSDLException;
+	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory) throws JSDLException;
 
-	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment)
-		throws JSDLException;
+	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment) throws JSDLException;
 
 	public void consumeUserName(Object currentUnderstanding, String userName) throws JSDLException;
 
@@ -29,8 +27,8 @@ public interface SPMDApplicationFacet extends PersonalityFacet
 
 	public void consumeProcessesPerHost(Object currentUnderstanding, Integer processesPerHost) throws JSDLException;
 
-	public void consumeThreadsPerProcess(Object currentUnderstanding, Integer threadsPerProcess,
-		boolean useActualIndividualCPUCount) throws JSDLException;
+	public void consumeThreadsPerProcess(Object currentUnderstanding, Integer threadsPerProcess, boolean useActualIndividualCPUCount)
+		throws JSDLException;
 
 	public void consumeSPMDVariation(Object currentUnderstanding, URI spmdVariation) throws JSDLException;
 }

@@ -76,20 +76,16 @@ public class AccountingTool extends BaseGridTool
 
 		private StatementBundle(Connection connection) throws SQLException
 		{
-			_lookupCID =
-				connection.prepareStatement("SELECT cid, credential FROM xcgcredentials " + "WHERE credentialhash = ?");
+			_lookupCID = connection.prepareStatement("SELECT cid, credential FROM xcgcredentials " + "WHERE credentialhash = ?");
 			_insertCredential =
 				connection.prepareStatement("INSERT INTO xcgcredentials " + "(credential, credentialdesc, credentialhash) "
 					+ "VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-			_lookupBESID =
-				connection.prepareStatement("SELECT besid, besmachinename, arch, os "
-					+ "FROM xcgbescontainers WHERE besepi = ?");
+			_lookupBESID = connection.prepareStatement("SELECT besid, besmachinename, arch, os " + "FROM xcgbescontainers WHERE besepi = ?");
 			_insertBES =
-				connection.prepareStatement("INSERT INTO xcgbescontainers "
-					+ "(besepi, besmachinename, arch, os) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+				connection.prepareStatement("INSERT INTO xcgbescontainers " + "(besepi, besmachinename, arch, os) VALUES (?, ?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 			_lookupAccountingRecord =
-				connection.prepareStatement("SELECT arid FROM xcgaccountingrecords "
-					+ "WHERE besaccountingrecordid = ? AND besid = ?");
+				connection.prepareStatement("SELECT arid FROM xcgaccountingrecords " + "WHERE besaccountingrecordid = ? AND besid = ?");
 			_insertAccountingRecord =
 				connection.prepareStatement("INSERT INTO xcgaccountingrecords " + "(besaccountingrecordid, besid, exitcode, "
 					+ "usertimemicrosecs, kerneltimemicrosecs, " + "wallclocktimemicrosecs, maxrssbytes, recordtimestamp) "
@@ -182,8 +178,7 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 
-	private long getBESId(StatementBundle sBundle, String besEPI, String besMachineName, String arch, String os)
-		throws SQLException
+	private long getBESId(StatementBundle sBundle, String besEPI, String besMachineName, String arch, String os) throws SQLException
 	{
 		ResultSet rs = null;
 
@@ -241,16 +236,15 @@ public class AccountingTool extends BaseGridTool
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addRecordToTargetDatabase(AccountingRecordType art, StatementBundle sBundle) throws IOException,
-		ClassNotFoundException, SQLException
+	private void addRecordToTargetDatabase(AccountingRecordType art, StatementBundle sBundle) throws IOException, ClassNotFoundException,
+		SQLException
 	{
 		ResultSet rs = null;
 
 		long besid = getBESId(sBundle, art.getBesEpi(), art.getBesMachineName(), art.getArch(), art.getOs());
 
 		if (lookupAccountingRecordID(sBundle, art.getRecordId(), besid) != null) {
-			stdout.format("Accounting record %d from bes %s already exists.  " + "Skipping.\n", art.getRecordId(),
-				art.getBesEpi());
+			stdout.format("Accounting record %d from bes %s already exists.  " + "Skipping.\n", art.getRecordId(), art.getBesEpi());
 			return;
 		}
 
@@ -311,8 +305,8 @@ public class AccountingTool extends BaseGridTool
 	private Object _connect;
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath source = lookup(current, new GeniiPath(getArgument(0)));
@@ -351,8 +345,7 @@ public class AccountingTool extends BaseGridTool
 
 	public AccountingTool()
 	{
-		super(new LoadFileResource(ACCOUNTING_TOOL_DESCRIPTION), new LoadFileResource(USAGE_RESOURCE), true,
-			ToolCategory.INTERNAL);
+		super(new LoadFileResource(ACCOUNTING_TOOL_DESCRIPTION), new LoadFileResource(USAGE_RESOURCE), true, ToolCategory.INTERNAL);
 	}
 
 	@Option({ "collect" })
@@ -415,8 +408,7 @@ public class AccountingTool extends BaseGridTool
 
 		try {
 			ClientUtils.setTimeout(container, 1000 * 60 * 20);
-			iterable =
-				WSIterable.axisIterable(AccountingRecordType.class, container.iterateAccountingRecords(null).getResult(), 100);
+			iterable = WSIterable.axisIterable(AccountingRecordType.class, container.iterateAccountingRecords(null).getResult(), 100);
 
 			sBundle = new StatementBundle(targetConnection);
 

@@ -11,14 +11,13 @@ import edu.virginia.vcgr.genii.client.ser.AnyHelper;
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2014-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 public class Elementals
 {
 	/**
-	 * a frequently used pattern, where we want to pass axis a list of message elements with zero
-	 * length.
+	 * a frequently used pattern, where we want to pass axis a list of message elements with zero length.
 	 */
 	public static MessageElement[] getEmptyArray()
 	{
@@ -26,8 +25,8 @@ public class Elementals
 	}
 
 	/**
-	 * returns a list with exactly one axis version of the MessageElement in it. the message element
-	 * comes from conversion of the object passed in.
+	 * returns a list with exactly one axis version of the MessageElement in it. the message element comes from conversion of the object
+	 * passed in.
 	 */
 	public static MessageElement[] objectToArray(Object toElement)
 	{
@@ -79,8 +78,8 @@ public class Elementals
 	}
 
 	/**
-	 * slightly different from original getChildren() which returns a List (without generic
-	 * arguments); we switch to an array automatically since we mainly use that.
+	 * slightly different from original getChildren() which returns a List (without generic arguments); we switch to an array automatically
+	 * since we mainly use that.
 	 */
 	static public org.apache.axis.message.MessageElement[] getOurChildren(MessageElement parent)
 	{

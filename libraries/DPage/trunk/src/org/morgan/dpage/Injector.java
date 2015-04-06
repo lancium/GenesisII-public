@@ -16,11 +16,11 @@ class Injector
 			field.setAccessible(true);
 			field.set(instance, value);
 		} catch (IllegalArgumentException e) {
-			throw new InjectionException(String.format("Unable to inject value into field \"%s.%s\".", field
-				.getDeclaringClass().getName(), field.getName()), e);
+			throw new InjectionException(String.format("Unable to inject value into field \"%s.%s\".", field.getDeclaringClass().getName(),
+				field.getName()), e);
 		} catch (IllegalAccessException e) {
-			throw new InjectionException(String.format("Unable to inject value into field \"%s.%s\".", field
-				.getDeclaringClass().getName(), field.getName()), e);
+			throw new InjectionException(String.format("Unable to inject value into field \"%s.%s\".", field.getDeclaringClass().getName(),
+				field.getName()), e);
 		} finally {
 			field.setAccessible(false);
 		}
@@ -32,21 +32,20 @@ class Injector
 			method.setAccessible(true);
 			method.invoke(instance, value);
 		} catch (IllegalArgumentException e) {
-			throw new InjectionException(String.format("Unable to inject value into method \"%s.%s\".", method
-				.getDeclaringClass().getName(), method.getName()), e);
+			throw new InjectionException(String.format("Unable to inject value into method \"%s.%s\".", method.getDeclaringClass().getName(),
+				method.getName()), e);
 		} catch (IllegalAccessException e) {
-			throw new InjectionException(String.format("Unable to inject value into method \"%s.%s\".", method
-				.getDeclaringClass().getName(), method.getName()), e);
+			throw new InjectionException(String.format("Unable to inject value into method \"%s.%s\".", method.getDeclaringClass().getName(),
+				method.getName()), e);
 		} catch (InvocationTargetException e) {
-			throw new InjectionException(String.format("Unable to inject value into method \"%s.%s\".", method
-				.getDeclaringClass().getName(), method.getName()), e.getCause());
+			throw new InjectionException(String.format("Unable to inject value into method \"%s.%s\".", method.getDeclaringClass().getName(),
+				method.getName()), e.getCause());
 		} finally {
 			method.setAccessible(false);
 		}
 	}
 
-	static private void injectFields(Object instance, Field[] fields, InjectionContext injectionContext)
-		throws InjectionException
+	static private void injectFields(Object instance, Field[] fields, InjectionContext injectionContext) throws InjectionException
 	{
 		InjectParameter iParameter;
 		InjectCookie iCookie;
@@ -82,8 +81,8 @@ class Injector
 				if (fieldType.equals(Cookie.class))
 					injectFieldValue(instance, field, cookie);
 				else
-					throw new InjectionException(String.format("Cannot inject parameter into \"%s.%s\".  "
-						+ "Type is not Cookie!", field.getDeclaringClass().getName(), field.getName()));
+					throw new InjectionException(String.format("Cannot inject parameter into \"%s.%s\".  " + "Type is not Cookie!", field
+						.getDeclaringClass().getName(), field.getName()));
 			}
 
 			iObject = field.getAnnotation(InjectObject.class);
@@ -93,8 +92,7 @@ class Injector
 		}
 	}
 
-	static private void injectMethods(Object instance, Method[] methods, InjectionContext injectionContext)
-		throws InjectionException
+	static private void injectMethods(Object instance, Method[] methods, InjectionContext injectionContext) throws InjectionException
 	{
 		InjectParameter iParameter;
 		InjectCookie iCookie;
@@ -138,8 +136,8 @@ class Injector
 				if (parameterTypes[0].equals(Cookie.class))
 					injectMethodValue(instance, method, cookie);
 				else
-					throw new InjectionException(String.format("Cannot inject parameter into \"%s.%s\".  "
-						+ "Parameter type is not Cookie!", method.getDeclaringClass().getName(), method.getName()));
+					throw new InjectionException(String.format("Cannot inject parameter into \"%s.%s\".  " + "Parameter type is not Cookie!",
+						method.getDeclaringClass().getName(), method.getName()));
 			}
 
 			iObject = method.getAnnotation(InjectObject.class);
@@ -148,8 +146,7 @@ class Injector
 					throw new InjectionException(String.format("Cannot inject into method \"%s.%s\".  "
 						+ "Signature must have exactly 1 parameter.", method.getDeclaringClass().getName(), method.getName()));
 
-				injectMethodValue(instance, method, injectionContext.injectionHandler()
-					.getMethodInjectionValue(method, iObject));
+				injectMethodValue(instance, method, injectionContext.injectionHandler().getMethodInjectionValue(method, iObject));
 			}
 		}
 	}

@@ -34,8 +34,8 @@ public class JobHistoryFrame extends JFrame
 					if (id != null && (id.equals(queueName)))
 						source = new SimpleStringHistoryEventSource(queue.toString(), null, source);
 
-					tempEvents.add(new HistoryEvent(event.eventNumber(), event.eventTimestamp(), source, event.eventLevel(),
-						event.eventCategory(), event.eventProperties(), event.eventData()));
+					tempEvents.add(new HistoryEvent(event.eventNumber(), event.eventTimestamp(), source, event.eventLevel(), event
+						.eventCategory(), event.eventProperties(), event.eventData()));
 				}
 
 				events = tempEvents;

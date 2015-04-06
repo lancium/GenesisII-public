@@ -7,8 +7,8 @@ class PageContextDescription
 	private ObjectInjectionHandlerFactory _injectionHandlerFactory;
 
 	@SuppressWarnings("unchecked")
-	PageContextDescription(String context, String resourceBase, String injectionHandlerFactoryClassName)
-		throws ClassNotFoundException, InstantiationException, IllegalAccessException
+	PageContextDescription(String context, String resourceBase, String injectionHandlerFactoryClassName) throws ClassNotFoundException,
+		InstantiationException, IllegalAccessException
 	{
 		_context = context;
 		_resourceBase = resourceBase;

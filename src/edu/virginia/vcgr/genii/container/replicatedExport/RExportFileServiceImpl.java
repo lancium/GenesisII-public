@@ -66,8 +66,8 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl implements R
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE());
 	}
 
-	public WriteResponse write(Write write) throws RemoteException, CustomFaultType, ReadNotPermittedFaultType,
-		UnsupportedTransferFaultType, ResourceUnknownFaultType
+	public WriteResponse write(Write write) throws RemoteException, CustomFaultType, ReadNotPermittedFaultType, UnsupportedTransferFaultType,
+		ResourceUnknownFaultType
 	{
 		WriteResponse writeResp = super.write(write);
 
@@ -118,8 +118,7 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl implements R
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
-		WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("setMetadata operation not supported in replicated export");
 	}

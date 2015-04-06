@@ -51,8 +51,8 @@ public class Filter<E extends Enum<E>>
 		EnumSet<E> filterSet;
 		String filename = String.format(FILENAME_FORMAT, getShortName(filterClass));
 		IOSource source =
-			new OverridenIOSource(new FileIOSource(new File(configurationDirectory, filename)), new ClassRelativeIOSource(
-				Filter.class, filename));
+			new OverridenIOSource(new FileIOSource(new File(configurationDirectory, filename)), new ClassRelativeIOSource(Filter.class,
+				filename));
 		String line;
 
 		InputStream in = null;

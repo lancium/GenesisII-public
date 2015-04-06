@@ -8,9 +8,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * implements a file containing a bit sequence, where individual bits can be flipped on and off at
- * will. the state of the bits is tracked per change operation via a differential list. changes will
- * be written on call to the close() method.
+ * implements a file containing a bit sequence, where individual bits can be flipped on and off at will. the state of the bits is tracked per
+ * change operation via a differential list. changes will be written on call to the close() method.
  */
 public class BitmapFile implements Closeable
 {

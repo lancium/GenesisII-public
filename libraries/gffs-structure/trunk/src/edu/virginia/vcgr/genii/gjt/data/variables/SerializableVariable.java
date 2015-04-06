@@ -16,14 +16,10 @@ public class SerializableVariable
 	private String _name;
 
 	@XmlElements({
-		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "undefined",
-			type = UndefinedVariableDefinition.class),
-		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "integer-loop",
-			type = IntegerLoopVariableDefinition.class),
-		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "double-loop",
-			type = DoubleLoopVariableDefinition.class),
-		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "value-list",
-			type = ValueListVariableDefinition.class) })
+		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "undefined", type = UndefinedVariableDefinition.class),
+		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "integer-loop", type = IntegerLoopVariableDefinition.class),
+		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "double-loop", type = DoubleLoopVariableDefinition.class),
+		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "value-list", type = ValueListVariableDefinition.class) })
 	private VariableDefinition _definition;
 
 	public SerializableVariable(String name, VariableDefinition varDef)

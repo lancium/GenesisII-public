@@ -53,8 +53,8 @@ public class WhoamiTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 
 		ICallingContext callingContext = ContextManager.getCurrentContext();
@@ -64,12 +64,11 @@ public class WhoamiTool extends BaseGridTool
 		else {
 			// remove/renew stale creds/attributes
 			KeyAndCertMaterial clientKeyMaterial =
-				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(),
-					new SecurityUpdateResults());
+				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 
 			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callingContext);
-			stdout.format("Client Tool Identity: \n\t%s\n", (new X509Identity(clientKeyMaterial._clientCertChain,
-				IdentityType.CONNECTION)).describe(_verbosity));
+			stdout.format("Client Tool Identity: \n\t%s\n",
+				(new X509Identity(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION)).describe(_verbosity));
 			if (_oneLine) {
 				stdout.format("\t%s\n", X509Identity.getOpensslRdn(clientKeyMaterial._clientCertChain[0]));
 			}

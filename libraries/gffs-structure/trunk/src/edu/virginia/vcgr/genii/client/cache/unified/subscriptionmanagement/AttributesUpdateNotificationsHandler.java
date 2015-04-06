@@ -22,15 +22,14 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOAttributesU
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
 /*
- * This is the handler class for processing any notification received for byteIO attributes update
- * and access right change on any kind of resource.
+ * This is the handler class for processing any notification received for byteIO attributes update and access right change on any kind of
+ * resource.
  */
 public class AttributesUpdateNotificationsHandler
 {
 	private static Log _logger = LogFactory.getLog(AttributesUpdateNotificationsHandler.class);
 
-	public static void handleByteIOAttributesUpdate(ByteIOAttributesUpdateNotification notification,
-		EndpointReferenceType byteIOEndpoint)
+	public static void handleByteIOAttributesUpdate(ByteIOAttributesUpdateNotification notification, EndpointReferenceType byteIOEndpoint)
 	{
 
 		String nameSpaceForAttributes = CacheUtils.getNamespaceForByteIOAttributes(byteIOEndpoint);
@@ -67,24 +66,23 @@ public class AttributesUpdateNotificationsHandler
 		CacheManager.putItemInCache(byteIOEndpoint, createTimeAttributeQName, createTimeElement);
 	}
 
-	private static void handleNotificationBlockage(ByteIOAttributesUpdateNotification notification,
-		EndpointReferenceType byteIOEndpoint, String nameSpaceForAttributes)
+	private static void handleNotificationBlockage(ByteIOAttributesUpdateNotification notification, EndpointReferenceType byteIOEndpoint,
+		String nameSpaceForAttributes)
 	{
 
 		WSName byteIOName = new WSName(byteIOEndpoint);
 		URI wsEndpointIdentifier = byteIOName.getEndpointIdentifier();
 
 		/*
-		 * Remove size and modification time attributes from the cache, because these are the only
-		 * two attributes that get affected by a blockade.
+		 * Remove size and modification time attributes from the cache, because these are the only two attributes that get affected by a
+		 * blockade.
 		 */
-		CacheManager.removeItemFromCache(wsEndpointIdentifier,
-			new QName(nameSpaceForAttributes, ByteIOConstants.SIZE_ATTR_NAME), MessageElement.class);
-		CacheManager.removeItemFromCache(wsEndpointIdentifier, new QName(nameSpaceForAttributes,
-			ByteIOConstants.MODTIME_ATTR_NAME), MessageElement.class);
+		CacheManager.removeItemFromCache(wsEndpointIdentifier, new QName(nameSpaceForAttributes, ByteIOConstants.SIZE_ATTR_NAME),
+			MessageElement.class);
+		CacheManager.removeItemFromCache(wsEndpointIdentifier, new QName(nameSpaceForAttributes, ByteIOConstants.MODTIME_ATTR_NAME),
+			MessageElement.class);
 
-		WSResourceConfig resourceConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(wsEndpointIdentifier, WSResourceConfig.class);
+		WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsEndpointIdentifier, WSResourceConfig.class);
 		if (resourceConfig == null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("A notification blocking request received for a resource that has no cached configuration!");
@@ -104,8 +102,8 @@ public class AttributesUpdateNotificationsHandler
 			AuthZConfig config = notification.getNewConfig();
 			if (config == null)
 				return;
-			CacheManager.putItemInCache(endPoint, GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, new MessageElement(
-				GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, config));
+			CacheManager.putItemInCache(endPoint, GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, new MessageElement(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME,
+				config));
 		} catch (Exception e) {
 			_logger.info("failed to process authzUpdate notification");
 		}

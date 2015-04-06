@@ -223,9 +223,8 @@ public class RunTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException
 	{
 		LightweightNotificationServer server = null;
 
@@ -353,8 +352,7 @@ public class RunTool extends BaseGridTool
 		}
 	}
 
-	public JobDefinition_Type createJobDefinition(String jobName, java.util.List<String> cLine)
-		throws URI.MalformedURIException
+	public JobDefinition_Type createJobDefinition(String jobName, java.util.List<String> cLine) throws URI.MalformedURIException
 	{
 		JSDLFormer former = new JSDLFormer(jobName, cLine);
 
@@ -370,8 +368,8 @@ public class RunTool extends BaseGridTool
 		for (String stage : _stageIns) {
 			Matcher matcher = _STAGE_PATTERN.matcher(stage);
 			if (!matcher.matches())
-				throw new IllegalArgumentException("Data stage description \"" + stage
-					+ "\" does not match required pattern of " + "<filename>/<stage-uri>");
+				throw new IllegalArgumentException("Data stage description \"" + stage + "\" does not match required pattern of "
+					+ "<filename>/<stage-uri>");
 			stages.put(matcher.group(1), new URI(matcher.group(2)));
 		}
 
@@ -379,16 +377,15 @@ public class RunTool extends BaseGridTool
 		for (String stage : _stageOuts) {
 			Matcher matcher = _STAGE_PATTERN.matcher(stage);
 			if (!matcher.matches())
-				throw new IllegalArgumentException("Data stage description \"" + stage
-					+ "\" does not match required pattern of " + "<filename>/<stage-uri>");
+				throw new IllegalArgumentException("Data stage description \"" + stage + "\" does not match required pattern of "
+					+ "<filename>/<stage-uri>");
 			stages.put(matcher.group(1), new URI(matcher.group(2)));
 		}
 
 		return former.formJSDL();
 	}
 
-	public ActivityState checkStatus(String jobPath) throws RemoteException, RNSException, IOException,
-		InvalidToolUsageException
+	public ActivityState checkStatus(String jobPath) throws RemoteException, RNSException, IOException, InvalidToolUsageException
 	{
 		GeniiPath gPath = new GeniiPath(jobPath);
 		RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
@@ -400,12 +397,11 @@ public class RunTool extends BaseGridTool
 	{
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
 		GetResourcePropertyResponse resp = common.getResourceProperty(aconsts.STATUS_ATTR);
-		return new ActivityState(new MessageElement((org.apache.axis.message.MessageElement) resp.get_any()[0]
-			.getChildElements().next()));
+		return new ActivityState(new MessageElement((org.apache.axis.message.MessageElement) resp.get_any()[0].getChildElements().next()));
 	}
 
-	static public ActivityState checkStatus(EndpointReferenceType besContainer, EndpointReferenceType activity)
-		throws ResourceException, RemoteException, RNSPathDoesNotExistException
+	static public ActivityState checkStatus(EndpointReferenceType besContainer, EndpointReferenceType activity) throws ResourceException,
+		RemoteException, RNSPathDoesNotExistException
 	{
 		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, besContainer);
 		GetActivityStatusesResponseType resp =
@@ -424,16 +420,14 @@ public class RunTool extends BaseGridTool
 				fin = gPath.openInputStream();
 			else
 				fin = new FileInputStream(gPath.path());
-			JobDefinition_Type jobDef =
-				(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(fin), JobDefinition_Type.class);
+			JobDefinition_Type jobDef = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(fin), JobDefinition_Type.class);
 
 			if (optJobName != null) {
 				JobIdentification_Type ident = jobDef.getJobDescription().getJobIdentification();
 				if (ident != null) {
 					ident.setJobName(optJobName);
 				} else {
-					jobDef.getJobDescription().setJobIdentification(
-						new JobIdentification_Type(optJobName, null, null, null, null));
+					jobDef.getJobDescription().setJobIdentification(new JobIdentification_Type(optJobName, null, null, null, null));
 				}
 			}
 
@@ -443,11 +437,11 @@ public class RunTool extends BaseGridTool
 		}
 	}
 
-	public EndpointReferenceType submitJob(JobDefinition_Type jobDef, EndpointReferenceType besContainer,
-		SubscribeRequest subscribeRequest) throws ResourceException, RNSException, RemoteException
+	public EndpointReferenceType submitJob(JobDefinition_Type jobDef, EndpointReferenceType besContainer, SubscribeRequest subscribeRequest)
+		throws ResourceException, RNSException, RemoteException
 	{
 		if (_logger.isDebugEnabled()) {
-			TransientCredentials transientCredentials = null;		
+			TransientCredentials transientCredentials = null;
 			try {
 				ICallingContext callContext = ContextManager.getExistingContext();
 				transientCredentials = TransientCredentials.getTransientCredentials(callContext);
@@ -458,7 +452,7 @@ public class RunTool extends BaseGridTool
 				_logger.debug("submitting job with these credentials:\n" + transientCredentials.toString());
 			}
 		}
-		
+
 		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, besContainer);
 
 		jobDef = deployAndReify(bes, jobDef);
@@ -487,8 +481,8 @@ public class RunTool extends BaseGridTool
 	static private QName _GENII_APP_PATH_ELEMENT = new QName(GENII_APP_NS, "ApplicationPath");
 	static private QName _GENII_APP_ENDPOINT_ELEMENT = new QName(GENII_APP_NS, "ApplicationEndpoint");
 
-	private JobDefinition_Type deployAndReify(GeniiBESPortType bes, JobDefinition_Type jobDef) throws RNSException,
-		ResourceException, RemoteException
+	private JobDefinition_Type deployAndReify(GeniiBESPortType bes, JobDefinition_Type jobDef) throws RNSException, ResourceException,
+		RemoteException
 	{
 		EndpointReferenceType applicationDescriptionEPR = null;
 
@@ -536,8 +530,7 @@ public class RunTool extends BaseGridTool
 		return rPath.getEndpoint();
 	}
 
-	private Collection<EndpointReferenceType> getPossibleBESDeployers(GeniiBESPortType bes) throws ResourceUnknownFaultType,
-		RemoteException
+	private Collection<EndpointReferenceType> getPossibleBESDeployers(GeniiBESPortType bes) throws ResourceUnknownFaultType, RemoteException
 	{
 		ArrayList<EndpointReferenceType> ret = new ArrayList<EndpointReferenceType>();
 
@@ -553,8 +546,8 @@ public class RunTool extends BaseGridTool
 		return ret;
 	}
 
-	static private EndpointReferenceType createDeployment(EndpointReferenceType deployerService,
-		EndpointReferenceType applicationDescription) throws RemoteException
+	static private EndpointReferenceType
+		createDeployment(EndpointReferenceType deployerService, EndpointReferenceType applicationDescription) throws RemoteException
 	{
 		ApplicationDeployerPortType deployer = ClientUtils.createProxy(ApplicationDeployerPortType.class, deployerService);
 
@@ -575,8 +568,7 @@ public class RunTool extends BaseGridTool
 
 		SupportDocumentType[] have = determineSupport(deployer);
 
-		ApplicationDescriptionPortType application =
-			ClientUtils.createProxy(ApplicationDescriptionPortType.class, applicationDescription);
+		ApplicationDescriptionPortType application = ClientUtils.createProxy(ApplicationDescriptionPortType.class, applicationDescription);
 		RNSIterable iterable = new RNSIterable(application.lookup(null), null, QueueConstants.PREFERRED_BATCH_SIZE);
 		for (RNSEntryResponseType entry : iterable) {
 			RNSMetadataType mdt = entry.getMetadata();
@@ -595,11 +587,10 @@ public class RunTool extends BaseGridTool
 		return _acceptableChoices.get(_generator.nextInt(_acceptableChoices.size())).getEndpoint();
 	}
 
-	static private SupportDocumentType[] determineSupport(ApplicationDeployerPortType deployer)
-		throws ResourceUnknownFaultType, RemoteException
+	static private SupportDocumentType[] determineSupport(ApplicationDeployerPortType deployer) throws ResourceUnknownFaultType,
+		RemoteException
 	{
-		GetResourcePropertyResponse resp =
-			deployer.getResourceProperty(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME);
+		GetResourcePropertyResponse resp = deployer.getResourceProperty(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME);
 
 		MessageElement[] any = resp.get_any();
 		SupportDocumentType[] ret = new SupportDocumentType[any.length];
@@ -611,8 +602,7 @@ public class RunTool extends BaseGridTool
 		return ret;
 	}
 
-	static private ToolException getError(EndpointReferenceType activity) throws RemoteException, IOException,
-		ClassNotFoundException
+	static private ToolException getError(EndpointReferenceType activity) throws RemoteException, IOException, ClassNotFoundException
 	{
 		TypeInformation typeInfo = new TypeInformation(activity);
 		if (typeInfo.isBESActivity()) {

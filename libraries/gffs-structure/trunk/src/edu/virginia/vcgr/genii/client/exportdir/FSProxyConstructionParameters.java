@@ -11,8 +11,7 @@ public class FSProxyConstructionParameters extends ConstructionParameters implem
 {
 	static final long serialVersionUID = 0L;
 
-	@XmlElement(namespace = "http://genesisII.virginia.edu/fsproxy", name = "connection-information", required = true,
-		nillable = false)
+	@XmlElement(namespace = "http://genesisII.virginia.edu/fsproxy", name = "connection-information", required = true, nillable = false)
 	private FSViewConnectionInformation _connectionInformation;
 
 	public FSProxyConstructionParameters(FSViewConnectionInformation connectionInformation)

@@ -5,8 +5,8 @@ import org.apache.axis.types.URI;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 
 /**
- * An interface for all Simple transferers. This interface is basically a convenient place to put
- * some constants relevant to the Simple transfer protocol.
+ * An interface for all Simple transferers. This interface is basically a convenient place to put some constants relevant to the Simple
+ * transfer protocol.
  * 
  * @author mmm2a
  */

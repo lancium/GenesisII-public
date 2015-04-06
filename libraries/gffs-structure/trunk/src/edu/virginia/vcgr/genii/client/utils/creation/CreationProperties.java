@@ -9,8 +9,7 @@ import javax.xml.soap.SOAPException;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
 /**
- * This class is a collection of utility functions that makes it easier to add Java Properties to a
- * creation message (the any element).
+ * This class is a collection of utility functions that makes it easier to add Java Properties to a creation message (the any element).
  * 
  * @author mmm2a
  */

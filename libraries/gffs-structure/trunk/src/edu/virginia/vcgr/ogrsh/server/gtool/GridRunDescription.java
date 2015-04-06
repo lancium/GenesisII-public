@@ -21,8 +21,8 @@ public class GridRunDescription implements Closeable
 	private ServerSocketChannel _server;
 
 	@SuppressWarnings("unchecked")
-	public GridRunDescription(String gridToolClassName, String[] arguments) throws ClassNotFoundException,
-		IllegalAccessException, InstantiationException, ToolException, IOException
+	public GridRunDescription(String gridToolClassName, String[] arguments) throws ClassNotFoundException, IllegalAccessException,
+		InstantiationException, ToolException, IOException
 	{
 		ClassLoader loader = GenesisClassLoader.classLoaderFactory();
 		Class<? extends ITool> toolClass = (Class<? extends ITool>) loader.loadClass(gridToolClassName);

@@ -28,8 +28,8 @@ public class EnvTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		Map<String, String> env = GridUserEnvironment.getGridUserEnvironment();
 		Set<String> keySet = env.keySet();

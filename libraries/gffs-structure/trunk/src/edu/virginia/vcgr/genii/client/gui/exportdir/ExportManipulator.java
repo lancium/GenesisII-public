@@ -28,8 +28,8 @@ public class ExportManipulator
 	static private Log _logger = LogFactory.getLog(ExportManipulator.class);
 
 	static public RNSPath createExport(String containerPath, String localPath, String rnsPath, boolean isLightweight)
-		throws FileNotFoundException, ExportException, RNSException, CreationException, ResourceCreationFaultType,
-		RemoteException, IOException, InvalidToolUsageException
+		throws FileNotFoundException, ExportException, RNSException, CreationException, ResourceCreationFaultType, RemoteException,
+		IOException, InvalidToolUsageException
 	{
 
 		RNSPath cpath, targetpath, servicepath;
@@ -74,16 +74,16 @@ public class ExportManipulator
 			throw new ResourceException("exception during export checking.", r);
 		}
 		// Now we have both the container path and the target path.
-		
+
 		// find out the owner of the export from the preferred id.
 		PreferredIdentity current = PreferredIdentity.getCurrent();
-		String owner = current != null? current.getIdentityString() : null;
+		String owner = current != null ? current.getIdentityString() : null;
 		if (_logger.isDebugEnabled())
 			_logger.debug("got preferred identity for new export: '" + owner + "'");
 		try {
 			EndpointReferenceType exEPR =
-				ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "", 0L,
-					targetpath.toString(), false, owner);
+				ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "", 0L, targetpath.toString(),
+					false, owner);
 			if (exEPR == null)
 				_logger.debug("created null EPR with createExportedRoot");
 		} catch (Exception r) {
@@ -93,17 +93,14 @@ public class ExportManipulator
 	}
 
 	/*
-	 * static public RNSPath createExport(URL containerURL, File localPath, String rnsPath, boolean
-	 * isLightweight) throws FileNotFoundException, ExportException, RNSException,
-	 * CreationException, ResourceCreationFaultType, RemoteException, IOException,
+	 * static public RNSPath createExport(URL containerURL, File localPath, String rnsPath, boolean isLightweight) throws
+	 * FileNotFoundException, ExportException, RNSException, CreationException, ResourceCreationFaultType, RemoteException, IOException,
 	 * InvalidToolUsageException { validate(localPath);
 	 * 
-	 * RNSPath target = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
-	 * validate(target);
+	 * RNSPath target = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST); validate(target);
 	 * 
-	 * ExportTool.createExportedRoot( rnsPath, EPRUtils.makeEPR(containerURL.toString() +
-	 * "/axis/services/" + (isLightweight ? "LightWeightExportPortType" : "ExportedRootPortType")),
-	 * localPath.getAbsolutePath(), null, null, null, rnsPath, false); return
+	 * ExportTool.createExportedRoot( rnsPath, EPRUtils.makeEPR(containerURL.toString() + "/axis/services/" + (isLightweight ?
+	 * "LightWeightExportPortType" : "ExportedRootPortType")), localPath.getAbsolutePath(), null, null, null, rnsPath, false); return
 	 * RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST); }
 	 */
 

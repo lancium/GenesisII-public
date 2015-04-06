@@ -32,8 +32,8 @@ public class ResourceUsageDirectory
 			if (OperatingSystemType.isWindows())
 				tempFile.setWritable(true, false);
 			else
-				FileSystemUtils.chmod(tempFile.getAbsolutePath(), FileSystemUtils.MODE_USER_READ
-					| FileSystemUtils.MODE_USER_WRITE | FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE);
+				FileSystemUtils.chmod(tempFile.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+					| FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE);
 
 			return tempFile;
 		} catch (IOException ioe) {

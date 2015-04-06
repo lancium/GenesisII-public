@@ -31,12 +31,11 @@ class NotificationHandlerWrapper<ContentsType extends NotificationMessageContent
 		return _handler.contentsType();
 	}
 
-	final String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
-		EndpointReferenceType subscriptionReference, Object contents)
+	final String handleNotification(TopicPath topic, EndpointReferenceType producerReference, EndpointReferenceType subscriptionReference,
+		Object contents)
 	{
 		try {
-			return _handler.handleNotification(topic, producerReference, subscriptionReference,
-				_handler.contentsType().cast(contents));
+			return _handler.handleNotification(topic, producerReference, subscriptionReference, _handler.contentsType().cast(contents));
 		} catch (Exception e) {
 			_logger.warn("A notification handler threw an exception while " + "handling a notification.", e);
 			return NotificationConstants.FAIL;

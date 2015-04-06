@@ -36,14 +36,14 @@ public class ContainerConfiguration
 	static Object _lockSavedCert = new Object();
 
 	/*
-	 * static holder for the "real" container configuration, owned by the container object. this
-	 * will be null if the role is not actually for a container.
+	 * static holder for the "real" container configuration, owned by the container object. this will be null if the role is not actually for
+	 * a container.
 	 */
 	private static ContainerConfiguration _theConConf = null;
 
 	/**
-	 * constructor uses the configuration manager to retrieve most properties. some are filled in by
-	 * the container itself, such as the ssl information.
+	 * constructor uses the configuration manager to retrieve most properties. some are filled in by the container itself, such as the ssl
+	 * information.
 	 */
 	public ContainerConfiguration(ConfigurationManager manager)
 	{
@@ -66,8 +66,7 @@ public class ContainerConfiguration
 	}
 
 	/**
-	 * returns the statically held reference to the container's real configuration. this is null for
-	 * a client.
+	 * returns the statically held reference to the container's real configuration. this is null for a client.
 	 */
 	static public ContainerConfiguration getTheContainerConfig()
 	{
@@ -129,8 +128,7 @@ public class ContainerConfiguration
 		_listenPort = Integer.parseInt(sListenPort);
 
 		String dListenPort =
-			Installation.getDeployment(new DeploymentName()).webContainerProperties()
-				.getProperty(WebContainerConstants.DPAGES_PORT_PROP);
+			Installation.getDeployment(new DeploymentName()).webContainerProperties().getProperty(WebContainerConstants.DPAGES_PORT_PROP);
 		if (dListenPort != null)
 			_dpagesPort = Integer.valueOf(dListenPort);
 
@@ -142,7 +140,7 @@ public class ContainerConfiguration
 		String notSize = props.getProperty(_NOTIFICATION_POOL_SIZE, _NOTIFICATION_POOL_SIZE_DEFAULT);
 		_notificationPoolSize = Integer.parseInt(notSize);
 	}
-	
+
 	// returns the container TLS certificate for outgoing connections.
 	public static CertEntry getContainerTLSCert()
 	{

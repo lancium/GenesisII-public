@@ -11,8 +11,8 @@ import org.apache.commons.logging.LogFactory;
 public class GenesisHashMap extends HashMap<QName, Object>
 {
 	/*
-	 * this is intentionally incompatible with hashmap, since we don't want to directly serialize
-	 * these objects as part of ensuring db compatibility.
+	 * this is intentionally incompatible with hashmap, since we don't want to directly serialize these objects as part of ensuring db
+	 * compatibility.
 	 */
 	private static final long serialVersionUID = 23L;
 

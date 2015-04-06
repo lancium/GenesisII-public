@@ -38,8 +38,8 @@ public class RNSTreeMover extends RNSTreeOperator
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("RNSTreeMover called.");
-		_uiContext.progressMonitorFactory()
-			.createMonitor(_targetTree, "Moving Endpoints", "Moving endpoints.", 1000L, new MoverTask(), null).start();
+		_uiContext.progressMonitorFactory().createMonitor(_targetTree, "Moving Endpoints", "Moving endpoints.", 1000L, new MoverTask(), null)
+			.start();
 		return true;
 	}
 
@@ -70,8 +70,7 @@ public class RNSTreeMover extends RNSTreeOperator
 							if (wasCancelled())
 								return null;
 
-							_logger.warn(String.format("Unable to move endpoint for source \"%s\".", path.second().pwd()),
-								cause);
+							_logger.warn(String.format("Unable to move endpoint for source \"%s\".", path.second().pwd()), cause);
 							ErrorHandler.handleError(_uiContext, _targetTree, cause);
 						} finally {
 							ContextManager.setResolver(resolver);

@@ -15,8 +15,7 @@ public class DefaultRandomByteIOAttributePreFetcher extends RandomByteIOAttribut
 		super(resource);
 	}
 
-	public DefaultRandomByteIOAttributePreFetcher(EndpointReferenceType target) throws ResourceException,
-		ResourceUnknownFaultType
+	public DefaultRandomByteIOAttributePreFetcher(EndpointReferenceType target) throws ResourceException, ResourceUnknownFaultType
 	{
 		this((IRByteIOResource) ResourceManager.getTargetResource(target).dereference());
 	}

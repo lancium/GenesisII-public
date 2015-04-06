@@ -30,9 +30,8 @@ import edu.virginia.vcgr.genii.notification.broker.IndirectSubscriptionType;
 import edu.virginia.vcgr.genii.notification.broker.SubscriptionFailedFaultType;
 
 /*
- * This is the class for creating subscriptions for cache management. This works by running two
- * cooperating threads. The first is responsible for sampling the subscription requests and
- * accepting or filtering them on the basis of rate of subscription requests. The second is
+ * This is the class for creating subscriptions for cache management. This works by running two cooperating threads. The first is responsible
+ * for sampling the subscription requests and accepting or filtering them on the basis of rate of subscription requests. The second is
  * responsible for making subscribe out-calls to the resource containers.
  */
 class SubscriptionOutcallHandler extends Thread
@@ -55,8 +54,8 @@ class SubscriptionOutcallHandler extends Thread
 	private ICallingContext callingContext;
 	private EndpointReferenceType localEndpoint;
 
-	public SubscriptionOutcallHandler(LinkedBlockingQueue<PendingSubscription> queue,
-		LightweightNotificationServer notificationServer, boolean controlledRateMode)
+	public SubscriptionOutcallHandler(LinkedBlockingQueue<PendingSubscription> queue, LightweightNotificationServer notificationServer,
+		boolean controlledRateMode)
 	{
 		this.requestedSubscriptionQueue = queue;
 		this.scheduledSubscriptionQueue = new LinkedBlockingQueue<PendingSubscription>();
@@ -183,8 +182,7 @@ class SubscriptionOutcallHandler extends Thread
 		for (PendingSubscription request : requests) {
 			EndpointReferenceType EPR = request.getNewsSource();
 			URI wsEndpointIdentifier = new WSName(EPR).getEndpointIdentifier();
-			WSResourceConfig resourceConfig =
-				(WSResourceConfig) CacheManager.getItemFromCache(wsEndpointIdentifier, WSResourceConfig.class);
+			WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsEndpointIdentifier, WSResourceConfig.class);
 			if (resourceConfig != null) {
 				// although a single resource can be mapped to multiple RNS paths, we are
 				// assuming only one of them while calculating number of branches within
@@ -200,12 +198,10 @@ class SubscriptionOutcallHandler extends Thread
 	}
 
 	/*
-	 * This is a predictive operation. We cannot ensure that the resource we are trying to subscribe
-	 * hasn't been deleted by other user. However, when the deletion has been done locally, we
-	 * expect there wouldn't be any resource configuration instance in the cache for the concerned
-	 * news source. Based on that assumption we are filtering the subscription request. Note that,
-	 * to remove a directory we have to look check the its contents first, which result in a lookup
-	 * call, and naturally creates pending subscriptions.
+	 * This is a predictive operation. We cannot ensure that the resource we are trying to subscribe hasn't been deleted by other user.
+	 * However, when the deletion has been done locally, we expect there wouldn't be any resource configuration instance in the cache for the
+	 * concerned news source. Based on that assumption we are filtering the subscription request. Note that, to remove a directory we have to
+	 * look check the its contents first, which result in a lookup call, and naturally creates pending subscriptions.
 	 */
 	private void filterRequestsCorrespondingDeletedResources(List<PendingSubscription> requests)
 	{

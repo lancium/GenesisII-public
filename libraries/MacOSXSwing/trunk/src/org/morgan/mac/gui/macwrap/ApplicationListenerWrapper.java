@@ -54,7 +54,6 @@ class ApplicationListenerWrapper implements InvocationHandler
 
 	static Object wrapApplicationListener(ApplicationListener listener)
 	{
-		return Proxy.newProxyInstance(null, new Class<?>[] { REAL_APPLICATION_LISTENER_CLASS }, new ApplicationListenerWrapper(
-			listener));
+		return Proxy.newProxyInstance(null, new Class<?>[] { REAL_APPLICATION_LISTENER_CLASS }, new ApplicationListenerWrapper(listener));
 	}
 }

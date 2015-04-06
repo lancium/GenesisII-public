@@ -17,9 +17,8 @@ import edu.virginia.vcgr.genii.security.credentials.X509Identity;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
 /**
- * Class for holding and managing a set of "outgoing" credentials within the current calling
- * context. This is a combination of all authenticated certificate chains, caller credentials and
- * credentials for the target.
+ * Class for holding and managing a set of "outgoing" credentials within the current calling context. This is a combination of all
+ * authenticated certificate chains, caller credentials and credentials for the target.
  * 
  * @author dmerrill
  */
@@ -82,8 +81,7 @@ public class TransientCredentials implements Serializable
 	}
 
 	/**
-	 * Retrieves the credentials from the calling context. Guaranteed to not be null (may be empty,
-	 * however)
+	 * Retrieves the credentials from the calling context. Guaranteed to not be null (may be empty, however)
 	 * 
 	 * @param callingContext
 	 * @return

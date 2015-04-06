@@ -34,8 +34,7 @@ public class RNSListTransferable extends ListTransferable
 		try {
 			String FLAVOR_PATTERN = "%s;class=\"%s\"";
 			RNS_PATH_LIST_FLAVOR =
-				new DataFlavor(String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType,
-					RNSListTransferData.class.getName()));
+				new DataFlavor(String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType, RNSListTransferData.class.getName()));
 
 			SUPPORTED_FLAVORS = new DataFlavor[] { RNS_PATH_LIST_FLAVOR };
 		} catch (ClassNotFoundException cnfe) {
@@ -75,8 +74,7 @@ public class RNSListTransferable extends ListTransferable
 			return localDir.listFiles()[0];
 		} else {
 			if (_logger.isDebugEnabled())
-				_logger.debug("failed to make a copy of " + path.toString() + " in " + localDir + " because "
-					+ PathOutcome.outcomeText(ret));
+				_logger.debug("failed to make a copy of " + path.toString() + " in " + localDir + " because " + PathOutcome.outcomeText(ret));
 		}
 		return null;
 	}

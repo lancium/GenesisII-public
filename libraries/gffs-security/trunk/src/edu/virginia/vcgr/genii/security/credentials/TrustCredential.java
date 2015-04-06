@@ -46,12 +46,10 @@ import eu.unicore.security.etd.ETDImpl;
 import eu.unicore.security.etd.TrustDelegation;
 
 /**
- * This is the main class GenesisII class for SAML based trust delegation mechanism. A single
- * TrustCredential object can be the representative of an isolated delegation or the holder of an
- * entire delegation chain. This replaces our old GIICredential based delegation mechanism. The
- * previous delegation mechanism was recursive which is not supported by UNICORE SAML library. So we
- * simulate the recursive credentials transferring, which is essential for our business logic, with
- * a linked list of trust delegation.
+ * This is the main class GenesisII class for SAML based trust delegation mechanism. A single TrustCredential object can be the representative
+ * of an isolated delegation or the holder of an entire delegation chain. This replaces our old GIICredential based delegation mechanism. The
+ * previous delegation mechanism was recursive which is not supported by UNICORE SAML library. So we simulate the recursive credentials
+ * transferring, which is essential for our business logic, with a linked list of trust delegation.
  * 
  * @author Muhammad Yanhaona
  * @author Chris Koeritz
@@ -68,25 +66,21 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	transient private String id; // this credential's own identifier (as a guid).
 
 	/*
-	 * if this credential is a linked delegation, than the priorDelegation is what comes before it
-	 * in the chain. for example, if this credential is B -> C and the prior delegation is A -> B,
-	 * then the entire chain is A -> B -> C.
+	 * if this credential is a linked delegation, than the priorDelegation is what comes before it in the chain. for example, if this
+	 * credential is B -> C and the prior delegation is A -> B, then the entire chain is A -> B -> C.
 	 */
 	// the credentials that support this credential, if any.
 	transient private TrustCredential priorDelegation;
 	// the identifier of that previous credential, if any.
 	transient private String priorDelegationId;
 	/*
-	 * priorDsig is the signature from the previous credential, if this is not the start of a
-	 * delegation chain. this is crucial for ensuring that some attacker doesn't get in and monkey
-	 * with our chains, since the GUID by itself is not enough of an assurance that the prior
-	 * delegation really was the one we were handed. but the signature is derived from the previous
-	 * credential and is part of what's signed into that credential, so an attacker would have to
-	 * exercise some extremely devious crafting of credentials to actually match the dsig value.
-	 * it's not impossible probably, for some delegation chains, but we're okay with them needing a
-	 * few million years to compute the exploitable prior delegation. and even if they successfully
-	 * spoof the chain with the dsig value *somehow*, they still have to be a valid grid user that
-	 * has access to the resource in question.
+	 * priorDsig is the signature from the previous credential, if this is not the start of a delegation chain. this is crucial for ensuring
+	 * that some attacker doesn't get in and monkey with our chains, since the GUID by itself is not enough of an assurance that the prior
+	 * delegation really was the one we were handed. but the signature is derived from the previous credential and is part of what's signed
+	 * into that credential, so an attacker would have to exercise some extremely devious crafting of credentials to actually match the dsig
+	 * value. it's not impossible probably, for some delegation chains, but we're okay with them needing a few million years to compute the
+	 * exploitable prior delegation. and even if they successfully spoof the chain with the dsig value *somehow*, they still have to be a
+	 * valid grid user that has access to the resource in question.
 	 */
 	transient private String priorDsig;
 
@@ -113,11 +107,10 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * the constructor for manually creating a trust delegation. isAssertion should be true if this
-	 * is a basic assertion.
+	 * the constructor for manually creating a trust delegation. isAssertion should be true if this is a basic assertion.
 	 */
-	public TrustCredential(X509Certificate[] delegatee, IdentityType delegateeType, X509Certificate[] issuer,
-		IdentityType issuerType, BasicConstraints restrictions, EnumSet<RWXCategory> accessMask)
+	public TrustCredential(X509Certificate[] delegatee, IdentityType delegateeType, X509Certificate[] issuer, IdentityType issuerType,
+		BasicConstraints restrictions, EnumSet<RWXCategory> accessMask)
 	{
 		this.delegatee = delegatee;
 		this._delegateeType = delegateeType;
@@ -176,8 +169,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	// converts from our basic constraints object to unicore's form.
 	public static DelegationRestrictions convert(BasicConstraints toConvert)
 	{
-		return new DelegationRestrictions(toConvert.getNotValidBefore(), toConvert.getExpiration(),
-			toConvert.getMaxDelegationDepth());
+		return new DelegationRestrictions(toConvert.getNotValidBefore(), toConvert.getExpiration(), toConvert.getMaxDelegationDepth());
 	}
 
 	// converts from unicore's delegation restrictions object to our basic constraints form.
@@ -243,10 +235,9 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * returns the current depth of delegation. a depth of zero implies there is no trust
-	 * delegation. that should never be the case. the first trust credential (such as user -> tls
-	 * connection) counts as a depth of one. a chain with N trust credentials thus will always
-	 * return a length of N.
+	 * returns the current depth of delegation. a depth of zero implies there is no trust delegation. that should never be the case. the first
+	 * trust credential (such as user -> tls connection) counts as a depth of one. a chain with N trust credentials thus will always return a
+	 * length of N.
 	 */
 	public int getDelegationDepth()
 	{
@@ -260,8 +251,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * gets the x509 identity that started the trust credential. this will generally be a grid user
-	 * or group of some sort.
+	 * gets the x509 identity that started the trust credential. this will generally be a grid user or group of some sort.
 	 */
 	public X509Identity getRootIdentity()
 	{
@@ -321,9 +311,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * This method recursively traverses the trust delegation chain and construct a list of
-	 * AssertionDocuments in appropriate order. This list of AssertionDocuments can be converted to
-	 * XML DOM nodes to send over the wire.
+	 * This method recursively traverses the trust delegation chain and construct a list of AssertionDocuments in appropriate order. This list
+	 * of AssertionDocuments can be converted to XML DOM nodes to send over the wire.
 	 */
 	public void getXMLChain(List<AssertionDocument> chain)
 	{
@@ -370,14 +359,12 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * This extends the length of the delegation chain by placing 'this' credential at the end, as
-	 * the newest delegation of trust. The obvious use case is the delegation of credentials from
-	 * the grid-client when making an RPC over a grid resource. Hence, the 'priorPortionOfChain'
-	 * parameter can be a single existing delegation or a chain. Note that linking must be done
-	 * before signing "this" newly created trust credential or an exception is thrown. There is just
-	 * one exception to this rule: when linking trust delegation whose ID matches the
-	 * priorDelegationId and whose dsig value matches the priorDsig reference, this is permitted on
-	 * signed trust credentials to allow reconstruction of delegation chains from XML.
+	 * This extends the length of the delegation chain by placing 'this' credential at the end, as the newest delegation of trust. The obvious
+	 * use case is the delegation of credentials from the grid-client when making an RPC over a grid resource. Hence, the
+	 * 'priorPortionOfChain' parameter can be a single existing delegation or a chain. Note that linking must be done before signing "this"
+	 * newly created trust credential or an exception is thrown. There is just one exception to this rule: when linking trust delegation whose
+	 * ID matches the priorDelegationId and whose dsig value matches the priorDsig reference, this is permitted on signed trust credentials to
+	 * allow reconstruction of delegation chains from XML.
 	 */
 	public void extendTrustChain(TrustCredential priorPortionOfChain)
 	{
@@ -428,11 +415,9 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * This method creates an UNICORE TrustDelegation from the information available in the trust
-	 * delegation assertion a caller has created. This method is used when the assertion is created
-	 * anew. Not when the assertion is derived from an existing TrustDelegation in the database or
-	 * that is received with a SOAP message. Note that, once signed no further modification of an
-	 * assertion is permitted.
+	 * This method creates an UNICORE TrustDelegation from the information available in the trust delegation assertion a caller has created.
+	 * This method is used when the assertion is created anew. Not when the assertion is derived from an existing TrustDelegation in the
+	 * database or that is received with a SOAP message. Note that, once signed no further modification of an assertion is permitted.
 	 */
 	public void signAssertion(PrivateKey privateKey)
 	{
@@ -441,8 +426,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		}
 
 		List<SAMLAttribute> attributes = new ArrayList<SAMLAttribute>();
-		SAMLAttribute idAttribute =
-			new SAMLAttribute(SAMLConstants.ASSERTION_ID_ATTRIBUTE_NAME, SAMLConstants.PLACEHOLDER_FOR_NAME_FORMAT);
+		SAMLAttribute idAttribute = new SAMLAttribute(SAMLConstants.ASSERTION_ID_ATTRIBUTE_NAME, SAMLConstants.PLACEHOLDER_FOR_NAME_FORMAT);
 		idAttribute.addStringAttributeValue(id);
 		attributes.add(idAttribute);
 
@@ -473,8 +457,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		typeAttrib.addStringAttributeValue(_delegateeType.toString());
 		attributes.add(typeAttrib);
 
-		typeAttrib =
-			new SAMLAttribute(SAMLConstants.ISSUER_IDENTITY_TYPE_ATTRIBUTE_NAME, SAMLConstants.PLACEHOLDER_FOR_NAME_FORMAT);
+		typeAttrib = new SAMLAttribute(SAMLConstants.ISSUER_IDENTITY_TYPE_ATTRIBUTE_NAME, SAMLConstants.PLACEHOLDER_FOR_NAME_FORMAT);
 		typeAttrib.addStringAttributeValue(_issuerType.toString());
 		attributes.add(typeAttrib);
 
@@ -495,8 +478,9 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				stc.checkTrust(delegation.getXMLBeanDoc());
 				_logger.debug("SUCCESS checking trust delegation just made.");
 			} catch (Exception e) {
-				_logger.error("exception checking signature just made for cred: " + toString() + " and last few frames are: "
-					+ ProgramTools.showLastFewOnStack(28), e);
+				_logger.error(
+					"exception checking signature just made for cred: " + toString() + " and last few frames are: "
+						+ ProgramTools.showLastFewOnStack(28), e);
 			}
 
 			AssertionDocument doc = delegation.getXMLBeanDoc();
@@ -606,8 +590,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 			}
 		} catch (Exception e) {
 			throw new SecurityException("failure: an invalid trust delegation was found!  delegation has subject "
-				+ delegation.getSubjectDN() + ", custodian " + delegation.getCustodianDN() + ", and issuer "
-				+ delegation.getIssuerDN(), e);
+				+ delegation.getSubjectDN() + ", custodian " + delegation.getCustodianDN() + ", and issuer " + delegation.getIssuerDN(), e);
 		}
 		this.delegation = delegation;
 		this.signed = true;
@@ -615,14 +598,12 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		this.delegatee = delegation.getSubjectFromConfirmation();
 		this.issuer = delegation.getIssuerFromSignature();
 		this.restrictions =
-			convert(new DelegationRestrictions(delegation.getNotBefore(), delegation.getNotOnOrAfter(),
-				delegation.getProxyRestriction()));
+			convert(new DelegationRestrictions(delegation.getNotBefore(), delegation.getNotOnOrAfter(), delegation.getProxyRestriction()));
 		retrieveAttributesFromDelegation();
 	}
 
 	/**
-	 * pulls out the attributes where we have stored the parts of the trust credential that unicore
-	 * doesn't directly support.
+	 * pulls out the attributes where we have stored the parts of the trust credential that unicore doesn't directly support.
 	 */
 	private void retrieveAttributesFromDelegation()
 	{
@@ -666,12 +647,10 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * A convenient method for extracting an attribute value from an XMLFragment. This works for
-	 * only simple attributes, e.g., that can be represented as a string. For reason unknown, direct
-	 * parsing of attributes using UNICORE library is not working and throwing an strange XMLBean
-	 * XmlValueDisconnectedException. If we need to use any compound attribute in our trust
-	 * delegations then we have to construct a more generic solution as the remedy of the parsing
-	 * problem.
+	 * A convenient method for extracting an attribute value from an XMLFragment. This works for only simple attributes, e.g., that can be
+	 * represented as a string. For reason unknown, direct parsing of attributes using UNICORE library is not working and throwing an strange
+	 * XMLBean XmlValueDisconnectedException. If we need to use any compound attribute in our trust delegations then we have to construct a
+	 * more generic solution as the remedy of the parsing problem.
 	 */
 	private String parseAttributeValue(XmlObject attributeValueXML)
 	{
@@ -724,8 +703,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				if (!delegation.getIssuerFromSignature()[0].equals(getIssuer()[0])) {
 					String msg =
 						"the signature in TD and signature here do not match! deleg issuer="
-							+ delegation.getIssuerFromSignature()[0].getSubjectDN() + " vs. issuer here="
-							+ getIssuer()[0].getSubjectDN();
+							+ delegation.getIssuerFromSignature()[0].getSubjectDN() + " vs. issuer here=" + getIssuer()[0].getSubjectDN();
 					if (performLogging)
 						_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
 					throw new AttributeInvalidException(msg);
@@ -735,8 +713,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 			}
 		} catch (SAMLValidationException e) {
 			String msg =
-				"failed to validate signature on our TrustDelegation: " + e.getMessage() + "\n...testing on: " + toString()
-					+ " signed by " + getIssuer()[0].getSubjectDN();
+				"failed to validate signature on our TrustDelegation: " + e.getMessage() + "\n...testing on: " + toString() + " signed by "
+					+ getIssuer()[0].getSubjectDN();
 			if (performLogging)
 				_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
 			throw new AttributeInvalidException(msg);
@@ -756,15 +734,13 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * Note that the end-entity of a trust delegation chain is the issuer of the innermost
-	 * delegation, and is not the delegatee. This is a shift from our old system of GIICredentials.
-	 * In the old system, the ultimate end-entity such as an IDP resource would create an
-	 * IdentityCredential having its certificate chains in it. Then it would sign the attribute with
-	 * the requester as the delegatee and itself as the issuer of the resulting assertion. In our
-	 * new system, we are not creating the IdentityCredential; rather creating a trust delegation
-	 * directly. This is equivalent of the statement that IDP resource has given permissions to the
-	 * requester to act on its behalf. Therefore, when checking for access right on any other
-	 * resource, we have to use the issuer's (in the example case, IDP resource's) certificate.
+	 * Note that the end-entity of a trust delegation chain is the issuer of the innermost delegation, and is not the delegatee. This is a
+	 * shift from our old system of GIICredentials. In the old system, the ultimate end-entity such as an IDP resource would create an
+	 * IdentityCredential having its certificate chains in it. Then it would sign the attribute with the requester as the delegatee and itself
+	 * as the issuer of the resulting assertion. In our new system, we are not creating the IdentityCredential; rather creating a trust
+	 * delegation directly. This is equivalent of the statement that IDP resource has given permissions to the requester to act on its behalf.
+	 * Therefore, when checking for access right on any other resource, we have to use the issuer's (in the example case, IDP resource's)
+	 * certificate.
 	 */
 	@Override
 	public X509Certificate[] getOriginalAsserter()
@@ -791,8 +767,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * luckily we have a unique id that can be checked for equality. this class does not support any
-	 * notions of equivalency aside from having identical guids.
+	 * luckily we have a unique id that can be checked for equality. this class does not support any notions of equivalency aside from having
+	 * identical guids.
 	 */
 	@Override
 	public boolean equals(Object other)
@@ -816,19 +792,16 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		return new HashCodeBuilder(281, 31).append(id).toHashCode();
 	}
 
-
 	// sentinel value returned when findDelegateeInChain sees the certificate as the chain's issuer.
 	static public final int TO_FIND_WAS_ISSUER = 10000;
 
 	/**
-	 * returns the position of the certificate in the list of delegatees in the trust credential. 0
-	 * is the initial delegation. if the certificate is not found as a delegatee, then -1 is
-	 * returned. note that this will also return TO_FIND_WAS_ISSUER if the "toFind" certificate is
-	 * the actual issuer of the chain, meaning that the identity sought actually created the chain;
-	 * in this case it is crucial one does not take that returned index seriously, since one cannot
-	 * find it in a valid chain. this is in line with proving that the tls session cert for the
-	 * caller actually signed the message, although we only issue credentials like that in the pass
-	 * through case for authenticating based on the original tls session cert of the caller.
+	 * returns the position of the certificate in the list of delegatees in the trust credential. 0 is the initial delegation. if the
+	 * certificate is not found as a delegatee, then -1 is returned. note that this will also return TO_FIND_WAS_ISSUER if the "toFind"
+	 * certificate is the actual issuer of the chain, meaning that the identity sought actually created the chain; in this case it is crucial
+	 * one does not take that returned index seriously, since one cannot find it in a valid chain. this is in line with proving that the tls
+	 * session cert for the caller actually signed the message, although we only issue credentials like that in the pass through case for
+	 * authenticating based on the original tls session cert of the caller.
 	 */
 	public int findDelegateeInChain(X509Certificate toFind)
 	{
@@ -862,8 +835,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * tests whether the trust credential can be serialized, then deserialized, and actually
-	 * recovered.
+	 * tests whether the trust credential can be serialized, then deserialized, and actually recovered.
 	 */
 	static public boolean paranoidSerializationCheck(TrustCredential toCheck)
 	{
@@ -907,13 +879,13 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				TrustCredential tc = reconstituted.getCredentials().get(0);
 
 				if (tc.getDelegationDepth() != toCheck.getDelegationDepth()) {
-					throw new IOException("reconstituted credential has wrong delegation depth!  reconst="
-						+ tc.getDelegationDepth() + ", orig=" + toCheck.getDelegationDepth());
+					throw new IOException("reconstituted credential has wrong delegation depth!  reconst=" + tc.getDelegationDepth()
+						+ ", orig=" + toCheck.getDelegationDepth());
 				}
 
 				if (!tc.getIssuer()[0].getSubjectDN().toString().equals(toCheck.getIssuer()[0].getSubjectDN().toString())) {
-					throw new IOException("issuer disagrees in reconstituted credential: original="
-						+ toCheck.getIssuer()[0].getSubjectDN() + " recons=" + tc.getIssuer()[0].getSubjectDN());
+					throw new IOException("issuer disagrees in reconstituted credential: original=" + toCheck.getIssuer()[0].getSubjectDN()
+						+ " recons=" + tc.getIssuer()[0].getSubjectDN());
 				}
 
 				if (!tc.getDelegatee()[0].getSubjectDN().toString().equals(toCheck.getDelegatee()[0].getSubjectDN().toString())) {

@@ -22,12 +22,11 @@ public class XMLUtilities
 		String value = element.getAttribute(attrName);
 		if (value == null || value.length() == 0) {
 			if (defaultValue == null)
-				throw new SAXException("Unable to find required attribute \"" + attrName + "\" in element \""
-					+ element.getNodeName() + "\".");
-	
+				throw new SAXException("Unable to find required attribute \"" + attrName + "\" in element \"" + element.getNodeName() + "\".");
+
 			value = defaultValue;
 		}
-	
+
 		return value;
 	}
 
@@ -72,8 +71,7 @@ public class XMLUtilities
 	}
 
 	/**
-	 * consumes the xml text in "xmlString" and attempts to return a w3c document object that
-	 * represents the contents.
+	 * consumes the xml text in "xmlString" and attempts to return a w3c document object that represents the contents.
 	 */
 	public static Document parseXML(String xmlString) throws ParserConfigurationException, SAXException, IOException
 	{

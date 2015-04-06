@@ -17,8 +17,8 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 public class RNSPathHierarchyHelper implements TreeTraversalPathQuery<RNSPath>
 {
@@ -48,8 +48,7 @@ public class RNSPathHierarchyHelper implements TreeTraversalPathQuery<RNSPath>
 	}
 
 	/**
-	 * some basic tests on the path provided. true is returned if it looks like a normal file or
-	 * directory at the location.
+	 * some basic tests on the path provided. true is returned if it looks like a normal file or directory at the location.
 	 */
 	public static PathOutcome checkPathIsNormal(RNSPath path, boolean bounceResourceForks)
 	{
@@ -68,11 +67,9 @@ public class RNSPathHierarchyHelper implements TreeTraversalPathQuery<RNSPath>
 				bounce_it = true;
 			}
 			/*
-			 * always bouncing on resource forks cannot be considered reasonable. exports are
-			 * resource forks. jobs that we submit to queue submission points get considered to be
-			 * resource forks afterwards. we need to be able to copy and delete into these
-			 * unfettered, and just rely on the authorization to keep people from messing with more
-			 * than they should.
+			 * always bouncing on resource forks cannot be considered reasonable. exports are resource forks. jobs that we submit to queue
+			 * submission points get considered to be resource forks afterwards. we need to be able to copy and delete into these unfettered,
+			 * and just rely on the authorization to keep people from messing with more than they should.
 			 */
 			if (bounceResourceForks && !bounce_it && info.isResourceFork()) {
 				_logger.warn("RNS checkPath bouncing resource fork at: " + path.pwd());

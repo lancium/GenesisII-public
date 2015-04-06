@@ -81,8 +81,8 @@ class ExportDataAction extends AbstractAction
 		}
 	}
 
-	private void createExport(ExportCreationInformation creationInfo) throws FileLockException, IOException, ExportException,
-		RNSException, CreationException, ResourceCreationFaultType, RemoteException, InvalidToolUsageException
+	private void createExport(ExportCreationInformation creationInfo) throws FileLockException, IOException, ExportException, RNSException,
+		CreationException, ResourceCreationFaultType, RemoteException, InvalidToolUsageException
 	{
 		String rnsPath = creationInfo.getRNSPath();
 		RNSPath rPath;
@@ -93,8 +93,7 @@ class ExportDataAction extends AbstractAction
 		} catch (Exception cause) {
 			throw new ExportException("exception occurred; failed to create export", cause);
 		}
-		ExportDirState.addExport(creationInfo.getContainerPath(),
-			new ExportDirInformation(rPath, new File(creationInfo.getLocalPath())));
+		ExportDirState.addExport(creationInfo.getContainerPath(), new ExportDirInformation(rPath, new File(creationInfo.getLocalPath())));
 		fireExportChanged();
 	}
 }

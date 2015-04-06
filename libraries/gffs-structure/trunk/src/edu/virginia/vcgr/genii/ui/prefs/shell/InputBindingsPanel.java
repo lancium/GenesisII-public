@@ -30,8 +30,8 @@ class InputBindingsPanel extends JPanel
 			_radios[index].setSelected(type == selectedType);
 			group.add(_radios[index]);
 
-			add(_radios[index], new GridBagConstraints(0, index, 1, 1, 1.0, 1.0, GridBagConstraints.WEST,
-				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			add(_radios[index], new GridBagConstraints(0, index, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 		}
 	}
 

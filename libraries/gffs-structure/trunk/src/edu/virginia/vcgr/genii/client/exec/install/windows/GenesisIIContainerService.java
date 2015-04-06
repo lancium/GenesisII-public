@@ -34,8 +34,7 @@ public class GenesisIIContainerService
 		File configurationFile = new File(geniiInstallDir, "ext\\JavaServiceWrapper\\conf\\runContainer.conf");
 		File localJavaDir = new File(geniiInstallDir, "Java\\windows-i586\\jre");
 
-		JavaServiceWrapper.JavaServiceWrapperTask task =
-			JavaServiceWrapper.uninstallServiceWrapper(wrapperExe, configurationFile);
+		JavaServiceWrapper.JavaServiceWrapperTask task = JavaServiceWrapper.uninstallServiceWrapper(wrapperExe, configurationFile);
 
 		task.addVariable("LOCAL_JAVA_DIR", localJavaDir.getAbsolutePath());
 		task.addVariable("GENII_INSTALL_DIR", geniiInstallDir.getAbsolutePath());

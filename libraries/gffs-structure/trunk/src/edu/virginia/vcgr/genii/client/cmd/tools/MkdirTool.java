@@ -68,8 +68,8 @@ public class MkdirTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		return makeDirectory(_parents, _rnsService, getArguments(), stderr);
 	}
@@ -81,16 +81,15 @@ public class MkdirTool extends BaseGridTool
 			throw new InvalidToolUsageException();
 	}
 
-	public static EndpointReferenceType lookupPath(String path) throws RNSPathDoesNotExistException, RNSException,
-		FileNotFoundException
+	public static EndpointReferenceType lookupPath(String path) throws RNSPathDoesNotExistException, RNSException, FileNotFoundException
 	{
 		NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
-		return RNSUtilities.findService(nsd.getRootContainer(), "EnhancedRNSPortType",
-			new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE() }, new GeniiPath(path).path()).getEndpoint();
+		return RNSUtilities.findService(nsd.getRootContainer(), "EnhancedRNSPortType", new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE() },
+			new GeniiPath(path).path()).getEndpoint();
 	}
 
-	public static int makeDirectory(boolean parents, String rnsService, List<String> pathsToCreate, PrintWriter stderr)
-		throws RNSException, InvalidToolUsageException, FileNotFoundException, IOException
+	public static int makeDirectory(boolean parents, String rnsService, List<String> pathsToCreate, PrintWriter stderr) throws RNSException,
+		InvalidToolUsageException, FileNotFoundException, IOException
 	{
 		boolean createParents = false;
 		EndpointReferenceType service = null;

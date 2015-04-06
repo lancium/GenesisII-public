@@ -27,8 +27,7 @@ public class PWrapperTester
 		File resourceUsageFile = new ResourceUsageDirectory(workingDirectory).getNewResourceUsageFile();
 
 		List<String> command =
-			wrapper.formCommandLine(null, null, workingDirectory, null, stdOutRedirect, null, resourceUsageFile, null,
-				"/bin/pwd");
+			wrapper.formCommandLine(null, null, workingDirectory, null, stdOutRedirect, null, resourceUsageFile, null, "/bin/pwd");
 
 		wrapper.execute(null, null, workingDirectory, null, resourceUsageFile, command);
 	}

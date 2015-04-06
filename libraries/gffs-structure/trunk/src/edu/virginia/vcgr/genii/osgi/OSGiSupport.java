@@ -39,11 +39,10 @@ public class OSGiSupport
 	static public Boolean setUpFramework()
 	{
 		/*
-		 * we are trying to build both a user-specific and installation-specific storage area for
-		 * the OSGi bundles at run-time. this folder can get "corrupted" if the installer has
-		 * upgraded the installation, in that eclipse equinox OSGi won't load. this can be solved
-		 * manually by cleaning out the storage area, but that's pretty crass. instead, we will try
-		 * to clean it out once, and if that fails, then we really do need to fail.
+		 * we are trying to build both a user-specific and installation-specific storage area for the OSGi bundles at run-time. this folder
+		 * can get "corrupted" if the installer has upgraded the installation, in that eclipse equinox OSGi won't load. this can be solved
+		 * manually by cleaning out the storage area, but that's pretty crass. instead, we will try to clean it out once, and if that fails,
+		 * then we really do need to fail.
 		 */
 		String username = System.getProperty("user.name");
 		String installDir = ApplicationDescription.getInstallationDirectory();
@@ -101,8 +100,7 @@ public class OSGiSupport
 			_logger.trace("using bundle source at: " + _bundleDir);
 
 		/*
-		 * could enable this if we want a remote console to manage OSGi: config.put("osgi.console",
-		 * "4228");
+		 * could enable this if we want a remote console to manage OSGi: config.put("osgi.console", "4228");
 		 */
 
 		ArrayList<Bundle> loadedBundles = new ArrayList<Bundle>();

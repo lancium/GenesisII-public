@@ -65,14 +65,13 @@ public class IdpTool extends BaseLoginTool
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		addManPage(new LoadFileResource(_MANPAGE));
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("idptool--valid millis default: %.2f days / %.2f years.",
-				TimeHelpers.millisToDays(getValidMillis()), TimeHelpers.millisToYears(getValidMillis())));
+			_logger.trace(String.format("idptool--valid millis default: %.2f days / %.2f years.", TimeHelpers.millisToDays(getValidMillis()),
+				TimeHelpers.millisToYears(getValidMillis())));
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException
 	{
 		String idpServiceRelPath = null;
 		String newIdpName = null;
@@ -266,8 +265,7 @@ public class IdpTool extends BaseLoginTool
 	 * Set the valid duration of the certificate for the new IDP instance.
 	 * 
 	 * @param validDuration
-	 *            The valid duration for this tool. This string is a formatted duration string. See
-	 *            Genesis II wiki page for a description.
+	 *            The valid duration for this tool. This string is a formatted duration string. See Genesis II wiki page for a description.
 	 */
 	@Option({ "validDuration" })
 	public void setValidDuration(String validDuration)

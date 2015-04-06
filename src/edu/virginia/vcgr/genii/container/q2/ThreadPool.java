@@ -8,8 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A simple thread pool class. This class doesn't do anything fancy with creating/timing out
- * threads. It simply creates the number asked for and keeps them alive.
+ * A simple thread pool class. This class doesn't do anything fancy with creating/timing out threads. It simply creates the number asked for
+ * and keeps them alive.
  * 
  * @author mmm2a
  */
@@ -98,8 +98,7 @@ public class ThreadPool implements Closeable
 	}
 
 	/**
-	 * This is the internal thread runner class. It's job is to wait for a worker task to get
-	 * enqueue, then run it and go back to sleep.
+	 * This is the internal thread runner class. It's job is to wait for a worker task to get enqueue, then run it and go back to sleep.
 	 * 
 	 * @author mmm2a
 	 */
@@ -125,8 +124,7 @@ public class ThreadPool implements Closeable
 
 					try {
 						/*
-						 * Run the task. Make sure we catch all exceptions so that the thread
-						 * doesn't exit prematurely.
+						 * Run the task. Make sure we catch all exceptions so that the thread doesn't exit prematurely.
 						 */
 						job.run();
 					} catch (Throwable cause) {

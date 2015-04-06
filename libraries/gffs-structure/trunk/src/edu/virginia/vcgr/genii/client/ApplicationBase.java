@@ -47,8 +47,8 @@ public class ApplicationBase
 	static TrustStoreLinkage _containerLinkage = null;
 
 	/**
-	 * a simple search for the deployment directory in the environment variables. this does not have
-	 * a default value implemented here, and must fall-back to a default elsewhere.
+	 * a simple search for the deployment directory in the environment variables. this does not have a default value implemented here, and
+	 * must fall-back to a default elsewhere.
 	 */
 	static public String getDeploymentDirFromEnvironment()
 	{
@@ -102,10 +102,9 @@ public class ApplicationBase
 	}
 
 	/**
-	 * Prepares the static configuration manager (using the config files in the explicitConfigDir).
-	 * If explicitConfigDir is null, the GENII_CONFIG_DIR is inspected. If that is not present (or
-	 * empty), the default configuration location located in a well-known spot from the installation
-	 * directory (as per the installation system property) is used.
+	 * Prepares the static configuration manager (using the config files in the explicitConfigDir). If explicitConfigDir is null, the
+	 * GENII_CONFIG_DIR is inspected. If that is not present (or empty), the default configuration location located in a well-known spot from
+	 * the installation directory (as per the installation system property) is used.
 	 */
 	static protected void prepareClientApplication()
 	{
@@ -149,7 +148,7 @@ public class ApplicationBase
 			_logger.error("failure while storing current context", e);
 		}
 	}
-	
+
 	static public GridStates establishGridConnection(Writer output, Writer error, Reader input)
 	{
 		ICallingContext callContext = null;

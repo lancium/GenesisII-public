@@ -13,8 +13,7 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.config.CommonVariationConfigur
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.VariationConfiguration;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 
-public abstract class AbstractCmdLineManipulator<ConfigType> implements CmdLineManipulator<ConfigType>,
-	CmdLineManipulatorConstants
+public abstract class AbstractCmdLineManipulator<ConfigType> implements CmdLineManipulator<ConfigType>, CmdLineManipulatorConstants
 {
 	static private Log _logger = LogFactory.getLog(AbstractCmdLineManipulator.class);
 
@@ -39,8 +38,7 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements CmdLineM
 		return _variationConfigurationType;
 	}
 
-	abstract protected void tweakCmdLine(Map<String, Object> jobProperties, Map<String, Object> manipulatorProps,
-		String variationName);
+	abstract protected void tweakCmdLine(Map<String, Object> jobProperties, Map<String, Object> manipulatorProps, String variationName);
 
 	protected void validateJob(Map<String, Object> jobProperties)
 	{
@@ -52,16 +50,14 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements CmdLineM
 	}
 
 	/*
-	 * Ensure correct tweaker has been called based on type Extract executable/args if specified in
-	 * configuration
+	 * Ensure correct tweaker has been called based on type Extract executable/args if specified in configuration
 	 */
-	protected void processManipulatorConfiguration(Map<String, Object> jobProps, CmdLineManipulatorConfiguration manipConfig,
-		String varName, Map<String, Object> manipProps) throws CmdLineManipulatorException
+	protected void processManipulatorConfiguration(Map<String, Object> jobProps, CmdLineManipulatorConfiguration manipConfig, String varName,
+		Map<String, Object> manipProps) throws CmdLineManipulatorException
 	{
 		_logger.debug("**Processing General Manipulator Construction Configuration");
 
-		CommonVariationConfiguration commonConfig =
-			(CommonVariationConfiguration) getVariationConfiguration(manipConfig, varName);
+		CommonVariationConfiguration commonConfig = (CommonVariationConfiguration) getVariationConfiguration(manipConfig, varName);
 
 		if (commonConfig != null) {
 

@@ -1,9 +1,9 @@
 package edu.virginia.vcgr.genii.container.cservices.infomgr;
 
 /**
- * The Blocking Information Listener is a special listener, used internally in this package, that
- * allows the caller to block until it's information listener interface is called. We use this in
- * the InformationPortal when a users asked to making a blocking call for information.
+ * The Blocking Information Listener is a special listener, used internally in this package, that allows the caller to block until it's
+ * information listener interface is called. We use this in the InformationPortal when a users asked to making a blocking call for
+ * information.
  * 
  * @author mmm2a
  * 

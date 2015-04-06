@@ -17,8 +17,8 @@ public class ForStatement implements ParseStatement
 	private String _incrementValue;
 	private ParseStatement _innerStatement;
 
-	public ForStatement(String paramName, String initialValue, String inclusiveLimit, String exclusiveLimit,
-		String incrementValue, ParseStatement innerStatement)
+	public ForStatement(String paramName, String initialValue, String inclusiveLimit, String exclusiveLimit, String incrementValue,
+		ParseStatement innerStatement)
 	{
 		_paramName = paramName;
 		_initialValue = initialValue;

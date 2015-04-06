@@ -25,8 +25,8 @@ public class ApplicationDescription
 	private File _resourceUsagePath;
 
 	public ApplicationDescription(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
-		String executableName, Collection<String> arguments, Map<String, String> environment, String stdinRedirect,
-		String stdoutRedirect, String stderrRedirect, ResourceConstraints resourceConstraints, File resourceUsagePath)
+		String executableName, Collection<String> arguments, Map<String, String> environment, String stdinRedirect, String stdoutRedirect,
+		String stderrRedirect, ResourceConstraints resourceConstraints, File resourceUsagePath)
 	{
 		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;

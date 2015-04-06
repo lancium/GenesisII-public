@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.x509authn;
 
@@ -149,8 +148,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public RequestSecurityTokenResponseType[] requestSecurityToken2(RequestSecurityTokenType request)
-		throws java.rmi.RemoteException
+	public RequestSecurityTokenResponseType[] requestSecurityToken2(RequestSecurityTokenType request) throws java.rmi.RemoteException
 	{
 		return sharedSecurityTokenResponder(this, _resource, request);
 	}
@@ -158,11 +156,10 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	/**
 	 * preconditions:
 	 * 
-	 * 1) the client has passed us an x509 session certificate that we will delegate to. this is the
-	 * delegatee of the credentials we'll build.
+	 * 1) the client has passed us an x509 session certificate that we will delegate to. this is the delegatee of the credentials we'll build.
 	 * 
-	 * 2) the client has given us sufficient information to authenticate against the STS here; this
-	 * may be a password or the mere fact that they have a particular TLS cert.
+	 * 2) the client has given us sufficient information to authenticate against the STS here; this may be a password or the mere fact that
+	 * they have a particular TLS cert.
 	 * 
 	 */
 	public static RequestSecurityTokenResponseType[] sharedSecurityTokenResponder(BaseAuthenticationServiceImpl theThis,
@@ -211,9 +208,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 											delegateToChain = new X509Certificate[] { delegateTo };
 										} else {
 											if (delegateToChain == null) {
-												throw new AxisFault(new QName(
-													"http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"),
-													"Missing or unsupported DelegateTo security ValueType", null, null);
+												throw new AxisFault(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+													"BadRequest"), "Missing or unsupported DelegateTo security ValueType", null, null);
 											}
 										}
 									} catch (GenesisIISecurityException e) {
@@ -234,11 +230,10 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		}
 
 		// check request type
-		if ((requestType == null)
-			|| !requestType.getRequestTypeEnumValue().toString().equals(RequestTypeEnum._value1.toString())) {
+		if ((requestType == null) || !requestType.getRequestTypeEnumValue().toString().equals(RequestTypeEnum._value1.toString())) {
 			throw new AxisFault(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"),
-				"IDP cannot service a request of type "
-					+ ((requestType == null) ? "null" : requestType.getRequestTypeEnumValue()), null, null);
+				"IDP cannot service a request of type " + ((requestType == null) ? "null" : requestType.getRequestTypeEnumValue()), null,
+				null);
 		}
 
 		// check lifetime element
@@ -262,15 +257,14 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 		try {
 			/*
-			 * do the first authentication against this resource, which should be an STS, and decide
-			 * if the caller has the right to assume that identity.
+			 * do the first authentication against this resource, which should be an STS, and decide if the caller has the right to assume
+			 * that identity.
 			 */
 			RequestSecurityTokenResponseType response = delegateCredential(theThis, resource, delegateToChain, created, expiry);
 			responseArray.add(response);
 
 			/*
-			 * aggregate the group identities or other things we find under the STS by attempting to
-			 * authenticate against each item found.
+			 * aggregate the group identities or other things we find under the STS by attempting to authenticate against each item found.
 			 */
 			if (theThis instanceof BaggageAggregatable) {
 				BaggageAggregatable bagger = (BaggageAggregatable) theThis;
@@ -291,8 +285,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, RNSEntryExistsFaultType,
-		ResourceUnknownFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		return addRNSEntries(addRequest, _resource);
 	}
@@ -320,8 +313,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
-		WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("\"setMetadata\" not applicable.");
 	}
@@ -335,20 +327,17 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	/**
 	 * used by both x509 and kerberos authorization.
 	 */
-	public static void
-		sharedPostCreate(BaseAuthenticationServiceImpl theThis, ResourceKey rKey, EndpointReferenceType newEPR,
-			ConstructionParameters cParams, GenesisHashMap constructionParameters,
-			Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType, RemoteException
+	public static void sharedPostCreate(BaseAuthenticationServiceImpl theThis, ResourceKey rKey, EndpointReferenceType newEPR,
+		ConstructionParameters cParams, GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		// determine the credential the idp will front.
 		NuCredential credential = null;
-		MessageElement encodedCredential =
-			constructionParameters.getMessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME);
+		MessageElement encodedCredential = constructionParameters.getMessageElement(SecurityConstants.IDP_STORED_CREDENTIAL_QNAME);
 
 		// get the IDP resource's db resource
 		IResource resource = rKey.dereference();
-		X509Certificate[] resourceCertChain =
-			(X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		X509Certificate[] resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 
 		String newIdpName = theThis.addResourceInServiceResourceList(newEPR, constructionParameters);
 
@@ -364,8 +353,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		}
 
 		STSCertificationSpec stsCertificationSpec = null;
-		stsCertificationSpec =
-			(STSCertificationSpec) constructionParameters.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
+		stsCertificationSpec = (STSCertificationSpec) constructionParameters.get(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM);
 		PrivateKey privateKey = stsCertificationSpec.getSubjectPrivateKey();
 		if ((stsCertificationSpec == null) || (stsCertificationSpec.issuerPrivateKey == null)) {
 			_logger.error("there is no certificate stored for the authorization; using container keys instead.");
@@ -394,14 +382,14 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 					TrustCredential wrapped = (TrustCredential) credential;
 					/*
-					 * Delegate the assertion to delegateTo. note that we are using a ridiculously
-					 * long time limit here rather than not create a basic constraints object.
+					 * Delegate the assertion to delegateTo. note that we are using a ridiculously long time limit here rather than not create
+					 * a basic constraints object.
 					 */
 					TrustCredential newTC =
 						new TrustCredential(resourceCertChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
 							wrapped.getDelegateeType(), new BasicConstraints(System.currentTimeMillis()
-								- SecurityConstants.CredentialGoodFromOffset, Long.MAX_VALUE,
-								SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+								- SecurityConstants.CredentialGoodFromOffset, Long.MAX_VALUE, SecurityConstants.MaxDelegationDepth),
+							RWXCategory.FULL_ACCESS);
 					newTC.extendTrustChain(wrapped);
 					newTC.signAssertion(privateKey);
 					credential = newTC;
@@ -447,8 +435,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {
 			super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
@@ -459,12 +447,11 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	}
 
 	/**
-	 * builds the initial credential that the STS trusts the TLS cert that we were told to delegate
-	 * to.
+	 * builds the initial credential that the STS trusts the TLS cert that we were told to delegate to.
 	 */
-	public static RequestSecurityTokenResponseType delegateCredential(BaseAuthenticationServiceImpl theThis,
-		IRNSResource resource, X509Certificate[] delegateToChain, Date created, Date expiry) throws AuthZSecurityException,
-		SOAPException, ConfigurationException, RemoteException
+	public static RequestSecurityTokenResponseType delegateCredential(BaseAuthenticationServiceImpl theThis, IRNSResource resource,
+		X509Certificate[] delegateToChain, Date created, Date expiry) throws AuthZSecurityException, SOAPException, ConfigurationException,
+		RemoteException
 	{
 		if (delegateToChain != null)
 			_logger.info("delegating to " + delegateToChain[0].getSubjectDN());
@@ -474,8 +461,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		_logger.debug("resource's credential is: " + credential.toString());
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("X509AuthnServiceImpl: authenticating " + credential.getOriginalAsserter()[0].getSubjectDN()
-			+ " to client at " + caller);
+		StatsLogger.logStats("X509AuthnServiceImpl: authenticating " + credential.getOriginalAsserter()[0].getSubjectDN() + " to client at "
+			+ caller);
 		// End logging
 		if (delegateToChain == null) {
 			_logger.debug("delegate to chain was null...  ignoring credential.");
@@ -500,8 +487,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				// Delegate the assertion to delegateTo.
 				newTC =
 					new TrustCredential(delegateToChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
-						wrapped.getDelegateeType(), new BasicConstraints(created.getTime(), expiry.getTime()
-							- created.getTime(), SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+						wrapped.getDelegateeType(), new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
+							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
 			} else if (credential instanceof FullX509Identity) {
 				if (_logger.isDebugEnabled())
@@ -509,9 +496,9 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				FullX509Identity realId = (FullX509Identity) credential;
 				// Delegate the assertion to delegateTo.
 				newTC =
-					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(),
-						realId.getType(), new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
-							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
+						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(), SecurityConstants.MaxDelegationDepth),
+						RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(realId.getKey());
 			} else if (credential instanceof X509Identity) {
 				if (_logger.isDebugEnabled())
@@ -519,9 +506,9 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				X509Identity realId = (X509Identity) credential;
 				// Delegate the assertion to delegateTo.
 				newTC =
-					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(),
-						realId.getType(), new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
-							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
+						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(), SecurityConstants.MaxDelegationDepth),
+						RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
 			} else {
 				_logger.error("failure, unknown type of assertion found.");
@@ -543,16 +530,14 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			_logger.error(msg);
 			throw new AuthZSecurityException(msg);
 		}
-		elements[0] =
-			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"), xup.getTokenType());
+		elements[0] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"), xup.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
 		SOAPHeaderElement elemConvert = creds.convertToSOAPElement();
 
 		/*
-		 * CAK: this is where the second problem dives into problematic conversion process (landing
-		 * in xerces with DOM error). it turns out we were making an extra copy of the message
-		 * element that was already in axis form. that was an undetected waste of cycles previously,
+		 * CAK: this is where the second problem dives into problematic conversion process (landing in xerces with DOM error). it turns out we
+		 * were making an extra copy of the message element that was already in axis form. that was an undetected waste of cycles previously,
 		 * but now is a deadly namespace error. great fun.
 		 */
 		MessageElement[] delegations = new MessageElement[] { elemConvert };

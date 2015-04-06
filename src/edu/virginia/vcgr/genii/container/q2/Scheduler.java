@@ -25,8 +25,8 @@ import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 /**
- * The scheduler class is another manager used by the queue that actively looks for opportunities to
- * match jobs to resources and then launches them.
+ * The scheduler class is another manager used by the queue that actively looks for opportunities to match jobs to resources and then launches
+ * them.
  * 
  * @author mmm2a
  */
@@ -61,8 +61,8 @@ public class Scheduler implements Closeable
 		}
 	}
 
-	public Scheduler(String queueID, SchedulingEvent schedulingEvent, ServerDatabaseConnectionPool connectionPool,
-		JobManager jobManager, BESManager besManager) throws SQLException
+	public Scheduler(String queueID, SchedulingEvent schedulingEvent, ServerDatabaseConnectionPool connectionPool, JobManager jobManager,
+		BESManager besManager) throws SQLException
 	{
 		_schedulingEvent = schedulingEvent;
 		_connectionPool = connectionPool;
@@ -110,9 +110,8 @@ public class Scheduler implements Closeable
 
 		try {
 			/*
-			 * First, we have to find all bes managers that are availble to accept jobs. In this
-			 * case, available simply means that they are responsive to communication and accepting
-			 * activities and have more then 0 slots allocated. It does NOT imply that the slots
+			 * First, we have to find all bes managers that are availble to accept jobs. In this case, available simply means that they are
+			 * responsive to communication and accepting activities and have more then 0 slots allocated. It does NOT imply that the slots
 			 * aren't being used. We determine that later.
 			 */
 			synchronized (_besManager) {
@@ -126,8 +125,7 @@ public class Scheduler implements Closeable
 					return;
 
 				/*
-				 * Now we go through the list and get rid of all resources that had no slots
-				 * allocated.
+				 * Now we go through the list and get rid of all resources that had no slots allocated.
 				 */
 				for (BESData data : availableResources) {
 					ResourceSlots rs = new ResourceSlots(data);
@@ -151,8 +149,7 @@ public class Scheduler implements Closeable
 					return;
 
 				/*
-				 * Ask the job manager to remove all slots from the slot list that are currently
-				 * being used.
+				 * Ask the job manager to remove all slots from the slot list that are currently being used.
 				 */
 				_jobManager.recordUsedSlots(slots);
 
@@ -169,12 +166,10 @@ public class Scheduler implements Closeable
 				ResourceMatch match;
 
 				/*
-				 * We are now going to match as many jobs to as many slots as possible. To make this
-				 * as efficient as possible, we keep track of the iterator and continually
-				 * re-iterate until we go through all the jobs waiting for a slot, or we run out of
-				 * resources to scheduling against. We are also going to keep track of the next job
-				 * that should be scheduled, but can't be scheduled now (for exponential backoff
-				 * purposes).
+				 * We are now going to match as many jobs to as many slots as possible. To make this as efficient as possible, we keep track
+				 * of the iterator and continually re-iterate until we go through all the jobs waiting for a slot, or we run out of resources
+				 * to scheduling against. We are also going to keep track of the next job that should be scheduled, but can't be scheduled now
+				 * (for exponential backoff purposes).
 				 */
 				Date now = new Date();
 				Date nextScheduledEvent = null;
@@ -215,15 +210,13 @@ public class Scheduler implements Closeable
 						match = findSlot(matcher, queuedJob, requirements, slotIter);
 					} else {
 						/*
-						 * If we got here, then we already had an iterator from before. Try to find
-						 * a match with it.
+						 * If we got here, then we already had an iterator from before. Try to find a match with it.
 						 */
 						match = findSlot(matcher, queuedJob, requirements, slotIter);
 
 						/*
-						 * If we couldn't find a match, it may have been the case that we simply had
-						 * already passed a potential match with the iterator before getting here,
-						 * so give the iterator a new chance from the begining.
+						 * If we couldn't find a match, it may have been the case that we simply had already passed a potential match with the
+						 * iterator before getting here, so give the iterator a new chance from the begining.
 						 */
 						if (match == null) {
 							/* If there are no slots available, we're done. */
@@ -275,8 +268,8 @@ public class Scheduler implements Closeable
 		} finally {
 			for (Map.Entry<JobResourceRequirements, Counter> entry : jobCounts.entrySet()) {
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("%d jobs failed to match any resources with requirements %s", entry.getValue()
-						.get(), entry.getKey()));
+					_logger.debug(String.format("%d jobs failed to match any resources with requirements %s", entry.getValue().get(),
+						entry.getKey()));
 			}
 		}
 	}
@@ -322,8 +315,7 @@ public class Scheduler implements Closeable
 	}
 
 	/**
-	 * This class is used by the scheduler to wait on scheduling opportunities and the start a
-	 * scheduling process.
+	 * This class is used by the scheduler to wait on scheduling opportunities and the start a scheduling process.
 	 * 
 	 * @author mmm2a
 	 */
@@ -347,9 +339,8 @@ public class Scheduler implements Closeable
 			long startTime = 0L;
 
 			/*
-			 * A small hack, but go ahead and pre-notify ourselves that there might be a scheduling
-			 * opportunity. This bootstraps the scheduler for when it is first loaded. If we just
-			 * loaded state from the database, this will start the scheduling process.
+			 * A small hack, but go ahead and pre-notify ourselves that there might be a scheduling opportunity. This bootstraps the scheduler
+			 * for when it is first loaded. If we just loaded state from the database, this will start the scheduling process.
 			 */
 			_schedulingEvent.notifySchedulingEvent();
 
@@ -359,8 +350,7 @@ public class Scheduler implements Closeable
 					_schedulingEvent.waitSchedulingEvent();
 					try {
 						/*
-						 * Now that we have an opportunity, go ahead and schedule some jobs if we
-						 * can.
+						 * Now that we have an opportunity, go ahead and schedule some jobs if we can.
 						 */
 						startTime = System.currentTimeMillis();
 						scheduleJobs();

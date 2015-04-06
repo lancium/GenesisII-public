@@ -40,11 +40,11 @@ public class HierarchicalDirectory
 	final public File lookupFile(String filename)
 	{
 		File file;
-		
+
 		// handle absolute paths first.
 		if (filename.startsWith("/")) {
 			_logger.debug("found a path to lookup that is absolute: " + filename);
-			file =  new File(filename);
+			file = new File(filename);
 			if (file.exists() && (file.isFile() || file.isDirectory()))
 				return file;
 		}

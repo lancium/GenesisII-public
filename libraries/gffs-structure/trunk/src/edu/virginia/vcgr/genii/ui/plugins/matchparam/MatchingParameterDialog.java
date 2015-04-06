@@ -58,8 +58,8 @@ class MatchingParameterDialog extends JDialog
 		comboBox.addItem(MatchingParamEnum.supports);
 		typeColumn.setCellEditor(new DefaultCellEditor(comboBox));
 
-		content.add(new JScrollPane(_table), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 0, 5), 5, 5));
+		content.add(new JScrollPane(_table), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 0, 5), 5, 5));
 
 		MinusAction minusAction = new MinusAction();
 		JButton plusButton = new SimpleIconButton(ShapeIcons.Plus, new PlusAction());
@@ -67,11 +67,11 @@ class MatchingParameterDialog extends JDialog
 
 		_table.getSelectionModel().addListSelectionListener(minusAction);
 
-		content.add(ButtonPanel.createHorizontalButtonPanel(plusButton, minusButton), new GridBagConstraints(0, 1, 1, 1, 1.0,
-			0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(plusButton, minusButton), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 5, 5), 5, 5));
 
-		content.add(ButtonPanel.createHorizontalButtonPanel(new CommitAction(), new CancelAction()), new GridBagConstraints(0,
-			2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(new CommitAction(), new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0,
+			0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
@@ -88,12 +88,12 @@ class MatchingParameterDialog extends JDialog
 		public void actionPerformed(ActionEvent e)
 		{
 			String name =
-				JOptionPane.showInputDialog(_table, "What would you like to call the new matching parameter?",
-					"New Matching Parameter", JOptionPane.QUESTION_MESSAGE);
+				JOptionPane.showInputDialog(_table, "What would you like to call the new matching parameter?", "New Matching Parameter",
+					JOptionPane.QUESTION_MESSAGE);
 			if (name != null && name.length() > 0) {
 				String value =
-					JOptionPane.showInputDialog(_table, String.format("What value should \"%s\" have?", name),
-						"New Matching Parameter", JOptionPane.QUESTION_MESSAGE);
+					JOptionPane.showInputDialog(_table, String.format("What value should \"%s\" have?", name), "New Matching Parameter",
+						JOptionPane.QUESTION_MESSAGE);
 				if (value != null && value.length() > 0) {
 					_model.addParameter(name, value);
 				}
@@ -160,8 +160,8 @@ class MatchingParameterDialog extends JDialog
 		}
 	}
 
-	static Collection<Pair<Pair<String, String>, MatchingParameterOperation>> handleMatchingParameters(
-		Component ownerComponent, Collection<Pair<String, String>> parameters)
+	static Collection<Pair<Pair<String, String>, MatchingParameterOperation>> handleMatchingParameters(Component ownerComponent,
+		Collection<Pair<String, String>> parameters)
 	{
 		MatchingParameterDialog dialog = new MatchingParameterDialog(ownerComponent, parameters);
 		dialog.setModalityType(ModalityType.DOCUMENT_MODAL);

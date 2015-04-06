@@ -39,8 +39,7 @@ public class MethodStatistics
 
 	public Map<TimeInterval, MethodStatisticsReport> report()
 	{
-		Map<TimeInterval, MethodStatisticsReport> report =
-			new EnumMap<TimeInterval, MethodStatisticsReport>(TimeInterval.class);
+		Map<TimeInterval, MethodStatisticsReport> report = new EnumMap<TimeInterval, MethodStatisticsReport>(TimeInterval.class);
 
 		for (TimeInterval ti : TimeInterval.values())
 			report.put(ti, new MethodStatisticsReport());

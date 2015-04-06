@@ -10,8 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 /**
- * This class is a worker class that is used by the BESResourceManager to automatically update the
- * BES resources on a regular interval.
+ * This class is a worker class that is used by the BESResourceManager to automatically update the BES resources on a regular interval.
  * 
  * @author mmm2a
  */

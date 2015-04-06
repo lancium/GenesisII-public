@@ -42,8 +42,8 @@ public class EditTool extends BaseGridTool
 	}
 
 	@Override
-	final protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	final protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		String arg = getArgument(0);
 

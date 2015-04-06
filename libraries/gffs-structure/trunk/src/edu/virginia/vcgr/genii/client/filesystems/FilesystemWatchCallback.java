@@ -27,8 +27,8 @@ class FilesystemWatchCallback
 		_handler = handler;
 	}
 
-	FilesystemWatchCallback(Integer callLimit, boolean registerAntiCallback,
-		Class<? extends FilesystemWatchHandler> handlerClass, Collection<Element> configurationData) throws IOException
+	FilesystemWatchCallback(Integer callLimit, boolean registerAntiCallback, Class<? extends FilesystemWatchHandler> handlerClass,
+		Collection<Element> configurationData) throws IOException
 	{
 		_registerAntiCallback = registerAntiCallback;
 		_callLimit = callLimit;
@@ -55,14 +55,13 @@ class FilesystemWatchCallback
 						cons = handlerClass.getConstructor();
 						_handler = cons.newInstance();
 					} catch (NoSuchMethodException e) {
-						throw new IOException(String.format(
-							"Couldn't find suitable constructor" + " for handler class \"%s\".", handlerClass));
+						throw new IOException(
+							String.format("Couldn't find suitable constructor" + " for handler class \"%s\".", handlerClass));
 					}
 				}
 			}
 		} catch (InvocationTargetException ite) {
-			throw new IOException(String.format("Unable to instantiate handler for class \"%s\".", handlerClass),
-				ite.getCause());
+			throw new IOException(String.format("Unable to instantiate handler for class \"%s\".", handlerClass), ite.getCause());
 		} catch (IllegalAccessException iae) {
 			throw new IOException(String.format("Unable to instantiate handler for class \"%s\".", handlerClass), iae);
 		} catch (InstantiationException ie) {
@@ -88,8 +87,7 @@ class FilesystemWatchCallback
 				if (!_firstTime || matched)
 					_handler.notifyFilesystemEvent(manager, filesystemName, filesystem, usageInformation, matched);
 			} catch (Throwable throwable) {
-				_logger
-					.error(String.format("Error thrown by file system watcher on filesystem %s.", filesystemName), throwable);
+				_logger.error(String.format("Error thrown by file system watcher on filesystem %s.", filesystemName), throwable);
 			} finally {
 				_firstTime = false;
 			}

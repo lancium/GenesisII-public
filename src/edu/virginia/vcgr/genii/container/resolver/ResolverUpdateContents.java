@@ -34,8 +34,7 @@ public class ResolverUpdateContents extends NotificationMessageContents
 	{
 	}
 
-	public ResolverUpdateContents(int targetID, EndpointReferenceType entryReference, VersionVector versionVector)
-		throws ResourceException
+	public ResolverUpdateContents(int targetID, EndpointReferenceType entryReference, VersionVector versionVector) throws ResourceException
 	{
 		_targetID = targetID;
 		if (entryReference != null)

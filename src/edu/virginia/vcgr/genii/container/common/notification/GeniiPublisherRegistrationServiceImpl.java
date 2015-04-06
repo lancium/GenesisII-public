@@ -35,8 +35,8 @@ public class GeniiPublisherRegistrationServiceImpl extends GenesisIIBase impleme
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public DestroyRegistrationResponse destroyRegistration(DestroyRegistration arg0) throws RemoteException,
-		ResourceUnknownFaultType, ResourceNotDestroyedFaultType
+	public DestroyRegistrationResponse destroyRegistration(DestroyRegistration arg0) throws RemoteException, ResourceUnknownFaultType,
+		ResourceNotDestroyedFaultType
 	{
 		destroy(new Destroy());
 		return new DestroyRegistrationResponse();

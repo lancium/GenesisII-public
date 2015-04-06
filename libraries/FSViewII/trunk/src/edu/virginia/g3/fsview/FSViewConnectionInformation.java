@@ -21,8 +21,7 @@ public class FSViewConnectionInformation implements Serializable
 	private boolean _readOnly;
 
 	@XmlElements({
-		@XmlElement(namespace = FSViewXMLConstants.NS, name = "anonymous", nillable = true,
-			type = AnonymousAuthenticationInformation.class),
+		@XmlElement(namespace = FSViewXMLConstants.NS, name = "anonymous", nillable = true, type = AnonymousAuthenticationInformation.class),
 		@XmlElement(namespace = FSViewXMLConstants.NS, name = "username-password", nillable = true,
 			type = UsernamePasswordAuthenticationInformation.class),
 		@XmlElement(namespace = FSViewXMLConstants.NS, name = "domain-username-password", nillable = true,

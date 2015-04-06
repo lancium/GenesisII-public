@@ -3,8 +3,8 @@ package edu.virginia.vcgr.fsii.file;
 import java.util.BitSet;
 
 /**
- * These are the flags that can be used to open a file. They specify conditions that affect that
- * creation such as whether to truncate the file, create it, append, etc.
+ * These are the flags that can be used to open a file. They specify conditions that affect that creation such as whether to truncate the
+ * file, create it, append, etc.
  * 
  * @author mmm2a
  */

@@ -38,8 +38,8 @@ public class GeniiBackendConfiguration implements Cloneable
 		ContextManager.storeCurrentContext(_callingContext);
 	}
 
-	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr,
-		ICallingContext callingContext) throws RNSException, IOException, ReloadShellException, ToolException
+	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr, ICallingContext callingContext)
+		throws RNSException, IOException, ReloadShellException, ToolException
 	{
 		IContextResolver oldResolver = ContextManager.getResolver();
 		try {

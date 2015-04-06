@@ -43,8 +43,8 @@ public class HelpTool extends BaseGridTool
 		_verbose = true;
 	}
 
-	public int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	public int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		_tools = CommandLineRunner.getToolList(ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
 

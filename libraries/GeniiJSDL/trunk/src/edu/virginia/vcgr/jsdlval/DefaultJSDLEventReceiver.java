@@ -1,19 +1,17 @@
 /*
- * This code was developed by Mark Morgan (mmm2a@virginia.edu) at the University of Virginia and is
- * an implementation of JSDL, JSDL ParameterSweep and other JSDL related specifications from the
- * OGF.
+ * This code was developed by Mark Morgan (mmm2a@virginia.edu) at the University of Virginia and is an implementation of JSDL, JSDL
+ * ParameterSweep and other JSDL related specifications from the OGF.
  * 
  * Copyright 2010 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.jsdlval;
 
@@ -45,8 +43,7 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void handleAnyAttribute(XMLDocumentPath path, QName attributeName, String attributeValue)
-		throws JSDLValidationException
+	public void handleAnyAttribute(XMLDocumentPath path, QName attributeName, String attributeValue) throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path, attributeName);
 	}
@@ -76,8 +73,8 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void startJobIdentification(XMLDocumentPath path, String jobName, String jobDescription,
-		List<String> jobAnnotations, List<String> jobProjects) throws JSDLValidationException
+	public void startJobIdentification(XMLDocumentPath path, String jobName, String jobDescription, List<String> jobAnnotations,
+		List<String> jobProjects) throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -113,8 +110,8 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void startApplication(XMLDocumentPath path, String applicationName, String applicationVersion,
-		String applicationDescription) throws JSDLValidationException
+	public void startApplication(XMLDocumentPath path, String applicationName, String applicationVersion, String applicationDescription)
+		throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -126,8 +123,8 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void startDataStaging(XMLDocumentPath path, String stageName, String filename, String filesystemName,
-		CreationFlag creationFlag, Boolean deleteOnTermination) throws JSDLValidationException
+	public void startDataStaging(XMLDocumentPath path, String stageName, String filename, String filesystemName, CreationFlag creationFlag,
+		Boolean deleteOnTermination) throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -145,8 +142,8 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void startFilesystem(XMLDocumentPath path, String filesystemName, FileSystemType fsType, String description,
-		String mountPoint, RangeValue diskSpace) throws JSDLValidationException
+	public void startFilesystem(XMLDocumentPath path, String filesystemName, FileSystemType fsType, String description, String mountPoint,
+		RangeValue diskSpace) throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -188,8 +185,7 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void startCPUArchitecture(XMLDocumentPath path, ProcessorArchitecture processorArchitecture)
-		throws JSDLValidationException
+	public void startCPUArchitecture(XMLDocumentPath path, ProcessorArchitecture processorArchitecture) throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -201,19 +197,17 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void handleIndividualResourceRanges(XMLDocumentPath path, RangeValue individualCPUSpeed,
-		RangeValue individualCPUTime, RangeValue individualCPUCount, RangeValue individualNetworkBandwidth,
-		RangeValue individualPhysicalMemory, RangeValue individualVirtualMemory, RangeValue individualDiskSpace)
-		throws JSDLValidationException
+	public void handleIndividualResourceRanges(XMLDocumentPath path, RangeValue individualCPUSpeed, RangeValue individualCPUTime,
+		RangeValue individualCPUCount, RangeValue individualNetworkBandwidth, RangeValue individualPhysicalMemory,
+		RangeValue individualVirtualMemory, RangeValue individualDiskSpace) throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
 
 	@Override
-	public void
-		handleTotalResourceRanges(XMLDocumentPath path, RangeValue totalCPUTime, RangeValue totalCPUCount,
-			RangeValue totalPhysicalMemory, RangeValue totalVirtualMemory, RangeValue totalDiskSpace,
-			RangeValue totalResourceCount) throws JSDLValidationException
+	public void handleTotalResourceRanges(XMLDocumentPath path, RangeValue totalCPUTime, RangeValue totalCPUCount,
+		RangeValue totalPhysicalMemory, RangeValue totalVirtualMemory, RangeValue totalDiskSpace, RangeValue totalResourceCount)
+		throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -267,9 +261,8 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void
-		handleExecutable(XMLDocumentPath path, String filename, String filesystemName, Map<QName, String> anyAttributes)
-			throws JSDLValidationException
+	public void handleExecutable(XMLDocumentPath path, String filename, String filesystemName, Map<QName, String> anyAttributes)
+		throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -303,15 +296,15 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void handleWorkingDirectory(XMLDocumentPath path, String directoryName, String filesystemName,
-		Map<QName, String> anyAttributes) throws JSDLValidationException
+	public void handleWorkingDirectory(XMLDocumentPath path, String directoryName, String filesystemName, Map<QName, String> anyAttributes)
+		throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
 
 	@Override
-	public void handleEnvironmentVariable(XMLDocumentPath path, String variableName, String variableValue,
-		String filesystemName, Map<QName, String> anyAttributes) throws JSDLValidationException
+	public void handleEnvironmentVariable(XMLDocumentPath path, String variableName, String variableValue, String filesystemName,
+		Map<QName, String> anyAttributes) throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -427,8 +420,8 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void handleDocumentNodeSweepParameter(XMLDocumentPath path, List<NamespaceBinding> namespaceBindings,
-		String matchExpression) throws JSDLValidationException
+	public void handleDocumentNodeSweepParameter(XMLDocumentPath path, List<NamespaceBinding> namespaceBindings, String matchExpression)
+		throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}
@@ -447,8 +440,8 @@ public class DefaultJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-	public void handleLoopDoubleSweepFunction(XMLDocumentPath path, double start, double end, double step,
-		Set<Double> exceptions) throws JSDLValidationException
+	public void handleLoopDoubleSweepFunction(XMLDocumentPath path, double start, double end, double step, Set<Double> exceptions)
+		throws JSDLValidationException
 	{
 		throw new JSDLComponentNotSupportedException(path);
 	}

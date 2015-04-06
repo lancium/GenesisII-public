@@ -12,8 +12,7 @@ import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 /**
- * This is the asynchronous worker class that periodically checks the status of running jobs on a
- * regular interval.
+ * This is the asynchronous worker class that periodically checks the status of running jobs on a regular interval.
  * 
  * @author mmm2a
  */
@@ -88,8 +87,7 @@ public class JobStatusChecker
 			Connection connection = null;
 			try {
 				/*
-				 * Acquire a connection from the connection pool and ask the manager to check the
-				 * job statuses.
+				 * Acquire a connection from the connection pool and ask the manager to check the job statuses.
 				 */
 				connection = _connectionPool.acquire(true);
 				_manager.checkJobStatuses(connection);

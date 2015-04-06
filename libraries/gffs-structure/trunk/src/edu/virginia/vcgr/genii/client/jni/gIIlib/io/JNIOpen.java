@@ -80,8 +80,7 @@ public class JNIOpen extends JNILibraryBase
 		return builder.toString();
 	}
 
-	static public ArrayList<String> open(String fileName, Integer requestedDeposition, Integer desiredAccess,
-		Boolean mustBeADirectory)
+	static public ArrayList<String> open(String fileName, Integer requestedDeposition, Integer desiredAccess, Boolean mustBeADirectory)
 	{
 		String[] path = convertPath(fileName);
 
@@ -176,8 +175,8 @@ public class JNIOpen extends JNILibraryBase
 		boolean isTruncate = (requestedDeposition == FilesystemHandle.OVERWRITE);
 
 		/*
-		 * I Know that this is wrong, but append isn't working and frankly isn't used that often.
-		 * boolean isAppend = (desiredAccess & FilesystemHandle.FILE_APPEND_DATA) > 0;
+		 * I Know that this is wrong, but append isn't working and frankly isn't used that often. boolean isAppend = (desiredAccess &
+		 * FilesystemHandle.FILE_APPEND_DATA) > 0;
 		 */
 		boolean isAppend = false;
 

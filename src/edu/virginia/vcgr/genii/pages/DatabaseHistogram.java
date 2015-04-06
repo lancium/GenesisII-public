@@ -27,8 +27,8 @@ public class DatabaseHistogram extends ImageSourceDynamicPage implements Dynamic
 		}
 
 		JFreeChart chart =
-			ChartFactory.createBarChart3D("Container DB Connection Statistics", "Time Interval", "Max Connections Open",
-				dataset, PlotOrientation.VERTICAL, true, true, true);
+			ChartFactory.createBarChart3D("Container DB Connection Statistics", "Time Interval", "Max Connections Open", dataset,
+				PlotOrientation.VERTICAL, true, true, true);
 		return chart.createBufferedImage(width(), height());
 	}
 }

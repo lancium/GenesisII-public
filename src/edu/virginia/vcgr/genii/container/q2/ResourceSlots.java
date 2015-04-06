@@ -1,9 +1,8 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 /**
- * A data structure which binds a bes container ID with the number of slots that that container has
- * available. This number starts out as the total allocated to the container, and later gets refined
- * by calls to reserveSlot.
+ * A data structure which binds a bes container ID with the number of slots that that container has available. This number starts out as the
+ * total allocated to the container, and later gets refined by calls to reserveSlot.
  * 
  * @author mmm2a
  */

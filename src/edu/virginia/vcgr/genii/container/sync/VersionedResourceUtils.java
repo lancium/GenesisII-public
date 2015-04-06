@@ -50,8 +50,7 @@ public class VersionedResourceUtils
 	/**
 	 * Setup the state of a new resource before invoking ReplicationThread.
 	 */
-	public static void initializeReplica(IResource resource, EndpointReferenceType primaryEPR, int targetID)
-		throws ResourceException
+	public static void initializeReplica(IResource resource, EndpointReferenceType primaryEPR, int targetID) throws ResourceException
 	{
 		resource.setProperty(SyncProperty.PRIMARY_EPR_PROP_NAME, EPRUtils.toBytes(primaryEPR));
 		resource.setProperty(SyncProperty.ERROR_STATE_PROP_NAME, "unsubscribed");
@@ -61,8 +60,7 @@ public class VersionedResourceUtils
 	}
 
 	/**
-	 * Ask the resolver for the complete list of physical resources (with targetIDs) that make up
-	 * this logical resource.
+	 * Ask the resolver for the complete list of physical resources (with targetIDs) that make up this logical resource.
 	 */
 	public static EndpointReferenceType[] getTargetEPRs(WSName wsname) throws RemoteException
 	{
@@ -99,11 +97,11 @@ public class VersionedResourceUtils
 	}
 
 	/**
-	 * Send a "getResourceProperty" request for a property that may or may not be defined. If the
-	 * property is not defined, do not throw an exception. Simply return null.
+	 * Send a "getResourceProperty" request for a property that may or may not be defined. If the property is not defined, do not throw an
+	 * exception. Simply return null.
 	 */
-	static public MessageElement getResourceProperty(GeniiCommon common, QName property) throws RemoteException,
-		ResourceUnknownFaultType, ResourceUnavailableFaultType
+	static public MessageElement getResourceProperty(GeniiCommon common, QName property) throws RemoteException, ResourceUnknownFaultType,
+		ResourceUnavailableFaultType
 	{
 		GetResourcePropertyResponse rpResponse;
 		try {
@@ -167,8 +165,8 @@ public class VersionedResourceUtils
 	}
 
 	/**
-	 * When a versioned resource receives an update message, the resource should call this function
-	 * to determine whether it should apply the modification.
+	 * When a versioned resource receives an update message, the resource should call this function to determine whether it should apply the
+	 * modification.
 	 */
 	public static MessageFlags validateNotification(IResource resource, VersionVector localVector, VersionVector remoteVector)
 		throws ResourceException
@@ -236,8 +234,8 @@ public class VersionedResourceUtils
 	}
 
 	/**
-	 * After processing an update message, update the local VersionVector with the new remote
-	 * version number, and store the updated VersionVector as a resource property.
+	 * After processing an update message, update the local VersionVector with the new remote version number, and store the updated
+	 * VersionVector as a resource property.
 	 */
 	public static void updateVersionVector(IResource resource, VersionVector localVector, VersionVector remoteVector)
 		throws ResourceException
@@ -254,12 +252,11 @@ public class VersionedResourceUtils
 	}
 
 	/**
-	 * Replicated resources should call this before they are destroyed. If the resource should send
-	 * an update message indicating that it has been destroyed, then this returns the VersionVector
-	 * for the update message. Otherwise, it returns null.
+	 * Replicated resources should call this before they are destroyed. If the resource should send an update message indicating that it has
+	 * been destroyed, then this returns the VersionVector for the update message. Otherwise, it returns null.
 	 * 
-	 * Also, check if the resource has been "unlinked" from the other replicas, meaning that they
-	 * should be unaffected (other then destroying the unlinked replica's subscription).
+	 * Also, check if the resource has been "unlinked" from the other replicas, meaning that they should be unaffected (other then destroying
+	 * the unlinked replica's subscription).
 	 */
 	public static DestroyFlags preDestroy(IResource resource) throws ResourceException
 	{
@@ -273,9 +270,8 @@ public class VersionedResourceUtils
 	}
 
 	/**
-	 * Given a local resource and a remote resource: The remote resource was subscribed to the local
-	 * resource. The remote resource has been destroyed. Search the local subscription database for
-	 * the subscription from the remote resource, and destroy the subscription.
+	 * Given a local resource and a remote resource: The remote resource was subscribed to the local resource. The remote resource has been
+	 * destroyed. Search the local subscription database for the subscription from the remote resource, and destroy the subscription.
 	 */
 	public static void destroySubscription(IResource publisher, EndpointReferenceType consumerEPR)
 	{
@@ -283,12 +279,11 @@ public class VersionedResourceUtils
 	}
 
 	/**
-	 * A new replica calls this function to tell a resolver that the replica exists. The resolver
-	 * responds with the replica's targetID. Then, the replica updates its own state so that it will
-	 * tell the resolver when it is terminated.
+	 * A new replica calls this function to tell a resolver that the replica exists. The resolver responds with the replica's targetID. Then,
+	 * the replica updates its own state so that it will tell the resolver when it is terminated.
 	 */
-	public static UpdateResponseType updateResolver(List<ResolverDescription> resolverList, EndpointReferenceType myEPR,
-		String resourceKey) throws RemoteException
+	public static UpdateResponseType updateResolver(List<ResolverDescription> resolverList, EndpointReferenceType myEPR, String resourceKey)
+		throws RemoteException
 	{
 		// We only need to successfully update one resolver, since the resolver is a replicated
 		// resource that uses persistent notifications to keep the replicas in sync.
@@ -304,8 +299,8 @@ public class VersionedResourceUtils
 		throw firstException;
 	}
 
-	private static UpdateResponseType updateResolver(EndpointReferenceType resolverEPR, EndpointReferenceType myEPR,
-		URI targetEPI, String resourceKey) throws RemoteException
+	private static UpdateResponseType updateResolver(EndpointReferenceType resolverEPR, EndpointReferenceType myEPR, URI targetEPI,
+		String resourceKey) throws RemoteException
 	{
 		GeniiResolverPortType resolverService = ClientUtils.createProxy(GeniiResolverPortType.class, resolverEPR);
 		UpdateResponseType response = resolverService.update(new UpdateRequestType(myEPR));

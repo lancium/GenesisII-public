@@ -36,8 +36,7 @@ public class FileHandle extends AbstractFilesystemHandle
 	public void close() throws IOException
 	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("FileHandle::close(%s[%d])", UnixFilesystemPathRepresentation.INSTANCE.toString(_path),
-				_fileHandle));
+			_logger.trace(String.format("FileHandle::close(%s[%d])", UnixFilesystemPathRepresentation.INSTANCE.toString(_path), _fileHandle));
 
 		if (_fileHandle < 0)
 			return;
@@ -52,8 +51,8 @@ public class FileHandle extends AbstractFilesystemHandle
 	public byte[] read(long offset, int length) throws FSException
 	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("FileHandle::read(%s[%d], %d, %d)",
-				UnixFilesystemPathRepresentation.INSTANCE.toString(_path), _fileHandle, offset, length));
+			_logger.trace(String.format("FileHandle::read(%s[%d], %d, %d)", UnixFilesystemPathRepresentation.INSTANCE.toString(_path),
+				_fileHandle, offset, length));
 
 		ByteBuffer target = ByteBuffer.allocate(length);
 		_fs.read(_fileHandle, offset, target);
@@ -66,8 +65,8 @@ public class FileHandle extends AbstractFilesystemHandle
 	public int write(long offset, byte[] data) throws FSException
 	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("FileHandle::write(%s[%d], %d)",
-				UnixFilesystemPathRepresentation.INSTANCE.toString(_path), _fileHandle, offset));
+			_logger.trace(String.format("FileHandle::write(%s[%d], %d)", UnixFilesystemPathRepresentation.INSTANCE.toString(_path),
+				_fileHandle, offset));
 
 		ByteBuffer source = ByteBuffer.wrap(data);
 		_fs.write(_fileHandle, offset, source);
@@ -77,8 +76,8 @@ public class FileHandle extends AbstractFilesystemHandle
 	public int truncAppend(long offset, byte[] data) throws FSException
 	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("FileHandle::truncAppend(%s[%d], %d)",
-				UnixFilesystemPathRepresentation.INSTANCE.toString(_path), _fileHandle, offset));
+			_logger.trace(String.format("FileHandle::truncAppend(%s[%d], %d)", UnixFilesystemPathRepresentation.INSTANCE.toString(_path),
+				_fileHandle, offset));
 
 		ByteBuffer source = ByteBuffer.wrap(data);
 		_fs.truncate(_path, offset);

@@ -23,9 +23,8 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.context.ContextType;
 
 /*
- * Command to automate logging in to gffs.eu grid using the LRZ myproxy. this is the equivalent of
- * the following multistep login: myproxyLogin passwordLogin IDPLogin logout (username-password
- * token)
+ * Command to automate logging in to gffs.eu grid using the LRZ myproxy. this is the equivalent of the following multistep login: myproxyLogin
+ * passwordLogin IDPLogin logout (username-password token)
  */
 public class GffsEuLoginTool extends BaseLoginTool
 {
@@ -54,9 +53,8 @@ public class GffsEuLoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
@@ -84,14 +82,13 @@ public class GffsEuLoginTool extends BaseLoginTool
 		retVal = lTool.run(stdout, stderr, stdin);
 
 		/*
-		 * important: reloading current context here seems to be the crucial fix for the grid shell
-		 * login to work properly and for the changes to be seen in the context.
+		 * important: reloading current context here seems to be the crucial fix for the grid shell login to work properly and for the changes
+		 * to be seen in the context.
 		 */
 		callContext = ContextManager.getCurrentContext();
 
 		/*
-		 * reset any pass-through credential that had been established during login, since it's no
-		 * longer needed.
+		 * reset any pass-through credential that had been established during login, since it's no longer needed.
 		 */
 		callContext.removeProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 		ContextManager.storeCurrentContext(callContext);

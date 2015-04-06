@@ -18,9 +18,7 @@ public class Images
 		InputStream in = null;
 
 		try {
-			in =
-				ClassLoader.getSystemResourceAsStream(String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION,
-					resourcePath));
+			in = ClassLoader.getSystemResourceAsStream(String.format("%s%s", GenesisIIConstants.IMAGE_RELATIVE_LOCATION, resourcePath));
 			if (in == null)
 				throw new FileNotFoundException(String.format("Couldn't find resource %s.", resourcePath));
 			BufferedImage image = ImageIO.read(in);

@@ -228,16 +228,14 @@ public class OGRSHConnection implements Runnable
 			ctxt.getActiveKeyAndCertMaterial();
 			return 0;
 		} catch (ClassNotFoundException cnfe) {
-			throw new OGRSHException(OGRSHException.EXCEPTION_CORRUPTED_REQUEST,
-				"The stored calling context appears to be corrupt.");
+			throw new OGRSHException(OGRSHException.EXCEPTION_CORRUPTED_REQUEST, "The stored calling context appears to be corrupt.");
 		} catch (AuthZSecurityException gse) {
 			throw new OGRSHException(OGRSHException.PERMISSION_DENIED, "Unable to initialize key and cert material.");
 		} catch (MalformedURLException mue) {
 			throw new OGRSHException(OGRSHException.MALFORMED_URL, "The URL \"" + storedContextURL + "\" is malformed.");
 		} catch (IOException ioe) {
 			_logger.info("exception occurred in connectNetFromStoredContext", ioe);
-			throw new OGRSHException(OGRSHException.IO_EXCEPTION,
-				"An IO Exception occured while trying to acquire root RNS EPR.");
+			throw new OGRSHException(OGRSHException.IO_EXCEPTION, "An IO Exception occured while trying to acquire root RNS EPR.");
 		} finally {
 			StreamUtils.close(in);
 		}
@@ -259,8 +257,7 @@ public class OGRSHConnection implements Runnable
 			throw new OGRSHException(OGRSHException.MALFORMED_URL, "The URL \"" + rootRNSUrl + "\" is malformed.");
 		} catch (IOException ioe) {
 			_logger.info("exception occurred in connectNet", ioe);
-			throw new OGRSHException(OGRSHException.IO_EXCEPTION,
-				"An IO Exception occured while trying to acquire root RNS EPR.");
+			throw new OGRSHException(OGRSHException.IO_EXCEPTION, "An IO Exception occured while trying to acquire root RNS EPR.");
 		}
 	}
 
@@ -280,8 +277,7 @@ public class OGRSHConnection implements Runnable
 				tool.addArgument(file);
 			}
 
-			return tool.run(new PrintWriter(System.out), new PrintWriter(System.err), new BufferedReader(new InputStreamReader(
-				System.in)));
+			return tool.run(new PrintWriter(System.out), new PrintWriter(System.err), new BufferedReader(new InputStreamReader(System.in)));
 		} catch (ToolException te) {
 			String msg = "Unexpected login exception: " + te.getLocalizedMessage();
 			_logger.error(msg, te);

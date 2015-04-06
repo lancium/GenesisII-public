@@ -8,6 +8,6 @@ import edu.virginia.vcgr.genii.ui.EndpointType;
 
 public interface RNSSelectionFilter
 {
-	public boolean accept(RNSPath path, EndpointReferenceType epr, TypeInformation typeInformation, EndpointType displayType,
-		boolean isLocal);
+	public boolean
+		accept(RNSPath path, EndpointReferenceType epr, TypeInformation typeInformation, EndpointType displayType, boolean isLocal);
 }

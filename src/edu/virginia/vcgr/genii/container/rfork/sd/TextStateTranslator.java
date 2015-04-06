@@ -10,8 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Translates state variables using the state variable's toString method and a constructor which
- * takes as its one-and-only parameter a string.
+ * Translates state variables using the state variable's toString method and a constructor which takes as its one-and-only parameter a string.
  * 
  * @author mmm2a
  */
@@ -19,8 +18,8 @@ public class TextStateTranslator implements StateTranslator
 {
 	/** {@inheritDoc} */
 	@Override
-	public <StateType> StateType read(SimpleStateResourceFork<StateType> originatingFork, Class<StateType> targetType,
-		InputStream input) throws IOException
+	public <StateType> StateType read(SimpleStateResourceFork<StateType> originatingFork, Class<StateType> targetType, InputStream input)
+		throws IOException
 	{
 		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 		String line = reader.readLine();

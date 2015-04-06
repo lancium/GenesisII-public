@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
@@ -192,8 +191,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			keyStore.load(null, null);
 
 			KeyAndCertMaterial keyMaterial = _callContext.getActiveKeyAndCertMaterial();
-			keyStore.setKeyEntry(CRYPTO_ALIAS, keyMaterial._clientPrivateKey, CRYTO_PASS.toCharArray(),
-				keyMaterial._clientCertChain);
+			keyStore.setKeyEntry(CRYPTO_ALIAS, keyMaterial._clientPrivateKey, CRYTO_PASS.toCharArray(), keyMaterial._clientCertChain);
 
 			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
@@ -247,8 +245,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 	}
 
 	/**
-	 * (Duane: Copied from org.apache.ws.axis.security.WSDoAllReciever, modified to allow processing
-	 * of fault messages)
+	 * (Duane: Copied from org.apache.ws.axis.security.WSDoAllReciever, modified to allow processing of fault messages)
 	 * 
 	 * Axis calls invoke to handle a message.
 	 * <p/>
@@ -290,8 +287,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			Document doc = null;
 
 			/**
-			 * We did not receive anything...Usually happens when we get a HTTP 202 message (with no
-			 * content)
+			 * We did not receive anything...Usually happens when we get a HTTP 202 message (with no content)
 			 */
 			if (sm == null) {
 				return;
@@ -308,11 +304,9 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			}
 
 			/*
-			 * Duane: Commented out to allow for security header processing of fault messages.
-			 * String msgType = sm.getMessageType(); if (msgType != null &&
-			 * msgType.equals(Message.RESPONSE)) { SOAPConstants soapConstants = WSSecurityUtil
-			 * .getSOAPConstants(doc.getDocumentElement()); if
-			 * (WSSecurityUtil.findElement(doc.getDocumentElement(), "Fault",
+			 * Duane: Commented out to allow for security header processing of fault messages. String msgType = sm.getMessageType(); if
+			 * (msgType != null && msgType.equals(Message.RESPONSE)) { SOAPConstants soapConstants = WSSecurityUtil
+			 * .getSOAPConstants(doc.getDocumentElement()); if (WSSecurityUtil.findElement(doc.getDocumentElement(), "Fault",
 			 * soapConstants.getEnvelopeURI()) != null) { return; } }
 			 */
 
@@ -325,16 +319,14 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			}
 
 			/*
-			 * Get and check the Signature specific parameters first because they may be used for
-			 * encryption too.
+			 * Get and check the Signature specific parameters first because they may be used for encryption too.
 			 */
 			doReceiverAction(doAction, reqData);
 
 			Vector<?> wsResult = null;
 
 			try {
-				wsResult =
-					secEngine.processSecurityHeader(doc, actor, cbHandler, reqData.getSigCrypto(), reqData.getDecCrypto());
+				wsResult = secEngine.processSecurityHeader(doc, actor, cbHandler, reqData.getSigCrypto(), reqData.getDecCrypto());
 			} catch (WSSecurityException ex) {
 				_logger.info("exception occurred in superinvoke", ex);
 				throw new AxisFault("WSDoAllReceiver: security processing failed", ex);
@@ -357,16 +349,15 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			ArrayList<QName> processedHeaders = new ArrayList<QName>();
 			Iterator<?> iterator = sm.getSOAPEnvelope().getHeaders().iterator();
 			while (iterator.hasNext()) {
-				org.apache.axis.message.SOAPHeaderElement tempHeader =
-					(org.apache.axis.message.SOAPHeaderElement) iterator.next();
+				org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) iterator.next();
 				if (tempHeader.isProcessed()) {
 					processedHeaders.add(tempHeader.getQName());
 				}
 			}
 
 			/*
-			 * If we had some security processing, get the original SOAP part of Axis' message and
-			 * replace it with new SOAP part. This new part may contain decrypted elements.
+			 * If we had some security processing, get the original SOAP part of Axis' message and replace it with new SOAP part. This new
+			 * part may contain decrypted elements.
 			 */
 			SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
 
@@ -384,8 +375,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			iterator = processedHeaders.iterator();
 			while (iterator.hasNext()) {
 				QName qname = (QName) iterator.next();
-				Enumeration<?> headersByName =
-					sm.getSOAPEnvelope().getHeadersByName(qname.getNamespaceURI(), qname.getLocalPart());
+				Enumeration<?> headersByName = sm.getSOAPEnvelope().getHeadersByName(qname.getNamespaceURI(), qname.getLocalPart());
 				while (headersByName.hasMoreElements()) {
 					org.apache.axis.message.SOAPHeaderElement tempHeader =
 						(org.apache.axis.message.SOAPHeaderElement) headersByName.nextElement();
@@ -394,13 +384,12 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			}
 
 			/*
-			 * After setting the new current message, probably modified because of decryption, we
-			 * need to locate the security header. That is, we force Axis (with getSOAPEnvelope())
-			 * to parse the string, build the new header. Then we examine, look up the security
-			 * header and set the header as processed.
+			 * After setting the new current message, probably modified because of decryption, we need to locate the security header. That is,
+			 * we force Axis (with getSOAPEnvelope()) to parse the string, build the new header. Then we examine, look up the security header
+			 * and set the header as processed.
 			 * 
-			 * Please note: find all header elements that contain the same actor that was given to
-			 * processSecurityHeader(). Then check if there is a security header with this actor.
+			 * Please note: find all header elements that contain the same actor that was given to processSecurityHeader(). Then check if
+			 * there is a security header with this actor.
 			 */
 
 			SOAPHeader sHeader = null;
@@ -423,12 +412,10 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			((org.apache.axis.message.SOAPHeaderElement) headerElement).setProcessed(true);
 
 			/*
-			 * Now we can check the certificate used to sign the message. In the following
-			 * implementation the certificate is only trusted if either it itself or the certificate
-			 * of the issuer is installed in the keystore.
+			 * Now we can check the certificate used to sign the message. In the following implementation the certificate is only trusted if
+			 * either it itself or the certificate of the issuer is installed in the keystore.
 			 * 
-			 * Note: the method verifyTrust(X509Certificate) allows custom implementations with
-			 * other validation algorithms for subclasses.
+			 * Note: the method verifyTrust(X509Certificate) allows custom implementations with other validation algorithms for subclasses.
 			 */
 
 			// Extract the signature action result from the action vector
@@ -446,12 +433,10 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			}
 
 			/*
-			 * Perform further checks on the timestamp that was transmitted in the header. In the
-			 * following implementation the timestamp is valid if it was created after (now-ttl),
-			 * where ttl is set on server side, not by the client.
+			 * Perform further checks on the timestamp that was transmitted in the header. In the following implementation the timestamp is
+			 * valid if it was created after (now-ttl), where ttl is set on server side, not by the client.
 			 * 
-			 * Note: the method verifyTimestamp(Timestamp) allows custom implementations with other
-			 * validation algorithms for subclasses.
+			 * Note: the method verifyTimestamp(Timestamp) allows custom implementations with other validation algorithms for subclasses.
 			 */
 
 			// Extract the timestamp action result from the action vector
@@ -476,8 +461,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 
 			}
 			/*
-			 * All ok up to this point. Now construct and setup the security result structure. The
-			 * service may fetch this and check it.
+			 * All ok up to this point. Now construct and setup the security result structure. The service may fetch this and check it.
 			 */
 			Vector<Object> results = null;
 			if ((results = (Vector<Object>) msgContext.getProperty(WSHandlerConstants.RECV_RESULTS)) == null) {

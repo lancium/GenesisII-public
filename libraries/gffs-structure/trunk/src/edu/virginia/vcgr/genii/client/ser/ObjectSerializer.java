@@ -1,10 +1,10 @@
 /*
- * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright
- * 1999-2005 The University of Southern California.
+ * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright 1999-2005 The University of Southern
+ * California.
  * 
- * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public
- * License, found at http://www.globus.org/toolkit/download/license.html. If you redistribute this
- * file, with or without modifications, you must include this notice in the file.
+ * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public License, found at
+ * http://www.globus.org/toolkit/download/license.html. If you redistribute this file, with or without modifications, you must include this
+ * notice in the file.
  */
 package edu.virginia.vcgr.genii.client.ser;
 
@@ -27,9 +27,8 @@ import javax.xml.soap.SOAPElement;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 /**
- * Converts Java Objects to DOM Elements and SOAP Elements. The objects must be compliant with the
- * Axis Bean model, i.e. generated using the WSDL2Java tool from an XML Schema definition or must be
- * of simple type.
+ * Converts Java Objects to DOM Elements and SOAP Elements. The objects must be compliant with the Axis Bean model, i.e. generated using the
+ * WSDL2Java tool from an XML Schema definition or must be of simple type.
  */
 public class ObjectSerializer
 {
@@ -46,8 +45,7 @@ public class ObjectSerializer
 	}
 
 	/**
-	 * Populates a SOAPElement with an arbitrary object. The object will get wrapped inside of an
-	 * element named after the qname parameter.
+	 * Populates a SOAPElement with an arbitrary object. The object will get wrapped inside of an element named after the qname parameter.
 	 * 
 	 * @param obj
 	 *            object to be serialized in the any element
@@ -69,8 +67,7 @@ public class ObjectSerializer
 		} else if (obj instanceof Element) {
 			Element element = (Element) obj;
 			if (name == null
-				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
-					element.getNamespaceURI()))) {
+				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(element.getNamespaceURI()))) {
 				return new MessageElement((Element) obj);
 			} else {
 				throw new ResourceException("Not Implemented.");
@@ -126,8 +123,7 @@ public class ObjectSerializer
 		} else if (obj instanceof Element) {
 			Element element = (Element) obj;
 			if (name == null
-				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(
-					element.getNamespaceURI()))) {
+				|| (name.getLocalPart().equals(element.getLocalName()) && name.getNamespaceURI().equals(element.getNamespaceURI()))) {
 				return element;
 			} else {
 				throw new ResourceException("Not Implemented.");

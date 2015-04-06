@@ -93,8 +93,8 @@ public class Driver extends ApplicationBase
 		}
 
 		/*
-		 * } else { deploymentName = System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY); if
-		 * ((deploymentName == null) || deploymentName.isEmpty()) deploymentName = "default"; }
+		 * } else { deploymentName = System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY); if ((deploymentName == null) ||
+		 * deploymentName.isEmpty()) deploymentName = "default"; }
 		 */
 
 		System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName);
@@ -108,8 +108,7 @@ public class Driver extends ApplicationBase
 	}
 
 	/*
-	 * checks the timer for certificate updates and runs the update process if it's time. on
-	 * startup, it's always time to try it.
+	 * checks the timer for certificate updates and runs the update process if it's time. on startup, it's always time to try it.
 	 */
 	static private void checkCertUpdateTime(ApplicationBase.GridStates gridOkay)
 	{
@@ -254,8 +253,7 @@ public class Driver extends ApplicationBase
 				String[] passArgs = new String[args.length - firstArg];
 				System.arraycopy(args, firstArg, passArgs, 0, passArgs.length);
 
-				lastExit =
-					runner.runCommand(passArgs, new PrintWriter(System.out, true), new PrintWriter(System.err, true), in);
+				lastExit = runner.runCommand(passArgs, new PrintWriter(System.out, true), new PrintWriter(System.err, true), in);
 
 				long elapsed = System.currentTimeMillis() - startTime;
 
@@ -274,13 +272,11 @@ public class Driver extends ApplicationBase
 			} catch (ReloadShellException e) {
 				throw e;
 			} catch (Throwable cause) {
-				int toReturn =
-					ExceptionHandlerManager.getExceptionHandler().handleException(cause, new OutputStreamWriter(System.err));
+				int toReturn = ExceptionHandlerManager.getExceptionHandler().handleException(cause, new OutputStreamWriter(System.err));
 				if (toReturn != 0)
 					return toReturn;
 				/*
-				 * at least let them know we were displeased, if this is the last command in the
-				 * loop.
+				 * at least let them know we were displeased, if this is the last command in the loop.
 				 */
 				lastExit = 1;
 			} finally {

@@ -55,8 +55,7 @@ public class DatabaseStatistics
 
 	public Map<TimeInterval, DatabaseStatisticsReport> report()
 	{
-		Map<TimeInterval, DatabaseStatisticsReport> report =
-			new EnumMap<TimeInterval, DatabaseStatisticsReport>(TimeInterval.class);
+		Map<TimeInterval, DatabaseStatisticsReport> report = new EnumMap<TimeInterval, DatabaseStatisticsReport>(TimeInterval.class);
 
 		for (TimeInterval ti : TimeInterval.values())
 			report.put(ti, new DatabaseStatisticsReport());

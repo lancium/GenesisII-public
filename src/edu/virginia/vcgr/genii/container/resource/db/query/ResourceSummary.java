@@ -20,8 +20,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 public class ResourceSummary
 {
 	/**
-	 * Retrieves a list of all known resources in the container, grouped by the fully qualified name
-	 * of the implementing class.
+	 * Retrieves a list of all known resources in the container, grouped by the fully qualified name of the implementing class.
 	 * 
 	 * @param connection
 	 *            The database connection to use for querying.
@@ -53,8 +52,7 @@ public class ResourceSummary
 		}
 	}
 
-	static public Collection<ResourceSummaryInformation> resourcesFor(Connection connection, Class<?> implementingClass)
-		throws SQLException
+	static public Collection<ResourceSummaryInformation> resourcesFor(Connection connection, Class<?> implementingClass) throws SQLException
 	{
 		return resourcesForClass(connection, implementingClass.getName());
 	}
@@ -68,9 +66,7 @@ public class ResourceSummary
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT resourceid, humanname, epi FROM resources2 "
-					+ "WHERE implementingClass = ?");
+			stmt = connection.prepareStatement("SELECT resourceid, humanname, epi FROM resources2 " + "WHERE implementingClass = ?");
 			stmt.setString(1, implementingClassName);
 			rs = stmt.executeQuery();
 
@@ -171,9 +167,7 @@ public class ResourceSummary
 	{
 		PreparedStatement stmt = null;
 		try {
-			stmt =
-				connection.prepareStatement("DELETE FROM resources2 " + "WHERE resourceid NOT IN "
-					+ "(SELECT resourceid FROM resources)");
+			stmt = connection.prepareStatement("DELETE FROM resources2 " + "WHERE resourceid NOT IN " + "(SELECT resourceid FROM resources)");
 			stmt.executeUpdate();
 		} finally {
 			StreamUtils.close(stmt);

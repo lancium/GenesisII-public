@@ -9,9 +9,8 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 
 /**
- * To ease the transition of RNS to 1.1 in the system, I created this class to mimic the behavior of
- * the old RNS EntryType type. Its merely a transitional class that has a similar interface to the
- * old one.
+ * To ease the transition of RNS to 1.1 in the system, I created this class to mimic the behavior of the old RNS EntryType type. Its merely a
+ * transitional class that has a similar interface to the old one.
  * 
  * @author morgan
  */

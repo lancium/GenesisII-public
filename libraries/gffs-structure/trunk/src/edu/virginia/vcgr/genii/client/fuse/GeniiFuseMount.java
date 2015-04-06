@@ -223,8 +223,8 @@ public class GeniiFuseMount implements Filesystem
 		boolean writable = (flags & (FilesystemConstants.O_RDWR | FilesystemConstants.O_WRONLY)) > 0;
 
 		try {
-			return _fs.open(PATHREP.parse(null, path), new OpenFlags(false, false, false, false),
-				writable ? OpenModes.READ_WRITE : OpenModes.READ, null);
+			return _fs.open(PATHREP.parse(null, path), new OpenFlags(false, false, false, false), writable ? OpenModes.READ_WRITE
+				: OpenModes.READ, null);
 		} catch (Throwable cause) {
 			_logger.info("open exception:", cause);
 			throw FuseExceptions.translate("Unable to open files.", cause);
@@ -236,7 +236,7 @@ public class GeniiFuseMount implements Filesystem
 	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("read(%s, %d, %s, %d)", path, fileHandle, buffer, offset));
-		if ( (path != null) && (buffer != null) )
+		if ((path != null) && (buffer != null))
 			System.out.printf("read(%s, %d, %s, %d)\n", path, fileHandle, buffer, offset);
 		try {
 			_fs.read(fileHandle, offset, buffer);

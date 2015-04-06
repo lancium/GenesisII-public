@@ -86,8 +86,8 @@ public class DirHandler
 		}
 
 		if (!dir.isDirectory()) {
-			DefaultResponse.send(socket, ErrorCode.LL_NOT_DIR_ERROR_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.LL_NOT_DIR_ERROR_CODE));
+			DefaultResponse
+				.send(socket, ErrorCode.LL_NOT_DIR_ERROR_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.LL_NOT_DIR_ERROR_CODE));
 			return ErrorCode.LL_NOT_DIR_ERROR_CODE;
 		}
 
@@ -96,8 +96,7 @@ public class DirHandler
 		// this can happen when there isn't permission to
 		// list this dir!
 		if (files == null) {
-			DefaultResponse.send(socket, ErrorCode.LL_FAIL_ERROR_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.LL_FAIL_ERROR_CODE));
+			DefaultResponse.send(socket, ErrorCode.LL_FAIL_ERROR_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.LL_FAIL_ERROR_CODE));
 			return ErrorCode.LL_FAIL_ERROR_CODE;
 		}
 
@@ -175,8 +174,7 @@ public class DirHandler
 			DefaultResponse.send(socket, ErrorCode.SUCCESS_CODE, null);
 			return ErrorCode.SUCCESS_CODE;
 		} else {
-			DefaultResponse.send(socket, ErrorCode.DELETE_FAIL_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.DELETE_FAIL_CODE));
+			DefaultResponse.send(socket, ErrorCode.DELETE_FAIL_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.DELETE_FAIL_CODE));
 			return ErrorCode.DELETE_FAIL_CODE;
 		}
 	}

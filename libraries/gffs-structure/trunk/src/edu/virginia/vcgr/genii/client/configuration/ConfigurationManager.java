@@ -33,7 +33,7 @@ public class ConfigurationManager
 
 	// denotes type of configuration for this process
 	private Boolean _isClient = null;
-	
+
 	// only used for server role; tracks space available on file systems.
 	static private Thread _filesystemPollingThread = null;
 
@@ -55,8 +55,8 @@ public class ConfigurationManager
 	}
 
 	/**
-	 * Gets the default configuration directory, which is one directory below wherever directory is
-	 * indicated by the install-dir system property.
+	 * Gets the default configuration directory, which is one directory below wherever directory is indicated by the install-dir system
+	 * property.
 	 */
 	static public ConfigurationManager getCurrentConfiguration()
 	{
@@ -73,9 +73,8 @@ public class ConfigurationManager
 	 * Creates a configuration manager. Can only be called once.
 	 * 
 	 * @param configurationDir
-	 *            Place to where client/container config files are located. If null, will be filled
-	 *            in using the well-known spot from the installation directory (as per the
-	 *            installation directory system property)
+	 *            Place to where client/container config files are located. If null, will be filled in using the well-known spot from the
+	 *            installation directory (as per the installation directory system property)
 	 * @param userDir
 	 *            Place to remember the user directory for holding things like session state
 	 * @return
@@ -94,8 +93,7 @@ public class ConfigurationManager
 	}
 
 	/**
-	 * Creates new configuration manager and sets it as new _manager using the role and user
-	 * directory from the current manager
+	 * Creates new configuration manager and sets it as new _manager using the role and user directory from the current manager
 	 * 
 	 * @return
 	 */
@@ -106,13 +104,11 @@ public class ConfigurationManager
 				throw new RuntimeException("Cannot call reloadConfiguration() before initializing configuration manager first.");
 
 			/*
-			 * notify interested parties that they might want to unload any cached items from the
-			 * configuration(s). we make a copy of the list here in case listeners are added during
-			 * the config reload.
+			 * notify interested parties that they might want to unload any cached items from the configuration(s). we make a copy of the list
+			 * here in case listeners are added during the config reload.
 			 */
 			@SuppressWarnings("unchecked")
-			ArrayList<ConfigurationUnloadedListener> listenersCopy =
-				(ArrayList<ConfigurationUnloadedListener>) _unloadListeners.clone();
+			ArrayList<ConfigurationUnloadedListener> listenersCopy = (ArrayList<ConfigurationUnloadedListener>) _unloadListeners.clone();
 			for (ConfigurationUnloadedListener listener : listenersCopy) {
 				listener.notifyUnloaded();
 			}
@@ -189,7 +185,7 @@ public class ConfigurationManager
 	public void setRoleServer()
 	{
 		setRole(Boolean.FALSE);
-		
+
 		if (_filesystemPollingThread == null) {
 			_filesystemPollingThread = new Thread(new FilesystemPoller(_filesystemManager), "Filesystem Polling Thread");
 			_filesystemPollingThread.setDaemon(true);

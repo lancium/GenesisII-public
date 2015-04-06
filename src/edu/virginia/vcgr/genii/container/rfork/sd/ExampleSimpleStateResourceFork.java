@@ -15,8 +15,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 public class ExampleSimpleStateResourceFork extends SimpleStateResourceFork<Integer>
 {
 	/**
-	 * This just serves as our state variable. We don't even really have to have a state variable,
-	 * just the get/set functions.
+	 * This just serves as our state variable. We don't even really have to have a state variable, just the get/set functions.
 	 */
 	private int _initialValue;
 

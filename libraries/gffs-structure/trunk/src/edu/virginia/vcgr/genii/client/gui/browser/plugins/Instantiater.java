@@ -8,19 +8,16 @@ import org.w3c.dom.Element;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 /**
- * The Instantiater is a helper class that the RNS Browser uses to instantiate classes identified by
- * class name.
+ * The Instantiater is a helper class that the RNS Browser uses to instantiate classes identified by class name.
  * 
  * @author mmm2a
  */
 public class Instantiater
 {
 	/**
-	 * Given a class and possible construction parameters, try and instantiate it into a plugin. In
-	 * order to instantiate a plugin, the class must have a public constructor that takes an Element
-	 * as a parameter (which will be the <construction-params/> element given with the plugin in the
-	 * configuration files, or it must have a default empty constructor and NO construction-params
-	 * given in the config file.
+	 * Given a class and possible construction parameters, try and instantiate it into a plugin. In order to instantiate a plugin, the class
+	 * must have a public constructor that takes an Element as a parameter (which will be the <construction-params/> element given with the
+	 * plugin in the configuration files, or it must have a default empty constructor and NO construction-params given in the config file.
 	 * 
 	 * @param cl
 	 *            The plugin class to instantiate.
@@ -35,8 +32,8 @@ public class Instantiater
 		try {
 			try {
 				/*
-				 * First, see if there is a constructor that takes an Element instance as it's only
-				 * constructor parameter. This is the preferred way to instantiate plug-ins.
+				 * First, see if there is a constructor that takes an Element instance as it's only constructor parameter. This is the
+				 * preferred way to instantiate plug-ins.
 				 */
 				Constructor<IPlugin> cons = cl.getConstructor(new Class<?>[] { Element.class });
 
@@ -46,16 +43,15 @@ public class Instantiater
 				return cons.newInstance(new Object[] { constructionParams });
 			} catch (NoSuchMethodException nsme) {
 				/*
-				 * If we couldn't find the init(Element) constructor, see if it is permissible to
-				 * use a default constructor (it's permissible if the config file didn't indicate
-				 * any construction parameters).
+				 * If we couldn't find the init(Element) constructor, see if it is permissible to use a default constructor (it's permissible
+				 * if the config file didn't indicate any construction parameters).
 				 */
 				if (constructionParams != null && constructionParams.hasChildNodes())
 					throw nsme;
 
 				/*
-				 * It seems to be permissible to create the plugin with a default constructor, so
-				 * let's see if one exists and go ahead and use it if it does.
+				 * It seems to be permissible to create the plugin with a default constructor, so let's see if one exists and go ahead and use
+				 * it if it does.
 				 */
 				Constructor<IPlugin> cons = cl.getConstructor(new Class<?>[0]);
 				return cons.newInstance(new Object[0]);
@@ -67,17 +63,15 @@ public class Instantiater
 		} catch (NoSuchMethodException nsme) {
 			throw new PluginException("Unable to find suitable constructor for plugin class \"" + cl.getName() + "\".", nsme);
 		} catch (InvocationTargetException ite) {
-			throw new PluginException("Constructor for plugin class \"" + cl.getName() + "\" threw an exception.",
-				ite.getCause());
+			throw new PluginException("Constructor for plugin class \"" + cl.getName() + "\" threw an exception.", ite.getCause());
 		}
 	}
 
 	/**
-	 * Given a classname and possible construction parameters, try and find the class and
-	 * instantiate it into a plugin. In order to instantiate a plugin, the class must have a public
-	 * constructor that takes an Element as a parameter (which will be the <construction-params/>
-	 * element given with the plugin in the configuration files, or it must have a default empty
-	 * constructor and NO construction-params given in the config file.
+	 * Given a classname and possible construction parameters, try and find the class and instantiate it into a plugin. In order to
+	 * instantiate a plugin, the class must have a public constructor that takes an Element as a parameter (which will be the
+	 * <construction-params/> element given with the plugin in the configuration files, or it must have a default empty constructor and NO
+	 * construction-params given in the config file.
 	 * 
 	 * @param className
 	 *            The full class name to instantiate.

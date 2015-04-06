@@ -88,8 +88,7 @@ public class XMLPrettyPrinter
 	private void appendElement(XMLEventFilter reader, StartElement event, String tabs) throws IOException, XMLStreamException
 	{
 		QName name = event.getName();
-		String formattedName =
-			String.format("%s:%s", event.getNamespaceContext().getPrefix(name.getNamespaceURI()), name.getLocalPart());
+		String formattedName = String.format("%s:%s", event.getNamespaceContext().getPrefix(name.getNamespaceURI()), name.getLocalPart());
 
 		// Write the start element
 		_handler.appendText(tabs);

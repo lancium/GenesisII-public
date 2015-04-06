@@ -1,10 +1,10 @@
 /*
- * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright
- * 1999-2005 The University of Southern California.
+ * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright 1999-2005 The University of Southern
+ * California.
  * 
- * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public
- * License, found at http://www.globus.org/toolkit/download/license.html. If you redistribute this
- * file, with or without modifications, you must include this notice in the file.
+ * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public License, found at
+ * http://www.globus.org/toolkit/download/license.html. If you redistribute this file, with or without modifications, you must include this
+ * notice in the file.
  */
 package edu.virginia.vcgr.genii.client.ser;
 
@@ -92,11 +92,10 @@ public class XmlUtils
 	}
 
 	/**
-	 * Create a new document from the given URI, use the username and password if the URI requires
-	 * authentication.
+	 * Create a new document from the given URI, use the username and password if the URI requires authentication.
 	 */
-	public static Document newDocument(String uri, String username, String password) throws ParserConfigurationException,
-		SAXException, IOException
+	public static Document newDocument(String uri, String username, String password) throws ParserConfigurationException, SAXException,
+		IOException
 	{
 		InputSource ins = getInputSourceFromURI(uri, username, password);
 
@@ -118,11 +117,10 @@ public class XmlUtils
 	/**
 	 * Utility to get the bytes at a protected uri
 	 * 
-	 * This will retrieve the URL if a username and password are provided. The java.net.URL class
-	 * does not do Basic Authentication, so we have to do it manually in this routine.
+	 * This will retrieve the URL if a username and password are provided. The java.net.URL class does not do Basic Authentication, so we have
+	 * to do it manually in this routine.
 	 * 
-	 * If no username is provided, we create an InputSource from the uri and let the InputSource go
-	 * fetch the contents.
+	 * If no username is provided, we create an InputSource from the uri and let the InputSource go fetch the contents.
 	 * 
 	 * @param uri
 	 *            the resource to get

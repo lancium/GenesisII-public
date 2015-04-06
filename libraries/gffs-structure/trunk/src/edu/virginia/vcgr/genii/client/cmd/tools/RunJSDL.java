@@ -64,9 +64,8 @@ public class RunJSDL extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
@@ -89,8 +88,7 @@ public class RunJSDL extends BaseGridTool
 		JobRequest tJob = null;
 
 		if (_type.equals("jsdl")) {
-			JobDefinition_Type jsdl =
-				(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
+			JobDefinition_Type jsdl = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 			PersonalityProvider provider = new ExecutionProvider();
 			try {
 				tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
@@ -170,8 +168,8 @@ public class RunJSDL extends BaseGridTool
 			throw new InvalidToolUsageException();
 	}
 
-	private static void generateWrapperScript(OutputStream tStream, File workingDir, File resourceUsage, JobRequest job,
-		File tmpDir) throws ToolException
+	private static void generateWrapperScript(OutputStream tStream, File workingDir, File resourceUsage, JobRequest job, File tmpDir)
+		throws ToolException
 	{
 		try {
 

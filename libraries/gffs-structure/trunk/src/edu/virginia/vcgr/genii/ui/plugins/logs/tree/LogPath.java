@@ -156,8 +156,8 @@ public class LogPath
 		Vector<LogPath> ret = new Vector<LogPath>();
 		if (children != null) {
 			for (RPCCallerType child : children) {
-				ret.add(createChildPath(child.getRpcid(), child.getMetadata().getMethodName(), child.getMetadata()
-					.getTargetEPR(), _displayType));
+				ret.add(createChildPath(child.getRpcid(), child.getMetadata().getMethodName(), child.getMetadata().getTargetEPR(),
+					_displayType));
 			}
 		}
 		return ret;

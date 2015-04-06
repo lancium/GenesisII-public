@@ -27,8 +27,7 @@ public class FSProxyDirFork extends AbstractRNSResourceFork implements RNSResour
 	private FSViewSession session() throws IOException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		FSProxyConstructionParameters consParms =
-			(FSProxyConstructionParameters) resource.constructionParameters(FSProxyServiceImpl.class);
+		FSProxyConstructionParameters consParms = (FSProxyConstructionParameters) resource.constructionParameters(FSProxyServiceImpl.class);
 
 		return consParms.connectionInformation().openSession();
 	}
@@ -61,8 +60,7 @@ public class FSProxyDirFork extends AbstractRNSResourceFork implements RNSResour
 				// because we are a file mounted as the root
 
 				if (entryName == null || entryName.equals("root")) {
-					ret.add(createInternalEntry(exemplarEPR, "root",
-						new FSProxyFileFork(getService(), formForkPath("")).describe()));
+					ret.add(createInternalEntry(exemplarEPR, "root", new FSProxyFileFork(getService(), formForkPath("")).describe()));
 				}
 
 				return ret;

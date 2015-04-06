@@ -30,25 +30,21 @@ public class DeployDatabase implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(DeployDatabase.class);
 
-	static private QName _CONFIGURATION_SECTION = new QName("http://vcgr.cs.virginia.edu/Genesis-II",
-		"deployment-configuration");
+	static private QName _CONFIGURATION_SECTION = new QName("http://vcgr.cs.virginia.edu/Genesis-II", "deployment-configuration");
 	static private final String _DEPLOYMENT_POOL_PROPERTY = "edu.virginia.vcgr.genii.container.deployment.connection-pool";
 
 	static private final String[] _TABLE_CREATION_STMTS = {
 		"CREATE TABLE DEPLOYMENTS (" + "INSTANCE_ID VARCHAR(512) PRIMARY KEY," + "DEPLOYMENT_ID VARCHAR(512),"
 			+ "DIRECTORY_NAME VARCHAR(128)," + "LAST_ACCESSED TIMESTAMP," + "USE_COUNT INTEGER," + "STATE VARCHAR(32))",
-		"CREATE TABLE DEPLOYMENT_STAMPS (" + "INSTANCE_ID VARCHAR(512)," + "COMPONENT_ID VARCHAR(512),"
-			+ "MODIFICATION_TIME TIMESTAMP)" };
+		"CREATE TABLE DEPLOYMENT_STAMPS (" + "INSTANCE_ID VARCHAR(512)," + "COMPONENT_ID VARCHAR(512)," + "MODIFICATION_TIME TIMESTAMP)" };
 
 	/*
-	 * Hypersonic static private final String _FIND_STALE_INSTANCES_TEXT =
-	 * "SELECT INSTANCE_ID, DIRECTORY_NAME FROM DEPLOYMENTS WHERE " +
-	 * "(((USE_COUNT = 0) AND ((STATE = ?) OR " +
-	 * "(DATEDIFF('ms', LAST_ACCESSED, CURRENT_TIMESTAMP) > ?)))" + "OR(STATE = ?))";
+	 * Hypersonic static private final String _FIND_STALE_INSTANCES_TEXT = "SELECT INSTANCE_ID, DIRECTORY_NAME FROM DEPLOYMENTS WHERE " +
+	 * "(((USE_COUNT = 0) AND ((STATE = ?) OR " + "(DATEDIFF('ms', LAST_ACCESSED, CURRENT_TIMESTAMP) > ?)))" + "OR(STATE = ?))";
 	 */
 	static private final String _FIND_STALE_INSTANCES_TEXT = "SELECT INSTANCE_ID, DIRECTORY_NAME FROM DEPLOYMENTS WHERE "
-		+ "(((USE_COUNT = 0) AND ((STATE = ?) OR "
-		+ "({fn TIMESTAMPDIFF(SQL_TSI_DAY, LAST_ACCESSED, CURRENT_TIMESTAMP)} > ?)))" + "OR(STATE = ?))";
+		+ "(((USE_COUNT = 0) AND ((STATE = ?) OR " + "({fn TIMESTAMPDIFF(SQL_TSI_DAY, LAST_ACCESSED, CURRENT_TIMESTAMP)} > ?)))"
+		+ "OR(STATE = ?))";
 	static private final String _SET_STATE_TEXT = "UPDATE DEPLOYMENTS SET STATE = ? WHERE INSTANCE_ID = ?";
 	static private final String _DELETE_DEPLOYMENTS_TEXT = "DELETE FROM DEPLOYMENTS WHERE INSTANCE_ID = ?";
 	static private final String _DELETE_STAMPS_TEXT = "DELETE FROM DEPLOYMENT_STAMPS WHERE INSTANCE_ID = ?";
@@ -56,8 +52,8 @@ public class DeployDatabase implements Closeable
 		+ "DEPLOYMENT_STAMPS";
 	static private final String _CREATE_DEPLOYMENT_TEXT = "INSERT INTO DEPLOYMENTS VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
 	static private final String _CREATE_STAMP_TEXT = "INSERT INTO DEPLOYMENT_STAMPS VALUES (?, ?, ?)";
-	static private final String _UPDATE_COUNT_TEXT = "UPDATE DEPLOYMENTS SET LAST_ACCESSED = CURRENT_TIMESTAMP, "
-		+ "USE_COUNT = (" + "(SELECT USE_COUNT FROM DEPLOYMENTS WHERE INSTANCE_ID = ?)" + " + ?) WHERE INSTANCE_ID = ?";
+	static private final String _UPDATE_COUNT_TEXT = "UPDATE DEPLOYMENTS SET LAST_ACCESSED = CURRENT_TIMESTAMP, " + "USE_COUNT = ("
+		+ "(SELECT USE_COUNT FROM DEPLOYMENTS WHERE INSTANCE_ID = ?)" + " + ?) WHERE INSTANCE_ID = ?";
 	static private final String _GET_DIRECTORY_TEXT = "SELECT DIRECTORY_NAME FROM DEPLOYMENTS WHERE INSTANCE_ID = ?";
 
 	static private ServerDatabaseConnectionPool _pool = null;

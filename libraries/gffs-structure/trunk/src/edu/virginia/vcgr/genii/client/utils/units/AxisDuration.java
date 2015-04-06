@@ -3,9 +3,8 @@ package edu.virginia.vcgr.genii.client.utils.units;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- * A simple class to store a duration. Durations are nothing more then longs indicating the number
- * of milliseconds in the duration. What makes this class special is it's ability to parse duration
- * descriptions from strings.
+ * A simple class to store a duration. Durations are nothing more then longs indicating the number of milliseconds in the duration. What makes
+ * this class special is it's ability to parse duration descriptions from strings.
  * 
  * @author mmm2a
  */

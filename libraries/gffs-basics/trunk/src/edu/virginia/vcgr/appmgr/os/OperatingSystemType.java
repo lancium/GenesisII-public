@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import edu.virginia.vcgr.appmgr.io.IOUtils;
 
-public class OperatingSystemType 
+public class OperatingSystemType
 {
 	public enum OperatingSystemTypes {
 		Unknown(),
@@ -84,14 +84,12 @@ public class OperatingSystemType
 	}
 
 	static final private String _OS_NAME_PREFIX = "os.name.";
-	static private Properties _propertyMap;	
-	
+	static private Properties _propertyMap;
+
 	static {
 		InputStream in = null;
 		try {
-			in =
-				Thread.currentThread().getContextClassLoader()
-					.getResourceAsStream("edu/virginia/vcgr/appmgr/os/os-map.properties");
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream("edu/virginia/vcgr/appmgr/os/os-map.properties");
 			_propertyMap = new Properties();
 			_propertyMap.load(in);
 		} catch (Exception e) {
@@ -105,11 +103,12 @@ public class OperatingSystemType
 	{
 		return System.getProperty("os.version");
 	}
-	
+
 	/**
 	 * returns the java os.name property, but stashes the value since this doesn't change at run-time.
 	 */
 	static private String _osName = null;
+
 	static public String getOpsysName()
 	{
 		synchronized (OperatingSystemType.class) {

@@ -14,9 +14,8 @@ import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.security.acl.Acl;
 
 /*
- * This is the utility class that removes references to SOAPMessages from objects that we want to
- * store in cache. If we don't remove all references of a SOAPMessage from the going to be stored
- * item then the cache will quickly get out of space and bring down the system with
+ * This is the utility class that removes references to SOAPMessages from objects that we want to store in cache. If we don't remove all
+ * references of a SOAPMessage from the going to be stored item then the cache will quickly get out of space and bring down the system with
  * OutOfMemoryException.
  */
 public class Sanitizer

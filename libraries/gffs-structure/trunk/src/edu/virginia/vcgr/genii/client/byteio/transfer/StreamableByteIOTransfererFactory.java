@@ -11,8 +11,8 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.mtom.MTOMSByteIOTransferer
 import edu.virginia.vcgr.genii.client.byteio.transfer.simple.SimpleSByteIOTransferer;
 
 /**
- * Similar to the RandomByteIO transferer factory, this class is a convenient single point from
- * which streamable byteio transferers can be created.
+ * Similar to the RandomByteIO transferer factory, this class is a convenient single point from which streamable byteio transferers can be
+ * created.
  * 
  * @author mmm2a
  */
@@ -60,13 +60,11 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	}
 
 	/**
-	 * A convenience method to create new StreamableByteIO transferers given the URI description of
-	 * the transfer protocol to use.
+	 * A convenience method to create new StreamableByteIO transferers given the URI description of the transfer protocol to use.
 	 * 
 	 * @param desiredTransferType
-	 *            The desired transfer protocol to use (if available). By default, this factory will
-	 *            create an instance of a "preferred" transfer type (one that is deemed to be the
-	 *            most efficient).
+	 *            The desired transfer protocol to use (if available). By default, this factory will create an instance of a "preferred"
+	 *            transfer type (one that is deemed to be the most efficient).
 	 * 
 	 * @return A newly created streamable byteio transferer.
 	 * 
@@ -82,8 +80,7 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	}
 
 	/**
-	 * A convenience method to create a new Streamable transferer which implements a "preferred"
-	 * transfer type.
+	 * A convenience method to create a new Streamable transferer which implements a "preferred" transfer type.
 	 * 
 	 * @return A newly created streamable byteio transferer.
 	 * 
@@ -95,8 +92,7 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	}
 
 	/**
-	 * A convenience method to create a new streamable byteio transferer based off of a given target
-	 * streamablebyteio.
+	 * A convenience method to create a new streamable byteio transferer based off of a given target streamablebyteio.
 	 * 
 	 * @param target
 	 *            The target for which to create a new StreamableByteIO transferer agent.
@@ -107,29 +103,27 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * @throws RemoteException
 	 */
 
-	static public StreamableByteIOTransferer createStreamableByteIOTransferer(StreamableByteIOPortType target)
-		throws RemoteException, IOException
+	static public StreamableByteIOTransferer createStreamableByteIOTransferer(StreamableByteIOPortType target) throws RemoteException,
+		IOException
 	{
 		return (new StreamableByteIOTransfererFactory(target)).createStreamableByteIOTransferer();
 	}
 
 	/**
-	 * A convenience method to create a new streamable byteio transferer based off of a given target
-	 * streamablebyteio.
+	 * A convenience method to create a new streamable byteio transferer based off of a given target streamablebyteio.
 	 * 
 	 * @param target
 	 *            target The target for which to create a new StreamableByteIO transferer agent.
 	 * @param desiredTransferType
-	 *            The transfer type (if any) that the caller wants to use. If null, a "preferred"
-	 *            transfer type will be created.
+	 *            The transfer type (if any) that the caller wants to use. If null, a "preferred" transfer type will be created.
 	 * 
 	 * @return A newly create transferer.
 	 * 
 	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
-	static public StreamableByteIOTransferer createStreamableByteIOTransferer(StreamableByteIOPortType target,
-		URI desiredTransferType) throws RemoteException, IOException
+	static public StreamableByteIOTransferer createStreamableByteIOTransferer(StreamableByteIOPortType target, URI desiredTransferType)
+		throws RemoteException, IOException
 	{
 		return (new StreamableByteIOTransfererFactory(target)).createStreamableByteIOTransferer(desiredTransferType);
 	}

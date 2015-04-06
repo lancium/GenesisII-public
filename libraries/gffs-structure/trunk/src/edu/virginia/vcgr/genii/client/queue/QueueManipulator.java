@@ -69,8 +69,7 @@ public class QueueManipulator
 
 	public JobTicket submit(InputStream in, int priority) throws ResourceException, RemoteException
 	{
-		return submit((JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class),
-			priority);
+		return submit((JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class), priority);
 	}
 
 	public JobTicket submit(JobDefinition_Type jobDef, int priority) throws RemoteException
@@ -252,9 +251,9 @@ public class QueueManipulator
 				throw new RuntimeException("Unable to deserialize owner identities.", e);
 			}
 
-			return new JobInformation(ticket, jobInfo.getJobName(), identities, QueueStates.fromQueueStateType(jobInfo
-				.getJobStatus()), (int) jobInfo.getPriority(), jobInfo.getSubmitTime(), jobInfo.getStartTime(),
-				jobInfo.getFinishTime(), jobInfo.getAttempts().intValue(), jobInfo.getBesStatus(), jobInfo.getScheduledOn());
+			return new JobInformation(ticket, jobInfo.getJobName(), identities, QueueStates.fromQueueStateType(jobInfo.getJobStatus()),
+				(int) jobInfo.getPriority(), jobInfo.getSubmitTime(), jobInfo.getStartTime(), jobInfo.getFinishTime(), jobInfo.getAttempts()
+					.intValue(), jobInfo.getBesStatus(), jobInfo.getScheduledOn());
 		}
 
 		@Override

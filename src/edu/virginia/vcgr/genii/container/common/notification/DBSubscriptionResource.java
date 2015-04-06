@@ -22,12 +22,11 @@ public class DBSubscriptionResource extends BasicDBResource
 		super(parentKey, connectionPool);
 	}
 
-	void createSubscription(EndpointReferenceType subscriptionReference, SubscriptionConstructionParameters cons)
-		throws ResourceException
+	void createSubscription(EndpointReferenceType subscriptionReference, SubscriptionConstructionParameters cons) throws ResourceException
 	{
 		try {
-			SubscriptionsDatabase.createSubscription(_connection, _resourceKey, cons.publisherResourceKey(),
-				subscriptionReference, cons.consumerReference(), cons.topicQuery(), cons.policies(), cons.additionalUserData());
+			SubscriptionsDatabase.createSubscription(_connection, _resourceKey, cons.publisherResourceKey(), subscriptionReference,
+				cons.consumerReference(), cons.topicQuery(), cons.policies(), cons.additionalUserData());
 		} catch (SQLException e) {
 			throw new ResourceException("Unable to create subscription entry in table.", e);
 		}

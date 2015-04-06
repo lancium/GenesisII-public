@@ -70,8 +70,8 @@ public class ProcessWrapperFactory
 
 	static private ExecutorService _processThreadPool = Executors.newCachedThreadPool(new ProcessThreadFactory());
 
-	static public ProcessWrapper createWrapper(File commonDirectory, OperatingSystemNames desiredOSName,
-		ProcessorArchitecture desiredArch) throws ProcessWrapperException
+	static public ProcessWrapper createWrapper(File commonDirectory, OperatingSystemNames desiredOSName, ProcessorArchitecture desiredArch)
+		throws ProcessWrapperException
 	{
 		if (commonDirectory == null)
 			throw new IllegalArgumentException("Common Directory cannot be null.");

@@ -11,16 +11,15 @@ import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
 
 /*
- * This is the intercepter for retrieving lookup response from cache and submitting subscribe
- * requests for endPoints on which a lookup operation is invoked.
+ * This is the intercepter for retrieving lookup response from cache and submitting subscribe requests for endPoints on which a lookup
+ * operation is invoked.
  */
 public class SecurityHeaderAttacher
 {
 
 	/*
-	 * These set of interceptor methods set thread local variables with the logged in user's x.509
-	 * certificate. This variable (certificate) is attached to Soap headers AxisClientHeaderHandler
-	 * when a job is submitted to a queue or a bes.
+	 * These set of interceptor methods set thread local variables with the logged in user's x.509 certificate. This variable (certificate) is
+	 * attached to Soap headers AxisClientHeaderHandler when a job is submitted to a queue or a bes.
 	 */
 
 	// Intercept Job Submission to Queue

@@ -23,8 +23,7 @@ public class ParameterizableStringListEditor implements DescribedFieldEditor<Par
 	public void edit(JComponent parentComponent, ParameterizableStringList currentValue)
 	{
 		ParameterizableStringListEditorDialog dialog =
-			new ParameterizableStringListEditorDialog(SwingUtilities.getWindowAncestor(parentComponent), _title, _prompt,
-				currentValue);
+			new ParameterizableStringListEditorDialog(SwingUtilities.getWindowAncestor(parentComponent), _title, _prompt, currentValue);
 		dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 		dialog.pack();
 		GUIUtils.centerComponent(dialog);

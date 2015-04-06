@@ -52,8 +52,7 @@ public enum TopicQueryDialects implements TopicQueryDialectable {
 		}
 	}
 
-	static public edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects convert(
-		TopicQueryDialects toConvert)
+	static public edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects convert(TopicQueryDialects toConvert)
 	{
 		if (toConvert.equals(Simple))
 			return edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.TopicQueryDialects.Simple;

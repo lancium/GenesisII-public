@@ -45,12 +45,11 @@ public class SubscribeRequest
 	private EndpointReferenceType _consumerReference = null;
 	private TopicQueryExpression _topicFilter = null;
 	private TerminationTimeType _terminationTime = null;
-	private Map<SubscriptionPolicyTypes, SubscriptionPolicy> _policies =
-		new EnumMap<SubscriptionPolicyTypes, SubscriptionPolicy>(SubscriptionPolicyTypes.class);
+	private Map<SubscriptionPolicyTypes, SubscriptionPolicy> _policies = new EnumMap<SubscriptionPolicyTypes, SubscriptionPolicy>(
+		SubscriptionPolicyTypes.class);
 	private AdditionalUserData _additionalUserData = null;
 
-	private TopicQueryExpression topicExpressionFromFilterElement(Element e) throws InvalidFilterFaultType,
-		TopicNotSupportedFaultType
+	private TopicQueryExpression topicExpressionFromFilterElement(Element e) throws InvalidFilterFaultType, TopicNotSupportedFaultType
 	{
 		return TopicQueryDialects.createFromElement(e);
 	}
@@ -59,8 +58,7 @@ public class SubscribeRequest
 	{
 		if (_topicFilter == null)
 			return null;
-		return new FilterType(new MessageElement[] { _topicFilter.toTopicExpressionElement(TOPIC_EXPRESSION_QNAME,
-			TOPIC_NS_PREFIX_PATTERN) });
+		return new FilterType(new MessageElement[] { _topicFilter.toTopicExpressionElement(TOPIC_EXPRESSION_QNAME, TOPIC_NS_PREFIX_PATTERN) });
 	}
 
 	private SubscriptionPolicyType createPolicy() throws JAXBException
@@ -83,8 +81,8 @@ public class SubscribeRequest
 		return new SubscriptionPolicyType(any);
 	}
 
-	public SubscribeRequest(EndpointReferenceType consumerReference, TopicQueryExpression topicFilter,
-		TerminationTimeType terminationTime, AdditionalUserData additionalUserData, SubscriptionPolicy... policies)
+	public SubscribeRequest(EndpointReferenceType consumerReference, TopicQueryExpression topicFilter, TerminationTimeType terminationTime,
+		AdditionalUserData additionalUserData, SubscriptionPolicy... policies)
 	{
 		_consumerReference = consumerReference;
 		_topicFilter = topicFilter;
@@ -186,9 +184,9 @@ public class SubscribeRequest
 	final public Subscribe asRequestType()
 	{
 		try {
-			return new Subscribe(_consumerReference, createFilter(), (_terminationTime == null) ? null
-				: _terminationTime.toAxisType(), createPolicy(), (_additionalUserData == null) ? null
-				: new MessageElement[] { AdditionalUserData.toMessageElement(_additionalUserData) });
+			return new Subscribe(_consumerReference, createFilter(), (_terminationTime == null) ? null : _terminationTime.toAxisType(),
+				createPolicy(), (_additionalUserData == null) ? null
+					: new MessageElement[] { AdditionalUserData.toMessageElement(_additionalUserData) });
 		} catch (SOAPException e) {
 			throw new ConfigurationException("Unable to create topic expression.", e);
 		} catch (JAXBException e) {

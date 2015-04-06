@@ -66,8 +66,7 @@ public class ExecutableApplicationConfiguration implements Serializable, NativeQ
 		this(null, new LinkedList<String>());
 	}
 
-	final public List<String> startCommandLine(File binDirectoryOverride, String defaultBinaryName)
-		throws FileNotFoundException
+	final public List<String> startCommandLine(File binDirectoryOverride, String defaultBinaryName) throws FileNotFoundException
 	{
 		List<String> ret = new LinkedList<String>();
 

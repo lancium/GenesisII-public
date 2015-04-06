@@ -59,8 +59,7 @@ public class DAIRUtils
 		}
 	}
 
-	static public MessageElement[] createCreationProperties(String driver, String connect_string, String username,
-		String password)
+	static public MessageElement[] createCreationProperties(String driver, String connect_string, String username, String password)
 	{
 		MessageElement[] any = new MessageElement[4];
 		any[0] = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _DB_DRIVER_NAME), driver);
@@ -84,8 +83,7 @@ public class DAIRUtils
 
 		// get driver
 		/*
-		 * it's not getting the correct value for the driver element there's something messed up
-		 * with the creationProperties
+		 * it's not getting the correct value for the driver element there's something messed up with the creationProperties
 		 */
 
 		Hashtable<String, String> table =

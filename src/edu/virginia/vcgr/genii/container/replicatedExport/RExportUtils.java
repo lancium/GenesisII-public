@@ -45,8 +45,7 @@ public class RExportUtils
 	static final protected String _REXPORT_DIR_SERVICE = "RExportDirPortType";
 
 	/**
-	 * Creates EPR for replica with EPI specified by primary. Creates RExport if file or RExportDir
-	 * if dir
+	 * Creates EPR for replica with EPI specified by primary. Creates RExport if file or RExportDir if dir
 	 * 
 	 * @param primaryEPR
 	 *            : epr of new export entry on primary
@@ -57,9 +56,9 @@ public class RExportUtils
 	 * @param isDir
 	 *            : true if new export entry is dir; false if file
 	 */
-	static public EndpointReferenceType createReplica(EndpointReferenceType primaryEPR, String commonEPI,
-		EndpointReferenceType resolverEPR, String primaryLocalPath, String replicaName, String entryType,
-		EndpointReferenceType dataStreamEPR) throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
+	static public EndpointReferenceType createReplica(EndpointReferenceType primaryEPR, String commonEPI, EndpointReferenceType resolverEPR,
+		String primaryLocalPath, String replicaName, String entryType, EndpointReferenceType dataStreamEPR) throws RemoteException,
+		RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 
 		/* create creation params for replica */
@@ -147,8 +146,7 @@ public class RExportUtils
 	 * @param primaryLocalPath
 	 *            : used to connect to newly exported local file
 	 */
-	static public void unpackDataStream(EndpointReferenceType replicaEPR, EndpointReferenceType primaryDataStream)
-		throws ResourceException
+	static public void unpackDataStream(EndpointReferenceType replicaEPR, EndpointReferenceType primaryDataStream) throws ResourceException
 	{
 
 		InputStream primaryDataStreamIN = null;
@@ -168,19 +166,16 @@ public class RExportUtils
 	}
 
 	/**
-	 * Subscribe replica to be notified of resolver termination and (if file replica) of
-	 * RandomByteIO operations performed on primary
+	 * Subscribe replica to be notified of resolver termination and (if file replica) of RandomByteIO operations performed on primary
 	 */
 	static protected void createReplicaSubscriptions(EndpointReferenceType primaryEPR, EndpointReferenceType resolverEPR,
-		EndpointReferenceType replicaEPR, String primaryLocalPath, String replicaName, String replicaType)
-		throws ResourceException
+		EndpointReferenceType replicaEPR, String primaryLocalPath, String replicaName, String replicaType) throws ResourceException
 	{
 		PrimaryExportLocalpathUserData userData = new PrimaryExportLocalpathUserData(primaryLocalPath);
 		SubscriptionFactory factory = new DefaultSubscriptionFactory(replicaEPR);
 
 		try {
-			factory.subscribe(resolverEPR, GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(), null,
-				userData);
+			factory.subscribe(resolverEPR, GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(), null, userData);
 		} catch (SubscribeException e1) {
 			_logger.error("Could not create replica subscription to rexport resolver termination.", e1);
 			throw new ResourceException("Could not create replica subscription to rexport resolver termination.", e1);
@@ -191,8 +186,7 @@ public class RExportUtils
 			factory = new DefaultSubscriptionFactory(resolverEPR);
 
 			try {
-				factory.subscribe(primaryEPR, ByteIOTopics.BYTEIO_CONTENTS_CHANGED_TOPIC.asConcreteQueryExpression(), null,
-					userData);
+				factory.subscribe(primaryEPR, ByteIOTopics.BYTEIO_CONTENTS_CHANGED_TOPIC.asConcreteQueryExpression(), null, userData);
 			} catch (SubscribeException e) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("Could not subscribe resolver to export randomByteIO ops.");

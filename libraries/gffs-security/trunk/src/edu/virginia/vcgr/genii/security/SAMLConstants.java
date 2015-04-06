@@ -10,15 +10,13 @@ import javax.xml.namespace.QName;
 public class SAMLConstants
 {
 	/*
-	 * this property name is used for storing the credentials while they are still in the working
-	 * context, and not yet in the calling context.
+	 * this property name is used for storing the credentials while they are still in the working context, and not yet in the calling context.
 	 */
 	public static final String SAML_CREDENTIALS_WORKING_CONTEXT_CREDS_PROPERTY_NAME = "creds-from-wire";
 
 	/*
-	 * this wallet property is a generally client-side property that holds onto any credentials that
-	 * the client has managed to create or be granted by a container. it lives in the calling
-	 * context.
+	 * this wallet property is a generally client-side property that holds onto any credentials that the client has managed to create or be
+	 * granted by a container. it lives in the calling context.
 	 */
 	public static final String SAML_CREDENTIALS_WALLET_PROPERTY_NAME = "saml-credentials-wallet";
 
@@ -28,9 +26,9 @@ public class SAMLConstants
 	public static final String SAML_CLIENT_SSL_CERTIFICATE_PROPERTY_NAME = "saml-client-ssl-certiticate";
 
 	/**
-	 * a property that holds the "caller-only" credentials. this is mainly used on the container
-	 * side for tracking the credentials that were originally presented at the time of a request
-	 * from a client. this plus a few other credentials are stored into the TransientCredentials.
+	 * a property that holds the "caller-only" credentials. this is mainly used on the container side for tracking the credentials that were
+	 * originally presented at the time of a request from a client. this plus a few other credentials are stored into the
+	 * TransientCredentials.
 	 */
 	public static final String CALLER_CREDENTIALS_PROPERTY = "genii.security.caller-credentials";
 

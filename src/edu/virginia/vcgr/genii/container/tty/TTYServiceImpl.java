@@ -75,8 +75,8 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public SeekReadResponse seekRead(SeekRead seekReadRequest) throws RemoteException, ReadNotPermittedFaultType,
-		SeekNotPermittedFaultType, ResourceUnknownFaultType, UnsupportedTransferFaultType, CustomFaultType
+	public SeekReadResponse seekRead(SeekRead seekReadRequest) throws RemoteException, ReadNotPermittedFaultType, SeekNotPermittedFaultType,
+		ResourceUnknownFaultType, UnsupportedTransferFaultType, CustomFaultType
 	{
 		int numBytes = seekReadRequest.getNumBytes().intValue();
 		TransferInformationType xType = seekReadRequest.getTransferInformation();
@@ -126,8 +126,8 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}

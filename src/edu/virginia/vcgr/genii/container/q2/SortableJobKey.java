@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.container.q2;
 import java.util.Date;
 
 /**
- * We need to be able to sort jobs by their priority and submit time. This class groups together
- * information about a job necessary to do that sort.
+ * We need to be able to sort jobs by their priority and submit time. This class groups together information about a job necessary to do that
+ * sort.
  * 
  * @author mmm2a
  */
@@ -40,8 +40,7 @@ public class SortableJobKey implements Comparable<SortableJobKey>
 	}
 
 	/**
-	 * Java requires that if you overload equals, you have to do it for the method signature
-	 * equals(Object).
+	 * Java requires that if you overload equals, you have to do it for the method signature equals(Object).
 	 */
 	public boolean equals(Object other)
 	{
@@ -60,8 +59,8 @@ public class SortableJobKey implements Comparable<SortableJobKey>
 	 * 
 	 * @param other
 	 *            The other job key to compare against.
-	 * @return If "this" object is less than the "other" object, return a negative integer, if
-	 *         greater, return a positive integer, if equal, return 0.
+	 * @return If "this" object is less than the "other" object, return a negative integer, if greater, return a positive integer, if equal,
+	 *         return 0.
 	 */
 	public int compareTo(SortableJobKey other)
 	{

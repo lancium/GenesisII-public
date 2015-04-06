@@ -83,8 +83,7 @@ public class RNSContainerUtilities
 			}
 		}
 
-		return new LookupResponseType(batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]),
-			iit.getIteratorEndpoint());
+		return new LookupResponseType(batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]), iit.getIteratorEndpoint());
 	}
 
 	public static NuCredential loadRNSResourceCredential(IRNSResource resource)
@@ -102,8 +101,7 @@ public class RNSContainerUtilities
 			try {
 				resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			} catch (ResourceException e) {
-				_logger.error("failed to load resource certificate chain!  this is quite bad.  resource is: "
-					+ resource.toString());
+				_logger.error("failed to load resource certificate chain!  this is quite bad.  resource is: " + resource.toString());
 			}
 
 			// trying to find the real types involved by looking at ACLs.

@@ -74,9 +74,7 @@ public class CloudMonitor
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt =
-				connection.prepareStatement("SELECT resourceid, host, load, port, setup "
-					+ "FROM cloudResources WHERE besid = ?");
+			stmt = connection.prepareStatement("SELECT resourceid, host, load, port, setup " + "FROM cloudResources WHERE besid = ?");
 			stmt.setString(1, besid);
 			rs = stmt.executeQuery();
 
@@ -162,9 +160,7 @@ public class CloudMonitor
 
 		try {
 			connection = _connectionPool.acquire(false);
-			stmt =
-				connection.prepareStatement("UPDATE cloudResources SET " + "load = ?, setup = ? "
-					+ "WHERE besid = ? AND resourceID = ?");
+			stmt = connection.prepareStatement("UPDATE cloudResources SET " + "load = ?, setup = ? " + "WHERE besid = ? AND resourceID = ?");
 			stmt.setInt(1, load);
 			stmt.setInt(2, setup);
 			stmt.setString(3, besid);

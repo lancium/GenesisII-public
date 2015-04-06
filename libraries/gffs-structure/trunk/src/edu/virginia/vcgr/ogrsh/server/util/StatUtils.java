@@ -18,8 +18,7 @@ public class StatUtils
 		if (name.isValidWSName()) {
 			return name.getEndpointIdentifier().toString().hashCode();
 		} else {
-			_logger.warn("Trying to generate an INode number of a target which"
-				+ "does not implement the WS-Naming specification.");
+			_logger.warn("Trying to generate an INode number of a target which" + "does not implement the WS-Naming specification.");
 
 			try {
 				byte[] array = EPRUtils.toBytes(target);

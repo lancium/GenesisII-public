@@ -1,10 +1,10 @@
 /*
- * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright
- * 1999-2005 The University of Southern California.
+ * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright 1999-2005 The University of Southern
+ * California.
  * 
- * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public
- * License, found at http://www.globus.org/toolkit/download/license.html. If you redistribute this
- * file, with or without modifications, you must include this notice in the file.
+ * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public License, found at
+ * http://www.globus.org/toolkit/download/license.html. If you redistribute this file, with or without modifications, you must include this
+ * notice in the file.
  */
 package edu.virginia.vcgr.genii.client.ser;
 
@@ -25,21 +25,18 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
 /**
- * The <code>AnyHelper</code> is a utility that provides common functions for working with
- * <code>MessageElement</code> and beans with <code>AnyContentType</code> class. <b>Do not used this
- * class for serialization or deserialization of objects.</b> Use
+ * The <code>AnyHelper</code> is a utility that provides common functions for working with <code>MessageElement</code> and beans with
+ * <code>AnyContentType</code> class. <b>Do not used this class for serialization or deserialization of objects.</b> Use
  * {@link edu.virginia.vcgr.genii.client.ser.ObjectSerializer ObjectSerializer} and
- * {@link edu.virginia.vcgr.genii.client.ser.ObjectDeserializer ObjectDeserializer} for that
- * purposes instead.
+ * {@link edu.virginia.vcgr.genii.client.ser.ObjectDeserializer ObjectDeserializer} for that purposes instead.
  */
 public class AnyHelper
 {
 	static Log _logger = LogFactory.getLog(AnyHelper.class.getName());
 
 	/**
-	 * Populates a SOAP MessageElement with an arbitrary object, and wraps it inside of a value
-	 * element with an xsi:type attribute. This is similar to using the xsd:any in the same way you
-	 * would use xsd:anyType objects.
+	 * Populates a SOAP MessageElement with an arbitrary object, and wraps it inside of a value element with an xsi:type attribute. This is
+	 * similar to using the xsd:any in the same way you would use xsd:anyType objects.
 	 * 
 	 * @param obj
 	 *            object to be serialized in the any element

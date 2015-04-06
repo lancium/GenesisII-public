@@ -7,8 +7,8 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 
 /**
- * This interface represents the methods that a multi-valued resource property translator MUST
- * implement in order to be used as an RP translator.
+ * This interface represents the methods that a multi-valued resource property translator MUST implement in order to be used as an RP
+ * translator.
  * 
  * @author mmm2a
  */
@@ -34,8 +34,8 @@ public interface MultiResourcePropertyTranslator extends ResourcePropertyTransla
 	 * @param <Type>
 	 *            The Java type created from this deserialization process.
 	 * @param clazz
-	 *            The class of the type to use for deserialization (this is used by Apache Axis to
-	 *            determine the structure of the corresponding elements).
+	 *            The class of the type to use for deserialization (this is used by Apache Axis to determine the structure of the
+	 *            corresponding elements).
 	 * @param element
 	 *            THe collectionof XML elements to deserialize.
 	 * 
@@ -43,6 +43,5 @@ public interface MultiResourcePropertyTranslator extends ResourcePropertyTransla
 	 * 
 	 * @throws ResourcePropertyException
 	 */
-	public <Type> Collection<Type> deserialize(Class<Type> clazz, Collection<MessageElement> element)
-		throws ResourcePropertyException;
+	public <Type> Collection<Type> deserialize(Class<Type> clazz, Collection<MessageElement> element) throws ResourcePropertyException;
 }

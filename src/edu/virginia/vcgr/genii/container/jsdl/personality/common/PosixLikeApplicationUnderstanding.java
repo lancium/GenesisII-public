@@ -132,21 +132,17 @@ public abstract class PosixLikeApplicationUnderstanding extends CommonApplicatio
 	protected PassiveStreamRedirectionDescription getStreamRedirectionDescription() throws JSDLException
 	{
 		/*
-		 * Old way StreamRedirectionSource stdin = null; StreamRedirectionSink stdout = null;
-		 * StreamRedirectionSink stderr = null;
+		 * Old way StreamRedirectionSource stdin = null; StreamRedirectionSink stdout = null; StreamRedirectionSink stderr = null;
 		 * 
-		 * FilesystemRelativePath stdinRedirect = getStdinRedirect(); FilesystemRelativePath
-		 * stdoutRedirect = getStdoutRedirect(); FilesystemRelativePath stderrRedirect =
-		 * getStderrRedirect();
+		 * FilesystemRelativePath stdinRedirect = getStdinRedirect(); FilesystemRelativePath stdoutRedirect = getStdoutRedirect();
+		 * FilesystemRelativePath stderrRedirect = getStderrRedirect();
 		 * 
-		 * if (stdinRedirect != null) stdin = new FileRedirectionSource(
-		 * getFilesystemManager().lookup(stdinRedirect)); if (stdoutRedirect != null) stdout = new
-		 * FileRedirectionSink( getFilesystemManager().lookup(stdoutRedirect)); if (stderrRedirect
-		 * != null) stderr = new FileRedirectionSink(
-		 * getFilesystemManager().lookup(stderrRedirect));
+		 * if (stdinRedirect != null) stdin = new FileRedirectionSource( getFilesystemManager().lookup(stdinRedirect)); if (stdoutRedirect !=
+		 * null) stdout = new FileRedirectionSink( getFilesystemManager().lookup(stdoutRedirect)); if (stderrRedirect != null) stderr = new
+		 * FileRedirectionSink( getFilesystemManager().lookup(stderrRedirect));
 		 * 
-		 * StreamRedirectionSink tty = discoverTTYRedirectionSink(); if (tty != null) { if (stdout
-		 * != null) stdout = new TeeRedirectionSink(stdout, tty); else stdout = tty;
+		 * StreamRedirectionSink tty = discoverTTYRedirectionSink(); if (tty != null) { if (stdout != null) stdout = new
+		 * TeeRedirectionSink(stdout, tty); else stdout = tty;
 		 * 
 		 * if (stderr != null) stderr = new TeeRedirectionSink(stderr, tty); else stderr = tty; }
 		 */

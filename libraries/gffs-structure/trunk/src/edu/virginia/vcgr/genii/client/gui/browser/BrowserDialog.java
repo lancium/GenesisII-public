@@ -57,11 +57,10 @@ public class BrowserDialog extends JFrame
 
 	static {
 		/*
-		 * Create a list of top menu names that can easily be referenced by a hash table, but can be
-		 * accessed in the order in which they were added. This list is used to priority the order
-		 * that menus appear in along the top. If a plugin shows up in one of these menus, then that
-		 * menu will be placed, relative to others, according to this list. If a plugin is in a menu
-		 * NOT included on this list, then it simply goes at the end.
+		 * Create a list of top menu names that can easily be referenced by a hash table, but can be accessed in the order in which they were
+		 * added. This list is used to priority the order that menus appear in along the top. If a plugin shows up in one of these menus, then
+		 * that menu will be placed, relative to others, according to this list. If a plugin is in a menu NOT included on this list, then it
+		 * simply goes at the end.
 		 */
 		PREFERRED_MENU_ORDER = new LinkedHashSet<String>();
 
@@ -77,8 +76,7 @@ public class BrowserDialog extends JFrame
 	private RNSTree _rnsTree;
 
 	/**
-	 * Given a plugin manager (with configured plugins), create a new browser dialog that we can
-	 * display.
+	 * Given a plugin manager (with configured plugins), create a new browser dialog that we can display.
 	 * 
 	 * @param pluginManager
 	 *            The plugin manager that contains the plugins to use for this browser.
@@ -108,8 +106,8 @@ public class BrowserDialog extends JFrame
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		contentPane.add(new JScrollPane(_rnsTree), new GridBagConstraints(0, 1, 1, 1, 0.3, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		contentPane.add(tabWidget, new GridBagConstraints(1, 0, 1, 2, 0.7, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(tabWidget, new GridBagConstraints(1, 0, 1, 2, 0.7, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		setJMenuBar(createMenuBar());
 
@@ -128,8 +126,7 @@ public class BrowserDialog extends JFrame
 		HashMap<String, HashMap<String, Collection<MainMenuDescriptor>>> mainMenu = _pluginManager.getMainMenuPlugins();
 
 		/*
-		 * First, go through the preferred order and see if there are any plugins in the list that
-		 * should be added in a specific order.
+		 * First, go through the preferred order and see if there are any plugins in the list that should be added in a specific order.
 		 */
 		for (String menuName : PREFERRED_MENU_ORDER) {
 			HashMap<String, Collection<MainMenuDescriptor>> menu = mainMenu.get(menuName);
@@ -138,8 +135,8 @@ public class BrowserDialog extends JFrame
 		}
 
 		/*
-		 * Now, go through all the plugins and add all the ones which weren't already taken care of
-		 * during the preferred menu order code above.
+		 * Now, go through all the plugins and add all the ones which weren't already taken care of during the preferred menu order code
+		 * above.
 		 */
 		for (String menuName : mainMenu.keySet()) {
 			if (!PREFERRED_MENU_ORDER.contains(menuName)) {
@@ -174,8 +171,7 @@ public class BrowserDialog extends JFrame
 		/* Iterate through all the groups */
 		for (String group : menuDesc.keySet()) {
 			/*
-			 * If it's a new group and we have already added at least one group before, then add a
-			 * seperator
+			 * If it's a new group and we have already added at least one group before, then add a seperator
 			 */
 			if (!first)
 				menu.addSeparator();
@@ -184,8 +180,8 @@ public class BrowserDialog extends JFrame
 			Collection<MainMenuDescriptor> descList = menuDesc.get(group);
 
 			/*
-			 * If this group has more then the group limit number of items, then go ahead and make
-			 * it a seperate pop-up menu off of the main menu.
+			 * If this group has more then the group limit number of items, then go ahead and make it a seperate pop-up menu off of the main
+			 * menu.
 			 */
 			if (descList.size() > GROUP_SIZE_LIMIT) {
 				targetMenu = new JMenu(group);
@@ -223,8 +219,7 @@ public class BrowserDialog extends JFrame
 				ret.addSeparator();
 
 			/*
-			 * We're now going to figure out which of the plugins are NOT hidden according to their
-			 * status.
+			 * We're now going to figure out which of the plugins are NOT hidden according to their status.
 			 */
 			Collection<ContextMenuDescriptor> nonHiddenItems = new ArrayList<ContextMenuDescriptor>();
 			for (ContextMenuDescriptor desc : menuDesc.get(group)) {
@@ -238,14 +233,13 @@ public class BrowserDialog extends JFrame
 			}
 
 			/*
-			 * Now that we know how many plugins in this group are NOT hidden, we check to see if
-			 * the number is larger then our group limit. If it is, we instead create a side
-			 * popup-menu to handle the large group.
+			 * Now that we know how many plugins in this group are NOT hidden, we check to see if the number is larger then our group limit.
+			 * If it is, we instead create a side popup-menu to handle the large group.
 			 */
 			if (nonHiddenItems.size() > GROUP_SIZE_LIMIT) {
 				/*
-				 * ASG 10-07-2013: This code does not work. Rather than fix it, when i am not sure
-				 * what it is trying to do, i will increae group size limit.
+				 * ASG 10-07-2013: This code does not work. Rather than fix it, when i am not sure what it is trying to do, i will increae
+				 * group size limit.
 				 */
 				JMenu menu = new JMenu(group);
 
@@ -273,8 +267,7 @@ public class BrowserDialog extends JFrame
 	}
 
 	/**
-	 * Create a new action context that we can give to plugins to allow them to request "favors"
-	 * from us.
+	 * Create a new action context that we can give to plugins to allow them to request "favors" from us.
 	 * 
 	 * @return The newly created action context.
 	 */
@@ -284,9 +277,8 @@ public class BrowserDialog extends JFrame
 	}
 
 	/**
-	 * The tree refresher is a simple internal class that gets queued up by the event dispatch
-	 * mechanism so that we can guarantee that it modifies the RNS tree on the event dispatch
-	 * thread.
+	 * The tree refresher is a simple internal class that gets queued up by the event dispatch mechanism so that we can guarantee that it
+	 * modifies the RNS tree on the event dispatch thread.
 	 * 
 	 * @author mmm2a
 	 */
@@ -313,8 +305,7 @@ public class BrowserDialog extends JFrame
 	}
 
 	/**
-	 * This private class is the implementation of the ActionContext that plugins can use to ask the
-	 * browser to do things for them.
+	 * This private class is the implementation of the ActionContext that plugins can use to ask the browser to do things for them.
 	 * 
 	 * @author mmm2a
 	 */
@@ -367,8 +358,8 @@ public class BrowserDialog extends JFrame
 	}
 
 	/**
-	 * The selection callback class is used to allow other pieces of code to ask for the currently
-	 * selected items. This is given to actions so that they know how to find the items.
+	 * The selection callback class is used to allow other pieces of code to ask for the currently selected items. This is given to actions so
+	 * that they know how to find the items.
 	 * 
 	 * @author mmm2a
 	 */
@@ -409,8 +400,7 @@ public class BrowserDialog extends JFrame
 	}
 
 	/**
-	 * This is a class which is registered with the RNSTree to receive mouse clicks that might
-	 * trigger the popup-context menu.
+	 * This is a class which is registered with the RNSTree to receive mouse clicks that might trigger the popup-context menu.
 	 * 
 	 * @author mmm2a
 	 */

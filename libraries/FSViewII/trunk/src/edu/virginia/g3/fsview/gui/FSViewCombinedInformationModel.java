@@ -13,8 +13,7 @@ class FSViewCombinedInformationModel extends AbstractFSViewInformationModel<FSVi
 	private FSViewInformationModel<URI> _viewModel;
 	private AuthenticationInformationMultiModel _authModel;
 
-	private FSViewCombinedInformationModel(FSViewInformationModel<URI> factoryModel,
-		AuthenticationInformationMultiModel authModel)
+	private FSViewCombinedInformationModel(FSViewInformationModel<URI> factoryModel, AuthenticationInformationMultiModel authModel)
 	{
 		super(factoryModel.modelName());
 

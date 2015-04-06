@@ -18,8 +18,8 @@ class MethodInjectionPoint extends InjectionPoint
 
 		Class<?>[] paramTypes = method.getParameterTypes();
 		if (paramTypes.length != 1)
-			throw new InjectionException(String.format(
-				"Method %s isn't a valid injection target -- must take exactly one parameter.", method));
+			throw new InjectionException(
+				String.format("Method %s isn't a valid injection target -- must take exactly one parameter.", method));
 
 		_targetType = paramTypes[0];
 		_method = method;

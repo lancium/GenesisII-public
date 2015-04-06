@@ -24,9 +24,9 @@ public class LRUCache<KeyType, DataType> extends LinkedHashMap<KeyType, DataType
 	}
 
 	/**
-	 * Returns <tt>true</tt> if this map should remove its eldest entry. This method is invoked by
-	 * <tt>put</tt> and <tt>putAll</tt> after inserting a new entry into the map. It provides the
-	 * implementer with the opportunity to remove the eldest entry each time a new one is added.
+	 * Returns <tt>true</tt> if this map should remove its eldest entry. This method is invoked by <tt>put</tt> and <tt>putAll</tt> after
+	 * inserting a new entry into the map. It provides the implementer with the opportunity to remove the eldest entry each time a new one is
+	 * added.
 	 */
 	protected boolean removeEldestEntry(Map.Entry<KeyType, DataType> eldest)
 	{

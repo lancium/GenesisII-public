@@ -10,8 +10,7 @@ import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 
 public class DialogFactory
 {
-	static public DialogProvider getProvider(PrintWriter stdout, PrintWriter stderr, BufferedReader stdin,
-		boolean allowGraphicsOverride)
+	static public DialogProvider getProvider(PrintWriter stdout, PrintWriter stderr, BufferedReader stdin, boolean allowGraphicsOverride)
 	{
 		if (!UserPreferences.preferences().preferGUI())
 			allowGraphicsOverride = false;

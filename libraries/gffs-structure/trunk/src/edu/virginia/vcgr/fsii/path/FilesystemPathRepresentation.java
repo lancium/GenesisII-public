@@ -1,8 +1,8 @@
 package edu.virginia.vcgr.fsii.path;
 
 /**
- * This interface is used by clients and providers alike to specify how paths in their file system
- * are parsed and concatenated together to form strings.
+ * This interface is used by clients and providers alike to specify how paths in their file system are parsed and concatenated together to
+ * form strings.
  * 
  * @author mmm2a
  */
@@ -12,8 +12,7 @@ public interface FilesystemPathRepresentation
 	 * Converts a path array into a rooted, String representation.
 	 * 
 	 * @param path
-	 *            The path to convert. This parameter can be null in which case it is equivalent to
-	 *            new String[0].
+	 *            The path to convert. This parameter can be null in which case it is equivalent to new String[0].
 	 * 
 	 * @return The rooted string representation of the path given.
 	 */

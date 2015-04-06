@@ -29,9 +29,8 @@ import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.security.x509.CertTool;
 
 /**
- * This class implements an abstract notion of resource key. It can translate between WS-Addressing
- * and internal key representations and also manages the lifetime of the java object for the
- * resource.
+ * This class implements an abstract notion of resource key. It can translate between WS-Addressing and internal key representations and also
+ * manages the lifetime of the java object for the resource.
  * 
  * @author Mark Morgan (mmm2a@cs.virginia.edu)
  */
@@ -196,9 +195,8 @@ public class ResourceKey implements Closeable, Rollbackable
 	}
 
 	/**
-	 * Because resource can be created multiple times for a given resource, you can't simply lock on
-	 * the resource. Rather, you can get this object and lock on it. This method assumes that the
-	 * internal key representation supports a reasonable hashcode and equals semantic.
+	 * Because resource can be created multiple times for a given resource, you can't simply lock on the resource. Rather, you can get this
+	 * object and lock on it. This method assumes that the internal key representation supports a reasonable hashcode and equals semantic.
 	 * 
 	 * @return An object which can be locked on.
 	 */
@@ -220,8 +218,8 @@ public class ResourceKey implements Closeable, Rollbackable
 	}
 
 	/**
-	 * Return resources used by this key (and it's underlying resource) to the system. This method
-	 * should ALWAYS be called when the user is done with the resource.
+	 * Return resources used by this key (and it's underlying resource) to the system. This method should ALWAYS be called when the user is
+	 * done with the resource.
 	 * 
 	 * @throws IOException
 	 *             if something goes wrong with the close.
@@ -294,8 +292,7 @@ public class ResourceKey implements Closeable, Rollbackable
 					}
 					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields =
 						CertTool.constructCommonDnFields(epi.toString(), orgs, CNs, null); // uid
-					consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
-						CertTool.createResourceCertChain(spec, additionalFields));
+					consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, CertTool.createResourceCertChain(spec, additionalFields));
 				} catch (GeneralSecurityException gse) {
 					throw new ResourceException(gse.getLocalizedMessage(), gse);
 				}

@@ -47,8 +47,7 @@ public abstract class AbstractCleanupHandler implements CleanupHandler
 			} else {
 				connection.rollback();
 				for (Map.Entry<String, Collection<CleanupReason>> entry : context.resourcesToClean().entrySet()) {
-					_logger.info(String.format("If we were enacting, we would clean up %s:  %s.", entry.getKey(),
-						entry.getValue()));
+					_logger.info(String.format("If we were enacting, we would clean up %s:  %s.", entry.getKey(), entry.getValue()));
 				}
 			}
 		} catch (Throwable cause) {

@@ -101,8 +101,7 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 		model
 			.uiContext()
 			.progressMonitorFactory()
-			.createMonitor(tree, null, null, 1000L * 1000,
-				new ExpansionTask(model.uiContext().callingContext(), object.path()),
+			.createMonitor(tree, null, null, 1000L * 1000, new ExpansionTask(model.uiContext().callingContext(), object.path()),
 				new ExpansionCompletionListener(tree, model.uiContext())).start();
 	}
 

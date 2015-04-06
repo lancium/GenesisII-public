@@ -102,8 +102,7 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements Genii
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RenewResponse renew(Renew renew) throws RemoteException, ResourceUnknownFaultType,
-		UnacceptableTerminationTimeFaultType
+	public RenewResponse renew(Renew renew) throws RemoteException, ResourceUnknownFaultType, UnacceptableTerminationTimeFaultType
 	{
 		AbsoluteOrRelativeTimeType termTime = renew.getTerminationTime();
 		if (termTime == null)
@@ -118,8 +117,8 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements Genii
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public ResumeSubscriptionResponse resumeSubscription(ResumeSubscription arg0) throws RemoteException,
-		ResourceUnknownFaultType, ResumeFailedFaultType
+	public ResumeSubscriptionResponse resumeSubscription(ResumeSubscription arg0) throws RemoteException, ResourceUnknownFaultType,
+		ResumeFailedFaultType
 	{
 		DBSubscriptionResource resource = (DBSubscriptionResource) ResourceManager.getCurrentResource().dereference();
 		resource.toggleSubscriptionPause(false);

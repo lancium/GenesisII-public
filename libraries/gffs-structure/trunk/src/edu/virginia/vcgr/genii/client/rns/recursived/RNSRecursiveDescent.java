@@ -93,8 +93,7 @@ public class RNSRecursiveDescent
 		}
 	}
 
-	private RNSRecursiveDescentCallbackResult descend(Set<URI> visited, RNSPath root, RNSRecursiveDescentCallback callback,
-		int depth)
+	private RNSRecursiveDescentCallbackResult descend(Set<URI> visited, RNSPath root, RNSRecursiveDescentCallback callback, int depth)
 	{
 		int attempt = 0;
 		EndpointReferenceType epr = null;

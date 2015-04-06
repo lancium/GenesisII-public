@@ -120,8 +120,8 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 		return NativeQueues.getNativeQueue(_providerName);
 	}
 
-	final public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorCon, File workingDirectory) throws NativeQueueException
+	final public NativeQueueConnection connect(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorCon,
+		File workingDirectory) throws NativeQueueException
 	{
 		NativeQueue queue = nativeQueue();
 		return queue.connect(resourceOverrides, cmdLineManipulatorCon, workingDirectory, this, _providerConfiguration);

@@ -53,8 +53,8 @@ public class JobTool
 		}
 	}
 
-	static public void launch(Collection<File> initialFiles, JobDefinitionListener generationListener,
-		JobToolListener toolListener) throws IOException
+	static public void launch(Collection<File> initialFiles, JobDefinitionListener generationListener, JobToolListener toolListener)
+		throws IOException
 	{
 		if (toolListener != null)
 			toolListener = new CountingJobToolListener(initialFiles.size(), toolListener);

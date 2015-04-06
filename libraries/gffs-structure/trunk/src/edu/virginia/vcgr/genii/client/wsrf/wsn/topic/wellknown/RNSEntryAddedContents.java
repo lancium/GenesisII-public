@@ -9,9 +9,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 
 /**
- * It is very likely that this class can be safely removed. Genesis II now sends "RNSOperation"
- * messages rather then "RNSEntryAdded" messages. It is unlikely that there is any grid software or
- * any specification that uses this message type.
+ * It is very likely that this class can be safely removed. Genesis II now sends "RNSOperation" messages rather then "RNSEntryAdded" messages.
+ * It is unlikely that there is any grid software or any specification that uses this message type.
  */
 @XmlRootElement(namespace = RNSConstants.GENII_RNS_NS, name = "RNSEntryAddedContents")
 public class RNSEntryAddedContents extends NotificationMessageContents

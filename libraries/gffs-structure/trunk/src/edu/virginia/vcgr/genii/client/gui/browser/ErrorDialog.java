@@ -23,8 +23,7 @@ import javax.swing.JTextArea;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 
 /**
- * The ErrorDialog class implements a simple error display dialog box that can display both an error
- * message and an exception.
+ * The ErrorDialog class implements a simple error display dialog box that can display both an error message and an exception.
  * 
  * @author mmm2a
  */
@@ -50,15 +49,15 @@ public class ErrorDialog extends JDialog
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 
-		contentPane.add(new JLabel(msg), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(new JLabel(msg), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 		contentPane.add(createDetails(cause), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		JButton ok = new JButton("OK");
 		ok.addActionListener(new OKHandler());
-		contentPane.add(ok, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(ok, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5,
+			5, 5), 5, 5));
 	}
 
 	/**

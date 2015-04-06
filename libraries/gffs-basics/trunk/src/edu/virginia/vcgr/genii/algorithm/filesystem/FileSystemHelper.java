@@ -41,9 +41,8 @@ public class FileSystemHelper
 		return false;
 
 		/*
-		 * future: this could be more useful if it returned the position of the link as a component in
-		 * path, but then we also need to accept a starting point for the link searching so they can
-		 * find all of them.
+		 * future: this could be more useful if it returned the position of the link as a component in path, but then we also need to accept a
+		 * starting point for the link searching so they can find all of them.
 		 */
 	}
 

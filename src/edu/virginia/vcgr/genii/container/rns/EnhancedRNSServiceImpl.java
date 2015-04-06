@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.rns;
 
@@ -145,13 +144,12 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 
-		EndpointReferenceType primaryEPR =
-			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType primaryEPR = (EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (primaryEPR != null) {
 			IResource resource = rKey.dereference();
 			VersionedResourceUtils.initializeReplica(resource, primaryEPR, 0);
@@ -190,8 +188,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		return createFile(createFile, null);
 	}
 
-	protected CreateFileResponseType createFile(CreateFileRequestType createFile, MessageElement[] attributes)
-		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
+	protected CreateFileResponseType createFile(CreateFileRequestType createFile, MessageElement[] attributes) throws RemoteException,
+		RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		String filename = createFile.getFilename();
 		// 2014-11-05 ASG - adding logging
@@ -200,8 +198,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		// End logging
 		try {
 			/*
-			 * TODO - rather than building a list of all the files in the directory and seeing if
-			 * this one is there - just check if is there.
+			 * TODO - rather than building a list of all the files in the directory and seeing if this one is there - just check if is there.
 			 */
 			_resourceLock.lock();
 			Collection<String> entries = _resource.listEntries(filename);
@@ -238,8 +235,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 
 	static private String toString(RNSEntryType entry)
 	{
-		return String.format("RNSEntry[name=%s, epr=%s,...]", entry.getEntryName(), (entry.getEndpoint() == null) ? "no"
-			: "yes");
+		return String.format("RNSEntry[name=%s, epr=%s,...]", entry.getEntryName(), (entry.getEndpoint() == null) ? "no" : "yes");
 	}
 
 	static private String toString(RNSEntryType[] entries)
@@ -278,9 +274,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			} catch (Throwable cause) {
 				_logger.error("failure during add request", cause);
 				ret[lcv] =
-					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: "
-							+ cause.getMessage()) }, null)), addRequest[lcv].getEntryName());
+					new RNSEntryResponseType(null, null,
+						FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: " + cause.getMessage()) },
+							null)), addRequest[lcv].getEntryName());
 			}
 		}
 		return ret;
@@ -338,8 +335,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		// service is unused
 		// forkPath is unused
 			public
-			AttributePreFetcher getPreFetcher(EndpointReferenceType target, ResourceKey rKey, ResourceForkService service)
-				throws Throwable
+			AttributePreFetcher getPreFetcher(EndpointReferenceType target, ResourceKey rKey, ResourceForkService service) throws Throwable
 		{
 			String targetAddress = target.getAddress().toString();
 			String rbyteioAddress = Container.getServiceURL("RandomByteIOPortType");
@@ -461,9 +457,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				// the looked-up entry does not exist . Only for non-batch
 				String name = internalEntry.getName();
 				RNSEntryResponseType entry =
-					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null,
-						null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry"
-							+ " %s does not exist!", name)) }, null, name)), name);
+					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null,
+						null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry" + " %s does not exist!",
+							name)) }, null, name)), name);
 				resultEntries.add(entry);
 			} else {
 				EndpointReferenceType epr = internalEntry.getEntryReference();
@@ -471,8 +467,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 
 				entry =
 					new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
-						Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm)),
-						null, internalEntry.getName());
+						Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm)), null,
+						internalEntry.getName());
 
 				// ---------------------------------------------------------------------------------------------
 				// Removing EPR from entry when short form is requested
@@ -489,8 +485,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		Timer createTimer = tSink.getTimer("Create Iterator");
 		try {
 			InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices, null);
-			return RNSContainerUtilities.indexedTranslate(resultEntries, iteratorBuilder(RNSEntryResponseType.getTypeDesc()
-				.getXmlType()), imiw);
+			return RNSContainerUtilities.indexedTranslate(resultEntries, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()),
+				imiw);
 		} finally {
 			createTimer.noteTime();
 		}
@@ -550,8 +546,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		throw new UnsupportedOperationException("setMetadata operation not supported!");
 	}
 
-	private void fireRNSEntryAdded(VersionVector vvr, String name, EndpointReferenceType entry)
-		throws ResourceUnknownFaultType, ResourceException
+	private void fireRNSEntryAdded(VersionVector vvr, String name, EndpointReferenceType entry) throws ResourceUnknownFaultType,
+		ResourceException
 	{
 		TopicSet space = TopicSet.forPublisher(getClass());
 		PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
@@ -568,9 +564,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	// TODO: setResourceProperties() does not send "policy" update.
 
 	/**
-	 * Given a new resource which was just created and which is about to be added to this directory
-	 * - if this directory has a policy that new resources must be registered with a resolver, then
-	 * register the resource and return an EPR that includes the resolver reference.
+	 * Given a new resource which was just created and which is about to be added to this directory - if this directory has a policy that new
+	 * resources must be registered with a resolver, then register the resource and return an EPR that includes the resolver reference.
 	 */
 	private EndpointReferenceType prepareEPRToStore(EndpointReferenceType entryReference) throws RemoteException
 	{
@@ -597,14 +592,12 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	}
 
 	/*
-	 * Do not change the name or signature of the below method. It is used in WSIteratorDBResource
-	 * using java-reflection.
+	 * Do not change the name or signature of the below method. It is used in WSIteratorDBResource using java-reflection.
 	 * 
-	 * If modifying: edit in WSIteratorDBResource.java and QueueServiceImpl.java and
-	 * LightWeightExportDirFork.java.
+	 * If modifying: edit in WSIteratorDBResource.java and QueueServiceImpl.java and LightWeightExportDirFork.java.
 	 */
-	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] obj,
-		boolean shortForm) throws ResourceException
+	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] obj, boolean shortForm)
+		throws ResourceException
 	{
 		if (connection == null || entry == null) // obj will be null as it is unused
 			throw new ResourceException("Unable to list directory contents");
@@ -614,9 +607,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		if (!entry.isExistent()) {
 			String name = entry.getEntryName();
 			resp =
-				new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null,
-					null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry"
-						+ " %s does not exist!", name)) }, null, name)), name);
+				new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry" + " %s does not exist!", name)) },
+					null, name)), name);
 		}
 
 		else {
@@ -625,9 +618,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			if (ie == null) {
 				String name = entry.getEntryName();
 				resp =
-					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null,
-						null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry"
-							+ " %s does not exist!", name)) }, null, name)), name);
+					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null,
+						null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry" + " %s does not exist!",
+							name)) }, null, name)), name);
 			}
 
 			else {

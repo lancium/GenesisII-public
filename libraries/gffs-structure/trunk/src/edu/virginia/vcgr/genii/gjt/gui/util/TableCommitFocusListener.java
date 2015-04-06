@@ -22,8 +22,8 @@ public class TableCommitFocusListener extends FocusAdapter
 		TableCellEditor editor = _table.getCellEditor();
 		if (editor != null) {
 			if (!editor.stopCellEditing()) {
-				JOptionPane.showMessageDialog(_table, "Unable to commit partial change to table cell.",
-					"Partial Change Failure", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(_table, "Unable to commit partial change to table cell.", "Partial Change Failure",
+					JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

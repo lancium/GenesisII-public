@@ -15,8 +15,8 @@ public class GenesisIIConstants
 	static public final String NAMING_CLIENT_CONFORMANCE_PROPERTY = "IsWSNamingClient";
 
 	/*
-	 * a storage area in the calling context where the original TLS certificate can be remembered
-	 * during container operations on behalf of the client.
+	 * a storage area in the calling context where the original TLS certificate can be remembered during container operations on behalf of the
+	 * client.
 	 */
 	static public final String PASS_THROUGH_IDENTITY = "PassThroughIdentity";
 
@@ -28,8 +28,7 @@ public class GenesisIIConstants
 	static public final String REGISTERED_TOPICS_ATTR = "registered-topic";
 	static public QName REGISTERED_TOPICS_ATTR_QNAME = new QName(GENESISII_NS, REGISTERED_TOPICS_ATTR);
 
-	static public QName AUTHZ_CONFIG_ATTR_QNAME =
-		new QName("http://vcgr.cs.virginia.edu/genii/2008/12/security", "AuthZConfig");
+	static public QName AUTHZ_CONFIG_ATTR_QNAME = new QName("http://vcgr.cs.virginia.edu/genii/2008/12/security", "AuthZConfig");
 	static public final String AUTHZ_CONFIG_ATTR = AUTHZ_CONFIG_ATTR_QNAME.getLocalPart();
 
 	static public final String CACHE_COHERENCE_WINDOW_ATTR_NAME = "CacheCoherenceWindow";
@@ -63,17 +62,14 @@ public class GenesisIIConstants
 	static public final String GENESIS_DAIR_RESULTS = "dair-results";
 
 	static final public String COMMAND_FUNCTION_NAME = "function";
-	static final public QName COMMAND_FUNCTION_QNAME = new QName(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE().getQName()
-		.getNamespaceURI(), COMMAND_FUNCTION_NAME);
+	static final public QName COMMAND_FUNCTION_QNAME = new QName(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE().getQName().getNamespaceURI(),
+		COMMAND_FUNCTION_NAME);
 
-	static public QName NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR = new QName(GENESISII_NS,
-		"notification-message-attributes-separator");
+	static public QName NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR = new QName(GENESISII_NS, "notification-message-attributes-separator");
 
-	static public final QName NOTIFICATION_BROKER_FACTORY_ADDRESS = new QName(GenesisIIConstants.GENESISII_NS,
-		"NotificationBrokerFactory");
+	static public final QName NOTIFICATION_BROKER_FACTORY_ADDRESS = new QName(GenesisIIConstants.GENESISII_NS, "NotificationBrokerFactory");
 
-	static public final String ENHANCED_NOTIFICATION_BROKER_NS =
-		"http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker";
+	static public final String ENHANCED_NOTIFICATION_BROKER_NS = "http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker";
 
 	static public final String CLIENT_ID_ATTRIBUTE_NAME = "ClientID";
 	static public final String MYPROXY_ATTRIBUTE_NAME = "Proxy";
@@ -90,21 +86,18 @@ public class GenesisIIConstants
 	static public final QName RPC_ID_QNAME = new QName(GENESISII_NS, RPC_ID_ATTRIBUTE_NAME);
 
 	// constant object for the security token ref qname.
-	static public final QName WSSE11_NS_SECURITY_QNAME = new QName(org.apache.ws.security.WSConstants.WSSE11_NS,
-		"SecurityTokenReference");
+	static public final QName WSSE11_NS_SECURITY_QNAME = new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "SecurityTokenReference");
 
 	// three attributes to be used in short RNS Lookup and Iterate responses
 	static public final String HUMAN_READABLE_PORT_TYPES_ATTRIBUTE_NAME = "String-PortTypes";
-	static public final QName HUMAN_READABLE_PORT_TYPES_QNAME = new QName(GENESISII_NS,
-		HUMAN_READABLE_PORT_TYPES_ATTRIBUTE_NAME);
+	static public final QName HUMAN_READABLE_PORT_TYPES_QNAME = new QName(GENESISII_NS, HUMAN_READABLE_PORT_TYPES_ATTRIBUTE_NAME);
 	static public final String RESOURCE_URI_ATTRIBUTE_NAME = "Resource-URI";
 	static public final QName RESOURCE_URI_QNAME = new QName(GENESISII_NS, RESOURCE_URI_ATTRIBUTE_NAME);
 	static public final String CONTAINER_ID_ATTRIBUTE_NAME = "Container-ID";
 	static public final QName CONTAINER_ID_QNAME = new QName(GENESISII_NS, CONTAINER_ID_ATTRIBUTE_NAME);
 
 	// our old namespace for wss, which has been outdated by using newer wss4j library.
-	static public final String INTERMEDIATE_WSE_NS =
-		"http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-wssecurity-secext-1.1.xsd";
+	static public final String INTERMEDIATE_WSE_NS = "http://docs.oasis-open.org/wss/2005/xx/oasis-2005xx-wss-wssecurity-secext-1.1.xsd";
 
 	// constant object for the older version of the security token ref qname.
 	static public final QName INTERMEDIATE_WSE_NS_SECURITY_QNAME = new QName(INTERMEDIATE_WSE_NS, "SecurityTokenReference");

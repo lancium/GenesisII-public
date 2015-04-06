@@ -12,8 +12,8 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 public class PathDisposal
 {
@@ -93,8 +93,7 @@ public class PathDisposal
 	}
 
 	/**
-	 * Attempts to do the right thing about a path that should be removed. This will not succeed on
-	 * a directory that is not empty.
+	 * Attempts to do the right thing about a path that should be removed. This will not succeed on a directory that is not empty.
 	 */
 	static public PathOutcome removeAppropriately(RNSPath path, TreeTraversalPathQuery<RNSPath> querier, RemoveBouncerRNS b)
 	{
@@ -169,8 +168,7 @@ public class PathDisposal
 	}
 
 	/**
-	 * Removes a path recursively, if possible. All contents will be removed. The only way this
-	 * should fail is due to a permissions problem.
+	 * Removes a path recursively, if possible. All contents will be removed. The only way this should fail is due to a permissions problem.
 	 */
 	static public PathOutcome recursiveDelete(RNSPath path)
 	{
@@ -179,8 +177,7 @@ public class PathDisposal
 		RNSPathHierarchyHelper helping = new RNSPathHierarchyHelper();
 		RemoveBouncerRNS ourBouncer = new RemoveBouncerRNS();
 		RNSRecurser zapper =
-			new RNSRecurser(null, new RemoveDirectoryRNS(helping, ourBouncer), new RemoveFileRNS(helping, ourBouncer),
-				ourBouncer);
+			new RNSRecurser(null, new RemoveDirectoryRNS(helping, ourBouncer), new RemoveFileRNS(helping, ourBouncer), ourBouncer);
 		zapper.setMaximumRecursionDepth(MAX_DELETE_DEPTH);
 		PathOutcome ret = PathOutcome.OUTCOME_NO_ACCESS;
 		try {
@@ -254,8 +251,7 @@ public class PathDisposal
 	}
 
 	/**
-	 * Attempts to do the right thing about a path that should be removed. This will not succeed on
-	 * a directory that is not empty.
+	 * Attempts to do the right thing about a path that should be removed. This will not succeed on a directory that is not empty.
 	 */
 	static public PathOutcome removeAppropriately(File path, TreeTraversalPathQuery<File> querier, RemoveBouncerJavaFile b)
 	{
@@ -297,8 +293,7 @@ public class PathDisposal
 	}
 
 	/**
-	 * Removes a path recursively, if possible. All contents will be removed. The only way this
-	 * should fail is due to a permissions problem.
+	 * Removes a path recursively, if possible. All contents will be removed. The only way this should fail is due to a permissions problem.
 	 */
 	static public PathOutcome recursiveDelete(File path)
 	{
@@ -307,8 +302,8 @@ public class PathDisposal
 		JavaFileHierarchyHelper helping = new JavaFileHierarchyHelper();
 		RemoveBouncerJavaFile ourBouncer = new RemoveBouncerJavaFile();
 		JavaFileRecurser zapper =
-			new JavaFileRecurser(null, new RemoveDirectoryJavaFile(helping, ourBouncer), new RemoveFileJavaFile(helping,
-				ourBouncer), ourBouncer);
+			new JavaFileRecurser(null, new RemoveDirectoryJavaFile(helping, ourBouncer), new RemoveFileJavaFile(helping, ourBouncer),
+				ourBouncer);
 		zapper.setMaximumRecursionDepth(MAX_DELETE_DEPTH);
 		PathOutcome ret = PathOutcome.OUTCOME_NO_ACCESS;
 		ret = zapper.recursePath(path);

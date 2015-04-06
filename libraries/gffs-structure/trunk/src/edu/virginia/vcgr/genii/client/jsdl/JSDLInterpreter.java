@@ -115,8 +115,7 @@ public class JSDLInterpreter
 						Iterator<?> iter = a.getChildElements();
 						while (iter.hasNext())
 							children.add((MessageElement) iter.next());
-						understandResourcesAny(provider, f2, newUnderstanding,
-							children.toArray(new MessageElement[children.size()]));
+						understandResourcesAny(provider, f2, newUnderstanding, children.toArray(new MessageElement[children.size()]));
 						f2.completeFacet(understanding, newUnderstanding);
 					} else if (name.equals(new QName("http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime"))) {
 						try {
@@ -134,8 +133,7 @@ public class JSDLInterpreter
 		}
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, JobDefinition_Type def)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, JobDefinition_Type def) throws JSDLException
 	{
 		if (def == null)
 			return;
@@ -153,8 +151,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, JobDescription_Type desc)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, JobDescription_Type desc) throws JSDLException
 	{
 		if (desc == null)
 			return;
@@ -210,8 +207,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, Application_Type app)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, Application_Type app) throws JSDLException
 	{
 		Collection<MessageElement> any = new LinkedList<MessageElement>();
 
@@ -242,24 +238,22 @@ public class JSDLInterpreter
 						POSIXApplication_Type pat = ObjectDeserializer.toObject(a, POSIXApplication_Type.class);
 						understand(provider, understanding, pat);
 					} catch (ResourceException re) {
-						throw new InvalidJSDLException("Unable to parse JSDL Application element "
-							+ "into POSIXApplication element.", re);
+						throw new InvalidJSDLException("Unable to parse JSDL Application element " + "into POSIXApplication element.", re);
 					}
 				} else if (elementName.equals(HPCConstants.HPC_APPLICATION_QNAME)) {
 					try {
 						HPCProfileApplication_Type hat = ObjectDeserializer.toObject(a, HPCProfileApplication_Type.class);
 						understand(provider, understanding, hat);
 					} catch (ResourceException re) {
-						throw new InvalidJSDLException("Unable to parse JSDL Application element "
-							+ "into HPCProfileApplication element.", re);
+						throw new InvalidJSDLException("Unable to parse JSDL Application element " + "into HPCProfileApplication element.",
+							re);
 					}
 				} else if (elementName.equals(SPMDConstants.JSDL_SPMD_APPLICATION_QNAME)) {
 					try {
 						SPMDApplication_Type spmd = ObjectDeserializer.toObject(a, SPMDApplication_Type.class);
 						understand(provider, understanding, spmd);
 					} catch (ResourceException re) {
-						throw new InvalidJSDLException("Unable to parse JSDL Application element "
-							+ "into SPMDApplication element.", re);
+						throw new InvalidJSDLException("Unable to parse JSDL Application element " + "into SPMDApplication element.", re);
 					}
 				} else {
 					any.add(a);
@@ -271,8 +265,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, Resources_Type resources)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, Resources_Type resources) throws JSDLException
 	{
 		if (resources == null)
 			return;
@@ -347,8 +340,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, DataStaging_Type[] staging)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, DataStaging_Type[] staging) throws JSDLException
 	{
 		if (staging == null)
 			return;
@@ -358,8 +350,7 @@ public class JSDLInterpreter
 		}
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, SPMDApplication_Type spmd)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, SPMDApplication_Type spmd) throws JSDLException
 	{
 		if (spmd == null)
 			return;
@@ -380,8 +371,7 @@ public class JSDLInterpreter
 			for (Argument_Type arg : args) {
 				nStr = arg.getFilesystemName();
 				NormalizedString nStr2 = arg.get_value();
-				facet.consumeArgument(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString()
-					: null);
+				facet.consumeArgument(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString() : null);
 			}
 		}
 
@@ -413,8 +403,8 @@ public class JSDLInterpreter
 			for (Environment_Type e : env) {
 				nStr = e.getName();
 				NormalizedString nStr2 = e.getFilesystemName();
-				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString()
-					: null, e.get_value());
+				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString() : null,
+					e.get_value());
 			}
 		}
 
@@ -427,8 +417,7 @@ public class JSDLInterpreter
 			PositiveInteger pi = nProcs.get_value();
 			Boolean b = nProcs.getActualtotalcpucount();
 
-			facet.consumeNumberOfProcesses(understanding, pi != null ? pi.intValue() : null, b != null ? b.booleanValue()
-				: false);
+			facet.consumeNumberOfProcesses(understanding, pi != null ? pi.intValue() : null, b != null ? b.booleanValue() : false);
 		}
 
 		ProcessesPerHost_Type pph = spmd.getProcessesPerHost();
@@ -442,8 +431,7 @@ public class JSDLInterpreter
 		if (tpp != null) {
 			PositiveInteger pi = tpp.get_value();
 			Boolean b = tpp.getActualindividualcpucount();
-			facet.consumeThreadsPerProcess(understanding, pi != null ? pi.intValue() : null, b != null ? b.booleanValue()
-				: false);
+			facet.consumeThreadsPerProcess(understanding, pi != null ? pi.intValue() : null, b != null ? b.booleanValue() : false);
 		}
 
 		org.apache.axis.types.URI variation = spmd.getSPMDVariation();
@@ -452,8 +440,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, POSIXApplication_Type pat)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, POSIXApplication_Type pat) throws JSDLException
 	{
 		if (pat == null)
 			return;
@@ -474,8 +461,7 @@ public class JSDLInterpreter
 			for (Argument_Type arg : args) {
 				nStr = arg.getFilesystemName();
 				NormalizedString nStr2 = arg.get_value();
-				facet.consumeArgument(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString()
-					: null);
+				facet.consumeArgument(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString() : null);
 			}
 		}
 
@@ -507,8 +493,8 @@ public class JSDLInterpreter
 			for (Environment_Type e : env) {
 				nStr = e.getName();
 				NormalizedString nStr2 = e.getFilesystemName();
-				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString()
-					: null, e.get_value());
+				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, nStr2 != null ? nStr2.toString() : null,
+					e.get_value());
 			}
 		}
 
@@ -627,8 +613,8 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understandCandidateHosts(PersonalityProvider provider, Object parentUnderstanding,
-		String[] candidateHosts) throws JSDLException
+	static private void understandCandidateHosts(PersonalityProvider provider, Object parentUnderstanding, String[] candidateHosts)
+		throws JSDLException
 	{
 		if (candidateHosts == null)
 			return;
@@ -644,8 +630,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object understanding, FileSystem_Type[] fs)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object understanding, FileSystem_Type[] fs) throws JSDLException
 	{
 		if (fs == null)
 			return;
@@ -655,8 +640,7 @@ public class JSDLInterpreter
 		}
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, FileSystem_Type fst)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, FileSystem_Type fst) throws JSDLException
 	{
 		if (fst == null)
 			return;
@@ -739,8 +723,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, CPUArchitecture_Type arch)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, CPUArchitecture_Type arch) throws JSDLException
 	{
 		if (arch == null)
 			return;
@@ -757,8 +740,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, DataStaging_Type stage)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, DataStaging_Type stage) throws JSDLException
 	{
 		Collection<MessageElement> any = new LinkedList<MessageElement>();
 

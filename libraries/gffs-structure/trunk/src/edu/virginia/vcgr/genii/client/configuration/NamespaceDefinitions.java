@@ -42,8 +42,7 @@ public class NamespaceDefinitions
 			_namespaceProperties.load(fin);
 		} catch (IOException ioe) {
 			_logger.fatal("Unable to load namespace properties from deployment.", ioe);
-			throw new InvalidDeploymentException(deploymentDirectory.getName(),
-				"Unable to load namespace properties from deployment.");
+			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Unable to load namespace properties from deployment.");
 		} finally {
 			StreamUtils.close(fin);
 		}
@@ -77,8 +76,7 @@ public class NamespaceDefinitions
 	}
 
 	/**
-	 * the specific location for the root, or Bootstrap, Container. this container may not always be
-	 * located in the main containers directory.
+	 * the specific location for the root, or Bootstrap, Container. this container may not always be located in the main containers directory.
 	 */
 	public String getRootContainer()
 	{
@@ -86,8 +84,7 @@ public class NamespaceDefinitions
 	}
 
 	/**
-	 * the top-level storage for most of the grid's users. this is used as the default when no
-	 * specific path is provided.
+	 * the top-level storage for most of the grid's users. this is used as the default when no specific path is provided.
 	 */
 	public String getUsersDirectory()
 	{

@@ -11,9 +11,8 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 /**
- * manages the properties for gffs exports for the container. this class should only be used by the
- * container-side code, although due to current organizational constraints, it's in gffs-structure
- * which is nominally a client-side library.
+ * manages the properties for gffs exports for the container. this class should only be used by the container-side code, although due to
+ * current organizational constraints, it's in gffs-structure which is nominally a client-side library.
  * 
  * @author Chris Koeritz
  */
@@ -45,8 +44,7 @@ public class ExportProperties
 	}
 
 	/**
-	 * provides access to all of the properties that control exports and certain other storage
-	 * attributes.
+	 * provides access to all of the properties that control exports and certain other storage attributes.
 	 */
 	private ExportProperties()
 	{
@@ -96,8 +94,7 @@ public class ExportProperties
 		}
 
 		/**
-		 * returns an ExportMechanisms enum from a string if possible. if not possible, null is
-		 * returned.
+		 * returns an ExportMechanisms enum from a string if possible. if not possible, null is returned.
 		 */
 		public static ExportMechanisms parse(String fromString)
 		{

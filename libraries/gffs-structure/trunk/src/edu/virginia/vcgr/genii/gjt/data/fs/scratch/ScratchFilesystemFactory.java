@@ -13,8 +13,8 @@ public class ScratchFilesystemFactory implements FilesystemFactory
 	public Filesystem instantiate(Window owner)
 	{
 		String answer =
-			JOptionPane.showInputDialog(owner, "Unique identifier for this scratch filesystem.",
-				"Scratch Filesystem Configuration", JOptionPane.QUESTION_MESSAGE);
+			JOptionPane.showInputDialog(owner, "Unique identifier for this scratch filesystem.", "Scratch Filesystem Configuration",
+				JOptionPane.QUESTION_MESSAGE);
 		if (answer == null)
 			return null;
 

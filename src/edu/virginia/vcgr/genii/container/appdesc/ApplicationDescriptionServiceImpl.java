@@ -55,10 +55,8 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 {
 	static private Log _logger = LogFactory.getLog(ApplicationDescriptionServiceImpl.class);
 
-	static final public String APPLICATION_DESCRIPTION_PROPERTY_NAME =
-		"edu.virginia.vcgr.genii.container.appdesc.app_desc_property";
-	static final public String APPLICATION_VERSION_PROPERTY_NAME =
-		"edu.virginia.vcgr.genii.container.appdesc.app_vers_property";
+	static final public String APPLICATION_DESCRIPTION_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.appdesc.app_desc_property";
+	static final public String APPLICATION_VERSION_PROPERTY_NAME = "edu.virginia.vcgr.genii.container.appdesc.app_vers_property";
 
 	@Override
 	protected void setAttributeHandlers() throws NoSuchMethodException, ResourceException, ResourceUnknownFaultType
@@ -70,8 +68,8 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		super.postCreate(rKey, myEPR, cParams, creationParameters, resolverCreationParams);
 
@@ -99,8 +97,8 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateDeploymentDocumentResponseType createDeploymentDocument(
-		CreateDeploymentDocumentRequestType createDeploymentDocumentRequest) throws RemoteException, DeploymentExistsFaultType
+	public CreateDeploymentDocumentResponseType createDeploymentDocument(CreateDeploymentDocumentRequestType createDeploymentDocumentRequest)
+		throws RemoteException, DeploymentExistsFaultType
 	{
 		String name = createDeploymentDocumentRequest.getName();
 		DeploymentDocumentType deployDoc = createDeploymentDocumentRequest.getDeploymentDocument();
@@ -123,8 +121,8 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 			newFile = response.getEndpoint();
 			bos = ByteIOStreamFactory.createOutputStream(newFile);
 			writer = new OutputStreamWriter(bos);
-			ObjectSerializer.serialize(writer, deployDoc, new QName(
-				"http://vcgr.cs.virginia.edu/genii/application-description", "deployment-description"));
+			ObjectSerializer.serialize(writer, deployDoc, new QName("http://vcgr.cs.virginia.edu/genii/application-description",
+				"deployment-description"));
 			writer.flush();
 
 			CreateDeploymentDocumentResponseType ret = new CreateDeploymentDocumentResponseType(newFile);

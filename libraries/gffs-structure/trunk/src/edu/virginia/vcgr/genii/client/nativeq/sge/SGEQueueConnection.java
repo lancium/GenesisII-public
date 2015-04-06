@@ -65,10 +65,9 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 	private List<String> _qstatStart;
 	private List<String> _qdelStart;
 
-	SGEQueueConnection(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf,
-		File workingDirectory, NativeQueueConfiguration nativeQueueConfig, SGEQueueConfiguration sgeConfig, String queueName,
-		List<String> qsubStart, List<String> qstatStart, List<String> qdelStart, JobStateCache statusCache)
-		throws NativeQueueException
+	SGEQueueConnection(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf, File workingDirectory,
+		NativeQueueConfiguration nativeQueueConfig, SGEQueueConfiguration sgeConfig, String queueName, List<String> qsubStart,
+		List<String> qstatStart, List<String> qdelStart, JobStateCache statusCache) throws NativeQueueException
 	{
 		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, nativeQueueConfig, sgeConfig);
 
@@ -163,9 +162,8 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 	}
 
 	@Override
-	protected List<String>
-		generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException
+	protected List<String> generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
+		throws NativeQueueException, IOException
 	{
 		URI variation = application.getSPMDVariation();
 		if (variation != null) {

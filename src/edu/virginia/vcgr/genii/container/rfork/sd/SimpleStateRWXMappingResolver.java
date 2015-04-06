@@ -28,8 +28,7 @@ public class SimpleStateRWXMappingResolver implements MappingResolver
 
 			return RWXManager.lookup(serviceClass, translateMethod);
 		} catch (NoSuchMethodException nsme) {
-			throw new RWXMappingException("Couldn't find appropriate get/set methods on class \"" + serviceClass.getName()
-				+ "\".");
+			throw new RWXMappingException("Couldn't find appropriate get/set methods on class \"" + serviceClass.getName() + "\".");
 		}
 	}
 }

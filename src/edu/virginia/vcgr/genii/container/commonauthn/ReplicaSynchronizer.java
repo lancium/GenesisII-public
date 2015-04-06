@@ -14,12 +14,10 @@ import edu.virginia.vcgr.genii.container.rns.GeniiDirSyncRunner;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 
 /*
- * The behavior of a IDP resource is determined by its various resource properties. In addition, it
- * has the same capabilities that are available in an RNS resource. Therefore the replica
- * synchronization class for RNS, Genii- DirSyncRunner, can perform a bulk of the tasks warranted by
- * a IDP replication. The remaining places where we need to deal with IDP specific properties such
- * as specialized resource-create operation and resource properties synchronization are controlled
- * by this extension of the GeniiDirSyncRunner class.
+ * The behavior of a IDP resource is determined by its various resource properties. In addition, it has the same capabilities that are
+ * available in an RNS resource. Therefore the replica synchronization class for RNS, Genii- DirSyncRunner, can perform a bulk of the tasks
+ * warranted by a IDP replication. The remaining places where we need to deal with IDP specific properties such as specialized resource-create
+ * operation and resource properties synchronization are controlled by this extension of the GeniiDirSyncRunner class.
  */
 public class ReplicaSynchronizer extends GeniiDirSyncRunner
 {
@@ -34,9 +32,8 @@ public class ReplicaSynchronizer extends GeniiDirSyncRunner
 	}
 
 	/*
-	 * This is the method for populating some construction properties that are used to distinguish
-	 * between the creation of a replica resource and a primary resource. Specific STS port-type
-	 * classes use these properties to bypass or augment steps of resource creation procedure.
+	 * This is the method for populating some construction properties that are used to distinguish between the creation of a replica resource
+	 * and a primary resource. Specific STS port-type classes use these properties to bypass or augment steps of resource creation procedure.
 	 */
 	@Override
 	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR)
@@ -49,8 +46,8 @@ public class ReplicaSynchronizer extends GeniiDirSyncRunner
 	}
 
 	/*
-	 * This is a hook that is used by individual STS port-type classes to populate necessary
-	 * resource properties after a replica resource has been created.
+	 * This is a hook that is used by individual STS port-type classes to populate necessary resource properties after a replica resource has
+	 * been created.
 	 */
 	@Override
 	protected void retrieveAndStoreResourcePropertiesFromPrimary(GeniiCommon proxyToPrimary, IRNSResource resource)

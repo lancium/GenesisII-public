@@ -29,14 +29,13 @@ public class ApplicationDeployerAttributeHandler extends AbstractAttributeHandle
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
 
 		PlatformDescriptionType[] platform =
-			new PlatformDescriptionType[] { new PlatformDescriptionType(
-				new CPUArchitecture_Type[] { JSDLUtils.getLocalCPUArchitecture() },
+			new PlatformDescriptionType[] { new PlatformDescriptionType(new CPUArchitecture_Type[] { JSDLUtils.getLocalCPUArchitecture() },
 				new OperatingSystem_Type[] { JSDLUtils.getLocalOperatingSystem() }, null) };
 
-		ret.add(new MessageElement(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME, new SupportDocumentType(platform,
-			null, ApplicationDescriptionUtils.DEPLOYMENT_TYPE_BINARY)));
-		ret.add(new MessageElement(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME, new SupportDocumentType(platform,
-			null, ApplicationDescriptionUtils.DEPLOYMENT_TYPE_ZIPJAR)));
+		ret.add(new MessageElement(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME, new SupportDocumentType(platform, null,
+			ApplicationDescriptionUtils.DEPLOYMENT_TYPE_BINARY)));
+		ret.add(new MessageElement(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME, new SupportDocumentType(platform, null,
+			ApplicationDescriptionUtils.DEPLOYMENT_TYPE_ZIPJAR)));
 
 		return ret;
 	}

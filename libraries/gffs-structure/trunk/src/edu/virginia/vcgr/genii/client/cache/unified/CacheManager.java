@@ -14,10 +14,9 @@ import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Notif
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.SubscriptionDirectory;
 
 /*
- * This is the facet that mediates all cache related operation issued from other places of the code.
- * Additionally, when different caches want to interact with each other to get or update required
- * information, instead of directly invoking one another's methods, they invoke methods in
- * CacheManager interface. This is done because each cache is oblivious of the others.
+ * This is the facet that mediates all cache related operation issued from other places of the code. Additionally, when different caches want
+ * to interact with each other to get or update required information, instead of directly invoking one another's methods, they invoke methods
+ * in CacheManager interface. This is done because each cache is oblivious of the others.
  */
 public class CacheManager
 {
@@ -32,13 +31,11 @@ public class CacheManager
 	{
 		if (CacheConfigurer.isCachingEnabled()) {
 			/*
-			 * Before accessing the cache, this tries to assess the freshness of cached information
-			 * by investigating the target, whenever possible. This helps to reduce load on cache
-			 * management module and to ensure freshness of information when nothing can be inferred
-			 * from the retrieved cached item.
+			 * Before accessing the cache, this tries to assess the freshness of cached information by investigating the target, whenever
+			 * possible. This helps to reduce load on cache management module and to ensure freshness of information when nothing can be
+			 * inferred from the retrieved cached item.
 			 */
-			if (ResourceAccessMonitor.isMonitoredObject(target)
-				&& !ResourceAccessMonitor.isCachedContentGuaranteedToBeFresh(target))
+			if (ResourceAccessMonitor.isMonitoredObject(target) && !ResourceAccessMonitor.isCachedContentGuaranteedToBeFresh(target))
 				return null;
 			try {
 				CommonCache cache = findCacheForObject(target, cacheKey, itemType);
@@ -266,8 +263,8 @@ public class CacheManager
 			NotificationBrokerDirectory.clearDirectory();
 			SubscriptionDirectory.clearDirectory();
 		} catch (Exception ex) {
-			_logger.error("Alarm: couldn't reset the caching system after a failure. "
-				+ "To avoid seeing, possibly, stale contents, " + "restart the grid client: " + ex.getMessage());
+			_logger.error("Alarm: couldn't reset the caching system after a failure. " + "To avoid seeing, possibly, stale contents, "
+				+ "restart the grid client: " + ex.getMessage());
 		}
 	}
 
@@ -295,8 +292,8 @@ public class CacheManager
 			}
 		}
 		if (_logger.isTraceEnabled())
-			_logger.trace("could not find an appropriate cache for key '" + cacheKey.toString() + "' type "
-				+ typeOfItem.getCanonicalName() + ", coming from: " + ProgramTools.showLastFewOnStack(20));
+			_logger.trace("could not find an appropriate cache for key '" + cacheKey.toString() + "' type " + typeOfItem.getCanonicalName()
+				+ ", coming from: " + ProgramTools.showLastFewOnStack(20));
 		return null;
 	}
 }

@@ -29,23 +29,18 @@ public class CertGeneratorUtils
 			CERT_GENERATOR_DEFAULT_VALIDITY_CONSTRUCTION_PARAMETER, defaultValidity.toString()));
 		parameters.put(CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER, new MessageElement(
 			CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER, DBSerializer.serialize(issuerChain, Long.MAX_VALUE)));
-		parameters
-			.put(
-				CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER,
-				new MessageElement(CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER, DBSerializer.serialize(
-					issuerPrivateKey, Long.MAX_VALUE)));
+		parameters.put(CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER, new MessageElement(
+			CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER, DBSerializer.serialize(issuerPrivateKey, Long.MAX_VALUE)));
 	}
 
-	static public MessageElement[] createCreationProperties(X509Certificate[] issuerChain, PrivateKey issuerPrivateKey,
-		Long defaultValidity) throws IOException
+	static public MessageElement[] createCreationProperties(X509Certificate[] issuerChain, PrivateKey issuerPrivateKey, Long defaultValidity)
+		throws IOException
 	{
 		MessageElement[] any = new MessageElement[3];
-		any[0] =
-			new MessageElement(CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER, DBSerializer.serialize(issuerChain,
-				Long.MAX_VALUE));
+		any[0] = new MessageElement(CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER, DBSerializer.serialize(issuerChain, Long.MAX_VALUE));
 		any[1] =
-			new MessageElement(CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER, DBSerializer.serialize(
-				issuerPrivateKey, Long.MAX_VALUE));
+			new MessageElement(CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER, DBSerializer.serialize(issuerPrivateKey,
+				Long.MAX_VALUE));
 		if (defaultValidity == null)
 			defaultValidity = new Long(_DEFAULT_VALIDITY);
 		any[2] = new MessageElement(CERT_GENERATOR_DEFAULT_VALIDITY_CONSTRUCTION_PARAMETER, defaultValidity.toString());

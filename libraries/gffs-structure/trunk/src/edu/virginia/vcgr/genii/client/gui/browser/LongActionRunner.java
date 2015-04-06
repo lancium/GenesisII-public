@@ -4,8 +4,7 @@ import edu.virginia.vcgr.genii.client.gui.browser.grid.IActionContext;
 import edu.virginia.vcgr.genii.client.gui.browser.grid.ILongRunningAction;
 
 /**
- * The long action runner is the wrapper class that wraps a long running action and handles it
- * inside of a seperate thread.
+ * The long action runner is the wrapper class that wraps a long running action and handles it inside of a seperate thread.
  * 
  * @author mmm2a
  */

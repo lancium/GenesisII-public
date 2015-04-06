@@ -65,8 +65,8 @@ class AccountingRecord
 			if (_commandLine.get(lcv) == null)
 				_commandLine.remove(lcv);
 
-		return new AccountingRecordType(_arid, _besEPI, _arch, _os, _machineName, _commandLine.toArray(new String[_commandLine
-			.size()]), _exitCode, _userTimeMicro, _kernelTimeMicro, _wallclockTimeMicro, _maxRSS, DBSerializer.serialize(
-			_credentials, Long.MAX_VALUE), _timestamp);
+		return new AccountingRecordType(_arid, _besEPI, _arch, _os, _machineName, _commandLine.toArray(new String[_commandLine.size()]),
+			_exitCode, _userTimeMicro, _kernelTimeMicro, _wallclockTimeMicro, _maxRSS, DBSerializer.serialize(_credentials, Long.MAX_VALUE),
+			_timestamp);
 	}
 }

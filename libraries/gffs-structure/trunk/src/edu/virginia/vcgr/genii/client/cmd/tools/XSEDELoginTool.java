@@ -23,8 +23,8 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.context.ContextType;
 
 /*
- * Command to automate logging in to XSEDE infrastructure this is the equivalent of the following
- * multistep login: myproxyLogin passwordLogin IDPLogin logout (username-password token)
+ * Command to automate logging in to XSEDE infrastructure this is the equivalent of the following multistep login: myproxyLogin passwordLogin
+ * IDPLogin logout (username-password token)
  */
 public class XSEDELoginTool extends BaseLoginTool
 {
@@ -53,9 +53,8 @@ public class XSEDELoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext();
@@ -83,8 +82,7 @@ public class XSEDELoginTool extends BaseLoginTool
 		retVal = lTool.run(stdout, stderr, stdin);
 
 		/*
-		 * reload current context. this seems to be the crucial fix for the grid shell logging in to
-		 * work and be kept in context.
+		 * reload current context. this seems to be the crucial fix for the grid shell logging in to work and be kept in context.
 		 */
 		callContext = ContextManager.getCurrentContext();
 

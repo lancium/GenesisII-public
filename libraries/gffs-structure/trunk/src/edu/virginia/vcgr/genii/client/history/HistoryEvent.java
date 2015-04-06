@@ -61,9 +61,8 @@ public class HistoryEvent implements Serializable
 
 	private HistoryEventData _eventData;
 
-	public HistoryEvent(SequenceNumber eventNumber, Calendar eventTimestamp, HistoryEventSource eventSource,
-		HistoryEventLevel eventLevel, HistoryEventCategory eventCategory, Map<String, String> eventProperties,
-		HistoryEventData eventData)
+	public HistoryEvent(SequenceNumber eventNumber, Calendar eventTimestamp, HistoryEventSource eventSource, HistoryEventLevel eventLevel,
+		HistoryEventCategory eventCategory, Map<String, String> eventProperties, HistoryEventData eventData)
 	{
 		if (eventNumber == null)
 			throw new IllegalArgumentException("Event number cannot be null.");

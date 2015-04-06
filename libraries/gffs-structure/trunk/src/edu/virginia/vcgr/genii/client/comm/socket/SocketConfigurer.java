@@ -143,8 +143,7 @@ public class SocketConfigurer
 			if (_sendBufferSize != null) {
 				socket.setSendBufferSize(_sendBufferSize);
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Set send buffer size to %d (now it's %d).", _sendBufferSize,
-						socket.getSendBufferSize()));
+					_logger.debug(String.format("Set send buffer size to %d (now it's %d).", _sendBufferSize, socket.getSendBufferSize()));
 			} else {
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Left send buffer size at %d.", socket.getSendBufferSize()));
@@ -189,13 +188,13 @@ public class SocketConfigurer
 					_logger.debug(String.format("Setting Traffic Class to %s.", _trafficClass));
 				socket.setTrafficClass(_trafficClass.trafficClassBitVector());
 			}
-			
+
 			if (socket instanceof SSLSocket) {
 				// this change does fix the POODLE issue for our clients; clients
 				// will no longer negotiate down to SSLv3 afterwards.
-				((SSLSocket)socket).setEnabledProtocols(new String[] {"TLSv1"});
+				((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1" });
 			}
-			
+
 		} catch (SocketException se) {
 			_logger.warn("Unable to configure socket properties.", se);
 		}

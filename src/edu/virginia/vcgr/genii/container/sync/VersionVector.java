@@ -13,8 +13,7 @@ public class VersionVector extends edu.virginia.vcgr.genii.client.sync.VersionVe
 
 	private Object readResolve() throws ObjectStreamException
 	{
-		edu.virginia.vcgr.genii.client.sync.VersionItem[] realVector =
-			new edu.virginia.vcgr.genii.client.sync.VersionItem[vector.length];
+		edu.virginia.vcgr.genii.client.sync.VersionItem[] realVector = new edu.virginia.vcgr.genii.client.sync.VersionItem[vector.length];
 		for (int i = 0; i < vector.length; i++) {
 			realVector[i] = new edu.virginia.vcgr.genii.client.sync.VersionItem(vector[i].uid, vector[i].version);
 		}

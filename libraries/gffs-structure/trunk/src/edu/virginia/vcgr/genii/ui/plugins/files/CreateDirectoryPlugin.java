@@ -22,9 +22,8 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 
 /*
  * 
- * String ContainerPath=null; String TargetPath=null; ExportDirDialog dialog = new
- * ExportDirDialog(ContainerPath,TargetPath); dialog.pack(); GuiUtils.centerComponent(dialog);
- * dialog.setVisible(true);
+ * String ContainerPath=null; String TargetPath=null; ExportDirDialog dialog = new ExportDirDialog(ContainerPath,TargetPath); dialog.pack();
+ * GuiUtils.centerComponent(dialog); dialog.setVisible(true);
  */
 
 public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
@@ -40,8 +39,8 @@ public class CreateDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 		try {
 			assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 			RNSPath path = context.endpointRetriever().getTargetEndpoints().iterator().next();
-				EndpointReferenceType epr = path.getEndpoint();
-				
+			EndpointReferenceType epr = path.getEndpoint();
+
 			EndpointDescription ep = new EndpointDescription(epr);
 			TypeInformation tp = ep.typeInformation();
 			// First determine if we were called on a container, if not then it must be on an RNS.

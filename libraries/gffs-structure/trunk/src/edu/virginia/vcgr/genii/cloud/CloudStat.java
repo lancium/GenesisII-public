@@ -33,8 +33,8 @@ public class CloudStat
 	@Override
 	public String toString()
 	{
-		return " Available=" + _available + "\n Total=" + _total + "\n" + " Busy=" + _busy + "\n Pending=" + _pending
-			+ "\n Preparing= " + _preparing;
+		return " Available=" + _available + "\n Total=" + _total + "\n" + " Busy=" + _busy + "\n Pending=" + _pending + "\n Preparing= "
+			+ _preparing;
 	}
 
 	public MessageElement toMessageElement(QName elementName)
@@ -47,8 +47,7 @@ public class CloudStat
 		MessageElement pending = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "pending"), _pending);
 		MessageElement preparing = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "preparing"), _preparing);
 		MessageElement type = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "type"), _type);
-		MessageElement description =
-			new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "description"), _description);
+		MessageElement description = new MessageElement(new QName(CloudConstants.GENII_CLOUDBES_NS, "description"), _description);
 
 		try {
 			ret.addChild(available);

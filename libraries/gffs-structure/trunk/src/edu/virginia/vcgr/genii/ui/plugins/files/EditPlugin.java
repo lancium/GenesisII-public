@@ -121,8 +121,7 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 					if (val != null)
 						isReadOnly = (!val);
 				} else {
-					StreamableByteIORP rp =
-						(StreamableByteIORP) ResourcePropertyManager.createRPInterface(epr, StreamableByteIORP.class);
+					StreamableByteIORP rp = (StreamableByteIORP) ResourcePropertyManager.createRPInterface(epr, StreamableByteIORP.class);
 					Boolean val = rp.getWriteable();
 					if (val != null)
 						isReadOnly = (!val);
@@ -165,13 +164,11 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 		private int WaitForEditor(String filestr)
 		{
 			/*
-			 * WaitForEditor(String editFile) that searches the process list on windows or unix
-			 * looking for a process opened with an argument that includes the specified file name
-			 * that will be of the form grid<somefilename>integers
+			 * WaitForEditor(String editFile) that searches the process list on windows or unix looking for a process opened with an argument
+			 * that includes the specified file name that will be of the form grid<somefilename>integers
 			 * 
-			 * We start by getting this list of processes using some form of ps, note this varies by
-			 * OS. We then search for the existence of the file string in the output line. If the
-			 * processes is still running, we sleep for a second and do it all over again. Written
+			 * We start by getting this list of processes using some form of ps, note this varies by OS. We then search for the existence of
+			 * the file string in the output line. If the processes is still running, we sleep for a second and do it all over again. Written
 			 * by ASG while on sabbatical in Munich. September 10, 2013
 			 */
 			int found = 0, everFound = -1;
@@ -237,9 +234,8 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 							if (!_edit) {
 								if (_ownerComponent.getTopLevelAncestor() instanceof ClientApplication) {
 									ClientApplication top = (ClientApplication) _ownerComponent.getTopLevelAncestor();
-									top.addStatusLine(
-										"Please note:  you are viewing " + _source.getName()
-											+ ", updates WILL NOT be propagated.",
+									top.addStatusLine("Please note:  you are viewing " + _source.getName()
+										+ ", updates WILL NOT be propagated.",
 										"Double clicking on a file invokes the viewer, not the editor. Changes made with the viewer WILL NOT be propagated back to the GFFS.");
 								}
 							} else {
@@ -375,9 +371,8 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 
 	static public void performEdit(JComponent ownerComponent, UIContext context, RNSPath path, boolean edit)
 	/*
-	 * ASG 9-28-2013 Added boolean edit, to indicate whether it is an edit op or a view op Also
-	 * removed the external application type stuff, we're just going to use the java desktop to find
-	 * it for us.
+	 * ASG 9-28-2013 Added boolean edit, to indicate whether it is an edit op or a view op Also removed the external application type stuff,
+	 * we're just going to use the java desktop to find it for us.
 	 */
 	{
 		Closeable assumedContextToken = null;
@@ -387,17 +382,13 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 			ProgressMonitorFactory factory = context.progressMonitorFactory();
 
 			/*
-			 * String mimeType =
-			 * MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(path.getName());
-			 * ExternalApplication externalApplication =
-			 * ApplicationDatabase.database().getExternalApplication(mimeType); if
-			 * (externalApplication == null) { JOptionPane.showMessageDialog(ownerComponent,
-			 * "No editor registered for this file type!", "No Editor Available",
+			 * String mimeType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(path.getName()); ExternalApplication
+			 * externalApplication = ApplicationDatabase.database().getExternalApplication(mimeType); if (externalApplication == null) {
+			 * JOptionPane.showMessageDialog(ownerComponent, "No editor registered for this file type!", "No Editor Available",
 			 * JOptionPane.ERROR_MESSAGE); return; }
 			 */
-			factory.createMonitor(ownerComponent, "Edit", "Downloading grid file for edit.", 1L,
-				new DownloadTask(context, path), new DownloadTaskCompletionListener(ownerComponent, context, path, edit))
-				.start();
+			factory.createMonitor(ownerComponent, "Edit", "Downloading grid file for edit.", 1L, new DownloadTask(context, path),
+				new DownloadTaskCompletionListener(ownerComponent, context, path, edit)).start();
 
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context, ownerComponent, cause);

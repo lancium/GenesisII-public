@@ -37,8 +37,8 @@ import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
 /**
- * This class is a conduit for accessing all information from the database. It SHOULD be the only
- * class that actually creates and executes SQL statements.
+ * This class is a conduit for accessing all information from the database. It SHOULD be the only class that actually creates and executes SQL
+ * statements.
  * 
  * @author mmm2a
  */
@@ -76,9 +76,7 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT resourceid, resourcename, totalslots "
-					+ "FROM q2resources WHERE queueid = ?");
+			stmt = connection.prepareStatement("SELECT resourceid, resourcename, totalslots " + "FROM q2resources WHERE queueid = ?");
 			stmt.setString(1, _queueID);
 			rs = stmt.executeQuery();
 
@@ -115,8 +113,8 @@ public class QueueDatabase
 
 		try {
 			stmt =
-				connection.prepareStatement("INSERT INTO q2resources "
-					+ "(queueid, resourcename, resourceendpoint, totalslots) " + "VALUES (?, ?, ?, 1)");
+				connection.prepareStatement("INSERT INTO q2resources " + "(queueid, resourcename, resourceendpoint, totalslots) "
+					+ "VALUES (?, ?, ?, 1)");
 			stmt.setString(1, _queueID);
 			stmt.setString(2, name);
 			stmt.setBlob(3, EPRUtils.toBlob(epr, "q2resources", "resourceendpoint"));
@@ -206,8 +204,7 @@ public class QueueDatabase
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	public void fillInBESEPRs(Connection connection, HashMap<Long, LegacyEntryType> entries) throws SQLException,
-		ResourceException
+	public void fillInBESEPRs(Connection connection, HashMap<Long, LegacyEntryType> entries) throws SQLException, ResourceException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -310,10 +307,10 @@ public class QueueDatabase
 				}
 
 				JobData data =
-					new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs
-						.getString(4)), new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
-						HistoryContextFactory.createContext(HistoryEventCategory.Default, DBSerializer.fromBlob(rs.getBlob(9)),
-							historyKey(jobTicket)), new LoggingContext(rs.getString(11)));
+					new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
+						new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7), HistoryContextFactory.createContext(
+							HistoryEventCategory.Default, DBSerializer.fromBlob(rs.getBlob(9)), historyKey(jobTicket)), new LoggingContext(
+							rs.getString(11)));
 
 				Blob blob = rs.getBlob(8);
 				if (blob != null) {
@@ -350,18 +347,16 @@ public class QueueDatabase
 	 * @param besID
 	 *            The bes db key related to this job.
 	 * @param besEndpoint
-	 *            The endpoint of the bes associated with this job. The reason that we keep this
-	 *            endpoint here (even though we probably also have it in the resources table) is
-	 *            that it is technically possible for a bes resource to get removed from the queue
-	 *            while jobs are still running on it. If that is true, we will need this epr so we
-	 *            can later call back into the bes to get the status and kill/complete that job.
+	 *            The endpoint of the bes associated with this job. The reason that we keep this endpoint here (even though we probably also
+	 *            have it in the resources table) is that it is technically possible for a bes resource to get removed from the queue while
+	 *            jobs are still running on it. If that is true, we will need this epr so we can later call back into the bes to get the
+	 *            status and kill/complete that job.
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
 	public void modifyJobState(Connection connection, long jobID, short attempts, QueueStates newState, Date finishTime,
-		EndpointReferenceType jobEndpoint, Long besID, EndpointReferenceType besEndpoint) throws SQLException,
-		ResourceException
+		EndpointReferenceType jobEndpoint, Long besID, EndpointReferenceType besEndpoint) throws SQLException, ResourceException
 	{
 		PreparedStatement stmt = null;
 
@@ -401,8 +396,7 @@ public class QueueDatabase
 
 			if (newToken != null) {
 				stmt =
-					connection.prepareStatement("INSERT INTO " + "q2jobhistorytokens (jobid, queueid, historytoken) "
-						+ "VALUES (?, ?, ?)");
+					connection.prepareStatement("INSERT INTO " + "q2jobhistorytokens (jobid, queueid, historytoken) " + "VALUES (?, ?, ?)");
 				stmt.setLong(1, jobID);
 				stmt.setString(2, _queueID);
 				stmt.setBlob(3, DBSerializer.toBlob(newToken, "q2jobhistorytokens", "historytoken"));
@@ -459,9 +453,8 @@ public class QueueDatabase
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	public long submitJob(Connection connection, String ticket, short priority, JobDefinition_Type jsdl,
-		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime, String rpcid)
-		throws SQLException, IOException
+	public long submitJob(Connection connection, String ticket, short priority, JobDefinition_Type jsdl, ICallingContext callingContext,
+		Collection<Identity> identities, QueueStates state, Date submitTime, String rpcid) throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -469,8 +462,7 @@ public class QueueDatabase
 		try {
 			stmt =
 				connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
-					+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
+					+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));
@@ -523,8 +515,8 @@ public class QueueDatabase
 	 * @throws ResourceException
 	 */
 	@SuppressWarnings("unchecked")
-	public HashMap<Long, PartialJobInfo> getPartialJobInfos(Connection connection, Collection<Long> jobIDs)
-		throws SQLException, ResourceException
+	public HashMap<Long, PartialJobInfo> getPartialJobInfos(Connection connection, Collection<Long> jobIDs) throws SQLException,
+		ResourceException
 	{
 		HashMap<Long, PartialJobInfo> ret = new HashMap<Long, PartialJobInfo>();
 		PreparedStatement stmt = null;
@@ -543,10 +535,8 @@ public class QueueDatabase
 					break;
 				}
 
-				ret.put(
-					jobID,
-					new PartialJobInfo((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1)), rs.getTimestamp(2), rs
-						.getTimestamp(3)));
+				ret.put(jobID,
+					new PartialJobInfo((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1)), rs.getTimestamp(2), rs.getTimestamp(3)));
 
 				rs.close();
 				rs = null;
@@ -565,8 +555,7 @@ public class QueueDatabase
 	}
 
 	/**
-	 * Get all information from the database necessary to outcall to a job to get it's current job
-	 * status.
+	 * Get all information from the database necessary to outcall to a job to get it's current job status.
 	 * 
 	 * @param connection
 	 *            The database connection.
@@ -578,16 +567,13 @@ public class QueueDatabase
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	public JobStatusInformation getJobStatusInformation(Connection connection, long jobID) throws SQLException,
-		ResourceException
+	public JobStatusInformation getJobStatusInformation(Connection connection, long jobID) throws SQLException, ResourceException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT callingcontext, jobendpoint, resourceendpoint "
-					+ "FROM q2jobs WHERE jobid = ?");
+			stmt = connection.prepareStatement("SELECT callingcontext, jobendpoint, resourceendpoint " + "FROM q2jobs WHERE jobid = ?");
 			stmt.setLong(1, jobID);
 			rs = stmt.executeQuery();
 
@@ -605,8 +591,7 @@ public class QueueDatabase
 	}
 
 	/**
-	 * Mark a job as starting in the database. This includes setting it's state and noting the bes
-	 * container that it's starting on.
+	 * Mark a job as starting in the database. This includes setting it's state and noting the bes container that it's starting on.
 	 * 
 	 * @param connection
 	 *            The database connection.
@@ -702,8 +687,7 @@ public class QueueDatabase
 	}
 
 	/**
-	 * Get the large memory information from the database necessary to start a new job on a bes
-	 * container.
+	 * Get the large memory information from the database necessary to start a new job on a bes container.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -741,8 +725,7 @@ public class QueueDatabase
 	}
 
 	/**
-	 * Mark in the database information about a job that is now running. This includes things like
-	 * the state and the job's activity EPR.
+	 * Mark in the database information about a job that is now running. This includes things like the state and the job's activity EPR.
 	 * 
 	 * @param connection
 	 *            The database connection to use.
@@ -754,8 +737,7 @@ public class QueueDatabase
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	public void markRunning(Connection connection, long jobID, EndpointReferenceType jobEPR) throws SQLException,
-		ResourceException
+	public void markRunning(Connection connection, long jobID, EndpointReferenceType jobEPR) throws SQLException, ResourceException
 	{
 		PreparedStatement stmt = null;
 
@@ -837,8 +819,7 @@ public class QueueDatabase
 	}
 
 	/**
-	 * Get all of the information from the database necessary to call out to a BES container and
-	 * kill a job (terminate it).
+	 * Get all of the information from the database necessary to call out to a BES container and kill a job (terminate it).
 	 * 
 	 * @param connection
 	 *            The database connection.
@@ -856,9 +837,7 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT callingcontext, jobendpoint, resourceendpoint "
-					+ "FROM q2jobs WHERE jobid = ?");
+			stmt = connection.prepareStatement("SELECT callingcontext, jobendpoint, resourceendpoint " + "FROM q2jobs WHERE jobid = ?");
 			stmt.setLong(1, jobID);
 
 			rs = stmt.executeQuery();
@@ -873,8 +852,7 @@ public class QueueDatabase
 					fillInBESEPRs(connection, entryMap);
 					bes = entryMap.get(besID).getEntry_reference();
 				}
-				return new KillInformation((ICallingContext) DBSerializer.fromBlob(rs.getBlob(1)), EPRUtils.fromBlob(rs
-					.getBlob(2)), bes);
+				return new KillInformation((ICallingContext) DBSerializer.fromBlob(rs.getBlob(1)), EPRUtils.fromBlob(rs.getBlob(2)), bes);
 			} catch (IOException ioe) {
 				throw new ResourceException("Couldn't deserialize blob from database.", ioe);
 			}
@@ -908,8 +886,7 @@ public class QueueDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("INSERT INTO q2errors (queueid, jobid, attempt, errors) " + "VALUES (?, ?, ?, ?)");
+			stmt = connection.prepareStatement("INSERT INTO q2errors (queueid, jobid, attempt, errors) " + "VALUES (?, ?, ?, ?)");
 			stmt.setString(1, _queueID);
 			stmt.setLong(2, jobid);
 			stmt.setShort(3, attempt);
@@ -1003,16 +980,12 @@ public class QueueDatabase
 			stmt.close();
 			stmt = null;
 			if (value == null) {
-				stmt =
-					connection.prepareStatement("INSERT INTO properties " + "(resourceid, propname, propvalue) "
-						+ "VALUES (?, ?, ?)");
+				stmt = connection.prepareStatement("INSERT INTO properties " + "(resourceid, propname, propvalue) " + "VALUES (?, ?, ?)");
 				stmt.setString(1, _queueID);
 				stmt.setString(2, IQueueResource.TOTAL_COUNT_PROPERTY_NAME);
 				stmt.setBlob(3, DBSerializer.toBlob(new Long(1), "properties", "propvalue"));
 			} else {
-				stmt =
-					connection.prepareStatement("UPDATE properties SET propvalue = ? "
-						+ "WHERE resourceid = ? AND propname = ?");
+				stmt = connection.prepareStatement("UPDATE properties SET propvalue = ? " + "WHERE resourceid = ? AND propname = ?");
 				stmt.setBlob(1, DBSerializer.toBlob(new Long(value.longValue() + 1), "properties", "propvalue"));
 				stmt.setString(2, _queueID);
 				stmt.setString(3, IQueueResource.TOTAL_COUNT_PROPERTY_NAME);

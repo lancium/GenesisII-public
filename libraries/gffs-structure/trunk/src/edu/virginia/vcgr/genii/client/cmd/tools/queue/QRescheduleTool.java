@@ -28,8 +28,8 @@ public class QRescheduleTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		QueueManipulator manipulator = new QueueManipulator(getArgument(0));
 		String[] tickets = new String[numArguments() - 1];
@@ -37,8 +37,7 @@ public class QRescheduleTool extends BaseGridTool
 		System.arraycopy(getArguments().toArray(), 1, tickets, 0, numArguments() - 1);
 
 		/*
-		 * Andrew actually doesn't want us to do this in the tool, he wants to do it outside the
-		 * tool.
+		 * Andrew actually doesn't want us to do this in the tool, he wants to do it outside the tool.
 		 */
 		// manipulator.configure(getArgument(1), 0);
 

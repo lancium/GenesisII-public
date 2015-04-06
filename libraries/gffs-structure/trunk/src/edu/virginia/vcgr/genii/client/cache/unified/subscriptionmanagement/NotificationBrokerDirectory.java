@@ -29,8 +29,7 @@ import edu.virginia.vcgr.genii.notification.factory.EnhancedNotificationBrokerFa
 import edu.virginia.vcgr.genii.notification.factory.NotificationBrokerCreationFailedFaultType;
 
 /*
- * This class keeps track of all working notification brokers registered on different GenesisII
- * containers the client is accessing.
+ * This class keeps track of all working notification brokers registered on different GenesisII containers the client is accessing.
  */
 public class NotificationBrokerDirectory
 {
@@ -96,15 +95,13 @@ public class NotificationBrokerDirectory
 		int containerIdBeginAt = indexOfContainerIdParameter + EPRUtils.GENII_CONTAINER_ID_PARAMETER.length() + 1;
 		int containerIDEndAt = factoryUrl.lastIndexOf("&", containerIdBeginAt);
 		String containerId =
-			(containerIDEndAt == -1) ? factoryUrl.substring(containerIdBeginAt) : factoryUrl.substring(containerIdBeginAt,
-				containerIDEndAt);
+			(containerIDEndAt == -1) ? factoryUrl.substring(containerIdBeginAt) : factoryUrl.substring(containerIdBeginAt, containerIDEndAt);
 
 		factoryUrls.add(factoryUrl);
 		containerIdToBrokerFactoryMapping.put(containerId, factoryUrl);
 	}
 
-	public static NotificationBrokerWrapper getNotificationBrokerForEndpoint(EndpointReferenceType epr,
-		EndpointReferenceType forwardingPort)
+	public static NotificationBrokerWrapper getNotificationBrokerForEndpoint(EndpointReferenceType epr, EndpointReferenceType forwardingPort)
 	{
 
 		String containerId = CacheUtils.getContainerId(epr);
@@ -204,9 +201,8 @@ public class NotificationBrokerDirectory
 		containerIdToBrokerMapping.clear();
 	}
 
-	private static EnhancedNotificationBrokerPortType createNewBroker(EndpointReferenceType forwardingPort,
-		EndpointReferenceType factoryEPR) throws ResourceException, GenesisIISecurityException, RemoteException,
-		NotificationBrokerCreationFailedFaultType
+	private static EnhancedNotificationBrokerPortType createNewBroker(EndpointReferenceType forwardingPort, EndpointReferenceType factoryEPR)
+		throws ResourceException, GenesisIISecurityException, RemoteException, NotificationBrokerCreationFailedFaultType
 	{
 
 		EnhancedNotificationBrokerFactoryPortType factoryPort =
@@ -215,8 +211,7 @@ public class NotificationBrokerDirectory
 		request.setNotificationForwardingPort(forwardingPort);
 		request.setNotificationBrokerLifetime(LIFETIME_OF_BROKER);
 		EndpointReferenceType brokerEndpoint = factoryPort.createNotificationBrokerWithForwardingPort(request);
-		EnhancedNotificationBrokerPortType brokerPortType =
-			ClientUtils.createProxy(EnhancedNotificationBrokerPortType.class, brokerEndpoint);
+		EnhancedNotificationBrokerPortType brokerPortType = ClientUtils.createProxy(EnhancedNotificationBrokerPortType.class, brokerEndpoint);
 		return brokerPortType;
 	}
 
@@ -230,8 +225,7 @@ public class NotificationBrokerDirectory
 		} else {
 			try {
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, epr);
-				GetResourcePropertyResponse resp =
-					common.getResourceProperty(GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS);
+				GetResourcePropertyResponse resp = common.getResourceProperty(GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS);
 				if (resp != null && resp.get_any() != null) {
 					factoryUrl = new MessageElement(resp.get_any()[0]).getValue();
 					factoryUrls.add(factoryUrl);

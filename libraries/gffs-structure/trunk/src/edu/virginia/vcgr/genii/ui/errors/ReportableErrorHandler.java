@@ -62,8 +62,8 @@ public class ReportableErrorHandler extends JDialog
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 		_details = createDetails(cause);
-		add(new JLabel(_message), new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel(_message), new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 		add(_details, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
 	}
@@ -82,8 +82,8 @@ public class ReportableErrorHandler extends JDialog
 		if ((uiContext == null) || (message == null) || (cause == null))
 			return;
 		ReportableErrorHandler eh =
-			new ReportableErrorHandler(responsibleComponent == null ? null
-				: SwingUtilities.getWindowAncestor(responsibleComponent), cause, message);
+			new ReportableErrorHandler(responsibleComponent == null ? null : SwingUtilities.getWindowAncestor(responsibleComponent), cause,
+				message);
 		eh.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		eh.setResizable(true);
 		eh.pack();

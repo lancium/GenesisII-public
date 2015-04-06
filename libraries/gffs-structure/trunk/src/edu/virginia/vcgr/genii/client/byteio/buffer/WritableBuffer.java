@@ -15,9 +15,8 @@ import edu.virginia.vcgr.genii.client.lease.LeaseeAgreement;
 public class WritableBuffer implements Closeable
 {
 	/**
-	 * Any IO exceptions that may occur during a flush. This is stored so that if the exception
-	 * occurs during an asynchronous operation, it can be thrown later when a synchronous one
-	 * occurs.
+	 * Any IO exceptions that may occur during a flush. This is stored so that if the exception occurs during an asynchronous operation, it
+	 * can be thrown later when a synchronous one occurs.
 	 */
 	private IOException _ioe = null;
 
@@ -43,8 +42,8 @@ public class WritableBuffer implements Closeable
 	private WriteResolver _resolver;
 
 	/**
-	 * Ensure that the given file offset can be written to the buffer. If the current state of the
-	 * buffer does not allow this, then flush what we currently have and reset.
+	 * Ensure that the given file offset can be written to the buffer. If the current state of the buffer does not allow this, then flush what
+	 * we currently have and reset.
 	 * 
 	 * @param fileOffset
 	 *            The offset in the target file at which we would like to begin writing.

@@ -73,11 +73,9 @@ public class FSViewFactories
 
 		try {
 			/*
-			 * session = factory.openSession(fsRoot, new AnonymousAuthenticationInformation(),
-			 * true);
+			 * session = factory.openSession(fsRoot, new AnonymousAuthenticationInformation(), true);
 			 */
-			session =
-				factory.openSession(fsRoot, new UsernamePasswordAuthenticationInformation("griduser", "!!griduser"), true);
+			session = factory.openSession(fsRoot, new UsernamePasswordAuthenticationInformation("griduser", "!!griduser"), true);
 
 			FSViewEntry root = session.root();
 

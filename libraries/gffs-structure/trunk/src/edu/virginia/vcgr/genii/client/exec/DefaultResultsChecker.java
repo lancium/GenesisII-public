@@ -13,7 +13,7 @@ public class DefaultResultsChecker implements ExecutionResultsChecker
 	public void checkResults(int exitCode) throws ExecutionException
 	{
 		if (exitCode != _expectedResult)
-			throw new ExecutionException(String.format("Program exited with incorrect exit code.  "
-				+ "Expected %d, but got %d.", _expectedResult, exitCode));
+			throw new ExecutionException(String.format("Program exited with incorrect exit code.  " + "Expected %d, but got %d.",
+				_expectedResult, exitCode));
 	}
 }

@@ -16,8 +16,7 @@ public class TrashTransferable implements Transferable
 	static {
 		try {
 			TRASH_TRANSFER_FLAVOR =
-				new DataFlavor(String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType,
-					TrashCanEntryWrapper[].class.getName()));
+				new DataFlavor(String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType, TrashCanEntryWrapper[].class.getName()));
 		} catch (ClassNotFoundException cnfe) {
 			throw new ConfigurationException("Unable to create trash can data flavor.", cnfe);
 		}

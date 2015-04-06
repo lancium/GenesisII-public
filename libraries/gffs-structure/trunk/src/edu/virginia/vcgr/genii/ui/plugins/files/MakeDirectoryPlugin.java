@@ -41,9 +41,7 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 				String answer = null;
 				while (answer == null) {
 					// Keep trying until they get a good path or they give up
-					answer =
-						JOptionPane.showInputDialog(context.ownerComponent(), "New Directory Path <pwd=" + path.toString()
-							+ ">?");
+					answer = JOptionPane.showInputDialog(context.ownerComponent(), "New Directory Path <pwd=" + path.toString() + ">?");
 					if (answer == null)
 						return;
 					// Now check path
@@ -58,8 +56,8 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 					}
 					if (!path.getParent().exists()) {
 						String msg = "Parent directory " + path.getParent().toString() + " does not exist";
-						JOptionPane.showMessageDialog(null, answer, "Parent directory " + path.getParent().toString()
-							+ " does not exist!", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, answer, "Parent directory " + path.getParent().toString() + " does not exist!",
+							JOptionPane.ERROR_MESSAGE);
 						LoggingTarget.logInfo(msg, null);
 						answer = null;
 					}
@@ -83,8 +81,7 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 					while (!done) {
 						// Keep trying till they get a good container path or they give up
 						containerPath =
-							JOptionPane.showInputDialog(context.ownerComponent(), "Input storage container path: ",
-								containerPath);
+							JOptionPane.showInputDialog(context.ownerComponent(), "Input storage container path: ", containerPath);
 						if (containerPath == null)
 							return;
 						done = true; // assume this works until proven otherwise
@@ -110,8 +107,7 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 						linkPath.link(newEPR);
 
 					} else {
-						JOptionPane.showMessageDialog(null, containerPath, "Storage container is not a container",
-							JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, containerPath, "Storage container is not a container", JOptionPane.ERROR_MESSAGE);
 						containerPath = null;
 					}
 

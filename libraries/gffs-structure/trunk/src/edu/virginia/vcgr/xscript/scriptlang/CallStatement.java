@@ -33,8 +33,7 @@ public class CallStatement implements ParseStatement
 	@Override
 	public Object evaluate(XScriptContext context) throws ScriptException, EarlyExitException, ReturnFromFunctionException
 	{
-		Object functionObj =
-			context.getAttribute(MacroReplacer.replaceMacros(context, _functionName), ScriptContext.GLOBAL_SCOPE);
+		Object functionObj = context.getAttribute(MacroReplacer.replaceMacros(context, _functionName), ScriptContext.GLOBAL_SCOPE);
 
 		if ((functionObj == null) || !(functionObj instanceof ParseStatement))
 			throw new ScriptException(String.format("Unable to find function %s.", _functionName));

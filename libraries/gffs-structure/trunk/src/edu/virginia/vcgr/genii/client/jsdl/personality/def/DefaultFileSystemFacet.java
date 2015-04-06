@@ -24,8 +24,7 @@ public class DefaultFileSystemFacet extends DefaultPersonalityFacet implements F
 	}
 
 	@Override
-	public void consumeFileSystemType(Object currentUnderstanding, FileSystemTypeEnumeration fileSystemType)
-		throws JSDLException
+	public void consumeFileSystemType(Object currentUnderstanding, FileSystemTypeEnumeration fileSystemType) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "FileSystemType"));
 	}

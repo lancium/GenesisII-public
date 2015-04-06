@@ -12,8 +12,7 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 public class DirListRequest
 {
 
-	public static void send(Socket clientSocket, byte pathtype, byte cmd, String path, byte[] nonce)
-		throws UnknownHostException, IOException
+	public static void send(Socket clientSocket, byte pathtype, byte cmd, String path, byte[] nonce) throws UnknownHostException, IOException
 	{
 		DefaultRequest.send(clientSocket, pathtype, cmd, path, nonce);
 	}

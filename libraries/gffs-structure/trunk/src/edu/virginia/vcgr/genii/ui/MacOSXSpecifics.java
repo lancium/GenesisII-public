@@ -22,16 +22,14 @@ public class MacOSXSpecifics
 		return getterMethod.invoke(null);
 	}
 
-	static private Object getApplicationAdapterObject() throws ClassNotFoundException, InstantiationException,
-		IllegalAccessException
+	static private Object getApplicationAdapterObject() throws ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
 		Class<?> appClass = Class.forName("com.apple.eawt.ApplicationAdapter");
 		return appClass.newInstance();
 	}
 
-	static private void callVoidMethod(Object instance, String methodName, Class<?>[] types, Object[] parameters)
-		throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException,
-		InvocationTargetException
+	static private void callVoidMethod(Object instance, String methodName, Class<?>[] types, Object[] parameters) throws SecurityException,
+		NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException
 	{
 		Class<?> cl = instance.getClass();
 		Method m = cl.getDeclaredMethod(methodName, types);

@@ -9,8 +9,7 @@ import java.security.cert.X509Certificate;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 
 /**
- * this class not only tracks a user identity, but also the private key of the identity, where it is
- * possible to know that.
+ * this class not only tracks a user identity, but also the private key of the identity, where it is possible to know that.
  * 
  * @author fred
  * 

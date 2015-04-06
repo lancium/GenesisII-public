@@ -79,17 +79,16 @@ public class CreateDirDialog extends JDialog
 		container = getContentPane();
 		container.setLayout(new GridBagLayout());
 
-		container.add(_keepWithParent = new JRadioButton("Recommended: Store with parent directory"), new GridBagConstraints(0,
-			0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-		container.add(_selectNewContainer = new JRadioButton("Choose a new container - for control over placement"),
-			new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
-				5), 5, 5));
+		container.add(_keepWithParent = new JRadioButton("Recommended: Store with parent directory"), new GridBagConstraints(0, 0, 2, 1, 1.0,
+			0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+		container.add(_selectNewContainer = new JRadioButton("Choose a new container - for control over placement"), new GridBagConstraints(
+			0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		_keepWithParent.setSelected(true);
 		_selectNewContainer.setSelected(false);
 		// _selectNewContainer.isSelected()
-		container.add(_paths = new ResourcePathsWidget(false, true, _container_path, _target_path), new GridBagConstraints(0,
-			2, 2, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_paths = new ResourcePathsWidget(false, true, _container_path, _target_path), new GridBagConstraints(0, 2, 2, 1, 1.0,
+			1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		_paths.disableContainerPath();
 
 		_keepWithParent.addActionListener(new ActionListener()
@@ -118,13 +117,12 @@ public class CreateDirDialog extends JDialog
 		CreateDirAction action = new CreateDirAction();
 		_paths.addInformationListener(action);
 		/*
-		 * container.add(new JButton(new QuitButton()), new GridBagConstraints(0, 3, 1, 1, 0.0, 1.0,
-		 * GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		 * container.add(new JButton(new QuitButton()), new GridBagConstraints(0, 3, 1, 1, 0.0, 1.0, GridBagConstraints.EAST,
+		 * GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		 * 
 		 * container.add(new JButton(new GuiHelpAction(null,
-		 * HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.CREATE_DIRECTORY_HELP))), new
-		 * GridBagConstraints(1, 3, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-		 * GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		 * HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.CREATE_DIRECTORY_HELP))), new GridBagConstraints(1, 3, 1, 1, 1.0, 0.0,
+		 * GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		 */
 
 		container.add(createButtonPanel(action), new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER,
@@ -135,15 +133,12 @@ public class CreateDirDialog extends JDialog
 	{
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 		panel.add(new JButton(new QuitButton()), new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(
-			new JButton(
-				new GuiHelpAction(null, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.CREATE_DIRECTORY_HELP))),
-			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5,
-				5), 5, 5));
+		panel.add(new JButton(new GuiHelpAction(null, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.CREATE_DIRECTORY_HELP))),
+			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}
@@ -212,8 +207,7 @@ public class CreateDirDialog extends JDialog
 						linkPath = path;
 					} catch (RNSPathAlreadyExistsException r) {
 						String msg = "Indicated path " + rnsPath + " already exists ";
-						JOptionPane
-							.showMessageDialog(null, rnsPath, "Indicated path already exists", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, rnsPath, "Indicated path already exists", JOptionPane.ERROR_MESSAGE);
 						rnsPath = null;
 						LoggingTarget.logInfo(msg, r);
 						return;
@@ -232,8 +226,8 @@ public class CreateDirDialog extends JDialog
 				}
 				if (!path.getParent().exists()) {
 					String msg = "Parent directory " + path.getParent().toString() + " does not exist";
-					JOptionPane.showMessageDialog(null, rnsPath, "Parent directory " + path.getParent().toString()
-						+ " does not exist!", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, rnsPath, "Parent directory " + path.getParent().toString() + " does not exist!",
+						JOptionPane.ERROR_MESSAGE);
 					LoggingTarget.logInfo(msg, null);
 					rnsPath = null;
 					return;
@@ -244,8 +238,7 @@ public class CreateDirDialog extends JDialog
 						path = path.lookup(containerPath, RNSPathQueryFlags.MUST_EXIST);
 						path = path.lookup(containerPath + "/Services/EnhancedRNSPortType", RNSPathQueryFlags.MUST_EXIST);
 					} catch (RNSPathDoesNotExistException r) {
-						String msg =
-							"Container " + path.getParent().toString() + " does not exist or you do not have permission";
+						String msg = "Container " + path.getParent().toString() + " does not exist or you do not have permission";
 						JOptionPane.showMessageDialog(null, rnsPath, "Container" + path.getParent().toString()
 							+ " does not exist or you have no permission!", JOptionPane.ERROR_MESSAGE);
 						LoggingTarget.logInfo(msg, null);
@@ -261,8 +254,7 @@ public class CreateDirDialog extends JDialog
 						linkPath.link(newEPR);
 
 					} else {
-						JOptionPane.showMessageDialog(null, containerPath, "Storage container is not a container",
-							JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, containerPath, "Storage container is not a container", JOptionPane.ERROR_MESSAGE);
 						LoggingTarget.logInfo("The path " + containerPath + " is not a storage container!", null);
 						containerPath = null;
 					}

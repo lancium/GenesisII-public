@@ -11,8 +11,7 @@ public class NotificationBrokerDBResourceProvider extends BasicDBResourceProvide
 {
 
 	@Override
-	protected IResourceFactory instantiateResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException,
-		ResourceException
+	protected IResourceFactory instantiateResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException, ResourceException
 	{
 		return new NotificationBrokerDBResourceFactory(pool);
 	}

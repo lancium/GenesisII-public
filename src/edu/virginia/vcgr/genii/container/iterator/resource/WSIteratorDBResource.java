@@ -87,16 +87,15 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 			try {
 
 				stmt =
-					getConnection().prepareStatement(
-						"INSERT INTO iterators(" + "iteratorid, elementindex, contents) " + "VALUES (?, ?, ?)");
+					getConnection().prepareStatement("INSERT INTO iterators(" + "iteratorid, elementindex, contents) " + "VALUES (?, ?, ?)");
 
 				if (rest != null) {
 					while (rest.hasNext()) {
 						MessageElement next = rest.next();
 						stmt.setString(1, getKey());
 						stmt.setLong(2, (long) lcv);
-						stmt.setBlob(3, DBSerializer.toBlob(ObjectSerializer.anyToBytes(Elementals.unitaryArray(next)),
-							"iterators", "contents"));
+						stmt.setBlob(3,
+							DBSerializer.toBlob(ObjectSerializer.anyToBytes(Elementals.unitaryArray(next)), "iterators", "contents"));
 						stmt.addBatch();
 						lcv++;
 					}
@@ -152,8 +151,7 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 				stmt =
 					getConnection().prepareStatement(
-						"SELECT elementindex, contents FROM iterators WHERE "
-							+ "iteratorid = ? AND elementindex >= ? AND elementindex < ?");
+						"SELECT elementindex, contents FROM iterators WHERE " + "iteratorid = ? AND elementindex >= ? AND elementindex < ?");
 
 				stmt.setString(1, getKey());
 				stmt.setLong(2, firstElement);
@@ -209,8 +207,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 			try {
 				clazz = Class.forName(invokee);
 				meth =
-					clazz.getMethod("getIndexedContent", new Class[] { Connection.class, InMemoryIteratorEntry.class,
-						Object[].class, boolean.class });
+					clazz.getMethod("getIndexedContent", new Class[] { Connection.class, InMemoryIteratorEntry.class, Object[].class,
+						boolean.class });
 			} catch (ClassNotFoundException e) {
 				throw new ResourceException("Unable to retrieve entries!", e);
 			} catch (NoSuchMethodException e) {

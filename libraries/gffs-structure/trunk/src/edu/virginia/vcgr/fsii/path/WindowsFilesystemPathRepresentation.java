@@ -12,8 +12,7 @@ public class WindowsFilesystemPathRepresentation extends AbstractFilesystemPathR
 	private Character _driveLetter = null;
 
 	/**
-	 * Initializes the WindowsFilesystemPathRepresentation with a drive letter (used only in
-	 * toString transformations).
+	 * Initializes the WindowsFilesystemPathRepresentation with a drive letter (used only in toString transformations).
 	 * 
 	 * @param driveLetter
 	 *            The drive letter to use for toString transformations.
@@ -24,8 +23,7 @@ public class WindowsFilesystemPathRepresentation extends AbstractFilesystemPathR
 	}
 
 	/**
-	 * Initializes the WindowsFilesystemPathRepresentation with a drive letter (used only in
-	 * toString transformations).
+	 * Initializes the WindowsFilesystemPathRepresentation with a drive letter (used only in toString transformations).
 	 * 
 	 * @param driveLetter
 	 *            The drive letter to use for toString transformations.
@@ -36,8 +34,8 @@ public class WindowsFilesystemPathRepresentation extends AbstractFilesystemPathR
 	}
 
 	/**
-	 * Initializes the WindowsFilesystemPathRepresentation without a drive letter. In this case,
-	 * toString transformations will simply be rooted using a backslash.
+	 * Initializes the WindowsFilesystemPathRepresentation without a drive letter. In this case, toString transformations will simply be
+	 * rooted using a backslash.
 	 */
 	public WindowsFilesystemPathRepresentation()
 	{

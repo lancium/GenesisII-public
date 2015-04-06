@@ -93,8 +93,7 @@ class CredentialBundle implements Comparable<CredentialBundle>
 	CredentialBundle(Collection<Identity> identities)
 	{
 		Collection<Identity> owners =
-			SecurityUtilities.filterCredentials(identities, SecurityUtilities.GROUP_TOKEN_PATTERN,
-				SecurityUtilities.CLIENT_IDENTITY_PATTERN);
+			SecurityUtilities.filterCredentials(identities, SecurityUtilities.GROUP_TOKEN_PATTERN, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 		Set<String> ownerSet = new HashSet<String>();
 
 		for (Identity owner : owners)

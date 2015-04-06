@@ -22,8 +22,7 @@ public class TrashCan
 	private Collection<TrashCanStateListener> _listeners = new LinkedList<TrashCanStateListener>();
 
 	private PersistenceDirectory _pDirectory;
-	private Map<PersistenceKey, Pair<String, PersistenceKey>> _entries =
-		new HashMap<PersistenceKey, Pair<String, PersistenceKey>>();
+	private Map<PersistenceKey, Pair<String, PersistenceKey>> _entries = new HashMap<PersistenceKey, Pair<String, PersistenceKey>>();
 
 	protected void fireTrashCanEmptied()
 	{

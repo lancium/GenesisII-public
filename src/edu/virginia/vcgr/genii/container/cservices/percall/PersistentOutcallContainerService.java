@@ -40,8 +40,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 
 		try {
 			connection = getConnectionPool().acquire(false);
-			PersistentOutcallEntry entry =
-				PersistentOutcallDatabase.add(connection, target, callingContext, actor, scheduler, attachment);
+			PersistentOutcallEntry entry = PersistentOutcallDatabase.add(connection, target, callingContext, actor, scheduler, attachment);
 			connection.commit();
 
 			synchronized (_entries) {
@@ -105,8 +104,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 				PersistentOutcallDatabase.remove(connection, entry);
 			} else {
 				if (_logger.isDebugEnabled())
-					_logger.debug("PersistentOutcall: Next attempt at "
-						+ new SimpleDateFormat("HH:mm:ss").format(nextAttempt.getTime()));
+					_logger.debug("PersistentOutcall: Next attempt at " + new SimpleDateFormat("HH:mm:ss").format(nextAttempt.getTime()));
 				entry.nextAttempt(nextAttempt);
 				PersistentOutcallDatabase.update(connection, entry);
 				synchronized (_entries) {
@@ -142,8 +140,8 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 			reAdd(connection, entry);
 			connection.commit();
 		} catch (Throwable cause) {
-			_logger.warn("Persistent outcall service tried to make outcall, but "
-				+ "got an exception -- putting it back in the list.", cause);
+			_logger
+				.warn("Persistent outcall service tried to make outcall, but " + "got an exception -- putting it back in the list.", cause);
 			try {
 				reAdd(connection, entry);
 			} catch (Throwable inner_cause) {
@@ -204,8 +202,8 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		}
 	}
 
-	static public boolean schedulePersistentOutcall(OutcallActor actor, AttemptScheduler scheduler,
-		EndpointReferenceType target, ICallingContext callingContext)
+	static public boolean schedulePersistentOutcall(OutcallActor actor, AttemptScheduler scheduler, EndpointReferenceType target,
+		ICallingContext callingContext)
 	{
 		PersistentOutcallContainerService service = ContainerServices.findService(PersistentOutcallContainerService.class);
 		if (service != null)

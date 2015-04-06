@@ -29,8 +29,7 @@ public class RetrieveCommandHandler extends AbstractCommandHandler
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
+	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out) throws FTPException
 	{
 		RollingCommandHistory history = sessionState.getHistory();
 		FTPAction lastCompletedAction = history.lastCompleted(PASVCommandHandler.class);

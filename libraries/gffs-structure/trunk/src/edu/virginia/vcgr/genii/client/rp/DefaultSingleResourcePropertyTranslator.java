@@ -34,8 +34,7 @@ public class DefaultSingleResourcePropertyTranslator implements SingleResourcePr
 			return null;
 		}
 		if (_logger.isTraceEnabled())
-			_logger.trace("deserializing type " + clazz.getCanonicalName() + " from elem real type "
-				+ element.getClass().getCanonicalName());
+			_logger.trace("deserializing type " + clazz.getCanonicalName() + " from elem real type " + element.getClass().getCanonicalName());
 		try {
 			Object ob = ObjectDeserializer.toObject(element, clazz);
 			if (ob == null) {

@@ -12,8 +12,7 @@ public class DebugInvoker implements IAroundInvoker
 	public Object invoke(InvocationContext invocationContext) throws Exception
 	{
 		String description =
-			"method " + invocationContext.getMethod().getName() + " on class "
-				+ invocationContext.getTarget().getClass().getName() + ".";
+			"method " + invocationContext.getMethod().getName() + " on class " + invocationContext.getTarget().getClass().getName() + ".";
 
 		if (_logger.isTraceEnabled())
 			_logger.trace("Calling " + description + " from a " + (NamingUtils.isWSNamingAwareClient() ? "" : "non-")

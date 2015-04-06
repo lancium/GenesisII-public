@@ -24,8 +24,7 @@ abstract class AbstractFilesystemHandle implements FilesystemHandle
 	public void delete() throws FSException
 	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("AbstractFilesystemHandle::delete(%s)",
-				UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
+			_logger.trace(String.format("AbstractFilesystemHandle::delete(%s)", UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
 
 		_fs.unlink(_path);
 	}
@@ -35,8 +34,7 @@ abstract class AbstractFilesystemHandle implements FilesystemHandle
 	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("AbstractFilesystemHandle::renameTo(%s, %s)",
-				UnixFilesystemPathRepresentation.INSTANCE.toString(_path),
-				UnixFilesystemPathRepresentation.INSTANCE.toString(target)));
+				UnixFilesystemPathRepresentation.INSTANCE.toString(_path), UnixFilesystemPathRepresentation.INSTANCE.toString(target)));
 
 		try {
 			_fs.rename(_path, target);

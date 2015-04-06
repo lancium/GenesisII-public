@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.comm;
 
@@ -55,8 +54,7 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 /**
- * A utility class which allows users to create dynamic, client side proxies for talking to remote
- * service endpoints.
+ * A utility class which allows users to create dynamic, client side proxies for talking to remote service endpoints.
  * 
  * @author mmm2a
  */
@@ -127,9 +125,8 @@ public class ClientUtils
 		X509Certificate[] clientCertChain = null;
 		try {
 			clientCertChain =
-				new X509Certificate[] { CertTool.createMasterCert(
-					"C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert " + (new GUID()).toString(),
-					TimeUnit.MILLISECONDS.convert(timeout, units), keyPair.getPublic(), keyPair.getPrivate()) };
+				new X509Certificate[] { CertTool.createMasterCert("C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert "
+					+ (new GUID()).toString(), TimeUnit.MILLISECONDS.convert(timeout, units), keyPair.getPublic(), keyPair.getPrivate()) };
 		} catch (GeneralSecurityException e) {
 			throw new AuthZSecurityException("failure generating keypair: " + e.getLocalizedMessage(), e);
 
@@ -138,16 +135,15 @@ public class ClientUtils
 	}
 
 	/**
-	 * Note that it is possible for a calling context not to have ANY key and cert material, in
-	 * which case this method does nothing.
+	 * Note that it is possible for a calling context not to have ANY key and cert material, in which case this method does nothing.
 	 * 
 	 * @param callContext
 	 *            The calling context containing the
-	 * @return The client's key and cert material, re-generated if necessary. (Upon refresh, all
-	 *         previous attributes will be renewed if possible, discarded otherwise)
+	 * @return The client's key and cert material, re-generated if necessary. (Upon refresh, all previous attributes will be renewed if
+	 *         possible, discarded otherwise)
 	 */
-	public static KeyAndCertMaterial checkAndRenewCredentials(ICallingContext callContext, Date validUntil,
-		SecurityUpdateResults results) throws AuthZSecurityException
+	public static KeyAndCertMaterial checkAndRenewCredentials(ICallingContext callContext, Date validUntil, SecurityUpdateResults results)
+		throws AuthZSecurityException
 	{
 		if (callContext == null) {
 			// we never had any client identity.
@@ -185,17 +181,16 @@ public class ClientUtils
 
 				_logger.info("Renewing client tool identity until " + validUntil);
 				/*
-				 * old rule: We create an identity for either 24 hours, or until the valid duration
-				 * expires (which ever is longer) + 10 seconds of slop for in transit time outs.
+				 * old rule: We create an identity for either 24 hours, or until the valid duration expires (which ever is longer) + 10
+				 * seconds of slop for in transit time outs.
 				 * 
-				 * new rule: we create an identity for the duration requested or our current default
-				 * time-out, based on whichever is longer, plus 10 seconds of slop for in transit
-				 * time outs.
+				 * new rule: we create an identity for the duration requested or our current default time-out, based on whichever is longer,
+				 * plus 10 seconds of slop for in transit time outs.
 				 */
 				retval =
-					generateKeyAndCertMaterial(Math.max(
-						edu.virginia.vcgr.genii.security.SecurityConstants.defaultCredentialExpirationMillis,
-						validUntil.getTime() - System.currentTimeMillis() + 10000), TimeUnit.MILLISECONDS);
+					generateKeyAndCertMaterial(
+						Math.max(edu.virginia.vcgr.genii.security.SecurityConstants.defaultCredentialExpirationMillis, validUntil.getTime()
+							- System.currentTimeMillis() + 10000), TimeUnit.MILLISECONDS);
 				callContext.setActiveKeyAndCertMaterial(retval);
 				updated = true;
 
@@ -261,8 +256,8 @@ public class ClientUtils
 	}
 
 	/**
-	 * Throws out any current credentials. This will ensure that the next call to
-	 * checkAndRenewCredentials() causes a new TLS certificate to be created.
+	 * Throws out any current credentials. This will ensure that the next call to checkAndRenewCredentials() causes a new TLS certificate to
+	 * be created.
 	 */
 	public static void invalidateCredentials(ICallingContext callContext) throws AuthZSecurityException
 	{
@@ -335,17 +330,14 @@ public class ClientUtils
 	}
 
 	/**
-	 * Create a new, dynamically generated client stub which has the interface specified and is
-	 * prepared to talk to the endpoint given.
+	 * Create a new, dynamically generated client stub which has the interface specified and is prepared to talk to the endpoint given.
 	 * 
 	 * @param iface
-	 *            The class which represents the java interface that the client stub should
-	 *            implement for communication.
+	 *            The class which represents the java interface that the client stub should implement for communication.
 	 * @param epr
-	 *            The EndpointReferenceType that indicates the target of the newly generated client
-	 *            stub.
-	 * @return An dynamically generated client proxy which implements the passed in interface and is
-	 *         configured to communicate to the given EPR.
+	 *            The EndpointReferenceType that indicates the target of the newly generated client stub.
+	 * @return An dynamically generated client proxy which implements the passed in interface and is configured to communicate to the given
+	 *         EPR.
 	 */
 	static public <IFace> IFace createProxy(Class<IFace> iface, EndpointReferenceType epr) throws ResourceException,
 		GenesisIISecurityException
@@ -366,22 +358,19 @@ public class ClientUtils
 	}
 
 	/**
-	 * Create a new, dynamically generated client stub which has the interface specified and is
-	 * prepared to talk to the endpoint given.
+	 * Create a new, dynamically generated client stub which has the interface specified and is prepared to talk to the endpoint given.
 	 * 
 	 * @param loader
 	 *            The class loader to use when generating the new class for this client stub.
 	 * @param iface
-	 *            The class which represents the java interface that the client stub should
-	 *            implement for communication.
+	 *            The class which represents the java interface that the client stub should implement for communication.
 	 * @param epr
-	 *            The EndpointReferenceType that indicates the target of the newly generated client
-	 *            stub.
-	 * @return An dynamically generated client proxy which implements the passed in interface and is
-	 *         configured to communicate to the given EPR.
+	 *            The EndpointReferenceType that indicates the target of the newly generated client stub.
+	 * @return An dynamically generated client proxy which implements the passed in interface and is configured to communicate to the given
+	 *         EPR.
 	 */
-	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr)
-		throws ResourceException, GenesisIISecurityException
+	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr) throws ResourceException,
+		GenesisIISecurityException
 	{
 		try {
 			return createProxy(loader, iface, epr, ContextManager.getExistingContext());
@@ -391,19 +380,16 @@ public class ClientUtils
 	}
 
 	/**
-	 * Create a new, dynamically generated client stub which has the interface specified and is
-	 * prepared to talk to the endpoint given.
+	 * Create a new, dynamically generated client stub which has the interface specified and is prepared to talk to the endpoint given.
 	 * 
 	 * @param iface
-	 *            The class which represents the java interface that the client stub should
-	 *            implement for communication.
+	 *            The class which represents the java interface that the client stub should implement for communication.
 	 * @param epr
-	 *            The EndpointReferenceType that indicates the target of the newly generated client
-	 *            stub.
+	 *            The EndpointReferenceType that indicates the target of the newly generated client stub.
 	 * @param callContext
 	 *            A calling context to use instead of the current context when making out calls.
-	 * @return An dynamically generated client proxy which implements the passed in interface and is
-	 *         configured to communicate to the given EPR.
+	 * @return An dynamically generated client proxy which implements the passed in interface and is configured to communicate to the given
+	 *         EPR.
 	 */
 	static public <IFace> IFace createProxy(Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
 		throws ResourceException, GenesisIISecurityException
@@ -412,24 +398,21 @@ public class ClientUtils
 	}
 
 	/**
-	 * Create a new, dynamically generated client stub which has the interface specified and is
-	 * prepared to talk to the endpoint given.
+	 * Create a new, dynamically generated client stub which has the interface specified and is prepared to talk to the endpoint given.
 	 * 
 	 * @param loader
 	 *            The class loader to use when generating the new class for this client stub.
 	 * @param iface
-	 *            The class which represents the java interface that the client stub should
-	 *            implement for communication.
+	 *            The class which represents the java interface that the client stub should implement for communication.
 	 * @param epr
-	 *            The EndpointReferenceType that indicates the target of the newly generated client
-	 *            stub.
+	 *            The EndpointReferenceType that indicates the target of the newly generated client stub.
 	 * @param callContext
 	 *            A calling context to use instead of the current context when making out calls.
-	 * @return An dynamically generated client proxy which implements the passed in interface and is
-	 *         configured to communicate to the given EPR.
+	 * @return An dynamically generated client proxy which implements the passed in interface and is configured to communicate to the given
+	 *         EPR.
 	 */
-	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr,
-		ICallingContext callContext) throws ResourceException, GenesisIISecurityException
+	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
+		throws ResourceException, GenesisIISecurityException
 	{
 		IProxyFactory factory = getProxyFactory();
 		IFace face = factory.createProxy(loader, iface, epr, callContext);
@@ -441,8 +424,8 @@ public class ClientUtils
 	}
 
 	/**
-	 * Given a dynamically generated proxy generated by the ClientUtils class, return the EPR which
-	 * the given proxy is configured to communicate with.
+	 * Given a dynamically generated proxy generated by the ClientUtils class, return the EPR which the given proxy is configured to
+	 * communicate with.
 	 * 
 	 * @param clientProxy
 	 *            The client proxy object generated earlier by this class.
@@ -453,9 +436,8 @@ public class ClientUtils
 		return getProxyFactory().extractTargetEPR(clientProxy);
 	}
 
-	static public void
-		setAttachments(Object clientProxy, Collection<GeniiAttachment> attachments, AttachmentType attachmentType)
-			throws ResourceException
+	static public void setAttachments(Object clientProxy, Collection<GeniiAttachment> attachments, AttachmentType attachmentType)
+		throws ResourceException
 	{
 		getProxyFactory().setAttachments(clientProxy, attachments, attachmentType);
 	}

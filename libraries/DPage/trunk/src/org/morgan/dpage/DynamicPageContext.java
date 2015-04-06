@@ -28,8 +28,8 @@ class DynamicPageContext extends AbstractHandler
 	}
 
 	@Override
-	public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
-		throws IOException, ServletException
+	public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) throws IOException,
+		ServletException
 	{
 		OutputStream out = null;
 		String targetDirectory;

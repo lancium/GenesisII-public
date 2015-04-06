@@ -29,8 +29,8 @@ public class NotificationForwarder implements Runnable
 	private List<NotificationBrokerDBResource> listOfActiveBrokers;
 	private ICallingContext callingContext;
 
-	public NotificationForwarder(NotificationMessageOutcallContent message,
-		List<NotificationBrokerDBResource> listOfActiveBrokers, ICallingContext callingContext)
+	public NotificationForwarder(NotificationMessageOutcallContent message, List<NotificationBrokerDBResource> listOfActiveBrokers,
+		ICallingContext callingContext)
 	{
 		this.message = message;
 		this.listOfActiveBrokers = listOfActiveBrokers;
@@ -45,8 +45,7 @@ public class NotificationForwarder implements Runnable
 
 		MessageElement[] additionalAttributes = message.contents().getAdditionalAttributes();
 		NotificationMessageHolder holder =
-			new NotificationMessageHolder(message.subscriptionReference(), message.publisher(), message.topic(),
-				message.contents());
+			new NotificationMessageHolder(message.subscriptionReference(), message.publisher(), message.topic(), message.contents());
 
 		List<MessageElement> messageElements = new ArrayList<MessageElement>();
 		if (additionalAttributes != null && additionalAttributes.length > 0) {
@@ -71,8 +70,7 @@ public class NotificationForwarder implements Runnable
 				// set of messages at once.
 				// Finally, ordering is important here to ensure that attribute separator has been
 				// placed at the beginning.
-				brokerSpecificMessageElements.add(new MessageElement(
-					GenesisIIConstants.NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR, 0));
+				brokerSpecificMessageElements.add(new MessageElement(GenesisIIConstants.NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR, 0));
 				brokerSpecificMessageElements.addAll(messageElements);
 				brokerSpecificMessageElements.add(new MessageElement(NotificationBrokerConstants.MESSAGE_INDEX_QNAME,
 					messageIndexOfCurrentBroker));

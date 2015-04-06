@@ -22,11 +22,9 @@ public interface OGSARP extends OGSAWSRFBPConstants
 	@ResourceProperty(namespace = WSRF_RL_NS, localname = TERMINATION_TIME_ATTR)
 	public Calendar getTerminationTime();
 
-	@ResourceProperty(namespace = OGSA_WSRF_BP_NS, localname = WS_RESOURCE_INTERFACES_ATTR,
-		translator = QNameListTranslator.class)
+	@ResourceProperty(namespace = OGSA_WSRF_BP_NS, localname = WS_RESOURCE_INTERFACES_ATTR, translator = QNameListTranslator.class)
 	public OGSAQNameList getWSResourceInterfaces();
 
-	@ResourceProperty(namespace = OGSA_WSRF_BP_NS, localname = RESOURCE_PROPERTY_NAMES_ATTR,
-		translator = QNameListTranslator.class)
+	@ResourceProperty(namespace = OGSA_WSRF_BP_NS, localname = RESOURCE_PROPERTY_NAMES_ATTR, translator = QNameListTranslator.class)
 	public OGSAQNameList getResourcePropertyNames();
 }

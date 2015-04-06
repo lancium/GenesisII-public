@@ -70,8 +70,8 @@ public class DLogUtils
 		return null;
 	}
 
-	public static DLogDatabase addConnector(String databaseURL, String databaseUser, String databasePassword,
-		String entryTable, String metaTable, String hierTable)
+	public static DLogDatabase addConnector(String databaseURL, String databaseUser, String databasePassword, String entryTable,
+		String metaTable, String hierTable)
 	{
 		DLogDatabase ret = new DLogDatabase(databaseURL, databaseUser, databasePassword, entryTable, metaTable, hierTable);
 		return ret;

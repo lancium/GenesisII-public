@@ -5,9 +5,8 @@ import org.ggf.jsdl.JobDefinition_Type;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
 /**
- * A simple data structure for keeping together JSDL and calling context that allows for a simple
- * return from another method. This is mostly sugar coating to make calling the database class
- * easier.
+ * A simple data structure for keeping together JSDL and calling context that allows for a simple return from another method. This is mostly
+ * sugar coating to make calling the database class easier.
  * 
  * @author mmm2a
  */

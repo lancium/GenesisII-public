@@ -44,14 +44,13 @@ public class LightWeightExportUtils
 
 				VExportRoot vroot = null;
 
-				// future: Temporarily disabled code for svn exports.  why was it disabled?  -cak
+				// future: Temporarily disabled code for svn exports. why was it disabled? -cak
 				boolean svnEnabled = false;
 				if (svnEnabled && (rootDirString.matches("^.+:.*$"))) {
 					// Handle SVN export types.
 					Long revision = (Long) resource.getProperty(LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME);
 					vroot =
-						new SVNExportRoot(rootDirString,
-							(String) resource.getProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME),
+						new SVNExportRoot(rootDirString, (String) resource.getProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME),
 							(String) resource.getProperty(LightWeightExportConstants.SVN_PASS_PROPERTY_NAME), revision);
 					if (revision == null)
 						return vroot;
@@ -59,13 +58,12 @@ public class LightWeightExportUtils
 					File root = new File(rootDirString);
 
 					ExportMechanisms exportType =
-						ExportMechanisms.parse((String) rKey.dereference().getProperty(
-							LightWeightExportConstants.EXPORT_MECHANISM));
+						ExportMechanisms.parse((String) rKey.dereference().getProperty(LightWeightExportConstants.EXPORT_MECHANISM));
 
 					if (exportType == null) {
 						/*
-						 * if we couldn't retrieve the original mode used for creating the export,
-						 * we fall back to the original mode since this is probably an older export.
+						 * if we couldn't retrieve the original mode used for creating the export, we fall back to the original mode since
+						 * this is probably an older export.
 						 */
 						exportType = ExportMechanisms.EXPORT_MECH_ACL;
 						if (_logger.isDebugEnabled())

@@ -22,11 +22,9 @@ public class ProgressMonitor<Type>
 	private Collection<ProgressListener<Type>> _listeners = new LinkedList<ProgressListener<Type>>();
 	private Collection<ProgressNotifier> _notifiers = new LinkedList<ProgressNotifier>();
 
-	final public ProgressListener<Type> addProgressListener(ProgressListener<Type> listener,
-		boolean mustHappenOnEventDispatchThread)
+	final public ProgressListener<Type> addProgressListener(ProgressListener<Type> listener, boolean mustHappenOnEventDispatchThread)
 	{
-		ProgressListener<Type> ret =
-			mustHappenOnEventDispatchThread ? new SwingInvokeProgressListenerHolder<Type>(listener) : listener;
+		ProgressListener<Type> ret = mustHappenOnEventDispatchThread ? new SwingInvokeProgressListenerHolder<Type>(listener) : listener;
 
 		synchronized (_listeners) {
 			_listeners.add(ret);

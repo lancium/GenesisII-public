@@ -37,8 +37,7 @@ public class PublisherTopic
 		publish(contents, null);
 	}
 
-	final public <ContentsType extends NotificationMessageContents> void publish(ContentsType contents,
-		GeniiAttachment attachment)
+	final public <ContentsType extends NotificationMessageContents> void publish(ContentsType contents, GeniiAttachment attachment)
 	{
 		try {
 			ResourceKey rKey = ResourceManager.getTargetResource(_publisherReference);

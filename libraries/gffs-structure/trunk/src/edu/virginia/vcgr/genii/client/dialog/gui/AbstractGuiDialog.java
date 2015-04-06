@@ -48,12 +48,12 @@ abstract class AbstractGuiDialog extends JDialog implements Dialog
 		_helpButton.setEnabled(false);
 		_helpButton.addActionListener(new HelpButtonActionListener());
 
-		container.add(_body = createBody(bodyParameters), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_body = createBody(bodyParameters), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		container.add(createButtonBar(), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(_helpButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 0, 0, 0), 0, 0));
+		container.add(_helpButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(
+			5, 0, 0, 0), 0, 0));
 
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

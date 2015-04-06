@@ -27,8 +27,7 @@ public class MatchingParamsTool extends BaseGridTool
 	static final private LoadFileResource _USAGE = new LoadFileResource("config/tooldocs/usage/umatching-params");
 	static final private String _MANPAGE = "config/tooldocs/man/matching-params";
 
-	static private final Pattern ADD_REMOVE_PATTERN = Pattern
-		.compile("^\\s*((?:add)|(?:remove))\\s*\\(([^),]+),([^)]+)\\)\\s*$");
+	static private final Pattern ADD_REMOVE_PATTERN = Pattern.compile("^\\s*((?:add)|(?:remove))\\s*\\(([^),]+),([^)]+)\\)\\s*$");
 
 	private Collection<String> _targets = new LinkedList<String>();
 	private Collection<MatchingParameter> _adds = new LinkedList<MatchingParameter>();
@@ -42,8 +41,8 @@ public class MatchingParamsTool extends BaseGridTool
 				MatchingParamEnum.valueOf(name.substring(0, index));
 		} catch (IllegalArgumentException e) {
 			throw new InvalidToolUsageException(String.format(
-				"Matching parameter name %s is not valid (requirment indicator must be %s, or %s).", name,
-				MatchingParamEnum.requires, MatchingParamEnum.supports));
+				"Matching parameter name %s is not valid (requirment indicator must be %s, or %s).", name, MatchingParamEnum.requires,
+				MatchingParamEnum.supports));
 		}
 	}
 
@@ -54,8 +53,8 @@ public class MatchingParamsTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		MatchingParameter[] addParameters;

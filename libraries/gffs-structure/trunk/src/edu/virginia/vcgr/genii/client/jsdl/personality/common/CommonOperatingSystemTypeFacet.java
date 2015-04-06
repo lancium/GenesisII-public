@@ -12,13 +12,11 @@ public class CommonOperatingSystemTypeFacet extends DefaultOperatingSystemTypeFa
 		throws JSDLException
 	{
 		/*
-		 * This has been causing us problems with BES containers that front end other machines.
-		 * Instead, we're just going to ignore it.
+		 * This has been causing us problems with BES containers that front end other machines. Instead, we're just going to ignore it.
 		 */
 		/*
-		 * if (operatingSystemType != null && !operatingSystemType.equals(
-		 * JSDLUtils.getLocalOperatingSystemType().getOperatingSystemName())) throw new
-		 * JSDLMatchException( "Requested operating system not supported.");
+		 * if (operatingSystemType != null && !operatingSystemType.equals( JSDLUtils.getLocalOperatingSystemType().getOperatingSystemName()))
+		 * throw new JSDLMatchException( "Requested operating system not supported.");
 		 */
 	}
 }

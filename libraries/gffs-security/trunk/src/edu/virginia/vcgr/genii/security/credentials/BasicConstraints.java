@@ -12,8 +12,7 @@ import edu.virginia.vcgr.genii.security.faults.AttributeInvalidException;
 import edu.virginia.vcgr.genii.security.faults.AttributeNotYetValidException;
 
 /**
- * Describes how long a credential can live, when it starts being valid, and the maximum delegation
- * depth allowed on it.
+ * Describes how long a credential can live, when it starts being valid, and the maximum delegation depth allowed on it.
  * 
  * @author dmerrill
  * @author ckoeritz
@@ -39,8 +38,8 @@ public class BasicConstraints implements Describable
 	}
 
 	/**
-	 * Checks that the attribute is time-valid with respect to the supplied date and any delegation
-	 * depth requirements are met by the supplied delegationDepth.
+	 * Checks that the attribute is time-valid with respect to the supplied date and any delegation depth requirements are met by the supplied
+	 * delegationDepth.
 	 */
 	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException
 	{

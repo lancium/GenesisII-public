@@ -24,8 +24,7 @@ import edu.virginia.vcgr.genii.text.TextHelper;
 /**
  * Takes a string with XML code and returns a string of nicely formatted XML.
  * 
- * @author Chris Koeritz inspired by posting:
- *         http://stackoverflow.com/questions/139076/how-to-pretty-print-xml-from-java
+ * @author Chris Koeritz inspired by posting: http://stackoverflow.com/questions/139076/how-to-pretty-print-xml-from-java
  */
 public class XMLStringPrinter
 {
@@ -69,8 +68,8 @@ public class XMLStringPrinter
 	}
 
 	/**
-	 * a simple dump of the current node and descendants, with no extra formatting. good for
-	 * comparing fouled-up bits of xml against each other.
+	 * a simple dump of the current node and descendants, with no extra formatting. good for comparing fouled-up bits of xml against each
+	 * other.
 	 */
 	public static String nodeToString(Node node, boolean omitXmlDeclare)
 	{

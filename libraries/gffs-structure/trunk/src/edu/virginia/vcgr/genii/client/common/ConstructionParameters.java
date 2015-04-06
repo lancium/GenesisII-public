@@ -29,8 +29,7 @@ import org.w3c.dom.Node;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 
-@XmlRootElement(namespace = ConstructionParameters.CONSTRUCTION_PARAMETERS_NS,
-	name = ConstructionParameters.CONSTRUCTION_PARAMETERS_NAME)
+@XmlRootElement(namespace = ConstructionParameters.CONSTRUCTION_PARAMETERS_NS, name = ConstructionParameters.CONSTRUCTION_PARAMETERS_NAME)
 public class ConstructionParameters implements Serializable
 {
 	static final long serialVersionUID = 0L;
@@ -39,8 +38,7 @@ public class ConstructionParameters implements Serializable
 
 	static final public String CONSTRUCTION_PARAMETERS_NAME = "construction-parameters";
 
-	static final public QName CONSTRUCTION_PARAMETERS_QNAME = new QName(CONSTRUCTION_PARAMETERS_NS,
-		CONSTRUCTION_PARAMETERS_NAME);
+	static final public QName CONSTRUCTION_PARAMETERS_QNAME = new QName(CONSTRUCTION_PARAMETERS_NS, CONSTRUCTION_PARAMETERS_NAME);
 
 	static private Map<Class<?>, Class<? extends ConstructionParameters>> _typeMap =
 		new HashMap<Class<?>, Class<? extends ConstructionParameters>>();
@@ -89,11 +87,11 @@ public class ConstructionParameters implements Serializable
 			pType = getConstructionParameterType(serviceClass);
 			return pType.newInstance();
 		} catch (IllegalAccessException iae) {
-			throw new RuntimeException(String.format("Construction parameter type %s does not "
-				+ "have a public no-arg constructor.", pType), iae);
+			throw new RuntimeException(
+				String.format("Construction parameter type %s does not " + "have a public no-arg constructor.", pType), iae);
 		} catch (InstantiationException e) {
-			throw new RuntimeException(String.format("Construction parameter type %s does not "
-				+ "have a public no-arg constructor.", pType), e);
+			throw new RuntimeException(
+				String.format("Construction parameter type %s does not " + "have a public no-arg constructor.", pType), e);
 		}
 	}
 
@@ -122,8 +120,7 @@ public class ConstructionParameters implements Serializable
 		return u.unmarshal(serializedContent, pType).getValue();
 	}
 
-	static public ConstructionParameters deserializeConstructionParameters(Class<?> serviceClass, InputStream in)
-		throws JAXBException
+	static public ConstructionParameters deserializeConstructionParameters(Class<?> serviceClass, InputStream in) throws JAXBException
 	{
 		Class<? extends ConstructionParameters> pType = getConstructionParameterType(serviceClass);
 		JAXBContext context = getContext(pType);

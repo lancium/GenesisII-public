@@ -29,8 +29,8 @@ public class mpichManipulator extends AbstractCmdLineManipulator<MpichVariationC
 	}
 
 	@Override
-	public List<String> transform(Map<String, Object> jobProperties, CmdLineManipulatorConfiguration manipulatorConfig,
-		String variationName) throws CmdLineManipulatorException
+	public List<String> transform(Map<String, Object> jobProperties, CmdLineManipulatorConfiguration manipulatorConfig, String variationName)
+		throws CmdLineManipulatorException
 	{
 		_logger.debug("**Transforming with Mpich CmdLine Manipulator");
 
@@ -97,8 +97,7 @@ public class mpichManipulator extends AbstractCmdLineManipulator<MpichVariationC
 	}
 
 	/*
-	 * extract construction properties associated with MPICH tweaker (mpich executable and
-	 * additional arguments)
+	 * extract construction properties associated with MPICH tweaker (mpich executable and additional arguments)
 	 */
 	@Override
 	protected void processManipulatorConfiguration(Map<String, Object> jobProps, CmdLineManipulatorConfiguration manipConfig,
@@ -112,8 +111,7 @@ public class mpichManipulator extends AbstractCmdLineManipulator<MpichVariationC
 			throw new IllegalArgumentException("Null MPICH executable configuration parameter.");
 
 		// get mpich specific configuration
-		MpichVariationConfiguration mpichConfiguration =
-			(MpichVariationConfiguration) getVariationConfiguration(manipConfig, variationName);
+		MpichVariationConfiguration mpichConfiguration = (MpichVariationConfiguration) getVariationConfiguration(manipConfig, variationName);
 
 		if (mpichConfiguration != null) {
 			// confirm requested spmd variation supported by BES
@@ -123,16 +121,15 @@ public class mpichManipulator extends AbstractCmdLineManipulator<MpichVariationC
 					matchingSupport = true;
 
 			if (!matchingSupport)
-				throw new CmdLineManipulatorException(String.format("Requested SPMD variation not supported "
-					+ "by manipulator \"%s\"", variationName));
+				throw new CmdLineManipulatorException(String.format("Requested SPMD variation not supported " + "by manipulator \"%s\"",
+					variationName));
 
 			// extract processNum flag
 			String processNumFlag = mpichConfiguration.processNumFlag();
 
 			if (processNumFlag != null) {
 				manipProps.put(MPICH_PROCESSNUM_FLAG, processNumFlag);
-				_logger.debug(String.format("\tNumber of processes will be specified on " + "cmdLine with flag \"%s\"",
-					processNumFlag));
+				_logger.debug(String.format("\tNumber of processes will be specified on " + "cmdLine with flag \"%s\"", processNumFlag));
 			}
 		}
 

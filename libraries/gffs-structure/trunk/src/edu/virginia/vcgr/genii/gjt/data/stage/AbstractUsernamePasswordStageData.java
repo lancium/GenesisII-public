@@ -66,8 +66,7 @@ public abstract class AbstractUsernamePasswordStageData extends AbstractStageDat
 	}
 
 	@Override
-	public void generateAdditionalJSDL(DataStaging jsdlStaging, XPathBuilder builder,
-		Map<String, List<SweepParameter>> variables)
+	public void generateAdditionalJSDL(DataStaging jsdlStaging, XPathBuilder builder, Map<String, List<SweepParameter>> variables)
 	{
 		String username = (_username == null) ? "" : _username;
 		String password = (_password == null) ? "" : _password;

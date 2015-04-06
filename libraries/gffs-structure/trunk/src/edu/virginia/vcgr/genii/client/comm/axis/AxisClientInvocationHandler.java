@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.comm.axis;
 
@@ -98,14 +97,12 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	// future: this really needs to be stored in a config file so users can change it!!!
 	/*
-	 * the amount of time that any particular client request is allowed to take before time expires.
-	 * default was raised from 2 minutes to 6.
+	 * the amount of time that any particular client request is allowed to take before time expires. default was raised from 2 minutes to 6.
 	 */
 	static private int _DEFAULT_CLIENT_REQUEST_TIMEOUT = 1000 * 60 * 6;
 
 	/**
-	 * We'll wait 16 seconds for a connection failure before it's considered TOO long for the
-	 * exponential back-off retry.
+	 * We'll wait 16 seconds for a connection failure before it's considered TOO long for the exponential back-off retry.
 	 */
 	static private final long MAX_FAILURE_TIME_RETRY = 1000L * 16;
 
@@ -150,20 +147,18 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	// cache of signed, serialized delegation assertions
 	static private int VALIDATED_CERT_CACHE_SIZE = 32;
-	static private LRUCache<X509Certificate, Boolean> validatedCerts = new LRUCache<X509Certificate, Boolean>(
-		VALIDATED_CERT_CACHE_SIZE);
+	static private LRUCache<X509Certificate, Boolean> validatedCerts = new LRUCache<X509Certificate, Boolean>(VALIDATED_CERT_CACHE_SIZE);
 
 	static Object _lock = new Object();
 
-	public AxisClientInvocationHandler(Class<?> locator, EndpointReferenceType epr, ICallingContext callContext)
-		throws ResourceException, GenesisIISecurityException
+	public AxisClientInvocationHandler(Class<?> locator, EndpointReferenceType epr, ICallingContext callContext) throws ResourceException,
+		GenesisIISecurityException
 	{
 		this(new Class[] { locator }, epr, callContext);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <HandlerClass> ArrayList<HandlerClass>
-		getHandler(SimpleChain handlerChain, Class<HandlerClass> handlerClass)
+	private static <HandlerClass> ArrayList<HandlerClass> getHandler(SimpleChain handlerChain, Class<HandlerClass> handlerClass)
 	{
 		ArrayList<HandlerClass> retval = new ArrayList<HandlerClass>();
 
@@ -189,8 +184,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 
 		String minMessageSecurity =
-			Installation.getDeployment(new DeploymentName()).security()
-				.getProperty(KeystoreSecurityConstants.Client.MESSAGE_MIN_CONFIG_PROP);
+			Installation.getDeployment(new DeploymentName()).security().getProperty(KeystoreSecurityConstants.Client.MESSAGE_MIN_CONFIG_PROP);
 
 		__minClientMessageSec = new MessageLevelSecurityRequirements(minMessageSecurity);
 		return __minClientMessageSec;
@@ -229,8 +223,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		// perform resource-AuthN as specified in the client config file
 		try {
 			if (chain == null) {
-				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString()
-					+ " does not contain a certificate chain.");
+				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " does not contain a certificate chain.");
 			}
 			_resourceCert = chain[0];
 
@@ -247,8 +240,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					boolean okay = CertificateValidatorFactory.getValidator().validateIsTrustedResource(chain);
 					if (!okay) {
 						/*
-						 * we throw an exception so that we can either bail out, or just warn about
-						 * it.
+						 * we throw an exception so that we can either bail out, or just warn about it.
 						 */
 						// but we warn very quietly these days.
 						throw new AuthZSecurityException("failed to validate cert chain: " + chain[0].getSubjectDN());
@@ -261,15 +253,13 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		} catch (Exception e) {
 			if (minClientMessageSec.isWarn()) {
 				/*
-				 * the security level is set to just warning, and this is as loud of a warning as we
-				 * want to emit. otherwise we're just constantly complaining that the message
-				 * security level was set to warn only.
+				 * the security level is set to just warning, and this is as loud of a warning as we want to emit. otherwise we're just
+				 * constantly complaining that the message security level was set to warn only.
 				 */
 				if (_logger.isTraceEnabled())
 					_logger.trace("Cannot confirm trusted identity for " + _epr.getAddress().toString());
 			} else {
-				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " is untrusted: "
-					+ e.getMessage(), e);
+				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " is untrusted: " + e.getMessage(), e);
 			}
 		}
 
@@ -281,8 +271,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		try {
 			/*
-			 * configure the send handler(s), working backwards so as to set the last one that
-			 * actually does work to serialize the message.
+			 * configure the send handler(s), working backwards so as to set the last one that actually does work to serialize the message.
 			 */
 			ArrayList<ISecuritySendHandler> sendHandlers =
 				getHandler((SimpleChain) _providerConfig.getGlobalRequest(), ISecuritySendHandler.class);
@@ -307,8 +296,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 	}
 
-	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext)
-		throws ResourceException, GenesisIISecurityException
+	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext) throws ResourceException,
+		GenesisIISecurityException
 	{
 		// future: this would be a good place to use a shorter timeout on containers.
 
@@ -334,8 +323,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	}
 
-	private AxisClientInvocationHandler cloneHandlerForNewEPR(EndpointReferenceType epr) throws ResourceException,
-		GenesisIISecurityException
+	private AxisClientInvocationHandler cloneHandlerForNewEPR(EndpointReferenceType epr) throws ResourceException, GenesisIISecurityException
 	{
 		AxisClientInvocationHandler newHandler = new AxisClientInvocationHandler(_locators, epr, _callContext);
 		if (_outAttachments != null)
@@ -554,14 +542,12 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	/**
 	 * Send the message. If it fails, then resolve a replica and try again.
 	 * 
-	 * Possible sequence of events: 1. Send message to first instance. Catch exception. 2. Ask
-	 * resolver for second instance. 3. Send message to second instance. Catch exception. 4. Ask
-	 * resolver for next instance. 5. There are no more instances, so resolve() throws an exception.
-	 * Catch it. 6. Throw the failure that was reported by the first instance back in step 1.
-	 * Discard the exceptions from resolve() and from all other instances.
+	 * Possible sequence of events: 1. Send message to first instance. Catch exception. 2. Ask resolver for second instance. 3. Send message
+	 * to second instance. Catch exception. 4. Ask resolver for next instance. 5. There are no more instances, so resolve() throws an
+	 * exception. Catch it. 6. Throw the failure that was reported by the first instance back in step 1. Discard the exceptions from resolve()
+	 * and from all other instances.
 	 */
-	private Object resolveAndInvoke(ResolutionContext context, Method calledMethod, Object[] arguments, int timeout)
-		throws Throwable
+	private Object resolveAndInvoke(ResolutionContext context, Method calledMethod, Object[] arguments, int timeout) throws Throwable
 	{
 		AxisClientInvocationHandler handler = null;
 		boolean tryAgain = false;
@@ -578,8 +564,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			try {
 				return handler.doInvoke(calledMethod, arguments, timeout);
 			} catch (Throwable throwable) {
-				DetailedLogger.detailed().info(
-					"resolveAndInvoke partial handling for exception:" + ExceptionUtils.getStackTrace(throwable));
+				DetailedLogger.detailed().info("resolveAndInvoke partial handling for exception:" + ExceptionUtils.getStackTrace(throwable));
 				if (throwable instanceof InvocationTargetException) {
 					if (throwable.getCause() != null)
 						throwable = throwable.getCause();
@@ -597,9 +582,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						_logger.debug("faulting method: " + calledMethod.getName());
 
 					/*
-					 * Resetting the client cache as the original EPR holding container might be
-					 * down, which will invalidate existing subscriptions and the notification
-					 * broker.
+					 * Resetting the client cache as the original EPR holding container might be down, which will invalidate existing
+					 * subscriptions and the notification broker.
 					 */
 					String methodName = calledMethod.getName();
 					if (!"destroy".equalsIgnoreCase(methodName) && !"createIndirectSubscriptions".equalsIgnoreCase(methodName)
@@ -607,13 +591,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						&& !"getMessages".equalsIgnoreCase(methodName) && !"updateMode".equalsIgnoreCase(methodName)) {
 
 						/*
-						 * If the method is not the destroy method or any notification management
-						 * method only then cache has been refreshed. Destroy method is ignored
-						 * because otherwise there is a chance of cycle formation as the cache
-						 * management system itself use WS-resources that are destroyed with a cache
-						 * refresh and invocation of destroy on those resources can fail too.
-						 * Meanwhile, notification management methods are ignored to avoid redundant
-						 * cache refreshes.
+						 * If the method is not the destroy method or any notification management method only then cache has been refreshed.
+						 * Destroy method is ignored because otherwise there is a chance of cycle formation as the cache management system
+						 * itself use WS-resources that are destroyed with a cache refresh and invocation of destroy on those resources can
+						 * fail too. Meanwhile, notification management methods are ignored to avoid redundant cache refreshes.
 						 */
 						CacheManager.resetCachingSystem();
 					}
@@ -656,19 +637,17 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		 * Set calling context so that the socket factory has access to it.
 		 */
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("Starting an outcall for %s on thread [%x]%s.", calledMethod.getName(), Thread
-				.currentThread().getId(), Thread.currentThread()));
+			_logger.trace(String.format("Starting an outcall for %s on thread [%x]%s.", calledMethod.getName(), Thread.currentThread()
+				.getId(), Thread.currentThread()));
 		long start = System.currentTimeMillis();
 		VcgrSslSocketFactory.threadCallingContext.set(_callContext);
 		Object ret = calledMethod.invoke(stubInstance, arguments);
 		VcgrSslSocketFactory.threadCallingContext.set(null);
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("Finished an outcall for %s on thread [%x]%s (duration %d ms).",
-				calledMethod.getName(), Thread.currentThread().getId(), Thread.currentThread(), System.currentTimeMillis()
-					- start));
+			_logger.trace(String.format("Finished an outcall for %s on thread [%x]%s (duration %d ms).", calledMethod.getName(), Thread
+				.currentThread().getId(), Thread.currentThread(), System.currentTimeMillis() - start));
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Outcall for '%s' took %d ms.", calledMethod.getName(), System.currentTimeMillis()
-				- start));
+			_logger.debug(String.format("Outcall for '%s' took %d ms.", calledMethod.getName(), System.currentTimeMillis() - start));
 
 		Object[] inAttachments = stubInstance.getAttachments();
 		if (inAttachments != null)
@@ -733,8 +712,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	}
 
 	/*
-	 * Try to resolve EPR (based on resolution context) and return a new invocation handler for next
-	 * invocation attempt. If resolution fails, throw exception.
+	 * Try to resolve EPR (based on resolution context) and return a new invocation handler for next invocation attempt. If resolution fails,
+	 * throw exception.
 	 * 
 	 * WARNING: Contents of ResolutionContext may be changed during this call.
 	 */

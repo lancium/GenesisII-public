@@ -72,8 +72,8 @@ public class CloudTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 
 		RNSPath bes = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);

@@ -18,8 +18,8 @@ public class NetworkConstraint
 			throw new IllegalArgumentException("Constraint must be of form \"###.###.###.###\".");
 
 		_constraint =
-			new int[] { Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)),
-				Integer.parseInt(matcher.group(3)), Integer.parseInt(matcher.group(4)) };
+			new int[] { Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)),
+				Integer.parseInt(matcher.group(4)) };
 	}
 
 	public boolean matches(SocketAddress addr)
@@ -35,8 +35,8 @@ public class NetworkConstraint
 			return false;
 
 		int[] ip =
-			new int[] { Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)),
-				Integer.parseInt(matcher.group(3)), Integer.parseInt(matcher.group(4)) };
+			new int[] { Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)),
+				Integer.parseInt(matcher.group(4)) };
 
 		if (ip.length != _constraint.length)
 			return false;

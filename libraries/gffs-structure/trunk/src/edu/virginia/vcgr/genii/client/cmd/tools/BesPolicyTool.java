@@ -65,8 +65,8 @@ public class BesPolicyTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		RNSPath bes = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
 
@@ -79,18 +79,17 @@ public class BesPolicyTool extends BaseGridTool
 				DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
 				ComboBoxDialog dialog =
-					provider.createComboBoxDialog("User Logged In Action", "User logged in action?", null, new SimpleMenuItem(
-						"N", BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND), new SimpleMenuItem(
-						"SK", BESPolicyActions.SUSPENDORKILL), new SimpleMenuItem("K", BESPolicyActions.KILL));
+					provider.createComboBoxDialog("User Logged In Action", "User logged in action?", null, new SimpleMenuItem("N",
+						BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND), new SimpleMenuItem("SK",
+						BESPolicyActions.SUSPENDORKILL), new SimpleMenuItem("K", BESPolicyActions.KILL));
 				dialog.setHelp(new TextContent("Please select the action to take when a user logs in to the target computer."));
 				dialog.showDialog();
 				_userLoggedInAction = (BESPolicyActions) dialog.getSelectedItem().getContent();
 
 				dialog =
-					provider.createComboBoxDialog("Screensaver Inactive Action", "Screensaver inactive action?", null,
-						new SimpleMenuItem("N", BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND),
-						new SimpleMenuItem("SK", BESPolicyActions.SUSPENDORKILL),
-						new SimpleMenuItem("K", BESPolicyActions.KILL));
+					provider.createComboBoxDialog("Screensaver Inactive Action", "Screensaver inactive action?", null, new SimpleMenuItem(
+						"N", BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND), new SimpleMenuItem("SK",
+						BESPolicyActions.SUSPENDORKILL), new SimpleMenuItem("K", BESPolicyActions.KILL));
 				dialog.setHelp(new TextContent(
 					"Please select the action to take when the screensaver is de-activated on the target computer."));
 				dialog.showDialog();
@@ -133,8 +132,8 @@ public class BesPolicyTool extends BaseGridTool
 		stdout.println(policy.toString());
 	}
 
-	private void setPolicy(EndpointReferenceType bes, BESPolicyActions userLoggedInAction,
-		BESPolicyActions screenSaverInactiveAction) throws ResourcePropertyException
+	private void setPolicy(EndpointReferenceType bes, BESPolicyActions userLoggedInAction, BESPolicyActions screenSaverInactiveAction)
+		throws ResourcePropertyException
 	{
 		BESRP rp = (BESRP) ResourcePropertyManager.createRPInterface(bes, BESRP.class);
 

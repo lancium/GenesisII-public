@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package edu.virginia.vcgr.genii.client.security.axis;
@@ -56,12 +55,12 @@ public class AclAuthZClientTool
 	static private final int WRITE = 2;
 	static private final int EXECUTE = 1;
 
-	static public final String CHMOD_SYNTAX = "<change-command> <acl-entry>\n" + "\n"
-		+ "\t where <change-command> is one of:\n" + "\n" + "\t\t<[<+|->r][<+|->w][<+|->x]> \n" + "\n" + "\t\t<octal mode> \n"
-		+ "\n" + "\t and where <acl-entry> is one of:\n" + "\n" + "\t\t<[local:]cert-file> \n" + "\n"
-		+ "\t\t<[local:]ca-cert-file> --pattern=<DN-pattern> \n" + "\t\t\t where <DN-pattern> is a (possibly-empty) set of \n"
-		+ "\t\t\t comma-separated X.500 distinguished-name \n" + "\t\t\t <attribute>=<value> components \n" + "\n"
-		+ "\t\t--everyone \n" + "\n" + "\t\t--username=<username> --password=<password>\n";
+	static public final String CHMOD_SYNTAX = "<change-command> <acl-entry>\n" + "\n" + "\t where <change-command> is one of:\n" + "\n"
+		+ "\t\t<[<+|->r][<+|->w][<+|->x]> \n" + "\n" + "\t\t<octal mode> \n" + "\n" + "\t and where <acl-entry> is one of:\n" + "\n"
+		+ "\t\t<[local:]cert-file> \n" + "\n" + "\t\t<[local:]ca-cert-file> --pattern=<DN-pattern> \n"
+		+ "\t\t\t where <DN-pattern> is a (possibly-empty) set of \n" + "\t\t\t comma-separated X.500 distinguished-name \n"
+		+ "\t\t\t <attribute>=<value> components \n" + "\n" + "\t\t--everyone \n" + "\n"
+		+ "\t\t--username=<username> --password=<password>\n";
 
 	/**
 	 * Create a new empty ACL.
@@ -120,11 +119,10 @@ public class AclAuthZClientTool
 	}
 
 	/**
-	 * If modeString is a number from 0 through 7, then it means: add the identity to these ACLs,
-	 * and remove it from all other ACLs.
+	 * If modeString is a number from 0 through 7, then it means: add the identity to these ACLs, and remove it from all other ACLs.
 	 * 
-	 * Otherwise, modeString must contain one or more plus or minus signs. Each plus or minus sign
-	 * must be followed by one or more of "r", "w", and "x".
+	 * Otherwise, modeString must contain one or more plus or minus signs. Each plus or minus sign must be followed by one or more of "r",
+	 * "w", and "x".
 	 */
 	private static int parseMode(String modeString) throws IllegalArgumentException
 	{
@@ -187,11 +185,10 @@ public class AclAuthZClientTool
 	}
 
 	/**
-	 * Read a certificate from a local file or a grid file, or read the certificate from the
-	 * metadata of a grid resource.
+	 * Read a certificate from a local file or a grid file, or read the certificate from the metadata of a grid resource.
 	 */
-	public static X509Identity downloadIdentity(GeniiPath certificatePath) throws ConfigurationException,
-		FileNotFoundException, IOException, RNSException, GeneralSecurityException
+	public static X509Identity downloadIdentity(GeniiPath certificatePath) throws ConfigurationException, FileNotFoundException, IOException,
+		RNSException, GeneralSecurityException
 	{
 		RNSPath certificateRNS = certificatePath.lookupRNS();
 		if ((certificateRNS == null) || certificatePath.isFile()) {
@@ -216,8 +213,8 @@ public class AclAuthZClientTool
 	 * 
 	 * @return the modified ACL.
 	 */
-	public static AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintWriter out, PrintWriter err, BufferedReader in)
-		throws IOException, AuthZSecurityException
+	public static AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintWriter out, PrintWriter err, BufferedReader in) throws IOException,
+		AuthZSecurityException
 	{
 		boolean chosen = false;
 		while (!chosen) {
@@ -297,9 +294,8 @@ public class AclAuthZClientTool
 	}
 
 	/**
-	 * Parses the given command line and applies the indicated authz changes to the specified authz
-	 * configuration. Assumes that the syntax is valid (having been checked with
-	 * validateChmodSyntax())
+	 * Parses the given command line and applies the indicated authz changes to the specified authz configuration. Assumes that the syntax is
+	 * valid (having been checked with validateChmodSyntax())
 	 */
 	private static AuthZConfig chmod(ICommandLine cLine, AuthZConfig config) throws IOException, AuthZSecurityException
 	{
@@ -344,8 +340,7 @@ public class AclAuthZClientTool
 	}
 
 	/**
-	 * Add or remove read, write, and/or execute permission for the given entry in the given ACL as
-	 * specified by the given mode.
+	 * Add or remove read, write, and/or execute permission for the given entry in the given ACL as specified by the given mode.
 	 */
 	protected static void chmod(Acl acl, String modeString, AclEntry newEntry) throws AuthZSecurityException
 	{

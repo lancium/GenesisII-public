@@ -11,8 +11,7 @@ import java.util.Set;
 
 public class DependencyGraph
 {
-	static private Class<?>[] dependentClasses(Class<?> sourceClass, String sourceMethodName,
-		Class<?>[] sourceMethodParameterTypes)
+	static private Class<?>[] dependentClasses(Class<?> sourceClass, String sourceMethodName, Class<?>[] sourceMethodParameterTypes)
 	{
 		GridDependency dependency = null;
 

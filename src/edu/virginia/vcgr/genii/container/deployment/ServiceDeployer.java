@@ -49,8 +49,7 @@ public class ServiceDeployer extends Thread
 
 	static private Pattern _DEPLOYMENT_FILE_PATTERN = Pattern.compile("^.*\\.gdb$");
 
-	static private PatternFilenameFilter _FILTER = new PatternFilenameFilter(new Pattern[] { _DEPLOYMENT_FILE_PATTERN,
-		_WSDD_FILE_PATTERN });
+	static private PatternFilenameFilter _FILTER = new PatternFilenameFilter(new Pattern[] { _DEPLOYMENT_FILE_PATTERN, _WSDD_FILE_PATTERN });
 
 	private AxisEngine _axisEngine;
 	private BarrieredWorkQueue _postStartupQueue;
@@ -90,8 +89,7 @@ public class ServiceDeployer extends Thread
 		}
 	}
 
-	static public void startServiceDeployer(AxisEngine axisEngine, BarrieredWorkQueue postStartupQueue,
-		HierarchicalDirectory watchDirectory)
+	static public void startServiceDeployer(AxisEngine axisEngine, BarrieredWorkQueue postStartupQueue, HierarchicalDirectory watchDirectory)
 	{
 		ServiceDeployer sd = new ServiceDeployer(axisEngine, postStartupQueue, watchDirectory);
 		sd.setDaemon(true);
@@ -128,8 +126,7 @@ public class ServiceDeployer extends Thread
 	}
 
 	/**
-	 * returns true if the deployment succeeded and false if it failed. no exceptions are allowed
-	 * out of here.
+	 * returns true if the deployment succeeded and false if it failed. no exceptions are allowed out of here.
 	 */
 	private boolean attemptDeployment()
 	{
@@ -168,8 +165,7 @@ public class ServiceDeployer extends Thread
 					JarFile jFile = null;
 					try {
 						URLClassLoader loader =
-							new URLClassLoader(new URL[] { file.toURI().toURL() }, Thread.currentThread()
-								.getContextClassLoader());
+							new URLClassLoader(new URL[] { file.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
 
 						jFile = new JarFile(file);
 						Enumeration<JarEntry> entries = jFile.entries();
@@ -226,8 +222,7 @@ public class ServiceDeployer extends Thread
 							long startedAt = TimeHelpers.millisSinceAppStart();
 							base.startup();
 							long finishedAt = TimeHelpers.millisSinceAppStart();
-							_logger.debug("deploying " + className + " took " + ((float) (finishedAt - startedAt)) / 1000.0
-								+ " seconds.");
+							_logger.debug("deploying " + className + " took " + ((float) (finishedAt - startedAt)) / 1000.0 + " seconds.");
 							_postStartupQueue.enqueue(base);
 						}
 					} catch (NoSuchMethodException nsme) {
@@ -257,8 +252,7 @@ public class ServiceDeployer extends Thread
 		if (className == null)
 			return null;
 
-		element.getDocumentElement().setAttributeNS("http://vcgr.cs.virginia.edu/GenesisII/invoker", "genii:dumm",
-			"dummy-value");
+		element.getDocumentElement().setAttributeNS("http://vcgr.cs.virginia.edu/GenesisII/invoker", "genii:dumm", "dummy-value");
 		element.normalizeDocument();
 		NodeList list = element.getDocumentElement().getChildNodes();
 		for (int lcv = 0; lcv < list.getLength(); lcv++) {

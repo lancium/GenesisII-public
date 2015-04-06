@@ -29,8 +29,8 @@ public class RExportResolverEntry
 	 * @param primaryLocalPath
 	 * @param resolverServiceEPR
 	 */
-	public RExportResolverEntry(URI commonEPI, EndpointReferenceType primaryEPR, EndpointReferenceType replicaEPR,
-		URI resolverEPI, EndpointReferenceType resolverEPR, String primaryLocalPath, EndpointReferenceType resolverServiceEPR)
+	public RExportResolverEntry(URI commonEPI, EndpointReferenceType primaryEPR, EndpointReferenceType replicaEPR, URI resolverEPI,
+		EndpointReferenceType resolverEPR, String primaryLocalPath, EndpointReferenceType resolverServiceEPR)
 	{
 		_commonEPI = commonEPI;
 		_primaryEPR = primaryEPR;
@@ -42,8 +42,7 @@ public class RExportResolverEntry
 	}
 
 	/**
-	 * Creates new entry with all but replicaEPR parameters set. commonEPI is extracted from passed
-	 * in primaryEPR.
+	 * Creates new entry with all but replicaEPR parameters set. commonEPI is extracted from passed in primaryEPR.
 	 * 
 	 * @param primaryEPR
 	 * @param resolverEPI

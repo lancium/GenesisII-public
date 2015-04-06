@@ -132,9 +132,8 @@ public class InstallationState implements Serializable
 	static private File getInstallationStateFile()
 	{
 		/*
-		 * This isn't a perfect solution to bug #65, but until we have something better, it will
-		 * have to do. The problem is that the user's home directory may not be a local partition
-		 * which could cause troubles.
+		 * This isn't a perfect solution to bug #65, but until we have something better, it will have to do. The problem is that the user's
+		 * home directory may not be a local partition which could cause troubles.
 		 */
 		File installFile = new File(System.getProperty("user.home"), ".installation-state");
 		return installFile;

@@ -7,9 +7,8 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirector
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 
 /**
- * An execution context is a context that is passed to execution phases that may or may not contain
- * information relevant to them such as who the execution is taking place as, what directory it is
- * taking place in, etc.
+ * An execution context is a context that is passed to execution phases that may or may not contain information relevant to them such as who
+ * the execution is taking place as, what directory it is taking place in, etc.
  * 
  * @author mmm2a
  */

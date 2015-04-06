@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.bes.resource;
 
@@ -36,9 +35,8 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 {
 	static private Log _logger = LogFactory.getLog(DBBESResourceFactory.class);
 
-	static private final String[] _CREATE_STMTS = new String[] { "CREATE TABLE bespolicytable ("
-		+ "besid VARCHAR(256) NOT NULL PRIMARY KEY," + "userloggedinaction VARCHAR(64) NOT NULL,"
-		+ "screensaverinactiveaction VARCHAR(64) NOT NULL)" };
+	static private final String[] _CREATE_STMTS = new String[] { "CREATE TABLE bespolicytable (" + "besid VARCHAR(256) NOT NULL PRIMARY KEY,"
+		+ "userloggedinaction VARCHAR(64) NOT NULL," + "screensaverinactiveaction VARCHAR(64) NOT NULL)" };
 
 	public DBBESResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
@@ -81,8 +79,8 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 		try {
 			queryStmt = conn.prepareStatement("SELECT resourceid, propvalue FROM properties " + "WHERE propname = ?");
 			insertStmt =
-				conn.prepareStatement("INSERT INTO persistedproperties "
-					+ "(resourceid, category, propertyname, propertyvalue) " + "VALUES(?, ?, ?, ?)");
+				conn.prepareStatement("INSERT INTO persistedproperties " + "(resourceid, category, propertyname, propertyvalue) "
+					+ "VALUES(?, ?, ?, ?)");
 			deleteStmt = conn.prepareStatement("DELETE FROM properties WHERE resourceid = ? AND propname = ?");
 			queryStmt.setString(1, GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
 			rs = queryStmt.executeQuery();

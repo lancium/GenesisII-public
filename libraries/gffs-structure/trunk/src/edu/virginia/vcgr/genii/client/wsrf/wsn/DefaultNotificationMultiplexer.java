@@ -59,8 +59,8 @@ public class DefaultNotificationMultiplexer implements NotificationMultiplexer
 	}
 
 	@Override
-	final public String notify(TopicPath path, EndpointReferenceType producerReference,
-		EndpointReferenceType subscriptionReference, Element messageContents, MessageElement[] additionalAttributes)
+	final public String notify(TopicPath path, EndpointReferenceType producerReference, EndpointReferenceType subscriptionReference,
+		Element messageContents, MessageElement[] additionalAttributes)
 	{
 		String status = NotificationConstants.UNPROCESSED;
 
@@ -75,8 +75,7 @@ public class DefaultNotificationMultiplexer implements NotificationMultiplexer
 				try {
 					JAXBContext context = JAXBContext.newInstance(handler.contentsType());
 					Unmarshaller u = context.createUnmarshaller();
-					JAXBElement<? extends NotificationMessageContents> jaxbe =
-						u.unmarshal(messageContents, handler.contentsType());
+					JAXBElement<? extends NotificationMessageContents> jaxbe = u.unmarshal(messageContents, handler.contentsType());
 
 					NotificationMessageContents messageContent = jaxbe.getValue();
 					messageContent.setAdditionalAttributes(additionalAttributes);

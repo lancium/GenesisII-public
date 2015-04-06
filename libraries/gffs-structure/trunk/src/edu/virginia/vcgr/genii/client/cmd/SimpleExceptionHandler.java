@@ -25,8 +25,8 @@ public class SimpleExceptionHandler implements IExceptionHandler
 		int toReturn = 0; // assume we can recover by default.
 
 		/*
-		 * remembers the last message we printed so we don't echo duplicates (which can happen when
-		 * exceptions are wrapped repeatedly at different levels).
+		 * remembers the last message we printed so we don't echo duplicates (which can happen when exceptions are wrapped repeatedly at
+		 * different levels).
 		 */
 		String lastMessage = null;
 

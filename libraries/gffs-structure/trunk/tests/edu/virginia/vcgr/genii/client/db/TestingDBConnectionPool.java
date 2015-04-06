@@ -44,8 +44,7 @@ public class TestingDBConnectionPool
 				deleteRows();
 
 				/*
-				 * if (lcv % 50 == 0) { System.err.println("\tCompacting database.");
-				 * compactDatabase(); }
+				 * if (lcv % 50 == 0) { System.err.println("\tCompacting database."); compactDatabase(); }
 				 */
 			}
 		} catch (Throwable t) {
@@ -59,10 +58,8 @@ public class TestingDBConnectionPool
 	/* This is for hypersonic, which is no longer used. */
 	/*
 	 * static void createConnectionPool() throws Throwable { Properties props = new Properties();
-	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name",
-	 * "org.hsqldb.jdbcDriver");
-	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string",
-	 * "jdbc:hsqldb:file:/home/mmm2a/marks-database/database");
+	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name", "org.hsqldb.jdbcDriver");
+	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string", "jdbc:hsqldb:file:/home/mmm2a/marks-database/database");
 	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-user", "sa");
 	 * props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
 	 * props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");
@@ -73,8 +70,7 @@ public class TestingDBConnectionPool
 	{
 		Properties props = new Properties();
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-class-name", "org.apache.derby.jdbc.EmbeddedDriver");
-		props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string",
-			"jdbc:derby:C:\\marks-database\\database;create=true");
+		props.setProperty("edu.virginia.vcgr.genii.client.db.db-connect-string", "jdbc:derby:C:\\marks-database\\database;create=true");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-user", "sa");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");
@@ -91,8 +87,7 @@ public class TestingDBConnectionPool
 		try {
 			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
-			stmt.executeUpdate("CREATE TABLE test1 (ID INTEGER PRIMARY KEY,"
-				+ "guid VARCHAR(256), bits VARCHAR (8192) FOR BIT DATA)");
+			stmt.executeUpdate("CREATE TABLE test1 (ID INTEGER PRIMARY KEY," + "guid VARCHAR(256), bits VARCHAR (8192) FOR BIT DATA)");
 			conn.commit();
 		} finally {
 			StreamUtils.close(stmt);
@@ -224,8 +219,7 @@ public class TestingDBConnectionPool
 		 * 
 		 * try { conn = _pool.acquire(); stmt = conn.createStatement();
 		 * 
-		 * stmt.executeUpdate("SHUTDOWN COMPACT"); conn.commit(); } finally {
-		 * StreamUtils.close(stmt); StreamUtils.close(conn); }
+		 * stmt.executeUpdate("SHUTDOWN COMPACT"); conn.commit(); } finally { StreamUtils.close(stmt); StreamUtils.close(conn); }
 		 */
 	}
 }

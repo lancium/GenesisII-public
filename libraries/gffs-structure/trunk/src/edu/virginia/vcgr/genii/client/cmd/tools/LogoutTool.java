@@ -57,31 +57,29 @@ public class LogoutTool extends BaseGridTool
 	}
 
 	/**
-	 * checks whether the credential "cred" is equivalent to the preferred identity or not. if it
-	 * is, then we toss out the current preferred identity unless it's fixated.
+	 * checks whether the credential "cred" is equivalent to the preferred identity or not. if it is, then we toss out the current preferred
+	 * identity unless it's fixated.
 	 */
 	public void removePreferredIdentityIfAppropriate(NuCredential cred)
 	{
 		// remove the preferred identity if this guy matches (and pref id is not fixated).
 		if (!PreferredIdentity.fixatedInCurrent()) {
 			PreferredIdentity current = PreferredIdentity.getCurrent();
-			
+
 			if (current.matchesIdentity(cred.getOriginalAsserter()[0])) {
 				/*
-				 * ouch, we have a match to the preferred identity. they just logged out of it, so
-				 * we need to drop it. if they don't have it in their credentials, it's worthless to
-				 * everyone.
+				 * ouch, we have a match to the preferred identity. they just logged out of it, so we need to drop it. if they don't have it
+				 * in their credentials, it's worthless to everyone.
 				 */
 				PreferredIdentity.dropCurrent();
-				_logger
-					.debug("dropping preferred identity found same as logged out credential: " + current.getIdentityString());
+				_logger.debug("dropping preferred identity found same as logged out credential: " + current.getIdentityString());
 			}
 		}
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		ICallingContext callContext = ContextManager.getCurrentContext();
 
@@ -132,8 +130,7 @@ public class LogoutTool extends BaseGridTool
 			CacheManager.resetCachingSystem();
 		} else {
 			while (true) {
-				ArrayList<NuCredential> credentials =
-					TransientCredentials.getTransientCredentials(callContext).getCredentials();
+				ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
 				if (credentials.size() == 0)
 					break;
 				stdout.println("Please select a credential to logout from:");

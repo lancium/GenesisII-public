@@ -43,8 +43,8 @@ public class ParseJSDLTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 
 		// get the local identity's key material (or create one if necessary)
@@ -67,8 +67,7 @@ public class ParseJSDLTool extends BaseGridTool
 		out = dest.openOutputStream();
 
 		// Parse jsdl
-		JobDefinition_Type jsdl =
-			(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
+		JobDefinition_Type jsdl = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 		PersonalityProvider provider = new ExecutionProvider();
 		JobRequest tJob;
 		try {

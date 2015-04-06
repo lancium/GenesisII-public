@@ -33,8 +33,7 @@ final public class JobFork extends AbstractRNSResourceFork
 		String jobTicket = getForkName();
 
 		if (entryName == null || entryName.equals("status"))
-			entries.add(createInternalEntry(exemplarEPR, "status",
-				new JobInformationFork(getService(), formForkPath("status")).describe()));
+			entries.add(createInternalEntry(exemplarEPR, "status", new JobInformationFork(getService(), formForkPath("status")).describe()));
 
 		if (entryName == null || entryName.equals("activity")) {
 			try {

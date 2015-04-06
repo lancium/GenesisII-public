@@ -43,8 +43,7 @@ public class RunnerKiller
 
 	static public void main(String[] args) throws Throwable
 	{
-		ProcessBuilder builder =
-			new ProcessBuilder("C:\\Documents and Settings\\Mark Morgan\\longrun\\LongRunner\\Debug\\RunnerRunner.bat");
+		ProcessBuilder builder = new ProcessBuilder("C:\\Documents and Settings\\Mark Morgan\\longrun\\LongRunner\\Debug\\RunnerRunner.bat");
 		builder.directory(new File("C:\\Documents and Settings\\Mark Morgan\\longrun\\LongRunner\\Debug"));
 		Process p = builder.start();
 

@@ -19,8 +19,8 @@ public class TTYWatcher
 
 	static private WatcherThread _watcherThread = null;
 
-	synchronized static public void watch(PrintWriter stdout, PrintWriter stderr, EndpointReferenceType tty)
-		throws ToolException, RemoteException, FileNotFoundException, IOException
+	synchronized static public void watch(PrintWriter stdout, PrintWriter stderr, EndpointReferenceType tty) throws ToolException,
+		RemoteException, FileNotFoundException, IOException
 	{
 		if (_watcherThread != null)
 			throw new ToolException("Already watching a tty object.");

@@ -23,12 +23,11 @@ class PreferredLevelPanel extends JPanel
 	{
 		super(new GridBagLayout());
 
-		_combo =
-			new EnumComboBox<HistoryEventLevel>(HistoryEventLevel.class, EnumComboSort.ByOrdinal, false, LevelIcon.ICON_MAP);
+		_combo = new EnumComboBox<HistoryEventLevel>(HistoryEventLevel.class, EnumComboSort.ByOrdinal, false, LevelIcon.ICON_MAP);
 		_combo.setSelectedItem(level);
 
-		add(_combo, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(_combo, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
+			5, 5));
 
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Preferred Level"));
 	}

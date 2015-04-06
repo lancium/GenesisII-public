@@ -78,8 +78,7 @@ public class NotificationHelper
 	private static Map<Integer, Collection<MessageElement>> extractAdditionalAttributes(Notify notify)
 	{
 
-		Map<Integer, Collection<MessageElement>> messageIndexToAttributesMap =
-			new HashMap<Integer, Collection<MessageElement>>();
+		Map<Integer, Collection<MessageElement>> messageIndexToAttributesMap = new HashMap<Integer, Collection<MessageElement>>();
 		MessageElement[] _any = notify.get_any();
 		if (_any == null || _any.length == 0)
 			return messageIndexToAttributesMap;

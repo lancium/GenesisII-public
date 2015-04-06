@@ -21,17 +21,16 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 /**
- * This class is a collection of utilities that the queue uses to manipulate certain aspects of
- * security implemented by the queue. Mostly having to do with the association of identities with
- * jobs (ownership relationship).
+ * This class is a collection of utilities that the queue uses to manipulate certain aspects of security implemented by the queue. Mostly
+ * having to do with the association of identities with jobs (ownership relationship).
  * 
  * @author mmm2a
  */
 public class QueueSecurity
 {
 	/**
-	 * Retrieve the list of identities associated with the current calling context. The queue will
-	 * associate these identities with being the "caller's" identities.
+	 * Retrieve the list of identities associated with the current calling context. The queue will associate these identities with being the
+	 * "caller's" identities.
 	 * 
 	 * @return The list of identities.
 	 * 
@@ -56,15 +55,13 @@ public class QueueSecurity
 	}
 
 	/**
-	 * Check to see if the current caller has any matches in the list of supplied job owners. We
-	 * have a match if any of the identities in the current calling context matches any of the
-	 * identities in the listed job owners.
+	 * Check to see if the current caller has any matches in the list of supplied job owners. We have a match if any of the identities in the
+	 * current calling context matches any of the identities in the listed job owners.
 	 * 
 	 * @param jobOwners
 	 *            The list of job owners that we are checking against.
 	 * 
-	 * @return True if the calling context represents an owner of the indicated job owners, false
-	 *         otherwise.
+	 * @return True if the calling context represents an owner of the indicated job owners, false otherwise.
 	 * 
 	 * @throws AuthZSecurityException
 	 */
@@ -115,8 +112,7 @@ public class QueueSecurity
 	 * @param jobOwner
 	 *            The identity of an owner of the job.
 	 * 
-	 * @return True if the caller has an identity that matches the indicated job owner, false
-	 *         otherwise.
+	 * @return True if the caller has an identity that matches the indicated job owner, false otherwise.
 	 * 
 	 * @throws AuthZSecurityException
 	 */
@@ -132,14 +128,13 @@ public class QueueSecurity
 	}
 
 	/**
-	 * Converts a list of Identities into an array of byte arrays. We do this so that they
-	 * identities can easily be serialized into a SOAP message.
+	 * Converts a list of Identities into an array of byte arrays. We do this so that they identities can easily be serialized into a SOAP
+	 * message.
 	 * 
 	 * @param identities
 	 *            The list of identieis to convert.
 	 * 
-	 * @return An array of byte arrays that represents the serialized versions of the listed
-	 *         identities.
+	 * @return An array of byte arrays that represents the serialized versions of the listed identities.
 	 * 
 	 * @throws IOException
 	 */
@@ -155,8 +150,7 @@ public class QueueSecurity
 	}
 
 	/*
-	 * Determines if caller is admin of this queue. User is a queue admin if they are admin of
-	 * container Or in the write acl of the queue.
+	 * Determines if caller is admin of this queue. User is a queue admin if they are admin of container Or in the write acl of the queue.
 	 */
 	public static boolean isQueueAdmin() throws AuthZSecurityException
 	{
@@ -171,7 +165,7 @@ public class QueueSecurity
 			if (authZHandler != null) {
 				config = authZHandler.getAuthZConfig(rKey.dereference(), false);
 				Acl resourceAcls = AxisAcl.decodeAcl(config);
-				for (AclEntry entry : resourceAcls.writeAcl) {					
+				for (AclEntry entry : resourceAcls.writeAcl) {
 					if (entry == null) {
 						// null entry indicates all access.
 						return true;

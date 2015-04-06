@@ -41,8 +41,8 @@ public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 		return new ActivityState(ActivityStateEnumeration.Running, "generating-wrapper-scripts", false);
 	}
 
-	public CloudGenerateRunScriptPhase(String scratchDir, String runScript, String workingDir, String resourceFile,
-		JobRequest job, String stageInScript, String stageOutScript, String genState, String jobFile, String genDir,
+	public CloudGenerateRunScriptPhase(String scratchDir, String runScript, String workingDir, String resourceFile, JobRequest job,
+		String stageInScript, String stageOutScript, String genState, String jobFile, String genDir,
 		CmdLineManipulatorConfiguration manipulatorConfiguration)
 	{
 		_scratchDir = scratchDir;
@@ -64,8 +64,8 @@ public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 		try {
 
 			FileOutputStream tStream = new FileOutputStream(_scratchDir + _runScript);
-			CloudJobWrapper.generateWrapperScript(tStream, new File(_workingDir), new File(_workingDir + _resourceFile), _job,
-				new File(_scratchDir), _manipulatorConfiguration);
+			CloudJobWrapper.generateWrapperScript(tStream, new File(_workingDir), new File(_workingDir + _resourceFile), _job, new File(
+				_scratchDir), _manipulatorConfiguration);
 			tStream.close();
 
 			// Generate Stage in and out scripts
@@ -75,8 +75,8 @@ public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 			ps.format("#!%s\n\n", "/bin/bash");
 			// Generate App Body
 			ps.println("export GENII_USER_DIR=" + _workingDir + _genState);
-			ps.println(_genDir + "grid stageData --direction=\"in\" " + "--type=\"binary\" " + _workingDir + " local:"
-				+ _workingDir + _jobFile);
+			ps.println(_genDir + "grid stageData --direction=\"in\" " + "--type=\"binary\" " + _workingDir + " local:" + _workingDir
+				+ _jobFile);
 			ps.println("touch " + _workingDir + "stageInPhase.complete");
 			ps.close();
 			tStream.close();
@@ -88,8 +88,8 @@ public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 			ps.format("#!%s\n\n", "/bin/bash");
 			// Generate App Body
 			ps.println("export GENII_USER_DIR=" + _workingDir + _genState);
-			ps.println(_genDir + "grid stageData --direction=\"out\" " + "--type=\"binary\" " + _workingDir + " local:"
-				+ _workingDir + _jobFile);
+			ps.println(_genDir + "grid stageData --direction=\"out\" " + "--type=\"binary\" " + _workingDir + " local:" + _workingDir
+				+ _jobFile);
 			ps.println("touch " + _workingDir + "stageOutPhase.complete");
 			ps.close();
 			tStream.close();

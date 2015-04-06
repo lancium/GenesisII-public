@@ -6,10 +6,9 @@ public class Commons
 {
 
 	/**
-	 * This method forms the prefix part of a request between GFFS container and the FileServer.
-	 * Each request is unique depending on the type of operation it performs. But the prefix
-	 * contains fields which are common to every request. However the length of these fields need
-	 * not be the same. This prefix is formed in this method and stored in a passed byte array.
+	 * This method forms the prefix part of a request between GFFS container and the FileServer. Each request is unique depending on the type
+	 * of operation it performs. But the prefix contains fields which are common to every request. However the length of these fields need not
+	 * be the same. This prefix is formed in this method and stored in a passed byte array.
 	 * 
 	 * @param request
 	 *            The byte array where the prefix has to be stored
@@ -21,8 +20,7 @@ public class Commons
 	 *            The filesystem path where the cmd operation has to be performed
 	 * @param nonce
 	 *            The nonce which goes in every request
-	 * @return The number of bytes in the prefix. The length of the prefix varies as it has a
-	 *         filesystem path field
+	 * @return The number of bytes in the prefix. The length of the prefix varies as it has a filesystem path field
 	 */
 	public static int formPrefix(byte[] request, byte pathtype, byte cmd, String path, byte[] nonce)
 	{

@@ -16,13 +16,11 @@ final public class SSHFSViewFactory extends AbstractFSViewFactory
 
 	public SSHFSViewFactory()
 	{
-		super(new SSHFSViewInformationManager(), SUPPORTED_URI_SCHEMES, DESCRIPTION,
-			FSViewAuthenticationInformationTypes.UsernamePassword);
+		super(new SSHFSViewInformationManager(), SUPPORTED_URI_SCHEMES, DESCRIPTION, FSViewAuthenticationInformationTypes.UsernamePassword);
 	}
 
 	@Override
-	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly)
-		throws IOException
+	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly) throws IOException
 	{
 		return new SSHFSViewSession(this, fsRoot, (UsernamePasswordAuthenticationInformation) authInfo, readOnly);
 	}

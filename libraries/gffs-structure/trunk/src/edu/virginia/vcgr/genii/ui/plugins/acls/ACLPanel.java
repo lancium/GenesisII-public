@@ -87,10 +87,10 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		add(SimplePanel.createVerticalPanel(GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			GUIUtils.addTitle("Read Permissions", new JScrollPane(_readList)),
 			GUIUtils.addTitle("Write Permissions", new JScrollPane(_writeList)),
-			GUIUtils.addTitle("Execute Permissions", new JScrollPane(_executeList))), new GridBagConstraints(1, 0, 1, 1, 1.0,
-			1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		add(SimplePanel.createVerticalPanel(GridBagConstraints.CENTER, GridBagConstraints.NONE, GUIUtils.addTitle(
-			"Username/Password Token", new UsernamePasswordComponent(_uiContext)), new PatternComponent(_uiContext),
+			GUIUtils.addTitle("Execute Permissions", new JScrollPane(_executeList))), new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(SimplePanel.createVerticalPanel(GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			GUIUtils.addTitle("Username/Password Token", new UsernamePasswordComponent(_uiContext)), new PatternComponent(_uiContext),
 			new EveryoneComponent(_uiContext)), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 	}
@@ -116,10 +116,8 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 	@Override
 	public void load()
 	{
-		_uiContext
-			.progressMonitorFactory()
-			.createMonitor(this, "Retrieving ACL Information", "Retrieving ACLs", 1000L, new ACLGetTask(),
-				new AuthZConfigReceiver()).start();
+		_uiContext.progressMonitorFactory()
+			.createMonitor(this, "Retrieving ACL Information", "Retrieving ACLs", 1000L, new ACLGetTask(), new AuthZConfigReceiver()).start();
 	}
 
 	public TearoffHandler createTearoffHandler()
@@ -144,8 +142,7 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		_executeList.setEnabled(false);
 
 		_uiContext.progressMonitorFactory()
-			.createMonitor(this, "Updating ACLs", "Updating ACLs", 1000L, new ACLSetTask(acl), new AuthZConfigReceiver())
-			.start();
+			.createMonitor(this, "Updating ACLs", "Updating ACLs", 1000L, new ACLSetTask(acl), new AuthZConfigReceiver()).start();
 	}
 
 	private void add(ACLList target, Collection<ACLEntryWrapper> wrappers)
@@ -311,8 +308,8 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		public AuthZConfig execute(TaskProgressListener progressListener) throws Exception
 		{
 			GenesisIIBaseRP rp =
-				(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(_uiContext.callingContext(),
-					_targetPath.getEndpoint(), GenesisIIBaseRP.class);
+				(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(_uiContext.callingContext(), _targetPath.getEndpoint(),
+					GenesisIIBaseRP.class);
 			AuthZConfig config = null;
 			try {
 				config = rp.getAuthZConfig();
@@ -398,8 +395,8 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		public AuthZConfig execute(TaskProgressListener progressListener) throws Exception
 		{
 			GenesisIIBaseRP rp =
-				(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(_uiContext.callingContext(),
-					_targetPath.getEndpoint(), GenesisIIBaseRP.class);
+				(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(_uiContext.callingContext(), _targetPath.getEndpoint(),
+					GenesisIIBaseRP.class);
 			AuthZConfig config = AxisAcl.encodeAcl(_newACL);
 			rp.setAuthZConfig(config);
 			return config;
@@ -477,8 +474,7 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 						return false;
 
 					RNSListTransferData data =
-						(RNSListTransferData) support.getTransferable().getTransferData(
-							RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+						(RNSListTransferData) support.getTransferable().getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
 					addRNS((ACLList) support.getComponent(), data.paths());
 
 					return true;
@@ -513,8 +509,7 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		{
 			try {
 				if (tData.isDataFlavorSupported(ACLTransferable.DATA_FLAVOR)) {
-					ACLEntryWrapperTransferData data =
-						(ACLEntryWrapperTransferData) tData.getTransferData(ACLTransferable.DATA_FLAVOR);
+					ACLEntryWrapperTransferData data = (ACLEntryWrapperTransferData) tData.getTransferData(ACLTransferable.DATA_FLAVOR);
 
 					if (action == MOVE && !data.handled())
 						remove(data.source(), data.wrappers());
@@ -555,8 +550,7 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 				if (transferable == null)
 					return;
 
-				ACLEntryWrapperTransferData data =
-					(ACLEntryWrapperTransferData) transferable.getTransferData(ACLTransferable.DATA_FLAVOR);
+				ACLEntryWrapperTransferData data = (ACLEntryWrapperTransferData) transferable.getTransferData(ACLTransferable.DATA_FLAVOR);
 				if (data == null)
 					return;
 
@@ -565,8 +559,8 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 					return;
 
 				int answer =
-					JOptionPane.showConfirmDialog(_list, "Are you sure you want to delete the selected entries?",
-						"Delete Confirmation", JOptionPane.YES_NO_OPTION);
+					JOptionPane.showConfirmDialog(_list, "Are you sure you want to delete the selected entries?", "Delete Confirmation",
+						JOptionPane.YES_NO_OPTION);
 				if (answer == JOptionPane.YES_OPTION)
 					remove(_list, wrappers);
 			} catch (Throwable cause) {

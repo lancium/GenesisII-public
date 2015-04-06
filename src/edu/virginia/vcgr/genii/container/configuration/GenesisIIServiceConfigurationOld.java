@@ -36,14 +36,12 @@ public class GenesisIIServiceConfigurationOld
 		} catch (IllegalAccessException e) {
 			throw new ConfigurationException(String.format("Unable to create instance for configuration item %s.", cl), e);
 		} catch (InvocationTargetException e) {
-			throw new ConfigurationException(String.format("Unable to create instance for configuration item %s.", cl),
-				e.getCause());
+			throw new ConfigurationException(String.format("Unable to create instance for configuration item %s.", cl), e.getCause());
 		}
 	}
 
 	private GenesisIIServiceConfigurationOld(Class<? extends IResourceProvider> resourceProviderClass,
-		Class<? extends IAuthZProvider> defaultAuthZProviderClass,
-		Class<? extends IResolverFactoryProxy> defaultResolverFactoryProxyClass)
+		Class<? extends IAuthZProvider> defaultAuthZProviderClass, Class<? extends IResolverFactoryProxy> defaultResolverFactoryProxyClass)
 	{
 		if (resourceProviderClass == null)
 			throw new IllegalArgumentException("Resource provider cannot be null.");
@@ -71,8 +69,7 @@ public class GenesisIIServiceConfigurationOld
 		return _defaultResolverFactoryProxy;
 	}
 
-	static private Map<Class<?>, GenesisIIServiceConfigurationOld> _confMap =
-		new HashMap<Class<?>, GenesisIIServiceConfigurationOld>();
+	static private Map<Class<?>, GenesisIIServiceConfigurationOld> _confMap = new HashMap<Class<?>, GenesisIIServiceConfigurationOld>();
 
 	static private GenesisIIServiceConfigurationOld discoverServiceConfiguration(Class<?> serviceClass)
 	{

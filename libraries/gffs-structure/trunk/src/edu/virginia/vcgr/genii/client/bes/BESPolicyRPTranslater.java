@@ -23,8 +23,7 @@ public class BESPolicyRPTranslater implements SingleResourcePropertyTranslator
 	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
 	{
 		if (!(obj instanceof BESPolicy))
-			throw new ResourcePropertyException("Unable to translate from type \"" + obj.getClass().getName()
-				+ "\" to BESPolicy.");
+			throw new ResourcePropertyException("Unable to translate from type \"" + obj.getClass().getName() + "\" to BESPolicy.");
 
 		return ((BESPolicy) obj).toMessageElement(name);
 	}

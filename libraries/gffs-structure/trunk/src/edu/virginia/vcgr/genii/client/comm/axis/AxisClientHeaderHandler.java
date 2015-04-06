@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package edu.virginia.vcgr.genii.client.comm.axis;
@@ -109,8 +108,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 	private void setMessageID(MessageContext msgContext) throws AxisFault
 	{
 		SOAPHeaderElement messageid =
-			new SOAPHeaderElement(new QName(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "MessageID"),
-				"urn:uuid:" + new GUID());
+			new SOAPHeaderElement(new QName(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "MessageID"), "urn:uuid:"
+				+ new GUID());
 		messageid.setActor(null);
 		messageid.setMustUnderstand(false);
 		try {
@@ -126,8 +125,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 		if ((uri != null) && (uri.length() > 0)) {
 			SOAPHeaderElement action =
-				new SOAPHeaderElement(new QName(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "Action"),
-					uri);
+				new SOAPHeaderElement(new QName(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "Action"), uri);
 			action.setActor(null);
 			action.setMustUnderstand(false);
 			try {
@@ -174,26 +172,22 @@ public class AxisClientHeaderHandler extends BasicHandler
 						SOAPHeaderElement she = new SOAPHeaderElement(elem);
 
 						/*
-						 * dgm4d: Haxx for problem where resource keys go missing: Basically we have
-						 * resource keys occasionally set as MessageElement.objectValue, which isn't
-						 * deep-copied from "elem" during the SOAPHeaderElement construction.
+						 * dgm4d: Haxx for problem where resource keys go missing: Basically we have resource keys occasionally set as
+						 * MessageElement.objectValue, which isn't deep-copied from "elem" during the SOAPHeaderElement construction.
 						 */
 						if ((elem.getObjectValue() != null) && ((she.getChildren() == null) || (she.getChildren().isEmpty()))) {
 							she.setObjectValue(elem.getObjectValue());
 						}
 
-						she.removeAttributeNS(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(),
-							"IsReferenceParameter");
-						she.addAttribute(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(),
-							"IsReferenceParameter", "true");
+						she.removeAttributeNS(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "IsReferenceParameter");
+						she.addAttribute(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "IsReferenceParameter", "true");
 						header.addChildElement(she);
 						referenceParameters.add(elem.getQName());
 					}
 
 					for (QName refParamName : referenceParameters) {
 						// specify that we need to sign the reference params
-						signParts.add(new WSEncryptionPart(refParamName.getLocalPart(), refParamName.getNamespaceURI(),
-							"Element"));
+						signParts.add(new WSEncryptionPart(refParamName.getLocalPart(), refParamName.getNamespaceURI(), "Element"));
 					}
 				}
 			}
@@ -202,8 +196,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 	}
 
-	public static void delegateCredentials(CredentialWallet wallet, ICallingContext callingContext,
-		MessageContext messageContext, MessageSecurity msgSecData) throws Exception
+	public static void delegateCredentials(CredentialWallet wallet, ICallingContext callingContext, MessageContext messageContext,
+		MessageSecurity msgSecData) throws Exception
 	{
 		if ((wallet == null) || (msgSecData == null)) {
 			_logger.error("failure in calling delegate credentials; null object passed");
@@ -225,8 +219,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 		EnumSet<RWXCategory> accessCategories = EnumSet.of(RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
 
 		/*
-		 * A new credentials wallet is needed for the resource. Otherwise, the operation of
-		 * delegation will corrupt client's own credentials wallet.
+		 * A new credentials wallet is needed for the resource. Otherwise, the operation of delegation will corrupt client's own credentials
+		 * wallet.
 		 */
 		AxisCredentialWallet walletForResource = new AxisCredentialWallet();
 
@@ -246,27 +240,26 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 					if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 						/*
-						 * in the server role, we first delegate from the source resource to our
-						 * container tls cert and thence to the target resource.
+						 * in the server role, we first delegate from the source resource to our container tls cert and thence to the target
+						 * resource.
 						 */
 						CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
 						if (tlsKey != null) {
 							// first delegate from the credential's resource to our tls cert.
 							TrustCredential newCred =
 								walletForResource.getRealCreds().delegateTrust(tlsKey._certChain, IdentityType.CONNECTION,
-									clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
-									restrictions, accessCategories, trustDelegation);
+									clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
+									accessCategories, trustDelegation);
 							if (newCred == null) {
 								_logger
 									.debug("failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
-										+ trustDelegation
-										+ "\nbecause we received a null delegated assertion for our tls cert.");
+										+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
 								continue;
 							}
 
 							// then delegate from the tls cert to the remote resource.
-							walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
-								tlsKey._certChain, tlsKey._privateKey, restrictions, accessCategories, newCred);
+							walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER, tlsKey._certChain,
+								tlsKey._privateKey, restrictions, accessCategories, newCred);
 
 							handledThisAlready = true;
 						} else {
@@ -284,8 +277,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 						// in the client role here, so just delegate to the resource.
 						TrustCredential newTC =
 							walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
-								clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
-								restrictions, accessCategories, trustDelegation);
+								clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
+								accessCategories, trustDelegation);
 
 						if (newTC != null) {
 							if (_logger.isDebugEnabled())
@@ -306,9 +299,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 				_logger.error("failed to find a TLS certificate to delegate to for outcall");
 			} else {
 				/*
-				 * possible extra credential 1: the idea here is that we need at least one assurance
-				 * that the source resource trusts this tls certificate and therefore the recipient
-				 * should also. we only add this certificate if we didn't already add other
+				 * possible extra credential 1: the idea here is that we need at least one assurance that the source resource trusts this tls
+				 * certificate and therefore the recipient should also. we only add this certificate if we didn't already add other
 				 * credentials delegated to the tls cert.
 				 */
 				if (!foundAny) {
@@ -324,18 +316,15 @@ public class AxisClientHeaderHandler extends BasicHandler
 				}
 
 				/*
-				 * possible extra credential 2: this credential says that the tls connection cert
-				 * trusts a pass-through tls identity, if any. this identity is used for matching
-				 * the original tls session cert who requested the identity against possible
-				 * patterns in the ACL; otherwise we can't join groups designated by myproxy CA or
-				 * other CA certs.
+				 * possible extra credential 2: this credential says that the tls connection cert trusts a pass-through tls identity, if any.
+				 * this identity is used for matching the original tls session cert who requested the identity against possible patterns in
+				 * the ACL; otherwise we can't join groups designated by myproxy CA or other CA certs.
 				 */
 				X509Certificate passThrough =
 					(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 				if (passThrough != null) {
 					/*
-					 * verify that this cert matches the last TLS we saw from the client, or we
-					 * won't propagate it.
+					 * verify that this cert matches the last TLS we saw from the client, or we won't propagate it.
 					 */
 					X509Certificate lastTLS =
 						(X509Certificate) callingContext.getSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
@@ -345,11 +334,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 						X509Certificate passOn[] = new X509Certificate[1];
 						passOn[0] = passThrough;
 						TrustCredential newerTC =
-							CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
-								tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
+							CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain, tlsKey._privateKey,
+								restrictions, RWXCategory.FULL_ACCESS);
 						if (newerTC == null) {
-							_logger.error("failed to create credential for pass-through connection for: "
-								+ passOn[0].getSubjectDN());
+							_logger.error("failed to create credential for pass-through connection for: " + passOn[0].getSubjectDN());
 						} else {
 							walletForResource.getRealCreds().addCredential(newerTC);
 							foundAny = true;
@@ -408,8 +396,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 
 		/*
-		 * process the transient credentials to prepare the serializable portion of the calling
-		 * context for them.
+		 * process the transient credentials to prepare the serializable portion of the calling context for them.
 		 */
 		MessageSecurity msgSecData = (MessageSecurity) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
 
@@ -430,8 +417,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		try {
 			SOAPHeader header = (SOAPHeader) msgContext.getMessage().getSOAPHeader();
 			SOAPHeaderElement context =
-				new SOAPHeaderElement(ObjectSerializer.toElement(callContext.getSerialized(),
-					GenesisIIConstants.CONTEXT_INFORMATION_QNAME));
+				new SOAPHeaderElement(ObjectSerializer.toElement(callContext.getSerialized(), GenesisIIConstants.CONTEXT_INFORMATION_QNAME));
 			header.addChildElement(context);
 
 			// specify that we need to sign the calling context

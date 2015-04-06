@@ -38,8 +38,7 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 	}
 
 	@SuppressWarnings("unchecked")
-	public DefaultGenesisIIAttributesPreFetcher(EndpointReferenceType target) throws ResourceException,
-		ResourceUnknownFaultType
+	public DefaultGenesisIIAttributesPreFetcher(EndpointReferenceType target) throws ResourceException, ResourceUnknownFaultType
 	{
 		this((Type) ResourceManager.getTargetResource(target).dereference());
 	}
@@ -53,8 +52,7 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 	{
 		IResource resource = getResource();
 
-		IAuthZProvider authZHandler =
-			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
@@ -65,8 +63,7 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 	protected AuthZConfig getAuthZConfig() throws Throwable
 	{
 		IResource resource = getResource();
-		IAuthZProvider authZHandler =
-			AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);

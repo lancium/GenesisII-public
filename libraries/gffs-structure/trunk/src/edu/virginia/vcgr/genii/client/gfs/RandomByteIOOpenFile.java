@@ -24,17 +24,15 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 class RandomByteIOOpenFile extends OperatorBasedOpenFile
 {
-	static private BasicFileOperator createOperator(EndpointReferenceType target) throws ResourceException,
-		GenesisIISecurityException, RemoteException, IOException
+	static private BasicFileOperator createOperator(EndpointReferenceType target) throws ResourceException, GenesisIISecurityException,
+		RemoteException, IOException
 	{
 
 		// ak3ka's additions for parallel fuse IO
 		int numThreads = ByteIOConstants.numThreads;
 		RandomByteIOTransferer rbit[] = new RandomByteIOTransferer[numThreads];
 		for (int i = 0; i < numThreads; ++i)
-			rbit[i] =
-				RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class,
-					target));
+			rbit[i] = RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class, target));
 
 		return new BasicFileOperator(ByteIOBufferLeaser.leaser(rbit[0].getTransferProtocol()), new ReadResolverImpl(rbit),
 			new WriteResolverImpl(rbit[0]), new AppendResolverImpl(rbit[0]), false);
@@ -82,8 +80,8 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 			}
 
 			fr[numThreads - 1] =
-				new FastRead(_transferer[numThreads - 1], fileOffset + subLength, threadBlkReadSize + (length % numThreads),
-					fac, numThreads - 1, threadBlkReadSize);
+				new FastRead(_transferer[numThreads - 1], fileOffset + subLength, threadBlkReadSize + (length % numThreads), fac,
+					numThreads - 1, threadBlkReadSize);
 
 			thread[numThreads - 1] = new Thread(fr[numThreads - 1]);
 

@@ -15,8 +15,7 @@ public class MethodStatisticsReportPoint implements Serializable
 
 	public String toString()
 	{
-		return String.format(
-			"Calls Started = %d, Calls Succeeded = %d, Calls Failed = %d, Failure Rate = %.2f%%, Average Duration = %d ms",
+		return String.format("Calls Started = %d, Calls Succeeded = %d, Calls Failed = %d, Failure Rate = %.2f%%, Average Duration = %d ms",
 			totalCallsStarted(), totalSucceeded(), totalFailed(), failureRate() * 100, averageDuration());
 	}
 

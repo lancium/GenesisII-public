@@ -72,8 +72,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 
-	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
-		File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout, File stderr,
+	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost, File executable,
+		Collection<String> arguments, Map<String, String> environment, File stdin, File stdout, File stderr,
 		BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
@@ -154,8 +154,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 				_logger.info(String.format("Asking batch system (%s) to submit the job.", queue));
 				history.trace("Batch System (%s) Starting Activity", queue);
-				resourceUsageFile =
-					new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory()).getNewResourceUsageFile();
+				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory()).getNewResourceUsageFile();
 				preDelay();
 				stderrPath = fileToPath(_stderr, null);
 				PrintWriter hWriter =
@@ -166,13 +165,11 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				hWriter.close();
 
 				_jobToken =
-					queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses,
-						_numProcessesPerHost, _executable.getAbsolutePath(), _arguments, _environment,
-						fileToPath(_stdin, null), fileToPath(_stdout, null), stderrPath, _resourceConstraints,
-						resourceUsageFile));
+					queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost, _executable
+						.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null), fileToPath(_stdout, null), stderrPath,
+						_resourceConstraints, resourceUsageFile));
 
-				_logger.info(String.format("Queue submitted job %s using command line:\n\t%s", _jobToken,
-					_jobToken.getCmdLine()));
+				_logger.info(String.format("Queue submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()));
 				history.createTraceWriter("Job Queued into Batch System")
 					.format("BES submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()).close();
 
@@ -213,8 +210,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						Vector<String> command = new Vector<String>(_arguments);
 						command.add(0, _executable.getAbsolutePath());
 						acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null,
-							_jobToken.getCmdLine(), exitCode, eResults.userTime(), eResults.kernelTime(),
-							eResults.wallclockTime(), eResults.maximumRSS());
+							_jobToken.getCmdLine(), exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(),
+							eResults.maximumRSS());
 					}
 
 				} catch (ProcessWrapperException pwe) {
@@ -224,8 +221,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			}
 
 			ExitCondition exitCondition = interpretExitCode(exitCode);
-			_logger.info(String.format("Process exited with %s.",
-				(exitCondition instanceof SignaledExit) ? ("Signal " + exitCondition) : ("Exit code " + exitCondition)));
+			_logger.info(String.format("Process exited with %s.", (exitCondition instanceof SignaledExit) ? ("Signal " + exitCondition)
+				: ("Exit code " + exitCondition)));
 			if (exitCode == 257)
 				throw new IgnoreableFault("Queue process exited with signal.");
 		}
@@ -267,8 +264,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			if (conf == null)
 				throw new RuntimeException("Unable to acquire connection to native queue; no queue defined.");
 
-			return conf.connect(_constructionParameters.getResourceOverrides(),
-				_constructionParameters.getCmdLineManipulatorConfiguration(), workingDirectory);
+			return conf.connect(_constructionParameters.getResourceOverrides(), _constructionParameters.getCmdLineManipulatorConfiguration(),
+				workingDirectory);
 		} catch (NativeQueueException nqe) {
 			throw new RuntimeException("Unable to acquire connection to native queue.", nqe);
 		}

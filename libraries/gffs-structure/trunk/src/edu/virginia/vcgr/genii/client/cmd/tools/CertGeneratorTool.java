@@ -179,9 +179,8 @@ public class CertGeneratorTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException
 	{
 		int numArgs = numArguments();
 		if (_create_generator) {
@@ -189,8 +188,8 @@ public class CertGeneratorTool extends BaseGridTool
 			if (numArgs > 1)
 				_path_for_cert_generator = getArgument(1);
 			try {
-				createGenerator(_path_for_cert_generator_factory, _url, _path_for_cert_generator, _ks_path, _ks_password,
-					_ks_alias, _entry_password, _default_validity);
+				createGenerator(_path_for_cert_generator_factory, _url, _path_for_cert_generator, _ks_path, _ks_password, _ks_alias,
+					_entry_password, _default_validity);
 			} catch (KeyStoreException e) {
 				throw new AuthZSecurityException("keystore issue: " + e.getLocalizedMessage(), e);
 			} catch (GeneralSecurityException e) {
@@ -206,8 +205,7 @@ public class CertGeneratorTool extends BaseGridTool
 			}
 			try {
 				KeyPair newKeyPair = CertTool.generateKeyPair(_keySize);
-				X509Certificate[] certChain =
-					createCert(newKeyPair, _path_for_cert_generator, _cn, _c, _st, _l, _o, _ou, _email);
+				X509Certificate[] certChain = createCert(newKeyPair, _path_for_cert_generator, _cn, _c, _st, _l, _o, _ou, _email);
 				storeCert(newKeyPair, certChain, _ks_path, _ks_password, _ks_alias, _entry_password);
 			} catch (GeneralSecurityException e) {
 				throw new AuthZSecurityException(e.getLocalizedMessage(), e);
@@ -244,9 +242,8 @@ public class CertGeneratorTool extends BaseGridTool
 	}
 
 	public EndpointReferenceType createGenerator(String service, boolean url, String optTargetName, String issuerCertKSPath,
-		String issuerCertKSPassword, String issuerCertAlias, String issuerCertEntryPassword, Long defaultValidity)
-		throws IOException, RNSException, CreationException, KeyStoreException, GeneralSecurityException,
-		InvalidToolUsageException
+		String issuerCertKSPassword, String issuerCertAlias, String issuerCertEntryPassword, Long defaultValidity) throws IOException,
+		RNSException, CreationException, KeyStoreException, GeneralSecurityException, InvalidToolUsageException
 	{
 		EndpointReferenceType epr;
 		PrivateKey issuerPrivateKey = null;
@@ -292,34 +289,31 @@ public class CertGeneratorTool extends BaseGridTool
 		Certificate[] chain = keyStore.getCertificateChain(issuerCertAlias);
 
 		if (chain == null) {
-			throw new CreationException("Could not retrieve cert " + issuerCertAlias + " from key store at path "
-				+ issuerCertKSPath);
+			throw new CreationException("Could not retrieve cert " + issuerCertAlias + " from key store at path " + issuerCertKSPath);
 		}
 
 		X509Certificate[] issuerCertChain = new X509Certificate[chain.length];
 		for (int i = 0; i < chain.length; i++)
 			issuerCertChain[i] = (X509Certificate) chain[i];
 
-		MessageElement[] createProps =
-			CertGeneratorUtils.createCreationProperties(issuerCertChain, issuerPrivateKey, defaultValidity);
+		MessageElement[] createProps = CertGeneratorUtils.createCreationProperties(issuerCertChain, issuerPrivateKey, defaultValidity);
 
 		if (!url) {
 			RNSPath path = RNSPath.getCurrent();
 			path = path.lookup(service, RNSPathQueryFlags.MUST_EXIST);
 			epr =
-				CreateResourceTool.createInstance(path.getEndpoint(), (optTargetName == null) ? null : new GeniiPath(
-					optTargetName), createProps);
+				CreateResourceTool.createInstance(path.getEndpoint(), (optTargetName == null) ? null : new GeniiPath(optTargetName),
+					createProps);
 		} else {
 			epr =
-				CreateResourceTool.createInstance(EPRUtils.makeEPR(service), (optTargetName == null) ? null : new GeniiPath(
-					optTargetName), createProps);
+				CreateResourceTool.createInstance(EPRUtils.makeEPR(service), (optTargetName == null) ? null : new GeniiPath(optTargetName),
+					createProps);
 		}
 		return epr;
 	}
 
-	static public X509Certificate[] createCert(KeyPair newKeyPair, String generatorPath, String cn, String c, String st,
-		String l, String o, String ou, String email) throws IOException, RNSException, CreationException,
-		GeneralSecurityException
+	static public X509Certificate[] createCert(KeyPair newKeyPair, String generatorPath, String cn, String c, String st, String l, String o,
+		String ou, String email) throws IOException, RNSException, CreationException, GeneralSecurityException
 	{
 		RNSPath path = RNSPath.getCurrent();
 		path = path.lookup(generatorPath, RNSPathQueryFlags.MUST_EXIST);
@@ -341,8 +335,8 @@ public class CertGeneratorTool extends BaseGridTool
 		return newCertChain;
 	}
 
-	static public void storeCert(KeyPair keyPair, X509Certificate[] certChain, String keyStorePath, String keyStorePassword,
-		String keyAlias, String entryPassword) throws IOException, GeneralSecurityException
+	static public void storeCert(KeyPair keyPair, X509Certificate[] certChain, String keyStorePath, String keyStorePassword, String keyAlias,
+		String entryPassword) throws IOException, GeneralSecurityException
 	{
 		String keyStoreType = "PKCS12";
 

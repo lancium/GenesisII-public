@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.naming;
 
@@ -195,12 +194,10 @@ public class WSName implements Comparable<WSName>, Serializable
 			for (MessageElement element : any) {
 				if (element.getQName().equals(WSName.REFERENCE_RESOLVER_QNAME)) {
 					try {
-						EndpointReferenceType resolverEPR =
-							(EndpointReferenceType) element.getObjectValue(EndpointReferenceType.class);
+						EndpointReferenceType resolverEPR = (EndpointReferenceType) element.getObjectValue(EndpointReferenceType.class);
 						if (resolverEPR != null) {
 							ResolverDescription resolver =
-								new ResolverDescription(_endpointIdentifier, resolverEPR,
-									ResolverDescription.ResolverType.REFERENCE_RESOLVER);
+								new ResolverDescription(_endpointIdentifier, resolverEPR, ResolverDescription.ResolverType.REFERENCE_RESOLVER);
 							_resolvers.add(resolver);
 						}
 					} catch (Throwable t) {
@@ -208,12 +205,10 @@ public class WSName implements Comparable<WSName>, Serializable
 					}
 				} else if (element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_RESOLVER_QNAME)) {
 					try {
-						EndpointReferenceType resolverEPR =
-							(EndpointReferenceType) element.getObjectValue(EndpointReferenceType.class);
+						EndpointReferenceType resolverEPR = (EndpointReferenceType) element.getObjectValue(EndpointReferenceType.class);
 						if (resolverEPR != null) {
 							ResolverDescription resolver =
-								new ResolverDescription(_endpointIdentifier, resolverEPR,
-									ResolverDescription.ResolverType.EPI_RESOLVER);
+								new ResolverDescription(_endpointIdentifier, resolverEPR, ResolverDescription.ResolverType.EPI_RESOLVER);
 							_resolvers.add(resolver);
 						}
 					} catch (Throwable t) {
@@ -227,8 +222,7 @@ public class WSName implements Comparable<WSName>, Serializable
 	public void addReferenceResolver(EndpointReferenceType resolverEPR)
 	{
 		doExtraction();
-		ResolverDescription newResolverDesc =
-			new ResolverDescription(_endpointIdentifier, resolverEPR, ResolverType.REFERENCE_RESOLVER);
+		ResolverDescription newResolverDesc = new ResolverDescription(_endpointIdentifier, resolverEPR, ResolverType.REFERENCE_RESOLVER);
 		_epr = createEPRWithResolvers(_epr, resolverEPR, ResolverType.REFERENCE_RESOLVER, null);
 		_resolvers.add(newResolverDesc);
 	}
@@ -236,8 +230,7 @@ public class WSName implements Comparable<WSName>, Serializable
 	public void addEndpointIdentifierReferenceResolver(EndpointReferenceType resolverEPR)
 	{
 		doExtraction();
-		ResolverDescription newResolverDesc =
-			new ResolverDescription(_endpointIdentifier, resolverEPR, ResolverType.EPI_RESOLVER);
+		ResolverDescription newResolverDesc = new ResolverDescription(_endpointIdentifier, resolverEPR, ResolverType.EPI_RESOLVER);
 		_epr = createEPRWithResolvers(_epr, resolverEPR, ResolverType.EPI_RESOLVER, null);
 		_resolvers.add(newResolverDesc);
 	}
@@ -257,8 +250,8 @@ public class WSName implements Comparable<WSName>, Serializable
 		_resolvers = resolvers;
 	}
 
-	private static EndpointReferenceType createEPRWithResolvers(EndpointReferenceType origEPR,
-		EndpointReferenceType resolverEPR, ResolverType resolverType, List<ResolverDescription> resolvers)
+	private static EndpointReferenceType createEPRWithResolvers(EndpointReferenceType origEPR, EndpointReferenceType resolverEPR,
+		ResolverType resolverType, List<ResolverDescription> resolvers)
 	{
 		AttributedURIType address = origEPR.getAddress();
 		ReferenceParametersType referenceParameters = origEPR.getReferenceParameters();

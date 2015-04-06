@@ -12,9 +12,8 @@ public abstract class AbstractFSViewFactory implements FSViewFactory
 	private FSViewAuthenticationInformationTypes[] _supportedAuthenticationTypes;
 	private FSViewInformationManager<URI> _informationManager;
 
-	protected AbstractFSViewFactory(FSViewInformationManager<URI> informationManager, String[] supportedURISchemes,
-		String description, FSViewAuthenticationInformationTypes authType,
-		FSViewAuthenticationInformationTypes... additionalAuthTypes)
+	protected AbstractFSViewFactory(FSViewInformationManager<URI> informationManager, String[] supportedURISchemes, String description,
+		FSViewAuthenticationInformationTypes authType, FSViewAuthenticationInformationTypes... additionalAuthTypes)
 	{
 		if (informationManager == null)
 			throw new IllegalArgumentException("Information manager cannot be null.");

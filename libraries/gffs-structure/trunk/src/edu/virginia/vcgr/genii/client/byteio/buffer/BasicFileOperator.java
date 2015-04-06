@@ -45,8 +45,8 @@ public class BasicFileOperator implements Closeable
 		this(leaser, readResolver, null, null, false);
 	}
 
-	public BasicFileOperator(ByteIOBufferLeaser leaser, WriteResolver writeResolver, AppendResolver appendResolver,
-		boolean truncate) throws IOException
+	public BasicFileOperator(ByteIOBufferLeaser leaser, WriteResolver writeResolver, AppendResolver appendResolver, boolean truncate)
+		throws IOException
 	{
 		this(leaser, null, writeResolver, appendResolver, truncate);
 	}

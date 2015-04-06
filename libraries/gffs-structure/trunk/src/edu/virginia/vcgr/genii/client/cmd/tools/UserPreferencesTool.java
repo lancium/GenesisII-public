@@ -48,9 +48,8 @@ public class UserPreferencesTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
@@ -62,8 +61,7 @@ public class UserPreferencesTool extends BaseGridTool
 
 		ComboBoxDialog menu =
 			provider.createSingleListSelectionDialog("User Preferences", "What would you like to do?", quitItem,
-				viewCurrentUserPreferencesItem, changeExceptionHandlerItem, changeGUIPreferencesItem, changeShellPromptItem,
-				quitItem);
+				viewCurrentUserPreferencesItem, changeExceptionHandlerItem, changeGUIPreferencesItem, changeShellPromptItem, quitItem);
 
 		while (true) {
 			menu.showDialog();
@@ -128,8 +126,8 @@ public class UserPreferencesTool extends BaseGridTool
 			MenuItem debug = new SimpleMenuItem("D", "Debug Exception Handler");
 
 			ComboBoxDialog dialog =
-				provider.createSingleListSelectionDialog("New Exception Handler",
-					"Please select the new exception handler to use:", null, simple, debug);
+				provider.createSingleListSelectionDialog("New Exception Handler", "Please select the new exception handler to use:", null,
+					simple, debug);
 			dialog.showDialog();
 			MenuItem selected = dialog.getSelectedItem();
 
@@ -155,8 +153,7 @@ public class UserPreferencesTool extends BaseGridTool
 		public void run(DialogProvider provider) throws DialogException, UserCancelException
 		{
 			YesNoDialog dialog =
-				provider.createYesNoDialog("Prefer GUI", "Do you prefer using graphical interfaces when available?",
-					YesNoSelection.YES);
+				provider.createYesNoDialog("Prefer GUI", "Do you prefer using graphical interfaces when available?", YesNoSelection.YES);
 			dialog.showDialog();
 
 			try {
@@ -177,8 +174,7 @@ public class UserPreferencesTool extends BaseGridTool
 	{
 		public void run(DialogProvider provider) throws DialogException, UserCancelException
 		{
-			InputDialog dialog =
-				provider.createInputDialog("Shell Prompt", "What would you like to use for your shell prompt?");
+			InputDialog dialog = provider.createInputDialog("Shell Prompt", "What would you like to use for your shell prompt?");
 			dialog.setDefaultAnswer(UserPreferences.preferences().shellPrompt().describe());
 			dialog.showDialog();
 

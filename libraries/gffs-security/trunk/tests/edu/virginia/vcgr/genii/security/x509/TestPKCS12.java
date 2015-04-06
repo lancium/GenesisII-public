@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.security.x509;
 
@@ -58,10 +57,9 @@ import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 import org.junit.Test;
 
 /**
- * Example of how to set up a certificate chain and a PKCS 12 store for a private individual -
- * obviously you'll need to generate your own keys, and you may need to add a NetscapeCertType
- * extension or add a key usage extension depending on your application, but you should get the
- * idea! As always this is just an example...
+ * Example of how to set up a certificate chain and a PKCS 12 store for a private individual - obviously you'll need to generate your own
+ * keys, and you may need to add a NetscapeCertType extension or add a key usage extension depending on your application, but you should get
+ * the idea! As always this is just an example...
  */
 @SuppressWarnings("deprecation")
 public class TestPKCS12
@@ -182,8 +180,7 @@ public class TestPKCS12
 		// this is actually optional - but if you want to have control
 		// over setting the friendly name this is the way to do it...
 		//
-		bagAttr.setBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString(
-			"Bouncy Intermediate Certificate"));
+		bagAttr.setBagAttribute(PKCSObjectIdentifiers.pkcs_9_at_friendlyName, new DERBMPString("Bouncy Intermediate Certificate"));
 
 		return cert;
 	}
@@ -292,8 +289,8 @@ public class TestPKCS12
 				new BigInteger("11", 16),
 				new BigInteger(
 					"9f66f6b05410cd503b2709e88115d55daced94d1a34d4e32bf824d0dde6028ae79c5f07b580f5dce240d7111f7ddb130a7945cd7d957d1920994da389f490c89",
-					16), new BigInteger("c0a0758cdf14256f78d4708c86becdead1b50ad4ad6c5c703e2168fbf37884cb", 16),
-				new BigInteger("f01734d7960ea60070f1b06f2bb81bfac48ff192ae18451d5e56c734a5aab8a5", 16), new BigInteger(
+					16), new BigInteger("c0a0758cdf14256f78d4708c86becdead1b50ad4ad6c5c703e2168fbf37884cb", 16), new BigInteger(
+					"f01734d7960ea60070f1b06f2bb81bfac48ff192ae18451d5e56c734a5aab8a5", 16), new BigInteger(
 					"b54bb9edff22051d9ee60f9351a48591b6500a319429c069a3e335a1d6171391", 16), new BigInteger(
 					"d3d83daf2a0cecd3367ae6f8ae1aeb82e9ac2f816c6fc483533d8297dd7884cd", 16), new BigInteger(
 					"b8f52fc6f38593dabb661d3f50f8897f8106eee68b1bce78a95b132b4e5b5d19", 16));
@@ -409,11 +406,9 @@ public class TestPKCS12
 
 		chain[chain.length - 1] = master;
 		/*
-		 * chain[6] = (X509Certificate) createIntermediateCert(caPubKey, caPrivKey,
-		 * (X509Certificate)chain[7], "a"); chain[5] = (X509Certificate)
-		 * createIntermediateCert(caPubKey, caPrivKey, (X509Certificate)chain[6], "b"); chain[4] =
-		 * (X509Certificate) createIntermediateCert(caPubKey, caPrivKey, (X509Certificate)chain[5],
-		 * "c");
+		 * chain[6] = (X509Certificate) createIntermediateCert(caPubKey, caPrivKey, (X509Certificate)chain[7], "a"); chain[5] =
+		 * (X509Certificate) createIntermediateCert(caPubKey, caPrivKey, (X509Certificate)chain[6], "b"); chain[4] = (X509Certificate)
+		 * createIntermediateCert(caPubKey, caPrivKey, (X509Certificate)chain[5], "c");
 		 */
 		try {
 			chain[3] = (X509Certificate) createIntermediateCert(caPubKey, caPrivKey, (X509Certificate) chain[4], "d");
@@ -504,27 +499,22 @@ public class TestPKCS12
 		Assert.assertEquals(0, exceptionsSeen);
 
 		/*
-		 * // load the trustmanager factory KeyStore store2 = KeyStore.getInstance("PKCS12", "BC");
-		 * store2.load(null, null); KeyStore.TrustedCertificateEntry entry = new
-		 * KeyStore.TrustedCertificateEntry(master); store2.setEntry("Bouncy Primary Certificate",
-		 * entry, null); // store2.setCertificateEntry("Bouncy Primary Certificate", chain[2]); //
-		 * TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); //
-		 * tmf.init(store2); PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(store2,
-		 * new X509CertSelector()); pkixParams.setRevocationEnabled(false); ManagerFactoryParameters
-		 * trustParams = new CertPathTrustManagerParameters(pkixParams); TrustManagerFactory tmf =
-		 * TrustManagerFactory.getInstance("PKIX", "SunJSSE"); tmf.init(trustParams);
+		 * // load the trustmanager factory KeyStore store2 = KeyStore.getInstance("PKCS12", "BC"); store2.load(null, null);
+		 * KeyStore.TrustedCertificateEntry entry = new KeyStore.TrustedCertificateEntry(master);
+		 * store2.setEntry("Bouncy Primary Certificate", entry, null); // store2.setCertificateEntry("Bouncy Primary Certificate", chain[2]);
+		 * // TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509"); // tmf.init(store2); PKIXBuilderParameters pkixParams =
+		 * new PKIXBuilderParameters(store2, new X509CertSelector()); pkixParams.setRevocationEnabled(false); ManagerFactoryParameters
+		 * trustParams = new CertPathTrustManagerParameters(pkixParams); TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX",
+		 * "SunJSSE"); tmf.init(trustParams);
 		 * 
 		 * 
-		 * X509Certificate[] c2 = new X509Certificate[chain.length]; CertificateFactory cf =
-		 * CertificateFactory.getInstance("X.509"); for (int i = 0; i < chain.length; i++) {
-		 * InputStream inputStream = new ByteArrayInputStream(chain[i].getEncoded()); c2[i] =
+		 * X509Certificate[] c2 = new X509Certificate[chain.length]; CertificateFactory cf = CertificateFactory.getInstance("X.509"); for (int
+		 * i = 0; i < chain.length; i++) { InputStream inputStream = new ByteArrayInputStream(chain[i].getEncoded()); c2[i] =
 		 * (X509Certificate) cf.generateCertificate(inputStream); }
 		 * 
-		 * CertPathValidator certPathValidator = CertPathValidator.getInstance("PKIX", "BC");
-		 * certPathValidator.validate(c2, null);
+		 * CertPathValidator certPathValidator = CertPathValidator.getInstance("PKIX", "BC"); certPathValidator.validate(c2, null);
 		 * 
-		 * X509TrustManager trustManager = (X509TrustManager) tmf.getTrustManagers()[0];
-		 * trustManager.checkClientTrusted(c2, "RSA");
+		 * X509TrustManager trustManager = (X509TrustManager) tmf.getTrustManagers()[0]; trustManager.checkClientTrusted(c2, "RSA");
 		 */
 
 		try {

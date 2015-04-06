@@ -52,8 +52,8 @@ public class SetResourcePropertiesTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 		GeniiPath target = new GeniiPath(getArgument(0));
 		GeniiPath rpFile = new GeniiPath(getArgument(1));

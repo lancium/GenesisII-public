@@ -15,8 +15,7 @@ import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 public class POSIXApplicationReifier
 {
-	static public POSIXApplication_Type reifyApplication(File deployDirectory, AbstractReifier reifier,
-		POSIXApplication_Type application)
+	static public POSIXApplication_Type reifyApplication(File deployDirectory, AbstractReifier reifier, POSIXApplication_Type application)
 	{
 		application.setEnvironment(reifyEnvironment(deployDirectory, reifier, application.getEnvironment()));
 
@@ -32,8 +31,7 @@ public class POSIXApplicationReifier
 		return application;
 	}
 
-	static private Environment_Type[] reifyEnvironment(File deployDirectory, AbstractReifier reifier,
-		Environment_Type[] original)
+	static private Environment_Type[] reifyEnvironment(File deployDirectory, AbstractReifier reifier, Environment_Type[] original)
 	{
 		boolean isWindows = isWindows();
 		boolean handledPath = false;

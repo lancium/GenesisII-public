@@ -46,8 +46,7 @@ public class FilesystemUnderstanding
 
 	public boolean isScratchFileSystem()
 	{
-		return ((_fsType == null) || (_fsType == FileSystemTypeEnumeration.spool))
-			&& ((_fsName != null) && (_fsName.equals("SCRATCH")));
+		return ((_fsType == null) || (_fsType == FileSystemTypeEnumeration.spool)) && ((_fsName != null) && (_fsName.equals("SCRATCH")));
 	}
 
 	public boolean isGridFileSystem()

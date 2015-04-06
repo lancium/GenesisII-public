@@ -105,8 +105,7 @@ public class JSDLFormer
 		POSIXApplication_Type posixApplication;
 
 		jobIdentification =
-			new JobIdentification_Type(_jobName, "Automatically generated JSDL document by Genesis II system.", null, null,
-				null);
+			new JobIdentification_Type(_jobName, "Automatically generated JSDL document by Genesis II system.", null, null, null);
 
 		posixApplication = createPOSIXApplication();
 		application = new Application_Type(_commandLine.get(0), null, null, Elementals.objectToArray(posixApplication));
@@ -114,8 +113,7 @@ public class JSDLFormer
 
 		dataStages = createDataStages();
 
-		return new JobDefinition_Type(new JobDescription_Type(jobIdentification, application, null, dataStages, null), null,
-			null);
+		return new JobDefinition_Type(new JobDescription_Type(jobIdentification, application, null, dataStages, null), null, null);
 	}
 
 	public void writeJSDL(OutputStream out) throws IOException
@@ -148,8 +146,8 @@ public class JSDLFormer
 			}
 		}
 
-		return new POSIXApplication_Type(executable, arguments, stdin, stdout, stderr, null, envOverload, null, null, null,
-			null, null, null, null, null, null, null, null, null, null, null, null, null);
+		return new POSIXApplication_Type(executable, arguments, stdin, stdout, stderr, null, envOverload, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null);
 	}
 
 	private DataStaging_Type[] createDataStages()
@@ -157,8 +155,8 @@ public class JSDLFormer
 		HashMap<String, DataStaging_Type> stages = new HashMap<String, DataStaging_Type>();
 		// Here is Andrew's first "code"
 		for (String stage : _stageIn.keySet()) {
-			stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE,
-				new SourceTarget_Type(_stageIn.get(stage), null), null, null, null));
+			stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE, new SourceTarget_Type(
+				_stageIn.get(stage), null), null, null, null));
 		}
 
 		for (String stage : _stageOut.keySet()) {

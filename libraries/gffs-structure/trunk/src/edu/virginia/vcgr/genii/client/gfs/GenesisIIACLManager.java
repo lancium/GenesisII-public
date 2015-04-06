@@ -26,8 +26,7 @@ public class GenesisIIACLManager
 	private Collection<Identity> _callerIdentities;
 	private GenesisIIBaseRP _rpStub;
 
-	public GenesisIIACLManager(EndpointReferenceType target, Collection<Identity> callerIdentities)
-		throws ResourcePropertyException
+	public GenesisIIACLManager(EndpointReferenceType target, Collection<Identity> callerIdentities) throws ResourcePropertyException
 	{
 		_callerIdentities = callerIdentities;
 		_rpStub = (GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(target, GenesisIIBaseRP.class);

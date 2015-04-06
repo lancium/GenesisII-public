@@ -22,8 +22,8 @@ public class FilesystemFactory
 		return new ScratchFilesystem();
 	}
 
-	static private Filesystem getGridFilesystem(String name, FileSystemTypeEnumeration type, String mountPoint,
-		String mountSource) throws JSDLException
+	static private Filesystem getGridFilesystem(String name, FileSystemTypeEnumeration type, String mountPoint, String mountSource)
+		throws JSDLException
 	{
 		if (type != GridFilesystem.FILESYSTEM_TYPE)
 			throw new InvalidJSDLException(String.format("Grid filesystem %s must have a file system type of \"%s\".", name,

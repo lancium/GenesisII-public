@@ -35,8 +35,8 @@ public class ConnectTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, InvalidToolUsageException, PermissionDeniedException,
-		UserCancelException, RNSPathAlreadyExistsException, RNSPathDoesNotExistException, AuthZSecurityException, IOException
+	protected int runCommand() throws ReloadShellException, InvalidToolUsageException, PermissionDeniedException, UserCancelException,
+		RNSPathAlreadyExistsException, RNSPathDoesNotExistException, AuthZSecurityException, IOException
 	{
 		GeniiPath gPath = new GeniiPath(getArgument(0));
 		String connectURL = gPath.path();
@@ -77,15 +77,14 @@ public class ConnectTool extends BaseGridTool
 			UserConfigUtils.setCurrentUserConfig(userConfig);
 
 			/*
-			 * reload the configuration manager so that all config options are loaded from the
-			 * specified deployment dir (instead of likely the "default" deployment).
+			 * reload the configuration manager so that all config options are loaded from the specified deployment dir (instead of likely the
+			 * "default" deployment).
 			 */
 			UserConfigUtils.reloadConfiguration();
 		}
 	}
 
-	static public void connect(String connectURL, DeploymentName deploymentName) throws ResourceException,
-		MalformedURLException, IOException
+	static public void connect(String connectURL, DeploymentName deploymentName) throws ResourceException, MalformedURLException, IOException
 	{
 		boolean isWindows = OperatingSystemType.isWindows();
 

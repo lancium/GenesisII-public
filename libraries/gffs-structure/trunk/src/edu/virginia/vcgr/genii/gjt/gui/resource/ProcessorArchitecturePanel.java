@@ -26,8 +26,8 @@ class ProcessorArchitecturePanel extends TitledPanel
 		arch.setSelectedItem(context.jobDocument().processorArchitecture());
 		arch.addItemListener(new ArchListener(context.jobDocument()));
 
-		add(new JLabel("Architecture"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel("Architecture"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 		add(arch, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 	}

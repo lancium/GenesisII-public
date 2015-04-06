@@ -94,8 +94,8 @@ public class StatBuffer implements IPackable
 				TimeUtils.getSeconds(new Date()), TimeUtils.getSeconds(new Date()));
 		} else if (ti.isByteIO()) {
 			return new StatBuffer(st_ino, StatBuffer.S_IFREG | StatBuffer.S_IRUSR | StatBuffer.S_IWUSR | StatBuffer.S_IRGRP
-				| StatBuffer.S_IROTH, ti.getByteIOSize(), 1024 * 512, TimeUtils.getSeconds(ti.getByteIOAccessTime()),
-				TimeUtils.getSeconds(ti.getByteIOModificationTime()), TimeUtils.getSeconds(ti.getByteIOCreateTime()));
+				| StatBuffer.S_IROTH, ti.getByteIOSize(), 1024 * 512, TimeUtils.getSeconds(ti.getByteIOAccessTime()), TimeUtils.getSeconds(ti
+				.getByteIOModificationTime()), TimeUtils.getSeconds(ti.getByteIOCreateTime()));
 		} else if (ti.isTool()) {
 			return new StatBuffer(st_ino, StatBuffer.S_IFREG, 0, 1024 * 4, TimeUtils.getSeconds(new Date()),
 				TimeUtils.getSeconds(new Date()), TimeUtils.getSeconds(new Date()));

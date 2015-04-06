@@ -50,8 +50,7 @@ public class VariationConfiguration implements Serializable
 	private void afterUnmarshal(Unmarshaller u, Object parent) throws JAXBException, CmdLineManipulatorException, IOException
 	{
 		if (_any.size() > 1)
-			throw new JAXBException("A CmdLine Manipulator configuration must have "
-				+ "0 or 1 variation configurations, not more.");
+			throw new JAXBException("A CmdLine Manipulator configuration must have " + "0 or 1 variation configurations, not more.");
 
 		if (_any.size() == 0)
 			_variationConfiguration = null;

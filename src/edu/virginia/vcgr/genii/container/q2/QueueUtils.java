@@ -16,8 +16,7 @@ import org.ggf.jsdl.JobIdentification_Type;
 public class QueueUtils
 {
 	/**
-	 * We occassionally need to convert a date object into a calendar object (SOAP uses calendars,
-	 * everyone else uses dates).
+	 * We occassionally need to convert a date object into a calendar object (SOAP uses calendars, everyone else uses dates).
 	 * 
 	 * @param d
 	 *            THe date to convert

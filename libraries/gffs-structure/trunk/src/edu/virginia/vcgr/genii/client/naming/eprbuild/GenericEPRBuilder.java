@@ -90,7 +90,7 @@ public class GenericEPRBuilder implements EPRBuilder
 		MessageElement[] rp = convert(referenceParameters());
 		MessageElement[] m = convert(metadata());
 
-		return new EndpointReferenceType(new AttributedURIType(_address.toString()), (rp == null) ? null
-			: new ReferenceParametersType(rp), (m == null) ? null : new MetadataType(m), null);
+		return new EndpointReferenceType(new AttributedURIType(_address.toString()), (rp == null) ? null : new ReferenceParametersType(rp),
+			(m == null) ? null : new MetadataType(m), null);
 	}
 }

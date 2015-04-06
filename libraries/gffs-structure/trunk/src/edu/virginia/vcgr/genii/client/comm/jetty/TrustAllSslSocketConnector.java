@@ -20,8 +20,7 @@ import org.mortbay.resource.Resource;
 import edu.virginia.vcgr.genii.security.x509.TrustAllX509TrustManager;
 
 /**
- * A wrapper of the generic Jetty SslSocketConnector connector in which all incoming connections are
- * initially trusted.
+ * A wrapper of the generic Jetty SslSocketConnector connector in which all incoming connections are initially trusted.
  * 
  * (Authorization and trust-verification occur later during message-level processing)
  * 
@@ -79,14 +78,12 @@ public class TrustAllSslSocketConnector extends SslSocketConnector
 		TrustManager[] trustManagers = new TrustManager[1];
 		trustManagers[0] = trustAll;
 
-		SecureRandom secureRandom =
-			getSecureRandomAlgorithm() == null ? null : SecureRandom.getInstance(getSecureRandomAlgorithm());
+		SecureRandom secureRandom = getSecureRandomAlgorithm() == null ? null : SecureRandom.getInstance(getSecureRandomAlgorithm());
 
 		String protocol = getProtocol();
 		_logger.debug("original ssl protocol is: " + protocol);
 		protocol = "TLSv1.1";
-		SSLContext context =
-			getProvider() == null ? SSLContext.getInstance(protocol) : SSLContext.getInstance(protocol, getProvider());
+		SSLContext context = getProvider() == null ? SSLContext.getInstance(protocol) : SSLContext.getInstance(protocol, getProvider());
 		SSLContext sslcontext = context;
 
 		SSLSessionContext sessionContext = sslcontext.getServerSessionContext();

@@ -26,9 +26,9 @@ public class UIContext implements Cloneable
 	private ICallingContext _callingContext;
 	private DirectoryChangeNexus _dChangeNexus;
 
-	private UIContext(ApplicationContext applicationContext, ExecutorService executor,
-		ProgressMonitorFactory progressMonitorFactory, UIConfiguration uiConfiguration, UIPreferences uiPreferences,
-		TrashCan trashCan, ICallingContext callingContext, DirectoryChangeNexus dChangeNexus)
+	private UIContext(ApplicationContext applicationContext, ExecutorService executor, ProgressMonitorFactory progressMonitorFactory,
+		UIConfiguration uiConfiguration, UIPreferences uiPreferences, TrashCan trashCan, ICallingContext callingContext,
+		DirectoryChangeNexus dChangeNexus)
 	{
 		_applicationContext = applicationContext;
 		_executor = executor;
@@ -51,8 +51,8 @@ public class UIContext implements Cloneable
 	@Override
 	final public Object clone()
 	{
-		return new UIContext(_applicationContext, _executor, _progressMonitorFactory, _configuration, _uiPreferences,
-			_trashCan, _callingContext.deriveNewContext(), _dChangeNexus);
+		return new UIContext(_applicationContext, _executor, _progressMonitorFactory, _configuration, _uiPreferences, _trashCan,
+			_callingContext.deriveNewContext(), _dChangeNexus);
 	}
 
 	final public ExecutorService executor()

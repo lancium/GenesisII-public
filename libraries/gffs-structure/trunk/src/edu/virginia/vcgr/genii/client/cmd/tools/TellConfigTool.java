@@ -38,8 +38,8 @@ public class TellConfigTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		int toReturn = 0;
 
@@ -61,15 +61,12 @@ public class TellConfigTool extends BaseGridTool
 				}
 				case ARG_ACTIVE_DEPLOYMENTS_DIR: {
 					stdout.println("Active Deployment directory is '"
-						+ Installation.getDeployment(new DeploymentName()).getDeploymentTop().lookupFile("").getAbsolutePath()
-						+ "'");
+						+ Installation.getDeployment(new DeploymentName()).getDeploymentTop().lookupFile("").getAbsolutePath() + "'");
 					break;
 				}
 				case ARG_SECURITY_DIR: {
-					File firstLevel =
-						InstallationProperties.getInstallationProperties().getLocalCertsDirectory().lookupFile("");
-					File secondLevel =
-						Installation.getDeployment(new DeploymentName()).security().getSecurityDirectory().lookupFile("");
+					File firstLevel = InstallationProperties.getInstallationProperties().getLocalCertsDirectory().lookupFile("");
+					File secondLevel = Installation.getDeployment(new DeploymentName()).security().getSecurityDirectory().lookupFile("");
 					String report = "Security directory is '" + firstLevel.getAbsolutePath() + "'";
 					if (!firstLevel.getName().equals(secondLevel.getName())) {
 						report = report + "\nFallback Security directory is: '" + secondLevel.getAbsolutePath() + "'";
@@ -98,8 +95,7 @@ public class TellConfigTool extends BaseGridTool
 					stdout.println("Owner Certificate stored in: '" + certFile + "'");
 					if (certFile != null) {
 						stdout.println("Owner Certificate Subject: '"
-							+ InstallationProperties.getInstallationProperties().getOwnerCertificate()
-								.describe(VerbosityLevel.LOW) + "'");
+							+ InstallationProperties.getInstallationProperties().getOwnerCertificate().describe(VerbosityLevel.LOW) + "'");
 					}
 					break;
 				}
@@ -108,8 +104,8 @@ public class TellConfigTool extends BaseGridTool
 					stdout.println("Admin Certificate stored in: '" + certFile + "'");
 					if (certFile != null) {
 						stdout.println("Admin Certificate Subject: '"
-							+ Installation.getDeployment(new DeploymentName()).security().getAdminIdentity()
-								.describe(VerbosityLevel.LOW) + "'");
+							+ Installation.getDeployment(new DeploymentName()).security().getAdminIdentity().describe(VerbosityLevel.LOW)
+							+ "'");
 					}
 					break;
 				}

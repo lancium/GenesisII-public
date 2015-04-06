@@ -51,8 +51,7 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 	{
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.StageIn);
 
-		history.createInfoWriter("Staging in to %s", _target.getName()).format("Staging in from %s to %s.", _source, _target)
-			.close();
+		history.createInfoWriter("Staging in to %s", _target.getName()).format("Staging in from %s to %s.", _source, _target).close();
 		DataTransferStatistics stats;
 
 		try {

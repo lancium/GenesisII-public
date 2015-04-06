@@ -36,8 +36,7 @@ public class InputStreamBuilder extends Builder
 
 	private Throwable oldException;
 
-	public InputStreamBuilder(String type, Provider provider, InputStream input, ProtectionParameter protection,
-		AccessControlContext context)
+	public InputStreamBuilder(String type, Provider provider, InputStream input, ProtectionParameter protection, AccessControlContext context)
 	{
 		this.type = type;
 		this.provider = provider;

@@ -45,11 +45,10 @@ public class Icons extends edu.virginia.vcgr.genii.ui.Icons
 			_logger.error("failure to load icons for grid job tool.", e);
 		}
 	}
-	
+
 	static public Icon labelIcon(Icon original, String text)
 	{
-		BufferedImage newImage =
-			new BufferedImage(original.getIconWidth(), original.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage newImage = new BufferedImage(original.getIconWidth(), original.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g = null;
 		Rectangle canvas = new Rectangle(0, 0, original.getIconWidth(), original.getIconHeight());
 		Rectangle2D r;
@@ -71,8 +70,7 @@ public class Icons extends edu.virginia.vcgr.genii.ui.Icons
 
 			g.setFont(font);
 			g.setColor(Color.BLACK);
-			g.drawString(text, (int) ((canvas.width - r.getWidth()) / 2),
-				(int) ((canvas.height - r.getHeight()) / 2 + r.getHeight()));
+			g.drawString(text, (int) ((canvas.width - r.getWidth()) / 2), (int) ((canvas.height - r.getHeight()) / 2 + r.getHeight()));
 
 			return new ImageIcon(newImage);
 		} finally {
@@ -88,8 +86,7 @@ public class Icons extends edu.virginia.vcgr.genii.ui.Icons
 
 	static public Icon createGrayedIcon(Icon original)
 	{
-		BufferedImage newImage =
-			new BufferedImage(original.getIconWidth(), original.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage newImage = new BufferedImage(original.getIconWidth(), original.getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g = null;
 
 		try {

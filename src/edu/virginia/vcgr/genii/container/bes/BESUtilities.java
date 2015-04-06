@@ -22,8 +22,7 @@ public class BESUtilities
 	{
 		BESConstants bconsts = new BESConstants();
 
-		String workerDirString =
-			Container.getContainerConfiguration().getGlobalProperties().getProperty(bconsts.CONFIG_PROPERTY_WORKER_DIR);
+		String workerDirString = Container.getContainerConfiguration().getGlobalProperties().getProperty(bconsts.CONFIG_PROPERTY_WORKER_DIR);
 
 		if (workerDirString == null)
 			throw new ConfigurationException("Unable to find BES worker dir configuration property.");
@@ -39,8 +38,7 @@ public class BESUtilities
 		BESConstants bconsts = new BESConstants();
 
 		String canOverrideString =
-			Container.getContainerConfiguration().getGlobalProperties()
-				.getProperty(bconsts.CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE);
+			Container.getContainerConfiguration().getGlobalProperties().getProperty(bconsts.CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE);
 		if (canOverrideString != null && canOverrideString.equalsIgnoreCase("true"))
 			return true;
 

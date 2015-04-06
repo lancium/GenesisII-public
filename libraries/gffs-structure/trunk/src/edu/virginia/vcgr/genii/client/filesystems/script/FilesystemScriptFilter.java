@@ -53,8 +53,7 @@ public class FilesystemScriptFilter implements FilesystemWatchFilter
 		return _expression.toString();
 	}
 
-	static private BooleanExpression parseBinaryBoolean(BinaryBooleanOperators operator, Element[] children)
-		throws FilterScriptException
+	static private BooleanExpression parseBinaryBoolean(BinaryBooleanOperators operator, Element[] children) throws FilterScriptException
 	{
 		if (children.length != 2)
 			throw new FilterScriptException(String.format("%s binary operator requires exactly 2 child elements.", operator));

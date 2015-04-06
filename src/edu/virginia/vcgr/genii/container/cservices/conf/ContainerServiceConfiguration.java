@@ -114,8 +114,8 @@ public class ContainerServiceConfiguration
 			ret = cons.newInstance((Object) any);
 		} catch (NoSuchMethodException nsme1) {
 			if (any.length > 1)
-				throw new NoSuchMethodException(String.format("Unable to find suitable constructor for "
-					+ "service %s defined in file %s.", _serviceClass, _sourceFile));
+				throw new NoSuchMethodException(String.format("Unable to find suitable constructor for " + "service %s defined in file %s.",
+					_serviceClass, _sourceFile));
 			try {
 				cons = _serviceClass.getConstructor(Element.class);
 				if (any.length == 0)
@@ -134,8 +134,7 @@ public class ContainerServiceConfiguration
 		return ret;
 	}
 
-	static public Collection<ContainerServiceConfiguration> loadConfigurations(HierarchicalDirectory sourceDirectory)
-		throws IOException
+	static public Collection<ContainerServiceConfiguration> loadConfigurations(HierarchicalDirectory sourceDirectory) throws IOException
 	{
 		Collection<ContainerServiceConfiguration> ret = new LinkedList<ContainerServiceConfiguration>();
 		JAXBContext context;
@@ -154,8 +153,7 @@ public class ContainerServiceConfiguration
 				conf._sourceFile = sourceFile;
 				ret.add(conf);
 			} catch (JAXBException e) {
-				_logger.error(
-					String.format("Unable to load container service configuration " + "from file \"%s\".", sourceFile), e);
+				_logger.error(String.format("Unable to load container service configuration " + "from file \"%s\".", sourceFile), e);
 			}
 		}
 

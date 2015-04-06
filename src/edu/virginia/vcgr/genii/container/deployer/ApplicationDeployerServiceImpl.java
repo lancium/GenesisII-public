@@ -52,8 +52,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 {
 	static private Log _logger = LogFactory.getLog(ApplicationDeployerServiceImpl.class);
 
-	static private QName DEPLOYMENT_CONSTRUCTION_PARAM = new QName(WellKnownPortTypes.DEPLOYER_PORT_TYPE().getQName()
-		.getNamespaceURI(), "deployment");
+	static private QName DEPLOYMENT_CONSTRUCTION_PARAM = new QName(WellKnownPortTypes.DEPLOYER_PORT_TYPE().getQName().getNamespaceURI(),
+		"deployment");
 
 	static private final String _DEPLOYMENT_PROPERTY = "edu.virginia.vcgr.genii.container.deployer.deployment-property";
 
@@ -78,8 +78,7 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateDeploymentResponseType createDeployment(CreateDeploymentRequestType createDeploymentRequest)
-		throws RemoteException
+	public CreateDeploymentResponseType createDeployment(CreateDeploymentRequestType createDeploymentRequest) throws RemoteException
 	{
 		VcgrCreate create =
 			new VcgrCreate(new MessageElement[] { new MessageElement(DEPLOYMENT_CONSTRUCTION_PARAM,
@@ -102,8 +101,7 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 		InputStream bin = null;
 		try {
 			bin = ByteIOStreamFactory.createInputStream(depDescEPR);
-			deployDoc =
-				(DeploymentDocumentType) ObjectDeserializer.deserialize(new InputSource(bin), DeploymentDocumentType.class);
+			deployDoc = (DeploymentDocumentType) ObjectDeserializer.deserialize(new InputSource(bin), DeploymentDocumentType.class);
 
 			MessageElement[] any = deployDoc.get_any();
 			if (any == null || any.length != 1)
@@ -114,8 +112,7 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 				throw new RemoteException("Deployment document not recognized.");
 
 			if (name.equals(ApplicationDescriptionUtils.ZIPJAR_DEPLOYMENT_ELEMENT_QNAME)) {
-				deployment =
-					createZipJarDeployment(depDescEPR, ObjectDeserializer.toObject(any[0], ZipJarDeploymentType.class));
+				deployment = createZipJarDeployment(depDescEPR, ObjectDeserializer.toObject(any[0], ZipJarDeploymentType.class));
 
 			} else if (name.equals(ApplicationDescriptionUtils.BINARY_DEPLOYMENT_ELEMENT_QNAME)) {
 				deployment = createBinaryDeployment(depDescEPR, ObjectDeserializer.toObject(any[0], BinDeploymentType.class));
@@ -166,8 +163,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 			SystemUtils.getSupportedOperatingSystems(), null) };
 	}
 
-	static private IDeployment createZipJarDeployment(EndpointReferenceType deployDescEPR,
-		ZipJarDeploymentType deploymentDescription) throws DeploymentException
+	static private IDeployment createZipJarDeployment(EndpointReferenceType deployDescEPR, ZipJarDeploymentType deploymentDescription)
+		throws DeploymentException
 	{
 		String deploymentID = new WSName(deployDescEPR).getEndpointIdentifier().toString();
 		ZipJarDeploymentProvider provider = new ZipJarDeploymentProvider(deployDescEPR, deploymentDescription);
@@ -178,8 +175,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 		return DeploymentManager.createDeployment(deploymentID, provider, snapshot);
 	}
 
-	static private IDeployment createBinaryDeployment(EndpointReferenceType deployDescEPR,
-		BinDeploymentType deploymentDescription) throws DeploymentException
+	static private IDeployment createBinaryDeployment(EndpointReferenceType deployDescEPR, BinDeploymentType deploymentDescription)
+		throws DeploymentException
 	{
 		String deploymentID = new WSName(deployDescEPR).getEndpointIdentifier().toString();
 		BinDeploymentProvider provider = new BinDeploymentProvider(deployDescEPR, deploymentDescription);

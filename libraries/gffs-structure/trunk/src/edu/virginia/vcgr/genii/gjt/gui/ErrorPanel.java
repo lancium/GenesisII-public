@@ -47,8 +47,8 @@ class ErrorPanel extends TitledPanel implements ModificationListener
 		_generateAction = generateAction;
 		_document = document;
 
-		add(_label, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(
-			5, 5, 5, 5), 5, 5));
+		add(_label, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5,
+			5));
 
 		analyze();
 	}

@@ -102,8 +102,7 @@ public class DefaultProgressNotifier implements ProgressNotifier
 					if (_parent != null)
 						owner = SwingUtilities.getWindowAncestor(_parent);
 
-					ProgressNotifierDialog dialog =
-						new ProgressNotifierDialog(owner, _title, _initialNote, _task, _progress, _controller);
+					ProgressNotifierDialog dialog = new ProgressNotifierDialog(owner, _title, _initialNote, _task, _progress, _controller);
 
 					dialog.pack();
 					GraphicsUtils.centerWindow(dialog);

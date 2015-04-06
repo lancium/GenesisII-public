@@ -19,8 +19,8 @@ class StreamableByteIOFactoryOpenFile extends GeniiOpenFile
 	private StreamableByteIOPortType _target;
 	private StreamableByteIOOpenFile _file;
 
-	StreamableByteIOFactoryOpenFile(String[] path, EndpointReferenceType target, boolean canRead, boolean canWrite,
-		boolean isAppend) throws ResourceException, GenesisIISecurityException, RemoteException, IOException
+	StreamableByteIOFactoryOpenFile(String[] path, EndpointReferenceType target, boolean canRead, boolean canWrite, boolean isAppend)
+		throws ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
 		super(path, canRead, canWrite, isAppend);
 

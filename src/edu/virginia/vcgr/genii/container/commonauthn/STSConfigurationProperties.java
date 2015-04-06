@@ -12,8 +12,7 @@ public interface STSConfigurationProperties
 	public static QName REPLICA_STS_CONSTRUCTION_PARAM = new QName(GenesisIIConstants.GENESISII_NS, "replica-sts");
 
 	// a flag directing to avoid linking a replicated resource under the service RNS directory
-	public static QName LINK_TO_SERVICE_DIR_CONSTRUCTION_PARAM = new QName(GenesisIIConstants.GENESISII_NS,
-		"link-sts-to-service-dir");
+	public static QName LINK_TO_SERVICE_DIR_CONSTRUCTION_PARAM = new QName(GenesisIIConstants.GENESISII_NS, "link-sts-to-service-dir");
 
 	// represents the EPR from which the resource certificate should be retrieved instead of
 	// creating a new resource certificate for a replica

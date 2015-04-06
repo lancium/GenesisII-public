@@ -98,8 +98,7 @@ public class ClientApplication extends UIFrame
 	}
 
 	@SuppressWarnings("unchecked")
-	public ClientApplication(UIContext context, boolean launchShell) throws FileNotFoundException, IOException,
-		RNSPathDoesNotExistException
+	public ClientApplication(UIContext context, boolean launchShell) throws FileNotFoundException, IOException, RNSPathDoesNotExistException
 	{
 		super(context, "XSEDE GFFS GUI - Provided as part of Genesis II from the University of Virginia");
 
@@ -136,21 +135,21 @@ public class ClientApplication extends UIFrame
 			new TearoffPanel(scroller, _browserTree.createTearoffHandler(_context), new IconBasedTearoffThumb())));
 		splitPane.setRightComponent(_tabbedPane);
 
-		content.add(splitPane, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(splitPane, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
+			5, 5, 5), 5, 5));
 
-		content.add(new CredentialManagementButton(_uiContext), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new CredentialManagementButton(_uiContext), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new TrashCanWidget(_context, _uiContext), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new TrashCanWidget(_context, _uiContext), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		// new code to add a diagnostics logging view.
 		LoggingListModel listModel = new LoggingListModel();
 		_debugTarget = new JList(listModel);
 		JScrollPane debugScroller = new JScrollPane(_debugTarget);
-		content.add(debugScroller, new GridBagConstraints(0, 2, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(debugScroller, new GridBagConstraints(0, 2, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		UIPlugins plugins = new UIPlugins(new UIPluginContext(_uiContext, _browserTree, _browserTree));
 		plugins.addTopLevelMenus(getJMenuBar());
@@ -167,12 +166,10 @@ public class ClientApplication extends UIFrame
 		_debugLinkage.consumeLogging("Application Started", new Exception("All is well."));
 
 		/*
-		 * try { EndpointReferenceType epr = new LocalContainer(_uiContext).getEndpoint();
-		 * EnhancedRNSPortType rns = ClientUtils.createProxy(EnhancedRNSPortType.class, epr,
-		 * _uiContext.callingContext()); ListResponse resp = rns.list(new List()); for (EntryType
-		 * entry : resp.getEntryList()) { System.err.format("Entry:  %s\n", entry.getEntry_name());
-		 * } } catch (ContainerNotRunningException cnre) {
-		 * _logger.info("exception in ClientApplication", cnre); }
+		 * try { EndpointReferenceType epr = new LocalContainer(_uiContext).getEndpoint(); EnhancedRNSPortType rns =
+		 * ClientUtils.createProxy(EnhancedRNSPortType.class, epr, _uiContext.callingContext()); ListResponse resp = rns.list(new List()); for
+		 * (EntryType entry : resp.getEntryList()) { System.err.format("Entry:  %s\n", entry.getEntry_name()); } } catch
+		 * (ContainerNotRunningException cnre) { _logger.info("exception in ClientApplication", cnre); }
 		 */
 	}
 
@@ -211,8 +208,8 @@ public class ClientApplication extends UIFrame
 			try {
 				_uiContext.preferences().launchEditor(ClientApplication.this);
 			} catch (BackingStoreException bse) {
-				JOptionPane.showMessageDialog(ClientApplication.this, "Unable to store preferences.",
-					"Preferences Store Exception", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(ClientApplication.this, "Unable to store preferences.", "Preferences Store Exception",
+					JOptionPane.ERROR_MESSAGE);
 			}
 		}
 

@@ -1,8 +1,7 @@
 package edu.virginia.vcgr.genii.system.classloader;
 
 /**
- * A class loader that builds a repository of all the known class loaders, so we can hopefully find
- * stuff across all our jar files.
+ * A class loader that builds a repository of all the known class loaders, so we can hopefully find stuff across all our jar files.
  */
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,10 +38,8 @@ public class GenesisClassLoader extends ClassLoader
 		if (!_loaders.contains(newLoader)) {
 
 			/*
-			 * nope //temp design truncation to see if we are causing osgi problems. if
-			 * (_loaders.size() > 0) { if (_logger.isDebugEnabled())
-			 * _logger.debug("skipping classloader add; single instance mode: " +
-			 * newLoader.toString()); return false; }
+			 * nope //temp design truncation to see if we are causing osgi problems. if (_loaders.size() > 0) { if (_logger.isDebugEnabled())
+			 * _logger.debug("skipping classloader add; single instance mode: " + newLoader.toString()); return false; }
 			 */
 
 			_loaders.add(newLoader);

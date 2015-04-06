@@ -57,11 +57,9 @@ public class TestExportRestrictionList
 		Assert.assertEquals(false, erl.checkCreationOkay("/etc/samba/smb.conf", "joe", ModeAllowance.getReadOnlyMode()));
 		Assert.assertEquals(false, erl.checkCreationOkay("/etc/samba", "joe", ModeAllowance.getReadWriteMode()));
 
-		Assert
-			.assertEquals(true, erl.checkCreationOkay("/etc/samba/fezziwig/smb.conf", "joe", ModeAllowance.getReadOnlyMode()));
+		Assert.assertEquals(true, erl.checkCreationOkay("/etc/samba/fezziwig/smb.conf", "joe", ModeAllowance.getReadOnlyMode()));
 		Assert.assertEquals(true, erl.checkCreationOkay("/etc/samba/fezziwig", "joe", ModeAllowance.getReadWriteMode()));
-		Assert.assertEquals(true,
-			erl.checkCreationOkay("/etc/samba/fezziwig/smb.conf", "tony", ModeAllowance.getReadWriteMode()));
+		Assert.assertEquals(true, erl.checkCreationOkay("/etc/samba/fezziwig/smb.conf", "tony", ModeAllowance.getReadWriteMode()));
 
 		Assert.assertEquals(false, erl.checkCreationOkay("/home/doughnut", "tony", ModeAllowance.getReadWriteMode()));
 

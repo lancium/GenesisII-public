@@ -20,13 +20,11 @@ import edu.virginia.vcgr.genii.client.rp.DefaultSingleResourcePropertyTranslator
 import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 
 /*
- * This class maintains the mapping between the different views of a web services resource. This is
- * needed because FUSE and Grid shell access the same resource using different identifiers. This is
- * also very useful for refreshing/invalidating cached items in multiple caches. As our caching
- * philosophy is to minimize the duplication of or cached information we need this mapping to locate
- * the components of cached resource that a particular client -- FUSE or Grid Shell -- is interested
- * in. Finally, since this is a lightweight class and has multiple use cases the cache holding
- * instances of this class should have both a larger lifetime and capacity.
+ * This class maintains the mapping between the different views of a web services resource. This is needed because FUSE and Grid shell access
+ * the same resource using different identifiers. This is also very useful for refreshing/invalidating cached items in multiple caches. As our
+ * caching philosophy is to minimize the duplication of or cached information we need this mapping to locate the components of cached resource
+ * that a particular client -- FUSE or Grid Shell -- is interested in. Finally, since this is a lightweight class and has multiple use cases
+ * the cache holding instances of this class should have both a larger lifetime and capacity.
  */
 public class WSResourceConfig
 {
@@ -50,25 +48,22 @@ public class WSResourceConfig
 	private ResourceType type;
 
 	/*
-	 * These two properties indicate that the concerned resource will remain synchronized -- using
-	 * container to client update notifications or by polling status -- with the container holding
-	 * it for the specified period of time. This information is used to increase the lifetime of the
-	 * related items in different caches.
+	 * These two properties indicate that the concerned resource will remain synchronized -- using container to client update notifications or
+	 * by polling status -- with the container holding it for the specified period of time. This information is used to increase the lifetime
+	 * of the related items in different caches.
 	 */
 	private boolean hasRegisteredCallback;
 	private Date callbackExpiryTime;
 
 	/*
-	 * This two fields are used to check whether the container has notified the client not to rely
-	 * on cache for a specific period of time. The container does that when it receive too many
-	 * notification to be delivered on behave of the concerned resource.
+	 * This two fields are used to check whether the container has notified the client not to rely on cache for a specific period of time. The
+	 * container does that when it receive too many notification to be delivered on behave of the concerned resource.
 	 */
 	private boolean cacheAccessBlocked;
 	private Date cacheBlockageExpiryTime;
 
 	/*
-	 * Represents in which GenesisII container the resource is located. For non-GenesisII resources
-	 * this should be NULL.
+	 * Represents in which GenesisII container the resource is located. For non-GenesisII resources this should be NULL.
 	 */
 	private String containerId;
 

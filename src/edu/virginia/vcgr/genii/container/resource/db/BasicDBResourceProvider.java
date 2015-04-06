@@ -46,8 +46,7 @@ public class BasicDBResourceProvider implements IResourceProvider, Initializable
 		return _factory;
 	}
 
-	protected IResourceFactory instantiateResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException,
-		ResourceException
+	protected IResourceFactory instantiateResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException, ResourceException
 	{
 		return new BasicDBResourceFactory(pool);
 	}

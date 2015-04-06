@@ -13,10 +13,8 @@ public class CloudDBResourceFactory
 
 	static private final String[] _CREATE_STMTS = new String[] {
 		"CREATE TABLE cloudResources (" + "resourceid VARCHAR(256) NOT NULL PRIMARY KEY, " + "host VARCHAR(4096) NOT NULL, "
-			+ "port INTEGER NOT NULL, " + "load INTEGER NOT NULL, " + "setup INTEGER NOT NULL, "
-			+ "besid VARCHAR(256) NOT NULL) ",
-		"CREATE TABLE cloudActivities (" + "activityid VARCHAR(256) NOT NULL PRIMARY KEY, "
-			+ "resourceid VARCHAR(256) NOT NULL)" };
+			+ "port INTEGER NOT NULL, " + "load INTEGER NOT NULL, " + "setup INTEGER NOT NULL, " + "besid VARCHAR(256) NOT NULL) ",
+		"CREATE TABLE cloudActivities (" + "activityid VARCHAR(256) NOT NULL PRIMARY KEY, " + "resourceid VARCHAR(256) NOT NULL)" };
 
 	public CloudDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{

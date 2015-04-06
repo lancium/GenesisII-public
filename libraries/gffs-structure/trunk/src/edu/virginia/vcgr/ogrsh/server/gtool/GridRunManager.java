@@ -31,8 +31,7 @@ public class GridRunManager implements Closeable
 
 	private ITool _gridTool;
 
-	static private void readFully(ByteBuffer buffer, Selector selector, Date timeoutTime) throws SocketTimeoutException,
-		IOException
+	static private void readFully(ByteBuffer buffer, Selector selector, Date timeoutTime) throws SocketTimeoutException, IOException
 	{
 		while (buffer.hasRemaining()) {
 			long timeout = timeoutTime.getTime() - System.currentTimeMillis();
@@ -47,8 +46,7 @@ public class GridRunManager implements Closeable
 		}
 	}
 
-	static private int identifyChannel(SocketChannel channel, String secretKey, Date timeoutTime)
-		throws SocketTimeoutException, IOException
+	static private int identifyChannel(SocketChannel channel, String secretKey, Date timeoutTime) throws SocketTimeoutException, IOException
 	{
 		Selector selector = Selector.open();
 		SelectionKey key = null;
@@ -84,8 +82,7 @@ public class GridRunManager implements Closeable
 		return whichChannel;
 	}
 
-	static private SocketChannel[] connectChannels(ServerSocketChannel server, String secretKey, Date timeoutTime)
-		throws IOException
+	static private SocketChannel[] connectChannels(ServerSocketChannel server, String secretKey, Date timeoutTime) throws IOException
 	{
 		Selector selector = Selector.open();
 		SocketChannel channel = null;

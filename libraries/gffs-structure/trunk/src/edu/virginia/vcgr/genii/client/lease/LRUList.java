@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.client.lease;
 import java.util.NoSuchElementException;
 
 /**
- * This special LRU list is designed to make maintaining an LRU relationship constant time. Other
- * than that, it is a relatively straight forward doubly-linked list.
+ * This special LRU list is designed to make maintaining an LRU relationship constant time. Other than that, it is a relatively straight
+ * forward doubly-linked list.
  * 
  * @author mmm2a
  * 
@@ -72,8 +72,7 @@ public class LRUList<Type extends LRUList.LRUNode>
 	}
 
 	/**
-	 * Note the use of some element in the list (moving that element to the tail so that it is the
-	 * most recently used).
+	 * Note the use of some element in the list (moving that element to the tail so that it is the most recently used).
 	 * 
 	 * @param d
 	 *            The element to "use".

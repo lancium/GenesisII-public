@@ -6,10 +6,9 @@ import java.util.Date;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
 /**
- * This class is poorly named because it doesn't serve a concise purpose. Essentially, it is a data
- * structure to bundle together some information that we get occassionally from the database.
- * Basically, it is information about who owns a job and what the start/finish times were for the
- * job.
+ * This class is poorly named because it doesn't serve a concise purpose. Essentially, it is a data structure to bundle together some
+ * information that we get occassionally from the database. Basically, it is information about who owns a job and what the start/finish times
+ * were for the job.
  * 
  * @author mmm2a
  */

@@ -106,8 +106,7 @@ public class SessionManager implements Closeable
 		synchronized (_sessions) {
 			SessionBundle bundle = _sessions.get(sessionID);
 			if (bundle == null)
-				throw new OGRSHException(OGRSHException.UNKNOWN_SESSION_EXCEPTION, "Session \"" + sessionID
-					+ "\" is not recognized.");
+				throw new OGRSHException(OGRSHException.UNKNOWN_SESSION_EXCEPTION, "Session \"" + sessionID + "\" is not recognized.");
 			session = bundle.getSession();
 			session = session.duplicate();
 			bundle = new SessionBundle(session);

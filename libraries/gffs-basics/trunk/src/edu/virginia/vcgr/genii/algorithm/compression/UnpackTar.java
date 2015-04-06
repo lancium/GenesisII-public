@@ -17,8 +17,7 @@ public class UnpackTar
 	static private Log _logger = LogFactory.getLog(UnpackTar.class);
 
 	/**
-	 * takes a tar.gz file as the "tarFile" parameter, then decompresses and unpacks the file into
-	 * the "dest" location.
+	 * takes a tar.gz file as the "tarFile" parameter, then decompresses and unpacks the file into the "dest" location.
 	 */
 	public static void uncompressTarGZ(File tarFile, File dest) throws IOException
 	{
@@ -35,7 +34,7 @@ public class UnpackTar
 				destPath.mkdirs();
 			} else {
 				destPath.createNewFile();
-				//byte [] btoRead = new byte[(int)tarEntry.getSize()];
+				// byte [] btoRead = new byte[(int)tarEntry.getSize()];
 				byte[] btoRead = new byte[8192];
 				BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(destPath));
 				int len = 0;
@@ -49,7 +48,7 @@ public class UnpackTar
 				if (!wroteAnything) {
 					_logger.error("zero bytes read from: " + destPath.getCanonicalPath());
 				}
-				
+
 				bout.close();
 			}
 			tarEntry = tarIn.getNextTarEntry();

@@ -48,9 +48,8 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements 
 
 		if (constructionParameters == null) {
 			ResourceCreationFaultType rcft =
-				new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-						"Could not create ExportedFile resource without cerationProperties") }, null);
+				new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+					"Could not create ExportedFile resource without cerationProperties") }, null);
 			throw FaultManipulator.fillInFault(rcft);
 		}
 
@@ -65,16 +64,15 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements 
 	}
 
 	/*
-	 * I think that this is now dead code -- mmm2a protected void fillIn(ResourceKey rKey,
-	 * EndpointReferenceType newEPR, ConstructionParameters cParams, GenesisHashMap
-	 * creationParameters, Collection<MessageElement> resolverCreationParams) throws
-	 * ResourceException, BaseFaultType, RemoteException { super.postCreate(rKey, newEPR, cParams,
-	 * creationParameters, resolverCreationParams);
+	 * I think that this is now dead code -- mmm2a protected void fillIn(ResourceKey rKey, EndpointReferenceType newEPR,
+	 * ConstructionParameters cParams, GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws
+	 * ResourceException, BaseFaultType, RemoteException { super.postCreate(rKey, newEPR, cParams, creationParameters,
+	 * resolverCreationParams);
 	 * 
 	 * Date d = new Date(); Calendar c = Calendar.getInstance(); c.setTime(d);
 	 * 
-	 * IExportedFileResource resource = (IExportedFileResource)rKey.dereference();
-	 * resource.setCreateTime(c); resource.setModTime(c); resource.setAccessTime(c); }
+	 * IExportedFileResource resource = (IExportedFileResource)rKey.dereference(); resource.setCreateTime(c); resource.setModTime(c);
+	 * resource.setAccessTime(c); }
 	 */
 
 	@RWXMapping(RWXCategory.READ)

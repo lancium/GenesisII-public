@@ -24,9 +24,8 @@ public class SLURMQueue extends AbstractNativeQueue<SLURMQueueConfiguration>
 	}
 
 	@Override
-	public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorConf, File workingDirectory,
-		NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException
+	public NativeQueueConnection connect(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf,
+		File workingDirectory, NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException
 	{
 		SLURMQueueConfiguration slurmConfig = (SLURMQueueConfiguration) providerConfiguration;
 
@@ -42,9 +41,8 @@ public class SLURMQueue extends AbstractNativeQueue<SLURMQueueConfiguration>
 		String qname = slurmConfig.queueName();
 
 		try {
-			return new SLURMQueueConnection(resourceOverrides, cmdLineManipulatorConf, workingDirectory,
-				nativeQueueConfiguration, slurmConfig, qname, slurmConfig.startSBatch(), slurmConfig.startSQueue(),
-				slurmConfig.startSCancel(), _statusCache);
+			return new SLURMQueueConnection(resourceOverrides, cmdLineManipulatorConf, workingDirectory, nativeQueueConfiguration,
+				slurmConfig, qname, slurmConfig.startSBatch(), slurmConfig.startSQueue(), slurmConfig.startSCancel(), _statusCache);
 		} catch (FileNotFoundException fnfe) {
 			throw new NativeQueueException("Unable to find queue binaries.", fnfe);
 		}

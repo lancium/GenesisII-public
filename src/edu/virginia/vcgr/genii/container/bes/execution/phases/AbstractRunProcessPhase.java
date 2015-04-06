@@ -135,8 +135,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return null;
 	}
 
-	static protected List<String>
-		resetCommand(List<String> commandLine, File workingDirectory, Map<String, String> environment)
+	static protected List<String> resetCommand(List<String> commandLine, File workingDirectory, Map<String, String> environment)
 	{
 		ArrayList<String> newCommandLine = new ArrayList<String>(commandLine.size());
 
@@ -200,8 +199,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 			if (!stderr.exists()) {
 				history.createDebugWriter("No Standard Error").format("Standard error path %s does not exist", stderr).close();
 			} else if (stderr.length() == 0) {
-				history.createDebugWriter("Standard Error Empty").format("Standard error file %s appears empty.", stderr)
-					.close();
+				history.createDebugWriter("Standard Error Empty").format("Standard error file %s appears empty.", stderr).close();
 			} else {
 				if (stderr.length() > STDERR_SIZE_CAP)
 					history.createDebugWriter("Standard Error Truncated")

@@ -131,8 +131,8 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType
+	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) throws RemoteException, RNSEntryExistsFaultType,
+		ResourceUnknownFaultType
 	{
 		throw new RemoteException("createFile operation not supported in RExportDir.");
 	}
@@ -162,20 +162,18 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 		// create EntryType list of found entries for response
 		Collection<RNSEntryResponseType> result = new ArrayList<RNSEntryResponseType>(entries.size());
 		for (RExportEntry entry : entries) {
-			result.add(new RNSEntryResponseType(entry.getEntryReference(), RNSUtilities.createMetadata(
-				entry.getEntryReference(), entry.getAttributes()), null, entry.getName()));
+			result.add(new RNSEntryResponseType(entry.getEntryReference(), RNSUtilities.createMetadata(entry.getEntryReference(),
+				entry.getAttributes()), null, entry.getName()));
 		}
 
 		return RNSContainerUtilities.translate(result, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()));
 	}
 
 	/*
-	 * creates entry for new replica of new export entry in rexportentry table called on RExportDir
-	 * containing replica resource
+	 * creates entry for new replica of new export entry in rexportentry table called on RExportDir containing replica resource
 	 */
 	@RWXMapping(RWXCategory.WRITE)
-	public void populateDir(PopulateDirRequestType request) throws ResourceException, ResourceUnknownFaultType,
-		RNSEntryExistsFaultType
+	public void populateDir(PopulateDirRequestType request) throws ResourceException, ResourceUnknownFaultType, RNSEntryExistsFaultType
 	{
 		// extract replica epr from request
 		EndpointReferenceType replicaEPR = request.getReplica_EPR();
@@ -238,8 +236,7 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
-		WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("SetMetadata operation not supported in RExportDir!");
 	}

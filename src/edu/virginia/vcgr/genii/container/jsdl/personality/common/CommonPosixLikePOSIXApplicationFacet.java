@@ -37,8 +37,7 @@ public class CommonPosixLikePOSIXApplicationFacet extends DefaultPOSIXApplicatio
 	}
 
 	@Override
-	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory)
-		throws JSDLException
+	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory) throws JSDLException
 	{
 		if (filesystemName != null)
 			throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "filesystemName"));
@@ -50,8 +49,7 @@ public class CommonPosixLikePOSIXApplicationFacet extends DefaultPOSIXApplicatio
 	}
 
 	@Override
-	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment)
-		throws JSDLException
+	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment) throws JSDLException
 	{
 		StringOrPath env;
 
@@ -66,28 +64,24 @@ public class CommonPosixLikePOSIXApplicationFacet extends DefaultPOSIXApplicatio
 	@Override
 	public void consumeInput(Object currentUnderstanding, String filesystemName, String input) throws JSDLException
 	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStdinRedirect(new FilesystemRelativePath(filesystemName,
-			input));
+		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStdinRedirect(new FilesystemRelativePath(filesystemName, input));
 	}
 
 	@Override
 	public void consumeOutput(Object currentUnderstanding, String filesystemName, String output) throws JSDLException
 	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStdoutRedirect(new FilesystemRelativePath(filesystemName,
-			output));
+		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStdoutRedirect(new FilesystemRelativePath(filesystemName, output));
 	}
 
 	@Override
 	public void consumeError(Object currentUnderstanding, String filesystemName, String error) throws JSDLException
 	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStderrRedirect(new FilesystemRelativePath(filesystemName,
-			error));
+		((PosixLikeApplicationUnderstanding) currentUnderstanding).setStderrRedirect(new FilesystemRelativePath(filesystemName, error));
 	}
 
 	@Override
 	public void consumeExecutable(Object currentUnderstanding, String filesystemName, String executable) throws JSDLException
 	{
-		((PosixLikeApplicationUnderstanding) currentUnderstanding).setExecutable(new FilesystemRelativePath(filesystemName,
-			executable));
+		((PosixLikeApplicationUnderstanding) currentUnderstanding).setExecutable(new FilesystemRelativePath(filesystemName, executable));
 	}
 }

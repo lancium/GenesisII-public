@@ -37,8 +37,7 @@ public class NotificationBrokerDBResource extends BasicDBResource
 		EndpointReferenceType forwardingPort) throws ResourceException
 	{
 
-		NotificationBrokerDatabase.createNotificationBroker(resourceId, mode, messageIndex, clientId, forwardingPort,
-			_connection);
+		NotificationBrokerDatabase.createNotificationBroker(resourceId, mode, messageIndex, clientId, forwardingPort, _connection);
 	}
 
 	@Override
@@ -79,15 +78,15 @@ public class NotificationBrokerDBResource extends BasicDBResource
 		this.messageIndex = messageIndex;
 	}
 
-	public void storeSubscriptionTracesInDB(List<String> subscriptionEPIs, EndpointReferenceType publisher,
-		long subscriptionTerminationTime) throws ResourceException
+	public void storeSubscriptionTracesInDB(List<String> subscriptionEPIs, EndpointReferenceType publisher, long subscriptionTerminationTime)
+		throws ResourceException
 	{
 
 		AddressingParameters addressingParameters = new AddressingParameters(publisher.getReferenceParameters());
 		String publisherKey = addressingParameters.getResourceKey();
 
-		NotificationBrokerDatabase.storeSubscriptionTraces(_resourceKey, subscriptionEPIs, publisherKey,
-			subscriptionTerminationTime, _connection);
+		NotificationBrokerDatabase.storeSubscriptionTraces(_resourceKey, subscriptionEPIs, publisherKey, subscriptionTerminationTime,
+			_connection);
 	}
 
 	public void initializeResourceFromDB() throws ResourceException

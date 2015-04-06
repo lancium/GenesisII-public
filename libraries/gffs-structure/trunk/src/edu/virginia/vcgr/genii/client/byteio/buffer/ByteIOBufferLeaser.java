@@ -12,8 +12,7 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.simple.SimpleByteIOTransfe
 import edu.virginia.vcgr.genii.client.lease.ResourceLeaser;
 
 /**
- * This is the final implementation class of a leaser which can lease out byte arrays to be used for
- * ByteIO Buffering.
+ * This is the final implementation class of a leaser which can lease out byte arrays to be used for ByteIO Buffering.
  * 
  * @author mmm2a
  */

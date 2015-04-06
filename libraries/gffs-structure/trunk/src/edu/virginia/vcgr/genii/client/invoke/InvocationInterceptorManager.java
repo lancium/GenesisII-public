@@ -10,8 +10,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
 public class InvocationInterceptorManager
 {
-	private HashMap<MethodDescription, Vector<OperationHandler>> _handlers =
-		new HashMap<MethodDescription, Vector<OperationHandler>>();
+	private HashMap<MethodDescription, Vector<OperationHandler>> _handlers = new HashMap<MethodDescription, Vector<OperationHandler>>();
 
 	public void addInterceptorClass(Object interceptorHandler) throws NoSuchMethodException
 	{
@@ -82,8 +81,8 @@ public class InvocationInterceptorManager
 			portTypePTypes.length == interceptorPTypes.length));
 	}
 
-	public Object invoke(EndpointReferenceType target, ICallingContext callingContext, IFinalInvoker finalObject,
-		Method finalMethod, Object[] finalParams) throws Throwable
+	public Object invoke(EndpointReferenceType target, ICallingContext callingContext, IFinalInvoker finalObject, Method finalMethod,
+		Object[] finalParams) throws Throwable
 	{
 		Vector<OperationHandler> handlers;
 		MethodDescription desc = new MethodDescription(finalMethod.getName(), finalMethod.getParameterTypes());

@@ -41,8 +41,7 @@ final public class RNSSelectionDialog extends JDialog
 				if (value != null && value instanceof RNSFilledInTreeObject) {
 					RNSFilledInTreeObject fObj = (RNSFilledInTreeObject) value;
 					if (_filter != null) {
-						if (_filter.accept(fObj.path(), fObj.endpoint(), fObj.typeInformation(), fObj.endpointType(),
-							fObj.isLocal()))
+						if (_filter.accept(fObj.path(), fObj.endpoint(), fObj.typeInformation(), fObj.endpointType(), fObj.isLocal()))
 							return fObj;
 					} else
 						return fObj;
@@ -70,11 +69,11 @@ final public class RNSSelectionDialog extends JDialog
 		_tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		_tree.getSelectionModel().addTreeSelectionListener(new SelectionListenerImpl());
 
-		content.add(new JScrollPane(_tree), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JScrollPane(_tree), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(ButtonPanel.createHorizontalButtonPanel(_ok, new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0,
-			0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(_ok, new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
 		Dimension d = new Dimension(500, 500);
 		setMinimumSize(d);

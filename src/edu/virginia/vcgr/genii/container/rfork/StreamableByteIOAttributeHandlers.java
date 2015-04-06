@@ -15,8 +15,7 @@ public class StreamableByteIOAttributeHandlers extends ByteIOAttributeHandlers
 {
 	static public final String STREAMABLE_BYTEIO_NS = "http://schemas.ggf.org/byteio/2005/10/streamable-access";
 
-	public StreamableByteIOAttributeHandlers(StreamableByteIOResourceFork fork, AttributePackage pkg)
-		throws NoSuchMethodException
+	public StreamableByteIOAttributeHandlers(StreamableByteIOResourceFork fork, AttributePackage pkg) throws NoSuchMethodException
 	{
 		super(fork, pkg);
 	}

@@ -62,8 +62,7 @@ public class NotificationOutcallActor implements OutcallActor
 	}
 
 	@Override
-	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment)
-		throws Throwable
+	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment) throws Throwable
 	{
 		LoggingContext.assumeLoggingContext(_context);
 
@@ -75,8 +74,7 @@ public class NotificationOutcallActor implements OutcallActor
 
 		for (NotificationMessageOutcallContent content : _contents) {
 			NotificationMessageHolder holder =
-				new NotificationMessageHolder(content.subscriptionReference(), content.publisher(), content.topic(),
-					content.contents());
+				new NotificationMessageHolder(content.subscriptionReference(), content.publisher(), content.topic(), content.contents());
 			holders.add(holder.toAxisType());
 			additionalAttributes = content.contents().getAdditionalAttributes();
 
@@ -85,8 +83,7 @@ public class NotificationOutcallActor implements OutcallActor
 			// add all the attributes in the collections. The separator is subsequently
 			// used to determine which attribute belongs to what message.
 			if (additionalAttributes != null && additionalAttributes.length > 0) {
-				messageElements.add(new MessageElement(GenesisIIConstants.NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR,
-					messageIndex));
+				messageElements.add(new MessageElement(GenesisIIConstants.NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR, messageIndex));
 				messageElements.addAll(Arrays.asList(additionalAttributes));
 			}
 			messageIndex++;
@@ -95,8 +92,7 @@ public class NotificationOutcallActor implements OutcallActor
 		Notify notify = new Notify(holders.toArray(new NotificationMessageHolderType[holders.size()]), null);
 		notify.set_any(Elementals.toArray(messageElements));
 
-		GeniiCommon common =
-			ClientUtils.createProxy(GeniiCommon.class, target, (callingContext == null) ? _callingContext : callingContext);
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target, (callingContext == null) ? _callingContext : callingContext);
 		if (attachment != null) {
 			Collection<GeniiAttachment> attachments = new LinkedList<GeniiAttachment>();
 			attachments.add(attachment);

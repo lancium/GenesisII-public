@@ -188,8 +188,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 	}
 
 	/*
-	 * What does this do? public Collection<SubscriptionInformation> matchSubscriptions( String
-	 * topicExpression) throws ResourceException {
+	 * What does this do? public Collection<SubscriptionInformation> matchSubscriptions( String topicExpression) throws ResourceException {
 	 * 
 	 * if (!isIdpResource()) { return super.matchSubscriptions(topicExpression); }
 	 * 
@@ -197,34 +196,31 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 	 */
 
 	/*
-	 * Mark Morgan -- This functionis no longer contained here. We'll have to revisit this issue
-	 * again. public ReferenceParametersType getResourceParameters() throws ResourceException {
+	 * Mark Morgan -- This functionis no longer contained here. We'll have to revisit this issue again. public ReferenceParametersType
+	 * getResourceParameters() throws ResourceException {
 	 * 
 	 * ReferenceParametersType refParams = super.getResourceParameters();
 	 * 
 	 * if (!isIdpResource()) { return refParams; }
 	 * 
-	 * ArrayList<MessageElement> mels = new ArrayList<MessageElement>(Arrays
-	 * .asList(refParams.get_any()));
+	 * ArrayList<MessageElement> mels = new ArrayList<MessageElement>(Arrays .asList(refParams.get_any()));
 	 * 
-	 * // add the end-certificate as a new reference parameter X509Certificate[] certChain =
-	 * (X509Certificate[]) getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME); if (certChain !=
-	 * null && (refParams != null)) {
+	 * // add the end-certificate as a new reference parameter X509Certificate[] certChain = (X509Certificate[])
+	 * getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME); if (certChain != null && (refParams != null)) {
 	 * 
-	 * try { MessageElement certRef = new MessageElement(_RESOURCE_CERT_QNAME);
-	 * certRef.addChild(WSSecurityUtils .makePkiPathSecTokenRef(certChain)); mels.add(certRef); }
-	 * catch (SOAPException e) { throw new ResourceException(e.getMessage(), e); } catch
-	 * (GeneralSecurityException e) { throw new ResourceException(e.getMessage(), e); } }
+	 * try { MessageElement certRef = new MessageElement(_RESOURCE_CERT_QNAME); certRef.addChild(WSSecurityUtils
+	 * .makePkiPathSecTokenRef(certChain)); mels.add(certRef); } catch (SOAPException e) { throw new ResourceException(e.getMessage(), e); }
+	 * catch (GeneralSecurityException e) { throw new ResourceException(e.getMessage(), e); } }
 	 * 
-	 * // add all of our creation params try { ResourceKey stsKey =
-	 * ResourceManager.getCurrentResource(); IResource stsResource = stsKey.dereference();
+	 * // add all of our creation params try { ResourceKey stsKey = ResourceManager.getCurrentResource(); IResource stsResource =
+	 * stsKey.dereference();
 	 * 
 	 * MessageElement stsParm = null;
 	 * 
 	 * stsParm = new MessageElement( SecurityConstants.NEW_JNDI_STS_HOST_QNAME, stsResource
-	 * .getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME .getLocalPart())); mels.add(stsParm);
-	 * stsParm = new MessageElement( SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME, stsResource
-	 * .getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME .getLocalPart())); mels.add(stsParm);
+	 * .getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME .getLocalPart())); mels.add(stsParm); stsParm = new MessageElement(
+	 * SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME, stsResource .getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME .getLocalPart()));
+	 * mels.add(stsParm);
 	 * 
 	 * } catch (ResourceUnknownFaultType e) { throw new ResourceException(e.getMessage(), e); }
 	 * 

@@ -30,8 +30,8 @@ public class GeniiDirSyncRunner implements ResourceSyncRunner
 {
 	static private Log _logger = LogFactory.getLog(GeniiDirSyncRunner.class);
 
-	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR,
-		ReplicationThread replicator) throws Throwable
+	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR, ReplicationThread replicator)
+		throws Throwable
 	{
 		// Synchronize the attributes -- resolver and replication policies.
 		IRNSResource resource = (IRNSResource) vResource;
@@ -106,9 +106,8 @@ public class GeniiDirSyncRunner implements ResourceSyncRunner
 	}
 
 	/*
-	 * Method that subclasses should override to retrieve and save properties that are usually been
-	 * passed from the client when a primary copy is been created and not directly available during
-	 * the replica creation process.
+	 * Method that subclasses should override to retrieve and save properties that are usually been passed from the client when a primary copy
+	 * is been created and not directly available during the replica creation process.
 	 */
 	protected void retrieveAndStoreResourcePropertiesFromPrimary(GeniiCommon proxyToPrimary, IRNSResource resource)
 	{

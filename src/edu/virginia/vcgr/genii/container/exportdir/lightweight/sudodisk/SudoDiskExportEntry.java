@@ -103,8 +103,7 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 		}
 		try {
 			// the exists check can be called with pathtype of file/dir!
-			DefaultResponse dr =
-				FileServerClient.exists(target.getAbsolutePath(), fsid.getNonce(), fsid.getPort(), PathType.FILE);
+			DefaultResponse dr = FileServerClient.exists(target.getAbsolutePath(), fsid.getNonce(), fsid.getPort(), PathType.FILE);
 
 			if (dr.getErrorCode() == ErrorCode.SUCCESS_CODE) {
 				return true;
@@ -337,8 +336,7 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 		try {
 			lock = _lockManager.acquire(_target);
 
-			ReadResponse rr =
-				FileServerClient.read(_target.getAbsolutePath(), offset, target.limit(), fsid.getNonce(), fsid.getPort());
+			ReadResponse rr = FileServerClient.read(_target.getAbsolutePath(), offset, target.limit(), fsid.getNonce(), fsid.getPort());
 
 			if (rr.getErrorCode() == ErrorCode.SUCCESS_CODE) {
 				target.put(rr.getReadBuf());
@@ -363,8 +361,7 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 	 *            The file system path which you want to check if it's readable
 	 * @param uname
 	 *            The local username on whose behalf the file system operation is to be performed
-	 * @return true/false depending on whether the given file system path is readable by uname or
-	 *         not
+	 * @return true/false depending on whether the given file system path is readable by uname or not
 	 * @throws IOException
 	 */
 	public static boolean canRead(String path, String uname) throws IOException
@@ -436,8 +433,7 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 			byte[] buf = new byte[source.remaining()];
 			source.get(buf);
 
-			DefaultResponse dr =
-				FileServerClient.truncAppend(_target.getAbsolutePath(), buf, offset, fsid.getNonce(), fsid.getPort());
+			DefaultResponse dr = FileServerClient.truncAppend(_target.getAbsolutePath(), buf, offset, fsid.getNonce(), fsid.getPort());
 			if (dr.getErrorCode() != ErrorCode.SUCCESS_CODE) {
 				throw new IOException(dr.getErrorMsg());
 			}
@@ -491,8 +487,7 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 
 			byte[] buf = new byte[source.remaining()];
 			source.get(buf);
-			DefaultResponse dr =
-				FileServerClient.write(_target.getAbsolutePath(), buf, offset, fsid.getNonce(), fsid.getPort());
+			DefaultResponse dr = FileServerClient.write(_target.getAbsolutePath(), buf, offset, fsid.getNonce(), fsid.getPort());
 			if (dr.getErrorCode() != ErrorCode.SUCCESS_CODE) {
 				throw new IOException(dr.getErrorMsg());
 			}

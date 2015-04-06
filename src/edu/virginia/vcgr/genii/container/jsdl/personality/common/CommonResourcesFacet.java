@@ -42,18 +42,15 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 	}
 
 	@Override
-	public void consumeTotalPhysicalMemory(Object currentUnderstanding, RangeExpression totalPhysicalMemory)
-		throws JSDLException
+	public void consumeTotalPhysicalMemory(Object currentUnderstanding, RangeExpression totalPhysicalMemory) throws JSDLException
 	{
-		((CommonExecutionUnderstanding) currentUnderstanding).setTotalPhysicalMemory(totalPhysicalMemory.describe()
-			.getUpperBound());
+		((CommonExecutionUnderstanding) currentUnderstanding).setTotalPhysicalMemory(totalPhysicalMemory.describe().getUpperBound());
 	}
 
 	@Override
 	public void consumeWallclockTimeLimit(Object currentUnderstanding, RangeExpression wallclockTimeLimit) throws JSDLException
 	{
-		((CommonExecutionUnderstanding) currentUnderstanding).setWallclockTimeLimit(wallclockTimeLimit.describe()
-			.getUpperBound());
+		((CommonExecutionUnderstanding) currentUnderstanding).setWallclockTimeLimit(wallclockTimeLimit.describe().getUpperBound());
 	}
 
 	@Override
@@ -65,7 +62,6 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 	@Override
 	public void consumeIndividualCPUCount(Object currentUnderstanding, RangeExpression individualCPUCount) throws JSDLException
 	{
-		((CommonExecutionUnderstanding) currentUnderstanding).setIndividualCPUCount(individualCPUCount.describe()
-			.getUpperBound());
+		((CommonExecutionUnderstanding) currentUnderstanding).setIndividualCPUCount(individualCPUCount.describe().getUpperBound());
 	}
 }

@@ -24,9 +24,8 @@ public class PBSQueue extends AbstractNativeQueue<PBSQueueConfiguration>
 	}
 
 	@Override
-	public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorConf, File workingDirectory,
-		NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException
+	public NativeQueueConnection connect(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf,
+		File workingDirectory, NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException
 	{
 		PBSQueueConfiguration pbsConfig = (PBSQueueConfiguration) providerConfiguration;
 
@@ -42,9 +41,8 @@ public class PBSQueue extends AbstractNativeQueue<PBSQueueConfiguration>
 		String qname = pbsConfig.queueName();
 
 		try {
-			return new PBSQueueConnection(resourceOverrides, cmdLineManipulatorConf, workingDirectory,
-				nativeQueueConfiguration, pbsConfig, qname, pbsConfig.startQSub(), pbsConfig.startQStat(),
-				pbsConfig.startQDel(), _statusCache);
+			return new PBSQueueConnection(resourceOverrides, cmdLineManipulatorConf, workingDirectory, nativeQueueConfiguration, pbsConfig,
+				qname, pbsConfig.startQSub(), pbsConfig.startQStat(), pbsConfig.startQDel(), _statusCache);
 		} catch (FileNotFoundException fnfe) {
 			throw new NativeQueueException("Unable to find queue binaries.", fnfe);
 		}

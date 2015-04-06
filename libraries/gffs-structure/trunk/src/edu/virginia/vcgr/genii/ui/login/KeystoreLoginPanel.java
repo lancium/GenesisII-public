@@ -52,16 +52,16 @@ final class KeystoreLoginPanel extends LoginPanel
 		_fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 		_fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-		add(new JLabel("Keystore Path"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_keystoreFile, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		add(new JButton(new BrowseAction()), new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel("Keystore Path"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		add(_keystoreFile, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(
+			5, 5, 5, 5), 5, 5));
+		add(new JButton(new BrowseAction()), new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 		add(new JLabel("Keystore Password"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_password, new GridBagConstraints(1, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		add(_password, new GridBagConstraints(1, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(
+			5, 5, 5, 5), 5, 5));
 	}
 
 	@Override
@@ -74,8 +74,7 @@ final class KeystoreLoginPanel extends LoginPanel
 			try {
 				inputStreamFile = new FileInputStream(_keystoreFile.getText());
 				GuiLoginHandler handler = new GuiLoginHandler(null, null, null);
-				CertEntry entry =
-					handler.selectCert(inputStreamFile, "PKCS12", new String(_password.getPassword()), false, null);
+				CertEntry entry = handler.selectCert(inputStreamFile, "PKCS12", new String(_password.getPassword()), false, null);
 				if (entry != null) {
 					KeyAndCertMaterial clientKeyMaterial =
 						ClientUtils.checkAndRenewCredentials(uiContext.callingContext(), BaseGridTool.credsValidUntil(),
@@ -86,8 +85,8 @@ final class KeystoreLoginPanel extends LoginPanel
 						new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset,
 							SecurityConstants.CredentialExpirationMillis, SecurityConstants.MaxDelegationDepth);
 					TrustCredential tc =
-						new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, entry._certChain,
-							IdentityType.USER, bc, RWXCategory.FULL_ACCESS);
+						new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, entry._certChain, IdentityType.USER,
+							bc, RWXCategory.FULL_ACCESS);
 					tc.signAssertion(entry._privateKey);
 
 					Collection<NuCredential> ret = new ArrayList<NuCredential>(1);
@@ -95,8 +94,7 @@ final class KeystoreLoginPanel extends LoginPanel
 					return ret;
 				}
 			} catch (FileNotFoundException fnfe) {
-				JOptionPane.showMessageDialog(this, "Couldn't locate keystore file!", "Unable to Login",
-					JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Couldn't locate keystore file!", "Unable to Login", JOptionPane.ERROR_MESSAGE);
 			} finally {
 				StreamUtils.close(inputStreamFile);
 			}

@@ -15,8 +15,7 @@ import edu.virginia.vcgr.genii.client.nativeq.ScriptExecutionException;
 
 public class ParsingExecutionEngine
 {
-	static public Map<Pattern, List<Matcher>> executeAndParse(ProcessBuilder builder, Pattern... patterns)
-		throws NativeQueueException
+	static public Map<Pattern, List<Matcher>> executeAndParse(ProcessBuilder builder, Pattern... patterns) throws NativeQueueException
 	{
 		StringBuilderProcessStreamSink errSink = new StringBuilderProcessStreamSink();
 		Map<Pattern, List<Matcher>> ret = new HashMap<Pattern, List<Matcher>>(patterns.length);
@@ -29,8 +28,7 @@ public class ParsingExecutionEngine
 			StreamUtils.close(proc.getOutputStream());
 
 			ActiveStreamCopier errCopier = new ActiveStreamCopier(proc.getErrorStream(), errSink);
-			ActiveStreamCopier outCopier =
-				new ActiveStreamCopier(proc.getInputStream(), new PatternParserProcessStreamSink(ret));
+			ActiveStreamCopier outCopier = new ActiveStreamCopier(proc.getInputStream(), new PatternParserProcessStreamSink(ret));
 
 			int result = proc.waitFor();
 

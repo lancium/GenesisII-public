@@ -45,8 +45,7 @@ public class ScriptExecutionException extends NativeQueueException
 	static private Pattern WHITESPACE = Pattern.compile("^.*\\s+.*$");
 
 	/**
-	 * Form a useful error text from the command line and the exit message that the fork/exec'd
-	 * application produced.
+	 * Form a useful error text from the command line and the exit message that the fork/exec'd application produced.
 	 * 
 	 * @param commandLine
 	 *            The command line that failed to execute successfully.

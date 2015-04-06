@@ -16,13 +16,11 @@ import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Notif
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.PollingIntervalDirectory;
 
 /*
- * This track the last time when a resource in individual containers was used. This information is
- * currently been used to adjust the polling interval. It can also be used to destroy the
- * subscriptions and notification-brokers when the resources have not been accessed for a long time.
- * Although this class can generate complicated resource usage statistics like rate of usage and
- * burstiness, we don't need them to adjust polling interval or destroy registered callbacks.
- * However, later if we want to consider reducing the polling interval bellow the default value then
- * we'll need to collect and use those statistics.
+ * This track the last time when a resource in individual containers was used. This information is currently been used to adjust the polling
+ * interval. It can also be used to destroy the subscriptions and notification-brokers when the resources have not been accessed for a long
+ * time. Although this class can generate complicated resource usage statistics like rate of usage and burstiness, we don't need them to
+ * adjust polling interval or destroy registered callbacks. However, later if we want to consider reducing the polling interval bellow the
+ * default value then we'll need to collect and use those statistics.
  */
 public class ResourceAccessMonitor
 {
@@ -68,8 +66,8 @@ public class ResourceAccessMonitor
 	}
 
 	/*
-	 * This determine whether a cached resource should be passed to the caller for use or the system
-	 * should issue an RPC for the resource to get a fresh copy.
+	 * This determine whether a cached resource should be passed to the caller for use or the system should issue an RPC for the resource to
+	 * get a fresh copy.
 	 */
 	public static boolean isCachedContentGuaranteedToBeFresh(Object targetOrCachedResource)
 	{

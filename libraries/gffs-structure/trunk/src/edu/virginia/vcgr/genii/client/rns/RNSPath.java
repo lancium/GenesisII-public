@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.rns;
 
@@ -60,12 +59,10 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
 /**
- * The RNSPath class is the main client side interface between developers and the grid directory
- * structure. Nearly all directory related operations (including creating files and destroying
- * instances), should be handled through instances of this class. You will also notice that there
- * are very few public constructors for this class. This is intentional. As a general rule of thumb,
- * you should always get your "current" path instance from the
- * edu.virginia.vcgr.htc.client.context.ContextManager class.
+ * The RNSPath class is the main client side interface between developers and the grid directory structure. Nearly all directory related
+ * operations (including creating files and destroying instances), should be handled through instances of this class. You will also notice
+ * that there are very few public constructors for this class. This is intentional. As a general rule of thumb, you should always get your
+ * "current" path instance from the edu.virginia.vcgr.htc.client.context.ContextManager class.
  * 
  * @author Mark Morgan
  */
@@ -97,10 +94,9 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Construct a new RNS path based off of component information. While it is permitted for users
-	 * to call this constructor directly, in general it is recommended that RNSPath instances be
-	 * obtained through other mechanisms such as calls to RNSPath.getCurrent() and by looking up
-	 * entries within other directories.
+	 * Construct a new RNS path based off of component information. While it is permitted for users to call this constructor directly, in
+	 * general it is recommended that RNSPath instances be obtained through other mechanisms such as calls to RNSPath.getCurrent() and by
+	 * looking up entries within other directories.
 	 * 
 	 * @param parent
 	 *            The RNSPath for the parent under which this entry exists.
@@ -156,8 +152,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Returns the current grid namespace path. This is similar to getcwd in posix systems but
-	 * refers only to grid paths here.
+	 * Returns the current grid namespace path. This is similar to getcwd in posix systems but refers only to grid paths here.
 	 * 
 	 * @return The grid client's current working directory in the grid namespace.
 	 */
@@ -221,8 +216,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Turn the current RNSPath into a sandbox. This essentially makes the current grid directory
-	 * the root of a new namespace.
+	 * Turn the current RNSPath into a sandbox. This essentially makes the current grid directory the root of a new namespace.
 	 * 
 	 * @return The RNSPath of a new sandbox namespace rooted at the represented grid directory.
 	 * 
@@ -239,8 +233,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Return the valid prefix of a path, as might be passed in lookup For example, if the path is
-	 * /home/xsede.org/andrew/dir1/fred and dir1 did not exist prefix would return
+	 * Return the valid prefix of a path, as might be passed in lookup For example, if the path is /home/xsede.org/andrew/dir1/fred and dir1
+	 * did not exist prefix would return
 	 * 
 	 * @return /home/xsede.org/andrew
 	 */
@@ -289,8 +283,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Get the EPR of the current entry if it exists. If the entry doesn't exist, this method throws
-	 * an exception.
+	 * Get the EPR of the current entry if it exists. If the entry doesn't exist, this method throws an exception.
 	 * 
 	 * @return The EPR of this entry if it exists.
 	 * 
@@ -302,8 +295,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Get the EPR of the RNSPath if it exists in the cache. This is useful when a call is made from
-	 * some cache management subroutine where we don't want to have any unaccounted outcall.
+	 * Get the EPR of the RNSPath if it exists in the cache. This is useful when a call is made from some cache management subroutine where we
+	 * don't want to have any unaccounted outcall.
 	 * 
 	 * @return the EPR of this entry if it exists in the cache
 	 * */
@@ -343,8 +336,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Test to see if two RNS paths are equal. This comparison is for String path representation
-	 * only (no comparison of EPRs or other metadata is done).
+	 * Test to see if two RNS paths are equal. This comparison is for String path representation only (no comparison of EPRs or other metadata
+	 * is done).
 	 * 
 	 * @param other
 	 *            The other path to compare against.
@@ -356,8 +349,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Test to see if two RNS paths are equal. This comparison is for String path representation
-	 * only (no comparison of EPRs or other metadata is done).
+	 * Test to see if two RNS paths are equal. This comparison is for String path representation only (no comparison of EPRs or other metadata
+	 * is done).
 	 * 
 	 * @param other
 	 *            The other path to compare against.
@@ -428,8 +421,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Assuming that this entry doesn't exist, this method creates a new directory at the indicated
-	 * path.
+	 * Assuming that this entry doesn't exist, this method creates a new directory at the indicated path.
 	 * 
 	 * @throws RNSException
 	 * @throws RNSPathAlreadyExistsException
@@ -456,8 +448,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Similar to mkdir(), but this operation creates all directories that don't exist in the
-	 * indicated path, including this one.
+	 * Similar to mkdir(), but this operation creates all directories that don't exist in the indicated path, including this one.
 	 * 
 	 * @throws RNSException
 	 * @throws RNSPathAlreadyExistsException
@@ -478,9 +469,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Creates a new ByteIO file at this path. This operation assumes that the current path doesn't
-	 * yet exist. The type of ByteIO created can be any valid ByteIO implementation that the parent
-	 * directory decides to create.
+	 * Creates a new ByteIO file at this path. This operation assumes that the current path doesn't yet exist. The type of ByteIO created can
+	 * be any valid ByteIO implementation that the parent directory decides to create.
 	 * 
 	 * @return The EPR of a newly created ByteIO file.
 	 * 
@@ -488,8 +478,7 @@ public class RNSPath implements Serializable, Cloneable
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public EndpointReferenceType createNewFile() throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
-		RNSException
+	public EndpointReferenceType createNewFile() throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException, RNSException
 	{
 		if (exists())
 			throw new RNSPathAlreadyExistsException(pwd());
@@ -518,9 +507,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Lookup an RNSPath based off of this path. This path can be relative or absolute compared to
-	 * this path. The path does not have to exist either. If the indicated path does not exist, an
-	 * RNSPath entry with no EPR will be returned.
+	 * Lookup an RNSPath based off of this path. This path can be relative or absolute compared to this path. The path does not have to exist
+	 * either. If the indicated path does not exist, an RNSPath entry with no EPR will be returned.
 	 * 
 	 * @param path
 	 *            The relative or absolute path to lookup.
@@ -544,8 +532,7 @@ public class RNSPath implements Serializable, Cloneable
 	/**
 	 * the "real" lookup function, which also specifies how the path should be located.
 	 */
-	public RNSPath lookup(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException,
-		RNSPathAlreadyExistsException
+	public RNSPath lookup(String path, RNSPathQueryFlags queryFlag) throws RNSPathDoesNotExistException, RNSPathAlreadyExistsException
 	{
 		if (path == null)
 			throw new IllegalArgumentException("Cannot lookup a path which is null.");
@@ -616,10 +603,9 @@ public class RNSPath implements Serializable, Cloneable
 						}
 					} else {
 						/*
-						 * Even though this maybe just a single lookup-call with a single-element we
-						 * should iterate. This is because the container can set its
-						 * preferred-batch-size to 0 and also not return an initial-block, meaning
-						 * we must do an iterate-call.
+						 * Even though this maybe just a single lookup-call with a single-element we should iterate. This is because the
+						 * container can set its preferred-batch-size to 0 and also not return an initial-block, meaning we must do an
+						 * iterate-call.
 						 */
 
 						for (RNSPath candidate : parent.listContents(element)) {
@@ -633,8 +619,7 @@ public class RNSPath implements Serializable, Cloneable
 				}
 			} catch (RNSException rne) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Skipping a directory in an RSNPath expansion which can't be expanded: "
-						+ rne.getLocalizedMessage());
+					_logger.debug("Skipping a directory in an RSNPath expansion which can't be expanded: " + rne.getLocalizedMessage());
 			}
 		}
 
@@ -645,12 +630,12 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * A utility operation that looks up a path expression and returns exactly one matching path
-	 * entry. If more then one path entry matching the pathExpression, an exception is thrown.
+	 * A utility operation that looks up a path expression and returns exactly one matching path entry. If more then one path entry matching
+	 * the pathExpression, an exception is thrown.
 	 * 
 	 * @param pathExpression
-	 *            A path expression which is to be looked up. This path expression can contain
-	 *            standard file system globbing patterns such as *.
+	 *            A path expression which is to be looked up. This path expression can contain standard file system globbing patterns such as
+	 *            *.
 	 * 
 	 * @return The resultant RNSPath entry (if any).
 	 * @throws RNSMultiLookupResultException
@@ -661,16 +646,13 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * This operation looks up pathExpressions and returns the exact matching entry that is found if
-	 * any.
+	 * This operation looks up pathExpressions and returns the exact matching entry that is found if any.
 	 * 
 	 * @param pathExpression
-	 *            The path expression to lookup. This expression will be matched against the
-	 *            filterType indicated.
+	 *            The path expression to lookup. This expression will be matched against the filterType indicated.
 	 * @param filterType
-	 *            A filter which figures out how to expand the pathExpression language given. Two
-	 *            pathExpressio filterTypes are available by default -- one parses file globbing
-	 *            patterns, the other parses Regular Expressions.
+	 *            A filter which figures out how to expand the pathExpression language given. Two pathExpressio filterTypes are available by
+	 *            default -- one parses file globbing patterns, the other parses Regular Expressions.
 	 * 
 	 * @return The matched RNSPath entry.
 	 * @throws RNSMultiLookupResultException
@@ -688,8 +670,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Similar to expandSingleton above, but this version of the operation matches 0 or more
-	 * entries.
+	 * Similar to expandSingleton above, but this version of the operation matches 0 or more entries.
 	 * 
 	 * @param pathExpression
 	 *            The file pattern globbing path expression to lookup.
@@ -702,8 +683,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Similar to the expandSingleton operation above except that this version of the operation can
-	 * return 0 or more entries that match the path query.
+	 * Similar to the expandSingleton operation above except that this version of the operation can return 0 or more entries that match the
+	 * path query.
 	 * 
 	 * @param pathExpression
 	 *            The path expression to lookup.
@@ -761,8 +742,8 @@ public class RNSPath implements Serializable, Cloneable
 	/**
 	 * List all of the entries in the given RNS directory.
 	 * 
-	 * This does not add the items to the cache, since the directories could potentially be huge,
-	 * and this will just wash out entries we care about, like the root RNSPath.
+	 * This does not add the items to the cache, since the directories could potentially be huge, and this will just wash out entries we care
+	 * about, like the root RNSPath.
 	 * 
 	 * @return The set of all RNSPath entries contained in this directory.
 	 * 
@@ -774,12 +755,10 @@ public class RNSPath implements Serializable, Cloneable
 		EndpointReferenceType me = resolveRequired();
 
 		/*
-		 * Note that calling context property for RNS-Short-Form in this case is set before creating
-		 * the proxy. This is because when a call is coming from FUSE, we get a context resolver
-		 * that cannot propagate property updates accurately across all the references of the
-		 * calling context. --old:For the same reason an explicit store is invoked after setting the
-		 * property.old:-- As a general rule, doing context update before proxy creation is
-		 * advisable to avoid similar unwanted problems.
+		 * Note that calling context property for RNS-Short-Form in this case is set before creating the proxy. This is because when a call is
+		 * coming from FUSE, we get a context resolver that cannot propagate property updates accurately across all the references of the
+		 * calling context. --old:For the same reason an explicit store is invoked after setting the property.old:-- As a general rule, doing
+		 * context update before proxy creation is advisable to avoid similar unwanted problems.
 		 */
 		ICallingContext context = null;
 		try {
@@ -834,8 +813,8 @@ public class RNSPath implements Serializable, Cloneable
 	/**
 	 * This method performs grouped/batch-mode operation on the RNS paths.
 	 * 
-	 * This does not add the items to the cache, since the directories could potentially be huge,
-	 * and this will just wash out entries we care about, like the root RNSPath.
+	 * This does not add the items to the cache, since the directories could potentially be huge, and this will just wash out entries we care
+	 * about, like the root RNSPath.
 	 */
 	public Collection<RNSPath> listContents(String... lookupPath) throws RNSPathDoesNotExistException, RNSException
 	{
@@ -864,9 +843,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * A more economical way of traversing and acting on the contents of an RNSPath than the
-	 * listContents methods. This applies the "applier" method to each object, which is just a way
-	 * to pass each RNSPath in the contents a specialized function without needing to instantiate
+	 * A more economical way of traversing and acting on the contents of an RNSPath than the listContents methods. This applies the "applier"
+	 * method to each object, which is just a way to pass each RNSPath in the contents a specialized function without needing to instantiate
 	 * the whole list at once.
 	 */
 	public boolean applyToContents(RNSPathApplyFunction applier) throws RNSException
@@ -925,9 +903,8 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/*
-	 * This method is used with RNS short entry responses to retrieve port-type and URI from
-	 * meta-data instead of from EPR. This is important as port-type information is used to control
-	 * recursive lookup and printing format in LS calls, and URI is needed to cache access.
+	 * This method is used with RNS short entry responses to retrieve port-type and URI from meta-data instead of from EPR. This is important
+	 * as port-type information is used to control recursive lookup and printing format in LS calls, and URI is needed to cache access.
 	 */
 	private void extractPortTypesAndURIFromMetadata(RNSEntryResponseType entry, SingleResourcePropertyTranslator translator)
 	{
@@ -992,8 +969,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Assuming that the indicated RNSPath entry does not yet exist (but that it's parent does),
-	 * links the given EPR into this named entry.
+	 * Assuming that the indicated RNSPath entry does not yet exist (but that it's parent does), links the given EPR into this named entry.
 	 * 
 	 * @param epr
 	 *            The EPR to link to this indicated name.
@@ -1002,8 +978,7 @@ public class RNSPath implements Serializable, Cloneable
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
 	 */
-	public void link(EndpointReferenceType epr) throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
-		RNSException
+	public void link(EndpointReferenceType epr) throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException, RNSException
 	{
 		if (exists())
 			throw new RNSPathAlreadyExistsException(pwd());
@@ -1024,8 +999,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Unlink this RNSPath entry from the namespace (this will never destroy the target resource --
-	 * it merely unlinks it from the filesystem).
+	 * Unlink this RNSPath entry from the namespace (this will never destroy the target resource -- it merely unlinks it from the filesystem).
 	 * 
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
@@ -1053,8 +1027,7 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/**
-	 * Similar to unlink above, but this operation also destroy the target resource if at all
-	 * possible.
+	 * Similar to unlink above, but this operation also destroy the target resource if at all possible.
 	 * 
 	 * @throws RNSPathDoesNotExistException
 	 * @throws RNSException
@@ -1092,12 +1065,10 @@ public class RNSPath implements Serializable, Cloneable
 	}
 
 	/*
-	 * RNSPath is the class that links between the client-side code and the web services endPoints
-	 * residing on the containers. So when we resolve an EPR for RNSPath or creating an RNSPath from
-	 * some already cached EPR, we should store the rnsPath to endPointIdentifier mapping of the
-	 * concerned EPR in a resource configuration instance. This configuration will subsequently
-	 * bridge/govern cache related settings of any information related to the EPR. This method also
-	 * puts the EPR in the cache in case it is already not there.
+	 * RNSPath is the class that links between the client-side code and the web services endPoints residing on the containers. So when we
+	 * resolve an EPR for RNSPath or creating an RNSPath from some already cached EPR, we should store the rnsPath to endPointIdentifier
+	 * mapping of the concerned EPR in a resource configuration instance. This configuration will subsequently bridge/govern cache related
+	 * settings of any information related to the EPR. This method also puts the EPR in the cache in case it is already not there.
 	 */
 	private void storeResourceConfigInCache()
 	{

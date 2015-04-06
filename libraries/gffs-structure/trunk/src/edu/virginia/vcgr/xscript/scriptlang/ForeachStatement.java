@@ -39,8 +39,8 @@ public class ForeachStatement implements ParseStatement
 		_innerStatement = innerStatement;
 	}
 
-	private Object evaluateSourceDir(XScriptContext context, String paramName, Pattern filter, String sourceDir)
-		throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	private Object evaluateSourceDir(XScriptContext context, String paramName, Pattern filter, String sourceDir) throws ScriptException,
+		EarlyExitException, ReturnFromFunctionException
 	{
 		File dir = new File(sourceDir);
 		if (!dir.exists())
@@ -60,8 +60,8 @@ public class ForeachStatement implements ParseStatement
 		return ret;
 	}
 
-	private Object evaluateSourceFile(XScriptContext context, String paramName, Pattern filter, String sourceFile)
-		throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	private Object evaluateSourceFile(XScriptContext context, String paramName, Pattern filter, String sourceFile) throws ScriptException,
+		EarlyExitException, ReturnFromFunctionException
 	{
 		String line;
 		BufferedReader reader = null;
@@ -88,8 +88,8 @@ public class ForeachStatement implements ParseStatement
 		}
 	}
 
-	private Object evaluateSourceRNS(XScriptContext context, String paramName, Pattern filter, String sourceRNS)
-		throws ScriptException, EarlyExitException, ReturnFromFunctionException
+	private Object evaluateSourceRNS(XScriptContext context, String paramName, Pattern filter, String sourceRNS) throws ScriptException,
+		EarlyExitException, ReturnFromFunctionException
 	{
 		Object ret = null;
 

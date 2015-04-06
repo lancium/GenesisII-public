@@ -22,8 +22,7 @@ public class CloudStatusRPTranslater implements SingleResourcePropertyTranslator
 	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
 	{
 		if (!(obj instanceof CloudStat))
-			throw new ResourcePropertyException("Unable to translate from type \"" + obj.getClass().getName()
-				+ "\" to CloudStat.");
+			throw new ResourcePropertyException("Unable to translate from type \"" + obj.getClass().getName() + "\" to CloudStat.");
 
 		return ((CloudStat) obj).toMessageElement(name);
 	}

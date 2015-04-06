@@ -15,13 +15,11 @@ final public class FileFSViewFactory extends AbstractFSViewFactory
 
 	public FileFSViewFactory()
 	{
-		super(new FileFSViewInformationManager(), SUPPORTED_SCHEMES, DESCRIPTION,
-			FSViewAuthenticationInformationTypes.Anonymous);
+		super(new FileFSViewInformationManager(), SUPPORTED_SCHEMES, DESCRIPTION, FSViewAuthenticationInformationTypes.Anonymous);
 	}
 
 	@Override
-	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly)
-		throws IOException
+	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly) throws IOException
 	{
 		return new FileFSViewSession(fsRoot, this, readOnly);
 	}

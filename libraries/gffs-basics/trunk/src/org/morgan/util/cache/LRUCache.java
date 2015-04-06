@@ -15,8 +15,7 @@ public class LRUCache<KeyType, DataType> extends AbstractCache<KeyType, DataType
 		private DataTypeNode<KeyType, DataType> _previous;
 		private DataTypeNode<KeyType, DataType> _next;
 
-		public DataTypeNode(KeyType key, DataType data, DataTypeNode<KeyType, DataType> previous,
-			DataTypeNode<KeyType, DataType> next)
+		public DataTypeNode(KeyType key, DataType data, DataTypeNode<KeyType, DataType> previous, DataTypeNode<KeyType, DataType> next)
 		{
 			_key = key;
 			_data = data;

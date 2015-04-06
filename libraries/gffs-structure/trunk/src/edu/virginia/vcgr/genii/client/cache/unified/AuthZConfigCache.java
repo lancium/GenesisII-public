@@ -146,8 +146,7 @@ public class AuthZConfigCache extends CommonAttributeCache
 	public boolean cacheKeyMatches(Object cacheKey)
 	{
 		if (cacheKey instanceof QName) {
-			return (cacheKey.equals(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME) || cacheKey
-				.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME));
+			return (cacheKey.equals(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME) || cacheKey.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME));
 		}
 		return false;
 	}

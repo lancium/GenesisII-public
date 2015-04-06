@@ -10,11 +10,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
 
 /*
- * This class periodically access per-container resource access information and adjust the polling
- * interval of the brokers that are in polling mode. This thread run very frequently, once in each
- * second, to keep the responsiveness of frequency adjuster very high. The motive here is to
- * response quickly to reduce polling interval when dictated by the usage pattern, to avoid blocking
- * the client-cache for longer terms.
+ * This class periodically access per-container resource access information and adjust the polling interval of the brokers that are in polling
+ * mode. This thread run very frequently, once in each second, to keep the responsiveness of frequency adjuster very high. The motive here is
+ * to response quickly to reduce polling interval when dictated by the usage pattern, to avoid blocking the client-cache for longer terms.
  */
 public class PollingFrequencyAdjuster extends Thread
 {

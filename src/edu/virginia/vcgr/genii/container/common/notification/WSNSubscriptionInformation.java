@@ -19,8 +19,7 @@ public class WSNSubscriptionInformation
 	private AdditionalUserData _additionalUserData;
 
 	WSNSubscriptionInformation(EndpointReferenceType subscriptionReference, EndpointReferenceType consumerReference,
-		TopicQueryExpression topicFilter, Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies,
-		AdditionalUserData additionalUserData)
+		TopicQueryExpression topicFilter, Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies, AdditionalUserData additionalUserData)
 	{
 		_subscriptionReference = subscriptionReference;
 		_consumerReference = consumerReference;

@@ -3,10 +3,9 @@ package edu.virginia.vcgr.genii.client.cache.unified;
 import java.util.Map;
 
 /*
- * This is the common abstraction for all client-side caches. For an external user of cache,
- * everything looks like a CommonCache. Because of being generic, its methods some-times have more
- * parameters than needed to get elements from or put elements in a particular cache. Subclasses are
- * supposed to override appropriate methods to indicate their method access specificities.
+ * This is the common abstraction for all client-side caches. For an external user of cache, everything looks like a CommonCache. Because of
+ * being generic, its methods some-times have more parameters than needed to get elements from or put elements in a particular cache.
+ * Subclasses are supposed to override appropriate methods to indicate their method access specificities.
  */
 public abstract class CommonCache implements Comparable<CommonCache>
 {
@@ -55,8 +54,8 @@ public abstract class CommonCache implements Comparable<CommonCache>
 	public abstract boolean supportRetrievalWithoutTarget();
 
 	/*
-	 * Wildcard matching is useful for caches that store elements by pathnames or something similar.
-	 * For example here we used it to retrieve endPoints of all RNS entries of a parent directory.
+	 * Wildcard matching is useful for caches that store elements by pathnames or something similar. For example here we used it to retrieve
+	 * endPoints of all RNS entries of a parent directory.
 	 */
 	public boolean supportRetrievalByWildCard()
 	{
@@ -64,11 +63,9 @@ public abstract class CommonCache implements Comparable<CommonCache>
 	}
 
 	/*
-	 * Wild card matchings are used to retrieve descendants of some RNS resource. The caller
-	 * supplies an RNSPath expression and gets a map of <cacheKey, cachedItem> pairs that matches
-	 * the expression. Although the search will almost always be performed by RNSPath string, the
-	 * keys of the returned Map should reflect the particular cacheKeys used to store the matched
-	 * items.
+	 * Wild card matchings are used to retrieve descendants of some RNS resource. The caller supplies an RNSPath expression and gets a map of
+	 * <cacheKey, cachedItem> pairs that matches the expression. Although the search will almost always be performed by RNSPath string, the
+	 * keys of the returned Map should reflect the particular cacheKeys used to store the matched items.
 	 */
 	@SuppressWarnings("rawtypes")
 	public Map getWildCardMatches(Object target, Object wildCardCacheKey)
@@ -93,20 +90,18 @@ public abstract class CommonCache implements Comparable<CommonCache>
 	public abstract boolean itemTypeMatches(Class<?> itemType);
 
 	/*
-	 * This determines how the cache implementation is tied with the resource configuration object,
-	 * which is used by the caller to extend or contract the cache lifetime of relevant properties
-	 * or view of any WS-resource. Furthermore, while inserting elements in the cache this
-	 * identifier is used to search resource configuration instance to check whether or not the item
-	 * should have a lifetime other than the default.
+	 * This determines how the cache implementation is tied with the resource configuration object, which is used by the caller to extend or
+	 * contract the cache lifetime of relevant properties or view of any WS-resource. Furthermore, while inserting elements in the cache this
+	 * identifier is used to search resource configuration instance to check whether or not the item should have a lifetime other than the
+	 * default.
 	 */
 	public abstract WSResourceConfig.IdentifierType getCachedItemIdentifier();
 
 	/*
-	 * This is used to update the lifetime of cached item when some resource has been subscribed or
-	 * un-subscribed. The different caches behaves differently on this. For example, the EPR
-	 * lookup-cache should(and does) update the lifetime of all the EPRs within the directory
-	 * represented by the commonIdentifer, but not the directory EPR itself. On the other hand,
-	 * attribute caches updates the lifetime of attributes for both the directory and its children.
+	 * This is used to update the lifetime of cached item when some resource has been subscribed or un-subscribed. The different caches
+	 * behaves differently on this. For example, the EPR lookup-cache should(and does) update the lifetime of all the EPRs within the
+	 * directory represented by the commonIdentifer, but not the directory EPR itself. On the other hand, attribute caches updates the
+	 * lifetime of attributes for both the directory and its children.
 	 */
 	public abstract void updateCacheLifeTimeOfItems(Object commonIdentifierForItems, long newCacheLifeTime);
 

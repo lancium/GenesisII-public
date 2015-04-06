@@ -13,8 +13,8 @@ import org.apache.log4j.Logger;
 // ////////////
 
 /**
- * provides a logger object that will be used to record statistics about runtime activity that can
- * help in providing usage metrics for the GFFS.
+ * provides a logger object that will be used to record statistics about runtime activity that can help in providing usage metrics for the
+ * GFFS.
  */
 public class StatsLogger
 {

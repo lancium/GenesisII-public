@@ -41,16 +41,14 @@ class PatternDialog extends JDialog
 		CurrentPrincipalLabel label = new CurrentPrincipalLabel();
 		table.getModel().addTableModelListener(label);
 
-		content.add(
-			new JLabel(String.format("Pattern for certificates created by \"%s\".",
-				issuingAuthority.describe(VerbosityLevel.LOW))), new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JScrollPane(table), new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(label, new GridBagConstraints(0, 2, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+		content.add(new JLabel(String.format("Pattern for certificates created by \"%s\".", issuingAuthority.describe(VerbosityLevel.LOW))),
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JScrollPane(table), new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new SetPatternAction()), new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(label, new GridBagConstraints(0, 2, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
+			5), 5, 5));
+		content.add(new JButton(new SetPatternAction()), new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(new JButton(new CancelAction()), new GridBagConstraints(1, 3, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 

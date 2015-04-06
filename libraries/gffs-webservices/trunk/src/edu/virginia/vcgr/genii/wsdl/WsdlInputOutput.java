@@ -14,8 +14,7 @@ public class WsdlInputOutput extends MessageNormalizable
 		NamedNodeMap attrs = wsdlIONode.getAttributes();
 		String msgStr = WsdlUtils.getAttribute(attrs, WsdlConstants.MESSAGE_ATTR, true);
 		_message = WsdlUtils.getQNameFromString(wsdlIONode, msgStr);
-		Node actionNode =
-			attrs.getNamedItemNS(WsdlConstants.ACTION_QNAME.getNamespaceURI(), WsdlConstants.ACTION_QNAME.getLocalPart());
+		Node actionNode = attrs.getNamedItemNS(WsdlConstants.ACTION_QNAME.getNamespaceURI(), WsdlConstants.ACTION_QNAME.getLocalPart());
 		if (actionNode != null)
 			_soapAction = actionNode.getTextContent();
 

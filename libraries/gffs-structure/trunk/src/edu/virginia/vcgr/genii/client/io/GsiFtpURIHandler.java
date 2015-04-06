@@ -36,8 +36,7 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	protected DataTransferStatistics getInternal(URI source, File destination, UsernamePasswordIdentity credential)
-		throws IOException
+	protected DataTransferStatistics getInternal(URI source, File destination, UsernamePasswordIdentity credential) throws IOException
 	{
 		String host = null;
 		int port;
@@ -62,8 +61,7 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential)
-		throws IOException
+	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential) throws IOException
 	{
 		String host = null;
 		int port;
@@ -73,8 +71,7 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 		remotePath = target.getPath();
 
 		if (!new File(source.getParentFile().getAbsolutePath() + GenesisIIConstants.myproxyFilenameSuffix).exists()) {
-			throw new IOException(
-				"No X.509 certificate found for the user. Try resubmitting the job after performing xsedeLogin command");
+			throw new IOException("No X.509 certificate found for the user. Try resubmitting the job after performing xsedeLogin command");
 		}
 
 		if (host == null)

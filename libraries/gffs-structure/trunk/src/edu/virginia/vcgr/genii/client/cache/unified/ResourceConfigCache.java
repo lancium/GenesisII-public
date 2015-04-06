@@ -14,19 +14,17 @@ import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
 
 /*
- * This cache allows retrieval of same cache entries using different keys. To be exact the caller
- * can retrieves resource configuration by WS-Identifier, INode number, and RNSPath string. This
- * unusual behavior is supported because a resource configuration instance stores the mapping
- * between these identifiers and should be accessible by any of those.
+ * This cache allows retrieval of same cache entries using different keys. To be exact the caller can retrieves resource configuration by
+ * WS-Identifier, INode number, and RNSPath string. This unusual behavior is supported because a resource configuration instance stores the
+ * mapping between these identifiers and should be accessible by any of those.
  */
 public class ResourceConfigCache extends CommonCache
 {
 	static private Log _logger = LogFactory.getLog(ResourceConfigCache.class);
 
 	/*
-	 * Directory and file resource configuration caches are kept separate as we don't want to loose
-	 * valuable directory configurations if the system tries to flood the cache with resource
-	 * configurations of files encountered in a large directory.
+	 * Directory and file resource configuration caches are kept separate as we don't want to loose valuable directory configurations if the
+	 * system tries to flood the cache with resource configurations of files encountered in a large directory.
 	 */
 	private TimedOutLRUCache<String, WSResourceConfig> fileConfigCache;
 	private TimedOutLRUCache<String, WSResourceConfig> directoryConfigCache;
@@ -66,15 +64,12 @@ public class ResourceConfigCache extends CommonCache
 	}
 
 	/*
-	 * Although a resource configuration instance can be retrieved using any of the three
-	 * identifiers, it can be stored by only WS-identifier. However, when the cacheKey is different
-	 * we are not throwing any exception. This is because often the caller may retrieve a
-	 * configuration and try to store it again after updating some identifiers. Note that this
-	 * scheme should work because -- and only because -- initially the resource is retrieved from
-	 * the container using the primary identifier, and we expect to have the configuration stored in
-	 * the cache at that time. This process may seems unnecessarily complicated, but we do this to
-	 * provide transparency: we do not assume the caller handling the INode or RNS path identifier
-	 * understands WS EndpointIdentifier URIs.
+	 * Although a resource configuration instance can be retrieved using any of the three identifiers, it can be stored by only WS-identifier.
+	 * However, when the cacheKey is different we are not throwing any exception. This is because often the caller may retrieve a
+	 * configuration and try to store it again after updating some identifiers. Note that this scheme should work because -- and only because
+	 * -- initially the resource is retrieved from the container using the primary identifier, and we expect to have the configuration stored
+	 * in the cache at that time. This process may seems unnecessarily complicated, but we do this to provide transparency: we do not assume
+	 * the caller handling the INode or RNS path identifier understands WS EndpointIdentifier URIs.
 	 */
 	@Override
 	public void putItem(Object cacheKey, Object target, Object value) throws Exception
@@ -88,8 +83,7 @@ public class ResourceConfigCache extends CommonCache
 			_logger.trace("caching object of type " + value.getClass().getCanonicalName());
 		WSResourceConfig newResourceConfig = (WSResourceConfig) value;
 		long lifetime = Math.max(cacheLifeTime, newResourceConfig.getMillisecondTimeLeftToCallbackExpiry());
-		TimedOutLRUCache<String, WSResourceConfig> cache =
-			(newResourceConfig.isDirectory()) ? directoryConfigCache : fileConfigCache;
+		TimedOutLRUCache<String, WSResourceConfig> cache = (newResourceConfig.isDirectory()) ? directoryConfigCache : fileConfigCache;
 
 		if (cacheKey instanceof URI) {
 			String primaryIdentifer = cacheKey.toString();
@@ -157,9 +151,8 @@ public class ResourceConfigCache extends CommonCache
 	}
 
 	/*
-	 * Since this is the store for resource configuration instances we do not expect it to respond
-	 * to any identifier lookup query. This is a safety precaution to avoid undetected infinite
-	 * loops.
+	 * Since this is the store for resource configuration instances we do not expect it to respond to any identifier lookup query. This is a
+	 * safety precaution to avoid undetected infinite loops.
 	 */
 	@Override
 	public IdentifierType getCachedItemIdentifier()
@@ -168,8 +161,8 @@ public class ResourceConfigCache extends CommonCache
 	}
 
 	/*
-	 * The caller should directly update the resource configuration by first retrieving it from the
-	 * cache then reinserting it with the updated lifetime setting.
+	 * The caller should directly update the resource configuration by first retrieving it from the cache then reinserting it with the updated
+	 * lifetime setting.
 	 */
 	@Override
 	public void updateCacheLifeTimeOfItems(Object commonIdentifierForItems, long newCacheLifeTime)
@@ -222,9 +215,8 @@ public class ResourceConfigCache extends CommonCache
 			String searchedIdentifier = null;
 
 			/*
-			 * Instead of directly iterating over the keySet of the cache we replicate the keySet
-			 * into another set and iterate over that. This is done to avoid misbehavior of the
-			 * iterator due to the concurrent update made by the cache itself inside the
+			 * Instead of directly iterating over the keySet of the cache we replicate the keySet into another set and iterate over that. This
+			 * is done to avoid misbehavior of the iterator due to the concurrent update made by the cache itself inside the
 			 * cache.get(argument) method.
 			 */
 			final Set<String> cachedKeys = new HashSet<String>(cache.keySet());

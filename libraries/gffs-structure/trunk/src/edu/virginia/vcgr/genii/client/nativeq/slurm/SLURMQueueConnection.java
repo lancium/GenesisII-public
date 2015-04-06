@@ -65,10 +65,9 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 	private List<String> _qstatStart;
 	private List<String> _qdelStart;
 
-	SLURMQueueConnection(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf,
-		File workingDirectory, NativeQueueConfiguration nativeQueueConfig, SLURMQueueConfiguration slurmConfig, String queueName,
-		List<String> qsubStart, List<String> qstatStart, List<String> qdelStart, JobStateCache statusCache)
-		throws NativeQueueException
+	SLURMQueueConnection(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf, File workingDirectory,
+		NativeQueueConfiguration nativeQueueConfig, SLURMQueueConfiguration slurmConfig, String queueName, List<String> qsubStart,
+		List<String> qstatStart, List<String> qdelStart, JobStateCache statusCache) throws NativeQueueException
 	{
 		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, nativeQueueConfig, slurmConfig);
 
@@ -222,32 +221,25 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 	}
 
 	@Override
-	protected List<String>
-		generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException
+	protected List<String> generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
+		throws NativeQueueException, IOException
 	{
-		/* VANA commented the whole section
-		URI variation = application.getSPMDVariation();
-		if (variation != null) {
-			// temporarily set std redirects to null; these are written as slurm directives
-			File stdoutRedirect = application.getStdoutRedirect(workingDirectory);
-			File stderrRedirect = application.getStderrRedirect(workingDirectory);
-
-			application.setStdoutRedirect(null);
-			application.setStderrRedirect(null);
-
-			// proceed as usual
-			List<String> finalCmdLine = super.generateApplicationBody(script, workingDirectory, application);
-
-			// reset std redirects in application description
-			if (stdoutRedirect != null)
-				application.setStdoutRedirect(stdoutRedirect.toString());
-			if (stderrRedirect != null)
-				application.setStderrRedirect(stderrRedirect.toString());
-
-			return finalCmdLine;
-		} else */
-			return super.generateApplicationBody(script, workingDirectory, application);
+		/*
+		 * VANA commented the whole section URI variation = application.getSPMDVariation(); if (variation != null) { // temporarily set std
+		 * redirects to null; these are written as slurm directives File stdoutRedirect = application.getStdoutRedirect(workingDirectory);
+		 * File stderrRedirect = application.getStderrRedirect(workingDirectory);
+		 * 
+		 * application.setStdoutRedirect(null); application.setStderrRedirect(null);
+		 * 
+		 * // proceed as usual List<String> finalCmdLine = super.generateApplicationBody(script, workingDirectory, application);
+		 * 
+		 * // reset std redirects in application description if (stdoutRedirect != null)
+		 * application.setStdoutRedirect(stdoutRedirect.toString()); if (stderrRedirect != null)
+		 * application.setStderrRedirect(stderrRedirect.toString());
+		 * 
+		 * return finalCmdLine; } else
+		 */
+		return super.generateApplicationBody(script, workingDirectory, application);
 	}
 
 	@Override
@@ -259,7 +251,7 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 
 		command.addAll(_qsubStart);
 		if (_qName != null || _destination != null) {
-			command.add("-p"); 
+			command.add("-p");
 			StringBuilder builder = new StringBuilder();
 			if (_qName != null)
 				builder.append(_qName);

@@ -24,8 +24,8 @@ public class GeniiResolverSyncRunner implements ResourceSyncRunner
 {
 	static private Log _logger = LogFactory.getLog(GeniiResolverSyncRunner.class);
 
-	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR,
-		ReplicationThread replicator) throws Throwable
+	public void doSync(IResource vResource, EndpointReferenceType primaryEPR, EndpointReferenceType myEPR, ReplicationThread replicator)
+		throws Throwable
 	{
 		// Synchronize the attributes -- resolver and replication policies.
 		IGeniiResolverResource resource = (IGeniiResolverResource) vResource;

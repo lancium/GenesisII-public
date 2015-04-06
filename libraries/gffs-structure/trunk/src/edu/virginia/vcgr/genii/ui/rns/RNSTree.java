@@ -67,10 +67,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 		iMap.put(CommonKeyStrokes.DELETE, _deleteAction.getValue(Action.NAME));
 		/* for now, we ignore cut/copy/paste */
 		/*
-		 * iMap.put(KeyStroke.getKeyStroke("ctrl X"),
-		 * TransferHandler.getCutAction().getValue(Action.NAME));
-		 * iMap.put(KeyStroke.getKeyStroke("ctrl C"),
-		 * TransferHandler.getCopyAction().getValue(Action.NAME));
+		 * iMap.put(KeyStroke.getKeyStroke("ctrl X"), TransferHandler.getCutAction().getValue(Action.NAME));
+		 * iMap.put(KeyStroke.getKeyStroke("ctrl C"), TransferHandler.getCopyAction().getValue(Action.NAME));
 		 */
 	}
 
@@ -80,10 +78,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 		aMap.put(_deleteAction.getValue(Action.NAME), _deleteAction);
 		/* for now, we ignore cut/copy/paste */
 		/*
-		 * aMap.put(TransferHandler.getCutAction().getValue(Action.NAME),
-		 * TransferHandler.getCutAction());
-		 * aMap.put(TransferHandler.getCopyAction().getValue(Action.NAME),
-		 * TransferHandler.getCopyAction());
+		 * aMap.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
+		 * aMap.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
 		 */
 	}
 
@@ -255,11 +251,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 			}
 		}
 
-		model
-			.uiContext()
-			.progressMonitorFactory()
-			.createMonitor(this, "Delete Entries", "Deleting entries", 1000L, new DeleteTask(model.uiContext(), pathList), null)
-			.start();
+		model.uiContext().progressMonitorFactory()
+			.createMonitor(this, "Delete Entries", "Deleting entries", 1000L, new DeleteTask(model.uiContext(), pathList), null).start();
 	}
 
 	private class TearoffHandlerImpl implements TearoffHandler
@@ -392,8 +385,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 				if (paths.length == 1)
 					answer =
 						JOptionPane.showConfirmDialog(RNSTree.this,
-							String.format("Are you sure you wish to delete \"%s\"?", paths[0].getLastPathComponent()),
-							"Delete Confirmation", JOptionPane.YES_NO_OPTION);
+							String.format("Are you sure you wish to delete \"%s\"?", paths[0].getLastPathComponent()), "Delete Confirmation",
+							JOptionPane.YES_NO_OPTION);
 				else
 					answer =
 						JOptionPane.showConfirmDialog(RNSTree.this, "Are you sure you wish to delete the selected endpoints?",

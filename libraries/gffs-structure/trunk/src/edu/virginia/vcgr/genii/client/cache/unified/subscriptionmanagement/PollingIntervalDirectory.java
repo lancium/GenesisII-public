@@ -8,9 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /*
- * This class tracks the last polling time, polling interval settings, and next scheduled polling
- * time for notification brokers that are working by polling notification messages from the
- * containers.
+ * This class tracks the last polling time, polling interval settings, and next scheduled polling time for notification brokers that are
+ * working by polling notification messages from the containers.
  */
 public class PollingIntervalDirectory
 {
@@ -26,8 +25,7 @@ public class PollingIntervalDirectory
 	private static final long MAX_DEVIATION_FROM_MISSED_POLLING_DEADLINE = 15 * 1000L; // fifteen
 																						// seconds
 
-	private static final Map<String, PollingTimeSettings> POLLING_TIME_CONFIGURATIONS =
-		new ConcurrentHashMap<String, PollingTimeSettings>();
+	private static final Map<String, PollingTimeSettings> POLLING_TIME_CONFIGURATIONS = new ConcurrentHashMap<String, PollingTimeSettings>();
 
 	public static void storePollingTimeSettings(PollingTimeSettings pollingTimeSettings)
 	{
@@ -41,9 +39,8 @@ public class PollingIntervalDirectory
 	}
 
 	/*
-	 * This method is used whenever a broker makes an polling outcall or the client receive
-	 * information piggy-backed from a container indicating the client-cache is fresh, which is
-	 * equivalent to making a polling outcall.
+	 * This method is used whenever a broker makes an polling outcall or the client receive information piggy-backed from a container
+	 * indicating the client-cache is fresh, which is equivalent to making a polling outcall.
 	 */
 	public static void notifyAboutPolling(String containerId)
 	{
@@ -59,8 +56,8 @@ public class PollingIntervalDirectory
 	}
 
 	/*
-	 * This method is invoked to schedule an immediate polling once the client knows that there are
-	 * some updates in the container that are not reflected in the cache.
+	 * This method is invoked to schedule an immediate polling once the client knows that there are some updates in the container that are not
+	 * reflected in the cache.
 	 */
 	public static void expediteScheduledPolling(String containerId)
 	{
@@ -108,8 +105,7 @@ public class PollingIntervalDirectory
 		if (pollingTimeSettings == null)
 			return;
 		synchronized (pollingTimeSettings) {
-			long verifiedPollingInterval =
-				Math.min(MAXIMUM_POLLING_INTERVAL, Math.max(pollingInterval, MINIMUM_POLLING_INTERVAL));
+			long verifiedPollingInterval = Math.min(MAXIMUM_POLLING_INTERVAL, Math.max(pollingInterval, MINIMUM_POLLING_INTERVAL));
 			pollingTimeSettings.setPollingRPCInterval(verifiedPollingInterval);
 			pollingTimeSettings.updateNextPollingTime();
 		}

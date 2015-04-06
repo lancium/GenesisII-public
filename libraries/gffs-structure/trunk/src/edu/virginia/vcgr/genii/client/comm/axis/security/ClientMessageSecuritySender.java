@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
@@ -123,8 +122,7 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements ISecur
 
 		// specify any other parts that we need to sign
 		ArrayList<WSEncryptionPart> signParts =
-			(ArrayList<WSEncryptionPart>) ((MessageContext) reqData.getMsgContext())
-				.getProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS);
+			(ArrayList<WSEncryptionPart>) ((MessageContext) reqData.getMsgContext()).getProperty(CommConstants.MESSAGE_SEC_SIGN_PARTS);
 		if (signParts != null) {
 			for (WSEncryptionPart part : signParts) {
 				partVector.add(part);
@@ -154,8 +152,7 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements ISecur
 			// create an in-memory keystore for the client's key material
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
-			keyStore.setKeyEntry(CRYPTO_ALIAS, keyMaterial._clientPrivateKey, CRYTO_PASS.toCharArray(),
-				keyMaterial._clientCertChain);
+			keyStore.setKeyEntry(CRYPTO_ALIAS, keyMaterial._clientPrivateKey, CRYTO_PASS.toCharArray(), keyMaterial._clientCertChain);
 
 			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);

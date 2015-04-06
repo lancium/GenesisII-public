@@ -32,8 +32,7 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
-		throws IOException
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry) throws IOException
 	{
 		throw new IOException("Cannot add new jobs using this RNS directory.");
 	}
@@ -55,9 +54,8 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 
 		if (forkPath.endsWith("/all"))
 			acceptableStatuses =
-				new String[] { JobStateEnumerationType._ERROR, JobStateEnumerationType._FINISHED,
-					JobStateEnumerationType._QUEUED, JobStateEnumerationType._REQUEUED, JobStateEnumerationType._RUNNING,
-					JobStateEnumerationType._STARTING };
+				new String[] { JobStateEnumerationType._ERROR, JobStateEnumerationType._FINISHED, JobStateEnumerationType._QUEUED,
+					JobStateEnumerationType._REQUEUED, JobStateEnumerationType._RUNNING, JobStateEnumerationType._STARTING };
 		else if (forkPath.endsWith("/queued"))
 			acceptableStatuses = new String[] { JobStateEnumerationType._QUEUED, JobStateEnumerationType._REQUEUED };
 		else if (forkPath.endsWith("/running")) {
@@ -80,8 +78,7 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 				jobs = mgr.getJobStatus(null);
 
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("JobListingRNSFork:  Getting the total listed of jobs.  Entry Name is \"%s\".",
-					entryName));
+				_logger.debug(String.format("JobListingRNSFork:  Getting the total listed of jobs.  Entry Name is \"%s\".", entryName));
 			for (ReducedJobInformationType job : jobs) {
 				if (entryName != null && !entryName.equals(job.getJobTicket()))
 					continue;
@@ -103,8 +100,8 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 					ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(),
 						new JobFork(getService(), formForkPath(job.getJobTicket())).describe()));
 				} else {
-					ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(), new JobInformationFork(getService(),
-						formForkPath(job.getJobTicket())).describe()));
+					ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(),
+						new JobInformationFork(getService(), formForkPath(job.getJobTicket())).describe()));
 				}
 			}
 

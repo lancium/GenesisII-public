@@ -38,8 +38,8 @@ public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin
 			Container container = frame.getContentPane();
 			container.setLayout(new GridBagLayout());
 
-			container.add(tabbed, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+			container.add(tabbed, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(5, 5, 5, 5), 5, 5));
 
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.pack();

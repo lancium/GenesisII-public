@@ -17,13 +17,13 @@ public class DataTab extends JPanel
 	{
 		TitledPanel stagingPanel = new TitledPanel("Data Staging", new GridBagLayout());
 
-		stagingPanel.add(new DataStagePanel(documentContext.jobDocument().filesystemMap(), "Input Stages", documentContext
-			.jobDocument().stageIns(), true), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		stagingPanel.add(new DataStagePanel(documentContext.jobDocument().filesystemMap(), "Input Stages", documentContext.jobDocument()
+			.stageIns(), true), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+			5, 5, 5, 5), 5, 5));
 
-		stagingPanel.add(new DataStagePanel(documentContext.jobDocument().filesystemMap(), "Output Stages", documentContext
-			.jobDocument().stageOuts(), false), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		stagingPanel.add(new DataStagePanel(documentContext.jobDocument().filesystemMap(), "Output Stages", documentContext.jobDocument()
+			.stageOuts(), false), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		return stagingPanel;
 	}
@@ -34,8 +34,8 @@ public class DataTab extends JPanel
 
 		setName("Data");
 
-		add(new RedirectionPanel(documentContext.jobDocument()), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		add(new RedirectionPanel(documentContext.jobDocument()), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		add(createDataStagingPanel(documentContext), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 	}

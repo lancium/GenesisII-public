@@ -185,8 +185,7 @@ public class GeniiPath implements Serializable
 	}
 
 	/**
-	 * returns the last component of the path. this doesn't include local: or grid: in the returned
-	 * string.
+	 * returns the last component of the path. this doesn't include local: or grid: in the returned string.
 	 */
 	final public String getName()
 	{
@@ -198,8 +197,7 @@ public class GeniiPath implements Serializable
 	}
 
 	/**
-	 * returns everything but the last component of the path. this does not include grid: or local:
-	 * in the returned string.
+	 * returns everything but the last component of the path. this does not include grid: or local: in the returned string.
 	 */
 	final public String getParent()
 	{
@@ -286,8 +284,8 @@ public class GeniiPath implements Serializable
 	}
 
 	/**
-	 * helper class that has room for either Java File object or an RNSPath. This allows a set of
-	 * paths to be returned without lots of object casting after the lookups are already done.
+	 * helper class that has room for either Java File object or an RNSPath. This allows a set of paths to be returned without lots of object
+	 * casting after the lookups are already done.
 	 */
 	public static class PathMixIn
 	{
@@ -318,7 +316,7 @@ public class GeniiPath implements Serializable
 	 * returns a list of paths of either local java File or RNSPath objects.
 	 */
 	public static Collection<PathMixIn> pathExpander(String path)
-	{		
+	{
 		if (path == null)
 			path = "";
 

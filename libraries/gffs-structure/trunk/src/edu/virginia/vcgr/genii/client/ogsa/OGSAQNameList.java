@@ -12,10 +12,9 @@ import org.apache.axis.message.MessageElement;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 
 /**
- * OGSA has a rather idiotic definition of lists of qnames for resource properties. It involves
- * putting them into a whitespace seperated list inside of an XML element. To make it possible to
- * parse/serialize these, we have to implement a specialize class to "wrap" these lists. That's what
- * this is.
+ * OGSA has a rather idiotic definition of lists of qnames for resource properties. It involves putting them into a whitespace seperated list
+ * inside of an XML element. To make it possible to parse/serialize these, we have to implement a specialize class to "wrap" these lists.
+ * That's what this is.
  * 
  * @author mmm2a
  */
@@ -53,8 +52,8 @@ public class OGSAQNameList extends ArrayList<QName>
 			String token = tokenizer.nextToken();
 
 			/*
-			 * See if the token has a colon. If so, it's a fully qualified qname that we have to
-			 * split into a prefix and a local part. If not, then it's the whole name.
+			 * See if the token has a colon. If so, it's a fully qualified qname that we have to split into a prefix and a local part. If not,
+			 * then it's the whole name.
 			 */
 			int index = token.indexOf(':');
 			if (index < 0) {

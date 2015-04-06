@@ -35,8 +35,7 @@ public class DefaultResourcesFacet extends DefaultPersonalityFacet implements Re
 	}
 
 	@Override
-	public void consumeIndividualDiskSpace(Object currentUnderstanding, RangeExpression individualDiskSpace)
-		throws JSDLException
+	public void consumeIndividualDiskSpace(Object currentUnderstanding, RangeExpression individualDiskSpace) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "IndividualDiskSpace"));
 	}
@@ -49,15 +48,13 @@ public class DefaultResourcesFacet extends DefaultPersonalityFacet implements Re
 	}
 
 	@Override
-	public void consumeIndividualPhysicalMemory(Object currentUnderstanding, RangeExpression individualPhysicalMemory)
-		throws JSDLException
+	public void consumeIndividualPhysicalMemory(Object currentUnderstanding, RangeExpression individualPhysicalMemory) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "IndividualPhsyicalMemory"));
 	}
 
 	@Override
-	public void consumeIndividualVirtualMemory(Object currentUnderstanding, RangeExpression individualVirtualMemory)
-		throws JSDLException
+	public void consumeIndividualVirtualMemory(Object currentUnderstanding, RangeExpression individualVirtualMemory) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "IndividualVirtualMemory"));
 	}
@@ -81,8 +78,7 @@ public class DefaultResourcesFacet extends DefaultPersonalityFacet implements Re
 	}
 
 	@Override
-	public void consumeTotalPhysicalMemory(Object currentUnderstanding, RangeExpression totalPhysicalMemory)
-		throws JSDLException
+	public void consumeTotalPhysicalMemory(Object currentUnderstanding, RangeExpression totalPhysicalMemory) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "TotalPhysicalMemory"));
 	}

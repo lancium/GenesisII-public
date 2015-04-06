@@ -194,8 +194,8 @@ public class HoverDialogController
 				if (!p.equals(_lastViewPosition) && _lastScreenPoint != null) {
 					Point mousePoint = new Point(_lastScreenPoint);
 					SwingUtilities.convertPointFromScreen(mousePoint, ((JViewport) e.getSource()).getView());
-					mouseMoved(new MouseEvent(((JViewport) e.getSource()).getView(), 0, System.currentTimeMillis(), 0x0,
-						mousePoint.x, mousePoint.y, 0, false));
+					mouseMoved(new MouseEvent(((JViewport) e.getSource()).getView(), 0, System.currentTimeMillis(), 0x0, mousePoint.x,
+						mousePoint.y, 0, false));
 				}
 			}
 

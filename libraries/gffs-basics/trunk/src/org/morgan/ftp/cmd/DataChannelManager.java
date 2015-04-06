@@ -22,8 +22,8 @@ public class DataChannelManager
 		int port = ss.getLocalPort();
 
 		_logger.info("Describing socket port " + port);
-		return String.format("=%s,%d,%d", FTPHostname.getLocalHost(FTPHostname.HostFormats.IP_ADDR).replace('.', ','),
-			port / 256, port % 256);
+		return String
+			.format("=%s,%d,%d", FTPHostname.getLocalHost(FTPHostname.HostFormats.IP_ADDR).replace('.', ','), port / 256, port % 256);
 	}
 
 	static public DataChannelKey acquireDataChannel(long timeoutSeconds) throws IOException, SocketException

@@ -61,8 +61,7 @@ public class ExportDirState
 		}
 	}
 
-	static private void writeState(File installFile, HashMap<String, Collection<ExportDirInformation>> state)
-		throws IOException
+	static private void writeState(File installFile, HashMap<String, Collection<ExportDirInformation>> state) throws IOException
 	{
 		FileOutputStream fout = null;
 

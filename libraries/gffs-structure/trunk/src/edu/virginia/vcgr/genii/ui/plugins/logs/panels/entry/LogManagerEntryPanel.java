@@ -101,10 +101,10 @@ public class LogManagerEntryPanel extends LogManagerPanel implements LazyLoadTab
 
 		JScrollPane pane = new JScrollPane(_table);
 
-		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-			5, 5, 5, 5), 5, 5));
-		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5,
+			5));
+		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		setPreferredSize(TABLE_SIZE);
 	}

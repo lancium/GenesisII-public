@@ -230,8 +230,8 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 				Double requestedSize = resourceConstraints.getTotalPhysicalMemory();
 				if (besUpperLimit != null && requestedSize != null) {
 					if (requestedSize > besUpperLimit.as(SizeUnits.Bytes))
-						throw new JSDLMatchException(String.format("Job requested %f bytes, but BES limits to %s.",
-							requestedSize, besUpperLimit));
+						throw new JSDLMatchException(String.format("Job requested %f bytes, but BES limits to %s.", requestedSize,
+							besUpperLimit));
 				}
 
 				// Wallclock
@@ -239,8 +239,8 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 				Double requestedWall = resourceConstraints.getWallclockTimeLimit();
 				if (besUpperWall != null && requestedWall != null) {
 					if (requestedWall > besUpperWall.as(DurationUnits.Seconds))
-						throw new JSDLMatchException(String.format("Job requested %f seconds, but BES limits to %s.",
-							requestedWall, besUpperWall));
+						throw new JSDLMatchException(String.format("Job requested %f seconds, but BES limits to %s.", requestedWall,
+							besUpperWall));
 				}
 			}
 		}
@@ -264,8 +264,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 				cleanups.add(new CleanupPhase(stageFile));
 		}
 		if (MyProxyCertificate.isAvailable())
-			cleanups
-				.add(new CleanupPhase(new File(getWorkingDirectory().toString() + GenesisIIConstants.myproxyFilenameSuffix)));
+			cleanups.add(new CleanupPhase(new File(getWorkingDirectory().toString() + GenesisIIConstants.myproxyFilenameSuffix)));
 
 		for (DataStagingUnderstanding stage : _pureCleans)
 			cleanups.add(new CleanupPhase(_fsManager.lookup(stage.getFilePath())));

@@ -20,9 +20,8 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider
 import edu.virginia.vcgr.genii.security.RWXCategory;
 
 /**
- * This class can handle AclChange messages for all resource types. If the current working context
- * contains credentials with write access to the current resource, then update the resource's ACLs
- * as specified in the ChangeContents message.
+ * This class can handle AclChange messages for all resource types. If the current working context contains credentials with write access to
+ * the current resource, then update the resource's ACLs as specified in the ChangeContents message.
  */
 public class AclChangeNotificationHandler extends AbstractNotificationHandler<AclChangeContents>
 {

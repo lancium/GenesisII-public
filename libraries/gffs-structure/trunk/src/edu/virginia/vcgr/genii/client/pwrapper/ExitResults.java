@@ -61,8 +61,9 @@ public class ExitResults
 	@Override
 	public String toString()
 	{
-		return String.format("Exit Code:  %d, User Time:  %d us, " + "Kernel Time:  %d us, Wallclock Time: %d us, "
-			+ "Max RSS:  %d bytes.\n", _exitCode, _userTime.as(TimeUnit.MICROSECONDS), _kernelTime.as(TimeUnit.MICROSECONDS),
-			_wallclockTime.as(TimeUnit.MICROSECONDS), _maximumRSS);
+		return String
+			.format("Exit Code:  %d, User Time:  %d us, " + "Kernel Time:  %d us, Wallclock Time: %d us, " + "Max RSS:  %d bytes.\n",
+				_exitCode, _userTime.as(TimeUnit.MICROSECONDS), _kernelTime.as(TimeUnit.MICROSECONDS),
+				_wallclockTime.as(TimeUnit.MICROSECONDS), _maximumRSS);
 	}
 }

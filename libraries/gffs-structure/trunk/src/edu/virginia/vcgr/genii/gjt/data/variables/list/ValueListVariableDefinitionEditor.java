@@ -52,15 +52,15 @@ class ValueListVariableDefinitionEditor extends VariableDefinitionEditor<ValueLi
 		Container container = getContentPane();
 		container.setLayout(new GridBagLayout());
 
-		container.add(new JLabel("Values"), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 0, 5), 0, 0));
+		container.add(new JLabel("Values"), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 0, 5), 0, 0));
 		container.add(new JScrollPane(_list), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(0, 5, 5, 5), 0, 0));
-		container.add(ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()),
-			new SimpleIconButton(ShapeIcons.Minus, _minusAction)), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-		container.add(ButtonPanel.createHorizontalPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 3, 1, 1,
-			1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()), new SimpleIconButton(
+			ShapeIcons.Minus, _minusAction)), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(0, 0, 0, 0), 0, 0));
+		container.add(ButtonPanel.createHorizontalPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
 		_list.addListSelectionListener(new ListSelectionListenerImpl());
 	}
@@ -83,8 +83,8 @@ class ValueListVariableDefinitionEditor extends VariableDefinitionEditor<ValueLi
 		public void actionPerformed(ActionEvent e)
 		{
 			String answer =
-				JOptionPane.showInputDialog(ValueListVariableDefinitionEditor.this, "What value would you like to add?",
-					"New Value", JOptionPane.QUESTION_MESSAGE);
+				JOptionPane.showInputDialog(ValueListVariableDefinitionEditor.this, "What value would you like to add?", "New Value",
+					JOptionPane.QUESTION_MESSAGE);
 			if (answer != null)
 				_model.addElement(answer);
 		}

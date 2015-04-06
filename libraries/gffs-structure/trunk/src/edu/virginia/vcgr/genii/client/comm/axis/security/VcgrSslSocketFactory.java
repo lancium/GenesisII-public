@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package edu.virginia.vcgr.genii.client.comm.axis.security;
@@ -56,8 +55,8 @@ import edu.virginia.vcgr.genii.security.x509.SingleSSLX509KeyManager;
 /**
  * Wrapper for the generic SSLSocketFactory.
  * 
- * Selects the identity in the current calling context's client cert/key for use during SSL
- * handshake. For containers, the TLS certificate is chosen instead of resource certificates.
+ * Selects the identity in the current calling context's client cert/key for use during SSL handshake. For containers, the TLS certificate is
+ * chosen instead of resource certificates.
  * 
  * Allows us to re-read trust-stores when we detect changes in the client/server configuration.
  * 
@@ -91,8 +90,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		new LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory>(getMaxCacheElements());
 
 	protected TrustManager[] _trustManagers;
-	protected SocketConfigurer _clientSocketConfigurer = Installation.getDeployment(new DeploymentName())
-		.clientSocketConfigurer();
+	protected SocketConfigurer _clientSocketConfigurer = Installation.getDeployment(new DeploymentName()).clientSocketConfigurer();
 
 	public VcgrSslSocketFactory()
 	{
@@ -134,8 +132,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			_maxCacheElements = DEFAULT_MAX_CACHE_ELEMENTS;
 			try {
 				File sslCachePropertiesFile =
-					Installation.getDeployment(new DeploymentName()).getConfigurationDirectory()
-						.lookupFile("ssl-cache.properties");
+					Installation.getDeployment(new DeploymentName()).getConfigurationDirectory().lookupFile("ssl-cache.properties");
 				in = new FileInputStream(sslCachePropertiesFile);
 				Properties props = new Properties();
 				props.load(in);
@@ -169,12 +166,10 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			}
 
 			KeyAndCertMaterial clientKeyMaterial =
-				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(),
-					new SecurityUpdateResults());
+				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 
 			/*
-			 * use only the container TLS cert rather than resource cert, unless we are acting as a
-			 * client.
+			 * use only the container TLS cert rather than resource cert, unless we are acting as a client.
 			 */
 			if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 				CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();

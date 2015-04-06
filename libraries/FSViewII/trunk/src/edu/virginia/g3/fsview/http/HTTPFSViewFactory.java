@@ -15,13 +15,11 @@ final public class HTTPFSViewFactory extends AbstractFSViewFactory
 
 	public HTTPFSViewFactory()
 	{
-		super(new HTTPFSViewInformationManager(), SUPPORTED_URI_SCHEMES, DESCRIPTION,
-			FSViewAuthenticationInformationTypes.Anonymous);
+		super(new HTTPFSViewInformationManager(), SUPPORTED_URI_SCHEMES, DESCRIPTION, FSViewAuthenticationInformationTypes.Anonymous);
 	}
 
 	@Override
-	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly)
-		throws IOException
+	final public FSViewSession openSession(URI fsRoot, FSViewAuthenticationInformation authInfo, boolean readOnly) throws IOException
 	{
 		return new HTTPFSViewSession(this, fsRoot.toURL());
 	}

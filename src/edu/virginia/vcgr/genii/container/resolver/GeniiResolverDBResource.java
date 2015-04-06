@@ -27,12 +27,11 @@ public class GeniiResolverDBResource extends BasicDBResource implements IGeniiRe
 	static private final String _GET_TARGETEPI_LIST_STMT = "SELECT DISTINCT epi FROM resolverentries " + "WHERE resourceid = ?";
 	static private final String _GET_TARGETEPR_STMT = "SELECT endpoint FROM resolverentries "
 		+ "WHERE resourceid = ? AND epi = ? AND targetid = ?";
-	static private final String _GET_TARGETID_LIST_STMT = "SELECT targetid FROM resolverentries "
-		+ "WHERE resourceid = ? AND epi = ? " + "ORDER BY targetid";
+	static private final String _GET_TARGETID_LIST_STMT = "SELECT targetid FROM resolverentries " + "WHERE resourceid = ? AND epi = ? "
+		+ "ORDER BY targetid";
 	static private final String _GET_ENTRY_COUNT_STMT = "SELECT COUNT(targetid) FROM resolverentries " + "WHERE resourceid = ?";
 	static private final String _LIST_RESOLVERS_STMT = "SELECT DISTINCT resourceid, epi FROM resolverentries";
-	static private final String _GET_ALL_ENTRIES_STMT = "SELECT epi, targetid, endpoint from resolverentries "
-		+ "WHERE resourceid = ?";
+	static private final String _GET_ALL_ENTRIES_STMT = "SELECT epi, targetid, endpoint from resolverentries " + "WHERE resourceid = ?";
 
 	public GeniiResolverDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException
 	{
@@ -171,8 +170,7 @@ public class GeniiResolverDBResource extends BasicDBResource implements IGeniiRe
 	}
 
 	/**
-	 * Return a map from targetEPI to resolver resourceKey for each targetEPI defined in the local
-	 * database.
+	 * Return a map from targetEPI to resolver resourceKey for each targetEPI defined in the local database.
 	 */
 	public HashMap<URI, String> listAllResolvers() throws ResourceException
 	{

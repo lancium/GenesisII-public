@@ -50,8 +50,8 @@ public class QueueResources extends ImageSourceDynamicPage implements DynamicPag
 			}
 
 			JFreeChart chart =
-				ChartFactory.createStackedBarChart3D("XCG Current Load", "Machine Type", "Job Slots", dataset,
-					PlotOrientation.VERTICAL, true, true, true);
+				ChartFactory.createStackedBarChart3D("XCG Current Load", "Machine Type", "Job Slots", dataset, PlotOrientation.VERTICAL,
+					true, true, true);
 			return chart.createBufferedImage(width(), height());
 		} catch (SQLException sqe) {
 			throw new IOException("Unable to genreate graph.", sqe);

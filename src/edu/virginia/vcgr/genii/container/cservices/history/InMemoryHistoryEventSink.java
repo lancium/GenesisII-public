@@ -51,8 +51,8 @@ public class InMemoryHistoryEventSink
 		}
 	}
 
-	static private List<HistoryEvent> extractHistoryEvents(SequenceNumber parentNumber, String stringName,
-		HistoryEventSource knownTo, MessageElement[] any)
+	static private List<HistoryEvent> extractHistoryEvents(SequenceNumber parentNumber, String stringName, HistoryEventSource knownTo,
+		MessageElement[] any)
 	{
 		List<HistoryEvent> ret = new ArrayList<HistoryEvent>(any == null ? 0 : any.length);
 
@@ -64,8 +64,8 @@ public class InMemoryHistoryEventSink
 						HistoryEventBundleType bundle = (HistoryEventBundleType) e.getObjectValue(HistoryEventBundleType.class);
 						HistoryEvent event = (HistoryEvent) DBSerializer.deserialize(bundle.getData());
 						ret.add(new HistoryEvent(event.eventNumber().wrapWith(parentNumber), event.eventTimestamp(),
-							new SimpleStringHistoryEventSource(stringName, knownTo, event.eventSource()), event.eventLevel(),
-							event.eventCategory(), event.eventProperties(), event.eventData()));
+							new SimpleStringHistoryEventSource(stringName, knownTo, event.eventSource()), event.eventLevel(), event
+								.eventCategory(), event.eventProperties(), event.eventData()));
 					} catch (Throwable cause) {
 						_logger.warn("Error trying to retrieve sub events.", cause);
 					}
@@ -84,8 +84,8 @@ public class InMemoryHistoryEventSink
 		HistoryContainerService service = ContainerServices.findService(HistoryContainerService.class);
 
 		for (HistoryEvent event : besEvents) {
-			service.addRecord(resourceKey, event.eventNumber(), event.eventCategory(), event.eventLevel(),
-				event.eventProperties(), event.eventSource(), event.eventData(), null);
+			service.addRecord(resourceKey, event.eventNumber(), event.eventCategory(), event.eventLevel(), event.eventProperties(),
+				event.eventSource(), event.eventData(), null);
 
 			if (event.eventNumber().compareTo(parentNumber) > 0)
 				parentNumber = event.eventNumber();
@@ -112,8 +112,7 @@ public class InMemoryHistoryEventSink
 			MessageElement[] ret = new MessageElement[events.size()];
 			int lcv = 0;
 			for (HistoryEvent event : events) {
-				ret[lcv] =
-					new MessageElement(SERIALIZATION_QNAME, new HistoryEventBundleType(DBSerializer.serialize(event, -1L)));
+				ret[lcv] = new MessageElement(SERIALIZATION_QNAME, new HistoryEventBundleType(DBSerializer.serialize(event, -1L)));
 				lcv++;
 			}
 
@@ -128,8 +127,7 @@ public class InMemoryHistoryEventSink
 		HistoryEventSource eventSource, HistoryEventData eventData)
 	{
 		synchronized (_events) {
-			_events.add(new HistoryEvent(_nextNumber, Calendar.getInstance(), eventSource, level, category, properties,
-				eventData));
+			_events.add(new HistoryEvent(_nextNumber, Calendar.getInstance(), eventSource, level, category, properties, eventData));
 			HistoryEventToken token = new InMemoryHistoryEventToken(_nextNumber);
 			_nextNumber = _nextNumber.next();
 			return token;

@@ -27,8 +27,8 @@ abstract class AbstractCloudExecutionPhase implements ExecutionPhase, Terminatea
 
 	abstract protected String getPhase();
 
-	protected final void tryExecuteCommand(String resourceID, String command, OutputStream out, OutputStream err,
-		CloudManager tManage) throws Exception
+	protected final void tryExecuteCommand(String resourceID, String command, OutputStream out, OutputStream err, CloudManager tManage)
+		throws Exception
 	{
 
 		while (true) {
@@ -60,8 +60,7 @@ abstract class AbstractCloudExecutionPhase implements ExecutionPhase, Terminatea
 
 	}
 
-	protected final void trySendFile(String resourceID, String localPath, String remotePath, CloudManager tManage)
-		throws Exception
+	protected final void trySendFile(String resourceID, String localPath, String remotePath, CloudManager tManage) throws Exception
 	{
 		while (true) {
 
@@ -92,8 +91,7 @@ abstract class AbstractCloudExecutionPhase implements ExecutionPhase, Terminatea
 
 	}
 
-	protected final void tryRecieveFile(String resourceID, String localPath, String remotePath, CloudManager tManage)
-		throws Exception
+	protected final void tryRecieveFile(String resourceID, String localPath, String remotePath, CloudManager tManage) throws Exception
 	{
 		while (true) {
 

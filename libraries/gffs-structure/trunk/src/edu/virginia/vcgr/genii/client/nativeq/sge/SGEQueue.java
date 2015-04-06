@@ -24,9 +24,8 @@ public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration>
 	}
 
 	@Override
-	public NativeQueueConnection connect(ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorConf, File workingDirectory,
-		NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException
+	public NativeQueueConnection connect(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf,
+		File workingDirectory, NativeQueueConfiguration nativeQueueConfiguration, Object providerConfiguration) throws NativeQueueException
 	{
 		SGEQueueConfiguration sgeConfig = (SGEQueueConfiguration) providerConfiguration;
 
@@ -42,9 +41,8 @@ public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration>
 		String qname = sgeConfig.queueName();
 
 		try {
-			return new SGEQueueConnection(resourceOverrides, cmdLineManipulatorConf, workingDirectory,
-				nativeQueueConfiguration, sgeConfig, qname, sgeConfig.startQSub(), sgeConfig.startQStat(),
-				sgeConfig.startQDel(), _statusCache);
+			return new SGEQueueConnection(resourceOverrides, cmdLineManipulatorConf, workingDirectory, nativeQueueConfiguration, sgeConfig,
+				qname, sgeConfig.startQSub(), sgeConfig.startQStat(), sgeConfig.startQDel(), _statusCache);
 		} catch (FileNotFoundException fnfe) {
 			throw new NativeQueueException("Unable to find queue binaries.", fnfe);
 		}

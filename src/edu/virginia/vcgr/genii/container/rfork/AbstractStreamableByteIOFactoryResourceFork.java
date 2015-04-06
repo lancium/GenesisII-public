@@ -6,8 +6,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractStreamableByteIOFactoryResourceFork extends AbstractResourceFork implements
-	StreamableByteIOFactoryResourceFork
+public abstract class AbstractStreamableByteIOFactoryResourceFork extends AbstractResourceFork implements StreamableByteIOFactoryResourceFork
 {
 	static private class SimpleCountingStream extends OutputStream
 	{

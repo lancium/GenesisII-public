@@ -1,10 +1,10 @@
 /*
- * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright
- * 1999-2005 The University of Southern California.
+ * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright 1999-2005 The University of Southern
+ * California.
  * 
- * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public
- * License, found at http://www.globus.org/toolkit/download/license.html. If you redistribute this
- * file, with or without modifications, you must include this notice in the file.
+ * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public License, found at
+ * http://www.globus.org/toolkit/download/license.html. If you redistribute this file, with or without modifications, you must include this
+ * notice in the file.
  */
 package edu.virginia.vcgr.genii.client.ser;
 
@@ -139,13 +139,11 @@ public class StringBufferReader extends Reader
 	}
 
 	/**
-	 * Mark the present position in the stream. Subsequent calls to reset() will reposition the
-	 * stream to this point.
+	 * Mark the present position in the stream. Subsequent calls to reset() will reposition the stream to this point.
 	 * 
 	 * @param readAheadLimit
-	 *            Limit on the number of characters that may be read while still preserving the
-	 *            mark. Because the stream's input comes from a string, there is no actual limit, so
-	 *            this argument must not be negative, but is otherwise ignored.
+	 *            Limit on the number of characters that may be read while still preserving the mark. Because the stream's input comes from a
+	 *            string, there is no actual limit, so this argument must not be negative, but is otherwise ignored.
 	 * 
 	 * @exception IllegalArgumentException
 	 *                If readAheadLimit is < 0
@@ -164,8 +162,7 @@ public class StringBufferReader extends Reader
 	}
 
 	/**
-	 * Reset the stream to the most recent mark, or to the beginning of the string if it has never
-	 * been marked.
+	 * Reset the stream to the most recent mark, or to the beginning of the string if it has never been marked.
 	 * 
 	 * @exception IOException
 	 *                If an I/O error occurs

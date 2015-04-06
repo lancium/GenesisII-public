@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.kerbauthn;
 
@@ -123,8 +122,8 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		_logger.debug("entering postCreate");
 		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {
@@ -156,16 +155,14 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public RequestSecurityTokenResponseType[] requestSecurityToken2(RequestSecurityTokenType request)
-		throws java.rmi.RemoteException
+	public RequestSecurityTokenResponseType[] requestSecurityToken2(RequestSecurityTokenType request) throws java.rmi.RemoteException
 	{
 		return X509AuthnServiceImpl.sharedSecurityTokenResponder(this, _resource, request);
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, RNSEntryExistsFaultType,
-		ResourceUnknownFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		return addRNSEntries(addRequest, _resource);
 	}
@@ -193,8 +190,7 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
-		WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("\"setMetadata\" not applicable.");
 	}

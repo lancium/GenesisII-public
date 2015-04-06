@@ -33,16 +33,16 @@ public class LogTreePanel extends JPanel
 	{
 		super(new GridBagLayout());
 
-		add(new JScrollPane(browserTree), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JScrollPane(browserTree), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(5, 5, 5, 5), 5, 5));
 		_browserTree = browserTree;
 
 		String[] options = { "Display logs by...", "RPC-ID", "command/procedure" };
 		_displayByBox = new JComboBox(options);
 		_displayByBox.setSelectedIndex(0);
 		_displayByBox.addActionListener(new DisplayBoxListener());
-		add(_displayByBox, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(_displayByBox, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5,
+			5), 5, 5));
 	}
 
 	private class DisplayBoxListener implements ActionListener

@@ -27,10 +27,8 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
  */
 public class WSSecurityUtils
 {
-	public static final String PKCS7_URI =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#PKCS7";
-	public static final String X509v3_URI =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
+	public static final String PKCS7_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#PKCS7";
+	public static final String X509v3_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
 	public static final String X509PKIPathv1_URI =
 		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509PKIPathv1";
 
@@ -122,8 +120,7 @@ public class WSSecurityUtils
 		return makePkiPathSecTokenRef(certChain, null);
 	}
 
-	static public MessageElement makePkiPathSecTokenRef(X509Certificate[] certChain, String wsuId)
-		throws AuthZSecurityException
+	static public MessageElement makePkiPathSecTokenRef(X509Certificate[] certChain, String wsuId) throws AuthZSecurityException
 	{
 		try {
 			MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
@@ -157,8 +154,7 @@ public class WSSecurityUtils
 
 	static public X509Certificate getX509v3FromSecTokenRef(MessageElement wseTokenRef) throws AuthZSecurityException
 	{
-		MessageElement element =
-			wseTokenRef.getChildElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+		MessageElement element = wseTokenRef.getChildElement(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
 		if (element != null) {
 			element = element.getChildElement(BinarySecurity.TOKEN_BST);
 			if (element != null) {

@@ -31,14 +31,13 @@ public class AuthZTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		RNSPath path = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
 
 		// get the authz config from the target's attributes
-		GenesisIIBaseRP rp =
-			(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(path.getEndpoint(), GenesisIIBaseRP.class);
+		GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(path.getEndpoint(), GenesisIIBaseRP.class);
 		AuthZConfig config = rp.getAuthZConfig();
 
 		boolean done = false;

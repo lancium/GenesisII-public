@@ -197,8 +197,8 @@ import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
-@GAroundInvoke({ ServiceInitializationLocker.class, BaseFaultFixer.class, SoapHeaderHandler.class, DatabaseHandler.class,
-	DebugInvoker.class, ScheduledTerminationInvoker.class, MInjectionInvoker.class, TimingHandler.class })
+@GAroundInvoke({ ServiceInitializationLocker.class, BaseFaultFixer.class, SoapHeaderHandler.class, DatabaseHandler.class, DebugInvoker.class,
+	ScheduledTerminationInvoker.class, MInjectionInvoker.class, TimingHandler.class })
 @ConstructionParametersType(ConstructionParameters.class)
 @GeniiServiceConfiguration(resourceProvider = BasicDBResourceProvider.class, defaultAuthZProvider = AclAuthZProvider.class)
 public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupHook, GenesisIIBaseTopics
@@ -304,8 +304,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 			// set the identity of the service into the creation params
 			X509Certificate[] serviceChain =
-				(X509Certificate[]) ResourceManager.getCurrentResource().dereference()
-					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+				(X509Certificate[]) ResourceManager.getCurrentResource().dereference().getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, serviceChain);
 		}
 		return ResourceManager.createNewResource(_serviceName, creationParameters);
@@ -315,8 +314,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
 		BaseFaultType, RemoteException
 	{
-		_logger.debug("postCreate: " + this.getClass().getName() + " -- " + constructionParameters.size()
-			+ " construct parms, " + resolverCreationParameters.size() + " resolver creation parms");
+		_logger.debug("postCreate: " + this.getClass().getName() + " -- " + constructionParameters.size() + " construct parms, "
+			+ resolverCreationParameters.size() + " resolver creation parms");
 
 		IResource resource = rKey.dereference();
 
@@ -340,15 +339,13 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return (Calendar) rKey.dereference().getProperty(IResource.SCHEDULED_TERMINATION_TIME_PROPERTY_NAME);
 	}
 
-	final protected void terminationAlarm(AlarmIdentifier alarmID, Object userData) throws ResourceNotDestroyedFaultType,
-		RemoteException
+	final protected void terminationAlarm(AlarmIdentifier alarmID, Object userData) throws ResourceNotDestroyedFaultType, RemoteException
 	{
 		_logger.info("Resource is self-terminating due to scheduled termination time.");
 		destroy(null);
 	}
 
-	static protected void setScheduledTerminationTime(Calendar termTime, ResourceKey rKey) throws ResourceUnknownFaultType,
-		ResourceException
+	static protected void setScheduledTerminationTime(Calendar termTime, ResourceKey rKey) throws ResourceUnknownFaultType, ResourceException
 	{
 		AlarmIdentifier alarmID;
 		IResource resource = rKey.dereference();
@@ -373,8 +370,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	}
 
 	/**
-	 * translates the property into an Object we know, if possible. otherwise just returns the axis
-	 * level MessageElement from the property.
+	 * translates the property into an Object we know, if possible. otherwise just returns the axis level MessageElement from the property.
 	 */
 	protected Object translateConstructionParameter(MessageElement property) throws Exception
 	{
@@ -417,8 +413,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		}
 	}
 
-	final public void callAlarmMethod(AlarmIdentifier alarm, String methodName, Object userData)
-		throws ResourceUnknownFaultType
+	final public void callAlarmMethod(AlarmIdentifier alarm, String methodName, Object userData) throws ResourceUnknownFaultType
 	{
 		Method m = findAlarmMethod(getClass(), methodName, userData);
 		if (m == null) {
@@ -455,9 +450,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetCurrentMessageResponse getCurrentMessage(GetCurrentMessage arg0) throws RemoteException,
-		TopicNotSupportedFaultType, TopicExpressionDialectUnknownFaultType, MultipleTopicsSpecifiedFaultType,
-		InvalidTopicExpressionFaultType, ResourceUnknownFaultType, NoCurrentMessageOnTopicFaultType
+	public GetCurrentMessageResponse getCurrentMessage(GetCurrentMessage arg0) throws RemoteException, TopicNotSupportedFaultType,
+		TopicExpressionDialectUnknownFaultType, MultipleTopicsSpecifiedFaultType, InvalidTopicExpressionFaultType, ResourceUnknownFaultType,
+		NoCurrentMessageOnTopicFaultType
 	{
 		throw FaultManipulator.fillInFault(new NoCurrentMessageOnTopicFaultType());
 	}
@@ -524,20 +519,19 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return new NotifyResponseType(NotificationConstants.toURI(status));
 	}
 
-	public static SubscribeResponse processSubscribeRequest(String resourceKey, SubscribeRequest request)
-		throws RemoteException, TopicNotSupportedFaultType, TopicExpressionDialectUnknownFaultType, InvalidFilterFaultType,
-		UnacceptableInitialTerminationTimeFaultType, SubscribeCreationFailedFaultType,
-		InvalidMessageContentExpressionFaultType, InvalidTopicExpressionFaultType, UnsupportedPolicyRequestFaultType,
-		UnrecognizedPolicyRequestFaultType, ResourceUnknownFaultType, NotifyMessageNotSupportedFaultType,
-		InvalidProducerPropertiesExpressionFaultType
+	public static SubscribeResponse processSubscribeRequest(String resourceKey, SubscribeRequest request) throws RemoteException,
+		TopicNotSupportedFaultType, TopicExpressionDialectUnknownFaultType, InvalidFilterFaultType,
+		UnacceptableInitialTerminationTimeFaultType, SubscribeCreationFailedFaultType, InvalidMessageContentExpressionFaultType,
+		InvalidTopicExpressionFaultType, UnsupportedPolicyRequestFaultType, UnrecognizedPolicyRequestFaultType, ResourceUnknownFaultType,
+		NotifyMessageNotSupportedFaultType, InvalidProducerPropertiesExpressionFaultType
 	{
 		Calendar currentTime = Calendar.getInstance();
 		TerminationTimeType ttt = request.terminationTime();
 		Calendar terminationTime = (ttt == null) ? null : ttt.terminationTime();
 
 		SubscriptionConstructionParameters cons =
-			new SubscriptionConstructionParameters(resourceKey, request.consumerReference(), request.topicFilter(),
-				request.policies(), request.additionalUserData());
+			new SubscriptionConstructionParameters(resourceKey, request.consumerReference(), request.topicFilter(), request.policies(),
+				request.additionalUserData());
 
 		if (terminationTime != null)
 			cons.timeToLive(terminationTime.getTimeInMillis() - currentTime.getTimeInMillis());
@@ -554,8 +548,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	public SubscribeResponse subscribe(Subscribe arg0) throws RemoteException, TopicNotSupportedFaultType,
 		TopicExpressionDialectUnknownFaultType, InvalidFilterFaultType, UnacceptableInitialTerminationTimeFaultType,
 		SubscribeCreationFailedFaultType, InvalidMessageContentExpressionFaultType, InvalidTopicExpressionFaultType,
-		UnsupportedPolicyRequestFaultType, UnrecognizedPolicyRequestFaultType, ResourceUnknownFaultType,
-		NotifyMessageNotSupportedFaultType, InvalidProducerPropertiesExpressionFaultType
+		UnsupportedPolicyRequestFaultType, UnrecognizedPolicyRequestFaultType, ResourceUnknownFaultType, NotifyMessageNotSupportedFaultType,
+		InvalidProducerPropertiesExpressionFaultType
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		return processSubscribeRequest(rKey.getResourceKey(), new SubscribeRequest(arg0));
@@ -598,8 +592,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				if (values == null) {
 					_logger.error("The resource property \"" + name + "\" is unknown.");
 					throw FaultManipulator.fillInFault(new InvalidResourcePropertyQNameFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("The resource property " + name
-							+ " is unknown.") }, null));
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("The resource property " + name + " is unknown.") },
+						null));
 				}
 
 				document.addAll(values);
@@ -627,8 +621,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 			if (!unknowns.containsKey(getResourcePropertyRequest))
 				throw FaultManipulator.fillInFault(new InvalidResourcePropertyQNameFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("The resource property "
-						+ getResourcePropertyRequest + " is unknown.") }, null));
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("The resource property " + getResourcePropertyRequest
+						+ " is unknown.") }, null));
 
 			document.addAll(unknowns.get(getResourcePropertyRequest));
 		} else
@@ -649,8 +643,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	}
 
 	/**
-	 * Quick test for overriding classes to implement should they desire to disable resource
-	 * creation on this endpoint
+	 * Quick test for overriding classes to implement should they desire to disable resource creation on this endpoint
 	 * 
 	 * @return true if vcgrCreate is applicable, false otherwise.
 	 */
@@ -659,8 +652,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return true;
 	}
 
-	public EndpointReferenceType CreateEPR(MessageElement[] creationParameters, String targetServiceURL)
-		throws RemoteException, ResourceCreationFaultType, BaseFaultType
+	public EndpointReferenceType CreateEPR(MessageElement[] creationParameters, String targetServiceURL) throws RemoteException,
+		ResourceCreationFaultType, BaseFaultType
 	{
 		GenesisHashMap constructionParameters = new GenesisHashMap();
 
@@ -684,8 +677,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		}
 
 		ResourceKey rKey = createResource(constructionParameters);
-		EndpointReferenceType epr =
-			ResourceManager.createEPR(rKey, targetServiceURL, getImplementedPortTypes(rKey), getMasterType(rKey));
+		EndpointReferenceType epr = ResourceManager.createEPR(rKey, targetServiceURL, getImplementedPortTypes(rKey), getMasterType(rKey));
 
 		WorkingContext.temporarilyAssumeNewIdentity(epr);
 		WorkingContext.getCurrentWorkingContext().setProperty(WorkingContext.CURRENT_RESOURCE_KEY, rKey);
@@ -698,10 +690,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 						.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM), Container.getContainerPrivateKey()));
 					rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
 				} catch (AuthZSecurityException gse) {
-					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
-							new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
+					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
+						new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
 				}
 			} else {
 				_logger.error("In createEPR 2 params, it is GeniiNoOutcalls");
@@ -746,8 +737,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 
 		if (myEPR == null) {
-			myEPR =
-				new EndpointReferenceType(new AttributedURITypeSmart(Container.getServiceURL(_serviceName)), null, null, null);
+			myEPR = new EndpointReferenceType(new AttributedURITypeSmart(Container.getServiceURL(_serviceName)), null, null, null);
 			WorkingContext.getCurrentWorkingContext().setProperty(WorkingContext.EPR_PROPERTY_NAME, myEPR);
 		}
 
@@ -779,8 +769,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		AttributedURIType targetAddress = myEPR.getAddress();
 		if (EPRUtils.getGeniiContainerID(myEPR) == null) {
 			targetAddress =
-				new AttributedURIType(String.format("%s?%s=%s", targetAddress.get_value(),
-					EPRUtils.GENII_CONTAINER_ID_PARAMETER, Container.getContainerID()));
+				new AttributedURIType(String.format("%s?%s=%s", targetAddress.get_value(), EPRUtils.GENII_CONTAINER_ID_PARAMETER,
+					Container.getContainerID()));
 		}
 
 		EndpointReferenceType epr =
@@ -793,10 +783,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 					.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM), Container.getContainerPrivateKey()));
 				rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
 			} catch (AuthZSecurityException gse) {
-				throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
-						new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
+				throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+					new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
+					new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
 			}
 		}
 		// collection to hold creation parameters for default resolvers
@@ -807,8 +796,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		if (resource instanceof BasicDBResource) {
 			try {
 				String hName = cParams.humanName();
-				ResourceSummary.addResource(((BasicDBResource) resource).getConnection(), rKey.getResourceKey(), hName,
-					getClass(), resolveEPR);
+				ResourceSummary.addResource(((BasicDBResource) resource).getConnection(), rKey.getResourceKey(), hName, getClass(),
+					resolveEPR);
 			} catch (Throwable cause) {
 				_logger.warn("Unable to note creation of resource.", cause);
 			}
@@ -842,8 +831,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		try {
 			IResolverFactoryProxy resolverFactoryProxy = getDefaultResolverFactoryProxy();
 			if (resolverFactoryProxy != null) {
-				EndpointReferenceType resolvedEPR =
-					resolverFactoryProxy.createResolver(newEPR, null, resolverCreationParamsArray);
+				EndpointReferenceType resolvedEPR = resolverFactoryProxy.createResolver(newEPR, null, resolverCreationParamsArray);
 				if (resolvedEPR == null) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Resolver proxy failed for service " + _serviceName);
@@ -866,8 +854,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	}
 
 	/**
-	 * Called by the container to initialize the service. Returns true if the service is being
-	 * *created* for the first time.
+	 * Called by the container to initialize the service. Returns true if the service is being *created* for the first time.
 	 */
 	@Override
 	public boolean startup()
@@ -877,8 +864,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		_logger.info("Initializing service: " + getClass().getName());
 
 		/*
-		 * future: this is the dog-slow place. what part of it is so slow? add printouts of millisecs
-		 * elapsed.
+		 * future: this is the dog-slow place. what part of it is so slow? add printouts of millisecs elapsed.
 		 */
 
 		ResourceKey rKey = null;
@@ -902,8 +888,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				// If this is null, then security isn't turned on.
 				if (containerChain != null) {
 					serviceCertSpec =
-						new CertCreationSpec(containerChain[0].getPublicKey(), containerChain,
-							Container.getContainerPrivateKey(), getServiceCertificateLifetime());
+						new CertCreationSpec(containerChain[0].getPublicKey(), containerChain, Container.getContainerPrivateKey(),
+							getServiceCertificateLifetime());
 
 					constructionParameters.put(IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM, serviceCertSpec);
 				}
@@ -935,11 +921,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		if (_serviceCertificateLifetime == null) {
 			synchronized (GenesisIIBase.class)
 			/*
-			 * ASG, August 10, 2008. The current code may over synchronize, and depending on the
-			 * cost of synchronization, may take too much time. A (most times) lock free way to
-			 * check is if (_serviceCertificateLifetime == null) { synchronized(GenesisIIBase.class)
-			 * Rest of code as before } Basically, if is not null (the vast majority of times) no
-			 * synch is performed.
+			 * ASG, August 10, 2008. The current code may over synchronize, and depending on the cost of synchronization, may take too much
+			 * time. A (most times) lock free way to check is if (_serviceCertificateLifetime == null) { synchronized(GenesisIIBase.class)
+			 * Rest of code as before } Basically, if is not null (the vast majority of times) no synch is performed.
 			 */
 			{
 				if (_serviceCertificateLifetime == null) {
@@ -1033,13 +1017,12 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public DestroyResponse destroy(Destroy destroyRequest) throws RemoteException, ResourceUnknownFaultType,
-		ResourceNotDestroyedFaultType, ResourceUnavailableFaultType
+	public DestroyResponse destroy(Destroy destroyRequest) throws RemoteException, ResourceUnknownFaultType, ResourceNotDestroyedFaultType,
+		ResourceUnavailableFaultType
 	{
 		ResourceKey resource = ResourceManager.getCurrentResource();
 		if (_logger.isDebugEnabled())
-			_logger.debug("Destroy resource \"" + resource.getResourceKey() + "\" for service \"" + resource.getServiceName()
-				+ "\".");
+			_logger.debug("Destroy resource \"" + resource.getResourceKey() + "\" for service \"" + resource.getServiceName() + "\".");
 		preDestroy();
 
 		TopicSet space = TopicSet.forPublisher(getClass());
@@ -1059,8 +1042,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public SetTerminationTimeResponse setTerminationTime(SetTerminationTime setTerminationTimeRequest) throws RemoteException,
-		ResourceUnknownFaultType, UnableToSetTerminationTimeFaultType, ResourceUnavailableFaultType,
-		TerminationTimeChangeRejectedFaultType
+		ResourceUnknownFaultType, UnableToSetTerminationTimeFaultType, ResourceUnavailableFaultType, TerminationTimeChangeRejectedFaultType
 	{
 		org.apache.axis.types.Duration duration = setTerminationTimeRequest.getRequestedLifetimeDuration();
 		Calendar c = setTerminationTimeRequest.getRequestedTerminationTime();
@@ -1085,9 +1067,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(
-		GetResourcePropertyDocument getResourcePropertyDocumentRequest) throws RemoteException, ResourceUnknownFaultType,
-		ResourceUnavailableFaultType
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(GetResourcePropertyDocument getResourcePropertyDocumentRequest)
+		throws RemoteException, ResourceUnknownFaultType, ResourceUnavailableFaultType
 	{
 		ArrayList<IAttributeManipulator> manipulators = _attributePackage.getManipulators();
 		ArrayList<MessageElement> elements = new ArrayList<MessageElement>();
@@ -1099,8 +1080,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 						elements.add(value);
 			}
 		}
-		for (Collection<MessageElement> values : _attributePackage.getUnknownAttributes(
-			ResourceManager.getCurrentResource().dereference()).values())
+		for (Collection<MessageElement> values : _attributePackage.getUnknownAttributes(ResourceManager.getCurrentResource().dereference())
+			.values())
 			elements.addAll(values);
 
 		MessageElement[] elementsArray = new MessageElement[elements.size()];
@@ -1113,8 +1094,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	@RWXMapping(RWXCategory.WRITE)
 	public InsertResourcePropertiesResponse insertResourceProperties(InsertResourceProperties insertResourcePropertiesRequest)
 		throws RemoteException, InsertResourcePropertiesRequestFailedFaultType, InvalidResourcePropertyQNameFaultType,
-		InvalidModificationFaultType, ResourceUnknownFaultType, UnableToModifyResourcePropertyFaultType,
-		ResourceUnavailableFaultType
+		InvalidModificationFaultType, ResourceUnknownFaultType, UnableToModifyResourcePropertyFaultType, ResourceUnavailableFaultType
 	{
 		setResourceProperties(insertResourcePropertiesRequest.getInsert());
 		return new InsertResourcePropertiesResponse();
@@ -1123,9 +1103,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public QueryResourcePropertiesResponse queryResourceProperties(QueryResourceProperties queryResourcePropertiesRequest)
-		throws RemoteException, UnknownQueryExpressionDialectFaultType, QueryEvaluationErrorFaultType,
-		InvalidQueryExpressionFaultType, InvalidResourcePropertyQNameFaultType, ResourceUnknownFaultType,
-		ResourceUnavailableFaultType
+		throws RemoteException, UnknownQueryExpressionDialectFaultType, QueryEvaluationErrorFaultType, InvalidQueryExpressionFaultType,
+		InvalidResourcePropertyQNameFaultType, ResourceUnknownFaultType, ResourceUnavailableFaultType
 	{
 		QueryExpressionType qet = queryResourcePropertiesRequest.getQueryExpression();
 
@@ -1147,8 +1126,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			writer.flush();
 			InputSource inputSource = new InputSource(new ByteArrayInputStream(baos.toByteArray()));
 
-			String str =
-				(String) XPathFactory.newInstance().newXPath().evaluate("/*/Ticker", inputSource, XPathConstants.STRING);
+			String str = (String) XPathFactory.newInstance().newXPath().evaluate("/*/Ticker", inputSource, XPathConstants.STRING);
 			System.err.println("The String is \"" + str + "\".");
 			StreamUtils.close(writer);
 			return null;
@@ -1166,10 +1144,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public SetResourcePropertiesResponse setResourceProperties(SetResourceProperties setResourcePropertiesRequest)
-		throws RemoteException, InvalidResourcePropertyQNameFaultType, InvalidModificationFaultType,
-		SetResourcePropertyRequestFailedFaultType, ResourceUnknownFaultType, UnableToModifyResourcePropertyFaultType,
-		ResourceUnavailableFaultType
+	public SetResourcePropertiesResponse setResourceProperties(SetResourceProperties setResourcePropertiesRequest) throws RemoteException,
+		InvalidResourcePropertyQNameFaultType, InvalidModificationFaultType, SetResourcePropertyRequestFailedFaultType,
+		ResourceUnknownFaultType, UnableToModifyResourcePropertyFaultType, ResourceUnavailableFaultType
 	{
 		setResourceProperties(setResourcePropertiesRequest.getInsert());
 		setResourceProperties(setResourcePropertiesRequest.getUpdate());
@@ -1287,8 +1264,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public AddMatchingParameterResponseType addMatchingParameter(MatchingParameter[] addMatchingParameterRequest)
-		throws RemoteException
+	public AddMatchingParameterResponseType addMatchingParameter(MatchingParameter[] addMatchingParameterRequest) throws RemoteException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
 		resource.addMatchingParameter(addMatchingParameterRequest);
@@ -1308,13 +1284,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	/**
 	 * See the comment in WorkingContextHandler.handleRequest().
 	 * 
-	 * The WorkingContext contains an EPR which does not contain the correct metadata, because the
-	 * client did not send the metadata. We can use this incomplete EPR for most purposes, but we do
-	 * not want to give the incomplete EPR to the resolver for long-term storage.
+	 * The WorkingContext contains an EPR which does not contain the correct metadata, because the client did not send the metadata. We can
+	 * use this incomplete EPR for most purposes, but we do not want to give the incomplete EPR to the resolver for long-term storage.
 	 * 
-	 * This function puts the implemented port types in the metadata in the EPR in the working
-	 * context. This should be called by the sync() method, which gives the EPR to the resolver for
-	 * long-term storage.
+	 * This function puts the implemented port types in the metadata in the EPR in the working context. This should be called by the sync()
+	 * method, which gives the EPR to the resolver for long-term storage.
 	 */
 	protected void fixMetadataInWorkingContext()
 	{
@@ -1340,8 +1314,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	}
 
 	/**
-	 * This should be a class annotation (GeniiServiceConfiguration.resourceSyncRunner), but
-	 * annotations cannot default to null?
+	 * This should be a class annotation (GeniiServiceConfiguration.resourceSyncRunner), but annotations cannot default to null?
 	 */
 	public ResourceSyncRunner getClassResourceSyncRunner()
 	{
@@ -1373,8 +1346,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				firstBlockList.add(item);
 			}
 
-			WSIteratorConstructionParameters consParms =
-				new WSIteratorConstructionParameters(iterator(), preferredBatchSize(), imiw);
+			WSIteratorConstructionParameters consParms = new WSIteratorConstructionParameters(iterator(), preferredBatchSize(), imiw);
 
 			try {
 				MessageElement[] firstBlock = firstBlockList.toArray(new MessageElement[firstBlockList.size()]);
@@ -1382,8 +1354,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				if (firstBlock != null) {
 					batchElements = new IterableElementType[firstBlock.length];
 					for (int lcv = 0; lcv < firstBlock.length; lcv++)
-						batchElements[lcv] =
-							new IterableElementType(new MessageElement[] { firstBlock[lcv] }, new UnsignedLong(lcv));
+						batchElements[lcv] = new IterableElementType(new MessageElement[] { firstBlock[lcv] }, new UnsignedLong(lcv));
 				}
 
 				Object tempObj = new Object();
@@ -1468,8 +1439,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		if (_database == null) {
 			_database = DLogUtils.getDBConnector();
 			if (_database == null)
-				throw new UnsupportedOperationException(
-					"Distributed Logging capabilities not currently active on this resource");
+				throw new UnsupportedOperationException("Distributed Logging capabilities not currently active on this resource");
 		}
 		return _database.selectLogs(rpcid);
 	}
@@ -1479,8 +1449,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		if (_database == null) {
 			_database = DLogUtils.getDBConnector();
 			if (_database == null)
-				throw new UnsupportedOperationException(
-					"Distributed Logging capabilities not currently active on this resource");
+				throw new UnsupportedOperationException("Distributed Logging capabilities not currently active on this resource");
 		}
 
 		Collection<LogHierarchyEntryType> ret = new ArrayList<LogHierarchyEntryType>();

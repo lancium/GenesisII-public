@@ -59,8 +59,8 @@ public class LnTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		if (numArguments() == 1) {
 			if (_eprFile != null)
@@ -82,22 +82,19 @@ public class LnTool extends BaseGridTool
 			throw new InvalidToolUsageException();
 	}
 
-	static public void linkFromEPRFile(GeniiPath eprFile, GeniiPath target) throws RNSException, IOException,
-		InvalidToolUsageException
+	static public void linkFromEPRFile(GeniiPath eprFile, GeniiPath target) throws RNSException, IOException, InvalidToolUsageException
 	{
 		InputStream in = null;
 
 		try {
 			in = eprFile.openInputStream();
-			link((EndpointReferenceType) ObjectDeserializer.deserialize(new InputSource(in), EndpointReferenceType.class),
-				target);
+			link((EndpointReferenceType) ObjectDeserializer.deserialize(new InputSource(in), EndpointReferenceType.class), target);
 		} finally {
 			StreamUtils.close(in);
 		}
 	}
 
-	static public void link(EndpointReferenceType epr, GeniiPath target) throws RNSException, RemoteException,
-		InvalidToolUsageException
+	static public void link(EndpointReferenceType epr, GeniiPath target) throws RNSException, RemoteException, InvalidToolUsageException
 	{
 		RNSPath path = lookup(target, RNSPathQueryFlags.MUST_NOT_EXIST);
 

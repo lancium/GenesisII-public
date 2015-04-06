@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package edu.virginia.vcgr.genii.container.security.authz.providers;
@@ -64,19 +63,17 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.rwx.RWXManager;
 
 /**
- * AuthZ provider implementation of GII Acls: an access-control mechanism comprised of
- * read/write/execute policy-sets.
+ * AuthZ provider implementation of GII Acls: an access-control mechanism comprised of read/write/execute policy-sets.
  * 
- * NOTES: - The presence of a NULL certificate in the ACL indicates open access. - A NULL ACL
- * indicates no access
+ * NOTES: - The presence of a NULL certificate in the ACL indicates open access. - A NULL ACL indicates no access
  * 
  * @author dmerrill
  */
 public class AclAuthZProvider implements IAuthZProvider, AclTopics
 {
 	/*
-	 * cak: this one seems too dangerous to change over to a SAML-named counterpart. it is the name
-	 * under which all the Acl information is stored in any grid we would want to migrate.
+	 * cak: this one seems too dangerous to change over to a SAML-named counterpart. it is the name under which all the Acl information is
+	 * stored in any grid we would want to migrate.
 	 */
 	static public final String GENII_ACL_PROPERTY_NAME = "genii.container.security.authz.gaml-acl";
 
@@ -88,9 +85,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	static private Log _logger = LogFactory.getLog(AclAuthZProvider.class);
 
 	/*
-	 * NOTE: 'static' below is an implementation change--we are only scanning the default owners
-	 * once now. we have already been telling people to stop the container if they want to update
-	 * the admin certificate or default owners...
+	 * NOTE: 'static' below is an implementation change--we are only scanning the default owners once now. we have already been telling people
+	 * to stop the container if they want to update the admin certificate or default owners...
 	 */
 	static private X509Certificate[] _defaultInitialResourceOwners = null;
 
@@ -107,9 +103,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 
 					for (File ownerFile : ownerFiles) {
 						/*
-						 * skip files of the wrong type. this is not a definitive list, but we have
-						 * seen problems with people storing these particular types in the default
-						 * owners folder.
+						 * skip files of the wrong type. this is not a definitive list, but we have seen problems with people storing these
+						 * particular types in the default owners folder.
 						 */
 						if (ownerFile.getName().endsWith(".pfx") || ownerFile.getName().endsWith(".txt")
 							|| ownerFile.getName().startsWith(".")) {
@@ -150,9 +145,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	}
 
 	/**
-	 * Presently configures the specified resource to have default access allowed for every
-	 * credential in the bag of credentials. We may want to look at restricting this in the future
-	 * to special credentials.
+	 * Presently configures the specified resource to have default access allowed for every credential in the bag of credentials. We may want
+	 * to look at restricting this in the future to special credentials.
 	 */
 	public void setDefaultAccess(ICallingContext callingContext, IResource resource, X509Certificate[] serviceCertChain)
 		throws AuthZSecurityException, ResourceException
@@ -199,13 +193,12 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		}
 
 		/*
-		 * dgm4d: this is a security issue // Add the resoure's static creating service if
-		 * (serviceCertChain != null) { defaultOwners.add(new X509Identity(serviceCertChain)); }
+		 * dgm4d: this is a security issue // Add the resoure's static creating service if (serviceCertChain != null) { defaultOwners.add(new
+		 * X509Identity(serviceCertChain)); }
 		 */
 
 		// Add the resource itself
-		defaultOwners
-			.add(new X509Identity((X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME)));
+		defaultOwners.add(new X509Identity((X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME)));
 
 		Acl acl = new Acl();
 		acl.readAcl.addAll(defaultOwners);
@@ -231,7 +224,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			case OPEN:
 				if (_logger.isDebugEnabled())
 					_logger.debug("giving access to identity due to OPEN permission: "
-						+ ((identity != null)? identity.describe(VerbosityLevel.HIGH) : "null"));
+						+ ((identity != null) ? identity.describe(VerbosityLevel.HIGH) : "null"));
 				return true;
 			case CLOSED:
 				return false;
@@ -253,8 +246,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				try {
 					if (entry.isPermitted(identity)) {
 						if (_logger.isDebugEnabled())
-							_logger.debug("passing ACL access check due to permission for identity: " 
-								+ ((identity != null)? identity.describe(VerbosityLevel.HIGH) : "null"));
+							_logger.debug("passing ACL access check due to permission for identity: "
+								+ ((identity != null) ? identity.describe(VerbosityLevel.HIGH) : "null"));
 						return true;
 					}
 				} catch (Exception e) {
@@ -268,8 +261,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	}
 
 	@Override
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation)
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, Class<?> serviceClass,
+		Method operation)
 	{
 		RWXCategory category = RWXManager.lookup(serviceClass, operation);
 		if (!checkAccess(authenticatedCallerCredentials, resource, category)) {
@@ -297,15 +290,14 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	}
 
 	@Override
-	public boolean
-		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
 	{
 		String messagePrefix = "checkAccess for " + category + " on " + ResourceManager.getResourceName(resource) + " ";
 
 		try {
 			ICallingContext callContext = ContextManager.getExistingContext();
 			Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
-			
+
 			// pre-emptive check of wildcard access.
 			if ((acl == null) || checkAclAccess(null, category, acl)) {
 				if (_logger.isDebugEnabled())
@@ -320,8 +312,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						if (((X509Identity) cred).checkRWXAccess(category)) {
 							if (checkAclAccess((Identity) cred, category, acl)) {
 								if (_logger.isDebugEnabled())
-									_logger.debug(messagePrefix + "granted to identity with x509: "
-										+ cred.describe(VerbosityLevel.LOW));
+									_logger.debug(messagePrefix + "granted to identity with x509: " + cred.describe(VerbosityLevel.LOW));
 								return true;
 							}
 						}
@@ -385,8 +376,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			} else if (acl.requireEncryption) {
 
 				// add in encryption
-				return _defaultMinMsgSec.computeUnion(new MessageLevelSecurityRequirements(
-					MessageLevelSecurityRequirements.ENCRYPT));
+				return _defaultMinMsgSec.computeUnion(new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.ENCRYPT));
 			}
 
 			return _defaultMinMsgSec;
@@ -427,8 +417,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	/**
 	 * Inform subscribers that one or more entries has been added or removed from one or more ACLs.
 	 */
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
-		throws AuthZSecurityException, ResourceException
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource) throws AuthZSecurityException,
+		ResourceException
 	{
 		if (resource.isServiceResource())
 			return;
@@ -453,8 +443,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		}
 	}
 
-	private static void findDeltas(List<AclEntry> entryList, List<String> tagList, Collection<AclEntry> newAcl,
-		Collection<AclEntry> oldAcl, String mode)
+	private static void findDeltas(List<AclEntry> entryList, List<String> tagList, Collection<AclEntry> newAcl, Collection<AclEntry> oldAcl,
+		String mode)
 	{
 		if (newAcl == null)
 			newAcl = new ArrayList<AclEntry>();
@@ -492,8 +482,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	/**
 	 * Update the resource ACLs with the changes that have been applied to a replica.
 	 */
-	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException,
-		AuthZSecurityException
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException, AuthZSecurityException
 	{
 		Acl acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
 		AclChangeContents contents = (AclChangeContents) message;

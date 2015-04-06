@@ -35,10 +35,10 @@ public class CertUpdateHelpers
 
 	// filename used for consistency locking (when managing the certificate update properties).
 	static public final String CONSISTENCY_LOCK_FILE = "cert-consistency.lock";
-	
+
 	/**
-	 * returns the currently active certificate update properties. the user must lock the
-	 * consistency lock file before invoking this to ensure a consistent property file exists.
+	 * returns the currently active certificate update properties. the user must lock the consistency lock file before invoking this to ensure
+	 * a consistent property file exists.
 	 */
 	public static Properties getCertUpdateProperties()
 	{
@@ -53,8 +53,8 @@ public class CertUpdateHelpers
 	}
 
 	/**
-	 * updates the certificate properties file with the properties provided. the user must lock the
-	 * consistency lock file before invoking this.
+	 * updates the certificate properties file with the properties provided. the user must lock the consistency lock file before invoking
+	 * this.
 	 */
 	public static boolean putCertUpdateProperties(Properties toWrite)
 	{
@@ -76,8 +76,7 @@ public class CertUpdateHelpers
 	}
 
 	/**
-	 * assuming the consistency lock is held, this reads the certificate update properties from the
-	 * config file.
+	 * assuming the consistency lock is held, this reads the certificate update properties from the config file.
 	 */
 	private static Properties readProperties(File propFile)
 	{
@@ -101,8 +100,7 @@ public class CertUpdateHelpers
 	}
 
 	/**
-	 * assuming that the consistency lock is already grabbed, this will write the default version of
-	 * the cert update properties file.
+	 * assuming that the consistency lock is already grabbed, this will write the default version of the cert update properties file.
 	 */
 	public static void writeDefaultProperties(File propFile)
 	{
@@ -125,8 +123,7 @@ public class CertUpdateHelpers
 	}
 
 	/**
-	 * assuming that the consistency lock is established, this will write out the properties
-	 * provided to the cert update properties file.
+	 * assuming that the consistency lock is established, this will write out the properties provided to the cert update properties file.
 	 */
 	public static boolean writeProperties(File propFile, Properties data)
 	{

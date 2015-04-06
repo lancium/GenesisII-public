@@ -42,36 +42,31 @@ public class NotificationMessageContents implements Cloneable, Serializable
 	private Element _additionalUserData = null;
 
 	/*
-	 * This includes all the attributes that cannot be properly serialized or deserialized by JAXB.
-	 * Information stored within this array do not travel as message content, rather these traveled
-	 * as part of the extension of the notification message (in "any" field of Notify class). As the
-	 * above suggests, this is not an ideal way of passing attributes. Hence, we should change how
-	 * these attributes are propagated if we find any better alternative.
+	 * This includes all the attributes that cannot be properly serialized or deserialized by JAXB. Information stored within this array do
+	 * not travel as message content, rather these traveled as part of the extension of the notification message (in "any" field of Notify
+	 * class). As the above suggests, this is not an ideal way of passing attributes. Hence, we should change how these attributes are
+	 * propagated if we find any better alternative.
 	 */
 	transient private MessageElement[] _additionalAttributes;
 
 	/*
-	 * Publisher blocking is used to control the rate at which a resource can publish notifications.
-	 * Upon receiving a notification with this flag set ON, the receiver should assume that it will
-	 * not receive further notification from it for the time period specified in blockageTime field,
-	 * and take appropriate action.
+	 * Publisher blocking is used to control the rate at which a resource can publish notifications. Upon receiving a notification with this
+	 * flag set ON, the receiver should assume that it will not receive further notification from it for the time period specified in
+	 * blockageTime field, and take appropriate action.
 	 */
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "publisher-will-be-blocked", nillable = false,
-		required = false)
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "publisher-will-be-blocked", nillable = false, required = false)
 	private boolean publisherBlockedFromFurtherNotifications;
 
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "blocking-period-in-millis", nillable = false,
-		required = false)
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS, name = "blocking-period-in-millis", nillable = false, required = false)
 	private Long blockageTime;
 
 	@XmlTransient
 	private QName _originalName = null;
 
 	/*
-	 * Indicate whether the notification messages are sent to the consumers holding subscription on
-	 * the current resource only or consumers holding subscription in another resource can also
-	 * receive notification. Such a scenario is desirable to pass ByteIO notifications through the
-	 * parent RNS directories containing the publisher ByteIO resource.
+	 * Indicate whether the notification messages are sent to the consumers holding subscription on the current resource only or consumers
+	 * holding subscription in another resource can also receive notification. Such a scenario is desirable to pass ByteIO notifications
+	 * through the parent RNS directories containing the publisher ByteIO resource.
 	 */
 	@XmlTransient
 	protected boolean useIndirectPublishers;
@@ -86,8 +81,7 @@ public class NotificationMessageContents implements Cloneable, Serializable
 	private void afterUnmarshal(Unmarshaller u, Object parent)
 	{
 		if (parent != null && parent instanceof JAXBElement) {
-			JAXBElement<? extends NotificationMessageContents> jaxbe =
-				(JAXBElement<? extends NotificationMessageContents>) parent;
+			JAXBElement<? extends NotificationMessageContents> jaxbe = (JAXBElement<? extends NotificationMessageContents>) parent;
 			_originalName = jaxbe.getName();
 		}
 
@@ -222,9 +216,8 @@ public class NotificationMessageContents implements Cloneable, Serializable
 	}
 
 	/*
-	 * Only used when the notification message is supposed to indirectly propagated through other
-	 * resources. Subclasses using indirect notification should override this method to reflect the
-	 * desired behavior.
+	 * Only used when the notification message is supposed to indirectly propagated through other resources. Subclasses using indirect
+	 * notification should override this method to reflect the desired behavior.
 	 */
 	public boolean isIgnoreBlockedIndirectPublisher(long blockingTime)
 	{
@@ -232,9 +225,8 @@ public class NotificationMessageContents implements Cloneable, Serializable
 	}
 
 	/*
-	 * We have to clone the attributes explicitly as JAXB cannot process arbitrary attributes.
-	 * Furthermore, to avoid JAXB serialization problem we have defined _additionalAttributes as
-	 * transient. So explicit copying is the only option.
+	 * We have to clone the attributes explicitly as JAXB cannot process arbitrary attributes. Furthermore, to avoid JAXB serialization
+	 * problem we have defined _additionalAttributes as transient. So explicit copying is the only option.
 	 */
 	private MessageElement[] cloneAdditionalAttributes()
 	{

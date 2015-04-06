@@ -23,8 +23,8 @@ import javax.swing.text.DefaultFormatter;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 
 /**
- * This dialog box is displayed when the user has requested that a new directory be created. It asks
- * the user to give a name to that new directory.
+ * This dialog box is displayed when the user has requested that a new directory be created. It asks the user to give a name to that new
+ * directory.
  * 
  * @author mmm2a
  */
@@ -47,30 +47,29 @@ class NewDirectoryDialog extends JDialog
 		setTitle("New Directory Name");
 
 		/*
-		 * Don't allow the user to click on "X" in the corner to close this box. They MUST click
-		 * cancel or OK.
+		 * Don't allow the user to click on "X" in the corner to close this box. They MUST click cancel or OK.
 		 */
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 
-		contentPane.add(new JLabel("New Directory Name?"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(new JLabel("New Directory Name?"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		DefaultFormatter formatter = new DefaultFormatter();
 		formatter.setAllowsInvalid(false);
 		formatter.setCommitsOnValidEdit(true);
 		formatter.setValueClass(NewDirectoryName.class);
 
-		contentPane.add(_input = new JFormattedTextField(formatter), new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(_input = new JFormattedTextField(formatter), new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
 		JPanel bottomPanel = new JPanel(new GridBagLayout());
 		OKAction action = new OKAction();
 		_input.addCaretListener(action);
-		bottomPanel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		bottomPanel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 		JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(new ActionListener()
 		{
@@ -80,10 +79,10 @@ class NewDirectoryDialog extends JDialog
 				setVisible(false);
 			}
 		});
-		bottomPanel.add(cancel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		contentPane.add(bottomPanel, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTH,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		bottomPanel.add(cancel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
+			5, 5, 5, 5), 5, 5));
+		contentPane.add(bottomPanel, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		Dimension d = _input.getPreferredSize();
 		d.width = 150;
@@ -93,8 +92,8 @@ class NewDirectoryDialog extends JDialog
 	}
 
 	/**
-	 * The action that the OK button has to either perform actions or disable the button when the
-	 * text in the text field is not appropriate to be a new directory name.
+	 * The action that the OK button has to either perform actions or disable the button when the text in the text field is not appropriate to
+	 * be a new directory name.
 	 * 
 	 * @author mmm2a
 	 */
@@ -133,8 +132,7 @@ class NewDirectoryDialog extends JDialog
 	 * 
 	 * @param owner
 	 *            The frame that should own the new dialog.
-	 * @return The string name of the directory entered by the user, or null if the user cancelled
-	 *         the dialog.
+	 * @return The string name of the directory entered by the user, or null if the user cancelled the dialog.
 	 */
 	static public String getDirectoryName(JFrame owner)
 	{

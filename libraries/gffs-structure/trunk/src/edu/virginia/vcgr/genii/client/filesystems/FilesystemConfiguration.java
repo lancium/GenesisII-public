@@ -21,8 +21,7 @@ class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 	@XmlAttribute(name = "path", required = true)
 	private String _path = null;
 
-	@XmlElement(namespace = FilesystemConstants.CONFIGURATION_NS, name = "filesystem-property", nillable = true,
-		required = false)
+	@XmlElement(namespace = FilesystemConstants.CONFIGURATION_NS, name = "filesystem-property", nillable = true, required = false)
 	private Collection<FilesystemProperties> _properties = new LinkedList<FilesystemProperties>();
 
 	@SuppressWarnings("unused")

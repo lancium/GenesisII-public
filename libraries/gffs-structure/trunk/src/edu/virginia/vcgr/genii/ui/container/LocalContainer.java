@@ -56,8 +56,7 @@ public class LocalContainer
 			throw new ContainerNotRunningException();
 
 		String urlString =
-			String.format(SERVICE_PATH_FORMAT, _localContainer.getContainerURL(), serviceName == null ? CONTAINER_SERVICE_NAME
-				: serviceName);
+			String.format(SERVICE_PATH_FORMAT, _localContainer.getContainerURL(), serviceName == null ? CONTAINER_SERVICE_NAME : serviceName);
 
 		return EPRUtils.makeEPR(urlString, false);
 	}

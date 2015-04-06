@@ -34,8 +34,7 @@ public class DefaultPOSIXApplicationFacet extends DefaultPersonalityFacet implem
 	}
 
 	@Override
-	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment)
-		throws JSDLException
+	public void consumeEnvironment(Object currentUnderstanding, String name, String filesystemName, String environment) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "Environment"));
 	}
@@ -137,8 +136,7 @@ public class DefaultPOSIXApplicationFacet extends DefaultPersonalityFacet implem
 	}
 
 	@Override
-	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory)
-		throws JSDLException
+	public void consumeWorkingDirectory(Object currentUnderstanding, String filesystemName, String workingDirectory) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLPosixConstants.JSDL_POSIX_NS, "WorkingDirectory"));
 	}

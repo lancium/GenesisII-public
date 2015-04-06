@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.bes;
 
@@ -115,8 +114,7 @@ public class ActivityState implements Serializable, Cloneable
 
 	public boolean equals(ActivityState other)
 	{
-		return equals(_besState, other._besState) && equals(_geniiState, other._geniiState)
-			&& (_isSuspended == other._isSuspended);
+		return equals(_besState, other._besState) && equals(_geniiState, other._geniiState) && (_isSuspended == other._isSuspended);
 	}
 
 	public boolean equals(Object other)
@@ -175,8 +173,7 @@ public class ActivityState implements Serializable, Cloneable
 			anyC.add(new MessageElement(new QName(_GENII_NS, _geniiState)));
 		if (_isSuspended)
 			anyC.add(new MessageElement(_SUSPEND_STATE_ELEMENT_QNAME));
-		return new ActivityStatusType((anyC.size() == 0) ? null : Elementals.toArray(anyC),
-			ActivityStateEnumeration.fromValue(_besState));
+		return new ActivityStatusType((anyC.size() == 0) ? null : Elementals.toArray(anyC), ActivityStateEnumeration.fromValue(_besState));
 	}
 
 	public String toString()

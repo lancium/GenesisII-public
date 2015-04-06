@@ -131,8 +131,8 @@ public class ScriptTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 		Reader reader = null;
 		int lcv;
@@ -206,7 +206,7 @@ public class ScriptTool extends BaseGridTool
 				retval = engine.eval(reader);
 			else
 				retval = engine.eval(stdin);
-			
+
 			if ((retval != null) && (retval instanceof Integer)) {
 				return (Integer) retval;
 			}

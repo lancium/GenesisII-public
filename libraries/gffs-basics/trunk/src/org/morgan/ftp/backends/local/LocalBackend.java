@@ -252,9 +252,8 @@ public class LocalBackend implements IBackend
 			File file = files[lcv];
 
 			ret[lcv] =
-				new ListEntry(file.getName(), new Date(file.lastModified()), file.length(), _authenticatedAs.getUser(),
-					"unknown", new FilePermissions((file.canRead() ? FilePermissions.READ_PERM : 0)
-						| (file.canWrite() ? FilePermissions.WRITE_PERM : 0)
+				new ListEntry(file.getName(), new Date(file.lastModified()), file.length(), _authenticatedAs.getUser(), "unknown",
+					new FilePermissions((file.canRead() ? FilePermissions.READ_PERM : 0) | (file.canWrite() ? FilePermissions.WRITE_PERM : 0)
 						| (file.canExecute() ? FilePermissions.EXEC_PERM : 0), 0, 0), 1, file.isDirectory());
 		}
 

@@ -44,8 +44,7 @@ public class MTOMRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 	{
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.MTOM);
 
-		TransferInformationType transType =
-			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
+		TransferInformationType transType = new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
 		_clientStub.append(new Append(transType));
 	}
 
@@ -79,8 +78,7 @@ public class MTOMRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 	{
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.MTOM);
 
-		TransferInformationType transType =
-			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
+		TransferInformationType transType = new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
 		_clientStub.truncAppend(new TruncAppend(offset, transType));
 	}
 
@@ -92,8 +90,7 @@ public class MTOMRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIO
 	{
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.MTOM);
 
-		TransferInformationType transType =
-			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
+		TransferInformationType transType = new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
 		_clientStub.write(new Write(startOffset, bytesPerBlock, stride, transType));
 	}
 

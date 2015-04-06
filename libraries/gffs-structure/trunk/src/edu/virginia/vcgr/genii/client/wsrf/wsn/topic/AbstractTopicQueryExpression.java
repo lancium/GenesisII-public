@@ -50,8 +50,8 @@ abstract class AbstractTopicQueryExpression implements TopicQueryExpression, Ser
 		ret.addTextNode(toString(factory));
 
 		for (Map.Entry<String, String> entry : factory._uri2PrefixMap.entrySet()) {
-			ret.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
-				String.format("%s:%s", XMLConstants.XMLNS_ATTRIBUTE, entry.getValue()), entry.getKey());
+			ret.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, String.format("%s:%s", XMLConstants.XMLNS_ATTRIBUTE, entry.getValue()),
+				entry.getKey());
 		}
 
 		return ret;

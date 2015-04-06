@@ -17,14 +17,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implements a transferable object that understands URI lists as well as java file lists. This is
- * useful for implementing file drag and drop that will work across different platforms (such as
- * Gnome on Linux).
+ * Implements a transferable object that understands URI lists as well as java file lists. This is useful for implementing file drag and drop
+ * that will work across different platforms (such as Gnome on Linux).
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 @SuppressWarnings("serial")
 public class ListTransferable extends Vector<Object> implements Transferable
@@ -48,8 +47,8 @@ public class ListTransferable extends Vector<Object> implements Transferable
 	}
 
 	/**
-	 * create a new flavor. this one understands URI lists, such as: file:///home/fred/arf.txt\r\n
-	 * file:///etc/inputrc\r\n http://gruntose.com\r\n ...
+	 * create a new flavor. this one understands URI lists, such as: file:///home/fred/arf.txt\r\n file:///etc/inputrc\r\n
+	 * http://gruntose.com\r\n ...
 	 */
 	private static DataFlavor URIListFlavor;
 	static {
@@ -82,16 +81,14 @@ public class ListTransferable extends Vector<Object> implements Transferable
 	}
 
 	/**
-	 * register the types of transfers that we understand. this is really only the normal java file
-	 * list and our new URI list.
+	 * register the types of transfers that we understand. this is really only the normal java file list and our new URI list.
 	 */
-	protected ArrayList<DataFlavor> FLAVORS = new ArrayList<DataFlavor>(Arrays.asList(DataFlavor.javaFileListFlavor,
-		URIListFlavor, AltURIListFlavor));
+	protected ArrayList<DataFlavor> FLAVORS = new ArrayList<DataFlavor>(Arrays.asList(DataFlavor.javaFileListFlavor, URIListFlavor,
+		AltURIListFlavor));
 
 	/**
-	 * a function that must be overridden by derived classes if they are not initially seeding the
-	 * vector of objects that we hold. the caller of this function expects it will populate the
-	 * vector held here with usable objects.
+	 * a function that must be overridden by derived classes if they are not initially seeding the vector of objects that we hold. the caller
+	 * of this function expects it will populate the vector held here with usable objects.
 	 */
 	public boolean loadDataJustInTime(DataFlavor flavor)
 	{
@@ -100,8 +97,7 @@ public class ListTransferable extends Vector<Object> implements Transferable
 	}
 
 	/**
-	 * using the set of files that we've been handed, we can do transfers using our two supported
-	 * flavors.
+	 * using the set of files that we've been handed, we can do transfers using our two supported flavors.
 	 */
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, java.io.IOException
 	{
@@ -214,8 +210,7 @@ public class ListTransferable extends Vector<Object> implements Transferable
 	 * 
 	 * @param data
 	 *            a string formatted with possibly multiple URIs separated by CRLF.
-	 * @return a list of the files as java File objects. many thanks to
-	 *         http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4899516
+	 * @return a list of the files as java File objects. many thanks to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4899516
 	 */
 	public static List<Object> textURIListToFileList(String data)
 	{

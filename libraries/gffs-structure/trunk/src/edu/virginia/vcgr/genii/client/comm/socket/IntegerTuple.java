@@ -45,7 +45,6 @@ public class IntegerTuple
 		if (!matcher.matches())
 			throw new NumberFormatException(String.format("Unable to parse integer tuple \"%s\".", value));
 
-		return new IntegerTuple(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)),
-			Integer.parseInt(matcher.group(3)));
+		return new IntegerTuple(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)));
 	}
 }

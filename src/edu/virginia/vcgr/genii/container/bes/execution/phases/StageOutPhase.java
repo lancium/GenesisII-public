@@ -47,14 +47,13 @@ public class StageOutPhase extends AbstractExecutionPhase implements Serializabl
 	{
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.StageOut);
 
-		history.createInfoWriter("Staging %s out.", _source.getName()).format("Staging %s out to %s.", _source, _target)
-			.close();
+		history.createInfoWriter("Staging %s out.", _source.getName()).format("Staging %s out to %s.", _source, _target).close();
 
 		DataTransferStatistics stats;
 
 		if (!_source.exists()) {
-			history.createErrorWriter("Can't stage %s out.", _source.getName())
-				.format("Source file (%s) does not seem to exist.", _source).close();
+			history.createErrorWriter("Can't stage %s out.", _source.getName()).format("Source file (%s) does not seem to exist.", _source)
+				.close();
 
 			throw new ContinuableExecutionException("Unable to locate source file \"" + _source.getName()
 				+ "\" for staging-out -- skipping it.");
@@ -67,8 +66,7 @@ public class StageOutPhase extends AbstractExecutionPhase implements Serializabl
 		} catch (Throwable cause) {
 			history.error(cause, "Can't stage %s out.", _source.getName());
 
-			throw new ContinuableExecutionException("A continuable exception has occurred while " + "running a BES activity.",
-				cause);
+			throw new ContinuableExecutionException("A continuable exception has occurred while " + "running a BES activity.", cause);
 		}
 	}
 }

@@ -13,8 +13,8 @@ public class MacOSXGuiSetup
 		return System.getProperty("os.name").equalsIgnoreCase("Mac OS X");
 	}
 
-	static public void setupMacOSXGuiApplication(String aboutName, boolean useScreenMenuBar, boolean growboxIntrudes,
-		boolean liveResize, boolean smallTabs)
+	static public void setupMacOSXGuiApplication(String aboutName, boolean useScreenMenuBar, boolean growboxIntrudes, boolean liveResize,
+		boolean smallTabs)
 	{
 		setAboutName(aboutName);
 

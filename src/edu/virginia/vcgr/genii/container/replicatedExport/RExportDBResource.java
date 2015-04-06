@@ -90,8 +90,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	// then get all entryids of these
 	// delete all attr entries that match these entryids
 	static private final String _DESTROY_ALL_ATTRS_FOR_PARENT_STMT = "DELETE FROM rexportentryattr "
-		+ "WHERE entryid in (SELECT entryid FROM rexport WHERE dirid in "
-		+ "(SELECT dirid FROM rexport WHERE parentIds LIKE ?))";
+		+ "WHERE entryid in (SELECT entryid FROM rexport WHERE dirid in " + "(SELECT dirid FROM rexport WHERE parentIds LIKE ?))";
 
 	/* clear rexportentry entries */
 	// get all dirids that match parentId
@@ -129,11 +128,10 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 		loadDirInfo();
 		/*
-		 * do we care if dir does not exist? this should be handled by other means if (!dirExists())
-		 * { _logger.error("Local file does not exist for RExportDir resource.");
+		 * do we care if dir does not exist? this should be handled by other means if (!dirExists()) {
+		 * _logger.error("Local file does not exist for RExportDir resource.");
 		 * 
-		 * destroy(_connection, false); throw FaultManipulator.fillInFault(new
-		 * ResourceUnknownFaultType()); }
+		 * destroy(_connection, false); throw FaultManipulator.fillInFault(new ResourceUnknownFaultType()); }
 		 */
 	}
 
@@ -217,8 +215,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		}
 	}
 
-	protected RExportEntry createEntryForRealFile(String nextRealName, EndpointReferenceType serviceEPR, String entryType,
-		String localPath, String parentIds) throws ResourceException, RemoteException
+	protected RExportEntry createEntryForRealFile(String nextRealName, EndpointReferenceType serviceEPR, String entryType, String localPath,
+		String parentIds) throws ResourceException, RemoteException
 	{
 		_logger.info("Creating new rexport entries");
 
@@ -233,8 +231,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		// update entryref to include resolver epr
 		try {
 			entryReference =
-				RExportResolverUtils.setupRExport(entryReference, entryType, creationProperties[0].getValue(), null,
-					nextRealName);
+				RExportResolverUtils.setupRExport(entryReference, entryType, creationProperties[0].getValue(), null, nextRealName);
 		} catch (Exception e) {
 			_logger.error("Unable to create rexport resolver: " + e.getLocalizedMessage());
 			throw new ResourceException("Unable to create rexport resolver.", e);
@@ -251,8 +248,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	/*
 	 * Initiate appropriate additions into db to store information about entry
 	 * 
-	 * in: entry - entry to be added into DB in: createOnDisk - if true, entry is to be created for
-	 * real as well
+	 * in: entry - entry to be added into DB in: createOnDisk - if true, entry is to be created for real as well
 	 */
 	public void addEntry(RExportEntry entry, boolean createOnDisk) throws ResourceException, RNSEntryExistsFaultType
 	{
@@ -400,8 +396,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	}
 
 	/*
-	 * destroy all entries under directory destroy info related to directory if hardDestroy, destroy
-	 * localFiles
+	 * destroy all entries under directory destroy info related to directory if hardDestroy, destroy localFiles
 	 */
 	public void destroy(Connection connection, boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType
 	{
@@ -433,8 +428,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			super.destroy();
 
 			/*
-			 * Delete underlying file system resources if necessary In the semantics where replica
-			 * is read only, hardDestroy is always false
+			 * Delete underlying file system resources if necessary In the semantics where replica is read only, hardDestroy is always false
 			 */
 			if (hardDestroy)
 				destroyDirectory(getLocalPath());
@@ -447,8 +441,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 	static void dirDestroyAllForParentDir(Connection connection, String parentId, boolean hardDestroy) throws ResourceException
 	{
-		String parentIdSearch =
-			"%" + RExportUtils._PARENT_ID_BEGIN_DELIMITER + parentId + RExportUtils._PARENT_ID_END_DELIMITER + "%";
+		String parentIdSearch = "%" + RExportUtils._PARENT_ID_BEGIN_DELIMITER + parentId + RExportUtils._PARENT_ID_END_DELIMITER + "%";
 
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -590,8 +583,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 			while (rs.next()) {
 				RExportEntry entry =
-					new RExportEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4),
-						rs.getString(5), null);
+					new RExportEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4), rs.getString(5),
+						null);
 				ret.add(entry);
 			}
 
@@ -654,21 +647,19 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		}
 
 		QName transMechName = new QName(RandomByteIOAttributeHandlers.RANDOM_BYTEIO_NS, "TransferMechanism");
-		attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME), entryFile
-			.length()));
+		attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME), entryFile.length()));
 		attrs.add(new MessageElement(transMechName, ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
 		attrs.add(new MessageElement(transMechName, ByteIOConstants.TRANSFER_TYPE_DIME_URI));
 		attrs.add(new MessageElement(transMechName, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
 
 		try {
-			IRByteIOResource resource =
-				(IRByteIOResource) (ResourceManager.getTargetResource(entry.getEntryReference()).dereference());
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME),
-				resource.getAccessTime()));
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME),
-				resource.getModTime()));
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME),
-				resource.getCreateTime()));
+			IRByteIOResource resource = (IRByteIOResource) (ResourceManager.getTargetResource(entry.getEntryReference()).dereference());
+			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME), resource
+				.getAccessTime()));
+			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME), resource
+				.getModTime()));
+			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME), resource
+				.getCreateTime()));
 		} catch (ResourceUnknownFaultType ruft) {
 			// We couldn't find the resource, so we just skip it for now.
 		}

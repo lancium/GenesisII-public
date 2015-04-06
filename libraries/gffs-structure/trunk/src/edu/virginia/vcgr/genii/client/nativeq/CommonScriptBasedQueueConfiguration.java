@@ -35,7 +35,7 @@ public class CommonScriptBasedQueueConfiguration extends ScriptBasedQueueConfigu
 
 	@XmlElement(namespace = NS, name = "qdel", required = false, nillable = true)
 	private ExecutableApplicationConfiguration _qdel = new ExecutableApplicationConfiguration();
-	
+
 	@XmlElement(namespace = NS, name = "sbatch", required = false, nillable = true)
 	private ExecutableApplicationConfiguration _sbatch = new ExecutableApplicationConfiguration();
 
@@ -96,32 +96,32 @@ public class CommonScriptBasedQueueConfiguration extends ScriptBasedQueueConfigu
 	}
 
 	final public List<String> startSBatch() throws FileNotFoundException
-        {
-                return _sbatch.startCommandLine(binDirectory(), DEFAULT_SBATCH_BINARY);
-        }
+	{
+		return _sbatch.startCommandLine(binDirectory(), DEFAULT_SBATCH_BINARY);
+	}
 
-        final public void sbatch(ExecutableApplicationConfiguration conf)
-        {
-                _sbatch = conf;
-        }
+	final public void sbatch(ExecutableApplicationConfiguration conf)
+	{
+		_sbatch = conf;
+	}
 
-        final public List<String> startSQueue() throws FileNotFoundException
-        {
-                return _squeue.startCommandLine(binDirectory(), DEFAULT_SQUEUE_BINARY);
-        }
+	final public List<String> startSQueue() throws FileNotFoundException
+	{
+		return _squeue.startCommandLine(binDirectory(), DEFAULT_SQUEUE_BINARY);
+	}
 
-        final public void squeue(ExecutableApplicationConfiguration conf)
-        {
-                _squeue = conf;
-        }
+	final public void squeue(ExecutableApplicationConfiguration conf)
+	{
+		_squeue = conf;
+	}
 
-        final public List<String> startSCancel() throws FileNotFoundException
-        {
-                return _scancel.startCommandLine(binDirectory(), DEFAULT_SCANCEL_BINARY);
-        }
+	final public List<String> startSCancel() throws FileNotFoundException
+	{
+		return _scancel.startCommandLine(binDirectory(), DEFAULT_SCANCEL_BINARY);
+	}
 
-        final public void scancel(ExecutableApplicationConfiguration conf)
-        {
-                _scancel = conf;
-        }
+	final public void scancel(ExecutableApplicationConfiguration conf)
+	{
+		_scancel = conf;
+	}
 }

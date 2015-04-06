@@ -16,8 +16,8 @@ public class SimplePanel extends JPanel
 		super(new GridBagLayout());
 
 		for (int lcv = 0; lcv < components.length; lcv++) {
-			add(components[lcv], new GridBagConstraints(isHorizontal ? lcv : 0, isHorizontal ? 0 : lcv, 1, 1, 1.0, 1.0,
-				gridBagAnchor, gridBagFill, new Insets(5, 5, 5, 5), 5, 5));
+			add(components[lcv], new GridBagConstraints(isHorizontal ? lcv : 0, isHorizontal ? 0 : lcv, 1, 1, 1.0, 1.0, gridBagAnchor,
+				gridBagFill, new Insets(5, 5, 5, 5), 5, 5));
 		}
 	}
 

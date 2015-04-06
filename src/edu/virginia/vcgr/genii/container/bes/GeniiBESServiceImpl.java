@@ -125,9 +125,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			try {
 				isGood = activity.isGood();
 			} catch (Throwable cause) {
-				_logger.warn(
-					String.format("Unable to determine is activity %s is good -- deleting it!", activity.getActivityID()),
-					cause);
+				_logger.warn(String.format("Unable to determine is activity %s is good -- deleting it!", activity.getActivityID()), cause);
 			}
 
 			boolean success = false;
@@ -149,8 +147,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				}
 
 				if (!isGood) {
-					_logger.info(String.format("Cleaning up a BES activity that we have determined is bad:  %s.",
-						activity.getActivityID()));
+					_logger.info(String.format("Cleaning up a BES activity that we have determined is bad:  %s.", activity.getActivityID()));
 
 					new BESActivityServiceImpl().destroy(new Destroy());
 				}
@@ -179,8 +176,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{
 		try {
 			/*
-			 * In order to make out calls, we have to have a working context so we go ahead and
-			 * create an empty one.
+			 * In order to make out calls, we have to have a working context so we go ahead and create an empty one.
 			 */
 			WorkingContext.setCurrentWorkingContext(new WorkingContext());
 
@@ -188,8 +184,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			 * Now we get the database connection pool configured with this service
 			 */
 			ServerDatabaseConnectionPool connectionPool =
-				((DBBESResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory())
-					.getConnectionPool();
+				((DBBESResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory()).getConnectionPool();
 
 			// Set cloud connection DB pool
 			CloudMonitor.setConnectionPool((new CloudDBResourceFactory(connectionPool).getConnectionPool()));
@@ -260,8 +255,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				history.createErrorWriter("Parameter Sweep Unsupported.")
 					.format("This type of BES container does not " + "support Parameter Sweeps.").close();
 
-				throw new UnsupportedFeatureFaultType(
-					new String[] { "This BES container does not support JSDL parameter sweeps." }, null);
+				throw new UnsupportedFeatureFaultType(new String[] { "This BES container does not support JSDL parameter sweeps." }, null);
 			}
 		} catch (JAXBException je) {
 			history.warn(je, "JAXB Error parsing JSDL");
@@ -288,7 +282,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 			throw new NotAcceptingNewActivitiesFaultType(null);
 		}
-		
+
 		if (_localActivityServiceEPR == null) {
 			// only need to make this epr from scratch once (which involves
 			// a get-attr rpc to the service to get its full epr)
@@ -341,8 +335,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				activity.verifyOwner();
 				Collection<Throwable> faults = activity.getFaults();
 				response.add(new GetActivityStatusResponseType(target, activity.getState().toActivityStatusType(),
-					((faults == null) || (faults.size() == 0)) ? null : BESFaultManager.constructFault(faults
-						.toArray(new Throwable[faults.size()])), null));
+					((faults == null) || (faults.size() == 0)) ? null : BESFaultManager.constructFault(faults.toArray(new Throwable[faults
+						.size()])), null));
 			} catch (Throwable cause) {
 				response.add(new GetActivityStatusResponseType(target, null, BESFaultManager.constructFault(cause), null));
 			}
@@ -395,8 +389,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		URI localResourceManagerType = null;
 
 		try {
-			namingProfiles =
-				new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING), new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
+			namingProfiles = new URI[] { new URI(bconsts.NAMING_PROFILE_WS_ADDRESSING), new URI(bconsts.NAMING_PROFILE_WS_NAMING) };
 			besExtensions = new URI[0];
 
 			BESConstructionParameters consParms = (BESConstructionParameters) _resource.constructionParameters(getClass());
@@ -428,14 +421,12 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 			return new GetFactoryAttributesDocumentResponseType(new FactoryResourceAttributesDocumentType(
 				new BasicResourceAttributesDocumentType(resourceName, BESAttributesHandler.getOperatingSystem(),
-					BESAttributesHandler.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()),
-					new Double((double) BESAttributesHandler.getCPUSpeed()), new Double(
-						(double) BESAttributesHandler.getPhysicalMemory()), new Double(
-						(double) BESAttributesHandler.getVirtualMemory()), Elementals.toArray(any)),
-				BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler.getName(),
-				BESAttributesHandler.getDescription(), BESAttributesHandler.getTotalNumberOfActivities(),
-				BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles, besExtensions, localResourceManagerType,
-				Elementals.toArray(any)), null);
+					BESAttributesHandler.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()), new Double(
+						(double) BESAttributesHandler.getCPUSpeed()), new Double((double) BESAttributesHandler.getPhysicalMemory()),
+					new Double((double) BESAttributesHandler.getVirtualMemory()), Elementals.toArray(any)),
+				BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler.getName(), BESAttributesHandler.getDescription(),
+				BESAttributesHandler.getTotalNumberOfActivities(), BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles,
+				besExtensions, localResourceManagerType, Elementals.toArray(any)), null);
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unexpected BES exception.", sqe);
 		}

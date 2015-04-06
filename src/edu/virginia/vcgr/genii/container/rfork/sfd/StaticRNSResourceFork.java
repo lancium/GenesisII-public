@@ -18,9 +18,8 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 /**
- * StaticRNSResourceForks are forks that have static (in terms of contents) entries. In fact, they
- * can change any time the resource is constructed, but that behavior is incidental and should not
- * be relied upon.
+ * StaticRNSResourceForks are forks that have static (in terms of contents) entries. In fact, they can change any time the resource is
+ * constructed, but that behavior is incidental and should not be relied upon.
  * 
  * @author mmm2a
  */
@@ -37,8 +36,8 @@ public abstract class StaticRNSResourceFork extends ReadOnlyRNSResourceFork
 	}
 
 	/**
-	 * This is a convenience method which allows a sub-class to easily add an entry which uses the
-	 * default resource fork information structure.
+	 * This is a convenience method which allows a sub-class to easily add an entry which uses the default resource fork information
+	 * structure.
 	 * 
 	 * @param entryName
 	 *            The new entry's name.
@@ -51,8 +50,7 @@ public abstract class StaticRNSResourceFork extends ReadOnlyRNSResourceFork
 	}
 
 	/**
-	 * This abstract method is called automatically to add the entries into this static resource
-	 * fork.
+	 * This abstract method is called automatically to add the entries into this static resource fork.
 	 * 
 	 * @param entries
 	 *            The map of entries the resource fork contains.

@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-public abstract class AbstractFSViewRandomAccessFileEntry<SessionType extends FSViewSession> extends
-	AbstractFSViewFileEntry<SessionType> implements FSViewRandomAccessFileEntry
+public abstract class AbstractFSViewRandomAccessFileEntry<SessionType extends FSViewSession> extends AbstractFSViewFileEntry<SessionType>
+	implements FSViewRandomAccessFileEntry
 {
 	abstract protected void truncateImpl(long newLength) throws IOException;
 
@@ -14,8 +14,8 @@ public abstract class AbstractFSViewRandomAccessFileEntry<SessionType extends FS
 
 	abstract protected void writeImpl(long offset, ByteBuffer source) throws IOException;
 
-	protected AbstractFSViewRandomAccessFileEntry(Class<SessionType> sessionTypeClass, SessionType session,
-		FSViewDirectoryEntry parentEntry, String entryName)
+	protected AbstractFSViewRandomAccessFileEntry(Class<SessionType> sessionTypeClass, SessionType session, FSViewDirectoryEntry parentEntry,
+		String entryName)
 	{
 		super(sessionTypeClass, session, parentEntry, entryName, FSViewFileEntryType.RandomAccessFile);
 	}

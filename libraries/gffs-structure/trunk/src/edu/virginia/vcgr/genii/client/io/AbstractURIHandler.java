@@ -86,8 +86,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 		throw lastException;
 	}
 
-	protected DataTransferStatistics getInternal(URI source, File target, UsernamePasswordIdentity credential)
-		throws IOException
+	protected DataTransferStatistics getInternal(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
 		FileOutputStream fos = null;
 		InputStream in = null;
@@ -102,8 +101,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 		}
 	}
 
-	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential)
-		throws IOException
+	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential) throws IOException
 	{
 		FileInputStream fin = null;
 		OutputStream out = null;

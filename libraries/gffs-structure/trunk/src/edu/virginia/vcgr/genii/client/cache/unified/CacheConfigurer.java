@@ -14,10 +14,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /*
- * CacheConfigurer holds the configuration properties (e.g. timeout, size) of all elements of the
- * entire client-side cache module. There is no reference of any cache, or related classes
- * elsewhere. Therefore, this is also the only place for enabling or disabling the client-side cache
- * or its component properties.
+ * CacheConfigurer holds the configuration properties (e.g. timeout, size) of all elements of the entire client-side cache module. There is no
+ * reference of any cache, or related classes elsewhere. Therefore, this is also the only place for enabling or disabling the client-side
+ * cache or its component properties.
  */
 public class CacheConfigurer
 {
@@ -29,8 +28,7 @@ public class CacheConfigurer
 	private static final String MAXIMUM_POLLING_DELAY = "edu.virginia.vcgr.genii.client.cache.maximum-polling-delay";
 	private static final String BYTE_IO_ATTRS_COUNT = "edu.virginia.vcgr.genii.client.cache.size.byteIO-attributes-cache";
 	private static final String PERMISSION_ATTR_COUNT = "edu.virginia.vcgr.genii.client.cache.size.permission-attribute-cache";
-	private static final String DIRECTORY_SIZE_ATTR_COUNT =
-		"edu.virginia.vcgr.genii.client.cache.size.directory-size-attribute-cache";
+	private static final String DIRECTORY_SIZE_ATTR_COUNT = "edu.virginia.vcgr.genii.client.cache.size.directory-size-attribute-cache";
 	private static final String EPR_COUNT = "edu.virginia.vcgr.genii.client.cache.size.epr-cache";
 	private static final String FUSE_DIR_COUNT = "edu.virginia.vcgr.genii.client.cache.size.fuse-directory-cache";
 	private static final String RESOURCE_CONFIG_COUNT = "edu.virginia.vcgr.genii.client.cache.size.resource-config-cache";
@@ -38,10 +36,9 @@ public class CacheConfigurer
 
 	public static long DEFAULT_CACHE_TIMOUT_TIME = 30 * 1000L; // 30 seconds
 	/*
-	 * We keep old subscribed contents in the cache even if no polling is done for 4 minutes. This
-	 * attribute is used with subscription based caching and when polling is used to make cached
-	 * contents temporarily unaccessible if current polling interval is too long. The system changes
-	 * from slow to rapid polling mode as soon as any activity from the client is detected.
+	 * We keep old subscribed contents in the cache even if no polling is done for 4 minutes. This attribute is used with subscription based
+	 * caching and when polling is used to make cached contents temporarily unaccessible if current polling interval is too long. The system
+	 * changes from slow to rapid polling mode as soon as any activity from the client is detected.
 	 */
 	public static long DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT = 30 * 1000L;
 	public static int DEFAULT_ATTRIBUTE_CACHE_SIZE = 1000;
@@ -49,9 +46,9 @@ public class CacheConfigurer
 	// cak: caching disabled by default to avoid unicore code trying to cache.
 	private static boolean CACHING_ENABLED = false;
 	private static boolean SUBSCRIPTION_BASED_CACHING_ENABLED = false;
-	
+
 	private static List<CommonCache> LIST_OF_CACHES = new ArrayList<CommonCache>();
-	
+
 	// record when we show the cache stats and don't show them again in same run.
 	private static boolean advertisedConfig = false;
 
@@ -72,7 +69,7 @@ public class CacheConfigurer
 		String validityPeriod = properties.getProperty(MAXIMUM_POLLING_DELAY);
 		if (validityPeriod != null)
 			DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT = Integer.parseInt(validityPeriod) * 1000L;
-		
+
 		if (!advertisedConfig) {
 			advertisedConfig = true;
 			_logger.debug("Caching enabled: " + Boolean.toString(CACHING_ENABLED));

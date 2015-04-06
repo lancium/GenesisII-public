@@ -15,8 +15,7 @@ public class QUITCommandHandler extends AbstractCommandHandler
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
+	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out) throws FTPException
 	{
 		out.println("250 OK");
 	}

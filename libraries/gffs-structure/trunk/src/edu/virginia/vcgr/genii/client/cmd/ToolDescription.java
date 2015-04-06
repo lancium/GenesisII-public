@@ -87,11 +87,9 @@ public class ToolDescription
 			} else
 				return _toolInstance;
 		} catch (NoSuchMethodException nsme) {
-			throw new ToolException(
-				"Unable to find appropriate no-arg constructor for " + "tool class \"" + _toolClass + "\".", nsme);
+			throw new ToolException("Unable to find appropriate no-arg constructor for " + "tool class \"" + _toolClass + "\".", nsme);
 		} catch (IllegalAccessException iae) {
-			throw new ToolException("No-arg constructor for tool class \"" + _toolClass + "\" does not appear to be public.",
-				iae);
+			throw new ToolException("No-arg constructor for tool class \"" + _toolClass + "\" does not appear to be public.", iae);
 		} catch (InvocationTargetException ite) {
 			throw new ToolException("No-arg constructor for tool class \"" + _toolClass + "\" threw exception.", ite.getCause());
 

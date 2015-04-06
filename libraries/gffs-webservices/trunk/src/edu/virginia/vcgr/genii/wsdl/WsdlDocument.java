@@ -159,16 +159,15 @@ public class WsdlDocument extends AbstractXMLComponent implements IXMLComponent
 		}
 	}
 
-	public void generateBindingAndService(String serviceName, String bindingName, QName portType, File targetFile)
-		throws IOException, WsdlException
+	public void generateBindingAndService(String serviceName, String bindingName, QName portType, File targetFile) throws IOException,
+		WsdlException
 	{
 		Document newDoc = (Document) _rootDocument.cloneNode(true);
 		stripDocument(newDoc);
 
 		newDoc.getDocumentElement().appendChild(createLocalImportElement(newDoc, _sourcePath));
 		newDoc.getDocumentElement().appendChild(createBindingElement(newDoc, bindingName, portType));
-		newDoc.getDocumentElement()
-			.appendChild(createServiceElement(newDoc, serviceName, portType.getLocalPart(), bindingName));
+		newDoc.getDocumentElement().appendChild(createServiceElement(newDoc, serviceName, portType.getLocalPart(), bindingName));
 
 		writeDocument(newDoc, targetFile);
 	}

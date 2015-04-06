@@ -2,8 +2,7 @@ package org.morgan.util.gui.table;
 
 import javax.swing.table.TableColumn;
 
-public abstract class AbstractRowTableColumnDefinition<RowType, ColumnType> implements
-	RowTableColumnDefinition<RowType, ColumnType>
+public abstract class AbstractRowTableColumnDefinition<RowType, ColumnType> implements RowTableColumnDefinition<RowType, ColumnType>
 {
 	private String _columnName;
 	private Class<ColumnType> _columnType;

@@ -16,8 +16,8 @@ import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.utils.Duration;
 
 /**
- * An Information Portal is a portal through which "information" can be acquired about endpoints.
- * This portal can cache values and gets updated values on separate threads from a thread pool.
+ * An Information Portal is a portal through which "information" can be acquired about endpoints. This portal can cache values and gets
+ * updated values on separate threads from a thread pool.
  * 
  * @author mmm2a
  * 
@@ -47,9 +47,7 @@ public class InformationPortal<InformationType> implements Closeable
 		synchronized (_persister) {
 			oldResult = _persister.get(endpoint);
 			if (oldResult != null)
-				newResult =
-					new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(),
-						new TimeoutException());
+				newResult = new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(), new TimeoutException());
 			else
 				newResult = new InformationResult<InformationType>(null, Calendar.getInstance(), new TimeoutException());
 			_persister.persist(endpoint, newResult);
@@ -64,8 +62,8 @@ public class InformationPortal<InformationType> implements Closeable
 		close();
 	}
 
-	InformationPortal(Executor executor, InformationPersister<InformationType> persister,
-		InformationResolver<InformationType> resolver, Duration defaultTimeout, Duration defaultCacheWindow)
+	InformationPortal(Executor executor, InformationPersister<InformationType> persister, InformationResolver<InformationType> resolver,
+		Duration defaultTimeout, Duration defaultCacheWindow)
 	{
 		_executor = executor;
 		_persister = persister;
@@ -131,8 +129,8 @@ public class InformationPortal<InformationType> implements Closeable
 			getInformation(endpoint, listener, _defaultTimeout, new Duration(1));
 	}
 
-	public InformationResult<InformationType> getInformation(InformationEndpoint endpoint, Duration timeout,
-		Duration cacheWindow) throws InterruptedException
+	public InformationResult<InformationType> getInformation(InformationEndpoint endpoint, Duration timeout, Duration cacheWindow)
+		throws InterruptedException
 	{
 		BlockingInformationListener<InformationType> listener = new BlockingInformationListener<InformationType>();
 		getInformation(endpoint, listener, timeout, cacheWindow);
@@ -251,9 +249,7 @@ public class InformationPortal<InformationType> implements Closeable
 					if (exception != null) {
 						InformationResult<InformationType> oldResult = _persister.get(_endpoint);
 						if (oldResult != null)
-							result =
-								new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(),
-									exception);
+							result = new InformationResult<InformationType>(oldResult.information(), Calendar.getInstance(), exception);
 						else
 							result = new InformationResult<InformationType>(null, Calendar.getInstance(), exception);
 					}

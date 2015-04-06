@@ -66,13 +66,13 @@ final public class FSViewCreatorDialog extends JDialog
 
 		ok.evalutateState();
 
-		content.add(_tabbedPane, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(_readOnlyButton, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_tabbedPane, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+			5, 5, 5, 5), 5, 5));
+		content.add(_readOnlyButton, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new JButton(ok), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(ok), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 		content.add(new JButton(new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(new JButton(new HelpAction()), new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
@@ -80,11 +80,11 @@ final public class FSViewCreatorDialog extends JDialog
 
 		JPanel errorPanel = new JPanel(new GridBagLayout());
 		errorPanel.setBorder(BorderFactory.createLoweredBevelBorder());
-		errorPanel.add(_errorLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		errorPanel.add(_errorLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(errorPanel, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(errorPanel, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		_tabbedPane.addChangeListener(ok);
 	}
@@ -101,8 +101,7 @@ final public class FSViewCreatorDialog extends JDialog
 		return info;
 	}
 
-	private class OKAction extends AbstractAction implements FSViewInformationListener<FSViewConnectionInformation>,
-		ChangeListener
+	private class OKAction extends AbstractAction implements FSViewInformationListener<FSViewConnectionInformation>, ChangeListener
 	{
 		static final long serialVersionUID = 0L;
 
@@ -195,13 +194,11 @@ final public class FSViewCreatorDialog extends JDialog
 			} else if (panel.model().modelName() == "Windows Share") {
 				message =
 					"Enter Windows machine Hostname." + "\n" + "Enter the Windows share name" + "\n"
-						+ "Enter Domain name of your windows machine" + "\n"
-						+ "Enter Username and Password to access windows share";
+						+ "Enter Domain name of your windows machine" + "\n" + "Enter Username and Password to access windows share";
 				JOptionPane.showMessageDialog(panel, message);
 			}
 		}
 	}
-
 
 	static public void main(String[] args)
 	{

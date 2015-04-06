@@ -12,12 +12,10 @@ public class TruncAppendRequest
 {
 
 	/**
-	 * Forms a truncappend request and sends it to the proxyserver. A trunc apprend request is of
-	 * the form: |nonce|file/dir|command|path-len|path|seekoffset| len of buffer to append|append
-	 * buffer
+	 * Forms a truncappend request and sends it to the proxyserver. A trunc apprend request is of the form:
+	 * |nonce|file/dir|command|path-len|path|seekoffset| len of buffer to append|append buffer
 	 */
-	public static void send(Socket clientSocket, String path, byte[] wb, long offset, byte[] nonce)
-		throws UnknownHostException, IOException
+	public static void send(Socket clientSocket, String path, byte[] wb, long offset, byte[] nonce) throws UnknownHostException, IOException
 	{
 
 		BufferedOutputStream bos = null;

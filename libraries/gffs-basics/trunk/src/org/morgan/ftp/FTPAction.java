@@ -42,8 +42,7 @@ public class FTPAction implements Closeable
 	}
 
 	/**
-	 * The timestamp on which this ftp action completed. This value CAN be null if the command
-	 * hasn't completed yet.
+	 * The timestamp on which this ftp action completed. This value CAN be null if the command hasn't completed yet.
 	 * 
 	 * @return THe timestamp when the command completed.
 	 */

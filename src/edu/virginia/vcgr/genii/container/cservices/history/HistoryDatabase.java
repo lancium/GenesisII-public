@@ -31,11 +31,11 @@ public class HistoryDatabase
 	static private Log _logger = LogFactory.getLog(HistoryDatabase.class);
 
 	static final private String[] CREATE_TABLE_STMTS = {
-		"CREATE TABLE historyrecords(" + "hrid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
-			+ "resourceid VARCHAR(128) NOT NULL," + "sequencenumber VARCHAR(32) NOT NULL," + "level VARCHAR(16) NOT NULL,"
-			+ "category VARCHAR(64) NOT NULL," + "createtimestamp TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP,"
-			+ "properties BLOB(2G) NOT NULL," + "eventsource BLOB(2G) NOT NULL," + "eventdata BLOB(2G) NOT NULL,"
-			+ "expirationtime TIMESTAMP," + "CONSTRAINT sequniqconstraint UNIQUE(resourceid, sequencenumber))",
+		"CREATE TABLE historyrecords(" + "hrid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "resourceid VARCHAR(128) NOT NULL,"
+			+ "sequencenumber VARCHAR(32) NOT NULL," + "level VARCHAR(16) NOT NULL," + "category VARCHAR(64) NOT NULL,"
+			+ "createtimestamp TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP," + "properties BLOB(2G) NOT NULL,"
+			+ "eventsource BLOB(2G) NOT NULL," + "eventdata BLOB(2G) NOT NULL," + "expirationtime TIMESTAMP,"
+			+ "CONSTRAINT sequniqconstraint UNIQUE(resourceid, sequencenumber))",
 		"CREATE INDEX historyrecordsresourceididx ON historyrecords(resourceid)",
 		"CREATE INDEX historyrecordsexpirationtimeidx ON historyrecords(expirationtime)",
 		"CREATE TABLE historystale ( resourceID VARCHAR(128) NOT NULL PRIMARY KEY )" };
@@ -48,8 +48,7 @@ public class HistoryDatabase
 		private Statement _stmt;
 		private ResultSet _rs;
 
-		private CloseableIteratorImpl(ServerDatabaseConnectionPool connectionPool, Connection connection, Statement stmt,
-			ResultSet rs)
+		private CloseableIteratorImpl(ServerDatabaseConnectionPool connectionPool, Connection connection, Statement stmt, ResultSet rs)
 		{
 			_connectionPool = connectionPool;
 			_connection = connection;
@@ -150,8 +149,8 @@ public class HistoryDatabase
 		try {
 			stmt =
 				connection.prepareStatement("INSERT INTO historyrecords" + "(resourceid, sequencenumber, level, category, "
-					+ "properties, eventsource, eventdata, expirationtime," + " createtimestamp) "
-					+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+					+ "properties, eventsource, eventdata, expirationtime," + " createtimestamp) " + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 
 			stmt.setString(1, resourceID);
 			stmt.setString(2, number.toString());
@@ -217,8 +216,8 @@ public class HistoryDatabase
 
 		try {
 			stmt =
-				connection.prepareStatement("SELECT sequencenumber, level, category, "
-					+ "createtimestamp, properties, eventsource, " + "eventdata FROM historyrecords " + "WHERE hrid = ?");
+				connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
+					+ "eventdata FROM historyrecords " + "WHERE hrid = ?");
 			stmt.setLong(1, hrid);
 			rs = stmt.executeQuery();
 
@@ -240,8 +239,8 @@ public class HistoryDatabase
 
 		try {
 			stmt =
-				connection.prepareStatement("SELECT sequencenumber, level, category, "
-					+ "createtimestamp, properties, eventsource, " + "eventdata FROM historyrecords " + "WHERE resourceid = ?");
+				connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
+					+ "eventdata FROM historyrecords " + "WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
 			rs = stmt.executeQuery();
 
@@ -255,16 +254,16 @@ public class HistoryDatabase
 		}
 	}
 
-	static CloseableIterator<HistoryEvent> iterateEvents(ServerDatabaseConnectionPool connectionPool, Connection connection,
-		String resourceID) throws SQLException
+	static CloseableIterator<HistoryEvent>
+		iterateEvents(ServerDatabaseConnectionPool connectionPool, Connection connection, String resourceID) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			stmt =
-				connection.prepareStatement("SELECT sequencenumber, level, category, "
-					+ "createtimestamp, properties, eventsource, " + "eventdata FROM historyrecords " + "WHERE resourceid = ?");
+				connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
+					+ "eventdata FROM historyrecords " + "WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
 			rs = stmt.executeQuery();
 
@@ -301,8 +300,8 @@ public class HistoryDatabase
 
 		try {
 			stmt =
-				connection.prepareStatement("SELECT sequencenumber, level, category, "
-					+ "createtimestamp, properties, eventsource, " + "eventdata FROM historyrecords");
+				connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
+					+ "eventdata FROM historyrecords");
 			rs = stmt.executeQuery();
 
 			while (rs.next())

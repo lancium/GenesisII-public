@@ -59,10 +59,10 @@ public abstract class GridJobToolFrame extends JFrame
 		Container container = getContentPane();
 		container.setLayout(new GridBagLayout());
 
-		add(_tabbedPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(ePanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(_tabbedPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5,
+			5), 5, 5));
+		add(ePanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+			5, 5), 5, 5));
 
 		addTabs(documentContext);
 
@@ -149,8 +149,7 @@ public abstract class GridJobToolFrame extends JFrame
 	{
 		while (_documentContext.isModified()) {
 			int answer =
-				JOptionPane.showConfirmDialog(this, "Save document before closing?", "Document Not Saved",
-					JOptionPane.YES_NO_CANCEL_OPTION);
+				JOptionPane.showConfirmDialog(this, "Save document before closing?", "Document Not Saved", JOptionPane.YES_NO_CANCEL_OPTION);
 
 			switch (answer) {
 				case JOptionPane.CANCEL_OPTION:
@@ -178,8 +177,7 @@ public abstract class GridJobToolFrame extends JFrame
 			super("New Project");
 
 			putValue(Action.MNEMONIC_KEY, KeyEvent.VK_N);
-			putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
 
 		@Override
@@ -198,8 +196,7 @@ public abstract class GridJobToolFrame extends JFrame
 			super("Open Project");
 
 			putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
-			putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
 
 		@Override
@@ -218,8 +215,7 @@ public abstract class GridJobToolFrame extends JFrame
 			super("Close Project");
 
 			putValue(Action.MNEMONIC_KEY, KeyEvent.VK_C);
-			putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
 
 		@Override
@@ -238,8 +234,7 @@ public abstract class GridJobToolFrame extends JFrame
 			super("Save Project");
 
 			putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
-			putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
 
 		@Override
@@ -274,10 +269,8 @@ public abstract class GridJobToolFrame extends JFrame
 			super("Save All Projects");
 
 			putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
-			putValue(
-				Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK
-					| Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.ACCELERATOR_KEY,
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
 
 		@Override
@@ -296,8 +289,7 @@ public abstract class GridJobToolFrame extends JFrame
 			super(willLaunch ? "Submit Job" : "Generate JSDL");
 
 			putValue(Action.MNEMONIC_KEY, KeyEvent.VK_G);
-			putValue(Action.ACCELERATOR_KEY,
-				KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		}
 
 		@Override

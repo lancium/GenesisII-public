@@ -7,9 +7,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A simple class that tracks whether a file's access time has changed since the last time it was
- * checked. If the time has changed, the owner will presumably want to react by re-reading the file
- * or other appropriate actions.
+ * A simple class that tracks whether a file's access time has changed since the last time it was checked. If the time has changed, the owner
+ * will presumably want to react by re-reading the file or other appropriate actions.
  */
 public class FileChangeTracker
 {
@@ -19,8 +18,8 @@ public class FileChangeTracker
 	private long _lastChangeTime = -1;
 
 	/**
-	 * constructs a change tracker for the file "toWatch". changes can be noticed by calling
-	 * hasFileChanged().  this method expects the config file to already exist.
+	 * constructs a change tracker for the file "toWatch". changes can be noticed by calling hasFileChanged(). this method expects the config
+	 * file to already exist.
 	 */
 	public FileChangeTracker(File toWatch)
 	{
@@ -28,8 +27,8 @@ public class FileChangeTracker
 	}
 
 	/**
-	 * constructs a change tracker for the file "toWatch". changes can be noticed by calling
-	 * hasFileChanged().  this also allows the file to be created automatically if it did not exist already.
+	 * constructs a change tracker for the file "toWatch". changes can be noticed by calling hasFileChanged(). this also allows the file to be
+	 * created automatically if it did not exist already.
 	 */
 	public FileChangeTracker(File toWatch, boolean createFile)
 	{
@@ -50,7 +49,7 @@ public class FileChangeTracker
 					_toWatch.createNewFile();
 				} catch (IOException e) {
 					_logger.error("failed to create new config file '" + _toWatch.getAbsolutePath() + "'");
-					return;  // fail.
+					return; // fail.
 				}
 			}
 			// by now the file should exist, so check it's time.
@@ -85,8 +84,8 @@ public class FileChangeTracker
 	}
 
 	/**
-	 * returns true if the file has changed since this watcher was created or since the last time it
-	 * was checked. if the file did change, then the last change time is updated.
+	 * returns true if the file has changed since this watcher was created or since the last time it was checked. if the file did change, then
+	 * the last change time is updated.
 	 */
 	public boolean hasFileChanged()
 	{

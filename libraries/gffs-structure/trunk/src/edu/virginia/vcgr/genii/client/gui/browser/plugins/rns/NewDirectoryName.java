@@ -5,8 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class is used internally by the NewDirectoryDialog to ensure that the directory name entered
- * into the text field contains the appropriate characters only.
+ * This class is used internally by the NewDirectoryDialog to ensure that the directory name entered into the text field contains the
+ * appropriate characters only.
  * 
  * @author mmm2a
  */

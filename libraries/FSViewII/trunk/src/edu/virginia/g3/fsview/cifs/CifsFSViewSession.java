@@ -16,8 +16,7 @@ final class CifsFSViewSession extends AbstractFSViewSession
 {
 	private SmbFile _root;
 
-	CifsFSViewSession(FSViewFactory factory, URI fsRoot, NtlmPasswordAuthentication authInfo, boolean readOnly)
-		throws IOException
+	CifsFSViewSession(FSViewFactory factory, URI fsRoot, NtlmPasswordAuthentication authInfo, boolean readOnly) throws IOException
 	{
 		super(factory, readOnly);
 

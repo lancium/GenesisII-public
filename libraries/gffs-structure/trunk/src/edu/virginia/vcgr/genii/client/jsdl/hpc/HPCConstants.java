@@ -7,8 +7,7 @@ public interface HPCConstants
 	static public final String HPC_NS = "http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcpa";
 	static public final String HPCP_NS = "http://schemas.ogf.org/hpcp/2007/11/ac";
 
-	static public final String USERNAME_TOKEN_NS =
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+	static public final String USERNAME_TOKEN_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 	static public final String USERNAME_TOKEN_NAME = "UsernameToken";
 
 	static public final String HPC_APPLICATION_NAME = "HPCProfileApplication";

@@ -20,8 +20,7 @@ public class CommonFilesystemFacet extends DefaultFileSystemFacet
 	}
 
 	@Override
-	public void consumeFileSystemType(Object currentUnderstanding, FileSystemTypeEnumeration fileSystemType)
-		throws JSDLException
+	public void consumeFileSystemType(Object currentUnderstanding, FileSystemTypeEnumeration fileSystemType) throws JSDLException
 	{
 		((FilesystemUnderstanding) currentUnderstanding).setFileSystemType(fileSystemType);
 	}

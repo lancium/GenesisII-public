@@ -18,9 +18,8 @@ public class JobInformation extends ReducedJobInformation
 	private String _jobName;
 	private ActivityStatusType _besActivityStatus;
 
-	public JobInformation(JobTicket ticket, String jobName, Collection<Identity> owners, QueueStates state, int prioity,
-		Calendar submitTime, Calendar startTime, Calendar finishTime, int failedAttempts, ActivityStatusType besActivityStatus,
-		String scheduledOn)
+	public JobInformation(JobTicket ticket, String jobName, Collection<Identity> owners, QueueStates state, int prioity, Calendar submitTime,
+		Calendar startTime, Calendar finishTime, int failedAttempts, ActivityStatusType besActivityStatus, String scheduledOn)
 	{
 		super(ticket, owners, state);
 

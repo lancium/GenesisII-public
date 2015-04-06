@@ -34,12 +34,12 @@ class PasswordDialog extends JDialog
 
 		content.add(new JLabel("Please enter password for accounting database."), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
 			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(_passwordField, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_passwordField, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		JButton okButton = new JButton(new OKAction());
-		content.add(ButtonPanel.createHorizontalButtonPanel(okButton, new CancelAction()), new GridBagConstraints(0, 2, 1, 1,
-			1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalButtonPanel(okButton, new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0,
+			GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
 		getRootPane().setDefaultButton(okButton);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);

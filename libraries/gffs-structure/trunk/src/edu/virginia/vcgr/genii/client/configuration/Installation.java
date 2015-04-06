@@ -63,8 +63,7 @@ public class Installation
 				try {
 					FileUtils.copyDirectory(saveOldWA, _webAppDirectory);
 				} catch (IOException e) {
-					throw new RuntimeException("Installation has a problem; cannot instantiate new webapps at "
-						+ WEBAPPS_DIR_NAME);
+					throw new RuntimeException("Installation has a problem; cannot instantiate new webapps at " + WEBAPPS_DIR_NAME);
 				}
 			}
 		}

@@ -74,8 +74,8 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		int result = 0;
 
@@ -120,8 +120,7 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 					_logger.error(String.format("Failed to execute task(%s) with all retries -- " + "giving up.", eTask));
 					return 1;
 				} else {
-					_logger.error(String.format("Failed to execute task(%s) with all retries -- "
-						+ "we'll keep going just in case.", eTask));
+					_logger.error(String.format("Failed to execute task(%s) with all retries -- " + "we'll keep going just in case.", eTask));
 					result = 1;
 				}
 			}

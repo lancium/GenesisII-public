@@ -25,8 +25,7 @@ public class ConstructionParametersFork extends AbstractStreamableByteIOFactoryR
 	public void modifyState(InputStream source) throws IOException
 	{
 		try {
-			ConstructionParameters cParams =
-				ConstructionParameters.deserializeConstructionParameters(getService().getClass(), source);
+			ConstructionParameters cParams = ConstructionParameters.deserializeConstructionParameters(getService().getClass(), source);
 			ResourceManager.getCurrentResource().dereference().constructionParameters(cParams);
 		} catch (JAXBException e) {
 			throw new IOException("Unable to unmarshall new construction parameters.", e);

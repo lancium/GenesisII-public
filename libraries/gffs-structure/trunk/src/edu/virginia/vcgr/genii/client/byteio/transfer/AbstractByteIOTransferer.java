@@ -63,10 +63,9 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	}
 
 	/**
-	 * A base class method which takes a client proxy object and retrieves the attachment data that
-	 * came back in with the call (obviously, this method is only useful for transfer mechanisms
-	 * which use attachments, but that is actually the common case for known ByteIO transfer
-	 * mechanisms).
+	 * A base class method which takes a client proxy object and retrieves the attachment data that came back in with the call (obviously,
+	 * this method is only useful for transfer mechanisms which use attachments, but that is actually the common case for known ByteIO
+	 * transfer mechanisms).
 	 * 
 	 * @param clientProxy
 	 *            The remote proxy stub used to call and retrieve the data.
@@ -87,8 +86,8 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	}
 
 	/**
-	 * Similar to the retrieveResponseAttachmentData method above, this method is used for the
-	 * rather common use case of attaching data to a SOAP message as an outgoing SOAP attachment.
+	 * Similar to the retrieveResponseAttachmentData method above, this method is used for the rather common use case of attaching data to a
+	 * SOAP message as an outgoing SOAP attachment.
 	 * 
 	 * @param clientProxy
 	 *            clientProxy The remote proxy stub used to call and send the data.
@@ -99,8 +98,7 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	 * 
 	 * @throws RemoteException
 	 */
-	static protected void sendRequestAttachmentData(Object clientProxy, byte[] data, AttachmentType attachmentType)
-		throws RemoteException
+	static protected void sendRequestAttachmentData(Object clientProxy, byte[] data, AttachmentType attachmentType) throws RemoteException
 	{
 		LinkedList<GeniiAttachment> attachments = new LinkedList<GeniiAttachment>();
 		attachments.add(new GeniiAttachment(data));
@@ -110,8 +108,7 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	protected Type _clientStub;
 
 	/**
-	 * Protected constructor that derived classes will use to initialize the common transfer
-	 * information.
+	 * Protected constructor that derived classes will use to initialize the common transfer information.
 	 * 
 	 * @param clientStub
 	 *            THe remote proxy stub used to call the ByteIO resource.
@@ -135,9 +132,8 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	}
 
 	/**
-	 * While not common, a type of byte io transfer we support is simple which effectively means
-	 * that the bytes are Base64 encoded into the SOAP message itself. This method wraps those bytes
-	 * with the correct XML.
+	 * While not common, a type of byte io transfer we support is simple which effectively means that the bytes are Base64 encoded into the
+	 * SOAP message itself. This method wraps those bytes with the correct XML.
 	 * 
 	 * @param data
 	 *            The data block to wrap.

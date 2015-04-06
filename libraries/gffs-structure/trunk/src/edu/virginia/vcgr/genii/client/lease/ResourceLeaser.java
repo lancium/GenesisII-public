@@ -5,8 +5,7 @@ import java.io.Closeable;
 import org.morgan.util.io.StreamUtils;
 
 /**
- * This class represents the base level functionallity of an entity which can lease out resources
- * for use.
+ * This class represents the base level functionallity of an entity which can lease out resources for use.
  * 
  * @author mmm2a
  * 
@@ -18,8 +17,7 @@ public abstract class ResourceLeaser<ResourceType>
 	private LRUList<LeaseableResourceImpl> _outstandingLeases = new LRUList<LeaseableResourceImpl>();
 
 	/**
-	 * An abstract method that derived classes will need to override that can create a new resource
-	 * to lease out.
+	 * An abstract method that derived classes will need to override that can create a new resource to lease out.
 	 * 
 	 * @return The newly created resource.
 	 */
@@ -40,8 +38,8 @@ public abstract class ResourceLeaser<ResourceType>
 	 * A method that leasees can call to obtain a new lease on some resource.
 	 * 
 	 * @param agreement
-	 *            The agreement that the leasee is making with the leaser (which will allow the
-	 *            leaser to reclaim the resource later if need be).
+	 *            The agreement that the leasee is making with the leaser (which will allow the leaser to reclaim the resource later if need
+	 *            be).
 	 * 
 	 * @return The newly obtained resource.
 	 */

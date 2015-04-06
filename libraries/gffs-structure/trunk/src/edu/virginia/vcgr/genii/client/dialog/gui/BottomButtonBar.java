@@ -17,8 +17,8 @@ public class BottomButtonBar extends JPanel
 		super(new GridBagLayout());
 
 		for (int x = 0; x < buttons.length; x++) {
-			add(buttons[x], new GridBagConstraints(x, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
+			add(buttons[x], new GridBagConstraints(x, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5,
+				5, 5), 5, 5));
 		}
 	}
 
@@ -27,8 +27,8 @@ public class BottomButtonBar extends JPanel
 		super(new GridBagLayout());
 
 		for (int x = 0; x < actions.length; x++) {
-			add(new JButton(actions[x]), new GridBagConstraints(x, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			add(new JButton(actions[x]), new GridBagConstraints(x, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 		}
 	}
 }

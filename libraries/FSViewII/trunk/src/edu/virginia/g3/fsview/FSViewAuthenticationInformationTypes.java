@@ -14,8 +14,7 @@ public enum FSViewAuthenticationInformationTypes {
 	private String _title;
 	private FSViewInformationManager<FSViewAuthenticationInformation> _informationManager;
 
-	private FSViewAuthenticationInformationTypes(String title,
-		FSViewInformationManager<FSViewAuthenticationInformation> informationManager)
+	private FSViewAuthenticationInformationTypes(String title, FSViewInformationManager<FSViewAuthenticationInformation> informationManager)
 	{
 		_title = title;
 		_informationManager = informationManager;

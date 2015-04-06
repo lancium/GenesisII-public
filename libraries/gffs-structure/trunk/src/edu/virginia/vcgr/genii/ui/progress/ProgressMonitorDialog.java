@@ -48,10 +48,10 @@ class ProgressMonitorDialog extends JDialog
 		JProgressBar progressBar = new JProgressBar(0, 100);
 		progressBar.setIndeterminate(true);
 
-		content.add(_subTitle, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+		content.add(_subTitle, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
+			5, 5, 5), 5, 5));
+		content.add(progressBar, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
-		content.add(progressBar, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(new JButton(new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 

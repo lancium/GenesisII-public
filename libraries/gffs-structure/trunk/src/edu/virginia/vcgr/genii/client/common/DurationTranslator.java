@@ -15,8 +15,7 @@ public class DurationTranslator implements SingleResourcePropertyTranslator
 	public <Type> Type deserialize(Class<Type> clazz, MessageElement element) throws ResourcePropertyException
 	{
 		if (!clazz.equals(edu.virginia.vcgr.genii.client.utils.units.Duration.class))
-			throw new ResourcePropertyException("The DurationTranslator can ONLY be used to translate "
-				+ "Duration resource properties.");
+			throw new ResourcePropertyException("The DurationTranslator can ONLY be used to translate " + "Duration resource properties.");
 
 		if (element == null)
 			return null;
@@ -35,8 +34,7 @@ public class DurationTranslator implements SingleResourcePropertyTranslator
 	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
 	{
 		if (!(obj instanceof edu.virginia.vcgr.genii.client.utils.units.Duration))
-			throw new ResourcePropertyException("The DurationTranslator can ONLY be used to translate "
-				+ "Duration resource properties.");
+			throw new ResourcePropertyException("The DurationTranslator can ONLY be used to translate " + "Duration resource properties.");
 
 		edu.virginia.vcgr.genii.client.utils.units.Duration gDur = (edu.virginia.vcgr.genii.client.utils.units.Duration) obj;
 		return new MessageElement(name, AxisDuration.toApacheDuration(gDur));

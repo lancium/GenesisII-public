@@ -45,8 +45,8 @@ public class ClientApplicationUITool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		if (OperatingSystemTypes.MACOS.equals(OperatingSystemType.getCurrent()))
 			setupMacOSProperties();

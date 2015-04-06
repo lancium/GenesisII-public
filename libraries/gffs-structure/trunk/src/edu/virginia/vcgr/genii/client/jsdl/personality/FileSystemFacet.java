@@ -17,8 +17,7 @@ public interface FileSystemFacet extends PersonalityFacet
 
 	public void consumeDiskSpace(Object currentUnderstanding, RangeExpression diskSpace) throws JSDLException;
 
-	public void consumeFileSystemType(Object currentUnderstanding, FileSystemTypeEnumeration fileSystemType)
-		throws JSDLException;
+	public void consumeFileSystemType(Object currentUnderstanding, FileSystemTypeEnumeration fileSystemType) throws JSDLException;
 
 	public void consumeUniqueID(Object currentUnderstanding, String uniqueID) throws JSDLException;
 }

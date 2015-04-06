@@ -89,8 +89,7 @@ public class RExportResolverDBResource extends BasicDBResource implements IRExpo
 		if (getProperty(_RESOLVER_SERVICE_EPR_PROPERTY_NAME) != null)
 			resolverServiceEPR = EPRUtils.fromBytes((byte[]) getProperty(_RESOLVER_SERVICE_EPR_PROPERTY_NAME));
 
-		return new RExportResolverEntry(commonEPI, primaryEPR, replicaEPR, resolverEPI, resolverEPR, localPath,
-			resolverServiceEPR);
+		return new RExportResolverEntry(commonEPI, primaryEPR, replicaEPR, resolverEPI, resolverEPR, localPath, resolverServiceEPR);
 	}
 
 	static private final String _CREATE_RESOLVER_INFO = "INSERT INTO resolvermapping VALUES(?, ?, ?)";

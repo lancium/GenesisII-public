@@ -14,8 +14,7 @@ import edu.virginia.vcgr.genii.gjt.data.stage.undef.UndefinedStageData;
 public class SerializableStageData
 {
 	@XmlElements({
-		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "undefined-stage",
-			type = UndefinedStageData.class),
+		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "undefined-stage", type = UndefinedStageData.class),
 		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "http", type = HttpStageData.class),
 		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "grid", type = GridStageData.class),
 		@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "mailto", type = MailtoStageData.class),

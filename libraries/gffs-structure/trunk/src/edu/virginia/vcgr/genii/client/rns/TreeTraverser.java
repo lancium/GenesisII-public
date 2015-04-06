@@ -4,16 +4,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Support for traversing a filesystem-like tree and travelling to all sub-nodes. This is generic
- * based on the nodeType involved, and requires creation of a helper class based on
- * TreeTraversalPathQuery to answer questions about the targeted filesystem. Note that instances of
- * this class are intended for a single thread to use at a time; they are not thread-safe for use
- * from different threads.
+ * Support for traversing a filesystem-like tree and travelling to all sub-nodes. This is generic based on the nodeType involved, and requires
+ * creation of a helper class based on TreeTraversalPathQuery to answer questions about the targeted filesystem. Note that instances of this
+ * class are intended for a single thread to use at a time; they are not thread-safe for use from different threads.
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 public class TreeTraverser<nodeType>
 {
@@ -34,15 +32,13 @@ public class TreeTraverser<nodeType>
 	private int _depth; // tracks how far we have delved into the tree.
 
 	/**
-	 * Constructs an object for recursing a directory tree. This takes a path query object for
-	 * navigating the nodeType properly. It also will accept 4 alert methods to be invoked when (1)
-	 * entering a directory, (2) leaving a directory, (3) hitting a file, and (4) encountering a
-	 * cycle in the tree hierarchy (due to links, for example). Any of the alert methods may be
-	 * null.
+	 * Constructs an object for recursing a directory tree. This takes a path query object for navigating the nodeType properly. It also will
+	 * accept 4 alert methods to be invoked when (1) entering a directory, (2) leaving a directory, (3) hitting a file, and (4) encountering a
+	 * cycle in the tree hierarchy (due to links, for example). Any of the alert methods may be null.
 	 */
-	public TreeTraverser(TreeTraversalPathQuery<nodeType> querierMethod,
-		TreeTraversalActionAlert<nodeType> enterDirectoryAlert, TreeTraversalActionAlert<nodeType> exitDirectoryAlert,
-		TreeTraversalActionAlert<nodeType> fileAlert, TreeTraversalActionAlert<nodeType> bounceAlert)
+	public TreeTraverser(TreeTraversalPathQuery<nodeType> querierMethod, TreeTraversalActionAlert<nodeType> enterDirectoryAlert,
+		TreeTraversalActionAlert<nodeType> exitDirectoryAlert, TreeTraversalActionAlert<nodeType> fileAlert,
+		TreeTraversalActionAlert<nodeType> bounceAlert)
 	{
 		_querier = querierMethod;
 		_dirEnter = enterDirectoryAlert;
@@ -60,11 +56,9 @@ public class TreeTraverser<nodeType>
 	}
 
 	/**
-	 * Traverses a directory tree structure and performs operations on the file and directory nodes
-	 * found. The directory and file ActionAlerts will be invoked when the traversal encounters
-	 * these items during the recursion. The bounceAlert will be called when a cycle in the
-	 * traversal graph has been detected. This will return zero if no errors were encountered during
-	 * tree traversal.
+	 * Traverses a directory tree structure and performs operations on the file and directory nodes found. The directory and file ActionAlerts
+	 * will be invoked when the traversal encounters these items during the recursion. The bounceAlert will be called when a cycle in the
+	 * traversal graph has been detected. This will return zero if no errors were encountered during tree traversal.
 	 */
 	public PathOutcome recursePath(nodeType path)
 	{

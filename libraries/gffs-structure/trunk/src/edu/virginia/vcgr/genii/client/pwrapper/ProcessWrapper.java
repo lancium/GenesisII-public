@@ -91,9 +91,8 @@ public class ProcessWrapper
 		}
 	}
 
-	final public Vector<String> formCommandLine(File fuseMountPoint, Map<String, String> environmentOverload,
-		File workingDirectory, File stdinRedirect, File stdoutRedirect, File stderrRedirect, File resourceUsagePath,
-		String executable, String... arguments)
+	final public Vector<String> formCommandLine(File fuseMountPoint, Map<String, String> environmentOverload, File workingDirectory,
+		File stdinRedirect, File stdoutRedirect, File stderrRedirect, File resourceUsagePath, String executable, String... arguments)
 	{
 		Vector<String> ret;
 
@@ -130,17 +129,15 @@ public class ProcessWrapper
 		return ret;
 	}
 
-	final public ProcessWrapperToken execute(File fuseMountPoint, Map<String, String> environmentOverload,
-		File workingDirectory, File stdinRedirect, File resourceUsageFile, List<String> command) throws ProcessWrapperException
+	final public ProcessWrapperToken execute(File fuseMountPoint, Map<String, String> environmentOverload, File workingDirectory,
+		File stdinRedirect, File resourceUsageFile, List<String> command) throws ProcessWrapperException
 	{
 		if (!_pathToWrapper.exists())
-			throw new ProcessWrapperException(String.format("Cannot find required Process Wrapper binary \"%s\"!",
-				_pathToWrapper));
+			throw new ProcessWrapperException(String.format("Cannot find required Process Wrapper binary \"%s\"!", _pathToWrapper));
 		if (!_pathToWrapper.isFile())
 			throw new ProcessWrapperException(String.format("Process Wrapper binary \"%s\" is not a file!", _pathToWrapper));
 		if (!_pathToWrapper.canExecute())
-			throw new ProcessWrapperException(String.format("Path to process wrapper binary \"%s\" is not executable!",
-				_pathToWrapper));
+			throw new ProcessWrapperException(String.format("Path to process wrapper binary \"%s\" is not executable!", _pathToWrapper));
 
 		if (workingDirectory != null) {
 			if (!workingDirectory.exists())

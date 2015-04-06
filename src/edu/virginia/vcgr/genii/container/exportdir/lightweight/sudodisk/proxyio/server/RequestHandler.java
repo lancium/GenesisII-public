@@ -16,7 +16,7 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 public class RequestHandler implements Runnable
 {
 	static private Log _logger = LogFactory.getLog(RequestHandler.class);
-	
+
 	private Socket socket;
 	private byte[] nonce = new byte[Constants.NONCE_SIZE];
 
@@ -42,8 +42,7 @@ public class RequestHandler implements Runnable
 
 			int bytes_read = bin.read(contents, 0, contents.length);
 			if (bytes_read == -1) {
-				DefaultResponse.send(socket, ErrorCode.NW_READ_ERROR_CODE,
-					ErrorCode.getErrorMsgFromErrorCode(ErrorCode.NW_READ_ERROR_CODE));
+				DefaultResponse.send(socket, ErrorCode.NW_READ_ERROR_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.NW_READ_ERROR_CODE));
 				_logger.warn("failed to read any bytes from client.");
 				return;
 			}
@@ -62,15 +61,14 @@ public class RequestHandler implements Runnable
 
 			return;
 		} catch (IOException e) {
-			DefaultResponse.send(socket, ErrorCode.NW_READ_ERROR_CODE,
-				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.NW_READ_ERROR_CODE));
+			DefaultResponse.send(socket, ErrorCode.NW_READ_ERROR_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.NW_READ_ERROR_CODE));
 			_logger.error("io exception caught in run", e);
 		} finally {
 			try {
 				bin.close();
 				socket.close();
 			} catch (IOException e) {
-				//ignored.
+				// ignored.
 			}
 
 		}
@@ -80,8 +78,8 @@ public class RequestHandler implements Runnable
 	private Request unmarshallStream(byte[] contents, int resp_size, BufferedInputStream bin)
 	{
 		/**
-		 * [16byte nonce]|[1byte f/d]|[1byte cmd]|[4byte pathname len]| [n bytes pathname]|[r/w req
-		 * arg(s) each 8 bytes] [4 byte write buflen for writes]| [write buf]
+		 * [16byte nonce]|[1byte f/d]|[1byte cmd]|[4byte pathname len]| [n bytes pathname]|[r/w req arg(s) each 8 bytes] [4 byte write buflen
+		 * for writes]| [write buf]
 		 */
 
 		int offset = 0;
@@ -102,8 +100,7 @@ public class RequestHandler implements Runnable
 
 		/* Next parse the args if any! */
 		long[] args = new long[Constants.MAX_NUM_ARGS];
-		boolean success =
-			parseArgs(contents, offset, resp_size, prefix.isReadReq(), prefix.isWriteReq() || prefix.isAppendReq(), args);
+		boolean success = parseArgs(contents, offset, resp_size, prefix.isReadReq(), prefix.isWriteReq() || prefix.isAppendReq(), args);
 
 		// we don't have args to satisfy request!
 		if (!success) {
@@ -128,8 +125,7 @@ public class RequestHandler implements Runnable
 		}
 
 		try {
-			buflen =
-				Conversions.getIntFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
+			buflen = Conversions.getIntFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
 		} catch (Exception e) {
 			return null;
 		}
@@ -149,7 +145,7 @@ public class RequestHandler implements Runnable
 				return null;
 			}
 		}
-		if (_logger.isDebugEnabled())	
+		if (_logger.isDebugEnabled())
 			_logger.debug("num bytes read = " + request.getNumBytesRead());
 		return request;
 	}
@@ -164,8 +160,8 @@ public class RequestHandler implements Runnable
 					return false;
 				}
 				long w_offset =
-					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++],
-						contents[offset++], contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
+					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
+						contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
 				args[0] = w_offset;
 			} else if (isReadReq) {
 				// 16 bytes = 2 longs!
@@ -173,12 +169,12 @@ public class RequestHandler implements Runnable
 					return false;
 				}
 				long r_offset =
-					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++],
-						contents[offset++], contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
+					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
+						contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
 
 				long r_numBytes =
-					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++],
-						contents[offset++], contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
+					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
+						contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
 
 				args[0] = r_offset;
 				args[1] = r_numBytes;
@@ -306,8 +302,7 @@ public class RequestHandler implements Runnable
 		// parse length of path
 		int path_length = 0;
 		try {
-			path_length =
-				Conversions.getIntFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
+			path_length = Conversions.getIntFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
 
 		} catch (Exception e) {
 			return null;

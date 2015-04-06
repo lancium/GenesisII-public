@@ -3,9 +3,8 @@ package edu.virginia.vcgr.genii.ui.utils;
 // Author: Chris Koeritz
 
 /**
- * A per-program object that provides a pathway to the real target of diagnostic and debugging
- * information. This must be initialized by the owner of the diagnostic target; until then, anything
- * logged will be thrown on the floor.
+ * A per-program object that provides a pathway to the real target of diagnostic and debugging information. This must be initialized by the
+ * owner of the diagnostic target; until then, anything logged will be thrown on the floor.
  */
 public class LoggingTarget
 {

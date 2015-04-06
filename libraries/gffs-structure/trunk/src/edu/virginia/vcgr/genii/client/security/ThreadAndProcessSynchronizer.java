@@ -16,9 +16,8 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 
 /**
- * provides support for an interprocess file lock that is also thread safe, which is more complex
- * since java's FileLock objects do not properly handle multi-threading, even with separate FileLock
- * objects.
+ * provides support for an interprocess file lock that is also thread safe, which is more complex since java's FileLock objects do not
+ * properly handle multi-threading, even with separate FileLock objects.
  */
 public class ThreadAndProcessSynchronizer
 {
@@ -39,14 +38,13 @@ public class ThreadAndProcessSynchronizer
 	}
 
 	/*
-	 * holds onto records for all file locks, and also serves as the object our critical section is
-	 * based on.
+	 * holds onto records for all file locks, and also serves as the object our critical section is based on.
 	 */
 	static volatile HashMap<String, SynchPackage> _lockRecords = new HashMap<String, SynchPackage>();
 
 	/**
-	 * locks the consistency lock file in a thread-safe and process-safe manner. any call to
-	 * acquireLock *must* be followed eventually by a call to releaseLock.
+	 * locks the consistency lock file in a thread-safe and process-safe manner. any call to acquireLock *must* be followed eventually by a
+	 * call to releaseLock.
 	 */
 	static public void acquireLock(String lockFile)
 	{
@@ -112,8 +110,8 @@ public class ThreadAndProcessSynchronizer
 	}
 
 	/**
-	 * uses the FileChannel and FileLock support of nio to lock the file. the lock is held until the
-	 * returned FileChannel is closed or the program exits.
+	 * uses the FileChannel and FileLock support of nio to lock the file. the lock is held until the returned FileChannel is closed or the
+	 * program exits.
 	 */
 	private static FileChannel lockConsistencyFile(SynchPackage lockPack)
 	{

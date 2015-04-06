@@ -79,8 +79,7 @@ public class JarDescription
 
 	private void parseJarDir(Element jarDirNode) throws IOException, SAXException
 	{
-		boolean isRecursive =
-			Boolean.parseBoolean(XMLUtilities.getAttribute(jarDirNode, RECURSIVE_ATTR_NAME, RECURSIVE_ATTR_DEFAULT));
+		boolean isRecursive = Boolean.parseBoolean(XMLUtilities.getAttribute(jarDirNode, RECURSIVE_ATTR_NAME, RECURSIVE_ATTR_DEFAULT));
 
 		File jarDir = new File(XMLUtilities.getTextContent(jarDirNode));
 		findJars(jarDir, isRecursive);

@@ -14,8 +14,7 @@ public class QNameListTranslator implements SingleResourcePropertyTranslator
 	public <Type> Type deserialize(Class<Type> clazz, MessageElement element) throws ResourcePropertyException
 	{
 		if (!clazz.equals(OGSAQNameList.class))
-			throw new ResourcePropertyException("The QNameListTranslator can ONLY be used to translate "
-				+ "QNameList resource properties.");
+			throw new ResourcePropertyException("The QNameListTranslator can ONLY be used to translate " + "QNameList resource properties.");
 
 		OGSAQNameList list = new OGSAQNameList(element);
 		return clazz.cast(list);
@@ -25,8 +24,7 @@ public class QNameListTranslator implements SingleResourcePropertyTranslator
 	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
 	{
 		if (!(obj instanceof OGSAQNameList))
-			throw new ResourcePropertyException("The QNameListTranslator can ONLY be used to translate "
-				+ "QNameList resource properties.");
+			throw new ResourcePropertyException("The QNameListTranslator can ONLY be used to translate " + "QNameList resource properties.");
 
 		try {
 			return ((OGSAQNameList) obj).toMessageElement(name);

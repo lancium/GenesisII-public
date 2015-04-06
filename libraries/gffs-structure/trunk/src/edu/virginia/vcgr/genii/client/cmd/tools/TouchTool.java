@@ -36,20 +36,18 @@ public class TouchTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 		for (String arg : getArguments()) {
 			RNSPath newPath = lookup(new GeniiPath(arg), RNSPathQueryFlags.MUST_EXIST);
 			TypeInformation typeInfo = new TypeInformation(newPath.getEndpoint());
 			if (typeInfo.isSByteIO()) {
 				StreamableByteIORP rp =
-					(StreamableByteIORP) ResourcePropertyManager.createRPInterface(newPath.getEndpoint(),
-						StreamableByteIORP.class);
+					(StreamableByteIORP) ResourcePropertyManager.createRPInterface(newPath.getEndpoint(), StreamableByteIORP.class);
 				rp.setModificationTime(Calendar.getInstance());
 			} else if (typeInfo.isRByteIO()) {
-				RandomByteIORP rp =
-					(RandomByteIORP) ResourcePropertyManager.createRPInterface(newPath.getEndpoint(), RandomByteIORP.class);
+				RandomByteIORP rp = (RandomByteIORP) ResourcePropertyManager.createRPInterface(newPath.getEndpoint(), RandomByteIORP.class);
 				rp.setModificationTime(Calendar.getInstance());
 			} else {
 				throw new ToolException("Target path \"" + arg + "\" does not represent a ByteIO.");

@@ -43,9 +43,8 @@ public class FilesystemUsageFork extends AbstractStreamableByteIOFactoryResource
 		for (String fsName : mgr.filesystems()) {
 			Filesystem fs = mgr.lookup(fsName);
 			FilesystemUsageInformation usageInfo = fs.currentUsage();
-			ps.format("Filesystem \"%s\" at %s:  %s (%.2f%%) space free.\n", fsName, fs.filesystemRoot(),
-				new Size(usageInfo.spaceUsable() / 1024.0 / 1024.0 / 1024.0, SizeUnits.Gigabytes).toString(2),
-				usageInfo.percentAvailable());
+			ps.format("Filesystem \"%s\" at %s:  %s (%.2f%%) space free.\n", fsName, fs.filesystemRoot(), new Size(
+				usageInfo.spaceUsable() / 1024.0 / 1024.0 / 1024.0, SizeUnits.Gigabytes).toString(2), usageInfo.percentAvailable());
 		}
 
 		ps.close();

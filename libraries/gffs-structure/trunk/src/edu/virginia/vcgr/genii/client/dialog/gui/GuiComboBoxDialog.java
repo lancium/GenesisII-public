@@ -35,10 +35,10 @@ public class GuiComboBoxDialog extends AbstractGuiDialog implements ComboBoxDial
 			_combo.setSelectedItem(parameters[1]);
 
 		JPanel panel = new JPanel(new GridBagLayout());
-		panel.add(_label, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(_combo, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(_label, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
+			5), 5, 5));
+		panel.add(_combo, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5,
+			5, 5, 5), 5, 5));
 
 		return panel;
 	}

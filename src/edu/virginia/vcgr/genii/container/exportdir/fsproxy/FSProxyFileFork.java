@@ -32,8 +32,7 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork implements
 	private FSViewSession session() throws IOException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		FSProxyConstructionParameters consParms =
-			(FSProxyConstructionParameters) resource.constructionParameters(FSProxyServiceImpl.class);
+		FSProxyConstructionParameters consParms = (FSProxyConstructionParameters) resource.constructionParameters(FSProxyServiceImpl.class);
 
 		return consParms.connectionInformation().openSession();
 	}

@@ -24,8 +24,7 @@ public class CleanupManager
 
 	static private Properties loadProperties()
 	{
-		File cleanupProperties =
-			Installation.getDeployment(new DeploymentName()).getConfigurationFile(CLEANUP_PROPERTIES_FILENAME);
+		File cleanupProperties = Installation.getDeployment(new DeploymentName()).getConfigurationFile(CLEANUP_PROPERTIES_FILENAME);
 
 		FileInputStream fin = null;
 		try {
@@ -84,8 +83,7 @@ public class CleanupManager
 			try {
 				boolean doEnact =
 					enactCleanup
-						&& enactCleanup(properties.getProperty(
-							String.format("%s.%s", handler.getClass().getName(), PROPERTY_SUFFIX), "true"));
+						&& enactCleanup(properties.getProperty(String.format("%s.%s", handler.getClass().getName(), PROPERTY_SUFFIX), "true"));
 				handler.doCleanup(connection, doEnact);
 
 				if (doEnact)

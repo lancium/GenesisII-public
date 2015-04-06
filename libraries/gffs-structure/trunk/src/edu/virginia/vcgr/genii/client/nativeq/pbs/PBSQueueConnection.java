@@ -65,10 +65,9 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 	private List<String> _qstatStart;
 	private List<String> _qdelStart;
 
-	PBSQueueConnection(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf,
-		File workingDirectory, NativeQueueConfiguration nativeQueueConfig, PBSQueueConfiguration pbsConfig, String queueName,
-		List<String> qsubStart, List<String> qstatStart, List<String> qdelStart, JobStateCache statusCache)
-		throws NativeQueueException
+	PBSQueueConnection(ResourceOverrides resourceOverrides, CmdLineManipulatorConfiguration cmdLineManipulatorConf, File workingDirectory,
+		NativeQueueConfiguration nativeQueueConfig, PBSQueueConfiguration pbsConfig, String queueName, List<String> qsubStart,
+		List<String> qstatStart, List<String> qdelStart, JobStateCache statusCache) throws NativeQueueException
 	{
 		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, nativeQueueConfig, pbsConfig);
 
@@ -221,20 +220,17 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 	}
 
 	@Override
-	protected List<String>
-		generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException
+	protected List<String> generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
+		throws NativeQueueException, IOException
 	{
 		/*
-		 * VANA commented the whole section URI variation = application.getSPMDVariation(); if
-		 * (variation != null) { // temporarily set std redirects to null; these are written as pbs
-		 * directives File stdoutRedirect = application.getStdoutRedirect(workingDirectory); File
+		 * VANA commented the whole section URI variation = application.getSPMDVariation(); if (variation != null) { // temporarily set std
+		 * redirects to null; these are written as pbs directives File stdoutRedirect = application.getStdoutRedirect(workingDirectory); File
 		 * stderrRedirect = application.getStderrRedirect(workingDirectory);
 		 * 
 		 * application.setStdoutRedirect(null); application.setStderrRedirect(null);
 		 * 
-		 * // proceed as usual List<String> finalCmdLine = super.generateApplicationBody(script,
-		 * workingDirectory, application);
+		 * // proceed as usual List<String> finalCmdLine = super.generateApplicationBody(script, workingDirectory, application);
 		 * 
 		 * // reset std redirects in application description if (stdoutRedirect != null)
 		 * application.setStdoutRedirect(stdoutRedirect.toString()); if (stderrRedirect != null)

@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.bes;
 
@@ -100,14 +99,13 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		return Hostname.getLocalHostname().toString();
 	}
 
-	static public int getTotalNumberOfActivities() throws ResourceUnknownFaultType, ResourceException, RemoteException,
-		SQLException
+	static public int getTotalNumberOfActivities() throws ResourceUnknownFaultType, ResourceException, RemoteException, SQLException
 	{
 		return getActivityReferences().length;
 	}
 
-	static public EndpointReferenceType[] getActivityReferences() throws ResourceUnknownFaultType, ResourceException,
-		RemoteException, SQLException
+	static public EndpointReferenceType[] getActivityReferences() throws ResourceUnknownFaultType, ResourceException, RemoteException,
+		SQLException
 	{
 		return new EndpointReferenceType[0];
 	}
@@ -138,8 +136,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 
 		OperatingSystem_Type ret = JSDLUtils.getLocalOperatingSystem();
 		if (osType != null)
-			ret.setOperatingSystemType(new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(osType.name()),
-				null));
+			ret.setOperatingSystemType(new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(osType.name()), null));
 		if (osVersion != null)
 			ret.setOperatingSystemVersion(osVersion);
 
@@ -327,8 +324,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		return new MessageElement(consts.NAME_ATTR, getName());
 	}
 
-	public MessageElement getTotalNumberOfActivitiesAttr() throws ResourceException, ResourceUnknownFaultType, RemoteException,
-		SQLException
+	public MessageElement getTotalNumberOfActivitiesAttr() throws ResourceException, ResourceUnknownFaultType, RemoteException, SQLException
 	{
 		return new MessageElement(consts.TOTAL_NUMBER_OF_ACTIVITIES_ATTR, getTotalNumberOfActivities());
 	}
@@ -344,8 +340,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		return ret;
 	}
 
-	public ArrayList<MessageElement> getActivityReferencesAttr() throws ResourceException, ResourceUnknownFaultType,
-		RemoteException, SQLException
+	public ArrayList<MessageElement> getActivityReferencesAttr() throws ResourceException, ResourceUnknownFaultType, RemoteException,
+		SQLException
 	{
 		EndpointReferenceType[] eprs = getActivityReferences();
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(eprs.length);

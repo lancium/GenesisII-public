@@ -178,8 +178,7 @@ public class CILogonClient
 			Document doc = builder.parse(new InputSource(new StringReader(res1)));
 			Node header = doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/soap/envelope/", "Header").item(0);
 
-			Node relayStateNode =
-				doc.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp", "RelayState").item(0);
+			Node relayStateNode = doc.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp", "RelayState").item(0);
 			if (relayStateNode != null) {
 				trace("Capturing relayState data");
 				_relayState = relayStateNode;
@@ -290,8 +289,7 @@ public class CILogonClient
 		return makeCall(request, _defaultContext);
 	}
 
-	private String makeSecureCall(HttpPost request, String username, String password) throws ClientProtocolException,
-		IOException
+	private String makeSecureCall(HttpPost request, String username, String password) throws ClientProtocolException, IOException
 	{
 		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(username, password);
 		BasicCredentialsProvider provider = new BasicCredentialsProvider();
@@ -303,8 +301,8 @@ public class CILogonClient
 		for (int i = 0; i < password.length(); ++i) {
 			stars += "*";
 		}
-		debug("Calling " + request.getMethod() + " on " + request.getURI().toString() + " with username=" + username
-			+ " and password=" + stars);
+		debug("Calling " + request.getMethod() + " on " + request.getURI().toString() + " with username=" + username + " and password="
+			+ stars);
 		return makeCall(request, context);
 	}
 

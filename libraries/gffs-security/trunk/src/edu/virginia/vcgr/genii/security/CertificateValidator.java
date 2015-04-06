@@ -16,10 +16,10 @@ public interface CertificateValidator
 	public KeyStore getResourceTrustStore() throws Exception;
 
 	/*
-	 * Provides access to the trust stores and crl store for the application. 
+	 * Provides access to the trust stores and crl store for the application.
 	 */
 	public TrustStoreProvider getTrustStoreProvider();
-	
+
 	/**
 	 * Verifies that the certificate is found rooted in our local resource trust store.
 	 */
@@ -29,9 +29,9 @@ public interface CertificateValidator
 	 * Verifies that the certificate is found rooted in the specified trust store.
 	 */
 	public boolean validateTrustedByKeystore(X509Certificate[] certChain, KeyStore store) throws Exception;
-	
+
 	/**
 	 * Required for communicating the grid-certificates directory to pattern-based trust stores.
 	 */
-//	public String getGridCertificatesDir();
+	// public String getGridCertificatesDir();
 }

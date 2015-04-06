@@ -45,8 +45,7 @@ public class TextCheckBoxDialog extends TextInputDialog implements CheckBoxDialo
 	protected String generateHint()
 	{
 		if (getHelp() != null) {
-			return "Hint:  You may enter \"Cancel\" to cancel this selection, "
-				+ "or \"Help\" to get help.\nPlease hit <enter> when done!";
+			return "Hint:  You may enter \"Cancel\" to cancel this selection, " + "or \"Help\" to get help.\nPlease hit <enter> when done!";
 		} else {
 			return "Hint:  You may enter \"Cancel\" to cancel this selection.\n" + "Please hit <enter> when done!";
 		}

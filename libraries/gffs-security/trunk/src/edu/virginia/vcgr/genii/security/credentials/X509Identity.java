@@ -98,8 +98,8 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 	}
 
 	/**
-	 * Checks that the attribute is time-valid with respect to the supplied date and any delegation
-	 * depth requirements are met by the supplied delegationDepth.
+	 * Checks that the attribute is time-valid with respect to the supplied date and any delegation depth requirements are met by the supplied
+	 * delegationDepth.
 	 */
 	@Override
 	public void checkValidity(Date date) throws AttributeInvalidException
@@ -113,8 +113,7 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 				cert.checkValidity(date);
 			}
 		} catch (CertificateException e) {
-			throw new AttributeInvalidException("Security attribute asserting identity contains an invalid certificate: "
-				+ e.getMessage(), e);
+			throw new AttributeInvalidException("Security attribute asserting identity contains an invalid certificate: " + e.getMessage(), e);
 		} catch (Exception e) {
 			throw new AttributeInvalidException("Failure during certificate validation: " + e.getMessage(), e);
 		}
@@ -132,21 +131,20 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 		switch (verbosity) {
 			case HIGH:
 				return String.format("(" + _type.toString() + ") \"%s\" [%2$tF %2$tT, %3$tF %3$tT]",
-					X500PrincipalUtilities.describe(_identity[0].getSubjectX500Principal(), verbosity),
-					_identity[0].getNotBefore(), _identity[0].getNotAfter());
+					X500PrincipalUtilities.describe(_identity[0].getSubjectX500Principal(), verbosity), _identity[0].getNotBefore(),
+					_identity[0].getNotAfter());
 
 			case MEDIUM:
 				return String.format("(" + _type.toString() + ") %s [%2$tF %2$tT, %3$tF %3$tT]",
-					X500PrincipalUtilities.describe(_identity[0].getSubjectX500Principal(), verbosity),
-					_identity[0].getNotBefore(), _identity[0].getNotAfter());
+					X500PrincipalUtilities.describe(_identity[0].getSubjectX500Principal(), verbosity), _identity[0].getNotBefore(),
+					_identity[0].getNotAfter());
 
 			default:
 				if (_type == IdentityType.USER) {
 					// System.err.println("The identity type is user " +
 					// _identity[0].getSubjectX500Principal().toString());
 				}
-				return ("(" + _type.toString() + ") " + X500PrincipalUtilities.describe(_identity[0].getSubjectX500Principal(),
-					verbosity));
+				return ("(" + _type.toString() + ") " + X500PrincipalUtilities.describe(_identity[0].getSubjectX500Principal(), verbosity));
 		}
 	}
 
@@ -261,8 +259,7 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 	}
 
 	/**
-	 * returns a string with the openssl style one-line rdn representation for the certificate's
-	 * subject.
+	 * returns a string with the openssl style one-line rdn representation for the certificate's subject.
 	 */
 	public static String getOpensslRdn(X509Certificate toShow)
 	{

@@ -3,11 +3,10 @@ package edu.virginia.vcgr.genii.container.q2;
 import java.util.Date;
 
 /**
- * The data structure used to keep information about updates of BES resources. BES resources are
- * update at a frequency determined by the following equation: updateInterval = updateFrequency * 2
- * ^ (MIN(missCap, misses)) <B>updateFrequency</B> is a base update frequency <B>missCap</B> is the
- * maximum number of misses to count against the resource in the exponential backoff algorithm
- * <B>misses</B> is the number of updates that the bes resource has failed to respond to.
+ * The data structure used to keep information about updates of BES resources. BES resources are update at a frequency determined by the
+ * following equation: updateInterval = updateFrequency * 2 ^ (MIN(missCap, misses)) <B>updateFrequency</B> is a base update frequency
+ * <B>missCap</B> is the maximum number of misses to count against the resource in the exponential backoff algorithm <B>misses</B> is the
+ * number of updates that the bes resource has failed to respond to.
  * 
  * @author mmm2a
  */
@@ -38,8 +37,8 @@ public class BESUpdateInformation
 	}
 
 	/**
-	 * Update the information for this BES. Calling this method implies that the container was
-	 * responsive, but not necessary available. The isAvailable parameter tells us that.
+	 * Update the information for this BES. Calling this method implies that the container was responsive, but not necessary available. The
+	 * isAvailable parameter tells us that.
 	 * 
 	 * @param isAvailable
 	 *            Was the bes available, or not.
@@ -69,8 +68,7 @@ public class BESUpdateInformation
 	}
 
 	/**
-	 * A getter method that indicates whether this update record reflects a responsive and available
-	 * resource or not.
+	 * A getter method that indicates whether this update record reflects a responsive and available resource or not.
 	 * 
 	 * @return True if the represented BES is available, false otherwise.
 	 */
@@ -81,8 +79,7 @@ public class BESUpdateInformation
 			return false;
 
 		/*
-		 * Otherwise, it's responsive if the last responsive timestamp occurrs on or after the
-		 * lastupdated timestamp.
+		 * Otherwise, it's responsive if the last responsive timestamp occurrs on or after the lastupdated timestamp.
 		 */
 		boolean responsive = !_lastResponsive.before(_lastUpdated);
 
@@ -120,8 +117,8 @@ public class BESUpdateInformation
 			return false;
 
 		/*
-		 * Otherwise, see how long we are supposed to wait for the next update based off of the
-		 * update frequency and the number of misses recorded so far.
+		 * Otherwise, see how long we are supposed to wait for the next update based off of the update frequency and the number of misses
+		 * recorded so far.
 		 */
 		long timeToWait = (_updateCycle << _misses);
 
@@ -147,11 +144,10 @@ public class BESUpdateInformation
 
 		if (nextUpdate == null)
 			return String.format("%s (misses = %d, last-updated = %3$tT %3$tF, \n"
-				+ "\tlast-responsive = %4$tT %4$tF, next-update = none scheduled)", responsiveString, _misses, _lastUpdated,
-				_lastResponsive);
+				+ "\tlast-responsive = %4$tT %4$tF, next-update = none scheduled)", responsiveString, _misses, _lastUpdated, _lastResponsive);
 		else
 			return String.format("%s (misses = %d, last-updated = %3$tT %3$tF, \n"
-				+ "\tlast-responsive = %4$tT %4$tF, next-update = %5$tT %5$tF)", responsiveString, _misses, _lastUpdated,
-				_lastResponsive, nextUpdate);
+				+ "\tlast-responsive = %4$tT %4$tF, next-update = %5$tT %5$tF)", responsiveString, _misses, _lastUpdated, _lastResponsive,
+				nextUpdate);
 	}
 }

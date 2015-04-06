@@ -35,8 +35,7 @@ class BooleanTextCellRenderer extends DefaultTableCellRenderer
 	}
 
 	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row,
-		int column)
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		String text;
 

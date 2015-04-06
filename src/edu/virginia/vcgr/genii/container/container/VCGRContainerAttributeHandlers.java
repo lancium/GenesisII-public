@@ -51,8 +51,7 @@ public class VCGRContainerAttributeHandlers extends AbstractAttributeHandler imp
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
-		addHandler(PROPERTY_DOWNLOAD_TMPDIR, "getDownloadManagerTemporaryDirectoryAttr",
-			"setDownloadManagerTemporaryDirectoryAttr");
+		addHandler(PROPERTY_DOWNLOAD_TMPDIR, "getDownloadManagerTemporaryDirectoryAttr", "setDownloadManagerTemporaryDirectoryAttr");
 		addHandler(PROPERTY_SCRATCH_SPACE_DIR, "getScratchSpaceDirectoryAttr", "setScratchSpaceDirectoryAttr");
 	}
 

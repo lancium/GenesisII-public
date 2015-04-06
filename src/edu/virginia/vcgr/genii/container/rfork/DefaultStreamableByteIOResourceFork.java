@@ -41,10 +41,8 @@ public class DefaultStreamableByteIOResourceFork extends AbstractStreamableByteI
 				if (ap != null) {
 					ResourceForkInformation info = (ResourceForkInformation) ap.getResourceForkInformation();
 					if (info != null) {
-						DefaultStreamableByteIOResourceFork fork =
-							(DefaultStreamableByteIOResourceFork) info.instantiateFork(null);
-						Class<? extends StreamableByteIOFactoryResourceFork> dependentForkClass =
-							fork._dependentFork.getClass();
+						DefaultStreamableByteIOResourceFork fork = (DefaultStreamableByteIOResourceFork) info.instantiateFork(null);
+						Class<? extends StreamableByteIOFactoryResourceFork> dependentForkClass = fork._dependentFork.getClass();
 
 						Method targetMethod;
 
@@ -80,8 +78,8 @@ public class DefaultStreamableByteIOResourceFork extends AbstractStreamableByteI
 	private File _targetFile;
 	private StreamableByteIOFactoryResourceFork _dependentFork;
 
-	public DefaultStreamableByteIOResourceFork(ResourceForkService service, String forkPath, boolean destroyOnClose,
-		boolean doNotify, StreamableByteIOFactoryResourceFork dependentFork) throws IOException
+	public DefaultStreamableByteIOResourceFork(ResourceForkService service, String forkPath, boolean destroyOnClose, boolean doNotify,
+		StreamableByteIOFactoryResourceFork dependentFork) throws IOException
 	{
 		super(service, forkPath);
 
@@ -102,8 +100,8 @@ public class DefaultStreamableByteIOResourceFork extends AbstractStreamableByteI
 		}
 	}
 
-	public DefaultStreamableByteIOResourceFork(ResourceForkService service, String forkPath, boolean destroyOnClose,
-		boolean doNotify, StreamableByteIOFactoryResourceFork dependentFork, String containerFilename) throws IOException
+	public DefaultStreamableByteIOResourceFork(ResourceForkService service, String forkPath, boolean destroyOnClose, boolean doNotify,
+		StreamableByteIOFactoryResourceFork dependentFork, String containerFilename) throws IOException
 	{
 		super(service, forkPath);
 
@@ -266,7 +264,7 @@ public class DefaultStreamableByteIOResourceFork extends AbstractStreamableByteI
 	@Override
 	public ResourceForkInformation describe()
 	{
-		return new DefaultStreamableByteIOResourceForkInformation(getForkPath(), _dependentFork, _targetFile.getName(),
-			_destroyOnClose, _doNotify);
+		return new DefaultStreamableByteIOResourceForkInformation(getForkPath(), _dependentFork, _targetFile.getName(), _destroyOnClose,
+			_doNotify);
 	}
 }

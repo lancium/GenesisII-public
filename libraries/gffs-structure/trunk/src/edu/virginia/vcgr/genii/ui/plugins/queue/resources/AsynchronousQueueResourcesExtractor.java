@@ -25,8 +25,7 @@ class AsynchronousQueueResourcesExtractor implements Callable<EnhancedRNSPortTyp
 		EndpointReferenceType queueEPR = _uiContext.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint();
 
 		queueEPR = ResourceForkUtils.stripResourceForkInformation(queueEPR);
-		EnhancedRNSPortType rpt =
-			ClientUtils.createProxy(EnhancedRNSPortType.class, queueEPR, _uiContext.uiContext().callingContext());
+		EnhancedRNSPortType rpt = ClientUtils.createProxy(EnhancedRNSPortType.class, queueEPR, _uiContext.uiContext().callingContext());
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt, _uiContext.uiContext().callingContext());
 		EndpointReferenceType resourcesEPR = proxy.lookup("resources")[0].getEndpoint();
 		return ClientUtils.createProxy(EnhancedRNSPortType.class, resourcesEPR, _uiContext.uiContext().callingContext());

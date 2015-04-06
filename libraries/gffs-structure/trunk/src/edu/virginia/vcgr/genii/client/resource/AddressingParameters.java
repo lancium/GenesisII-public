@@ -30,14 +30,12 @@ public class AddressingParameters
 	static public final String GENII_RESOURCE_FORK_REF_PARAM = "resource-fork";
 	static public final String GENII_ADDITIONAL_USER_INFO_REF_PARAM = "additional-user-information";
 
-	static public final QName OLD_REFERENCE_PARAMETER_QNAME = new QName("http://vcgr.cs.virginia.edu/Genesis-II",
-		"simple-string");
+	static public final QName OLD_REFERENCE_PARAMETER_QNAME = new QName("http://vcgr.cs.virginia.edu/Genesis-II", "simple-string");
 
 	static public final QName GENII_RESOURCE_KEY_REF_PARAM_QNAME = new QName(GENII_REF_PARAMS_NS, GENII_RESOURCE_KEY_REF_PARAM);
-	static public final QName GENII_RESOURCE_FORK_REF_PARAM_QNAME = new QName(GENII_REF_PARAMS_NS,
-		GENII_RESOURCE_FORK_REF_PARAM);
-	static public final QName GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME = new QName(GENII_REF_PARAMS_NS,
-		GENII_ADDITIONAL_USER_INFO_REF_PARAM);
+	static public final QName GENII_RESOURCE_FORK_REF_PARAM_QNAME = new QName(GENII_REF_PARAMS_NS, GENII_RESOURCE_FORK_REF_PARAM);
+	static public final QName GENII_ADDTIONAL_USER_INFO_REF_PARAM_QNAME =
+		new QName(GENII_REF_PARAMS_NS, GENII_ADDITIONAL_USER_INFO_REF_PARAM);
 
 	static private Serializable toObject(String encoded) throws ResourceException
 	{
@@ -89,8 +87,7 @@ public class AddressingParameters
 					QName elementName = element.getQName();
 					if (_logger.isTraceEnabled())
 						_logger.trace("seeing elem name: " + elementName);
-					if (elementName.equals(GENII_RESOURCE_KEY_REF_PARAM_QNAME)
-						|| elementName.equals(OLD_REFERENCE_PARAMETER_QNAME)) {
+					if (elementName.equals(GENII_RESOURCE_KEY_REF_PARAM_QNAME) || elementName.equals(OLD_REFERENCE_PARAMETER_QNAME)) {
 						_resourceKey = element.getValue();
 						if (_logger.isTraceEnabled())
 							_logger.trace("found resource key: " + _resourceKey);

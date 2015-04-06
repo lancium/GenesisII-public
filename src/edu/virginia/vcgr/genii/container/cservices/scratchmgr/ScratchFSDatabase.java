@@ -25,13 +25,11 @@ public class ScratchFSDatabase
 		DatabaseTableUtils.createTables(conn, false, "CREATE TABLE swapmgrdirectories ("
 			+ "dirid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " + "directory VARCHAR(512) UNIQUE NOT NULL, "
 			+ "lastidlestart TIMESTAMP)", "CREATE TABLE swapmgrdirectoryreservations ("
-			+ "reservationid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
-			+ "dirid BIGINT NOT NULL, timeacquired TIMESTAMP NOT NULL, " + "CONSTRAINT swapmgrdirresdiridfk "
-			+ "FOREIGN KEY (dirid) " + "REFERENCES swapmgrdirectories (dirid))", "CREATE INDEX swapmgrdirdirectoryidx "
-			+ "ON swapmgrdirectories (directory)", "CREATE INDEX swapmgrdirlastidlestartidx "
-			+ "ON swapmgrdirectories (lastidlestart)", "CREATE INDEX swapmgrdirresdirididx "
-			+ "ON swapmgrdirectoryreservations (dirid)", "CREATE INDEX swapmgrdirrestimeacquiredidx "
-			+ "ON swapmgrdirectoryreservations (timeacquired)");
+			+ "reservationid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " + "dirid BIGINT NOT NULL, timeacquired TIMESTAMP NOT NULL, "
+			+ "CONSTRAINT swapmgrdirresdiridfk " + "FOREIGN KEY (dirid) " + "REFERENCES swapmgrdirectories (dirid))",
+			"CREATE INDEX swapmgrdirdirectoryidx " + "ON swapmgrdirectories (directory)", "CREATE INDEX swapmgrdirlastidlestartidx "
+				+ "ON swapmgrdirectories (lastidlestart)", "CREATE INDEX swapmgrdirresdirididx " + "ON swapmgrdirectoryreservations (dirid)",
+			"CREATE INDEX swapmgrdirrestimeacquiredidx " + "ON swapmgrdirectoryreservations (timeacquired)");
 	}
 
 	public void cleanupExpiredReservations(Connection conn, long expiryTimeMillis) throws SQLException
@@ -41,8 +39,8 @@ public class ScratchFSDatabase
 		try {
 			stmt = conn.createStatement();
 
-			stmt.executeUpdate(String.format("DELETE FROM swapmgrdirectoryreservations " + "WHERE "
-				+ "{fn TIMESTAMPDIFF(SQL_TSI_SECOND, " + "timeacquired, CURRENT_TIMESTAMP)} > %d", (expiryTimeMillis / 1000L)));
+			stmt.executeUpdate(String.format("DELETE FROM swapmgrdirectoryreservations " + "WHERE " + "{fn TIMESTAMPDIFF(SQL_TSI_SECOND, "
+				+ "timeacquired, CURRENT_TIMESTAMP)} > %d", (expiryTimeMillis / 1000L)));
 		} finally {
 			StreamUtils.close(stmt);
 		}
@@ -75,8 +73,7 @@ public class ScratchFSDatabase
 
 			rs =
 				stmt.executeQuery(String.format("SELECT dirid, directory FROM swapmgrdirectories " + "WHERE "
-					+ "{fn TIMESTAMPDIFF(SQL_TSI_SECOND, " + "lastidlestart, CURRENT_TIMESTAMP)} > %d",
-					(idleTimeoutMillis / 1000L)));
+					+ "{fn TIMESTAMPDIFF(SQL_TSI_SECOND, " + "lastidlestart, CURRENT_TIMESTAMP)} > %d", (idleTimeoutMillis / 1000L)));
 			while (rs.next()) {
 				pStmt.setLong(1, rs.getLong(1));
 				pStmt.addBatch();
@@ -119,9 +116,7 @@ public class ScratchFSDatabase
 			stmt.close();
 			stmt = null;
 
-			stmt =
-				conn.prepareStatement("INSERT INTO swapmgrdirectoryreservations "
-					+ "(dirid, timeacquired) VALUES (?, CURRENT_TIMESTAMP)");
+			stmt = conn.prepareStatement("INSERT INTO swapmgrdirectoryreservations " + "(dirid, timeacquired) VALUES (?, CURRENT_TIMESTAMP)");
 			stmt.setLong(1, dirid);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to insert new reservation into database.");
@@ -212,8 +207,8 @@ public class ScratchFSDatabase
 
 		try {
 			stmt =
-				conn.prepareStatement("UPDATE swapmgrdirectories " + "SET lastidlestart = CURRENT_TIMESTAMP "
-					+ "WHERE dirid = ? AND " + "dirid NOT IN " + "(SELECT dirid FROM swapmgrdirectoryreservations)");
+				conn.prepareStatement("UPDATE swapmgrdirectories " + "SET lastidlestart = CURRENT_TIMESTAMP " + "WHERE dirid = ? AND "
+					+ "dirid NOT IN " + "(SELECT dirid FROM swapmgrdirectoryreservations)");
 			stmt.setLong(1, dirid);
 
 			stmt.executeUpdate();

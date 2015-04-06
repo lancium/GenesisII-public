@@ -99,8 +99,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new StreamableByteIO Resource.");
@@ -120,8 +120,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		MetadataType mdt = newEPR.getMetadata();
 		if (mdt == null)
 			newEPR.setMetadata(mdt =
-				new MetadataType(new MessageElement[] { new MessageElement(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG,
-					destroyOnClose) }));
+				new MetadataType(new MessageElement[] { new MessageElement(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG, destroyOnClose) }));
 		else {
 			ArrayList<MessageElement> tmp = new ArrayList<MessageElement>();
 			for (MessageElement e : mdt.get_any())
@@ -179,8 +178,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	}
 
 	@RWXMapping(RWXCategory.READ)
-	public SeekReadResponse seekRead(SeekRead seekReadRequest) throws RemoteException, SeekNotPermittedFaultType,
-		CustomFaultType, ReadNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
+	public SeekReadResponse seekRead(SeekRead seekReadRequest) throws RemoteException, SeekNotPermittedFaultType, CustomFaultType,
+		ReadNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
 	{
 		int numBytes = seekReadRequest.getNumBytes().intValue();
 		long seekOffset = seekReadRequest.getOffset();
@@ -223,8 +222,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public SeekWriteResponse seekWrite(SeekWrite seekWriteRequest) throws RemoteException, SeekNotPermittedFaultType,
-		CustomFaultType, WriteNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
+	public SeekWriteResponse seekWrite(SeekWrite seekWriteRequest) throws RemoteException, SeekNotPermittedFaultType, CustomFaultType,
+		WriteNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
 	{
 		long seekOffset = seekWriteRequest.getOffset();
 		URI uri = seekWriteRequest.getSeekOrigin();
@@ -274,8 +273,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 		return totalRead;
 	}
 
-	static private long seek(long currentPosition, URI seekOrigin, long seekOffset, RandomAccessFile raf) throws IOException,
-		RemoteException
+	static private long seek(long currentPosition, URI seekOrigin, long seekOffset, RandomAccessFile raf) throws IOException, RemoteException
 	{
 		long newPosition = currentPosition;
 		if (seekOrigin.equals(ByteIOConstants.SEEK_ORIGIN_BEGINNING_URI)) {
@@ -303,12 +301,10 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	}
 
 	/*
-	 * This method publish attributes update notification message and also return the updated
-	 * attributes as set of MessageElements. We use a single function instead of two for this two
-	 * operations in order to reduce the number of database access.
+	 * This method publish attributes update notification message and also return the updated attributes as set of MessageElements. We use a
+	 * single function instead of two for this two operations in order to reduce the number of database access.
 	 */
-	private MessageElement[] notifyAttributesUpdateAndGetMetadata(File currentFile, ISByteIOResource resource)
-		throws ResourceException
+	private MessageElement[] notifyAttributesUpdateAndGetMetadata(File currentFile, ISByteIOResource resource) throws ResourceException
 	{
 
 		MessageElement[] attributes = new MessageElement[4];

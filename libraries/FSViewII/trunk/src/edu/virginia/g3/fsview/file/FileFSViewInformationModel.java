@@ -61,8 +61,8 @@ final class FileFSViewInformationModel extends AbstractFSViewInformationModel<UR
 		panel.add(new JLabel("Filesystem Path"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		JTextField field = new JTextField(32);
-		panel.add(field, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(field, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
+			5, 5, 5), 5, 5));
 		field.addCaretListener(new CaretListener()
 		{
 			@Override

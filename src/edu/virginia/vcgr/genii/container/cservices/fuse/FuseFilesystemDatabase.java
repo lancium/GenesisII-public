@@ -26,9 +26,8 @@ class FuseFilesystemDatabase
 	static final private long DEFAULT_TTL = 1000L * 60 * 60 * 24 * 45;
 
 	static final private String[] CREATE_TABLE_STMTS = { "CREATE TABLE fusefilesystems("
-		+ "id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "parentdir VARCHAR(512) NOT NULL,"
-		+ "mountpoint VARCHAR(128) NOT NULL," + "deathtime TIMESTAMP,"
-		+ "createtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)", };
+		+ "id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "parentdir VARCHAR(512) NOT NULL," + "mountpoint VARCHAR(128) NOT NULL,"
+		+ "deathtime TIMESTAMP," + "createtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)", };
 
 	static void createTables(Connection connection)
 	{

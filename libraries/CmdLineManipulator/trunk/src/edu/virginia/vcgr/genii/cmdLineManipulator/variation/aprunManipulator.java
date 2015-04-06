@@ -26,8 +26,8 @@ public class aprunManipulator extends AbstractCmdLineManipulator<AprunVariationC
 	}
 
 	@Override
-	public List<String> transform(Map<String, Object> jobProperties, CmdLineManipulatorConfiguration manipConfig,
-		String variationName) throws CmdLineManipulatorException
+	public List<String> transform(Map<String, Object> jobProperties, CmdLineManipulatorConfiguration manipConfig, String variationName)
+		throws CmdLineManipulatorException
 	{
 		_logger.debug("**Transforming with Aprun CmdLine Manipulator");
 

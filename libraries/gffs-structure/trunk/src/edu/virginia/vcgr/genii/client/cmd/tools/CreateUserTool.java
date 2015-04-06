@@ -35,9 +35,8 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 
 /**
- * This is a rather complicated tool that acts as a front end to the idp tool. It's purpose is to
- * make the job of creating a new user from whole cloth easier for the user. It does this by making
- * calls out to other tools like the idp tool and the chmod tool.
+ * This is a rather complicated tool that acts as a front end to the idp tool. It's purpose is to make the job of creating a new user from
+ * whole cloth easier for the user. It does this by making calls out to other tools like the idp tool and the chmod tool.
  * 
  * @author mmm2a
  */
@@ -104,8 +103,7 @@ public class CreateUserTool extends BaseGridTool
 	 * Set the valid duration of the certificate for the new IDP instance.
 	 * 
 	 * @param validDuration
-	 *            The valid duration for this tool. This string is a formatted duration string. See
-	 *            Genesis II wiki page for a description.
+	 *            The valid duration for this tool. This string is a formatted duration string. See Genesis II wiki page for a description.
 	 */
 	@Option({ "validDuration" })
 	public void setValidDuration(String validDuration)
@@ -114,9 +112,8 @@ public class CreateUserTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		DialogProvider twp = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
@@ -193,8 +190,8 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @throws Throwable
 	 */
-	protected void enactCreation(String storeType, String sourcePath, String idpServicePath, String idpName)
-		throws RNSException, ToolException, ReloadShellException, AuthZSecurityException
+	protected void enactCreation(String storeType, String sourcePath, String idpServicePath, String idpName) throws RNSException,
+		ToolException, ReloadShellException, AuthZSecurityException
 	{
 		IdpTool idpTool = new IdpTool();
 		if (storeType != null)
@@ -216,8 +213,8 @@ public class CreateUserTool extends BaseGridTool
 			throw new AuthZSecurityException(msg);
 		}
 
-		stdout.println(String.format("\tLifetime:     %.2f days / %.2f years.",
-			TimeHelpers.millisToDays(BaseGridTool.getValidMillis()), TimeHelpers.millisToYears(BaseGridTool.getValidMillis())));
+		stdout.println(String.format("\tLifetime:     %.2f days / %.2f years.", TimeHelpers.millisToDays(BaseGridTool.getValidMillis()),
+			TimeHelpers.millisToYears(BaseGridTool.getValidMillis())));
 
 		String fullPath = idpServicePath + "/" + idpName;
 
@@ -285,8 +282,7 @@ public class CreateUserTool extends BaseGridTool
 				throw de;
 			} catch (Throwable cause) {
 				wp.createErrorDialog("Unable to Locate IDP Service",
-					new TextContent("Unable to locate IDP service.", "Please try again or type \"Cancel\" to quit."))
-					.showDialog();
+					new TextContent("Unable to locate IDP service.", "Please try again or type \"Cancel\" to quit.")).showDialog();
 			}
 		}
 	}
@@ -306,11 +302,9 @@ public class CreateUserTool extends BaseGridTool
 	protected String getIDPNameFromUser(DialogProvider wp, RNSPath idpServicePath) throws DialogException, UserCancelException
 	{
 		InputDialog input = wp.createInputDialog("New Instance IDP Name", "New IDP instance name?");
-		input.setHelp(new TextContent("The IDP name is the new name inside the IDP service by",
-			"which this instance will be known."));
-		input.setInputValidator(new ChainedInputValidator(new NonEmptyValidator(
-			"You must supply a non-empty IDP instance name."), ContainsTextValidator.mustNotContainText("/",
-			"IDP instance names cannot contain the '/' character.")));
+		input.setHelp(new TextContent("The IDP name is the new name inside the IDP service by", "which this instance will be known."));
+		input.setInputValidator(new ChainedInputValidator(new NonEmptyValidator("You must supply a non-empty IDP instance name."),
+			ContainsTextValidator.mustNotContainText("/", "IDP instance names cannot contain the '/' character.")));
 
 		while (true) {
 			try {
@@ -330,8 +324,7 @@ public class CreateUserTool extends BaseGridTool
 			} catch (UserCancelException uce) {
 				throw uce;
 			} catch (Throwable cause) {
-				wp.createErrorDialog("Bad IDP Service", new TextContent("Unable to locate IDP service.", "Please try again."))
-					.showDialog();
+				wp.createErrorDialog("Bad IDP Service", new TextContent("Unable to locate IDP service.", "Please try again.")).showDialog();
 			}
 		}
 	}

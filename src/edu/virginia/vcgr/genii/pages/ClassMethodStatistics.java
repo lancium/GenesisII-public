@@ -31,8 +31,7 @@ public class ClassMethodStatistics extends GenesisIIStyledPage
 		int index = classShortName.lastIndexOf('.');
 		classShortName = classShortName.substring(index + 1);
 
-		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats =
-			edu.virginia.vcgr.genii.client.stats.ContainerStatistics.instance();
+		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats = edu.virginia.vcgr.genii.client.stats.ContainerStatistics.instance();
 
 		MethodStatistics mStats = stats.getMethodStatistics();
 		Map<TimeInterval, MethodStatisticsReport> report = mStats.report();
@@ -58,8 +57,7 @@ public class ClassMethodStatistics extends GenesisIIStyledPage
 				if (methodMap != null) {
 					MethodStatisticsReportPoint point = methodMap.get(methodName);
 					if (point != null) {
-						ps.format(
-							"<TR><TD>%s</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%.2f %%</TD><TD>%d</TD></TR>\n",
+						ps.format("<TR><TD>%s</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%d</TD><TD>%.2f %%</TD><TD>%d</TD></TR>\n",
 							ti.longDescription(), point.totalCallsStarted(), point.totalCompleted(), point.totalSucceeded(),
 							point.totalFailed(), point.failureRate() * 100.0, point.averageDuration());
 					}

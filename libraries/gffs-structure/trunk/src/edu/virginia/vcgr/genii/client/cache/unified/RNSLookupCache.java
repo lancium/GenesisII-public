@@ -157,8 +157,7 @@ public class RNSLookupCache extends CommonCache
 	private long getCacheLifetTime(String rnsPath)
 	{
 		String parentPath = DirectoryManager.getParentPath(rnsPath);
-		WSResourceConfig parentResourceConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(parentPath, WSResourceConfig.class);
+		WSResourceConfig parentResourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(parentPath, WSResourceConfig.class);
 		if (parentResourceConfig == null)
 			return cacheLifeTime;
 		return Math.max(cacheLifeTime, parentResourceConfig.getMillisecondTimeLeftToCallbackExpiry());
@@ -227,9 +226,8 @@ public class RNSLookupCache extends CommonCache
 		/*
 		 * results:
 		 * 
-		 * 2013-12-20: this does not seem to be leaking in isolation, with the above test. it's not
-		 * totally realistic because the EPRs involved are already sanitized, but still the leak
-		 * doesn't seem to show up here at all.
+		 * 2013-12-20: this does not seem to be leaking in isolation, with the above test. it's not totally realistic because the EPRs
+		 * involved are already sanitized, but still the leak doesn't seem to show up here at all.
 		 */
 	}
 }

@@ -101,8 +101,7 @@ public class XMLTextWidget extends JTextPane
 		}
 	}
 
-	public void appendDocument(QName objectName, Object object) throws ResourceException, XMLStreamException,
-		FactoryConfigurationError
+	public void appendDocument(QName objectName, Object object) throws ResourceException, XMLStreamException, FactoryConfigurationError
 	{
 		try {
 			XMLPrettyPrinter pp = new XMLPrettyPrinter(new XMLTextWidgetFormatHandler());

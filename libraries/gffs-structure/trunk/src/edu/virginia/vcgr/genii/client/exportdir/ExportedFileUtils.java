@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.exportdir;
 
@@ -85,15 +84,13 @@ public class ExportedFileUtils
 			throw new IllegalArgumentException("Couldn't find path in creation properties.");
 		path = pathElement.getValue();
 
-		MessageElement parentIDSElement =
-			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
+		MessageElement parentIDSElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
 		if (parentIDSElement == null)
 			throw new IllegalArgumentException("Couldn't find parentIds in creation properties.");
 		parentIds = parentIDSElement.getValue();
 
 		// get replication state
-		MessageElement replicationElement =
-			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
+		MessageElement replicationElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
 		if (replicationElement == null)
 			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 		isReplicated = replicationElement.getValue();
@@ -118,8 +115,7 @@ public class ExportedFileUtils
 	 * 
 	 * @param path Path to new file
 	 * 
-	 * @return boolean Return true if file does not exist and could be created. False if file
-	 * exists. Pass through IOExceptions from create.
+	 * @return boolean Return true if file does not exist and could be created. False if file exists. Pass through IOExceptions from create.
 	 */
 	static public boolean createLocalFile(String path) throws IOException
 	{

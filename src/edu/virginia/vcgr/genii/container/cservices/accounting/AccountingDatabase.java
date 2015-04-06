@@ -39,13 +39,11 @@ class AccountingDatabase
 			+ "addtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 		"CREATE TABLE acctcommandlines(" + "id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "arid BIGINT NOT NULL,"
 			+ "index INTEGER NOT NULL," + "value VARCHAR(512) NOT NULL)",
-		"CREATE TABLE credentials(" + "cid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
-			+ "credentialhash INTEGER NOT NULL," + "credential BLOB(2G) NOT NULL,"
-			+ "addtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)",
+		"CREATE TABLE credentials(" + "cid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "credentialhash INTEGER NOT NULL,"
+			+ "credential BLOB(2G) NOT NULL," + "addtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 		"CREATE TABLE acctreccredmap(" + "id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "arid BIGINT NOT NULL,"
 			+ "cid BIGINT NOT NULL)", "CREATE INDEX acctreccredmaparididx ON acctreccredmap(arid)",
-		"CREATE INDEX acctreccredmapcididx ON acctreccredmap(cid)",
-		"CREATE INDEX acctcommandlinesarididx ON acctcommandlines(arid)" };
+		"CREATE INDEX acctreccredmapcididx ON acctreccredmap(cid)", "CREATE INDEX acctcommandlinesarididx ON acctcommandlines(arid)" };
 
 	static private Calendar convert(Timestamp stamp)
 	{
@@ -64,9 +62,9 @@ class AccountingDatabase
 		}
 	}
 
-	static void addRecord(Connection conn, String besepi, ProcessorArchitecture arch, OperatingSystemNames os,
-		String machineName, Collection<String> commandLine, int exitCode, ElapsedTime user, ElapsedTime kernel,
-		ElapsedTime wallclock, long maximumRSS, Collection<Identity> identities) throws SQLException
+	static void addRecord(Connection conn, String besepi, ProcessorArchitecture arch, OperatingSystemNames os, String machineName,
+		Collection<String> commandLine, int exitCode, ElapsedTime user, ElapsedTime kernel, ElapsedTime wallclock, long maximumRSS,
+		Collection<Identity> identities) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		PreparedStatement stmt2 = null;
@@ -75,8 +73,7 @@ class AccountingDatabase
 
 		try {
 			stmt =
-				conn.prepareStatement("INSERT INTO accountingrecords (besepi,"
-					+ "arch, os, besmachinename, exitcode, usertimemicrosecs, "
+				conn.prepareStatement("INSERT INTO accountingrecords (besepi," + "arch, os, besmachinename, exitcode, usertimemicrosecs, "
 					+ "kerneltimemicrosecs, wallclocktimemicrosecs, " + "maxrssbytes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
 			if (besepi == null)
@@ -103,8 +100,7 @@ class AccountingDatabase
 			stmt.close();
 			stmt = null;
 			stmt =
-				conn.prepareStatement("INSERT INTO credentials(credentialhash, credential) VALUES (?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
+				conn.prepareStatement("INSERT INTO credentials(credentialhash, credential) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
 			boolean failure = false;
 			for (Identity identity : identities) {
 				stmt.setInt(1, identity.hashCode());
@@ -153,49 +149,41 @@ class AccountingDatabase
 	}
 
 	/*
-	 * static Collection<AccountingRecordType> getAccountingRecords( Connection conn) throws
-	 * SQLException, IOException { Collection<AccountingRecordType> ret = new
-	 * LinkedList<AccountingRecordType>();
+	 * static Collection<AccountingRecordType> getAccountingRecords( Connection conn) throws SQLException, IOException {
+	 * Collection<AccountingRecordType> ret = new LinkedList<AccountingRecordType>();
 	 * 
-	 * PreparedStatement stmt1 = null; PreparedStatement stmt2 = null; PreparedStatement stmt3 =
-	 * null; ResultSet rs1 = null; ResultSet rs2 = null; ResultSet rs3 = null;
+	 * PreparedStatement stmt1 = null; PreparedStatement stmt2 = null; PreparedStatement stmt3 = null; ResultSet rs1 = null; ResultSet rs2 =
+	 * null; ResultSet rs3 = null;
 	 * 
-	 * int numRecords = 0; long startTime = System.currentTimeMillis(); try { stmt1 =
-	 * conn.prepareStatement( "SELECT * FROM accountingrecords"); stmt2 = conn.prepareStatement(
-	 * "SELECT c.credential FROM " + "acctreccredmap AS a, credentials AS c " +
-	 * "WHERE a.cid = c.cid AND a.arid = ?"); stmt3 = conn.prepareStatement(
+	 * int numRecords = 0; long startTime = System.currentTimeMillis(); try { stmt1 = conn.prepareStatement(
+	 * "SELECT * FROM accountingrecords"); stmt2 = conn.prepareStatement( "SELECT c.credential FROM " +
+	 * "acctreccredmap AS a, credentials AS c " + "WHERE a.cid = c.cid AND a.arid = ?"); stmt3 = conn.prepareStatement(
 	 * "SELECT index, value FROM acctcommandlines WHERE arid = ?");
 	 * 
 	 * rs1 = stmt1.executeQuery();
 	 * 
-	 * while (rs1.next()) { long arid = rs1.getLong("arid"); Collection<Identity> credentials = new
-	 * LinkedList<Identity>(); stmt2.setLong(1, arid); rs2 = stmt2.executeQuery(); while
-	 * (rs2.next()) { credentials.add( (Identity)DBSerializer.fromBlob(rs2.getBlob(1))); }
+	 * while (rs1.next()) { long arid = rs1.getLong("arid"); Collection<Identity> credentials = new LinkedList<Identity>(); stmt2.setLong(1,
+	 * arid); rs2 = stmt2.executeQuery(); while (rs2.next()) { credentials.add( (Identity)DBSerializer.fromBlob(rs2.getBlob(1))); }
 	 * 
 	 * rs2.close(); rs2 = null;
 	 * 
-	 * Vector<String> commandLineValues = new Vector<String>(); stmt3.setLong(1, arid); rs3 =
-	 * stmt3.executeQuery(); while (rs3.next()) { int index = rs3.getInt(1); String value =
-	 * rs3.getString(2);
+	 * Vector<String> commandLineValues = new Vector<String>(); stmt3.setLong(1, arid); rs3 = stmt3.executeQuery(); while (rs3.next()) { int
+	 * index = rs3.getInt(1); String value = rs3.getString(2);
 	 * 
-	 * if (index >= commandLineValues.size()) commandLineValues.setSize(index + 1);
-	 * commandLineValues.set(index, value); }
+	 * if (index >= commandLineValues.size()) commandLineValues.setSize(index + 1); commandLineValues.set(index, value); }
 	 * 
-	 * for (int lcv = 0; lcv < commandLineValues.size(); lcv++) if (commandLineValues.get(lcv) ==
-	 * null) commandLineValues.remove(lcv);
+	 * for (int lcv = 0; lcv < commandLineValues.size(); lcv++) if (commandLineValues.get(lcv) == null) commandLineValues.remove(lcv);
 	 * 
-	 * ret.add(new AccountingRecordType( arid, rs1.getString("besepi"), rs1.getString("arch"),
-	 * rs1.getString("os"), rs1.getString("besmachinename"), commandLineValues.toArray( new
-	 * String[commandLineValues.size()]), rs1.getInt("exitcode"), rs1.getLong("usertimemicrosecs"),
-	 * rs1.getLong("kerneltimemicrosecs"), rs1.getLong("wallclocktimemicrosecs"),
-	 * rs1.getLong("maxrssbytes"), DBSerializer.serialize(credentials, Long.MAX_VALUE),
-	 * convert(rs1.getTimestamp("addtime")))); numRecords++; }
+	 * ret.add(new AccountingRecordType( arid, rs1.getString("besepi"), rs1.getString("arch"), rs1.getString("os"),
+	 * rs1.getString("besmachinename"), commandLineValues.toArray( new String[commandLineValues.size()]), rs1.getInt("exitcode"),
+	 * rs1.getLong("usertimemicrosecs"), rs1.getLong("kerneltimemicrosecs"), rs1.getLong("wallclocktimemicrosecs"),
+	 * rs1.getLong("maxrssbytes"), DBSerializer.serialize(credentials, Long.MAX_VALUE), convert(rs1.getTimestamp("addtime")))); numRecords++;
+	 * }
 	 * 
 	 * return ret; } finally { long stopTime = System.currentTimeMillis();
 	 * 
-	 * _logger.info(String.format( "Retrieve %d accounting records from db in %d milliseconds.",
-	 * numRecords, (stopTime - startTime))); StreamUtils.close(rs3); StreamUtils.close(stmt3);
-	 * StreamUtils.close(rs2); StreamUtils.close(stmt2); StreamUtils.close(rs1);
+	 * _logger.info(String.format( "Retrieve %d accounting records from db in %d milliseconds.", numRecords, (stopTime - startTime)));
+	 * StreamUtils.close(rs3); StreamUtils.close(stmt3); StreamUtils.close(rs2); StreamUtils.close(stmt2); StreamUtils.close(rs1);
 	 * StreamUtils.close(stmt1); } }
 	 */
 
@@ -268,8 +256,8 @@ class AccountingDatabase
 		long startTime = System.currentTimeMillis();
 		try {
 			stmt =
-				conn.prepareStatement("SELECT arec.*, cl.index, cl.value "
-					+ "FROM accountingrecords AS arec, acctcommandlines AS cl " + "WHERE arec.arid = cl.arid");
+				conn.prepareStatement("SELECT arec.*, cl.index, cl.value " + "FROM accountingrecords AS arec, acctcommandlines AS cl "
+					+ "WHERE arec.arid = cl.arid");
 
 			rs = stmt.executeQuery();
 			while (rs.next()) {
@@ -281,8 +269,8 @@ class AccountingDatabase
 						ar =
 							new AccountingRecord(arid, rs.getString("besepi"), rs.getString("arch"), rs.getString("os"), rs
 								.getString("besmachinename"), rs.getInt("exitcode"), rs.getLong("usertimemicrosecs"), rs
-								.getLong("kerneltimemicrosecs"), rs.getLong("wallclocktimemicrosecs"), rs
-								.getLong("maxrssbytes"), convert(rs.getTimestamp("addtime"))));
+								.getLong("kerneltimemicrosecs"), rs.getLong("wallclocktimemicrosecs"), rs.getLong("maxrssbytes"), convert(rs
+								.getTimestamp("addtime"))));
 
 				int clineIndex = rs.getInt("index");
 				String clineElement = rs.getString("value");
@@ -316,8 +304,7 @@ class AccountingDatabase
 			return ret;
 		} finally {
 			long stopTime = System.currentTimeMillis();
-			_logger.info(String.format("Retrieve %d accounting records from db in %d milliseconds.", map.size(),
-				(stopTime - startTime)));
+			_logger.info(String.format("Retrieve %d accounting records from db in %d milliseconds.", map.size(), (stopTime - startTime)));
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
@@ -328,9 +315,7 @@ class AccountingDatabase
 		PreparedStatement stmt1 = null;
 
 		try {
-			stmt1 =
-				conn.prepareStatement("DELETE FROM credentials WHERE cid IN "
-					+ "(SELECT cid FROM acctreccredmap WHERE arid <= ?)");
+			stmt1 = conn.prepareStatement("DELETE FROM credentials WHERE cid IN " + "(SELECT cid FROM acctreccredmap WHERE arid <= ?)");
 			stmt1.setLong(1, lastRecordToDelete);
 			stmt1.executeUpdate();
 

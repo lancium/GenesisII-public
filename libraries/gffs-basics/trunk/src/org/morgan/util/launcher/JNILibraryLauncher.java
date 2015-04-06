@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package org.morgan.util.launcher;
 
@@ -31,9 +30,8 @@ public class JNILibraryLauncher
 	/*
 	 * Note:
 	 * 
-	 * You can change packages to point to edu...jni.giilibmirror.io(.miscellaneous) To get
-	 * interaction with old library. Especially useful for testing out the driver without Internet
-	 * connectivity
+	 * You can change packages to point to edu...jni.giilibmirror.io(.miscellaneous) To get interaction with old library. Especially useful
+	 * for testing out the driver without Internet connectivity
 	 */
 
 	private static final String BASE_DIR_SYSTEM_PROPERTY = "edu.virginia.vcgr.genii.install-base-dir";
@@ -100,8 +98,7 @@ public class JNILibraryLauncher
 		String myClass = JNI_IO_PACKAGE + ".JNIOpen";
 		String myMethod = "open";
 		Class<?>[] argTypes = new Class<?>[] { String.class, Integer.class, Integer.class, Boolean.class };
-		Object[] args =
-			new Object[] { fileName, new Integer(requestedDeposition), new Integer(DesiredAccess), new Boolean(isDirectory) };
+		Object[] args = new Object[] { fileName, new Integer(requestedDeposition), new Integer(DesiredAccess), new Boolean(isDirectory) };
 
 		ArrayList<String> toReturn = (ArrayList<String>) invoke(myClass, myMethod, argTypes, args);
 		return ((toReturn != null) ? toReturn.toArray() : null);
@@ -124,8 +121,7 @@ public class JNILibraryLauncher
 		Class<?>[] argTypes = new Class[] { Integer.class, byte[].class, Long.class };
 
 		/*
-		 * Only not use default if not the same size (i.e. pool buffers may be larger than valid
-		 * length
+		 * Only not use default if not the same size (i.e. pool buffers may be larger than valid length
 		 */
 
 		// Bytes to actually use
@@ -146,8 +142,7 @@ public class JNILibraryLauncher
 		Class<?>[] argTypes = new Class[] { Integer.class, byte[].class, Long.class };
 
 		/*
-		 * Only not use default if not the same size (i.e. pool buffers may be larger than valid
-		 * length
+		 * Only not use default if not the same size (i.e. pool buffers may be larger than valid length
 		 */
 
 		// Bytes to actually use

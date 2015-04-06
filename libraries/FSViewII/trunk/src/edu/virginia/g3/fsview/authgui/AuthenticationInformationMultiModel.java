@@ -29,8 +29,7 @@ import edu.virginia.g3.fsview.gui.FSViewInformationModel;
 final public class AuthenticationInformationMultiModel extends AbstractFSViewInformationModel<FSViewAuthenticationInformation>
 {
 	private Map<FSViewAuthenticationInformationTypes, AuthenticationInformationModel> _models =
-		new EnumMap<FSViewAuthenticationInformationTypes, AuthenticationInformationModel>(
-			FSViewAuthenticationInformationTypes.class);
+		new EnumMap<FSViewAuthenticationInformationTypes, AuthenticationInformationModel>(FSViewAuthenticationInformationTypes.class);
 	private FSViewAuthenticationInformationTypes _selectedType;
 	private boolean _isSingletonAnonymous;
 
@@ -41,8 +40,7 @@ final public class AuthenticationInformationMultiModel extends AbstractFSViewInf
 		if (supportedTypes == null || supportedTypes.length == 0)
 			supportedTypes = new FSViewAuthenticationInformationTypes[] { FSViewAuthenticationInformationTypes.Anonymous };
 
-		_isSingletonAnonymous =
-			(supportedTypes.length == 1) && (supportedTypes[0] == FSViewAuthenticationInformationTypes.Anonymous);
+		_isSingletonAnonymous = (supportedTypes.length == 1) && (supportedTypes[0] == FSViewAuthenticationInformationTypes.Anonymous);
 
 		FSViewInformationListenerImpl listener = new FSViewInformationListenerImpl();
 
@@ -110,8 +108,8 @@ final public class AuthenticationInformationMultiModel extends AbstractFSViewInf
 					JRadioButton button = new JRadioButton(new RadioAction(cardPanel, cardLayout, types[lcv]));
 					group.add(button);
 
-					panel.add(button, new GridBagConstraints(0, lcv, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-						GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+					panel.add(button, new GridBagConstraints(0, lcv, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+						new Insets(5, 5, 5, 5), 5, 5));
 
 					cardPanel.add(_models.get(types[lcv]).createGuiComponent(), types[lcv].name());
 				}

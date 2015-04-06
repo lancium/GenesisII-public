@@ -76,8 +76,7 @@ final public class UnicoreContextWorkAround
 				throw new IOException(String.format("Keystore %s appears empty!", keystoreFile));
 			certAlias = aliases.nextElement();
 			if (aliases.hasMoreElements())
-				throw new IOException(
-					String.format("Keystore %s has more than one entry and no alias was given!", keystoreFile));
+				throw new IOException(String.format("Keystore %s has more than one entry and no alias was given!", keystoreFile));
 		}
 
 		String keyAlias = props.getProperty(DELEGATEE_KEY_ALIAS_PROPERTY, certAlias);
@@ -93,8 +92,7 @@ final public class UnicoreContextWorkAround
 		X509Certificate[] xCertChain = new X509Certificate[certChain.length];
 		for (int lcv = 0; lcv < certChain.length; lcv++) {
 			if (!(certChain[lcv] instanceof X509Certificate))
-				throw new IOException(String.format("Certificate %s in keystore %s is not an X.509 Certificate!", certAlias,
-					keystoreFile));
+				throw new IOException(String.format("Certificate %s in keystore %s is not an X.509 Certificate!", certAlias, keystoreFile));
 
 			xCertChain[lcv] = (X509Certificate) certChain[lcv];
 		}

@@ -39,8 +39,8 @@ public class AxisTrustCredential implements XMLCompatible
 	}
 
 	/**
-	 * This is the method for converting a trust delegation into a form that can be transmitted over
-	 * the wire using Axis web-services facilities.
+	 * This is the method for converting a trust delegation into a form that can be transmitted over the wire using Axis web-services
+	 * facilities.
 	 */
 	public Element convertToMessageElement() throws GeneralSecurityException
 	{
@@ -63,7 +63,7 @@ public class AxisTrustCredential implements XMLCompatible
 			_logger.error("failure to create MessageElement: " + e.getMessage());
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
-		
+
 		return wseTokenRef;
 	}
 }

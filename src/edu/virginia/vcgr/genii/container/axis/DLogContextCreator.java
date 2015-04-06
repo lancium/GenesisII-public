@@ -38,8 +38,8 @@ public class DLogContextCreator extends WSDoAllReceiver
 						_isRequest = Boolean.FALSE;
 					else
 						fault =
-							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE
-								+ " or " + _FLOW_SIDE_RESPONSE_VALUE);
+							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE + " or "
+								+ _FLOW_SIDE_RESPONSE_VALUE);
 				} else {
 					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY + " parameter.");
 				}

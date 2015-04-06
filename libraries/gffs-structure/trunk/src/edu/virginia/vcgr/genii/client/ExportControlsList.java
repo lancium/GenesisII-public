@@ -20,12 +20,10 @@ import edu.virginia.vcgr.genii.algorithm.filesystem.FileChangeTracker;
 import edu.virginia.vcgr.genii.client.ExportControl.ModeAllowance;
 
 /**
- * Implements a set of restrictions on where exports may be created in the local filesystem. The
- * default allowance at the root of the file system is *disallow*, meaning that nothing can be
- * exported until some configuration line allows it to be. However, if the file is completely empty
- * of restrictions, then that is currently interpreted as meaning that all paths are allowed to be
- * exported (which coincidentally matches the initial version of the configuration files that were
- * released).
+ * Implements a set of restrictions on where exports may be created in the local filesystem. The default allowance at the root of the file
+ * system is *disallow*, meaning that nothing can be exported until some configuration line allows it to be. However, if the file is
+ * completely empty of restrictions, then that is currently interpreted as meaning that all paths are allowed to be exported (which
+ * coincidentally matches the initial version of the configuration files that were released).
  */
 public class ExportControlsList
 {
@@ -44,8 +42,7 @@ public class ExportControlsList
 	static ExportControlsList _theExpoCtrlList = null;
 
 	/**
-	 * to allow simple management of object at a static level, we provide this accessor to get the
-	 * single extant copy expected.
+	 * to allow simple management of object at a static level, we provide this accessor to get the single extant copy expected.
 	 */
 	public static synchronized ExportControlsList getExportControlsList()
 	{
@@ -70,15 +67,13 @@ public class ExportControlsList
 		boolean worked = readRestrictionsFromFile(_restrictionsFile);
 		if (!worked) {
 			/*
-			 * we don't know what is desired here, and our scheme says that if the file is missing
-			 * we disallow all exports.
+			 * we don't know what is desired here, and our scheme says that if the file is missing we disallow all exports.
 			 */
 			_logger.error("reading the export restrictions file has failed; disabling export creation.");
 		} else {
 			/*
-			 * we are hamstrung here by the original config file we sent out, and which we cannot
-			 * allow the installer to just stomp on. so, if the file is absolutely empty, then we
-			 * grant rwf to the root of the file system.
+			 * we are hamstrung here by the original config file we sent out, and which we cannot allow the installer to just stomp on. so, if
+			 * the file is absolutely empty, then we grant rwf to the root of the file system.
 			 */
 			if (_restrictions.size() == 0) {
 				// they have not specified any restrictions at all. our scheme for this case is to
@@ -173,9 +168,8 @@ public class ExportControlsList
 	}
 
 	/**
-	 * finds the most relevant restriction or allowance for the path in question. this just finds
-	 * the restriction of the highest appropriateness value. note that this expects the
-	 * appropriateness for a particular user to have already been established in the list of
+	 * finds the most relevant restriction or allowance for the path in question. this just finds the restriction of the highest
+	 * appropriateness value. note that this expects the appropriateness for a particular user to have already been established in the list of
 	 * "restrictions" passed in, which is why this is not considering the user name.
 	 */
 	ExportControl getMostRelevantRestriction(List<ExportControl> restrictions, String path)
@@ -191,15 +185,13 @@ public class ExportControlsList
 				priorRelevance = currentRelevance;
 			} else if (currentRelevance == toReturn.isPathAppropriate(path)) {
 				/*
-				 * the current item is the same level of relevance as previous choice, which now
-				 * means we have to decide which one is more tightly bound, i.e. whichever item
-				 * matches the exact user name should win.
+				 * the current item is the same level of relevance as previous choice, which now means we have to decide which one is more
+				 * tightly bound, i.e. whichever item matches the exact user name should win.
 				 */
 				if (toReturn.allowAnyUser()) {
 					/*
-					 * okay, the previous one was less tightly bound (probably). if they have two
-					 * paths which are both wildcards, then the later one gets to win. it makes no
-					 * sense to have two that are both wildcards, but it's not explicitly disallowed
+					 * okay, the previous one was less tightly bound (probably). if they have two paths which are both wildcards, then the
+					 * later one gets to win. it makes no sense to have two that are both wildcards, but it's not explicitly disallowed
 					 * either.
 					 */
 					toReturn = res;
@@ -210,9 +202,8 @@ public class ExportControlsList
 	}
 
 	/**
-	 * finds the most relevant restriction or allowance for a path given a requested mode of access.
-	 * if true is returned, then it means there are no restrictions that disallow that mode. false
-	 * means the request cannot be granted.
+	 * finds the most relevant restriction or allowance for a path given a requested mode of access. if true is returned, then it means there
+	 * are no restrictions that disallow that mode. false means the request cannot be granted.
 	 */
 	boolean checkMostRelevantRestriction(String path, String user, Set<ModeAllowance> modesRequested)
 	{
@@ -236,9 +227,8 @@ public class ExportControlsList
 	}
 
 	/**
-	 * tests a path to see whether exports are allowed on it or not for a particular user. the
-	 * "modes" list supplies all rights that are desired. if any of those is missing for the "path"
-	 * specified, then false is returned.
+	 * tests a path to see whether exports are allowed on it or not for a particular user. the "modes" list supplies all rights that are
+	 * desired. if any of those is missing for the "path" specified, then false is returned.
 	 */
 	public boolean checkCreationOkay(String path, String user, Set<ExportControl.ModeAllowance> modes)
 	{

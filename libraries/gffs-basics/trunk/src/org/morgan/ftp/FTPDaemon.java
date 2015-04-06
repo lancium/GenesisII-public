@@ -93,8 +93,7 @@ public class FTPDaemon
 						StreamUtils.close(socket);
 					} else {
 						FTPSession session =
-							new FTPSession(_listenerManager, _configuration, nextSession++,
-								_backendFactory.newBackendInstance(), socket);
+							new FTPSession(_listenerManager, _configuration, nextSession++, _backendFactory.newBackendInstance(), socket);
 
 						_vulture.addSession(session);
 

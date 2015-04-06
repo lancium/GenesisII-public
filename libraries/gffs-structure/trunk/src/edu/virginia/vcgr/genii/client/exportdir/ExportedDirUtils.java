@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.exportdir;
 
@@ -44,9 +43,8 @@ public class ExportedDirUtils
 	static final public String _SVN_PASSWORD = "svn-pass";
 	static final public String _SVN_REVISION = "svn-revision";
 	/*
-	 * the primary owner of the export is the DN of the identity who creates the export. the format
-	 * of this string is just the DN of the respective user / group. there is no longer any
-	 * secondary owner for the export.
+	 * the primary owner of the export is the DN of the identity who creates the export. the format of this string is just the DN of the
+	 * respective user / group. there is no longer any secondary owner for the export.
 	 */
 	static final public String _EXPORT_PRIMARY_OWNER = "primary-owner";
 
@@ -108,7 +106,7 @@ public class ExportedDirUtils
 		{
 			return _primaryOwner;
 		}
-		
+
 		public String svnUser()
 		{
 			return _svnUser;
@@ -125,8 +123,8 @@ public class ExportedDirUtils
 		}
 	}
 
-	static public MessageElement[] createCreationProperties(String humanName, String path, String svnUser, String svnPass,
-		Long svnRevision, String parentIds, String isReplicated, String owner) throws RemoteException
+	static public MessageElement[] createCreationProperties(String humanName, String path, String svnUser, String svnPass, Long svnRevision,
+		String parentIds, String isReplicated, String owner) throws RemoteException
 	{
 		Collection<MessageElement> any = new Vector<MessageElement>(6);
 		any.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path));
@@ -164,21 +162,19 @@ public class ExportedDirUtils
 	}
 
 	/**
-	 * Add creation parameters for the resolver from the passed in creation params for export root
-	 * creation. Localpath of export on primary and the epr of the resolver service are added.
+	 * Add creation parameters for the resolver from the passed in creation params for export root creation. Localpath of export on primary
+	 * and the epr of the resolver service are added.
 	 * 
 	 * @param resolverCreationParams
 	 *            : collection to which resolver creation params are added.
 	 * @param initInfo
 	 *            : Contains the processed creation parameters for export creation.
 	 */
-	static public void createResolverCreationProperties(Collection<MessageElement> resolverCreationParams,
-		ExportedDirInitInfo initInfo)
+	static public void createResolverCreationProperties(Collection<MessageElement> resolverCreationParams, ExportedDirInitInfo initInfo)
 	{
-		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), initInfo
-			.getPath()));
-		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
-			initInfo.getResolverFactoryEPR()));
+		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), initInfo.getPath()));
+		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR), initInfo
+			.getResolverFactoryEPR()));
 	}
 
 	static public ExportedDirInitInfo extractCreationProperties(GenesisHashMap properties) throws ResourceException
@@ -203,8 +199,7 @@ public class ExportedDirUtils
 		path = pathElement.getValue();
 
 		// get parentIds
-		MessageElement parentIDSElement =
-			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
+		MessageElement parentIDSElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME));
 		if (parentIDSElement == null)
 			throw new IllegalArgumentException("Couldn't find parentIds in export creation properties.");
 		parentIds = parentIDSElement.getValue();
@@ -222,8 +217,7 @@ public class ExportedDirUtils
 			svnPass = svnPassElement.getValue();
 
 		// get svn revision
-		MessageElement svnRevisionElement =
-			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
+		MessageElement svnRevisionElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
 		try {
 			if (svnRevisionElement != null && svnRevisionElement.getValue() != null)
 				svnRevision = (Long) svnRevisionElement.getObjectValue(Long.class);
@@ -232,8 +226,7 @@ public class ExportedDirUtils
 		}
 
 		// get replication state
-		MessageElement replicationElement =
-			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR));
+		MessageElement replicationElement = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR));
 		if (replicationElement == null)
 			throw new IllegalArgumentException("Couldn't find replication indicator in export creation properties.");
 		isReplicated = replicationElement.getValue();
@@ -251,8 +244,7 @@ public class ExportedDirUtils
 		}
 
 		// get the owner information for the export.
-		MessageElement primaryOwner =
-			properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _EXPORT_PRIMARY_OWNER));
+		MessageElement primaryOwner = properties.getMessageElement(new QName(GenesisIIConstants.GENESISII_NS, _EXPORT_PRIMARY_OWNER));
 		try {
 			if (primaryOwner != null && primaryOwner.getValue() != null)
 				primaryDN = (String) primaryOwner.getObjectValue(String.class);
@@ -269,8 +261,8 @@ public class ExportedDirUtils
 		// get last modified time
 		lastModified = getLastModifiedTime(path);
 
-		return new ExportedDirInitInfo(path, parentIds, isReplicated, lastModified, resolverServiceEPR, svnUser, svnPass,
-			svnRevision, primaryDN);
+		return new ExportedDirInitInfo(path, parentIds, isReplicated, lastModified, resolverServiceEPR, svnUser, svnPass, svnRevision,
+			primaryDN);
 	}
 
 	static public String createParentIdsString(String ancestorIdString, String parentId)
@@ -289,8 +281,7 @@ public class ExportedDirUtils
 	 * 
 	 * @param path Path to new directory
 	 * 
-	 * @return boolean Return true if dir does not exist and could be created. False if dir exists.
-	 * Pass through IOExceptions from create.
+	 * @return boolean Return true if dir does not exist and could be created. False if dir exists. Pass through IOExceptions from create.
 	 */
 	static public boolean createLocalDir(String path)
 	{

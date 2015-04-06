@@ -54,8 +54,7 @@ public class TabWidget extends JTabbedPane implements TreeSelectionListener
 	}
 
 	/**
-	 * This method is called every time we need to reset the tabs we are displaying (everytime the
-	 * selection changes).
+	 * This method is called every time we need to reset the tabs we are displaying (everytime the selection changes).
 	 */
 	private void setTabs()
 	{

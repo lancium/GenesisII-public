@@ -7,8 +7,7 @@ public class ReflectiveCommand extends AbstractCommand
 {
 	private Constructor<? extends ICommandHandler> _constructor;
 
-	public ReflectiveCommand(Class<? extends ICommandHandler> handlerClass, String... handledVerbs)
-		throws NoSuchMethodException
+	public ReflectiveCommand(Class<? extends ICommandHandler> handlerClass, String... handledVerbs) throws NoSuchMethodException
 	{
 		super(handledVerbs);
 

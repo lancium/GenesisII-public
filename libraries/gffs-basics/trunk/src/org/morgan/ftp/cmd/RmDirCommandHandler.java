@@ -15,8 +15,7 @@ public class RmDirCommandHandler extends AbstractCommandHandler
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
+	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out) throws FTPException
 	{
 		sessionState.getBackend().removeDirectory(parameters);
 		out.println("250 Removed.");

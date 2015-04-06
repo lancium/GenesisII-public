@@ -13,9 +13,8 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 /**
- * A translator that turns a piece of state into an XML element and reads from XML. In order for
- * this state translator to work, the state type MUST support XML serialization and deserialization.
- * Further, the class that sub-classes from SimpleStateResourceFork MUST have the
+ * A translator that turns a piece of state into an XML element and reads from XML. In order for this state translator to work, the state type
+ * MUST support XML serialization and deserialization. Further, the class that sub-classes from SimpleStateResourceFork MUST have the
  * XMLStateDescription annotation present on it.
  * 
  * @author mmm2a
@@ -25,8 +24,8 @@ public class XMLStateTranslator implements StateTranslator
 	/** {@inheritDoc} */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <StateType> StateType read(SimpleStateResourceFork<StateType> originatingFork, Class<StateType> targetType,
-		InputStream input) throws IOException
+	public <StateType> StateType read(SimpleStateResourceFork<StateType> originatingFork, Class<StateType> targetType, InputStream input)
+		throws IOException
 	{
 		return (StateType) ObjectDeserializer.deserialize(new InputSource(input), targetType);
 	}

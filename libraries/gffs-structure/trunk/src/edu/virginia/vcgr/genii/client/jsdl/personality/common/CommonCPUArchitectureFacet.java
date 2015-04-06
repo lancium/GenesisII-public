@@ -12,14 +12,11 @@ public class CommonCPUArchitectureFacet extends DefaultCPUArchitectureFacet
 		throws JSDLException
 	{
 		/*
-		 * This has been causing us problems with BES containers that front end other machines.
-		 * Instead, we're just going to ignore it.
+		 * This has been causing us problems with BES containers that front end other machines. Instead, we're just going to ignore it.
 		 */
 		/*
-		 * if
-		 * (!JSDLUtils.getLocalCPUArchitecture().getCPUArchitectureName().equals(cpuArchitectureName
-		 * )) throw new JSDLMatchException(String.format(
-		 * "Can't match requested arch (%s) against local arch (%s).", cpuArchitectureName,
+		 * if (!JSDLUtils.getLocalCPUArchitecture().getCPUArchitectureName().equals(cpuArchitectureName )) throw new
+		 * JSDLMatchException(String.format( "Can't match requested arch (%s) against local arch (%s).", cpuArchitectureName,
 		 * JSDLUtils.getLocalCPUArchitecture().getCPUArchitectureName()));
 		 */
 	}

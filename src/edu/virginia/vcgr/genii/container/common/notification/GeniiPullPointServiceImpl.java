@@ -39,8 +39,8 @@ public class GeniiPullPointServiceImpl extends GenesisIIBase implements GeniiPul
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint arg0) throws RemoteException,
-		UnableToDestroyPullPointFaultType, ResourceUnknownFaultType
+	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint arg0) throws RemoteException, UnableToDestroyPullPointFaultType,
+		ResourceUnknownFaultType
 	{
 		super.destroy(new Destroy());
 		return new DestroyPullPointResponse();
@@ -48,8 +48,7 @@ public class GeniiPullPointServiceImpl extends GenesisIIBase implements GeniiPul
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetMessagesResponse getMessages(GetMessages arg0) throws RemoteException, UnableToGetMessagesFaultType,
-		ResourceUnknownFaultType
+	public GetMessagesResponse getMessages(GetMessages arg0) throws RemoteException, UnableToGetMessagesFaultType, ResourceUnknownFaultType
 	{
 		throw FaultManipulator.fillInFault(new UnableToGetMessagesFaultType());
 	}

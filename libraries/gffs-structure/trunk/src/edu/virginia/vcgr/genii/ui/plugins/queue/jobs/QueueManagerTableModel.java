@@ -31,8 +31,8 @@ public class QueueManagerTableModel extends RowTableModel<JobInformation>
 {
 	static final long serialVersionUID = 0L;
 
-	static private RowTableColumnDefinition<?, ?>[] COLUMNS = { new JobTicketColumn(), new JobNameColumn(),
-		new SubmitTimeColumn(), new CredentialsColumn(), new AttemptNumberColumn(), new JobStateColumn() };
+	static private RowTableColumnDefinition<?, ?>[] COLUMNS = { new JobTicketColumn(), new JobNameColumn(), new SubmitTimeColumn(),
+		new CredentialsColumn(), new AttemptNumberColumn(), new JobStateColumn() };
 
 	private class QueueJobListFetcherTask extends AbstractTask<Collection<JobInformation>>
 	{
@@ -95,17 +95,16 @@ public class QueueManagerTableModel extends RowTableModel<JobInformation>
 		_uiContext
 			.uiContext()
 			.progressMonitorFactory()
-			.createMonitor(parentComponent, "Loading Queue Jobs", "Fetching job list from queue", 1000L,
-				new QueueJobListFetcherTask(), new QueueJobListCompletionListener(parentComponent)).start();
+			.createMonitor(parentComponent, "Loading Queue Jobs", "Fetching job list from queue", 1000L, new QueueJobListFetcherTask(),
+				new QueueJobListCompletionListener(parentComponent)).start();
 	}
 
-	QueueManagerTableModel(UIPluginContext uiContext) throws ResourceException, GenesisIISecurityException,
-		RNSPathDoesNotExistException
+	QueueManagerTableModel(UIPluginContext uiContext) throws ResourceException, GenesisIISecurityException, RNSPathDoesNotExistException
 	{
 		_uiContext = uiContext;
 		_queue =
-			ClientUtils.createProxy(QueuePortType.class, uiContext.endpointRetriever().getTargetEndpoints().iterator().next()
-				.getEndpoint(), uiContext.uiContext().callingContext());
+			ClientUtils.createProxy(QueuePortType.class, uiContext.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint(),
+				uiContext.uiContext().callingContext());
 	}
 
 	@SuppressWarnings("unchecked")

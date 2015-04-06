@@ -7,12 +7,10 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheUtils;
 
 /*
- * This is a utility class for processing the message-index for last notification message stored or
- * propagated by different containers. The information regarding current value of the message-index
- * can reach client in two ways: as attributes of the notification messages received and from
- * processed SOAP message headers. This class has the responsibility to adjust the polling interval
- * for different notification brokers that are operating in polling mode and to initiate
- * fault-confinement related activities when some messages are lost
+ * This is a utility class for processing the message-index for last notification message stored or propagated by different containers. The
+ * information regarding current value of the message-index can reach client in two ways: as attributes of the notification messages received
+ * and from processed SOAP message headers. This class has the responsibility to adjust the polling interval for different notification
+ * brokers that are operating in polling mode and to initiate fault-confinement related activities when some messages are lost
  */
 public class NotificationMessageIndexProcessor
 {
@@ -48,11 +46,9 @@ public class NotificationMessageIndexProcessor
 		int messageIndexOfBroker = broker.getLastReceivedMessageIndex();
 		if (receivedMessageIndex > messageIndexOfBroker + 1) {
 			/*
-			 * TODO: Some messages are missing. Need to discard the cached resources of concerned
-			 * container. However, we have to consider that the missing notification messages may be
-			 * delayed therefore can reach the client shortly. If the broker is in polling mode then
-			 * it may be polling notifications or immediately going to poll. Therefore, we need a
-			 * careful technique for fault tolerance.
+			 * TODO: Some messages are missing. Need to discard the cached resources of concerned container. However, we have to consider that
+			 * the missing notification messages may be delayed therefore can reach the client shortly. If the broker is in polling mode then
+			 * it may be polling notifications or immediately going to poll. Therefore, we need a careful technique for fault tolerance.
 			 */
 		}
 

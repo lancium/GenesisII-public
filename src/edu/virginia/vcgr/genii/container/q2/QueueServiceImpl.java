@@ -144,8 +144,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		super("QueuePortType");
 
 		/*
-		 * Now we have to add our own port types to the list of port types implemented by this
-		 * service.
+		 * Now we have to add our own port types to the list of port types implemented by this service.
 		 */
 		addImplementedPortType(QueueConstants.QUEUE_PORT_TYPE());
 	}
@@ -232,8 +231,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			}
 		}
 
-		InMemoryIteratorWrapper imiw =
-			new InMemoryIteratorWrapper(this.getClass().getName(), indices, new Object[] { _queueMgr });
+		InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices, new Object[] { _queueMgr });
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
 		builder.preferredBatchSize(QueueConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(col);
@@ -334,9 +332,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			JobDefinition jobDefinition = JSDLUtils.convert(submitJobRequest.getJobDefinition());
 			if (jobDefinition.parameterSweeps().size() > 0) {
 				SweepToken token;
-				token =
-					SweepUtility.performSweep(jobDefinition,
-						listener = new SweepListenerImpl(_queueMgr, submitJobRequest.getPriority()));
+				token = SweepUtility.performSweep(jobDefinition, listener = new SweepListenerImpl(_queueMgr, submitJobRequest.getPriority()));
 				token.join();
 				ticket = listener.firstTicket();
 			} else {
@@ -358,8 +354,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	}
 
 	/*
-	 * This method is called automatically when the Web server first comes up. We use it to restart
-	 * the queue from where it left off.
+	 * This method is called automatically when the Web server first comes up. We use it to restart the queue from where it left off.
 	 */
 	@Override
 	public boolean startup()
@@ -374,8 +369,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	{
 		try {
 			/*
-			 * In order to make out calls, we have to have a working context so we go ahead and
-			 * create an empty one.
+			 * In order to make out calls, we have to have a working context so we go ahead and create an empty one.
 			 */
 			WorkingContext.setCurrentWorkingContext(new WorkingContext());
 
@@ -383,8 +377,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			 * Now we get the database connection pool configured with this service
 			 */
 			ServerDatabaseConnectionPool connectionPool =
-				((QueueDBResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory())
-					.getConnectionPool();
+				((QueueDBResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory()).getConnectionPool();
 
 			_logger.info("Restarting all BES Managers.");
 			QueueManager.startAllManagers(connectionPool);
@@ -413,13 +406,11 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	{
 		super.registerNotificationHandlers(multiplexer);
 
-		multiplexer.registerNotificationHandler(
-			BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(),
+		multiplexer.registerNotificationHandler(BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(),
 			new LegacyBESActivityStateChangeFinalNotificationHandler());
 	}
 
-	private class LegacyBESActivityStateChangeFinalNotificationHandler extends
-		AbstractNotificationHandler<BESActivityStateChangedContents>
+	private class LegacyBESActivityStateChangeFinalNotificationHandler extends AbstractNotificationHandler<BESActivityStateChangedContents>
 	{
 		private LegacyBESActivityStateChangeFinalNotificationHandler()
 		{
@@ -459,8 +450,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	private boolean submitJobTryMulti(InputStream in) throws IOException
 	{
 		JobDefinition_Type[] jobDefs =
-			((JobMultiDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobMultiDefinition_Type.class))
-				.getJobDefinition();
+			((JobMultiDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobMultiDefinition_Type.class)).getJobDefinition();
 		if (jobDefs == null)
 			return false;
 
@@ -472,8 +462,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	private boolean submitJobTrySingle(InputStream in) throws IOException
 	{
-		JobDefinition_Type jobDef =
-			(JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
+		JobDefinition_Type jobDef = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(in), JobDefinition_Type.class);
 		if (jobDef == null || jobDef.getJobDescription() == null)
 			return false;
 
@@ -679,12 +668,11 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		}
 
 		QueueAsBESFactoryAttributesUtilities utils =
-			new QueueAsBESFactoryAttributesUtilities(_queueMgr.getBESManager().allBESInformation(),
-				(QueueConstructionParameters) baseCP);
+			new QueueAsBESFactoryAttributesUtilities(_queueMgr.getBESManager().allBESInformation(), (QueueConstructionParameters) baseCP);
 		boolean isAcceptingNewActivities = _resource.isAcceptingNewActivites();
 		long totalNumberOfActivities = _queueMgr.getJobCount();
-		return new GetFactoryAttributesDocumentResponseType(utils.factoryResourceAttributes(isAcceptingNewActivities,
-			totalNumberOfActivities), null);
+		return new GetFactoryAttributesDocumentResponseType(
+			utils.factoryResourceAttributes(isAcceptingNewActivities, totalNumberOfActivities), null);
 	}
 
 	@Override
@@ -692,8 +680,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	public CreateActivityResponseType createActivity(CreateActivityType parameters) throws RemoteException,
 		NotAcceptingNewActivitiesFaultType, InvalidRequestMessageFaultType, UnsupportedFeatureFaultType, NotAuthorizedFaultType
 	{
-		SubmitJobResponseType resp =
-			submitJob(new SubmitJobRequestType(parameters.getActivityDocument().getJobDefinition(), (byte) 0));
+		SubmitJobResponseType resp = submitJob(new SubmitJobRequestType(parameters.getActivityDocument().getJobDefinition(), (byte) 0));
 		String jobTicket = resp.getJobTicket();
 		String forkPath = String.format("/jobs/mine/all/%s", jobTicket);
 		EndpointReferenceType target = createForkEPR(forkPath, new JobFork(this, forkPath).describe());
@@ -719,11 +706,9 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	}
 
 	/*
-	 * Do not change the name or signature of the below method. It is used in WSIteratorDBResource
-	 * using java-reflection.
+	 * Do not change the name or signature of the below method. It is used in WSIteratorDBResource using java-reflection.
 	 * 
-	 * If modifying: edit in WSIteratorDBResource.java and EnhancedRNSServiceImpl.java and
-	 * LightWeightExportDirFork.java .
+	 * If modifying: edit in WSIteratorDBResource.java and EnhancedRNSServiceImpl.java and LightWeightExportDirFork.java .
 	 */
 
 	public static MessageElement getIndexedContent(Connection connection, InMemoryIteratorEntry entry, Object[] queueManager,

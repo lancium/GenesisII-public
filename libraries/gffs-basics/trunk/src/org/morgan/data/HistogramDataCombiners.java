@@ -10,8 +10,7 @@ public class HistogramDataCombiners
 	static private class HistogramDataSummer implements HistogramDataCombiner<TimeRange>
 	{
 		@Override
-		public Pair<TimeRange, Integer> combine(Calendar minimumTime, Calendar maximumTime,
-			Collection<Pair<Calendar, Integer>> data)
+		public Pair<TimeRange, Integer> combine(Calendar minimumTime, Calendar maximumTime, Collection<Pair<Calendar, Integer>> data)
 		{
 			int sum = 0;
 
@@ -25,8 +24,7 @@ public class HistogramDataCombiners
 	static private class HistogramDataAverager implements HistogramDataCombiner<TimeRange>
 	{
 		@Override
-		public Pair<TimeRange, Integer> combine(Calendar minimumTime, Calendar maximumTime,
-			Collection<Pair<Calendar, Integer>> data)
+		public Pair<TimeRange, Integer> combine(Calendar minimumTime, Calendar maximumTime, Collection<Pair<Calendar, Integer>> data)
 		{
 			int sum = 0;
 
@@ -43,8 +41,7 @@ public class HistogramDataCombiners
 	static private class HistogramDataMaximizer implements HistogramDataCombiner<TimeRange>
 	{
 		@Override
-		public Pair<TimeRange, Integer> combine(Calendar minimumTime, Calendar maximumTime,
-			Collection<Pair<Calendar, Integer>> data)
+		public Pair<TimeRange, Integer> combine(Calendar minimumTime, Calendar maximumTime, Collection<Pair<Calendar, Integer>> data)
 		{
 			int value = Integer.MIN_VALUE;
 
@@ -61,8 +58,7 @@ public class HistogramDataCombiners
 	static private class HistogramDataMinimizer implements HistogramDataCombiner<TimeRange>
 	{
 		@Override
-		public Pair<TimeRange, Integer> combine(Calendar minimumTime, Calendar maximumTime,
-			Collection<Pair<Calendar, Integer>> data)
+		public Pair<TimeRange, Integer> combine(Calendar minimumTime, Calendar maximumTime, Collection<Pair<Calendar, Integer>> data)
 		{
 			int value = Integer.MAX_VALUE;
 

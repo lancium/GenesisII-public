@@ -65,11 +65,9 @@ public class BESPolicy
 		MessageElement ret = new MessageElement(elementName);
 
 		MessageElement loggedIn =
-			new MessageElement(new QName(BESConstants.GENII_BES_NS, "user-logged-in-action"), getUserLoggedInAction()
-				.toString());
+			new MessageElement(new QName(BESConstants.GENII_BES_NS, "user-logged-in-action"), getUserLoggedInAction().toString());
 		MessageElement screenSaverInactive =
-			new MessageElement(new QName(BESConstants.GENII_BES_NS, "screensaver-inactive-action"),
-				getScreenSaverInactiveAction().toString());
+			new MessageElement(new QName(BESConstants.GENII_BES_NS, "screensaver-inactive-action"), getScreenSaverInactiveAction().toString());
 
 		try {
 			ret.addChild(loggedIn);
@@ -83,8 +81,7 @@ public class BESPolicy
 
 	public String toString()
 	{
-		return String.format("User Logged In Action:  %s\nScreensaver Inactive Action:  %s", _userLoggedInAction,
-			_screenSaverInactiveAction);
+		return String.format("User Logged In Action:  %s\nScreensaver Inactive Action:  %s", _userLoggedInAction, _screenSaverInactiveAction);
 	}
 
 	static public BESPolicy fromMessageElement(MessageElement element)

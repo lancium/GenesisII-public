@@ -15,7 +15,7 @@ public class GridMapUserList extends ArrayList<String>
 	{
 		this.addAll(Arrays.asList(names));
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -27,7 +27,7 @@ public class GridMapUserList extends ArrayList<String>
 			toReturn.append("'");
 			toReturn.append(s);
 			toReturn.append("'");
-		}		
+		}
 		return toReturn.toString();
 	}
 }

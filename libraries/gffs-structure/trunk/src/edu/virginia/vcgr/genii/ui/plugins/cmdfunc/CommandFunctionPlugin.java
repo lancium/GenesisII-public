@@ -46,9 +46,8 @@ public class CommandFunctionPlugin extends AbstractCombinedUIMenusPlugin
 
 			if (function.parameters().length == 0) {
 				int answer =
-					JOptionPane.showConfirmDialog(context.ownerComponent(),
-						String.format("Execute command function \"%s\"?", function), "Execute Command Function Confirmation",
-						JOptionPane.YES_NO_OPTION);
+					JOptionPane.showConfirmDialog(context.ownerComponent(), String.format("Execute command function \"%s\"?", function),
+						"Execute Command Function Confirmation", JOptionPane.YES_NO_OPTION);
 				if (answer == JOptionPane.YES_OPTION)
 					parameterValues = new String[0];
 			} else {

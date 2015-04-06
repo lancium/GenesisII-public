@@ -31,10 +31,8 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 public class SetContainerServicePropertiesTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION = "config/tooldocs/description/dset-container-service-properties";
-	static final private LoadFileResource _USAGE = new LoadFileResource(
-		"config/tooldocs/usage/uset-container-service-properties");
-	static final private LoadFileResource _MANPAGE = new LoadFileResource(
-		"config/tooldocs/man/set-container-service-properties");
+	static final private LoadFileResource _USAGE = new LoadFileResource("config/tooldocs/usage/uset-container-service-properties");
+	static final private LoadFileResource _MANPAGE = new LoadFileResource("config/tooldocs/man/set-container-service-properties");
 
 	private String _downloadMgrTmpDir = null;
 	private String _scratchSpaceDir = null;
@@ -76,8 +74,8 @@ public class SetContainerServicePropertiesTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 		SetResourceProperties request = generateSetRequest();
 

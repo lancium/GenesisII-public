@@ -1,19 +1,17 @@
 /*
- * This code was developed by Mark Morgan (mmm2a@virginia.edu) at the University of Virginia and is
- * an implementation of JSDL, JSDL ParameterSweep and other JSDL related specifications from the
- * OGF.
+ * This code was developed by Mark Morgan (mmm2a@virginia.edu) at the University of Virginia and is an implementation of JSDL, JSDL
+ * ParameterSweep and other JSDL related specifications from the OGF.
  * 
  * Copyright 2010 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.jsdl;
 
@@ -122,9 +120,8 @@ public enum OperatingSystemNames {
 		return (this == OperatingSystemNames.Windows_XP) || (this == OperatingSystemNames.Windows_7)
 			|| (this == OperatingSystemNames.Windows_8) || (this == OperatingSystemNames.Windows_VISTA)
 			|| (this == OperatingSystemNames.WINNT) || (this == OperatingSystemNames.Windows_2000)
-			|| (this == OperatingSystemNames.Windows_R_Me) || (this == OperatingSystemNames.WINCE)
-			|| (this == OperatingSystemNames.WIN98) || (this == OperatingSystemNames.WIN95)
-			|| (this == OperatingSystemNames.WIN3x);
+			|| (this == OperatingSystemNames.Windows_R_Me) || (this == OperatingSystemNames.WINCE) || (this == OperatingSystemNames.WIN98)
+			|| (this == OperatingSystemNames.WIN95) || (this == OperatingSystemNames.WIN3x);
 	}
 
 	public boolean isMacOSX()

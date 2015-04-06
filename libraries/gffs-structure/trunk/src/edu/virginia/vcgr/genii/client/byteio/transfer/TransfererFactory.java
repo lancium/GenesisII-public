@@ -16,24 +16,23 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 /**
- * This is an abstract base class for a convenience factory that can be used to create transferer
- * agents for both streamable and random byte io's.
+ * This is an abstract base class for a convenience factory that can be used to create transferer agents for both streamable and random byte
+ * io's.
  * 
  * @author mmm2a
  */
 abstract class TransfererFactory
 {
 	/**
-	 * These are the known transfer types supported by the transferers at this time. They are sorted
-	 * in order from most preferred, to least preferred in terms of efficiency.
+	 * These are the known transfer types supported by the transferers at this time. They are sorted in order from most preferred, to least
+	 * preferred in terms of efficiency.
 	 */
 	static final private String[] _SORTED_TRANSFER_TYPES = new String[] { ByteIOConstants.TRANSFER_TYPE_MTOM,
 		ByteIOConstants.TRANSFER_TYPE_DIME, ByteIOConstants.TRANSFER_TYPE_SIMPLE };
 
 	/**
-	 * Each given target byteIO may or may not supported all of the known transfer types (it depends
-	 * on the target implementation). This variable keeps track of which ones are supported by the
-	 * current target byteio.
+	 * Each given target byteIO may or may not supported all of the known transfer types (it depends on the target implementation). This
+	 * variable keeps track of which ones are supported by the current target byteio.
 	 */
 	private TreeSet<String> _supportedTransferTypes = new TreeSet<String>();
 
@@ -48,11 +47,9 @@ abstract class TransfererFactory
 	 * Create a new transferer factory for a given target stub.
 	 * 
 	 * @param clientStub
-	 *            THe target stub to use for remote communication. Note that it's an object and type
-	 *            a parameterized type. This is because it will either be a RandomByteIO client
-	 *            stub, or a streamable byteio client stub. The two are auto generated classes and
-	 *            don't have any thing in common with each other (code-wise) so a parameterized type
-	 *            here wouldn't help.
+	 *            THe target stub to use for remote communication. Note that it's an object and type a parameterized type. This is because it
+	 *            will either be a RandomByteIO client stub, or a streamable byteio client stub. The two are auto generated classes and don't
+	 *            have any thing in common with each other (code-wise) so a parameterized type here wouldn't help.
 	 * 
 	 * @throws ConfigurationException
 	 * @throws RemoteException
@@ -65,8 +62,8 @@ abstract class TransfererFactory
 	}
 
 	/**
-	 * Given the XML attributes of a given target ByteIO, parse those attributes and determine what
-	 * transfer types the target claims it supports.
+	 * Given the XML attributes of a given target ByteIO, parse those attributes and determine what transfer types the target claims it
+	 * supports.
 	 * 
 	 * @param any
 	 *            The XML elements to parse.
@@ -83,8 +80,7 @@ abstract class TransfererFactory
 	}
 
 	/**
-	 * Given a target ByteIO, ask for it's attributes and figure out which transfer protocols it
-	 * supports.
+	 * Given a target ByteIO, ask for it's attributes and figure out which transfer protocols it supports.
 	 * 
 	 * @throws ConfigurationException
 	 * @throws RemoteException
@@ -97,8 +93,8 @@ abstract class TransfererFactory
 		QName attrName;
 
 		/*
-		 * We have to figure out if the target is a Random ByteIO or a streamable ByteIO because the
-		 * namespaces are different for the attributes of each.
+		 * We have to figure out if the target is a Random ByteIO or a streamable ByteIO because the namespaces are different for the
+		 * attributes of each.
 		 */
 		if (ti.isSByteIO())
 			attrName = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
@@ -106,8 +102,7 @@ abstract class TransfererFactory
 			attrName = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
 
 		/*
-		 * Make the remote call to get the supported transfer mechanisms attribute and the parse the
-		 * result.
+		 * Make the remote call to get the supported transfer mechanisms attribute and the parse the result.
 		 */
 		GetResourcePropertyResponse resp = stub.getResourceProperty(attrName);
 		parseAttributes(resp.get_any());
@@ -181,8 +176,8 @@ abstract class TransfererFactory
 		else if (requestedTransferType.equals(ByteIOConstants.TRANSFER_TYPE_SIMPLE))
 			return createSimpleTransferer(_clientStub);
 		else
-			throw new IOException("Internal error -- Don't know " + "how to create a transferer for transfer type \""
-				+ requestedTransferType + "\".");
+			throw new IOException("Internal error -- Don't know " + "how to create a transferer for transfer type \"" + requestedTransferType
+				+ "\".");
 	}
 
 	/**

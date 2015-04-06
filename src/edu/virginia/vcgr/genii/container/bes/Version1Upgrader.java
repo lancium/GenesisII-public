@@ -221,14 +221,14 @@ class Version1Upgrader
 			conf.sbatch(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "sbatch"));
 			conf.squeue(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "squeue"));
 			conf.scancel(getAppConf(props, APPPATH_FMT, APPARG_FMT, provName, "scancel"));
-		}	
+		}
 
 		conf.bashBinary(props.getProperty(BASHBIN));
 		conf.submitScriptName(props.getProperty(SCRIPTNAME));
 	}
 
-	static private ExecutableApplicationConfiguration getAppConf(Properties props, String pathFmt, String argFmt,
-		String provName, String appName)
+	static private ExecutableApplicationConfiguration getAppConf(Properties props, String pathFmt, String argFmt, String provName,
+		String appName)
 	{
 		String path = null;
 		Collection<String> args = new LinkedList<String>();

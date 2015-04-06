@@ -20,8 +20,7 @@ public class CILogonParameters
 
 	public int lifetime;
 
-	public CILogonParameters(String url, String user, String pass, String csr, PrivateKey key, PrintWriter stdout,
-		PrintWriter stderr)
+	public CILogonParameters(String url, String user, String pass, String csr, PrivateKey key, PrintWriter stdout, PrintWriter stderr)
 	{
 		this.IDPUrl = url;
 		this.username = user;

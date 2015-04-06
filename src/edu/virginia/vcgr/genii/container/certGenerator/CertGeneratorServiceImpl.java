@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.certGenerator;
 
@@ -82,9 +81,8 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public GenerateX509V3CertificateChainResponseType generateX509V3CertificateChain(
-		GenerateX509V3CertificateChainRequestType request) throws java.rmi.RemoteException,
-		edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType, ResourceUnknownFaultType
+	public GenerateX509V3CertificateChainResponseType generateX509V3CertificateChain(GenerateX509V3CertificateChainRequestType request)
+		throws java.rmi.RemoteException, edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType, ResourceUnknownFaultType
 	{
 		GenerateX509V3CertificateChainResponseType response = null;
 
@@ -128,8 +126,7 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 		X509Certificate newCert = null;
 
 		try {
-			newCert =
-				CertTool.createIntermediateCert(x509Name.getX509Name(), defaultDuration, pk, issuerPrivateKey, issuerChain[0]);
+			newCert = CertTool.createIntermediateCert(x509Name.getX509Name(), defaultDuration, pk, issuerPrivateKey, issuerChain[0]);
 
 			int count = issuerChain.length + 1;
 			byte[][] newCertChainBytes = new byte[count][];
@@ -149,8 +146,8 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new certGenerator Resource.");

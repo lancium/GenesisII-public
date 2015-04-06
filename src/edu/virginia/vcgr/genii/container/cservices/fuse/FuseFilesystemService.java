@@ -82,8 +82,8 @@ public class FuseFilesystemService extends AbstractContainerService
 			getConnectionPool().release(connection);
 		}
 
-		getContainerServicesProperties().addPropertyChangeListener(
-			Pattern.compile("^" + Pattern.quote(FUSE_DIR_CSERVICE_PROPERTY) + "$"), new PropertyChangeListener());
+		getContainerServicesProperties().addPropertyChangeListener(Pattern.compile("^" + Pattern.quote(FUSE_DIR_CSERVICE_PROPERTY) + "$"),
+			new PropertyChangeListener());
 
 		selectFuseDirectory();
 	}

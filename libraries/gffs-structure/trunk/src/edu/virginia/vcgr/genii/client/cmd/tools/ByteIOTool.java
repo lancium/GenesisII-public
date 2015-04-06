@@ -62,8 +62,8 @@ public class ByteIOTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath rnsPath = current.lookup(getArgument(0), RNSPathQueryFlags.MUST_EXIST);

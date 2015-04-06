@@ -662,10 +662,10 @@ public class CommandField extends JTextField
 
 			try {
 				assumedContextToken = ContextManager.temporarilyAssumeContext(_uiContext.callingContext());
-				
+
 				// CAK: disabled logging due to complaint from andrew
 				// _display.output().println("\nLog ID is " + DLogUtils.getRPCID());
-				
+
 				_logger.info("Log ID is " + DLogUtils.getRPCID());
 				_label.setText(UserPreferences.preferences().shellPrompt().toString());
 				_reader = null;

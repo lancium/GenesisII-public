@@ -56,8 +56,7 @@ public class JavaServiceWrapper
 		private String _account;
 		private String _password;
 
-		public InstallServiceWrapper(File wrapperExe, File configurationFile, String account, String password)
-			throws IOException
+		public InstallServiceWrapper(File wrapperExe, File configurationFile, String account, String password) throws IOException
 		{
 			super(wrapperExe, configurationFile);
 
@@ -121,14 +120,13 @@ public class JavaServiceWrapper
 		}
 	}
 
-	static public JavaServiceWrapperTask installServiceWrapper(File wrapperExe, File configurationFile, String account,
-		String password) throws IOException
+	static public JavaServiceWrapperTask installServiceWrapper(File wrapperExe, File configurationFile, String account, String password)
+		throws IOException
 	{
 		return new InstallServiceWrapper(wrapperExe, configurationFile, account, password);
 	}
 
-	static public JavaServiceWrapperTask installServiceWrapper(File wrapperExe, File configurationFile, String account)
-		throws IOException
+	static public JavaServiceWrapperTask installServiceWrapper(File wrapperExe, File configurationFile, String account) throws IOException
 	{
 		return installServiceWrapper(wrapperExe, configurationFile, account, null);
 	}

@@ -53,8 +53,8 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 		@Override
 		public void taskCompleted(Task<Boolean> task, Boolean result)
 		{
-			JOptionPane.showMessageDialog(_table, "Update Complete.  Note that updates may not show up right away.",
-				"Update Complete", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(_table, "Update Complete.  Note that updates may not show up right away.", "Update Complete",
+				JOptionPane.INFORMATION_MESSAGE);
 
 			_model.refresh(_table);
 		}
@@ -150,8 +150,8 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 			_context
 				.uiContext()
 				.progressMonitorFactory()
-				.createMonitor(_table, "Forcing Resource Update", "Forcing BES Resource Update", 1000L,
-					new BESUpdaterTask(besNames), new BESUpdaterCompletionListener()).start();
+				.createMonitor(_table, "Forcing Resource Update", "Forcing BES Resource Update", 1000L, new BESUpdaterTask(besNames),
+					new BESUpdaterCompletionListener()).start();
 		}
 	}
 
@@ -208,8 +208,7 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 		popup.show(_table, e.getX(), e.getY());
 	}
 
-	public ResourcesPanel(UIPluginContext context) throws ResourceException, GenesisIISecurityException,
-		RNSPathDoesNotExistException
+	public ResourcesPanel(UIPluginContext context) throws ResourceException, GenesisIISecurityException, RNSPathDoesNotExistException
 	{
 		super(new GridBagLayout());
 
@@ -228,10 +227,10 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 
 		JScrollPane pane = new JScrollPane(_table);
 
-		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-			5, 5, 5, 5), 5, 5));
-		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5,
+			5));
+		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		setPreferredSize(TABLE_SIZE);
 	}

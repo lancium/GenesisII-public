@@ -39,7 +39,6 @@ public class UndefinedVariableDefinition extends AbstractVariableDefinition
 	@Override
 	public SweepFunction generateFunction()
 	{
-		throw new UnsupportedOperationException(
-			"Attempt to generate a sweep function from the undefined variable definition type.");
+		throw new UnsupportedOperationException("Attempt to generate a sweep function from the undefined variable definition type.");
 	}
 }

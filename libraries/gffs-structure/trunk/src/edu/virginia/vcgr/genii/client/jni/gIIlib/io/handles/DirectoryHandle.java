@@ -33,8 +33,7 @@ public class DirectoryHandle extends AbstractFilesystemHandle
 	public Iterable<FilesystemStatStructure> listEntries() throws FSException
 	{
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("DirectoryHandle::listEntries(%s)",
-				UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
+			_logger.trace(String.format("DirectoryHandle::listEntries(%s)", UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
 
 		return _fs.listDirectory(_path);
 	}

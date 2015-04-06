@@ -23,8 +23,7 @@ public class DefaultExternalApplicationFactory implements ExternalApplicationFac
 		try {
 			CONTEXT = JAXBContext.newInstance(DefaultExternalApplicationConfiguration.class);
 		} catch (JAXBException e) {
-			throw new ConfigurationException("Unable to create JAXBContext for " + "DefaultExternalApplicationConfiguration.",
-				e);
+			throw new ConfigurationException("Unable to create JAXBContext for " + "DefaultExternalApplicationConfiguration.", e);
 		}
 	}
 

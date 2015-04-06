@@ -27,9 +27,8 @@ public class UpdateGridCertsTool
 	public static final int UPDATER_SNOOZE_DURATION = 1000 * 60 * 60; // one hour.
 
 	/**
-	 * given the name of a certificate package, this will download it and install it into the state
-	 * directory in grid-certificates. this manages the file locking necessary to keep the certs dir
-	 * in synch with other users.
+	 * given the name of a certificate package, this will download it and install it into the state directory in grid-certificates. this
+	 * manages the file locking necessary to keep the certs dir in synch with other users.
 	 */
 	static private int getCertPackAndInstall(RNSPath certPackFile) throws IOException
 	{
@@ -39,8 +38,7 @@ public class UpdateGridCertsTool
 
 		// download the current certificate file from grid.
 		PathOutcome outc =
-			CopyTool.copy("grid:" + certPackFile.toString(), "local:" + downloadLocation.getAbsolutePath(), false, false, null,
-				null);
+			CopyTool.copy("grid:" + certPackFile.toString(), "local:" + downloadLocation.getAbsolutePath(), false, false, null, null);
 		if (outc.differs(PathOutcome.OUTCOME_SUCCESS)) {
 			_logger.error("failure during copy of grid certificate package to local directory: " + outc.toString());
 			return 1;
@@ -89,8 +87,7 @@ public class UpdateGridCertsTool
 			_logger.info("moved old certificates out of the way");
 
 			/*
-			 * move new certs dir into place. we need to go a level deeper due to the tar file
-			 * starting at a directory called certificates.
+			 * move new certs dir into place. we need to go a level deeper due to the tar file starting at a directory called certificates.
 			 */
 			File subCerts = new File(newCertsDir.getAbsolutePath(), "/certificates");
 			boolean movedOkay = subCerts.renameTo(currentCertsDir);
@@ -132,11 +129,9 @@ public class UpdateGridCertsTool
 	}
 
 	/**
-	 * locks the consistency lock before stuffing the properties provided into our external config
-	 * file. this sets the next update time to reflect a successful certificate update of some sort,
-	 * which will postpone checking certificates again until the checking interval elapses. the
-	 * caller can have the consistency lock already, but then must specify this in the
-	 * "alreadyLocked" parameter.
+	 * locks the consistency lock before stuffing the properties provided into our external config file. this sets the next update time to
+	 * reflect a successful certificate update of some sort, which will postpone checking certificates again until the checking interval
+	 * elapses. the caller can have the consistency lock already, but then must specify this in the "alreadyLocked" parameter.
 	 */
 	static public void justWriteProps(Properties props, boolean alreadyLocked)
 	{
@@ -168,8 +163,7 @@ public class UpdateGridCertsTool
 	static private boolean timeForUpdate(Properties props)
 	{
 		/*
-		 * if we got a bad properties file, something is hosed up. we will say it's not time to
-		 * block anyone else from using the file.
+		 * if we got a bad properties file, something is hosed up. we will say it's not time to block anyone else from using the file.
 		 */
 		if (props == null)
 			return false;
@@ -185,8 +179,8 @@ public class UpdateGridCertsTool
 	}
 
 	/**
-	 * determines the name of the new certificates package. returns null if there is no need to
-	 * update yet, either because the file is missing or because it's the same as last update.
+	 * determines the name of the new certificates package. returns null if there is no need to update yet, either because the file is missing
+	 * or because it's the same as last update.
 	 */
 	static private RNSPath getNewCertPackageName(Properties props)
 	{
@@ -224,8 +218,7 @@ public class UpdateGridCertsTool
 		// is file name different (or old one didn't exist)? if not different, skip update.
 		if (!certPack.getName().equals(lastCertFile)) {
 			// we need to update now.
-			_logger
-				.info("certificate update pack is different; last was " + lastCertFile + " and new is " + certPack.getName());
+			_logger.info("certificate update pack is different; last was " + lastCertFile + " and new is " + certPack.getName());
 			return certPack;
 		} else {
 			// it's the same file, so do not update.
@@ -235,8 +228,7 @@ public class UpdateGridCertsTool
 	}
 
 	/**
-	 * updates the grid-certificates directory in the state directory based on the latest
-	 * certificates available in the grid.
+	 * updates the grid-certificates directory in the state directory based on the latest certificates available in the grid.
 	 */
 	static public int runGridCertificateUpdates()
 	{

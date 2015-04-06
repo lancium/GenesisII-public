@@ -86,15 +86,13 @@ public class FilesystemManager
 	}
 
 	private Map<String, Filesystem> _filesystems = new HashMap<String, Filesystem>(4);
-	private PriorityQueue<FilesystemWatcher> _watchers = new PriorityQueue<FilesystemWatcher>(8,
-		new FilesystemWatcherComparator());
+	private PriorityQueue<FilesystemWatcher> _watchers = new PriorityQueue<FilesystemWatcher>(8, new FilesystemWatcherComparator());
 
 	private FilesystemManager(FilesystemsConfiguration conf) throws FileNotFoundException
 	{
 		for (FilesystemConfiguration fsConf : conf.filesystems()) {
 			Filesystem fs = new FilesystemImpl(this, fsConf.name(), fsConf);
-			_logger.info(String.format("adding filesystem at: " + fsConf.path() + " (%.2f%% used)", fs.currentUsage()
-				.percentUsed()));
+			_logger.info(String.format("adding filesystem at: " + fsConf.path() + " (%.2f%% used)", fs.currentUsage().percentUsed()));
 			_filesystems.put(fsConf.name(), fs);
 		}
 
@@ -116,21 +114,19 @@ public class FilesystemManager
 
 			try {
 				for (WatchCallbackConfiguration config : callbackConfigs) {
-					callbacks.add(new FilesystemWatchCallback(config.callLimit(), config.registerAntiCallback(), config
-						.handlerClass(), config.configurationContent()));
+					callbacks.add(new FilesystemWatchCallback(config.callLimit(), config.registerAntiCallback(), config.handlerClass(),
+						config.configurationContent()));
 				}
 
 				if (_logger.isTraceEnabled())
 					_logger.trace("constructor watching filesystem \"" + filesystemName + "\" with path "
 						+ filesystem.filesystemRoot().getPath());
 				FilesystemWatcher watcher =
-					new FilesystemWatcher((long) watcherConfig.checkPeriod().as(DurationUnits.Milliseconds), filesystemName,
-						filesystem, watcherConfig.filter(), callbacks);
+					new FilesystemWatcher((long) watcherConfig.checkPeriod().as(DurationUnits.Milliseconds), filesystemName, filesystem,
+						watcherConfig.filter(), callbacks);
 				_watchers.add(watcher);
 			} catch (Throwable cause) {
-				_logger.error(
-					String.format("Unable to load filesystem watcher for filesystem %s.", watcherConfig.filesystemName()),
-					cause);
+				_logger.error(String.format("Unable to load filesystem watcher for filesystem %s.", watcherConfig.filesystemName()), cause);
 				continue;
 			}
 		}

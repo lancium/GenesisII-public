@@ -86,8 +86,7 @@ public class ClientSideNotificationManager implements NotificationMultiplexer
 
 		JAXBContext context = JAXBContext.newInstance(RNSContentChangeNotification.class);
 		Unmarshaller u = context.createUnmarshaller();
-		JAXBElement<? extends NotificationMessageContents> jaxbe =
-			u.unmarshal(messageContents, RNSContentChangeNotification.class);
+		JAXBElement<? extends NotificationMessageContents> jaxbe = u.unmarshal(messageContents, RNSContentChangeNotification.class);
 
 		RNSContentChangeNotification notification = (RNSContentChangeNotification) jaxbe.getValue();
 		notification.setAdditionalAttributes(_additionalAttributes);

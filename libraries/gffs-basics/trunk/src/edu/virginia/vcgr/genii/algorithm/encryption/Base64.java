@@ -3,8 +3,7 @@ package edu.virginia.vcgr.genii.algorithm.encryption;
 /*
  * @(#)Base64.java 1.5 03/12/19 (copied from java.util.prefs.Base64, made public)
  * 
- * Copyright 2004 Sun Microsystems, Inc. All rights reserved. SUN PROPRIETARY/CONFIDENTIAL. Use is
- * subject to license terms.
+ * Copyright 2004 Sun Microsystems, Inc. All rights reserved. SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 
 /**
@@ -25,9 +24,8 @@ public class Base64
 	}
 
 	/**
-	 * Translates the specified byte array into an "aternate representation" Base64 string. This
-	 * non-standard variant uses an alphabet that does not contain the uppercase alphabetic
-	 * characters, which makes it suitable for use in situations where case-folding occurs.
+	 * Translates the specified byte array into an "aternate representation" Base64 string. This non-standard variant uses an alphabet that
+	 * does not contain the uppercase alphabetic characters, which makes it suitable for use in situations where case-folding occurs.
 	 */
 	public static String byteArrayToAltBase64(byte[] a)
 	{
@@ -76,24 +74,21 @@ public class Base64
 	}
 
 	/**
-	 * This array is a lookup table that translates 6-bit positive integer index values into their
-	 * "Base64 Alphabet" equivalents as specified in Table 1 of RFC 2045.
+	 * This array is a lookup table that translates 6-bit positive integer index values into their "Base64 Alphabet" equivalents as specified
+	 * in Table 1 of RFC 2045.
 	 */
-	private static final char intToBase64[] =
-		{ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-			'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-			'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
+	private static final char intToBase64[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+		'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+		's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
 
 	/**
-	 * This array is a lookup table that translates 6-bit positive integer index values into their
-	 * "Alternate Base64 Alphabet" equivalents. This is NOT the real Base64 Alphabet as per in Table
-	 * 1 of RFC 2045. This alternate alphabet does not use the capital letters. It is designed for
-	 * use in environments where "case folding" occurs.
+	 * This array is a lookup table that translates 6-bit positive integer index values into their "Alternate Base64 Alphabet" equivalents.
+	 * This is NOT the real Base64 Alphabet as per in Table 1 of RFC 2045. This alternate alphabet does not use the capital letters. It is
+	 * designed for use in environments where "case folding" occurs.
 	 */
-	private static final char intToAltBase64[] = { '!', '"', '#', '$', '%', '&', '\'', '(', ')', ',', '-', '.', ':', ';', '<',
-		'>', '@', '[', ']', '^', '`', '_', '{', '|', '}', '~', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-		'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+',
-		'?' };
+	private static final char intToAltBase64[] = { '!', '"', '#', '$', '%', '&', '\'', '(', ')', ',', '-', '.', ':', ';', '<', '>', '@', '[',
+		']', '^', '`', '_', '{', '|', '}', '~', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+		's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '?' };
 
 	/**
 	 * Translates the specified Base64 string (as per Preferences.get(byte[])) into a byte array.
@@ -110,8 +105,7 @@ public class Base64
 	 * Translates the specified "aternate representation" Base64 string into a byte array.
 	 * 
 	 * @throws IllegalArgumentException
-	 *             or ArrayOutOfBoundsException if <tt>s</tt> is not a valid alternate
-	 *             representation Base64 string.
+	 *             or ArrayOutOfBoundsException if <tt>s</tt> is not a valid alternate representation Base64 string.
 	 */
 	public static byte[] altBase64ToByteArray(String s)
 	{
@@ -166,11 +160,9 @@ public class Base64
 	}
 
 	/**
-	 * Translates the specified character, which is assumed to be in the "Base 64 Alphabet" into its
-	 * equivalent 6-bit positive integer.
+	 * Translates the specified character, which is assumed to be in the "Base 64 Alphabet" into its equivalent 6-bit positive integer.
 	 * 
-	 * @throw IllegalArgumentException or ArrayOutOfBoundsException if c is not in the Base64
-	 *        Alphabet.
+	 * @throw IllegalArgumentException or ArrayOutOfBoundsException if c is not in the Base64 Alphabet.
 	 */
 	private static int base64toInt(char c, byte[] alphaToInt)
 	{
@@ -181,26 +173,23 @@ public class Base64
 	}
 
 	/**
-	 * This array is a lookup table that translates unicode characters drawn from the
-	 * "Base64 Alphabet" (as specified in Table 1 of RFC 2045) into their 6-bit positive integer
-	 * equivalents. Characters that are not in the Base64 alphabet but fall within the bounds of the
-	 * array are translated to -1.
+	 * This array is a lookup table that translates unicode characters drawn from the "Base64 Alphabet" (as specified in Table 1 of RFC 2045)
+	 * into their 6-bit positive integer equivalents. Characters that are not in the Base64 alphabet but fall within the bounds of the array
+	 * are translated to -1.
 	 */
-	private static final byte base64ToInt[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, 52, 53,
-		54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-		41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 };
+	private static final byte base64ToInt[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59,
+		60, 61, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1,
+		-1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 };
 
 	/**
-	 * This array is the analogue of base64ToInt, but for the nonstandard variant that avoids the
-	 * use of uppercase alphabetic characters.
+	 * This array is the analogue of base64ToInt, but for the nonstandard variant that avoids the use of uppercase alphabetic characters.
 	 */
-	private static final byte altBase64ToInt[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, 62, 9, 10, 11, -1, 52, 53, 54,
-		55, 56, 57, 58, 59, 60, 61, 12, 13, 14, -1, 15, 63, 16, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 17, -1, 18, 19, 21, 20, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
-		40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 22, 23, 24, 25 };
+	private static final byte altBase64ToInt[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, 62, 9, 10, 11, -1, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+		12, 13, 14, -1, 15, 63, 16, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		17, -1, 18, 19, 21, 20, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 22,
+		23, 24, 25 };
 
 	public static void main(String args[])
 	{

@@ -93,8 +93,7 @@ public class LoginTool extends BaseLoginTool
 		// Let's first load the LoginSearchPath properties file
 		if (p == null) {
 			p = new Properties();
-			InputStream in =
-				HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/LoginSearchPath.properties");
+			InputStream in = HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/LoginSearchPath.properties");
 			try {
 				p.load(in);
 			} catch (IOException e) {
@@ -119,9 +118,8 @@ public class LoginTool extends BaseLoginTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 
 		// get the local identity's key material (or create one if necessary)
@@ -189,15 +187,13 @@ public class LoginTool extends BaseLoginTool
 			KeyAndCertMaterial clientKeyMaterial =
 				ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 
-			RNSPath authnPath =
-				callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
+			RNSPath authnPath = callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
 			EndpointReferenceType epr = authnPath.getEndpoint();
 
 			try {
 
 				// Do IDP login
-				ArrayList<NuCredential> creds =
-					IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
+				ArrayList<NuCredential> creds = IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
 
 				if (creds == null) {
 					return 0;
@@ -247,9 +243,8 @@ public class LoginTool extends BaseLoginTool
 			throw new InvalidToolUsageException("This tool takes at most one argument.");
 
 		/*
-		 * cannot check this here, since verify is called before runCommand, which gathers this
-		 * argument. if ((_username == null) || (_username.length() == 0)) throw new
-		 * InvalidToolUsageException("The username cannot be blank.");
+		 * cannot check this here, since verify is called before runCommand, which gathers this argument. if ((_username == null) ||
+		 * (_username.length() == 0)) throw new InvalidToolUsageException("The username cannot be blank.");
 		 */
 
 		if (_bogusPassword) {
@@ -258,8 +253,8 @@ public class LoginTool extends BaseLoginTool
 			}
 
 			/*
-			 * don't always use the same string for the bogus password. it's already bogus and
-			 * should just never be right, but using a simple constant string seemed wrong.
+			 * don't always use the same string for the bogus password. it's already bogus and should just never be right, but using a simple
+			 * constant string seemed wrong.
 			 */
 			_password = "bogus" + ((new Random()).nextInt(1000000000) + 1) + "-" + ((new Random()).nextInt(1000000000) + 1);
 		}
@@ -279,19 +274,15 @@ public class LoginTool extends BaseLoginTool
 	 * 
 	 * if (loginName == null) return;
 	 * 
-	 * List<String> candidateHomeDirs = new ArrayList<String>(); String constructedPathToHome =
-	 * constructPathFromLoginName(null, loginName);
+	 * List<String> candidateHomeDirs = new ArrayList<String>(); String constructedPathToHome = constructPathFromLoginName(null, loginName);
 	 * 
 	 * NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
 	 * 
-	 * if (constructedPathToHome != null) { candidateHomeDirs.add(nsd.getHomesDirectory() + "/" +
-	 * constructedPathToHome); candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" +
-	 * constructedPathToHome); } candidateHomeDirs.add(nsd.getHomesDirectory() + "/" + loginName);
-	 * candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + loginName);
-	 * candidateHomeDirs.add("rns:/");
+	 * if (constructedPathToHome != null) { candidateHomeDirs.add(nsd.getHomesDirectory() + "/" + constructedPathToHome);
+	 * candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + constructedPathToHome); } candidateHomeDirs.add(nsd.getHomesDirectory() +
+	 * "/" + loginName); candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + loginName); candidateHomeDirs.add("rns:/");
 	 * 
-	 * for (String userHome : candidateHomeDirs) { try { CdTool.chdir(userHome); break; } catch
-	 * (Throwable e) { } } }
+	 * for (String userHome : candidateHomeDirs) { try { CdTool.chdir(userHome); break; } catch (Throwable e) { } } }
 	 */
 
 	public static String constructPathFromLoginName(String pathPrefix, String loginName)

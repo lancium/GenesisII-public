@@ -48,9 +48,8 @@ public class ButtonPanel extends JPanel
 				_buttons.add(button);
 
 			if (horizontal) {
-				add(button == null ? new JLabel() : button, new GridBagConstraints(lcv, 0, 1, 1,
-					(!containsNulls || button == null) ? 1.0 : 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-					new Insets(0, 0, 0, 0), 0, 0));
+				add(button == null ? new JLabel() : button, new GridBagConstraints(lcv, 0, 1, 1, (!containsNulls || button == null) ? 1.0
+					: 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 			} else {
 				add(button == null ? new JLabel() : button, new GridBagConstraints(0, lcv, 1, 1, 1.0,
 					(!containsNulls || button == null) ? 1.0 : 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,

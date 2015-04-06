@@ -53,7 +53,6 @@ public class WSNSubscriptionCleanupHandler extends BasicResourceCleanupHandler
 
 		super.enactCleanup(connection, resourceID);
 
-		removeRowsFromTable(connection, new Triple<String, String, String>("wsnsubscriptions", "subscriptionresourcekey",
-			resourceID));
+		removeRowsFromTable(connection, new Triple<String, String, String>("wsnsubscriptions", "subscriptionresourcekey", resourceID));
 	}
 }

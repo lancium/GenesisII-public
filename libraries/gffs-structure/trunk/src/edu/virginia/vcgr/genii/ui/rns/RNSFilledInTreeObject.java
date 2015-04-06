@@ -16,8 +16,7 @@ public class RNSFilledInTreeObject extends DefaultRNSTreeObject
 	private EndpointType _endpointType;
 	private boolean _isLocal;
 
-	public RNSFilledInTreeObject(RNSPath path, EndpointReferenceType epr, TypeInformation typeInformation,
-		EndpointType endpointType)
+	public RNSFilledInTreeObject(RNSPath path, EndpointReferenceType epr, TypeInformation typeInformation, EndpointType endpointType)
 	{
 		super(RNSTreeObjectType.ENDPOINT_OBJECT);
 

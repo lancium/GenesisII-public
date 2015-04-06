@@ -130,8 +130,7 @@ public class JobApplicationContext
 			_openDocuments.add(ctxt);
 			ctxt.start();
 		} catch (IOException ioe) {
-			JOptionPane.showMessageDialog(null, "Error opening project file.", "Error Opening Project File",
-				JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Error opening project file.", "Error Opening Project File", JOptionPane.ERROR_MESSAGE);
 			_logger.error("Unable to open project file.", ioe);
 		}
 	}
@@ -180,12 +179,10 @@ public class JobApplicationContext
 		{
 			try {
 				JobDocumentContext ctxt;
-				_openDocuments.add(ctxt =
-					new JobDocumentContext(JobApplicationContext.this, new File(event.getFilename()), null));
+				_openDocuments.add(ctxt = new JobDocumentContext(JobApplicationContext.this, new File(event.getFilename()), null));
 				ctxt.start();
 			} catch (IOException ioe) {
-				JOptionPane.showMessageDialog(null, "Error opening project file.", "Error Opening Project File",
-					JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Error opening project file.", "Error Opening Project File", JOptionPane.ERROR_MESSAGE);
 				_logger.error("Unable to open project file.", ioe);
 			}
 		}

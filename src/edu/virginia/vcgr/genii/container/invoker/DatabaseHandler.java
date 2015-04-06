@@ -17,8 +17,7 @@ public class DatabaseHandler implements IAroundInvoker
 {
 	static private Log _logger = LogFactory.getLog(DatabaseHandler.class);
 
-	public Object invoke(InvocationContext invocationContext) throws AuthZSecurityException, SubscriptionFailedFaultType,
-		IOException
+	public Object invoke(InvocationContext invocationContext) throws AuthZSecurityException, SubscriptionFailedFaultType, IOException
 	{
 		Object result;
 		boolean succeeded = false;

@@ -11,9 +11,8 @@ import edu.virginia.vcgr.genii.client.utils.Duration;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 
 /**
- * This is the main container service that is started to hand out information portals. Technically
- * speaking, this probably didn't have to be a "service" per se, but it works and give a convenient
- * factory mechanism for creating the executor that we are going to use.
+ * This is the main container service that is started to hand out information portals. Technically speaking, this probably didn't have to be a
+ * "service" per se, but it works and give a convenient factory mechanism for creating the executor that we are going to use.
  * 
  * @author mmm2a
  */
@@ -29,12 +28,10 @@ public class InformationContainerService extends AbstractContainerService
 	private Executor _executor = null;
 
 	/**
-	 * The public constructor that the container services manager uses to instantiate this container
-	 * service.
+	 * The public constructor that the container services manager uses to instantiate this container service.
 	 * 
 	 * @param infoMgrProperties
-	 *            A properties object representing configuration properties given when the container
-	 *            service was configured.
+	 *            A properties object representing configuration properties given when the container service was configured.
 	 */
 	public InformationContainerService()
 	{
@@ -68,21 +65,17 @@ public class InformationContainerService extends AbstractContainerService
 	}
 
 	/**
-	 * Portals are created by parts of the Genesis II system that need to be able to access
-	 * information stored and cached about things. In general, a single portal should be created
-	 * once for each type of information cache (for example, one is created by the Queue class and
+	 * Portals are created by parts of the Genesis II system that need to be able to access information stored and cached about things. In
+	 * general, a single portal should be created once for each type of information cache (for example, one is created by the Queue class and
 	 * shared amongst all queues in the system for all time).
 	 * 
 	 * @param <InfoType>
-	 *            The data type of the type of information that is stored. This need not correspond
-	 *            to a SOAP method data type but can be some other type that SOAP messages are
-	 *            translated into.
+	 *            The data type of the type of information that is stored. This need not correspond to a SOAP method data type but can be some
+	 *            other type that SOAP messages are translated into.
 	 * @param persister
-	 *            A persister instance that is used to store the data that is obtained for caching
-	 *            purposes.
+	 *            A persister instance that is used to store the data that is obtained for caching purposes.
 	 * @param resolver
-	 *            A resolver instance that is used to obtain the information when the cache is not
-	 *            valid.
+	 *            A resolver instance that is used to obtain the information when the cache is not valid.
 	 * @param timeout
 	 *            The amount of time to wait before a request for data is timed out.
 	 * @param timeoutUnits
@@ -91,8 +84,7 @@ public class InformationContainerService extends AbstractContainerService
 	 *            The amount of time a piece of data is valid for before it is considered stale.
 	 * @param cacheWindowUnits
 	 *            The time units for the cache window value.
-	 * @return A new information portal that can be used to obtain information either cached or
-	 *         live.
+	 * @return A new information portal that can be used to obtain information either cached or live.
 	 */
 	public <InfoType> InformationPortal<InfoType> createNewPortal(InformationPersister<InfoType> persister,
 		InformationResolver<InfoType> resolver, Duration defaultTimeout, Duration defaultCacheWindow)

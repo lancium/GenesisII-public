@@ -43,9 +43,8 @@ class OrMatchingParameter extends MatchingParameter
 	/**
 	 * Determines if this matching parameter set is equal to another one.
 	 * 
-	 * This operation is incredibly heavy weight and should not be used lightly. It would be better
-	 * if we could sort these and then do the comparison, but unfortunately, there isn't a natural
-	 * sort order for matching parameters.
+	 * This operation is incredibly heavy weight and should not be used lightly. It would be better if we could sort these and then do the
+	 * comparison, but unfortunately, there isn't a natural sort order for matching parameters.
 	 * 
 	 * @param other
 	 * @return

@@ -14,6 +14,6 @@ public interface GenesisIIBaseTopics
 		"ResourceTermination", "wsrl"));
 
 	@WSNTopic(contentsType = AuthZConfigUpdateNotification.class)
-	static final public TopicPath AUTHZ_CONFIG_UPDATE_TOPIC = TopicPath.createTopicPath(new QName(
-		GenesisIIConstants.GENESISII_NS, "AuthZConfigUpdateNotification", "genii-ns"));
+	static final public TopicPath AUTHZ_CONFIG_UPDATE_TOPIC = TopicPath.createTopicPath(new QName(GenesisIIConstants.GENESISII_NS,
+		"AuthZConfigUpdateNotification", "genii-ns"));
 }

@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.security.x509;
 
@@ -116,8 +115,8 @@ public class CertTool
 	/**
 	 * we generate an intermediate certificate signed by our CA
 	 */
-	public static X509Certificate createIntermediateCert(String dn, long validityMillis, PublicKey pubKey,
-		PrivateKey caPrivKey, X509Certificate caCert) throws GeneralSecurityException
+	public static X509Certificate createIntermediateCert(String dn, long validityMillis, PublicKey pubKey, PrivateKey caPrivKey,
+		X509Certificate caCert) throws GeneralSecurityException
 	{
 
 		//
@@ -193,8 +192,8 @@ public class CertTool
 	/**
 	 * Construct a structure-of-arrays of distinguished-name fields and paired values
 	 */
-	public static Map.Entry<List<DERObjectIdentifier>, List<String>> constructCommonDnFields(String epi,
-		ArrayList<String> newOrgs, ArrayList<String> newCNs, String uid) throws GeneralSecurityException
+	public static Map.Entry<List<DERObjectIdentifier>, List<String>> constructCommonDnFields(String epi, ArrayList<String> newOrgs,
+		ArrayList<String> newCNs, String uid) throws GeneralSecurityException
 	{
 		ArrayList<DERObjectIdentifier> fields = new ArrayList<DERObjectIdentifier>();
 		ArrayList<String> values = new ArrayList<String>();
@@ -253,8 +252,8 @@ public class CertTool
 		dn = new X509Name(oids, values);
 
 		X509Certificate newCert =
-			CertTool.createIntermediateCert(dn.toString(), certSpec.validityMillis, certSpec.newPublicKey,
-				certSpec.issuerPrivateKey, certSpec.issuerChain[0]);
+			CertTool.createIntermediateCert(dn.toString(), certSpec.validityMillis, certSpec.newPublicKey, certSpec.issuerPrivateKey,
+				certSpec.issuerChain[0]);
 		X509Certificate[] newCertChain = new X509Certificate[certSpec.issuerChain.length + 1];
 		newCertChain[0] = newCert;
 		for (int i = 0; i < certSpec.issuerChain.length; i++) {
@@ -271,8 +270,7 @@ public class CertTool
 	 * @param password
 	 * @return Returns the keystore loaded from the given location.
 	 */
-	public static KeyStore openStoreDirectPath(File location, String type, char[] password) throws GeneralSecurityException,
-		IOException
+	public static KeyStore openStoreDirectPath(File location, String type, char[] password) throws GeneralSecurityException, IOException
 	{
 		// try both providers (BC and the default SunJCE)
 		KeyStore ks = null;
@@ -306,8 +304,7 @@ public class CertTool
 	 * @param password
 	 * @return Returns the keystore loaded from the given location.
 	 */
-	public static KeyStore openStore(String location, String type, char[] password) throws GeneralSecurityException,
-		IOException
+	public static KeyStore openStore(String location, String type, char[] password) throws GeneralSecurityException, IOException
 	{
 		KeyStore ks = KeyStore.getInstance(type, "BC");
 		InputStream keyStoreStream = ClassLoader.getSystemClassLoader().getResourceAsStream(location);
@@ -318,8 +315,7 @@ public class CertTool
 	}
 
 	/*
-	 * public static KeyPair generateKeyPair() throws GeneralSecurityException { return
-	 * generateKeyPair(RSA_KEYSIZE); }
+	 * public static KeyPair generateKeyPair() throws GeneralSecurityException { return generateKeyPair(RSA_KEYSIZE); }
 	 */
 	public static KeyPair generateKeyPair(int keySize) throws GeneralSecurityException
 	{
@@ -334,10 +330,9 @@ public class CertTool
 
 		+ "import options:\n" + "  Notes: Reads an X.509 certificate from one store and optionally places\n"
 			+ "  it in another store as a trusted certificate.  If the output-store is not\n"
-			+ "  specified, then the certificate will be displayed to the console.\n\n"
-			+ "  -base64-cert-file=<cert file path> | \n\n" + "  -input-keystore=<keystore> \n"
-			+ "  -input-keystore-pass=<keystore password> \n" + "  -input-storetype=<storetype: PKCS12(default) | BKS> \n"
-			+ "  -input-alias=<alias> \n" + "[ -output-keystore=<keystore> \n"
+			+ "  specified, then the certificate will be displayed to the console.\n\n" + "  -base64-cert-file=<cert file path> | \n\n"
+			+ "  -input-keystore=<keystore> \n" + "  -input-keystore-pass=<keystore password> \n"
+			+ "  -input-storetype=<storetype: PKCS12(default) | BKS> \n" + "  -input-alias=<alias> \n" + "[ -output-keystore=<keystore> \n"
 			+ "  -output-keystore-pass=<keystore password> \n" + "  -output-storetype=<storetype: PKCS12(default) | BKS> \n"
 			+ "  -output-alias=<trusted-alias> ] \n\n"
 
@@ -349,9 +344,9 @@ public class CertTool
 			+ "-keysize=<rsa-keysize> \n" + "-dn=<distinguished name> \n" + "[ -validity=<days (default:12 years)> ]\n"
 			+ "[ -input-keystore=<keystore> \n" + "  -input-keystore-pass=<keystore password> \n"
 			+ "  -input-storetype=<storetype: PKCS12(default) | BKS> \n" + "  -input-alias=<alias> \n"
-			+ "  -input-entry-pass=<password> ] \n" + "[ -output-keystore=<keystore> \n"
-			+ "  -output-keystore-pass=<keystore password> \n" + "  -output-storetype=<storetype: PKCS12(default) | BKS> \n"
-			+ "  -output-alias=<alias> \n" + "  -output-entry-pass=<password> ]");
+			+ "  -input-entry-pass=<password> ] \n" + "[ -output-keystore=<keystore> \n" + "  -output-keystore-pass=<keystore password> \n"
+			+ "  -output-storetype=<storetype: PKCS12(default) | BKS> \n" + "  -output-alias=<alias> \n"
+			+ "  -output-entry-pass=<password> ]");
 	}
 
 	public static void main(String args[]) throws Exception
@@ -570,8 +565,7 @@ public class CertTool
 
 				// load the signing cert/private key and generate a client cert
 				PrivateKey caPrivKey = (PrivateKey) ks.getKey(inputAlias, inputEntryPass);
-				java.security.cert.Certificate[] caCertChain =
-					(java.security.cert.Certificate[]) ks.getCertificateChain(inputAlias);
+				java.security.cert.Certificate[] caCertChain = (java.security.cert.Certificate[]) ks.getCertificateChain(inputAlias);
 
 				if ((caCertChain == null) || (caCertChain.length == 0)) {
 					System.err.println("No such issuing certificate alias");

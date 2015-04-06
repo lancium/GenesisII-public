@@ -29,9 +29,7 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions "
-					+ "WHERE publisherresourcekey = ?");
+			stmt = connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions " + "WHERE publisherresourcekey = ?");
 			stmt.setString(1, publisherKey);
 			rs = stmt.executeQuery();
 
@@ -45,8 +43,7 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		}
 	}
 
-	static protected void removeRowsFromTable(Connection connection, Triple<String, String, String> tableResourceTriple)
-		throws SQLException
+	static protected void removeRowsFromTable(Connection connection, Triple<String, String, String> tableResourceTriple) throws SQLException
 	{
 		PreparedStatement stmt = null;
 
@@ -75,8 +72,8 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		return;
 	}
 
-	static protected <Type> Type validateBlobToXml(CleanupContext context, String resourceID, Blob blob, Class<Type> type,
-		boolean mustExist) throws SQLException
+	static protected <Type> Type validateBlobToXml(CleanupContext context, String resourceID, Blob blob, Class<Type> type, boolean mustExist)
+		throws SQLException
 	{
 		if (blob == null && mustExist) {
 			context.addResource(resourceID, "Blob for type %s was null.", type);
@@ -113,18 +110,15 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 			if (cause == null || cause instanceof SQLException)
 				throw sqe;
 
-			context.addResource(resourceID, "Exception thrown while parsing Java serializeable from the database into %s:  %s",
-				type, cause);
+			context.addResource(resourceID, "Exception thrown while parsing Java serializeable from the database into %s:  %s", type, cause);
 			return null;
 		} catch (Throwable cause) {
-			context.addResource(resourceID, "Exceptino thrown while parsing Java serializable from the database into %s:  %s",
-				type, cause);
+			context.addResource(resourceID, "Exceptino thrown while parsing Java serializable from the database into %s:  %s", type, cause);
 			return null;
 		}
 	}
 
-	static protected void evaluatePropertiesTable(Connection connection, CleanupContext context, String resourceID)
-		throws SQLException
+	static protected void evaluatePropertiesTable(Connection connection, CleanupContext context, String resourceID) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -144,8 +138,8 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		}
 	}
 
-	static protected void evaluateResourcesTable(Connection connection, CleanupContext context, String resourceID,
-		boolean mustExist) throws SQLException
+	static protected void evaluateResourcesTable(Connection connection, CleanupContext context, String resourceID, boolean mustExist)
+		throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -166,8 +160,8 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		}
 	}
 
-	static protected void evaluateResources2Table(Connection connection, CleanupContext context, String resourceID,
-		boolean mustExist) throws SQLException
+	static protected void evaluateResources2Table(Connection connection, CleanupContext context, String resourceID, boolean mustExist)
+		throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;

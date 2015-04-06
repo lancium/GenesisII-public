@@ -20,8 +20,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 
 /**
- * An implementation of the standard Java Input stream that reads from remote Random ByteIO
- * resources.
+ * An implementation of the standard Java Input stream that reads from remote Random ByteIO resources.
  * 
  * @author mmm2a
  */
@@ -44,8 +43,7 @@ public class RandomByteIOInputStream extends InputStream
 	 * @param desiredTransferProtocol
 	 *            The desired transfer protocol to use when reading bytes.
 	 */
-	public RandomByteIOInputStream(EndpointReferenceType source, URI desiredTransferProtocol) throws RemoteException,
-		IOException
+	public RandomByteIOInputStream(EndpointReferenceType source, URI desiredTransferProtocol) throws RemoteException, IOException
 	{
 
 		if (numThreads <= 1)
@@ -151,8 +149,8 @@ public class RandomByteIOInputStream extends InputStream
 
 			// Handles the case when length is not a perfect multiple of the number of threads
 			fr[numThreads - 1] =
-				new FastRead(transferer[numThreads - 1], _offset + subLength, threadBlkReadSize + (length % numThreads), fac,
-					numThreads - 1, threadBlkReadSize);
+				new FastRead(transferer[numThreads - 1], _offset + subLength, threadBlkReadSize + (length % numThreads), fac, numThreads - 1,
+					threadBlkReadSize);
 
 			thread[numThreads - 1] = new Thread(fr[numThreads - 1]);
 
@@ -246,8 +244,7 @@ public class RandomByteIOInputStream extends InputStream
 	}
 
 	/**
-	 * A convenience method for creating a buffered stream (using the current transferer's preferred
-	 * buffering size) from this input stream.
+	 * A convenience method for creating a buffered stream (using the current transferer's preferred buffering size) from this input stream.
 	 * 
 	 * @return The newly created buffered input stream.
 	 */

@@ -10,16 +10,14 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.utils.Conversions;
 
 /**
- * A default send is a request which just has a request prefix For example, mkdir is a default
- * request |nonce|file/dir|command|path-len|path while read, write/truncappend aren't default as
- * they have arguments for offset and numbytes respectively
+ * A default send is a request which just has a request prefix For example, mkdir is a default request |nonce|file/dir|command|path-len|path
+ * while read, write/truncappend aren't default as they have arguments for offset and numbytes respectively
  * 
  */
 public class DefaultRequest
 {
 
-	public static void send(Socket clientSocket, byte pathtype, byte cmd, String path, byte[] nonce)
-		throws UnknownHostException, IOException
+	public static void send(Socket clientSocket, byte pathtype, byte cmd, String path, byte[] nonce) throws UnknownHostException, IOException
 	{
 
 		BufferedOutputStream bos = null;
@@ -37,10 +35,9 @@ public class DefaultRequest
 	}
 
 	/**
-	 * A default recv will have just the |error-code||len of err msg|error msg| It basically doesn't
-	 * expect a response like stat or read. Examples are mkdir (where error-code indicates success
-	 * of operation), and error msg indicating any failure in operation. Note that file system
-	 * operations can have defaultrequest.send (eg. stat) but someothertype.recv
+	 * A default recv will have just the |error-code||len of err msg|error msg| It basically doesn't expect a response like stat or read.
+	 * Examples are mkdir (where error-code indicates success of operation), and error msg indicating any failure in operation. Note that file
+	 * system operations can have defaultrequest.send (eg. stat) but someothertype.recv
 	 * 
 	 * @param clientSocket
 	 *            The socket which is going to get a response from server

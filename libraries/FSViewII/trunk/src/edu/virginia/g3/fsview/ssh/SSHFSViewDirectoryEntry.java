@@ -39,8 +39,7 @@ class SSHFSViewDirectoryEntry extends AbstractFSViewDirectoryEntry<SSHFSViewSess
 		return (_attrs.getPermissions() & 0222) > 0;
 	}
 
-	SSHFSViewDirectoryEntry(SSHFSViewSession session, FSViewDirectoryEntry parentEntry, String entryName, String sshPath,
-		SftpATTRS attrs)
+	SSHFSViewDirectoryEntry(SSHFSViewSession session, FSViewDirectoryEntry parentEntry, String entryName, String sshPath, SftpATTRS attrs)
 	{
 		super(SSHFSViewSession.class, session, parentEntry, entryName);
 

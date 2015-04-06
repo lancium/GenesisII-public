@@ -43,8 +43,7 @@ public class SoapHeaderHandler implements IAroundInvoker
 	{
 		MessageContext msgCtxt = invocationContext.getMessageContext();
 
-		EndpointReferenceType target =
-			(EndpointReferenceType) msgCtxt.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
+		EndpointReferenceType target = (EndpointReferenceType) msgCtxt.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
 
 		if (target == null) {
 			_logger.warn("Couldn't find target EPR in Working Context.");

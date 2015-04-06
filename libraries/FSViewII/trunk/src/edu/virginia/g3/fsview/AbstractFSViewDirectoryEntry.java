@@ -3,11 +3,11 @@ package edu.virginia.g3.fsview;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public abstract class AbstractFSViewDirectoryEntry<SessionType extends FSViewSession> extends AbstractFSViewEntry<SessionType>
-	implements FSViewDirectoryEntry
+public abstract class AbstractFSViewDirectoryEntry<SessionType extends FSViewSession> extends AbstractFSViewEntry<SessionType> implements
+	FSViewDirectoryEntry
 {
-	protected AbstractFSViewDirectoryEntry(Class<SessionType> sessionTypeClass, SessionType session,
-		FSViewDirectoryEntry parentEntry, String entryName)
+	protected AbstractFSViewDirectoryEntry(Class<SessionType> sessionTypeClass, SessionType session, FSViewDirectoryEntry parentEntry,
+		String entryName)
 	{
 		super(sessionTypeClass, session, parentEntry, entryName, FSViewEntryType.Directory);
 	}

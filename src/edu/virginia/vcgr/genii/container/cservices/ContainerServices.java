@@ -31,8 +31,7 @@ public class ContainerServices
 	static private Collection<ContainerService> getServices(HierarchicalDirectory configDirectory) throws IOException
 	{
 		HierarchicalDirectory configurationDirectory = configDirectory.lookupDirectory("cservices");
-		Collection<ContainerServiceConfiguration> configs =
-			ContainerServiceConfiguration.loadConfigurations(configurationDirectory);
+		Collection<ContainerServiceConfiguration> configs = ContainerServiceConfiguration.loadConfigurations(configurationDirectory);
 		Collection<ContainerService> ret = new ArrayList<ContainerService>(configs.size());
 		Class<? extends ContainerService> serviceClass = null;
 
@@ -42,12 +41,13 @@ public class ContainerServices
 				ret.add(configuration.instantiate());
 			} catch (InvocationTargetException e) {
 				_logger.error(
-					String.format("Error loading container service %s from file %s.", serviceClass,
-						configuration.configurationFile()), e.getCause());
+					String.format("Error loading container service %s from file %s.", serviceClass, configuration.configurationFile()),
+					e.getCause());
 			} catch (Throwable cause) {
-				_logger.error(
-					String.format("Error loading container service %s from file %s.", serviceClass,
-						configuration.configurationFile()), cause);
+				_logger
+					.error(
+						String.format("Error loading container service %s from file %s.", serviceClass, configuration.configurationFile()),
+						cause);
 			}
 		}
 
@@ -56,8 +56,7 @@ public class ContainerServices
 
 	static private ServerDatabaseConnectionPool findConnectionPool()
 	{
-		ServerDatabaseConnectionPool ret =
-			(ServerDatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
+		ServerDatabaseConnectionPool ret = (ServerDatabaseConnectionPool) NamedInstances.getServerInstances().lookup("connection-pool");
 		if (ret == null)
 			throw new ConfigurationException("Unable to find database connection pool.");
 

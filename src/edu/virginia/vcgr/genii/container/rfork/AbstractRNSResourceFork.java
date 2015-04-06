@@ -17,15 +17,14 @@ public abstract class AbstractRNSResourceFork extends AbstractResourceFork imple
 		super(service, forkPath);
 	}
 
-	protected InternalEntry createInternalEntry(EndpointReferenceType exemplarEPR, String entryName,
-		ResourceForkInformation rif, boolean isExistent) throws ResourceUnknownFaultType, ResourceException
+	protected InternalEntry createInternalEntry(EndpointReferenceType exemplarEPR, String entryName, ResourceForkInformation rif,
+		boolean isExistent) throws ResourceUnknownFaultType, ResourceException
 	{
 		return new InternalEntry(entryName, getService().createForkEPR(formForkPath(entryName), rif), null, isExistent);
 	}
 
-	protected InternalEntry
-		createInternalEntry(EndpointReferenceType exemplarEPR, String entryName, ResourceForkInformation rif)
-			throws ResourceUnknownFaultType, ResourceException
+	protected InternalEntry createInternalEntry(EndpointReferenceType exemplarEPR, String entryName, ResourceForkInformation rif)
+		throws ResourceUnknownFaultType, ResourceException
 	{
 		return new InternalEntry(entryName, getService().createForkEPR(formForkPath(entryName), rif), null, rif, true);
 	}

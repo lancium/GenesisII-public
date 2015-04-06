@@ -24,13 +24,11 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.x509.RevocationAwareTrustManager;
 
 /**
- * This ACL rule provides a chain of trust that callers must chain to, and, optionally, a pattern
- * that the caller's principal name must match.
+ * This ACL rule provides a chain of trust that callers must chain to, and, optionally, a pattern that the caller's principal name must match.
  * 
- * The pattern allows for a spectrum of principal-grouping possibilities, e.g.: - A null pattern
- * allows for grouping of X.509 principals by the specified certification authority - A partial
- * pattern allows for grouping of logically-equivalent principals (i.e., to allow for certificates
- * in which the distinguished name may vary slightly between versions, e.g., proxy certificates)
+ * The pattern allows for a spectrum of principal-grouping possibilities, e.g.: - A null pattern allows for grouping of X.509 principals by
+ * the specified certification authority - A partial pattern allows for grouping of logically-equivalent principals (i.e., to allow for
+ * certificates in which the distinguished name may vary slightly between versions, e.g., proxy certificates)
  * 
  * @author dgm4d
  */
@@ -78,8 +76,7 @@ public class X509PatternAclEntry implements AclEntry
 			X509Certificate trustedCert = _trustRoot.getOriginalAsserter()[0];
 			ks.setCertificateEntry(trustedCert.getSubjectX500Principal().getName(), trustedCert);
 
-			_trustManagerJdk =
-				new RevocationAwareTrustManager(CertificateValidatorFactory.getValidator().getTrustStoreProvider());
+			_trustManagerJdk = new RevocationAwareTrustManager(CertificateValidatorFactory.getValidator().getTrustStoreProvider());
 		}
 	}
 
@@ -125,8 +122,7 @@ public class X509PatternAclEntry implements AclEntry
 		try {
 			userPrincipal = PrincipalUtil.getSubjectX509Principal(userCert);
 		} catch (CertificateEncodingException t) {
-			_logger.debug(
-				"cert encoding problem for: " + userCert.getSubjectX500Principal().getName() + " -- " + t.getMessage(), t);
+			_logger.debug("cert encoding problem for: " + userCert.getSubjectX500Principal().getName() + " -- " + t.getMessage(), t);
 			return false;
 		}
 
@@ -134,10 +130,7 @@ public class X509PatternAclEntry implements AclEntry
 		try {
 			initPattern();
 		} catch (GeneralSecurityException t) {
-			_logger
-				.debug(
-					"pattern initialization problem for: " + userCert.getSubjectX500Principal().getName() + " -- "
-						+ t.getMessage(), t);
+			_logger.debug("pattern initialization problem for: " + userCert.getSubjectX500Principal().getName() + " -- " + t.getMessage(), t);
 			return false;
 		}
 		Vector<ASN1ObjectIdentifier> oids = _bcPattern.getOIDs();
@@ -209,8 +202,7 @@ public class X509PatternAclEntry implements AclEntry
 			return String.format("(X509PatternAclEntry) trustRoot: [%s] userPattern: [%s]", _trustRoot.describe(verbosity),
 				X500PrincipalUtilities.describe(_userPattern, verbosity));
 		else
-			return X500PrincipalUtilities.describe(_userPattern, VerbosityLevel.HIGH) + " signed by "
-				+ _trustRoot.describe(verbosity);
+			return X500PrincipalUtilities.describe(_userPattern, VerbosityLevel.HIGH) + " signed by " + _trustRoot.describe(verbosity);
 	}
 
 	@Override

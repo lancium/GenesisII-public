@@ -20,12 +20,11 @@ import edu.virginia.vcgr.genii.client.utils.flock.FileLock;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
 /**
- * Manages storing configuration items as a list of string value pairs (where each value is also of
- * type string). These config files often reside in the user state directory, but can be stored
- * anywhere. Each file is tracked by an associated "lock" file to ensure the file is not corrupted
- * by multiple writers. The configuration items are cached locally, so this is only appropriate for
- * fairly short files (less than say 500 entries). The configuration is re-read if the file changes.
- * The configuration is written immediately after a new property value is set.
+ * Manages storing configuration items as a list of string value pairs (where each value is also of type string). These config files often
+ * reside in the user state directory, but can be stored anywhere. Each file is tracked by an associated "lock" file to ensure the file is not
+ * corrupted by multiple writers. The configuration items are cached locally, so this is only appropriate for fairly short files (less than
+ * say 500 entries). The configuration is re-read if the file changes. The configuration is written immediately after a new property value is
+ * set.
  */
 public class UserConfigurationFile
 {
@@ -71,9 +70,8 @@ public class UserConfigurationFile
 	}
 
 	/**
-	 * returns our current cached list of properties. note that it is preferred to call getProperty
-	 * and setProperty individually, since then setProperty can properly update the config file for
-	 * changes in the configuration.
+	 * returns our current cached list of properties. note that it is preferred to call getProperty and setProperty individually, since then
+	 * setProperty can properly update the config file for changes in the configuration.
 	 */
 	public Properties getProperties()
 	{
@@ -85,9 +83,8 @@ public class UserConfigurationFile
 	{
 		if (_configFile.hasFileChanged()) {
 			/*
-			 * future: we really want a merge configuration method here; we don't want to lose
-			 * changes we had just coz someone else wrote the file. requires better tracking per
-			 * individual item.
+			 * future: we really want a merge configuration method here; we don't want to lose changes we had just coz someone else wrote the
+			 * file. requires better tracking per individual item.
 			 */
 			readConfiguration();
 		}
@@ -103,8 +100,7 @@ public class UserConfigurationFile
 			// lock our configuration file.
 			flock = acquireLock(_configFile.getTrackedFile());
 			if (!_configFile.getTrackedFile().isFile() || !_configFile.getTrackedFile().canRead()) {
-				_logger.error("either the configuration file does not exist or is not readable: '"
-					+ _configFile.getTrackedFile() + "'");
+				_logger.error("either the configuration file does not exist or is not readable: '" + _configFile.getTrackedFile() + "'");
 				return false;
 			}
 			_configItems = new Properties();
@@ -138,8 +134,7 @@ public class UserConfigurationFile
 			// lock our configuration file.
 			flock = acquireLock(_configFile.getTrackedFile());
 			if (!_configFile.getTrackedFile().isFile() || !_configFile.getTrackedFile().canWrite()) {
-				_logger.error("either the configuration file does not exist or is not writable: '"
-					+ _configFile.getTrackedFile() + "'");
+				_logger.error("either the configuration file does not exist or is not writable: '" + _configFile.getTrackedFile() + "'");
 				return false;
 			}
 			OutputStream outfile = null;
@@ -151,13 +146,13 @@ public class UserConfigurationFile
 					ByteArrayOutputStream bao = new ByteArrayOutputStream();
 					PrintStream out = new PrintStream(bao);
 					_configItems.list(out);
-					_logger.debug("writing user config to file '" + _configFile.getTrackedFile().getAbsolutePath()
-						+ "' with contents:\n" + bao.toString());
+					_logger.debug("writing user config to file '" + _configFile.getTrackedFile().getAbsolutePath() + "' with contents:\n"
+						+ bao.toString());
 				}
 
 				_configItems.store(outfile, "configuration file for gffs");
 				outfile.flush();
-				
+
 				// update the timestamp for our config file, since we just wrote it.
 				_configFile.fileHasChanged();
 			} catch (IOException e) {

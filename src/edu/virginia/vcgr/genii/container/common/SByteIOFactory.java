@@ -66,8 +66,8 @@ public class SByteIOFactory implements Closeable
 		}
 	}
 
-	public EndpointReferenceType create() throws ResourceCreationFaultType, GenesisIISecurityException, ResourceException,
-		RemoteException, IOException
+	public EndpointReferenceType create() throws ResourceCreationFaultType, GenesisIISecurityException, ResourceException, RemoteException,
+		IOException
 	{
 		synchronized (this) {
 			_stream.flush();
@@ -75,8 +75,7 @@ public class SByteIOFactory implements Closeable
 			_stream = null;
 		}
 
-		StreamableByteIOPortType sbyteio =
-			ClientUtils.createProxy(StreamableByteIOPortType.class, EPRUtils.makeEPR(_serviceURL));
+		StreamableByteIOPortType sbyteio = ClientUtils.createProxy(StreamableByteIOPortType.class, EPRUtils.makeEPR(_serviceURL));
 
 		MessageElement[] createRequest = new MessageElement[2];
 		createRequest[0] = new MessageElement(RByteIOResource.FILE_PATH_PROPERTY, _file.getAbsolutePath());

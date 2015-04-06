@@ -25,9 +25,8 @@ public class URLUtilityTest
 	}
 
 	/*
-	 * We can't actually run these tests because they behavior is incorrect for paths that occur on
-	 * platforms other than the one that the path is for -- in otherwords, a windows path only works
-	 * on a windows machine and vice-versa
+	 * We can't actually run these tests because they behavior is incorrect for paths that occur on platforms other than the one that the path
+	 * is for -- in otherwords, a windows path only works on a windows machine and vice-versa
 	 */
 
 	@Ignore

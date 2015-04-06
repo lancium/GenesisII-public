@@ -9,12 +9,9 @@ public abstract class RandomByteIOAttributePreFetcher<Type extends IResource> ex
 {
 	static final private QName XFER_MECHS_ATTR_NAME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, "TransferMechanism");
 	static final private QName SIZE_ATTR_NAME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
-	static final private QName ACCESS_TIME_ATTR_NAME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
-		ByteIOConstants.ACCESSTIME_ATTR_NAME);
-	static final private QName MOD_TIME_ATTR_NAME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
-		ByteIOConstants.MODTIME_ATTR_NAME);
-	static final private QName CREATE_TIME_ATTR_NAME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
-		ByteIOConstants.CREATTIME_ATTR_NAME);
+	static final private QName ACCESS_TIME_ATTR_NAME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static final private QName MOD_TIME_ATTR_NAME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
+	static final private QName CREATE_TIME_ATTR_NAME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
 
 	protected RandomByteIOAttributePreFetcher(Type resource)
 	{

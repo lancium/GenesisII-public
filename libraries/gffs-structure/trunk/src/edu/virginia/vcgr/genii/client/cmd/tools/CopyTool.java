@@ -79,8 +79,8 @@ public class CopyTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		if (isReliable) {
 
@@ -97,9 +97,7 @@ public class CopyTool extends BaseGridTool
 			PathOutcome ret = copy(getArgument(i), argLast, isRecursive, isForced, _logLocation, stderr);
 
 			if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
-				String msg =
-					"Failed to copy from " + getArgument(i) + " to " + argLast + " because " + PathOutcome.outcomeText(ret)
-						+ ".";
+				String msg = "Failed to copy from " + getArgument(i) + " to " + argLast + " because " + PathOutcome.outcomeText(ret) + ".";
 				stderr.println(msg);
 				_logger.error(msg);
 				toReturn = 1;
@@ -150,8 +148,8 @@ public class CopyTool extends BaseGridTool
 	}
 
 	/**
-	 * performs a copy operation from a source to a target. if the source or target mention grid: or
-	 * local:, then those are used. otherwise this assumes both are in grid: space.
+	 * performs a copy operation from a source to a target. if the source or target mention grid: or local:, then those are used. otherwise
+	 * this assumes both are in grid: space.
 	 */
 	public static PathOutcome copy(String sourcePath, String targetPath, boolean recursive, boolean force, RNSPath logLocation,
 		PrintWriter stderr)

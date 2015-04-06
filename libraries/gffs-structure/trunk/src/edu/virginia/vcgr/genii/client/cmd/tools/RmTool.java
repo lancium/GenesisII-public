@@ -56,8 +56,8 @@ public class RmTool extends BaseGridTool
 	 * implements the actual activity of rm, once all parameters have been grabbed.
 	 */
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 		boolean recursive = _recursive;
 		boolean force = _force;
@@ -125,8 +125,8 @@ public class RmTool extends BaseGridTool
 		if ((currentPath == null) || (filePath == null))
 			return PathOutcome.OUTCOME_NOTHING;
 		if (_logger.isTraceEnabled())
-			_logger.debug("entered into rm on RNSPath + String: currpath=" + currentPath.toString() + " filepath="
-				+ filePath.toString() + " recurs=" + recursive + " force=" + force);
+			_logger.debug("entered into rm on RNSPath + String: currpath=" + currentPath.toString() + " filepath=" + filePath.toString()
+				+ " recurs=" + recursive + " force=" + force);
 		for (RNSPath file : currentPath.expand(filePath)) {
 			PathOutcome ret = rm(file, recursive, force);
 			if (ret.differs(PathOutcome.OUTCOME_SUCCESS))

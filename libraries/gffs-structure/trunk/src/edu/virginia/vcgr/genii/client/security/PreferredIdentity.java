@@ -22,16 +22,15 @@ import edu.virginia.vcgr.genii.security.identity.IdentityType;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 /**
- * a data capsule for the preferred identity feature. this is what we can lookup in the calling
- * context to find out whether the user has a preferred identity set or not.
+ * a data capsule for the preferred identity feature. this is what we can lookup in the calling context to find out whether the user has a
+ * preferred identity set or not.
  */
 public class PreferredIdentity implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
 	/*
-	 * note: this class is serializable only for backwards compatibility; do not serialize it for
-	 * any purposes now-a-days.
+	 * note: this class is serializable only for backwards compatibility; do not serialize it for any purposes now-a-days.
 	 */
 
 	static private Log _logger = LogFactory.getLog(PreferredIdentity.class);
@@ -39,18 +38,17 @@ public class PreferredIdentity implements Serializable
 	static public final String PREFERRED_IDENTITY_PROPERTY_NAME = "PreferredIdentity";
 
 	/*
-	 * the current value of the preferred identity; this is sought in the credentials as a USER or
-	 * CONNECTION type. the server-side (gffs container) makes the final call about whether the user
-	 * has the right to become that identity, based on the user's current set of credentials.
+	 * the current value of the preferred identity; this is sought in the credentials as a USER or CONNECTION type. the server-side (gffs
+	 * container) makes the final call about whether the user has the right to become that identity, based on the user's current set of
+	 * credentials.
 	 */
 	private String _identityString = null;
 
 	/*
-	 * a hint for the client-side that the user doesn't care if the identity is not present in the
-	 * current set of credentials and that they wish to use it anyway. this means that the logout
-	 * command doesn't re-acquire a preferred identity. it also means that, in the case of that
-	 * identity not being in the current set of credentials, the server side will just use the first
-	 * "USER" style identity available in the credentials.
+	 * a hint for the client-side that the user doesn't care if the identity is not present in the current set of credentials and that they
+	 * wish to use it anyway. this means that the logout command doesn't re-acquire a preferred identity. it also means that, in the case of
+	 * that identity not being in the current set of credentials, the server side will just use the first "USER" style identity available in
+	 * the credentials.
 	 */
 	private Boolean _fixateIdentity = null;
 
@@ -99,8 +97,8 @@ public class PreferredIdentity implements Serializable
 	}
 
 	/**
-	 * returns true if the identity held in this object matches the certificate in "toCheck". the
-	 * identity equality will be based on the OpenSSL one-line RDN format.
+	 * returns true if the identity held in this object matches the certificate in "toCheck". the identity equality will be based on the
+	 * OpenSSL one-line RDN format.
 	 */
 	public boolean matchesIdentity(X509Certificate toCheck)
 	{
@@ -133,8 +131,7 @@ public class PreferredIdentity implements Serializable
 	}
 
 	/**
-	 * returns true if the current calling context has a preferred identity set *and* that identity
-	 * is fixated by user request.
+	 * returns true if the current calling context has a preferred identity set *and* that identity is fixated by user request.
 	 */
 	static public boolean fixatedInCurrent()
 	{
@@ -145,8 +142,7 @@ public class PreferredIdentity implements Serializable
 	}
 
 	/**
-	 * returns the preferred identity that's set in the current calling context. this will return
-	 * null if no identity is set.
+	 * returns the preferred identity that's set in the current calling context. this will return null if no identity is set.
 	 */
 	static public PreferredIdentity getCurrent()
 	{
@@ -172,8 +168,7 @@ public class PreferredIdentity implements Serializable
 	// static methods operating on specific context...
 
 	/**
-	 * loads the preferred identity object from the context, if possible. if it's not there, null is
-	 * returned.
+	 * loads the preferred identity object from the context, if possible. if it's not there, null is returned.
 	 */
 	static public PreferredIdentity getFromContext(ICallingContext context)
 	{
@@ -186,13 +181,11 @@ public class PreferredIdentity implements Serializable
 				return PreferredIdentity.decodePrefId((String) prefChunk);
 			} else if ((prefChunk != null) && (prefChunk instanceof PreferredIdentity)) {
 				/*
-				 * older school version. we will trust that it's still the right format. but next
-				 * time we store it, it goes in as a string.
+				 * older school version. we will trust that it's still the right format. but next time we store it, it goes in as a string.
 				 */
 				return (PreferredIdentity) prefChunk;
 			} else {
-				_logger
-					.debug("got something called a preferred identity in calling context, but it's the wrong type of object!");
+				_logger.debug("got something called a preferred identity in calling context, but it's the wrong type of object!");
 				return null;
 			}
 		} catch (Exception e) {
@@ -242,8 +235,7 @@ public class PreferredIdentity implements Serializable
 	}
 
 	/**
-	 * stores a preferred identity in the context provided. this stores the context also to make
-	 * sure the change persists.
+	 * stores a preferred identity in the context provided. this stores the context also to make sure the change persists.
 	 */
 	static public void setInContext(ICallingContext context, PreferredIdentity newIdentity)
 	{
@@ -283,9 +275,8 @@ public class PreferredIdentity implements Serializable
 	// helper methods...
 
 	/**
-	 * creates a list of credentials for the current client's state, and adds a credential for the
-	 * connection as an X509Identity. this should only be needed on the client; the container should
-	 * be able to use its list of authorized credentials instead.
+	 * creates a list of credentials for the current client's state, and adds a credential for the connection as an X509Identity. this should
+	 * only be needed on the client; the container should be able to use its list of authorized credentials instead.
 	 */
 	public static List<NuCredential> gatherCredentials(ICallingContext callingContext) throws AuthZSecurityException
 	{
@@ -306,11 +297,9 @@ public class PreferredIdentity implements Serializable
 	}
 
 	/**
-	 * tries to locate a matching identity in the "creds" to the "pattern" provided. if no match is
-	 * found, then null is returned. note that the "creds" list must contain all identities that
-	 * should be examined, including the CONNECTION identity stored as an X509Identity object. just
-	 * giving a credential wallet's contents is not enough, since those never include the
-	 * connection.
+	 * tries to locate a matching identity in the "creds" to the "pattern" provided. if no match is found, then null is returned. note that
+	 * the "creds" list must contain all identities that should be examined, including the CONNECTION identity stored as an X509Identity
+	 * object. just giving a credential wallet's contents is not enough, since those never include the connection.
 	 */
 	static public X509Certificate findIdentityPatternInCredentials(String pattern, List<NuCredential> creds)
 	{
@@ -337,7 +326,7 @@ public class PreferredIdentity implements Serializable
 		}
 		return null;
 	}
-	
+
 	static public String resolveIdentityPatternInCredentials(String pattern, List<NuCredential> creds)
 	{
 		X509Certificate cert = findIdentityPatternInCredentials(pattern, creds);

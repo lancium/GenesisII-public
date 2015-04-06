@@ -60,17 +60,16 @@ public class BESManagerPanel extends JPanel
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		ret.add(_screenSaverInactiveCombo, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		ret.add(new JLabel("User Logged In"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		ret.add(_userLoggedInCombo, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		ret.add(new JLabel("User Logged In"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		ret.add(_userLoggedInCombo, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 		ret.add(new JLabel("Activity Threshold"), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		ret.add(_thresholdField, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		ret.add(_thresholdField, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
-		ret.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-			"Activity Policies"));
+		ret.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Activity Policies"));
 
 		return ret;
 	}
@@ -88,8 +87,8 @@ public class BESManagerPanel extends JPanel
 		ProgressMonitor<ManagementData> monitor = new ProgressMonitor<ManagementData>();
 
 		monitor.addProgressListener(new AcquireFinishProgressListener(), true);
-		monitor.addProgressNotifier(new DefaultProgressNotifier(this, "Query BES Container",
-			"Getting resource properties from BES.", 1000L), false);
+		monitor.addProgressNotifier(new DefaultProgressNotifier(this, "Query BES Container", "Getting resource properties from BES.", 1000L),
+			false);
 
 		monitor.startTask(new BESManagerAcquisitionTask(_callingContext, _target));
 	}
@@ -104,8 +103,7 @@ public class BESManagerPanel extends JPanel
 				if (threshold < 0)
 					throw new NumberFormatException();
 			} catch (NumberFormatException nfe) {
-				JOptionPane.showMessageDialog(this, "Threshold value is invalid.", "Invalid Threshold Value",
-					JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Threshold value is invalid.", "Invalid Threshold Value", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		_screenSaverInactiveCombo.setEnabled(false);
@@ -119,13 +117,12 @@ public class BESManagerPanel extends JPanel
 		ProgressMonitor<ManagementData> monitor = new ProgressMonitor<ManagementData>();
 
 		monitor.addProgressListener(new ApplyFinishProgressListener(), true);
-		monitor.addProgressNotifier(new DefaultProgressNotifier(this, "Applying BES Configuration",
-			"Applying new BES configuration.", 1000L), false);
+		monitor.addProgressNotifier(
+			new DefaultProgressNotifier(this, "Applying BES Configuration", "Applying new BES configuration.", 1000L), false);
 
 		monitor.startTask(new BESManagerConfigurationTask(_callingContext, _target, new ManagementData(new BESPolicy(
-			((BESPolicyActionWrapper) _userLoggedInCombo.getSelectedItem()).action(),
-			((BESPolicyActionWrapper) _screenSaverInactiveCombo.getSelectedItem()).action()), threshold, _isAccepting
-			.isSelected())));
+			((BESPolicyActionWrapper) _userLoggedInCombo.getSelectedItem()).action(), ((BESPolicyActionWrapper) _screenSaverInactiveCombo
+				.getSelectedItem()).action()), threshold, _isAccepting.isSelected())));
 	}
 
 	public BESManagerPanel(ICallingContext callingContext, EndpointReferenceType target)
@@ -142,16 +139,16 @@ public class BESManagerPanel extends JPanel
 		_thresholdField.addCaretListener(changeListener);
 		_isAccepting.addActionListener(changeListener);
 
-		add(createActivityPoliciesPanel(), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		add(_isAccepting, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+		add(createActivityPoliciesPanel(), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(new JButton(_applyAction), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(new JButton(_refreshAction), new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_statusLabel, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+		add(_isAccepting, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5,
+			5), 5, 5));
+		add(new JButton(_applyAction), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(_refreshAction), new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		add(_statusLabel, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
+			5), 5, 5));
 
 		acquireState();
 	}
@@ -213,8 +210,7 @@ public class BESManagerPanel extends JPanel
 			_data = result;
 			_statusLabel.setText(" ");
 
-			_screenSaverInactiveCombo.setSelectedItem(BESPolicyActionWrapper
-				.wrap(_data.policy().getScreenSaverInactiveAction()));
+			_screenSaverInactiveCombo.setSelectedItem(BESPolicyActionWrapper.wrap(_data.policy().getScreenSaverInactiveAction()));
 			_userLoggedInCombo.setSelectedItem(BESPolicyActionWrapper.wrap(_data.policy().getUserLoggedInAction()));
 			_thresholdField.setText(_data.threshold() == null ? "" : _data.threshold().toString());
 			_isAccepting.setSelected(_data.isAcceptingActivities());
@@ -241,8 +237,8 @@ public class BESManagerPanel extends JPanel
 			_refreshAction.setEnabled(true);
 
 			_logger.error("Unable to refresh BES information.", e);
-			JOptionPane.showMessageDialog(BESManagerPanel.this, "An error occurred while refreshing BES information.",
-				"BES Refresh Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(BESManagerPanel.this, "An error occurred while refreshing BES information.", "BES Refresh Error",
+				JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -270,8 +266,7 @@ public class BESManagerPanel extends JPanel
 			_data = result;
 			_statusLabel.setText(" ");
 
-			_screenSaverInactiveCombo.setSelectedItem(BESPolicyActionWrapper
-				.wrap(_data.policy().getScreenSaverInactiveAction()));
+			_screenSaverInactiveCombo.setSelectedItem(BESPolicyActionWrapper.wrap(_data.policy().getScreenSaverInactiveAction()));
 			_userLoggedInCombo.setSelectedItem(BESPolicyActionWrapper.wrap(_data.policy().getUserLoggedInAction()));
 			_thresholdField.setText(_data.threshold() == null ? "" : _data.threshold().toString());
 			_isAccepting.setSelected(_data.isAcceptingActivities());

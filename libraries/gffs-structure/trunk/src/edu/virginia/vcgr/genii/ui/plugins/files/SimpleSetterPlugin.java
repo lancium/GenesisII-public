@@ -26,8 +26,8 @@ public class SimpleSetterPlugin extends AbstractCombinedUIMenusPlugin
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
 		String answer =
-			JOptionPane.showInputDialog(context.ownerComponent(), "What value would you like to set?",
-				"Set Resource Fork Value", JOptionPane.QUESTION_MESSAGE);
+			JOptionPane.showInputDialog(context.ownerComponent(), "What value would you like to set?", "Set Resource Fork Value",
+				JOptionPane.QUESTION_MESSAGE);
 
 		if (answer == null)
 			return;

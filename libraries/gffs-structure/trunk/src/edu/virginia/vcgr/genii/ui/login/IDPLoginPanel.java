@@ -50,7 +50,7 @@ final class IDPLoginPanel extends LoginPanel
 	static final long serialVersionUID = 0L;
 	static private Log _logger = LogFactory.getLog(IDPLoginPanel.class);
 
-	//future: move these to a more general login related constants file.
+	// future: move these to a more general login related constants file.
 	final public String DEFAULT_LRZ_USER_PATH = "/users/gffs.eu/lrz.de";
 	final public String DEFAULT_MYPROXY_USER_PATH = "/users/xsede.org";
 
@@ -128,10 +128,10 @@ final class IDPLoginPanel extends LoginPanel
 		setName(Title);
 
 		// add the drop down box with the types of proxies in it.
-		add(new JLabel("Proxy Setting"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
+		add(new JLabel("Proxy Setting"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
+		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5, 5,
+			5, 5), 5, 5));
 
 		// crank up a config file for our settings.
 		_loginSettings =
@@ -152,7 +152,7 @@ final class IDPLoginPanel extends LoginPanel
 		// handle when there was no previous setting (or we had an issue figuring out last value).
 		if (lastProxySetting == null) {
 			// no previous proxy setting, so read grid deployment to pick right one.
-			String gridName = InstallationProperties.getSimpleGridName(); 
+			String gridName = InstallationProperties.getSimpleGridName();
 			if (gridName.equalsIgnoreCase("xcg")) {
 				_type = ProxyTypes.NO_PROXY;
 			} else if (gridName.equalsIgnoreCase("xsede")) {
@@ -171,21 +171,21 @@ final class IDPLoginPanel extends LoginPanel
 		_username.addCaretListener(new InternalUsernameCaretListener());
 		_rnsPath.addCaretListener(new InternalRnspathCaretListener());
 
-		add(new JLabel("Username"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_username, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+		add(new JLabel("Username"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(new JLabel("Password"), new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_password, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+		add(_username, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+			5, 5), 5, 5));
+		add(new JLabel("Password"), new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
+		add(_password, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+			5, 5), 5, 5));
 
-		add(new JLabel("Grid Path"), new GridBagConstraints(0, 3, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_rnsPath, new GridBagConstraints(1, 3, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+		add(new JLabel("Grid Path"), new GridBagConstraints(0, 3, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
+		add(_rnsPath, new GridBagConstraints(1, 3, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
+			5, 5), 5, 5));
 	}
-	
+
 	@Override
 	final public Collection<NuCredential> doLogin(UIContext uiContext) throws Throwable
 	{
@@ -226,8 +226,7 @@ final class IDPLoginPanel extends LoginPanel
 
 					// reload the key material after myproxy changes it.
 					clientKeyMaterial =
-						ClientUtils.checkAndRenewCredentials(context, BaseGridTool.credsValidUntil(),
-							new SecurityUpdateResults());
+						ClientUtils.checkAndRenewCredentials(context, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 				}
 
 				upt = new UsernamePasswordIdentity(_username.getText(), new String(_password.getPassword()));
@@ -244,16 +243,14 @@ final class IDPLoginPanel extends LoginPanel
 
 				// login to the STS path that we've been given and see if our credentials allow it.
 				ArrayList<NuCredential> creds =
-					IDPLoginTool.doIdpLogin(epr, SecurityConstants.CredentialExpirationMillis,
-						clientKeyMaterial._clientCertChain);
+					IDPLoginTool.doIdpLogin(epr, SecurityConstants.CredentialExpirationMillis, clientKeyMaterial._clientCertChain);
 
 				// reload the context now, which is crucial for this method to see the most recent.
 				StreamUtils.close(assumedContextToken);
 				context = ContextManager.getCurrentContext();
 
 				/*
-				 * try to leave the user in the right current directory. Changed by ASAG March 6,
-				 * 2014
+				 * try to leave the user in the right current directory. Changed by ASAG March 6, 2014
 				 */
 				{
 					// Assumption is that user idp's are off /user and homes off /home
@@ -363,8 +360,8 @@ final class IDPLoginPanel extends LoginPanel
 	}
 
 	/**
-	 * handles events on the RNS path, which is the combination of the username and the last sts
-	 * location, but which the user can also edit to use any STS.
+	 * handles events on the RNS path, which is the combination of the username and the last sts location, but which the user can also edit to
+	 * use any STS.
 	 */
 	private class InternalRnspathCaretListener implements CaretListener
 	{

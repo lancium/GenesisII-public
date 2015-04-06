@@ -116,12 +116,10 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 				for (String child : children) {
 					File childFile = new File(parent, child);
 					if (enactCleanup) {
-						_logger.info(String.format("Cleaning up old activity directory %s [%tc]\n", childFile,
-							childFile.lastModified()));
+						_logger.info(String.format("Cleaning up old activity directory %s [%tc]\n", childFile, childFile.lastModified()));
 						FileSystemUtils.recursiveDelete(childFile, false);
 					} else {
-						_logger.info(String.format("Not cleaning up old activity directory %s [%tc]\n", childFile,
-							childFile.lastModified()));
+						_logger.info(String.format("Not cleaning up old activity directory %s [%tc]\n", childFile, childFile.lastModified()));
 					}
 				}
 			}

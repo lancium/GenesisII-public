@@ -53,8 +53,7 @@ public class UIPlugins
 		new LinkedHashMap<String, Collection<UIPopupMenuPluginAction>>();
 	private Collection<Pair<String, UITabPlugin>> _tabs = new LinkedList<Pair<String, UITabPlugin>>();
 
-	private Collection<UIMenuPluginAction<? extends UIMenuPlugin>> _allActions =
-		new LinkedList<UIMenuPluginAction<? extends UIMenuPlugin>>();
+	private Collection<UIMenuPluginAction<? extends UIMenuPlugin>> _allActions = new LinkedList<UIMenuPluginAction<? extends UIMenuPlugin>>();
 
 	private UIPluginContext _context;
 
@@ -86,8 +85,7 @@ public class UIPlugins
 				_allActions.add(action);
 				Map<String, Collection<UITopMenuPluginAction>> menu = _topMenuActions.get(topDesc.menuName());
 				if (menu == null)
-					_topMenuActions.put(topDesc.menuName(), menu =
-						new LinkedHashMap<String, Collection<UITopMenuPluginAction>>());
+					_topMenuActions.put(topDesc.menuName(), menu = new LinkedHashMap<String, Collection<UITopMenuPluginAction>>());
 				Collection<UITopMenuPluginAction> actions = menu.get(topDesc.groupName());
 				if (actions == null)
 					menu.put(topDesc.groupName(), actions = new LinkedList<UITopMenuPluginAction>());

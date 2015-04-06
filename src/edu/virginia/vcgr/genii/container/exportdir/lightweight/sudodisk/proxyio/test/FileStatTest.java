@@ -15,11 +15,9 @@ public class FileStatTest
 		byte[] nonce = s_nonce.getBytes();
 
 		/*
-		 * byte[] contents = new String("avinash").getBytes(); DefaultResponse dr =
-		 * FileServerClient.write(filepath, contents, 0, nonce, port);
-		 * System.out.println(dr.getErrorCode()); byte[] tappendcontents = new
-		 * String(" is the first alphabet").getBytes(); dr = FileServerClient.truncAppend(filepath,
-		 * tappendcontents, 1, nonce, port); System.out.println(dr.getErrorCode());
+		 * byte[] contents = new String("avinash").getBytes(); DefaultResponse dr = FileServerClient.write(filepath, contents, 0, nonce,
+		 * port); System.out.println(dr.getErrorCode()); byte[] tappendcontents = new String(" is the first alphabet").getBytes(); dr =
+		 * FileServerClient.truncAppend(filepath, tappendcontents, 1, nonce, port); System.out.println(dr.getErrorCode());
 		 */
 
 		DefaultResponse dr = FileServerClient.canWrite("/Users/guest1/foo/", nonce, port, PathType.DIRECTORY);

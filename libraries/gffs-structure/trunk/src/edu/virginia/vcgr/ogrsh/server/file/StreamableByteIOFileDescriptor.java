@@ -103,8 +103,7 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor imple
 	private long getPosition() throws RemoteException, OGRSHException
 	{
 		try {
-			StreamableByteIORP rp =
-				(StreamableByteIORP) ResourcePropertyManager.createRPInterface(_epr, StreamableByteIORP.class);
+			StreamableByteIORP rp = (StreamableByteIORP) ResourcePropertyManager.createRPInterface(_epr, StreamableByteIORP.class);
 			return rp.getPosition();
 		} catch (ResourcePropertyException re) {
 			throw new OGRSHException(re);

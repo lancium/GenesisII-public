@@ -33,8 +33,8 @@ public class AttachHostTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		String containerURL = getArgument(0);
 		RNSPath path = lookup(new GeniiPath(getArgument(1)), RNSPathQueryFlags.MUST_NOT_EXIST);

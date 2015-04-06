@@ -64,8 +64,8 @@ public class LightweightNotificationServer
 		return listener;
 	}
 
-	static private SocketConnector createSslSocketConnector(Integer port, String keystore, String keystoreType,
-		String password, String keyPassword)
+	static private SocketConnector createSslSocketConnector(Integer port, String keystore, String keystoreType, String password,
+		String keyPassword)
 	{
 		SslSocketConnector listener = new SslSocketConnector();
 
@@ -83,8 +83,8 @@ public class LightweightNotificationServer
 	private class NotificationJettyHandler extends AbstractHandler
 	{
 		@Override
-		public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
-			throws IOException, ServletException
+		public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) throws IOException,
+			ServletException
 		{
 			InputStream in = null;
 
@@ -174,8 +174,7 @@ public class LightweightNotificationServer
 		this(createSocketConnector(port));
 	}
 
-	private LightweightNotificationServer(Integer port, String keystore, String keystoreType, String password,
-		String keyPassword)
+	private LightweightNotificationServer(Integer port, String keystore, String keystoreType, String password, String keyPassword)
 	{
 		this(createSslSocketConnector(port, keystore, keystoreType, password, keyPassword));
 	}
@@ -217,13 +216,12 @@ public class LightweightNotificationServer
 	}
 
 	final public LightweightSubscription subscribe(EndpointReferenceType publisher, TopicQueryExpression topicFilter,
-		TerminationTimeType terminationTime, AdditionalUserData additionalUserData, SubscriptionPolicy... policies)
-		throws SubscribeException
+		TerminationTimeType terminationTime, AdditionalUserData additionalUserData, SubscriptionPolicy... policies) throws SubscribeException
 	{
 		try {
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, publisher);
-			return new LightweightSubscriptionImpl(topicFilter, common.subscribe(createSubscribeRequest(topicFilter,
-				terminationTime, additionalUserData, policies).asRequestType()));
+			return new LightweightSubscriptionImpl(topicFilter, common.subscribe(createSubscribeRequest(topicFilter, terminationTime,
+				additionalUserData, policies).asRequestType()));
 		} catch (IOException e) {
 			throw new SubscribeException("Unable to subscribe consumer to publisher!", e);
 		}
@@ -245,8 +243,8 @@ public class LightweightNotificationServer
 		return new LightweightNotificationServer(port);
 	}
 
-	static public LightweightNotificationServer createSslServer(String keystoreLocation, String keystoreType,
-		String keystorePassword, String keyPassword)
+	static public LightweightNotificationServer createSslServer(String keystoreLocation, String keystoreType, String keystorePassword,
+		String keyPassword)
 	{
 		return new LightweightNotificationServer(null, keystoreLocation, keystoreType, keystorePassword, keyPassword);
 	}

@@ -127,15 +127,14 @@ public class Container extends ApplicationBase
 			WSDDProvider.registerProvider(GAroundInvokerFactory.PROVIDER_QNAME, new GAroundInvokerFactory());
 
 			runContainer();
-			
+
 			ContainerIDFile.containerID(getContainerID());
 
 			_logger.info("Container Started");
 			AlarmManager.initializeAlarmManager();
 
 			/*
-			 * add a periodic drop of the TLS trust store and CRL records, to accommodate updated
-			 * grid-certificates folder.
+			 * add a periodic drop of the TLS trust store and CRL records, to accommodate updated grid-certificates folder.
 			 */
 			_crlInvigorator = new CrlInvigoratorThread();
 			_crlInvigorator.start();
@@ -187,9 +186,9 @@ public class Container extends ApplicationBase
 		initializeIdentitySecurity(getConfigurationManager().getContainerConfiguration());
 
 		// set our container key to allow for recovery from older serialization.
-		TrustStoreLinkage tsl = (TrustStoreLinkage)CertificateValidatorFactory.getValidator().getTrustStoreProvider(); 
+		TrustStoreLinkage tsl = (TrustStoreLinkage) CertificateValidatorFactory.getValidator().getTrustStoreProvider();
 		tsl.setContainerKey(new KeyAndCertMaterial(Container.getContainerCertChain(), Container.getContainerPrivateKey()));
-		
+
 		_containerConfiguration = new ContainerConfiguration(getConfigurationManager());
 		ContainerConfiguration.setTheContainerConfig(_containerConfiguration);
 
@@ -204,8 +203,7 @@ public class Container extends ApplicationBase
 				socketConnector = new SslSocketConnector();
 
 			socketConnector.setPort(_containerConfiguration.getListenPort());
-			_containerConfiguration.getSslInformation().configure(getConfigurationManager(),
-				(SslSocketConnector) socketConnector);
+			_containerConfiguration.getSslInformation().configure(getConfigurationManager(), (SslSocketConnector) socketConnector);
 			_containerURL = Hostname.normalizeURL("https://127.0.0.1:" + _containerConfiguration.getListenPort());
 		} else {
 			socketConnector = new SocketConnector();
@@ -231,8 +229,7 @@ public class Container extends ApplicationBase
 		server.setHandler(contexts);
 
 		try {
-			recordInstallationState(System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default"), new URL(
-				_containerURL));
+			recordInstallationState(System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default"), new URL(_containerURL));
 		} catch (Throwable cause) {
 			_logger.error("Unable to record installation state -- continuing anyways.", cause);
 		}
@@ -248,8 +245,7 @@ public class Container extends ApplicationBase
 
 		Collection<Class<? extends IServiceWithCleanupHook>> containerServices = initializeServices(webAppCtxt);
 
-		Collection<IServiceWithCleanupHook> containerServiceObjects =
-			new ArrayList<IServiceWithCleanupHook>(containerServices.size());
+		Collection<IServiceWithCleanupHook> containerServiceObjects = new ArrayList<IServiceWithCleanupHook>(containerServices.size());
 		for (Class<? extends IServiceWithCleanupHook> service : containerServices) {
 			try {
 				Constructor<?> cons = service.getConstructor(new Class[0]);
@@ -279,15 +275,15 @@ public class Container extends ApplicationBase
 			}
 		}
 
-		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue,
-			Installation.getDeployment(new DeploymentName()).getServicesDirectory());
+		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue, Installation.getDeployment(new DeploymentName())
+			.getServicesDirectory());
 
 		ServerWSDoAllReceiver.beginNormalRuntime();
 	}
 
 	@SuppressWarnings("unchecked")
-	static private Collection<Class<? extends IServiceWithCleanupHook>> initializeServices(WebAppContext ctxt)
-		throws ServletException, AxisFault
+	static private Collection<Class<? extends IServiceWithCleanupHook>> initializeServices(WebAppContext ctxt) throws ServletException,
+		AxisFault
 	{
 		Collection<Class<? extends IServiceWithCleanupHook>> managedServiceClasses =
 			new LinkedList<Class<? extends IServiceWithCleanupHook>>();
@@ -334,8 +330,8 @@ public class Container extends ApplicationBase
 		}
 	}
 
-	static private void initializeIdentitySecurity(XMLConfiguration serverConf) throws ConfigurationException,
-		KeyStoreException, GeneralSecurityException, IOException
+	static private void initializeIdentitySecurity(XMLConfiguration serverConf) throws ConfigurationException, KeyStoreException,
+		GeneralSecurityException, IOException
 	{
 		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
 		String keyStoreLoc = resourceIdSecProps.getSigningKeystoreFile();
@@ -349,12 +345,10 @@ public class Container extends ApplicationBase
 		// the rest come from deployment still...
 		String keyStoreType =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP, "PKCS12");
-		String keyPassword =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
+		String keyPassword = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
 		String keyStorePassword =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
-		String containerAlias =
-			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP);
+		String containerAlias = resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP);
 
 		String certificateLifetime =
 			resourceIdSecProps.getProperty(KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
@@ -445,8 +439,7 @@ public class Container extends ApplicationBase
 		return installedServices;
 	}
 
-	static final private Pattern SERVICE_NAME_FROM_URL = Pattern.compile("^https?://[^/]*/axis/services/(\\w+).*$",
-		Pattern.CASE_INSENSITIVE);
+	static final private Pattern SERVICE_NAME_FROM_URL = Pattern.compile("^https?://[^/]*/axis/services/(\\w+).*$", Pattern.CASE_INSENSITIVE);
 
 	static public Class<?> getClassForServiceURL(String serviceURL)
 	{
@@ -606,8 +599,7 @@ public class Container extends ApplicationBase
 
 		try {
 			File scratchSpaceDirectory =
-				new GuaranteedDirectory(ConfigurationManager.getCurrentConfiguration().getUserDirectory(),
-					"dynamic-pages-scratch");
+				new GuaranteedDirectory(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), "dynamic-pages-scratch");
 
 			ScratchSpaceManager scratchManager = new ScratchSpaceManager(scratchSpaceDirectory);
 			for (File entry : dynPagesDir.listFiles()) {
@@ -631,9 +623,9 @@ public class Container extends ApplicationBase
 
 	private static class CrlInvigoratorThread extends ethread
 	{
-		// how frequently we reload the trust stores and CRLs.  currently every 6 hours.
+		// how frequently we reload the trust stores and CRLs. currently every 6 hours.
 		static long SNOOZE_TIME_BETWEEN_TRUST_STORE_RELOAD = new Long(6 * 60 * 60 * 1000);
-			
+
 		CrlInvigoratorThread()
 		{
 			super(SNOOZE_TIME_BETWEEN_TRUST_STORE_RELOAD);

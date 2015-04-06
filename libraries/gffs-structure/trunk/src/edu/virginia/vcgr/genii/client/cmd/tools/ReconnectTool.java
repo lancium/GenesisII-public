@@ -23,11 +23,11 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 public class ReconnectTool extends BaseGridTool
 {
 	static private Log _logger = LogFactory.getLog(ReconnectTool.class);
-	
+
 	static private final String _DESCRIPTION = "config/tooldocs/description/dreconnect";
 	static private final String _USAGE = "config/tooldocs/usage/ureconnect";
 	static private final String _MANPAGE = "config/tooldocs/man/reconnect";
-	
+
 	public ReconnectTool()
 	{
 		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false);
@@ -35,20 +35,18 @@ public class ReconnectTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, InvalidToolUsageException, PermissionDeniedException,
-		UserCancelException, RNSPathAlreadyExistsException, RNSPathDoesNotExistException, AuthZSecurityException, IOException
+	protected int runCommand() throws ReloadShellException, InvalidToolUsageException, PermissionDeniedException, UserCancelException,
+		RNSPathAlreadyExistsException, RNSPathDoesNotExistException, AuthZSecurityException, IOException
 	{
 		// force a redo of the connection by dropping current one.
-		Driver.dropGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true),
-			new InputStreamReader(System.in));
+		Driver.dropGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true), new InputStreamReader(System.in));
 
 		// now make a new connection.
 		GridStates gridOkay =
-			Driver.establishGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true),
-				new InputStreamReader(System.in));
-		
-		if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD)
-			|| gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
+			Driver.establishGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true), new InputStreamReader(
+				System.in));
+
+		if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
 			System.out.println("Successfully connected to '" + InstallationProperties.getSimpleGridName() + "' grid.");
 		} else {
 			String msg = "failed to reconnect to the grid, result=" + gridOkay.toString();
@@ -56,11 +54,11 @@ public class ReconnectTool extends BaseGridTool
 			_logger.error(msg);
 			return 1;
 		}
-		
+
 		// return successfully.
 		return 0;
 	}
-	
+
 	@Override
 	protected void verify() throws ToolException
 	{

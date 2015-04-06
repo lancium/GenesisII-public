@@ -32,8 +32,7 @@ public class ActivityListRNSResourceFork extends AbstractRNSResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
-		throws IOException
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry) throws IOException
 	{
 		throw new IOException("Not allowed to add new activites to this resource fork.");
 	}
@@ -62,8 +61,8 @@ public class ActivityListRNSResourceFork extends AbstractRNSResourceFork
 						response.add(new InternalEntry(name, activity.getActivityEPR()));
 					} catch (NoSuchActivityFault nsaf) {
 						if (_logger.isDebugEnabled())
-							_logger.debug("We lost an activity between the " + "time we looked it up and the time we got "
-								+ "it's EPR.", nsaf);
+							_logger.debug("We lost an activity between the " + "time we looked it up and the time we got " + "it's EPR.",
+								nsaf);
 					}
 				}
 			}
@@ -102,8 +101,7 @@ public class ActivityListRNSResourceFork extends AbstractRNSResourceFork
 						}
 					} catch (NoSuchActivityFault nsaf) {
 						if (_logger.isDebugEnabled())
-							_logger.debug("We lost an activity between the time "
-								+ "we looked it up and when we asked for it's EPR.", nsaf);
+							_logger.debug("We lost an activity between the time " + "we looked it up and when we asked for it's EPR.", nsaf);
 					}
 				}
 			}

@@ -11,8 +11,7 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class MatchingParameterList extends DefaultDataItem implements Clearable, PostUnmarshallListener,
-	Iterable<StringStringPair>
+public class MatchingParameterList extends DefaultDataItem implements Clearable, PostUnmarshallListener, Iterable<StringStringPair>
 {
 	static final long serialVersionUID = 0L;
 

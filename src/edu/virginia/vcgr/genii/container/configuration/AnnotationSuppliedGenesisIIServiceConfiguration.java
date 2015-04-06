@@ -48,8 +48,7 @@ class AnnotationSuppliedGenesisIIServiceConfiguration implements GenesisIIServic
 		} catch (IllegalAccessException e) {
 			throw new ConfigurationException(String.format("Unable to instantiate %s for service configuration.", cl), e);
 		} catch (InvocationTargetException e) {
-			throw new ConfigurationException(String.format("Unable to instantiate %s for service configuration.", cl),
-				e.getCause());
+			throw new ConfigurationException(String.format("Unable to instantiate %s for service configuration.", cl), e.getCause());
 		}
 	}
 

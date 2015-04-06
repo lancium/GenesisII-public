@@ -39,8 +39,8 @@ public class Application
 
 			ADD_ABOUT_MENU_ITEM = REAL_APPLICATION_CLASS.getDeclaredMethod("addAboutMenuItem");
 			ADD_APPLICATION_LISTENER =
-				REAL_APPLICATION_CLASS.getDeclaredMethod("addApplicationListener",
-					ApplicationListenerWrapper.REAL_APPLICATION_LISTENER_CLASS);
+				REAL_APPLICATION_CLASS
+					.getDeclaredMethod("addApplicationListener", ApplicationListenerWrapper.REAL_APPLICATION_LISTENER_CLASS);
 			ADD_PREFERENCES_MENU_ITEM = REAL_APPLICATION_CLASS.getDeclaredMethod("addPreferencesMenuItem");
 			GET_APPLICATION = REAL_APPLICATION_CLASS.getDeclaredMethod("getApplication");
 			GET_DOCK_ICON_IMAGE = REAL_APPLICATION_CLASS.getDeclaredMethod("getDockIconImage");
@@ -107,8 +107,7 @@ public class Application
 
 	public void addApplicationListener(ApplicationListener listener)
 	{
-		doExceptionlessInvoke(ADD_APPLICATION_LISTENER, _applicationObject,
-			ApplicationListenerWrapper.wrapApplicationListener(listener));
+		doExceptionlessInvoke(ADD_APPLICATION_LISTENER, _applicationObject, ApplicationListenerWrapper.wrapApplicationListener(listener));
 	}
 
 	public void addPreferencesMenuItem()
@@ -158,8 +157,7 @@ public class Application
 
 	public void removeApplicationListener(ApplicationListener listener)
 	{
-		doExceptionlessInvoke(REMOVE_APPLICATION_LISTENER, _applicationObject,
-			ApplicationListenerWrapper.wrapApplicationListener(listener));
+		doExceptionlessInvoke(REMOVE_APPLICATION_LISTENER, _applicationObject, ApplicationListenerWrapper.wrapApplicationListener(listener));
 	}
 
 	public void removePreferencesMenuItem()

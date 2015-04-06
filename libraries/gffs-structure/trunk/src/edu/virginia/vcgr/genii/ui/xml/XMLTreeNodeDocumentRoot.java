@@ -45,8 +45,7 @@ class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements XMLTreeN
 			try {
 				new XMLReaderAcquirerReporter(_source.getReader()).run();
 			} catch (Throwable cause) {
-				new XMLReaderAcquirerReporter(String.format("Unable to load XML document:  %s", cause.getLocalizedMessage()))
-					.run();
+				new XMLReaderAcquirerReporter(String.format("Unable to load XML document:  %s", cause.getLocalizedMessage())).run();
 			}
 		}
 	}
@@ -145,8 +144,8 @@ class XMLTreeNodeDocumentRoot extends DefaultMutableTreeNode implements XMLTreeN
 					new XMLProcessorResult(root.children()).run();
 				}
 			} catch (Throwable cause) {
-				new XMLProcessorResult(new XMLErrorTreeNode(String.format("Unable to parse XML document:  %s",
-					cause.getLocalizedMessage()))).run();
+				new XMLProcessorResult(new XMLErrorTreeNode(String.format("Unable to parse XML document:  %s", cause.getLocalizedMessage())))
+					.run();
 			} finally {
 				if (_reader != null)
 					try {

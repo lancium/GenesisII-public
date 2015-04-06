@@ -61,8 +61,7 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 		}
 
 		KeyStore.Builder builder =
-			new InputStreamBuilder(storeType, null, storeInput, new KeyStore.CallbackHandlerProtection(this),
-				AccessController.getContext());
+			new InputStreamBuilder(storeType, null, storeInput, new KeyStore.CallbackHandlerProtection(this), AccessController.getContext());
 		try {
 			specifiedKs = builder.getKeyStore();
 		} catch (KeyStoreException e) {
@@ -118,8 +117,8 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 		return list;
 	}
 
-	public CertEntry selectCert(InputStream storeInput, String storeType, String password, boolean isAliasPattern,
-		String entryPattern) throws AuthZSecurityException, IOException
+	public CertEntry selectCert(InputStream storeInput, String storeType, String password, boolean isAliasPattern, String entryPattern)
+		throws AuthZSecurityException, IOException
 	{
 
 		Collection<CertEntry> entries = retrieveCertEntries(storeInput, storeType, password);
@@ -181,8 +180,8 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 						_password = null;
 					} else {
 						passwordChars =
-							new String(getPassword("Key Password", "Enter key password for \""
-								+ entry._certChain[0].getSubjectDN().getName() + "\"."));
+							new String(getPassword("Key Password", "Enter key password for \"" + entry._certChain[0].getSubjectDN().getName()
+								+ "\"."));
 					}
 				}
 			}

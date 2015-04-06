@@ -46,8 +46,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 {
 	static private Log _logger = LogFactory.getLog(ExportedDirDBResource.class);
 
-	static private final String _RETRIEVE_DIR_INFO =
-		"SELECT path, parentIds, isReplicated, lastModified FROM exporteddir WHERE dirid = ?";
+	static private final String _RETRIEVE_DIR_INFO = "SELECT path, parentIds, isReplicated, lastModified FROM exporteddir WHERE dirid = ?";
 	static private final String _CREATE_DIR_INFO = "INSERT INTO exporteddir VALUES(?, ?, ?, ?, ?)";
 	static private final String _UPDATE_MODIFY_TIME = "UPDATE exporteddir SET lastModified = ? WHERE dirid = ?";
 	static private final String _ADD_ENTRY_STMT = "INSERT INTO exporteddirentry VALUES(?, ?, ?, ?, ?)";
@@ -55,8 +54,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 	static private final String _RETRIEVE_EXPORTED_ENTRIES_STMT = "SELECT dirid, name, endpoint, entryid, type "
 		+ "FROM exporteddirentry WHERE dirid = ?";
 	static private final String _RETRIEVE_EXPORTED_ENTRY_ATTRS_FOR_DIR_STMT = "SELECT attrtab.entryid, attrtab.attr "
-		+ "FROM exportedentryattr attrtab, exporteddirentry entrytab "
-		+ "WHERE attrtab.entryid = entrytab.entryid AND entrytab.dirid = ?";
+		+ "FROM exportedentryattr attrtab, exporteddirentry entrytab " + "WHERE attrtab.entryid = entrytab.entryid AND entrytab.dirid = ?";
 	static private final String _DELETE_EXPORTED_ENTRY_STMT = "DELETE FROM exporteddirentry WHERE entryid = ?";
 	static private final String _DELETE_EXPORTED_ENTRY_ATTRS_STMT = "DELETE FROM exportedentryattr WHERE entryid = ?";
 	static private final String _DELETE_EXPORTED_DIR_STMT = "DELETE FROM exporteddir WHERE dirid = ?";
@@ -64,15 +62,14 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 		+ "(SELECT entryid FROM exporteddirentry WHERE dirid = ?)";
 	static private final String _DELETE_EXPORTED_DIR_ENTRIES_STMT = "DELETE FROM exporteddirentry WHERE dirid = ?";
 	static private final String _DESTROY_ALL_ATTRS_FOR_PARENT_STMT = "DELETE FROM exportedentryattr "
-		+ "WHERE entryid in (SELECT entryid FROM exporteddir WHERE dirid in "
-		+ "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?))";
+		+ "WHERE entryid in (SELECT entryid FROM exporteddir WHERE dirid in " + "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?))";
 	static private final String _DESTROY_ALL_ENTRIES_FOR_PARENT_STMT = "DELETE FROM exporteddirentry " + "WHERE dirid in "
 		+ "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?)";
 	static private final String _DESTROY_ALL_DIRS_FOR_PARENT_STMT = "DELETE FROM exporteddir WHERE parentIds LIKE ?";
 	static private final String _RETRIEVE_ALL_DIR_IDS_FOR_PARENT_STMT = "SELECT dirid FROM exporteddir WHERE parentIds LIKE ?";
 
-	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT = "SELECT endpoint " + "FROM exporteddirentry "
-		+ "WHERE dirid in " + "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?)";
+	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT = "SELECT endpoint " + "FROM exporteddirentry " + "WHERE dirid in "
+		+ "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?)";
 
 	static final private String _CREATE_TIME_PROP_NAME = "create-time";
 	static final private String _MOD_TIME_PROP_NAME = "mod-time";
@@ -569,8 +566,8 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 		String childrenParentIds = ExportedDirUtils.createParentIdsString(getParentIds(), getId());
 		Iterator<File> realIter = realEntries.iterator();
 		/*
-		 * ASG, August 10, 2008. Modified to do more initialization here rather than constantly
-		 * checking to see if things have been initialized later.
+		 * ASG, August 10, 2008. Modified to do more initialization here rather than constantly checking to see if things have been
+		 * initialized later.
 		 */
 		if ((_fileServiceEPR == null) || (_dirServiceEPR == null))
 			synchronized (this.getClass()) {
@@ -594,14 +591,12 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 
 				if (nextReal.isFile()) {
 					/*
-					 * Moved to constructor by ASG, 8/10/08 synchronized(this.getClass()) { if
-					 * (_fileServiceEPR == null) { _fileServiceEPR = EPRUtils.makeEPR(
-					 * Container.getServiceURL("ExportedFilePortType")); } }
+					 * Moved to constructor by ASG, 8/10/08 synchronized(this.getClass()) { if (_fileServiceEPR == null) { _fileServiceEPR =
+					 * EPRUtils.makeEPR( Container.getServiceURL("ExportedFilePortType")); } }
 					 */
 					serviceEPR = _fileServiceEPR;
 					entryType = ExportedDirEntry._FILE_TYPE;
-					creationProperties =
-						ExportedFileUtils.createCreationProperties(newPath, childrenParentIds, getReplicationState());
+					creationProperties = ExportedFileUtils.createCreationProperties(newPath, childrenParentIds, getReplicationState());
 
 				} else if (nextReal.isDirectory()) {
 					try {
@@ -609,7 +604,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 						serviceEPR = _dirServiceEPR;
 						entryType = ExportedDirEntry._DIR_TYPE;
 						PreferredIdentity current = PreferredIdentity.getCurrent();
-						String owner = current != null? current.getIdentityString() : null;
+						String owner = current != null ? current.getIdentityString() : null;
 						if (_logger.isDebugEnabled())
 							_logger.debug("got preferred identity for new export: '" + owner + "'");
 						creationProperties =
@@ -645,8 +640,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 		/* create new Export resource */
 
 		/*
-		 * ASG changes on August 9, 2008 to make a direct call to create an EPR rather than going
-		 * through the whole WS stack.
+		 * ASG changes on August 9, 2008 to make a direct call to create an EPR rather than going through the whole WS stack.
 		 */
 
 		EndpointReferenceType entryReference = null;
@@ -675,8 +669,8 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 		}
 
 		/*
-		 * GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
-		 * VcgrCreateResponse resp = common.vcgrCreate( new VcgrCreate(creationProperties));
+		 * GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR); VcgrCreateResponse resp = common.vcgrCreate( new
+		 * VcgrCreate(creationProperties));
 		 * 
 		 * EndpointReferenceType entryReference = resp.getEndpoint();
 		 */
@@ -694,8 +688,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 					nextRealName); // name of file/dir
 			} catch (Exception e) {
 				_logger.error("Unable to create/replicate/fill exportdir's rexport resolver: " + e.getLocalizedMessage());
-				throw new ResourceException("Unable to create/replicate/fill exportdir's  rexport resolver: "
-					+ e.getLocalizedMessage());
+				throw new ResourceException("Unable to create/replicate/fill exportdir's  rexport resolver: " + e.getLocalizedMessage());
 			}
 		}
 
@@ -795,8 +788,7 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 			resource.destroy(_connection, hardDestroy);
 		} catch (ResourceException ruft) {
 			// Ignore so we can keep cleaning up.
-			_logger.error("(EXPECTED) Unable to destroy resource.  "
-				+ "If file/dir no longer exists, then it was already cleaned up.");
+			_logger.error("(EXPECTED) Unable to destroy resource.  " + "If file/dir no longer exists, then it was already cleaned up.");
 		}
 
 		/* remove entry information */

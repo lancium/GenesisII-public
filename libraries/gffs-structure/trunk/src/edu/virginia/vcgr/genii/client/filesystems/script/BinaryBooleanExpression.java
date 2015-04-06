@@ -82,8 +82,7 @@ abstract class BinaryBooleanExpression implements BooleanExpression
 		}
 	}
 
-	static BooleanExpression createBinaryBooleanExpression(BooleanExpression left, BinaryBooleanOperators operator,
-		BooleanExpression right)
+	static BooleanExpression createBinaryBooleanExpression(BooleanExpression left, BinaryBooleanOperators operator, BooleanExpression right)
 	{
 		switch (operator) {
 			case And:

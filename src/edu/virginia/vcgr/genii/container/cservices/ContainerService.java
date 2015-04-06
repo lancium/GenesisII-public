@@ -13,8 +13,8 @@ public interface ContainerService
 
 	public String serviceName();
 
-	public void load(ExecutorService executor, ServerDatabaseConnectionPool connectionPool,
-		ContainerServicesProperties cservicesProperties) throws Throwable;
+	public void load(ExecutorService executor, ServerDatabaseConnectionPool connectionPool, ContainerServicesProperties cservicesProperties)
+		throws Throwable;
 
 	public void start() throws Throwable;
 

@@ -12,8 +12,7 @@ public class Permissions
 		if (c == acceptedValue)
 			_bits.set(bit.ordinal(), true);
 		else if (c != '-')
-			throw new IllegalArgumentException(String.format("The bit at position %d must be either %c or -.", pos,
-				acceptedValue));
+			throw new IllegalArgumentException(String.format("The bit at position %d must be either %c or -.", pos, acceptedValue));
 	}
 
 	public Permissions()
@@ -52,7 +51,7 @@ public class Permissions
 	public String toString()
 	{
 		return String.format("%c%c%c%c%c%c", toChar(PermissionBits.OWNER_READ, 'r'), toChar(PermissionBits.OWNER_WRITE, 'w'),
-			toChar(PermissionBits.OWNER_EXECUTE, 'x'), toChar(PermissionBits.EVERYONE_READ, 'r'),
-			toChar(PermissionBits.EVERYONE_WRITE, 'w'), toChar(PermissionBits.EVERYONE_EXECUTE, 'x'));
+			toChar(PermissionBits.OWNER_EXECUTE, 'x'), toChar(PermissionBits.EVERYONE_READ, 'r'), toChar(PermissionBits.EVERYONE_WRITE, 'w'),
+			toChar(PermissionBits.EVERYONE_EXECUTE, 'x'));
 	}
 }

@@ -68,9 +68,8 @@ public class AlarmManager
 	{
 		try {
 			DatabaseTableUtils.createTables(conn, false, "CREATE TABLE alarmtable ("
-				+ "alarmid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "nextoccurance TIMESTAMP NOT NULL,"
-				+ "repeatinterval BIGINT," + "callingcontext BLOB(2G)," + "target BLOB(2G),"
-				+ "methodname VARCHAR(256) NOT NULL," + "userdata BLOB(2G))");
+				+ "alarmid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "nextoccurance TIMESTAMP NOT NULL," + "repeatinterval BIGINT,"
+				+ "callingcontext BLOB(2G)," + "target BLOB(2G)," + "methodname VARCHAR(256) NOT NULL," + "userdata BLOB(2G))");
 			conn.commit();
 			return true;
 		} catch (SQLException sqe) {
@@ -150,22 +149,19 @@ public class AlarmManager
 	 * Add a new alarm to the system.
 	 * 
 	 * @param nextOccurrence
-	 *            The date on which the next occurrence of the alarm should take place. This value
-	 *            MUST be non-null, but MAY be in the past (it will get executed eventually).
+	 *            The date on which the next occurrence of the alarm should take place. This value MUST be non-null, but MAY be in the past
+	 *            (it will get executed eventually).
 	 * @param repeatIntervalMS
-	 *            This is the number of milliseconds between alarms. This value can be 0 or negative
-	 *            indicating that the alarm does NOT repeat.
+	 *            This is the number of milliseconds between alarms. This value can be 0 or negative indicating that the alarm does NOT
+	 *            repeat.
 	 * @param callingContext
-	 *            The calling context to use when calling the alarm. This value CAN be null in which
-	 *            case the current calling context will be used.
+	 *            The calling context to use when calling the alarm. This value CAN be null in which case the current calling context will be
+	 *            used.
 	 * @param targetEPR
-	 *            The target EPR for the service to receive the alarm. This can be null in which
-	 *            case the current EPR will be used.
+	 *            The target EPR for the service to receive the alarm. This can be null in which case the current EPR will be used.
 	 * @param methodName
-	 *            The name of the method on the service to handle the alarm. This cannot be null.
-	 *            This method MUST have a signature of "[public|protected] void methodName(
-	 *            AlarmIdentifier id, Type userData)" where Type is a compatible type to userData's
-	 *            type.
+	 *            The name of the method on the service to handle the alarm. This cannot be null. This method MUST have a signature of
+	 *            "[public|protected] void methodName( AlarmIdentifier id, Type userData)" where Type is a compatible type to userData's type.
 	 * @param userData
 	 *            Any user data (or null) to pass along for alarms.
 	 * @return An alarm identifier.
@@ -188,9 +184,7 @@ public class AlarmManager
 
 		if (targetEPR == null) {
 			try {
-				targetEPR =
-					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-						WorkingContext.EPR_PROPERTY_NAME);
+				targetEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 			} catch (Throwable cause) {
 				_logger.error("Unable to get current target EPR.", cause);
 			}
@@ -257,8 +251,8 @@ public class AlarmManager
 		}
 	}
 
-	private void updateDatabase(PreparedStatement removeStmt, PreparedStatement updateStmt, long alarmid, long repeatInterval,
-		Date now) throws Throwable
+	private void updateDatabase(PreparedStatement removeStmt, PreparedStatement updateStmt, long alarmid, long repeatInterval, Date now)
+		throws Throwable
 	{
 		Timestamp nextOccurance = null;
 
@@ -281,8 +275,8 @@ public class AlarmManager
 		}
 	}
 
-	private void performAlarm(Connection conn, PreparedStatement removeStmt, PreparedStatement updateStmt, long alarmid,
-		long repeatInterval, ICallingContext callingContext, EndpointReferenceType target, String methodName, Object userData)
+	private void performAlarm(Connection conn, PreparedStatement removeStmt, PreparedStatement updateStmt, long alarmid, long repeatInterval,
+		ICallingContext callingContext, EndpointReferenceType target, String methodName, Object userData)
 	{
 		boolean needRelease = false;
 		WorkingContext newContext = null;
@@ -349,14 +343,14 @@ public class AlarmManager
 					rs = getInfoStmt.executeQuery();
 					if (rs.next()) {
 						aInfo =
-							new AlarmInformation(desc.getAlarmID(), rs.getLong(1), (ICallingContext) DBSerializer.fromBlob(rs
-								.getBlob(2)), (EndpointReferenceType) EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4),
-								DBSerializer.fromBlob(rs.getBlob(5)));
+							new AlarmInformation(desc.getAlarmID(), rs.getLong(1), (ICallingContext) DBSerializer.fromBlob(rs.getBlob(2)),
+								(EndpointReferenceType) EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4), DBSerializer.fromBlob(rs
+									.getBlob(5)));
 						StreamUtils.close(rs);
 						rs = null;
 
-						performAlarm(conn, removeStmt, updateStmt, aInfo.alarmID(), aInfo.repeatInterval(),
-							aInfo.callingContext(), aInfo.target(), aInfo.methodName(), aInfo.userData());
+						performAlarm(conn, removeStmt, updateStmt, aInfo.alarmID(), aInfo.repeatInterval(), aInfo.callingContext(),
+							aInfo.target(), aInfo.methodName(), aInfo.userData());
 					}
 				} catch (Throwable cause) {
 					_logger.error("Problem handling alarms.", cause);

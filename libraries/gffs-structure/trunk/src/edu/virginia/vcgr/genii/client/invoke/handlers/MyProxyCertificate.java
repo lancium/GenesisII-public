@@ -40,8 +40,7 @@ public class MyProxyCertificate
 	};
 
 	/*
-	 * If the user has a myproxy certificate, set a thread local variable to the certificate's pem
-	 * formatted String
+	 * If the user has a myproxy certificate, set a thread local variable to the certificate's pem formatted String
 	 */
 	public static void setIfXSEDEUser()
 	{
@@ -117,21 +116,17 @@ public class MyProxyCertificate
 			return false;
 		}
 
-		String certificateString =
-			getCertificateString(clientKeyMaterial._clientPrivateKey, clientKeyMaterial._clientCertChain[0]);
+		String certificateString = getCertificateString(clientKeyMaterial._clientPrivateKey, clientKeyMaterial._clientCertChain[0]);
 		if (_logger.isDebugEnabled())
 			_logger.debug("got certificate for " + clientKeyMaterial._clientCertChain[0].getSubjectDN());
 		pemFormattedCertificate.set(certificateString);
 
 		/*
-		 * Can be removed after code review. Required to test locally try { BufferedReader reader =
-		 * new BufferedReader(new FileReader( "/if8/am2qa/.genesisII-2.0/x509up_u480965")); String
-		 * line = null; StringBuilder stringBuilder = new StringBuilder(); String ls =
-		 * System.getProperty("line.separator"); while ((line = reader.readLine()) != null) {
-		 * stringBuilder.append(line); stringBuilder.append(ls); }
-		 * pemFormattedCertificate.set(stringBuilder.toString()); reader.close(); } catch
-		 * (IOException e) { e.printStackTrace(); pemFormattedCertificate.set("arbit"); return
-		 * false; }
+		 * Can be removed after code review. Required to test locally try { BufferedReader reader = new BufferedReader(new FileReader(
+		 * "/if8/am2qa/.genesisII-2.0/x509up_u480965")); String line = null; StringBuilder stringBuilder = new StringBuilder(); String ls =
+		 * System.getProperty("line.separator"); while ((line = reader.readLine()) != null) { stringBuilder.append(line);
+		 * stringBuilder.append(ls); } pemFormattedCertificate.set(stringBuilder.toString()); reader.close(); } catch (IOException e) {
+		 * e.printStackTrace(); pemFormattedCertificate.set("arbit"); return false; }
 		 */
 		return true;
 	}

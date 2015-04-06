@@ -77,14 +77,12 @@ public class ApplicationDescriptionUtils
 			ZipJarDeploymentType deploymentInfo = ObjectDeserializer.toObject(any[0], ZipJarDeploymentType.class);
 
 			deploymentInfo = uploadLocalSources(deployDirectory, deploymentInfo, listener);
-			deploymentDocument.set_any(new MessageElement[] { new MessageElement(ZIPJAR_DEPLOYMENT_ELEMENT_QNAME,
-				deploymentInfo) });
+			deploymentDocument.set_any(new MessageElement[] { new MessageElement(ZIPJAR_DEPLOYMENT_ELEMENT_QNAME, deploymentInfo) });
 		} else if (name.equals(BINARY_DEPLOYMENT_ELEMENT_QNAME)) {
 			BinDeploymentType deploymentInfo = ObjectDeserializer.toObject(any[0], BinDeploymentType.class);
 
 			deploymentInfo = uploadLocalSources(deployDirectory, deploymentInfo, listener);
-			deploymentDocument.set_any(new MessageElement[] { new MessageElement(BINARY_DEPLOYMENT_ELEMENT_QNAME,
-				deploymentInfo) });
+			deploymentDocument.set_any(new MessageElement[] { new MessageElement(BINARY_DEPLOYMENT_ELEMENT_QNAME, deploymentInfo) });
 		} else {
 			throw new DeploymentException("Unknown deployment type.");
 		}
@@ -130,15 +128,12 @@ public class ApplicationDescriptionUtils
 		return deploymentInfo;
 	}
 
-	static public QName LOCAL_FILE_SOURCE_NAME = new QName(ApplicationDescriptionConstants.APPLICATION_DESCRIPTION_NS,
-		"local-file");
-	static public QName RNS_FILE_SOURCE_NAME =
-		new QName(ApplicationDescriptionConstants.APPLICATION_DESCRIPTION_NS, "rns-file");
-	static public QName REMOTE_ENDPOINT_NAME = new QName(ApplicationDescriptionConstants.APPLICATION_DESCRIPTION_NS,
-		"remote-endpoint");
+	static public QName LOCAL_FILE_SOURCE_NAME = new QName(ApplicationDescriptionConstants.APPLICATION_DESCRIPTION_NS, "local-file");
+	static public QName RNS_FILE_SOURCE_NAME = new QName(ApplicationDescriptionConstants.APPLICATION_DESCRIPTION_NS, "rns-file");
+	static public QName REMOTE_ENDPOINT_NAME = new QName(ApplicationDescriptionConstants.APPLICATION_DESCRIPTION_NS, "remote-endpoint");
 
-	static private MessageElement[] uploadLocalSource(File deployDirectory, MessageElement[] any,
-		IUploadProgressListener listener) throws IOException, RNSException
+	static private MessageElement[] uploadLocalSource(File deployDirectory, MessageElement[] any, IUploadProgressListener listener)
+		throws IOException, RNSException
 	{
 		if (any == null)
 			return null;
@@ -154,8 +149,8 @@ public class ApplicationDescriptionUtils
 		return any;
 	}
 
-	static private EndpointReferenceType uploadLocalFile(File deployDirectory, String localPath,
-		IUploadProgressListener listener) throws IOException
+	static private EndpointReferenceType uploadLocalFile(File deployDirectory, String localPath, IUploadProgressListener listener)
+		throws IOException
 	{
 		OutputStream bos = null;
 		EndpointReferenceType newFile = null;

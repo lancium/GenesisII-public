@@ -1,9 +1,8 @@
 package edu.virginia.vcgr.genii.client.gui.browser.plugins;
 
 /**
- * A context menu descriptor is a class that complete describes a registered context plugin. This is
- * a plugin which acts in a menu that can be popped up by the user by right-clicking on an element
- * in the RNS tree.
+ * A context menu descriptor is a class that complete describes a registered context plugin. This is a plugin which acts in a menu that can be
+ * popped up by the user by right-clicking on an element in the RNS tree.
  * 
  * @author mmm2a
  */

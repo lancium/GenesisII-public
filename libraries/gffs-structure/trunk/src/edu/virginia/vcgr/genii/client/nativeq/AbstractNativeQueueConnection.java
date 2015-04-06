@@ -16,8 +16,8 @@ public abstract class AbstractNativeQueueConnection<ProviderConfigType> implemen
 	private ProviderConfigType _providerConfiguration;
 
 	protected AbstractNativeQueueConnection(File workingDirectory, ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorConf, NativeQueueConfiguration queueConfig,
-		ProviderConfigType providerConfig) throws NativeQueueException
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf, NativeQueueConfiguration queueConfig, ProviderConfigType providerConfig)
+		throws NativeQueueException
 	{
 		_workingDirectory = workingDirectory;
 		_resourceOverrides = resourceOverrides;

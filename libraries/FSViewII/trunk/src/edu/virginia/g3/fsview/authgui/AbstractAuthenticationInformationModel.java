@@ -4,8 +4,8 @@ import edu.virginia.g3.fsview.FSViewAuthenticationInformation;
 import edu.virginia.g3.fsview.FSViewAuthenticationInformationTypes;
 import edu.virginia.g3.fsview.gui.AbstractFSViewInformationModel;
 
-public abstract class AbstractAuthenticationInformationModel extends
-	AbstractFSViewInformationModel<FSViewAuthenticationInformation> implements AuthenticationInformationModel
+public abstract class AbstractAuthenticationInformationModel extends AbstractFSViewInformationModel<FSViewAuthenticationInformation>
+	implements AuthenticationInformationModel
 {
 	private FSViewAuthenticationInformationTypes _authenticationType;
 

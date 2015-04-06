@@ -39,8 +39,7 @@ public class BESManager
 				return "Too many local containers found.";
 
 			ContainerInformation cInfo = containers.get(containers.keySet().iterator().next());
-			EndpointReferenceType service =
-				EPRUtils.makeEPR(cInfo.getContainerURL().toString() + "/axis/services/GeniiBESPortType");
+			EndpointReferenceType service = EPRUtils.makeEPR(cInfo.getContainerURL().toString() + "/axis/services/GeniiBESPortType");
 
 			target = RNSPath.getCurrent().lookup(path, RNSPathQueryFlags.MUST_NOT_EXIST);
 			GeniiBESPortType servicePT = ClientUtils.createProxy(GeniiBESPortType.class, service);

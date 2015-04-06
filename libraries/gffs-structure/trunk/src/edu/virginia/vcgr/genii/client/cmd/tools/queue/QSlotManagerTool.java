@@ -89,9 +89,8 @@ public class QSlotManagerTool extends BaseGridTool
 	}
 
 	/*
-	 * We could use the JobInformation data types from the stat call to track waiting jobs, but that
-	 * timing information may not always be available, so we keep a list in memory for estimating
-	 * the wait time when we can't get it exactly.
+	 * We could use the JobInformation data types from the stat call to track waiting jobs, but that timing information may not always be
+	 * available, so we keep a list in memory for estimating the wait time when we can't get it exactly.
 	 */
 	private class JobTimer
 	{
@@ -110,9 +109,8 @@ public class QSlotManagerTool extends BaseGridTool
 	private HashMap<JobTicket, JobTimer> watchList;
 
 	/*
-	 * Each BES has some data associated with it that we need as we modify the slot counts
-	 * throughout execution. This keeps that data in one place and easily accessible via the BES
-	 * name.
+	 * Each BES has some data associated with it that we need as we modify the slot counts throughout execution. This keeps that data in one
+	 * place and easily accessible via the BES name.
 	 */
 	private class BESStats
 	{
@@ -144,8 +142,8 @@ public class QSlotManagerTool extends BaseGridTool
 	// This is essentially your main() method, it loops for some time period
 	// periodically checking the jobs on a Queue and adjusting as needed
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		// timeout is the time to run the tool in hours, default is 24 hours
 		// runtime is the amount of time in minutes the program has been running so far
@@ -179,12 +177,10 @@ public class QSlotManagerTool extends BaseGridTool
 	}
 
 	/*
-	 * Based on the code Ashwin wrote to find BES Slot counts; there are two sets of slot counts:
-	 * current and max. Current is whatever the queue has at the moment, max is the highest we're
-	 * allowed to set current. The max counts should be stored in a centralized location on the GFFS
-	 * so our tool can access it wherever it runs; by convention, we will store them in
-	 * /etc/queue-slots/<queue-path> (e.g. "/etc/queue-slots/queues/grid-queue"). The user may
-	 * specify a different file path on the command line.
+	 * Based on the code Ashwin wrote to find BES Slot counts; there are two sets of slot counts: current and max. Current is whatever the
+	 * queue has at the moment, max is the highest we're allowed to set current. The max counts should be stored in a centralized location on
+	 * the GFFS so our tool can access it wherever it runs; by convention, we will store them in /etc/queue-slots/<queue-path> (e.g.
+	 * "/etc/queue-slots/queues/grid-queue"). The user may specify a different file path on the command line.
 	 */
 	private void populateSlotTable(String queuePath) throws IOException, RNSException
 	{
@@ -221,9 +217,8 @@ public class QSlotManagerTool extends BaseGridTool
 	}
 
 	/*
-	 * This should read a file (which already exists on GFFS) to determine the max slot counts for
-	 * the BESes on the target queue. This file will either be in a fixed location for each queue,
-	 * or specified by the user at run time.
+	 * This should read a file (which already exists on GFFS) to determine the max slot counts for the BESes on the target queue. This file
+	 * will either be in a fixed location for each queue, or specified by the user at run time.
 	 */
 	private void populateMaxBESSlots() throws IOException, RNSException
 	{
@@ -314,10 +309,9 @@ public class QSlotManagerTool extends BaseGridTool
 	}
 
 	/*
-	 * This function is the primary reschedule logic. It goes through the jobs from the queue,
-	 * determines the state of each job, and decides if it should be rescheduled. When a job is
-	 * chosen for reschedule, the BES that is currently hosting that job loses slots, and the job is
-	 * re-queued without penalty.
+	 * This function is the primary reschedule logic. It goes through the jobs from the queue, determines the state of each job, and decides
+	 * if it should be rescheduled. When a job is chosen for reschedule, the BES that is currently hosting that job loses slots, and the job
+	 * is re-queued without penalty.
 	 */
 	private void rescheduleJobs(QueueManipulator manipulator) throws RemoteException
 	{
@@ -411,8 +405,7 @@ public class QSlotManagerTool extends BaseGridTool
 	}
 
 	/*
-	 * This is the method YAN designed to read in a BES-level job status Returns true if the job is
-	 * Waiting on a BES somewhere
+	 * This is the method YAN designed to read in a BES-level job status Returns true if the job is Waiting on a BES somewhere
 	 */
 	private boolean isWaitingJob(ActivityStatusType status)
 	{
@@ -447,9 +440,8 @@ public class QSlotManagerTool extends BaseGridTool
 	}
 
 	/*
-	 * We should increase the slot count if: a) all the current slots are full, and b) all the
-	 * current jobs are running (not waiting), and c) the current slot count is less than the
-	 * maximum We can either increase by one at a time, or we can go straight to the max; currently
+	 * We should increase the slot count if: a) all the current slots are full, and b) all the current jobs are running (not waiting), and c)
+	 * the current slot count is less than the maximum We can either increase by one at a time, or we can go straight to the max; currently
 	 * it's one at a time.
 	 */
 	private void incrementSlots(QueueManipulator manipulator) throws RemoteException

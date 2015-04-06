@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.bes.activity;
 
@@ -107,8 +106,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType activityEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		super.postCreate(rKey, activityEPR, cParams, creationParameters, resolverCreationParams);
 
@@ -125,8 +124,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
 
 		BESWorkingDirectory workingDirectory =
-			new BESWorkingDirectory(
-				chooseDirectory((BESConstructionParameters) _resource.constructionParameters(getClass()), 5), true);
+			new BESWorkingDirectory(chooseDirectory((BESConstructionParameters) _resource.constructionParameters(getClass()), 5), true);
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
@@ -151,12 +149,10 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 				ExecutionUnderstanding executionUnderstanding;
 
 				if (qConf != null) {
-					Object understanding =
-						JSDLInterpreter.interpretJSDL(new QSubPersonalityProvider(fsManager, workingDirectory), jsdl);
+					Object understanding = JSDLInterpreter.interpretJSDL(new QSubPersonalityProvider(fsManager, workingDirectory), jsdl);
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				} else {
-					Object understanding =
-						JSDLInterpreter.interpretJSDL(new ForkExecPersonalityProvider(fsManager, workingDirectory), jsdl);
+					Object understanding = JSDLInterpreter.interpretJSDL(new ForkExecPersonalityProvider(fsManager, workingDirectory), jsdl);
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
 
@@ -170,8 +166,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			BES bes = BES.getBES(initInfo.getContainerID());
 			if (bes == null)
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID()
-						+ "\".") }, null));
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
+					null));
 
 			try {
 				WSName wsname = new WSName(activityEPR);
@@ -183,8 +179,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 				// for a print statement.
 			}
 
-			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners,
-				ContextManager.getExistingContext(), workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
+			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
+				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
 
 			if (_logger.isTraceEnabled()) {
 				_logger.debug("after creating job, context has these creds:\n"
@@ -193,8 +189,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 			Calendar future = Calendar.getInstance();
 			future.setTimeInMillis(System.currentTimeMillis() + BES_ACTIVITY_LIFETIME);
-			_logger
-				.debug(String.format("Setting term. time for BES Activity with resource key \"%s\".", rKey.getResourceKey()));
+			_logger.debug(String.format("Setting term. time for BES Activity with resource key \"%s\".", rKey.getResourceKey()));
 			setScheduledTerminationTime(future, rKey);
 		} catch (IOException fnfe) {
 			throw new RemoteException("Unable to create new activity.", fnfe);
@@ -227,16 +222,14 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		return configDir;
 	}
 
-	static private File chooseDirectory(BESConstructionParameters constructionParameters, int attempts)
-		throws ResourceException
+	static private File chooseDirectory(BESConstructionParameters constructionParameters, int attempts) throws ResourceException
 	{
 		return new File(getCommonDirectory(constructionParameters), new GUID().toString());
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public BESActivityGetErrorResponseType getError(Object BESActivityGetErrorRequest) throws RemoteException,
-		ResourceUnknownFaultType
+	public BESActivityGetErrorResponseType getError(Object BESActivityGetErrorRequest) throws RemoteException, ResourceUnknownFaultType
 	{
 		try {
 			byte[] serializedFault = null;

@@ -39,8 +39,8 @@ public class CdTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		chdir(getArgument(0));
 		return 0;
@@ -62,8 +62,7 @@ public class CdTool extends BaseGridTool
 			throw new InvalidToolUsageException();
 	}
 
-	static public void chdir(String target) throws ResourceException, RNSException, RemoteException, IOException,
-		InvalidToolUsageException
+	static public void chdir(String target) throws ResourceException, RNSException, RemoteException, IOException, InvalidToolUsageException
 	{
 		RNSPath path = lookup(new GeniiPath(target), RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation typeInfo = new TypeInformation(path.getEndpoint());

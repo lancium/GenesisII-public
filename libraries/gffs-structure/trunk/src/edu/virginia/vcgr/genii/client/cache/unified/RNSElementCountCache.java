@@ -87,8 +87,7 @@ public class RNSElementCountCache extends CommonAttributeCache
 	@Override
 	protected long getCacheLifeTime(URI endpointIdentifierURI)
 	{
-		WSResourceConfig resourceConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifierURI, WSResourceConfig.class);
+		WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifierURI, WSResourceConfig.class);
 		if (resourceConfig == null)
 			return cacheLifeTime;
 		if (resourceConfig.isCacheAccessBlocked())

@@ -25,10 +25,9 @@ import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 
 /**
- * This Axis intercepter/handler class is used for retrieving the SAML credentials wallet a client
- * delegates to a resource when issuing an RPC. Note that this class is populating the working
- * context with the retrieved credentials wallet. So this invoker must be invoked after we have
- * already processed the working context from the SOAP message context.
+ * This Axis intercepter/handler class is used for retrieving the SAML credentials wallet a client delegates to a resource when issuing an
+ * RPC. Note that this class is populating the working context with the retrieved credentials wallet. So this invoker must be invoked after we
+ * have already processed the working context from the SOAP message context.
  * 
  * @author myanhaona
  * @author ckoeritz
@@ -90,9 +89,8 @@ public class CredentialsWalletRetriever extends BasicHandler
 	}
 
 	/**
-	 * A caller's SSL certificate is not a part of the delegated SAML credentials wallet.
-	 * Nevertheless, we retrieve it and store it for the lifetime of an RPC because some of the
-	 * access control rule may be directly applicable to the SSL certificate in use.
+	 * A caller's SSL certificate is not a part of the delegated SAML credentials wallet. Nevertheless, we retrieve it and store it for the
+	 * lifetime of an RPC because some of the access control rule may be directly applicable to the SSL certificate in use.
 	 */
 	private void retrieveSSLCertificate(MessageContext messageContext, WorkingContext workingContext)
 	{
@@ -100,8 +98,7 @@ public class CredentialsWalletRetriever extends BasicHandler
 		Object transport = request.getConnection().getEndPoint().getTransport();
 		if (transport instanceof SSLSocket) {
 			try {
-				X509Certificate[] clientSSLCertificate =
-					(X509Certificate[]) ((SSLSocket) transport).getSession().getPeerCertificates();
+				X509Certificate[] clientSSLCertificate = (X509Certificate[]) ((SSLSocket) transport).getSession().getPeerCertificates();
 				if (clientSSLCertificate != null) {
 					workingContext.setProperty(SAMLConstants.SAML_CLIENT_SSL_CERTIFICATE_PROPERTY_NAME, clientSSLCertificate);
 				}

@@ -1,8 +1,7 @@
 package edu.virginia.vcgr.genii.client.gui.browser.plugins;
 
 /**
- * A PluginDescriptor is a simple descriptor object which describes the content about a plugin which
- * is the same for all plugin types.
+ * A PluginDescriptor is a simple descriptor object which describes the content about a plugin which is the same for all plugin types.
  * 
  * @author mmm2a
  * 

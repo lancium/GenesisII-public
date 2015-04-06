@@ -22,19 +22,19 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 class StreamableByteIOOpenFile extends OperatorBasedOpenFile
 {
-	static private BasicFileOperator createOperator(StreamableByteIOPortType portType) throws ResourceException,
-		GenesisIISecurityException, RemoteException, IOException
+	static private BasicFileOperator createOperator(StreamableByteIOPortType portType) throws ResourceException, GenesisIISecurityException,
+		RemoteException, IOException
 	{
 		StreamableByteIOTransferer transferer = StreamableByteIOTransfererFactory.createStreamableByteIOTransferer(portType);
 
-		return new BasicFileOperator(ByteIOBufferLeaser.leaser(transferer.getTransferProtocol()), new ReadResolverImpl(
-			transferer), new WriteResolverImpl(transferer), new AppendResolverImpl(transferer), false);
+		return new BasicFileOperator(ByteIOBufferLeaser.leaser(transferer.getTransferProtocol()), new ReadResolverImpl(transferer),
+			new WriteResolverImpl(transferer), new AppendResolverImpl(transferer), false);
 	}
 
 	private StreamableByteIOPortType _destroyer = null;
 
-	StreamableByteIOOpenFile(String[] path, boolean wasCreated, StreamableByteIOPortType portType, boolean canRead,
-		boolean canWrite, boolean isAppend) throws ResourceException, GenesisIISecurityException, RemoteException, IOException
+	StreamableByteIOOpenFile(String[] path, boolean wasCreated, StreamableByteIOPortType portType, boolean canRead, boolean canWrite,
+		boolean isAppend) throws ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
 		super(path, createOperator(portType), canRead, canWrite, isAppend);
 
@@ -42,8 +42,8 @@ class StreamableByteIOOpenFile extends OperatorBasedOpenFile
 			_destroyer = portType;
 	}
 
-	StreamableByteIOOpenFile(String[] path, boolean wasCreated, EndpointReferenceType target, boolean canRead,
-		boolean canWrite, boolean isAppend) throws ResourceException, GenesisIISecurityException, RemoteException, IOException
+	StreamableByteIOOpenFile(String[] path, boolean wasCreated, EndpointReferenceType target, boolean canRead, boolean canWrite,
+		boolean isAppend) throws ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
 		this(path, wasCreated, ClientUtils.createProxy(StreamableByteIOPortType.class, target), canRead, canWrite, isAppend);
 	}

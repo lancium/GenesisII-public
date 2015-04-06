@@ -43,8 +43,7 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 	public void consumeCreationFlag(Object currentUnderstanding, CreationFlagEnumeration creationFlag) throws JSDLException
 	{
 		if (creationFlag == CreationFlagEnumeration.append)
-			throw new UnsupportedJSDLElement("Creation flag \"append\" is not supported.", new QName(JSDLConstants.JSDL_NS,
-				"CreationFlag"));
+			throw new UnsupportedJSDLElement("Creation flag \"append\" is not supported.", new QName(JSDLConstants.JSDL_NS, "CreationFlag"));
 
 		_creationFlag = creationFlag;
 	}
@@ -77,7 +76,7 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 	public void completeFacet(Object parentUnderstanding, Object currentUnderstanding)
 	{
 		JobRequest jr = (JobRequest) parentUnderstanding;
-		jr.addDataStage(new ContainerDataStage(new FilesystemRelative<String>(_filesystemName, _fileName), _deleteOnTerminate,
-			_creationFlag, _sourceURI, _targetURI, _credential));
+		jr.addDataStage(new ContainerDataStage(new FilesystemRelative<String>(_filesystemName, _fileName), _deleteOnTerminate, _creationFlag,
+			_sourceURI, _targetURI, _credential));
 	}
 }

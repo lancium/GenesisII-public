@@ -49,8 +49,8 @@ public class AttributeCacheHandler
 	static private final int _MAX_CACHE_ELEMENTS = 1024;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 45;
 
-	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache = new TimedOutLRUCache<WSName, CachedAttributeData>(
-		_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
+	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache = new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS,
+		_DEFAULT_TIMEOUT_MS);
 
 	static private QName rxferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
 	static private QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
@@ -120,8 +120,8 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(InvocationContext ctxt,
-		GetResourcePropertyDocument request) throws Throwable
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(InvocationContext ctxt, GetResourcePropertyDocument request)
+		throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
@@ -151,8 +151,8 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public UpdateResourcePropertiesResponse updateResourceProperties(InvocationContext ctxt,
-		UpdateResourceProperties updateRequest) throws Throwable
+	public UpdateResourcePropertiesResponse updateResourceProperties(InvocationContext ctxt, UpdateResourceProperties updateRequest)
+		throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
@@ -173,8 +173,8 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public DeleteResourcePropertiesResponse deleteResourceProperties(InvocationContext ctxt,
-		DeleteResourceProperties deleteRequest) throws Throwable
+	public DeleteResourcePropertiesResponse deleteResourceProperties(InvocationContext ctxt, DeleteResourceProperties deleteRequest)
+		throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
@@ -195,8 +195,8 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public InsertResourcePropertiesResponse insertResourceProperties(InvocationContext ctxt,
-		InsertResourceProperties insertRequest) throws Throwable
+	public InsertResourcePropertiesResponse insertResourceProperties(InvocationContext ctxt, InsertResourceProperties insertRequest)
+		throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
@@ -217,8 +217,7 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public SetResourcePropertiesResponse setResourceProperties(InvocationContext ctxt, SetResourceProperties setRequest)
-		throws Throwable
+	public SetResourcePropertiesResponse setResourceProperties(InvocationContext ctxt, SetResourceProperties setRequest) throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
@@ -280,8 +279,7 @@ public class AttributeCacheHandler
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetResourcePropertyResponse getResourceProperty(InvocationContext ctxt, QName getResourcePropertyRequest)
-		throws Throwable
+	public GetResourcePropertyResponse getResourceProperty(InvocationContext ctxt, QName getResourcePropertyRequest) throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);

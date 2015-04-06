@@ -63,15 +63,14 @@ public class MoveTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		GeniiPath source = new GeniiPath(getArgument(0));
 		GeniiPath target = new GeniiPath(getArgument(1));
 
 		if (source.pathType() != target.pathType())
-			throw new InvalidToolUsageException(
-				"The source and target must both be local paths, or they must both be grid paths.");
+			throw new InvalidToolUsageException("The source and target must both be local paths, or they must both be grid paths.");
 
 		if (source.pathType() == GeniiPathType.Local)
 			return moveLocal(source.path(), target.path());

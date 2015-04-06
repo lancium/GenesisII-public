@@ -35,8 +35,7 @@ class XmlUtils
 	{
 		String value = node.getAttribute(attributeName);
 		if (value == null || value.length() == 0)
-			throw new FilterScriptException(String.format("Element %s is missing required attribute %s.", qname(node),
-				attributeName));
+			throw new FilterScriptException(String.format("Element %s is missing required attribute %s.", qname(node), attributeName));
 
 		return value;
 	}

@@ -94,9 +94,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 		if (constructionParameters == null) {
 			ResourceCreationFaultType rcft =
-				new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-						"Could not create ExportedDir resource without cerationProperties") }, null);
+				new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+					"Could not create ExportedDir resource without cerationProperties") }, null);
 			throw FaultManipulator.fillInFault(rcft);
 		}
 
@@ -112,21 +111,19 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 	}
 
 	/*
-	 * Looks like this is dead code -- mmm2a protected void fillIn(ResourceKey rKey,
-	 * EndpointReferenceType newEPR, ConstructionParameters cParams, GenesisHashMap
-	 * creationParameters, Collection<MessageElement> resolverCreationParams) throws
-	 * ResourceException, BaseFaultType, RemoteException { super.postCreate(rKey, newEPR, cParams,
-	 * creationParameters, resolverCreationParams);
+	 * Looks like this is dead code -- mmm2a protected void fillIn(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters
+	 * cParams, GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+	 * RemoteException { super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 	 * 
 	 * Date d = new Date(); Calendar c = Calendar.getInstance(); c.setTime(d);
 	 * 
-	 * IExportedDirResource resource = (IExportedDirResource)rKey.dereference();
-	 * resource.setCreateTime(c); resource.setModTime(c); resource.setAccessTime(c); }
+	 * IExportedDirResource resource = (IExportedDirResource)rKey.dereference(); resource.setCreateTime(c); resource.setModTime(c);
+	 * resource.setAccessTime(c); }
 	 */
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType
+	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) throws RemoteException, RNSEntryExistsFaultType,
+		ResourceUnknownFaultType
 	{
 		String filename = null;
 		EndpointReferenceType entryReference = null;
@@ -146,26 +143,23 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 			try {
 				if (!(new File(fullPath).createNewFile())) {
-					throw FaultManipulator
-						.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null, null, filename));
+					throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null, null, filename));
 				}
 			} catch (IOException ioe) {
 				throw new RemoteException(String.format("Unable to create new file on disk (%s).", fullPath), ioe);
 			}
 
 			try {
-				WorkingContext.temporarilyAssumeNewIdentity(EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType"),
-					false));
+				WorkingContext.temporarilyAssumeNewIdentity(EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType"), false));
 
 				entryReference =
 					new ExportedFileServiceImpl().vcgrCreate(
-						new VcgrCreate(ExportedFileUtils.createCreationProperties(fullPath, parentIds,
-							_resource.getReplicationState()))).getEndpoint();
+						new VcgrCreate(ExportedFileUtils.createCreationProperties(fullPath, parentIds, _resource.getReplicationState())))
+						.getEndpoint();
 
 				String newEntryId = (new GUID()).toString();
 				ExportedDirEntry newEntry =
-					new ExportedDirEntry(_resource.getId(), filename, entryReference, newEntryId, ExportedDirEntry._FILE_TYPE,
-						null);
+					new ExportedDirEntry(_resource.getId(), filename, entryReference, newEntryId, ExportedDirEntry._FILE_TYPE, null);
 				_resource.addEntry(newEntry, false);
 				_resource.commit();
 			} catch (Throwable t) {
@@ -204,8 +198,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 		if (addRequest == null) {
 			// Pure factory operation
 			throw FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Pure factory version of add not allowed in export dir.") }, null));
+				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Pure factory version of add not allowed in export dir.") },
+				null));
 		}
 
 		// decipher add request
@@ -217,8 +211,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 		if (entryReference != null) {
 			throw FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Add not allowed in ExportDirs (unless you are creating " + "a new directory.") }, null));
+				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Add not allowed in ExportDirs (unless you are creating "
+					+ "a new directory.") }, null));
 		}
 
 		if (_logger.isDebugEnabled())
@@ -240,12 +234,11 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 			newRef =
 				vcgrCreate(
-					new VcgrCreate(ExportedDirUtils.createCreationProperties(null, fullPath, null, null, null, parentIds,
-						isReplicated, owner))).getEndpoint();
+					new VcgrCreate(ExportedDirUtils
+						.createCreationProperties(null, fullPath, null, null, null, parentIds, isReplicated, owner))).getEndpoint();
 
 			String newEntryId = (new GUID()).toString();
-			ExportedDirEntry newEntry =
-				new ExportedDirEntry(_resource.getId(), name, newRef, newEntryId, ExportedDirEntry._DIR_TYPE, attrs);
+			ExportedDirEntry newEntry = new ExportedDirEntry(_resource.getId(), name, newRef, newEntryId, ExportedDirEntry._DIR_TYPE, attrs);
 			_resource.addEntry(newEntry, true);
 			_resource.commit();
 		} finally {
@@ -276,9 +269,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			} catch (Throwable cause) {
 				_logger.error("failure during add request", cause);
 				ret[lcv] =
-					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: "
-							+ cause.getMessage()) }, null)), addRequest[lcv].getEntryName());
+					new RNSEntryResponseType(null, null,
+						FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: " + cause.getMessage()) },
+							null)), addRequest[lcv].getEntryName());
 			}
 		}
 
@@ -312,8 +306,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 		timer = tSink.getTimer("Prepare Entries");
 		for (ExportedDirEntry exportDirEntry : entries) {
 			RNSEntryResponseType entry =
-				new RNSEntryResponseType(exportDirEntry.getEntryReference(), RNSUtilities.createMetadata(
-					exportDirEntry.getEntryReference(), exportDirEntry.getAttributes()), null, exportDirEntry.getName());
+				new RNSEntryResponseType(exportDirEntry.getEntryReference(), RNSUtilities.createMetadata(exportDirEntry.getEntryReference(),
+					exportDirEntry.getAttributes()), null, exportDirEntry.getName());
 
 			entryCollection.add(entry);
 		}
@@ -321,8 +315,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 
 		try {
 			timer = tSink.getTimer("Create Iterator");
-			return RNSContainerUtilities.translate(entryCollection, iteratorBuilder(RNSEntryResponseType.getTypeDesc()
-				.getXmlType()));
+			return RNSContainerUtilities.translate(entryCollection, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()));
 		} finally {
 			if (timer != null)
 				timer.noteTime();
@@ -330,8 +323,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest) throws RemoteException,
-		org.ggf.rns.WriteNotPermittedFaultType
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest) throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
 	{
 		throw new UnsupportedOperationException("Rename not supported in Resource forks!");
 	}
@@ -357,8 +349,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 	}
 
 	@Override
-	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
-		WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new UnsupportedOperationException("setMetadata not supported!");
 	}

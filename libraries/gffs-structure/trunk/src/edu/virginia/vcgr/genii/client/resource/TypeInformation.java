@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.resource;
 
@@ -70,8 +69,8 @@ public class TypeInformation
 
 		if (_implementedPortTypes == null) {
 			_implementedPortTypes = new PortType[0];
-			if (epr.getAddress() != null && epr.getAddress().get_value() != null && epr.get_any() == null
-				&& epr.getMetadata() == null && epr.getReferenceParameters() == null) {
+			if (epr.getAddress() != null && epr.getAddress().get_value() != null && epr.get_any() == null && epr.getMetadata() == null
+				&& epr.getReferenceParameters() == null) {
 				_pureURL = epr.getAddress().get_value().toString();
 			}
 		}
@@ -269,18 +268,15 @@ public class TypeInformation
 			Long value = null;
 
 			if (isRByteIO()) {
-				RandomByteIORP rp =
-					(RandomByteIORP) ResourcePropertyManager.createRPInterface(_epr, OGSARP.class, RandomByteIORP.class);
+				RandomByteIORP rp = (RandomByteIORP) ResourcePropertyManager.createRPInterface(_epr, OGSARP.class, RandomByteIORP.class);
 				value = rp.getSize();
 			} else if (isSByteIO()) {
 				StreamableByteIORP rp =
-					(StreamableByteIORP) ResourcePropertyManager
-						.createRPInterface(_epr, OGSARP.class, StreamableByteIORP.class);
+					(StreamableByteIORP) ResourcePropertyManager.createRPInterface(_epr, OGSARP.class, StreamableByteIORP.class);
 				value = rp.getSize();
 			} else if (isSByteIOFactory()) {
 				StreamableByteIORP rp =
-					(StreamableByteIORP) ResourcePropertyManager
-						.createRPInterface(_epr, OGSARP.class, StreamableByteIORP.class);
+					(StreamableByteIORP) ResourcePropertyManager.createRPInterface(_epr, OGSARP.class, StreamableByteIORP.class);
 				value = rp.getSize();
 			}
 
@@ -294,8 +290,7 @@ public class TypeInformation
 
 	private Date getTimeAttribute(String attrName) throws RemoteException
 	{
-		QName attrQName =
-			new QName((isRByteIO() ? ByteIOConstants.RANDOM_BYTEIO_NS : ByteIOConstants.STREAMABLE_BYTEIO_NS), attrName);
+		QName attrQName = new QName((isRByteIO() ? ByteIOConstants.RANDOM_BYTEIO_NS : ByteIOConstants.STREAMABLE_BYTEIO_NS), attrName);
 		GeniiCommon proxy = ClientUtils.createProxy(GeniiCommon.class, _epr);
 		GetResourcePropertyResponse resp = proxy.getResourceProperty(attrQName);
 
@@ -349,9 +344,8 @@ public class TypeInformation
 	}
 
 	/**
-	 * Return the name of the GenesisII top-level port type that most closely matches the given
-	 * resource. (Note that the given resource is not necessarily a GenesisII resource.) This
-	 * function is a hack and it should be removed. It is used by ReplicateTool and AutoReplicate.
+	 * Return the name of the GenesisII top-level port type that most closely matches the given resource. (Note that the given resource is not
+	 * necessarily a GenesisII resource.) This function is a hack and it should be removed. It is used by ReplicateTool and AutoReplicate.
 	 */
 	public String getBestMatchServiceName()
 	{

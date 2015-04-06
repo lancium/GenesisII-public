@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package org.morgan.util.configuration;
 
@@ -40,9 +39,8 @@ import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 /**
  * Parses a configuration file which has the format: &lt;mconf:node
- * xmlns:mconf="http://www.mark-morgan.net/org/morgan/util/configuration>"&gt;
- * &lt;mconf:config-sections&gt; &lt;mconf:config-section name={qname}
- * class=IXMLConfigurationSectionHandler/&gt;* &lt;mconf:config-sections&gt;
+ * xmlns:mconf="http://www.mark-morgan.net/org/morgan/util/configuration>"&gt; &lt;mconf:config-sections&gt; &lt;mconf:config-section
+ * name={qname} class=IXMLConfigurationSectionHandler/&gt;* &lt;mconf:config-sections&gt;
  * 
  * {xsd:any} &lt;/mconf:node&gt;
  * 
@@ -176,8 +174,7 @@ public class XMLConfiguration
 		}
 	}
 
-	private void initialize(InputStream in) throws ParserConfigurationException, IOException, SAXException,
-		ConfigurationException
+	private void initialize(InputStream in) throws ParserConfigurationException, IOException, SAXException, ConfigurationException
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -229,8 +226,8 @@ public class XMLConfiguration
 	}
 
 	/**
-	 * Retrieve a section from a configuration. If more than one section is registered with this
-	 * name, or if none are, this will throw an exception.
+	 * Retrieve a section from a configuration. If more than one section is registered with this name, or if none are, this will throw an
+	 * exception.
 	 * 
 	 * @param sectionName
 	 *            The name of the section to retrieve.
@@ -243,8 +240,7 @@ public class XMLConfiguration
 		ArrayList<Node> unparsed = _unparsedXML.get(sectionName);
 		if (unparsed != null) {
 			if (unparsed.size() > 1)
-				throw new ConfigurationException("Too many sections with name \"" + sectionName
-					+ "\" to retrieve to retrieve a singleton.");
+				throw new ConfigurationException("Too many sections with name \"" + sectionName + "\" to retrieve to retrieve a singleton.");
 
 			IXMLConfigurationSectionHandler handler = _handlers.get(sectionName);
 			if (handler == null)
@@ -261,8 +257,7 @@ public class XMLConfiguration
 			if (list == null)
 				throw new ConfigurationException("No section found with name \"" + sectionName + "\".");
 			if (list.size() > 1)
-				throw new ConfigurationException("Too many sections with name \"" + sectionName
-					+ "\" to retrieve to retrieve a singleton.");
+				throw new ConfigurationException("Too many sections with name \"" + sectionName + "\" to retrieve to retrieve a singleton.");
 
 			return list.get(0);
 		}

@@ -43,8 +43,7 @@ public class SByteIOResource extends RByteIOResource implements ISByteIOResource
 			deleteAny = creationProperties.getMessageElement(MUST_DESTROY_PROPERTY);
 			// deleteAny = (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
 			if (deleteAny == null)
-				throw new ResourceException("StreamableByteIO Instances MUST have a must destroy "
-					+ "element creation property.");
+				throw new ResourceException("StreamableByteIO Instances MUST have a must destroy " + "element creation property.");
 			try {
 				file = new File(fileAny.getValue());
 				// file = new File(fileAny);

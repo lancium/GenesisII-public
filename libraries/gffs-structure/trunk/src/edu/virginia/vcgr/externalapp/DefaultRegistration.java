@@ -26,9 +26,7 @@ class DefaultRegistration
 			try {
 				ret.put(reg.registrationType(), reg.createApplication());
 			} catch (Throwable cause) {
-				_logger.warn(
-					String.format("Unable to create external application for registration type %s.", reg.registrationType()),
-					cause);
+				_logger.warn(String.format("Unable to create external application for registration type %s.", reg.registrationType()), cause);
 			}
 		}
 

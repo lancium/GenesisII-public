@@ -21,8 +21,7 @@ public class ACLPlugin extends AbstractUITabPlugin
 		Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 
 		ACLPanel aclPanel = new ACLPanel(context, paths.iterator().next());
-		return new LazilyLoadedTab(aclPanel, new TearoffPanel(aclPanel, aclPanel.createTearoffHandler(),
-			new IconBasedTearoffThumb()));
+		return new LazilyLoadedTab(aclPanel, new TearoffPanel(aclPanel, aclPanel.createTearoffHandler(), new IconBasedTearoffThumb()));
 	}
 
 	@Override

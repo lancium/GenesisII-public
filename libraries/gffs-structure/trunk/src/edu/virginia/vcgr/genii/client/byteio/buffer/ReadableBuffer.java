@@ -46,8 +46,7 @@ public class ReadableBuffer implements Closeable
 			_lease = _leaser.obtainLease(new LeaseeAgreementImpl());
 		ByteBuffer buffer = _lease.resource();
 
-		if ((_blockOffsetInFile < 0) || (fileOffset < _blockOffsetInFile)
-			|| ((_blockOffsetInFile + buffer.limit()) <= fileOffset)) {
+		if ((_blockOffsetInFile < 0) || (fileOffset < _blockOffsetInFile) || ((_blockOffsetInFile + buffer.limit()) <= fileOffset)) {
 			buffer.clear();
 			_resolver.read(fileOffset, buffer);
 			buffer.flip();

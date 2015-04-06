@@ -57,9 +57,8 @@ public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase impleme
 		history.createInfoWriter("Working directory set up").close();
 	}
 
-	private void
-		copyDirectory(CloudManager tManage, File root, File dir, String resourceID, OutputStream out, OutputStream err)
-			throws Exception
+	private void copyDirectory(CloudManager tManage, File root, File dir, String resourceID, OutputStream out, OutputStream err)
+		throws Exception
 	{
 		File[] fileList = dir.listFiles();
 
@@ -67,8 +66,7 @@ public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase impleme
 			if (fileList[i].isDirectory()) {
 				// first create directory then copy it
 				tryExecuteCommand(resourceID, "mkdir " + _workingDir + fileList[i].getName(), out, err, tManage);
-				copyDirectory(tManage, new File(root.getAbsolutePath() + "/" + fileList[i].getName()), fileList[i], resourceID,
-					out, err);
+				copyDirectory(tManage, new File(root.getAbsolutePath() + "/" + fileList[i].getName()), fileList[i], resourceID, out, err);
 			} else
 				trySendFile(resourceID, fileList[i].getPath(), root.getAbsolutePath() + "/" + fileList[i].getName(), tManage);
 		}

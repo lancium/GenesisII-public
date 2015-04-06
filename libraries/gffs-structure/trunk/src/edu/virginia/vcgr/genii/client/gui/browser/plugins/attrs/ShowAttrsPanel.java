@@ -19,10 +19,9 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 /**
- * This is a special panel that the attributes plugin uses to display the attributes document for a
- * target resource. We derive off of the ExpensiveInitializationPanel class because getting the
- * attributes from a target endpoint could potentially be time consuming. Therefor, we implement a
- * lazy resolution protocol suggested by that base class panel.
+ * This is a special panel that the attributes plugin uses to display the attributes document for a target resource. We derive off of the
+ * ExpensiveInitializationPanel class because getting the attributes from a target endpoint could potentially be time consuming. Therefor, we
+ * implement a lazy resolution protocol suggested by that base class panel.
  * 
  * @author mmm2a
  */

@@ -9,8 +9,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ResourceForkUtils
 {
-	static public EndpointReferenceType stripResourceForkInformation(EndpointReferenceType originalEPR)
-		throws ResourceException
+	static public EndpointReferenceType stripResourceForkInformation(EndpointReferenceType originalEPR) throws ResourceException
 	{
 		MetadataType mt = originalEPR.getMetadata();
 		if (mt != null)

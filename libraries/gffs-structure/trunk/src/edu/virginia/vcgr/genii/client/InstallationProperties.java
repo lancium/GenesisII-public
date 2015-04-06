@@ -25,18 +25,15 @@ import edu.virginia.vcgr.genii.client.security.axis.AclAuthZClientTool;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
 /**
- * This class supports queries for items normally found in the Security class (via the
- * KeystoreSecurityConstants). It also supports some crucial items that were previously in
- * ContainerProperties and WebContainerConstants. It should be used as a first resource that
- * provides a "more local" configuration than older style (split configuration) installs. This new
- * lookup process implements the new configuration style we've called "unified configuration" in the
- * installer design document. Many configuration items can now be overridden in the file called
- * "installation.properties" that lives in the state directory, which is managed by the new
- * container configuration scripts (see trunk/installer/scripts).
+ * This class supports queries for items normally found in the Security class (via the KeystoreSecurityConstants). It also supports some
+ * crucial items that were previously in ContainerProperties and WebContainerConstants. It should be used as a first resource that provides a
+ * "more local" configuration than older style (split configuration) installs. This new lookup process implements the new configuration style
+ * we've called "unified configuration" in the installer design document. Many configuration items can now be overridden in the file called
+ * "installation.properties" that lives in the state directory, which is managed by the new container configuration scripts (see
+ * trunk/installer/scripts).
  * 
- * a note on usage: if the installation properties file is not found, many of the lookup functions
- * below return null. the one exception to this pattern is the getUserDir function, which must
- * always return a usable user state directory.
+ * a note on usage: if the installation properties file is not found, many of the lookup functions below return null. the one exception to
+ * this pattern is the getUserDir function, which must always return a usable user state directory.
  * 
  * @author Chris Koeritz
  */
@@ -110,9 +107,7 @@ public class InstallationProperties extends Properties
 		String stateDir = getUserDir();
 		File propsFile = new File(stateDir + "/" + ExportProperties.EXPORT_PROPERTIES_FILENAME);
 		if (!propsFile.exists()) {
-			propsFile =
-				new File(ApplicationDescription.getInstallationDirectory() + "/lib/"
-					+ ExportProperties.EXPORT_PROPERTIES_FILENAME);
+			propsFile = new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_PROPERTIES_FILENAME);
 			if (!propsFile.exists()) {
 				_logger.error("could not find any " + ExportProperties.EXPORT_PROPERTIES_FILENAME
 					+ " file in state or installation directory.");
@@ -130,9 +125,7 @@ public class InstallationProperties extends Properties
 		String stateDir = getUserDir();
 		File propsFile = new File(stateDir + "/" + ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
 		if (!propsFile.exists()) {
-			propsFile =
-				new File(ApplicationDescription.getInstallationDirectory() + "/lib/"
-					+ ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
+			propsFile = new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
 			if (!propsFile.exists()) {
 				_logger.error("could not find any " + ExportProperties.EXPORT_RESTRICTIONS_FILENAME
 					+ " file in state or installation directory.");
@@ -166,8 +159,7 @@ public class InstallationProperties extends Properties
 		if (_logger.isDebugEnabled())
 			_logger.debug("found owner certs dir as " + prop);
 
-		return HierarchicalDirectory.openRootHierarchicalDirectory(new File(prop + "/"
-			+ InstallationConstants.OWNER_CERTS_DIRECTORY_NAME));
+		return HierarchicalDirectory.openRootHierarchicalDirectory(new File(prop + "/" + InstallationConstants.OWNER_CERTS_DIRECTORY_NAME));
 	}
 
 	public File getOwnerCertFile()
@@ -261,8 +253,8 @@ public class InstallationProperties extends Properties
 	}
 
 	/*
-	 * returns the simple grid name from the current deployment properties file. only really
-	 * meaningful for a real installation, rather than a code build.
+	 * returns the simple grid name from the current deployment properties file. only really meaningful for a real installation, rather than a
+	 * code build.
 	 */
 	public static String getSimpleGridName()
 	{

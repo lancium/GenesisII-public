@@ -34,9 +34,8 @@ public class SubscriptionsDatabase
 
 	static final private String[] TABLE_STMTS = new String[] {
 		"CREATE TABLE wsnsubscriptions(" + "subscriptionresourcekey VARCHAR(128) PRIMARY KEY,"
-			+ "publisherresourcekey VARCHAR(128) NOT NULL," + "subscriptionreference BLOB(2G) NOT NULL,"
-			+ "consumerreference BLOB(2G)," + "topicquery BLOB(2G)," + "policies BLOB(2G)," + "additionaluserdata BLOB(2G),"
-			+ "paused SMALLINT NOT NULL WITH DEFAULT 0)",
+			+ "publisherresourcekey VARCHAR(128) NOT NULL," + "subscriptionreference BLOB(2G) NOT NULL," + "consumerreference BLOB(2G),"
+			+ "topicquery BLOB(2G)," + "policies BLOB(2G)," + "additionaluserdata BLOB(2G)," + "paused SMALLINT NOT NULL WITH DEFAULT 0)",
 		"CREATE INDEX wsnsubscriptionspubreskeyidx ON wsnsubscriptions(publisherresourcekey)" };
 
 	static private void destroySubscription(Connection connection, String subscriptionkey) throws ResourceException
@@ -60,8 +59,8 @@ public class SubscriptionsDatabase
 		try {
 			stmt =
 				connection.prepareStatement("INSERT INTO wsnsubscriptions(subscriptionresourcekey,"
-					+ "publisherresourcekey, subscriptionreference," + "consumerreference, topicquery,"
-					+ "policies, additionaluserdata) " + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+					+ "publisherresourcekey, subscriptionreference," + "consumerreference, topicquery," + "policies, additionaluserdata) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?)");
 
 			stmt.setString(1, subscriptionResourceKey);
 			stmt.setString(2, publisherResourceKey);
@@ -118,9 +117,7 @@ public class SubscriptionsDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions "
-					+ "WHERE publisherresourcekey = ?");
+			stmt = connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions " + "WHERE publisherresourcekey = ?");
 			stmt.setString(1, publisherKey);
 			rs = stmt.executeQuery();
 
@@ -140,8 +137,8 @@ public class SubscriptionsDatabase
 		}
 	}
 
-	static public Collection<WSNSubscriptionInformation> subscriptionsForPublisher(Connection connection, String publisherKey,
-		TopicPath topic) throws SQLException
+	static public Collection<WSNSubscriptionInformation>
+		subscriptionsForPublisher(Connection connection, String publisherKey, TopicPath topic) throws SQLException
 	{
 		Collection<WSNSubscriptionInformation> subscriptions = new LinkedList<WSNSubscriptionInformation>();
 
@@ -180,9 +177,8 @@ public class SubscriptionsDatabase
 
 		try {
 			String sql =
-				"SELECT subscriptionreference, consumerreference, topicquery, "
-					+ "policies, additionaluserdata FROM wsnsubscriptions " + "WHERE paused = 0 and publisherresourcekey in ("
-					+ joinStringsForInClause(publishers) + ")";
+				"SELECT subscriptionreference, consumerreference, topicquery, " + "policies, additionaluserdata FROM wsnsubscriptions "
+					+ "WHERE paused = 0 and publisherresourcekey in (" + joinStringsForInClause(publishers) + ")";
 
 			stmt = connection.prepareStatement(sql);
 			rs = stmt.executeQuery();
@@ -198,8 +194,7 @@ public class SubscriptionsDatabase
 		return subscriptions;
 	}
 
-	static public void toggleSubscriptionPause(Connection connection, String subscriptionKey, boolean markPaused)
-		throws SQLException
+	static public void toggleSubscriptionPause(Connection connection, String subscriptionKey, boolean markPaused) throws SQLException
 	{
 		PreparedStatement stmt = null;
 
@@ -236,8 +231,8 @@ public class SubscriptionsDatabase
 		return indirectPublishers;
 	}
 
-	private static void addSubscriptionFromResults(TopicPath topic, Collection<WSNSubscriptionInformation> subscriptions,
-		ResultSet rs) throws SQLException
+	private static void addSubscriptionFromResults(TopicPath topic, Collection<WSNSubscriptionInformation> subscriptions, ResultSet rs)
+		throws SQLException
 	{
 		try {
 			EndpointReferenceType subscriptionReference = EPRUtils.fromBlob(rs.getBlob(1));
@@ -251,8 +246,8 @@ public class SubscriptionsDatabase
 			AdditionalUserData additionalUserData = (AdditionalUserData) DBSerializer.fromBlob(rs.getBlob(5));
 
 			if (topic == null || topicFilter == null || topicFilter.matches(topic)) {
-				subscriptions.add(new WSNSubscriptionInformation(subscriptionReference, consumerReference, topicFilter,
-					policies, additionalUserData));
+				subscriptions.add(new WSNSubscriptionInformation(subscriptionReference, consumerReference, topicFilter, policies,
+					additionalUserData));
 			}
 		} catch (ResourceException e) {
 			_logger.warn("Error trying to load subscription from database.", e);

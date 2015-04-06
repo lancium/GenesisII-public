@@ -54,8 +54,7 @@ public class PollingTimeSettings
 		} else {
 			nextPollingTimeInMillis = mostRecentPollingTime.getTime() + pollingRPCInterval;
 		}
-		nextPollingTime =
-			(nextPollingTimeInMillis < System.currentTimeMillis()) ? new Date() : new Date(nextPollingTimeInMillis);
+		nextPollingTime = (nextPollingTimeInMillis < System.currentTimeMillis()) ? new Date() : new Date(nextPollingTimeInMillis);
 	}
 
 	public void notifyAboutPolling()

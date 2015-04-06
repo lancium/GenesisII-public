@@ -189,8 +189,7 @@ public class InCommonLoginTool extends BaseLoginTool
 			EndpointReferenceType epr = authnPath.getEndpoint();
 
 			// log in to the target STS using the InCommon cert as the base credential
-			ArrayList<NuCredential> creds =
-				IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
+			ArrayList<NuCredential> creds = IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
 			if (creds != null) {
 				// insert the target credential into the calling context
 				transientCredentials = TransientCredentials.getTransientCredentials(callContext);
@@ -252,15 +251,15 @@ public class InCommonLoginTool extends BaseLoginTool
 		return null;
 	}
 
-	private CILogonParameters getParams(String username, String password, String idpUrl, String csrFileName,
-		String csrKeyFileName) throws ToolException
+	private CILogonParameters getParams(String username, String password, String idpUrl, String csrFileName, String csrKeyFileName)
+		throws ToolException
 	{
 		if (username == null || password == null || idpUrl == null || csrFileName == null || csrKeyFileName == null) {
 			return promptForParams();
 		} else {
 			CILogonParameters params =
-				new CILogonParameters(idpUrl, username, password, readFile(csrFileName), parseKeyFile(csrKeyFileName)
-					.getPrivate(), stdout, stderr);
+				new CILogonParameters(idpUrl, username, password, readFile(csrFileName), parseKeyFile(csrKeyFileName).getPrivate(), stdout,
+					stderr);
 			return params;
 		}
 	}
@@ -274,19 +273,15 @@ public class InCommonLoginTool extends BaseLoginTool
 			// list hosted at: https://cilogon.org/include/ecpidps.txt
 			try {
 				ComboBoxDialog idpDialog =
-					provider.createSingleListSelectionDialog("IDP Choice", "Please choose IDP", new SimpleMenuItem(
-						"ProtectNetwork", "https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"),
-						new SimpleMenuItem("ProtectNetwork",
-							"https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
-							"LIGO Scientific Collaboration", "https://login.ligo.org/idp/profile/SAML2/SOAP/ECP"),
-						new SimpleMenuItem("LTER Network", "https://shib.lternet.edu/idp/profile/SAML2/SOAP/ECP"),
-						new SimpleMenuItem("University of Chicago",
-							"https://shibboleth2.uchicago.edu/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
-							"University of Illinois at Urbana-Champaign",
-							"https://shibboleth.illinois.edu/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
-							"University of Washington", "https://idp.u.washington.edu/idp/profile/SAML2/SOAP/ECP"),
-						new SimpleMenuItem("University of Wisconsin-Madison",
-							"https://login.wisc.edu/idp/profile/SAML2/SOAP/ECP"));
+					provider.createSingleListSelectionDialog("IDP Choice", "Please choose IDP", new SimpleMenuItem("ProtectNetwork",
+						"https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem("ProtectNetwork",
+						"https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
+						"LIGO Scientific Collaboration", "https://login.ligo.org/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
+						"LTER Network", "https://shib.lternet.edu/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem("University of Chicago",
+						"https://shibboleth2.uchicago.edu/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
+						"University of Illinois at Urbana-Champaign", "https://shibboleth.illinois.edu/idp/profile/SAML2/SOAP/ECP"),
+						new SimpleMenuItem("University of Washington", "https://idp.u.washington.edu/idp/profile/SAML2/SOAP/ECP"),
+						new SimpleMenuItem("University of Wisconsin-Madison", "https://login.wisc.edu/idp/profile/SAML2/SOAP/ECP"));
 				idpDialog.showDialog();
 
 				MenuItem response = idpDialog.getSelectedItem();
@@ -359,8 +354,7 @@ public class InCommonLoginTool extends BaseLoginTool
 				new JcaPKCS10CertificationRequestBuilder(new X500Name(subject), keyPair.getPublic());
 			ExtensionsGenerator extensionsGenerator = new ExtensionsGenerator();
 			extensionsGenerator.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(true));
-			extensionsGenerator.addExtension(X509Extension.keyUsage, true,
-				new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign));
+			extensionsGenerator.addExtension(X509Extension.keyUsage, true, new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign));
 			csrBuilder.addAttribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, extensionsGenerator.generate());
 			csr = csrBuilder.build(signer);
 		} catch (IOException e) {
@@ -421,8 +415,7 @@ public class InCommonLoginTool extends BaseLoginTool
 
 		InputDialog keyFileDialog;
 		try {
-			keyFileDialog =
-				provider.createInputDialog("KeyFile", "Please enter keypair filename, or leave blank to generate one.");
+			keyFileDialog = provider.createInputDialog("KeyFile", "Please enter keypair filename, or leave blank to generate one.");
 			keyFileDialog.showDialog();
 			_CSRKeyFileName = keyFileDialog.getAnswer();
 
@@ -440,8 +433,7 @@ public class InCommonLoginTool extends BaseLoginTool
 
 		InputDialog csrFileDialog;
 		try {
-			csrFileDialog =
-				provider.createInputDialog("CSR File", "Please enter CSR filename, or leave blank to generate one.");
+			csrFileDialog = provider.createInputDialog("CSR File", "Please enter CSR filename, or leave blank to generate one.");
 			csrFileDialog.showDialog();
 			_CSRFileName = csrFileDialog.getAnswer();
 			return (_CSRFileName != null && !_CSRFileName.equals(""));

@@ -26,11 +26,9 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import fuse.FuseDirEnt;
 
 /*
- * This is a helper class for propagating local changes in cached directories and retrieving cached
- * directories. Because of the unavoidable disparate nature of accessing and manipulating directory
- * related information we introduced this helper class. It encapsulates the details of Unix
- * directory level cache management from the codes that handles access and modification of
- * information relevant to directory entries.
+ * This is a helper class for propagating local changes in cached directories and retrieving cached directories. Because of the unavoidable
+ * disparate nature of accessing and manipulating directory related information we introduced this helper class. It encapsulates the details
+ * of Unix directory level cache management from the codes that handles access and modification of information relevant to directory entries.
  */
 public class DirectoryManager
 {
@@ -123,10 +121,9 @@ public class DirectoryManager
 	}
 
 	/*
-	 * Updating the resource configuration because of addition, removal, or movement of directory
-	 * entries is not a required operation. This is done just to reflect the local updates in the
-	 * resource configuration as soon as possible, which will subsequently help to reduce possible
-	 * redundant lookup calls.
+	 * Updating the resource configuration because of addition, removal, or movement of directory entries is not a required operation. This is
+	 * done just to reflect the local updates in the resource configuration as soon as possible, which will subsequently help to reduce
+	 * possible redundant lookup calls.
 	 */
 	private static void updateResourceConfigCache(RNSPath path, boolean pathAdded)
 	{
@@ -157,16 +154,14 @@ public class DirectoryManager
 	}
 
 	/*
-	 * This method is used to judge the effectiveness of using the local-cache for a directory
-	 * lookup operation. As we prefetch attributes with lookup call, when attributes are absent in
-	 * the cache but the directory entry is not, it is better to let the RPC to pass instead of
-	 * returning result from the local-cache since at the end it will reduce the overall RPCs.
+	 * This method is used to judge the effectiveness of using the local-cache for a directory lookup operation. As we prefetch attributes
+	 * with lookup call, when attributes are absent in the cache but the directory entry is not, it is better to let the RPC to pass instead
+	 * of returning result from the local-cache since at the end it will reduce the overall RPCs.
 	 */
 	private static boolean isCacheContainNecessaryDirectoryInfo(String directoryPath, UnixDirectory directory)
 	{
 
-		WSResourceConfig directoryConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(directoryPath, WSResourceConfig.class);
+		WSResourceConfig directoryConfig = (WSResourceConfig) CacheManager.getItemFromCache(directoryPath, WSResourceConfig.class);
 
 		// We adhere to a pessimistic approach here. Additionally, since we track last time usage of
 		// per-container

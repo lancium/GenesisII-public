@@ -90,24 +90,24 @@ public class ChmodTool extends BaseGridTool
 	{
 		_recursive = true;
 	}
-	
+
 	// the following three methods assist our command line parsing, which hoses up the chmod -rwx style of removing rights.
 
-	@Option({"r"})
+	@Option({ "r" })
 	public void setReadRemove()
 	{
 		List<String> args = getArguments();
 		args.add("-r");
 	}
 
-	@Option({"w"})
+	@Option({ "w" })
 	public void setWriteRemove()
 	{
 		List<String> args = getArguments();
 		args.add("-w");
 	}
-	
-	@Option({"x"})
+
+	@Option({ "x" })
 	public void setExecRemove()
 	{
 		List<String> args = getArguments();
@@ -131,8 +131,8 @@ public class ChmodTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		boolean isRecursive = _recursive;
 		String modeString = getArgument(1);
@@ -141,9 +141,8 @@ public class ChmodTool extends BaseGridTool
 			certificate = getArgument(2);
 
 		/*
-		 * Create an AclEntry that represents "everyone", or "username/password", or a certificate
-		 * read from a local file or a grid file, or a certificate read from the metadata of a
-		 * resource.
+		 * Create an AclEntry that represents "everyone", or "username/password", or a certificate read from a local file or a grid file, or a
+		 * certificate read from the metadata of a resource.
 		 */
 		AclEntry newEntry = null;
 		if (_everyone) {
@@ -227,8 +226,7 @@ public class ChmodTool extends BaseGridTool
 
 		}
 
-		GenesisIIBaseRP rp =
-			(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(pathRNS.getEndpoint(), GenesisIIBaseRP.class);
+		GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(pathRNS.getEndpoint(), GenesisIIBaseRP.class);
 		AuthZConfig config = rp.getAuthZConfig();
 		if (config == null)
 			config = AclAuthZClientTool.getEmptyAuthZConfig();

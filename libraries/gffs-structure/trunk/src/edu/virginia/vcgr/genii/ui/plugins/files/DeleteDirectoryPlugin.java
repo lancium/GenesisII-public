@@ -39,7 +39,7 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 		while (true) {
 			try {
 				assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
-				
+
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 
 				RNSPath path = paths.iterator().next();
@@ -47,15 +47,14 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 				// We really need to figure out how to refresh directories after deleting things -
 				// ASG
 				int reply =
-					JOptionPane.showConfirmDialog(context.ownerComponent(), "Are you sure you want to recursively delete "
-						+ path.getName() + "?", "Yes - DELETE WITHOUT UNDO " + path.getName(), JOptionPane.YES_NO_OPTION);
+					JOptionPane.showConfirmDialog(context.ownerComponent(), "Are you sure you want to recursively delete " + path.getName()
+						+ "?", "Yes - DELETE WITHOUT UNDO " + path.getName(), JOptionPane.YES_NO_OPTION);
 				if (reply == JOptionPane.YES_OPTION) {
 					RmTool rmtool = new RmTool();
 					PathOutcome ret;
 					ret = rmtool.rm(path, true, false);
 					if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
-						String msg =
-							"failed to delete the chosen path: " + path.getName() + " because " + PathOutcome.outcomeText(ret);
+						String msg = "failed to delete the chosen path: " + path.getName() + " because " + PathOutcome.outcomeText(ret);
 						LoggingTarget.logInfo(msg, null);
 						_logger.error(msg);
 					}

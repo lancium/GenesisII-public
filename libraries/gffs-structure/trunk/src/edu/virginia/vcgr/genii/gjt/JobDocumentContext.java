@@ -170,8 +170,7 @@ public class JobDocumentContext
 
 				if (target.exists()) {
 					int result =
-						JOptionPane.showConfirmDialog(_frame, "Overwrite existing file?", "File Exists",
-							JOptionPane.YES_NO_CANCEL_OPTION);
+						JOptionPane.showConfirmDialog(_frame, "Overwrite existing file?", "File Exists", JOptionPane.YES_NO_CANCEL_OPTION);
 					if (result == JOptionPane.CANCEL_OPTION)
 						return;
 					else if (result == JOptionPane.NO_OPTION)
@@ -219,8 +218,7 @@ public class JobDocumentContext
 			_modified = false;
 			setFrameTitle();
 		} catch (IOException ioe) {
-			JOptionPane.showMessageDialog(_frame, "Error saving project file.", "Error Saving Project File",
-				JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(_frame, "Error saving project file.", "Error Saving Project File", JOptionPane.ERROR_MESSAGE);
 			_logger.error("Unable to save project file.", ioe);
 		}
 	}
@@ -264,13 +262,11 @@ public class JobDocumentContext
 		for (Sweep sweep : sweeps)
 			count += sweep.size();
 
-		int limit =
-			(((Integer) (_applicationContext.preferences().preference(ToolPreference.ParameterSweepPopupLimit))).intValue());
+		int limit = (((Integer) (_applicationContext.preferences().preference(ToolPreference.ParameterSweepPopupLimit))).intValue());
 
 		if (count >= limit) {
 			int result =
-				JOptionPane.showConfirmDialog(_frame,
-					String.format("This JSDL document contains %d jobs!  Do you want to continue?", count),
+				JOptionPane.showConfirmDialog(_frame, String.format("This JSDL document contains %d jobs!  Do you want to continue?", count),
 					"JSDL Generation Confirmation", JOptionPane.YES_NO_OPTION);
 
 			if (result != JOptionPane.YES_OPTION)
@@ -291,8 +287,8 @@ public class JobDocumentContext
 
 					if (target.exists()) {
 						int result =
-							JOptionPane.showConfirmDialog(_frame, "Overwrite existing file?", "File Exists",
-								JOptionPane.YES_NO_CANCEL_OPTION);
+							JOptionPane
+								.showConfirmDialog(_frame, "Overwrite existing file?", "File Exists", JOptionPane.YES_NO_CANCEL_OPTION);
 						if (result == JOptionPane.CANCEL_OPTION)
 							return;
 						else if (result == JOptionPane.NO_OPTION)

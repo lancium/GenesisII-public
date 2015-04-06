@@ -18,8 +18,7 @@ public class UserConfigUtils
 	 * Stores information about current user's config.
 	 * 
 	 * @param UserConfig
-	 *            userConfig Current user config info to set. Null means none (delete current
-	 *            value).
+	 *            userConfig Current user config info to set. Null means none (delete current value).
 	 * @return
 	 */
 	static public void setCurrentUserConfig(UserConfig userConfig) throws IOException

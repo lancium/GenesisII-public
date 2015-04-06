@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.security.wincrypto;
 
@@ -35,9 +34,8 @@ public class WinCryptoLib extends JNIClientBaseClass
 	// -----------------------------------------------------------------------
 
 	/**
-	 * Returns an ArrayList of byte[] arrays, each of which identify a cert alias in the specified
-	 * store. Guaranteed to either throw an exception or return a non-null ArrayList (possibly
-	 * empty).
+	 * Returns an ArrayList of byte[] arrays, each of which identify a cert alias in the specified store. Guaranteed to either throw an
+	 * exception or return a non-null ArrayList (possibly empty).
 	 * 
 	 * @param certStore
 	 * @return
@@ -50,17 +48,15 @@ public class WinCryptoLib extends JNIClientBaseClass
 
 	private native byte[] getCertFromByteAlias(String certStore, byte[] alias) throws WinCryptoException;
 
-	private native ArrayList<byte[]> getCertChain(String certStore, byte[] alias) throws WinCryptoException,
-		WinCryptoChainInvalidException;
+	private native ArrayList<byte[]> getCertChain(String certStore, byte[] alias) throws WinCryptoException, WinCryptoChainInvalidException;
 
 	private native void isCertTrusted(byte[] certBlob) throws WinCryptoException, WinCryptoChainInvalidException;
 
 	/*
-	 * public native void MSrsaSignInit(byte[] privatekey, String hashalg); public native void
-	 * MSrsaSignUpdate(byte[] data); public native byte[] MSrsaSign(); public native byte[]
-	 * MSrsaSignHash(byte[] hash, byte[] privatekey, String hashalg); public native byte[]
-	 * MSrsaDecrypt(String padalg, byte[] data); public native byte[] MSrsaEncrypt(String padalg,
-	 * byte[] data); public native int MSrsaGetKeysize();
+	 * public native void MSrsaSignInit(byte[] privatekey, String hashalg); public native void MSrsaSignUpdate(byte[] data); public native
+	 * byte[] MSrsaSign(); public native byte[] MSrsaSignHash(byte[] hash, byte[] privatekey, String hashalg); public native byte[]
+	 * MSrsaDecrypt(String padalg, byte[] data); public native byte[] MSrsaEncrypt(String padalg, byte[] data); public native int
+	 * MSrsaGetKeysize();
 	 */
 
 	// -----------------------------------------------------------------------
@@ -68,9 +64,8 @@ public class WinCryptoLib extends JNIClientBaseClass
 	// -----------------------------------------------------------------------
 
 	/**
-	 * Returns an ArrayList of byte[] arrays, each of which identify a cert alias in the specified
-	 * store. Guaranteed to either throw an exception or return a non-null ArrayList (possibly
-	 * empty).
+	 * Returns an ArrayList of byte[] arrays, each of which identify a cert alias in the specified store. Guaranteed to either throw an
+	 * exception or return a non-null ArrayList (possibly empty).
 	 * 
 	 * @param certStore
 	 * @return The aliases contained within the given certStore.
@@ -131,8 +126,8 @@ public class WinCryptoLib extends JNIClientBaseClass
 		return cert;
 	}
 
-	public X509Certificate[] getCertificateChain(String certStore, String alias) throws WinCryptoChainInvalidException,
-		WinCryptoException, CertificateException
+	public X509Certificate[] getCertificateChain(String certStore, String alias) throws WinCryptoChainInvalidException, WinCryptoException,
+		CertificateException
 	{
 
 		ArrayList<byte[]> certBlobs = getCertChain(certStore, Base64.base64ToByteArray(alias));
@@ -158,8 +153,7 @@ public class WinCryptoLib extends JNIClientBaseClass
 		return chain;
 	}
 
-	public void isCertTrusted(X509Certificate cert) throws WinCryptoException, WinCryptoChainInvalidException,
-		CertificateEncodingException
+	public void isCertTrusted(X509Certificate cert) throws WinCryptoException, WinCryptoChainInvalidException, CertificateEncodingException
 	{
 
 		isCertTrusted(cert.getEncoded());

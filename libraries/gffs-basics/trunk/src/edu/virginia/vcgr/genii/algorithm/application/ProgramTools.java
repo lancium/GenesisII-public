@@ -8,17 +8,15 @@ package edu.virginia.vcgr.genii.algorithm.application;
 public class ProgramTools
 {
 	/**
-	 * produces a list of the stack for a certain number of its elements, called stack frames. this
-	 * will ignore the fact that this function is invoked, and start counting stack frames from the
-	 * immediate caller's perspective (including it).
+	 * produces a list of the stack for a certain number of its elements, called stack frames. this will ignore the fact that this function is
+	 * invoked, and start counting stack frames from the immediate caller's perspective (including it).
 	 */
 	public static String showLastFewOnStack(int howManyFrames)
 	{
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		StringBuilder toReturn = new StringBuilder();
 		/*
-		 * don't start at the very first frame; we want to skip backwards to the direct caller of
-		 * this function.
+		 * don't start at the very first frame; we want to skip backwards to the direct caller of this function.
 		 */
 		int startFrame = 3;
 		int endFrame = Math.min(howManyFrames + 3, elements.length - 1);
@@ -32,8 +30,7 @@ public class ProgramTools
 	}
 
 	/**
-	 * returns the Nth frame backwards starting from this function. 0 is this method, 1 is the
-	 * invoker, 2 is the invoker's invoker, etc.
+	 * returns the Nth frame backwards starting from this function. 0 is this method, 1 is the invoker, 2 is the invoker's invoker, etc.
 	 */
 	public static String getStackFrame(int which)
 	{

@@ -79,12 +79,10 @@ public class ToolPreferences
 				_preferences.put(preference,
 					_preferenceNode.getBoolean(preference.name(), ((Boolean) preference.defaultValue()).booleanValue()));
 			} else if (defaultType.equals(Integer.class)) {
-				_preferences.put(preference,
-					_preferenceNode.getInt(preference.name(), ((Integer) preference.defaultValue()).intValue()));
+				_preferences.put(preference, _preferenceNode.getInt(preference.name(), ((Integer) preference.defaultValue()).intValue()));
 			} else {
 				try {
-					_preferences.put(preference,
-						fromBytes(_preferenceNode.getByteArray(preference.name(), null), preference.defaultValue()));
+					_preferences.put(preference, fromBytes(_preferenceNode.getByteArray(preference.name(), null), preference.defaultValue()));
 				} catch (Throwable cause) {
 					_logger.error(String.format("Unable to read preference \"%s\".", preference), cause);
 				}

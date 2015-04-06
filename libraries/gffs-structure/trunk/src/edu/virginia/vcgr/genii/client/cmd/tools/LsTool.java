@@ -98,8 +98,8 @@ public class LsTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		boolean isLong = _long;
 		boolean isAll = _all;
@@ -201,8 +201,8 @@ public class LsTool extends BaseGridTool
 			out.println(name);
 	}
 
-	static private void printEntry(PrintWriter out, RNSPath path, boolean isLong, boolean isAll, boolean isEPR,
-		boolean isMultiline, boolean isCertChain) throws RNSException, ResourceException, AuthZSecurityException
+	static private void printEntry(PrintWriter out, RNSPath path, boolean isLong, boolean isAll, boolean isEPR, boolean isMultiline,
+		boolean isCertChain) throws RNSException, ResourceException, AuthZSecurityException
 	{
 		String name = path.getName();
 		if (name.startsWith(".") && !isAll)
@@ -220,8 +220,7 @@ public class LsTool extends BaseGridTool
 		}
 		out.println(name);
 		if (isEPR) {
-			out.println("\t"
-				+ ObjectSerializer.toString(path.getEndpoint(), new QName(GenesisIIConstants.GENESISII_NS, "endpoint"), false));
+			out.println("\t" + ObjectSerializer.toString(path.getEndpoint(), new QName(GenesisIIConstants.GENESISII_NS, "endpoint"), false));
 		}
 		if (isMultiline) {
 			EndpointReferenceType epr = path.getEndpoint();
@@ -263,8 +262,8 @@ public class LsTool extends BaseGridTool
 		boolean _isMultiline;
 		boolean _isCertChain;
 
-		DirLister(PrintWriter out, ArrayList<String> subdirs, boolean isLong, boolean isAll, boolean isEPR,
-			boolean isMultiline, boolean isCertChain)
+		DirLister(PrintWriter out, ArrayList<String> subdirs, boolean isLong, boolean isAll, boolean isEPR, boolean isMultiline,
+			boolean isCertChain)
 		{
 			_out = out;
 			_subdirs = subdirs;
@@ -296,8 +295,8 @@ public class LsTool extends BaseGridTool
 
 	}
 
-	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll,
-		boolean isEPR, boolean isMultiline, boolean isCertChain, boolean isRecursive) throws RNSException, ResourceException
+	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll, boolean isEPR,
+		boolean isMultiline, boolean isCertChain, boolean isRecursive) throws RNSException, ResourceException
 	{
 		String name = path.getName();
 		if (name == null)

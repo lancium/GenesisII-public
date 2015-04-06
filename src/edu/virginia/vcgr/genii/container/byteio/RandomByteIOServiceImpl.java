@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.container.byteio;
 
@@ -131,16 +130,15 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 
 		IRByteIOResource resource = (IRByteIOResource) rKey.dereference();
 		resource.chooseFile(creationParameters);
 
-		EndpointReferenceType primaryEPR =
-			(EndpointReferenceType) creationParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType primaryEPR = (EndpointReferenceType) creationParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (primaryEPR != null) {
 			VersionedResourceUtils.initializeReplica(resource, primaryEPR, 0);
 			WorkingContext context = WorkingContext.getCurrentWorkingContext();
@@ -173,8 +171,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	}
 
 	@RWXMapping(RWXCategory.READ)
-	public ReadResponse read(Read read) throws RemoteException, CustomFaultType, ReadNotPermittedFaultType,
-		UnsupportedTransferFaultType, ResourceUnknownFaultType
+	public ReadResponse read(Read read) throws RemoteException, CustomFaultType, ReadNotPermittedFaultType, UnsupportedTransferFaultType,
+		ResourceUnknownFaultType
 	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
@@ -183,7 +181,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		}
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("RandomByteIO: Read from "+caller);
+		StatsLogger.logStats("RandomByteIO: Read from " + caller);
 		// End logging
 		int bytesPerBlock = read.getBytesPerBlock();
 		int numBlocks = read.getNumBlocks();
@@ -245,8 +243,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	/**
 	 * Ensure that the local cache contains valid data from the given start offset.
 	 * 
-	 * This function always begins and ends with the resource locked, but the resource may be
-	 * unlocked in the middle.
+	 * This function always begins and ends with the resource locked, but the resource may be unlocked in the middle.
 	 */
 	private void downloadIfNecessary(long startOffset, int validSize, File cacheFile) throws IOException
 	{
@@ -291,8 +288,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		// TODO: incrementVersionLockCount(_resource);
 		_resourceLock.unlock();
 		try {
-			EndpointReferenceType primaryEPR =
-				EPRUtils.fromBytes((byte[]) _resource.getProperty(SyncProperty.PRIMARY_EPR_PROP_NAME));
+			EndpointReferenceType primaryEPR = EPRUtils.fromBytes((byte[]) _resource.getProperty(SyncProperty.PRIMARY_EPR_PROP_NAME));
 			RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, primaryEPR);
 			RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
 			RandomByteIOTransferer transferer = factory.createRandomByteIOTransferer();
@@ -328,7 +324,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		}
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("RandomByteIO: Write from "+caller);
+		StatsLogger.logStats("RandomByteIO: Write from " + caller);
 		// End logging
 		long startOffset = write.getStartOffset();
 		int bytesPerBlock = write.getBytesPerBlock();
@@ -361,8 +357,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			GeniiAttachment attachment = new GeniiAttachment(data);
 			TopicSet space = TopicSet.forPublisher(getClass());
 			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.Write, startOffset, bytesPerBlock,
-				stride, data.length, vvr), attachment);
+			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.Write, startOffset, bytesPerBlock, stride, data.length,
+				vvr), attachment);
 			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		} catch (IOException ioe) {
 			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
@@ -403,8 +399,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			GeniiAttachment attachment = new GeniiAttachment(data);
 			TopicSet space = TopicSet.forPublisher(getClass());
 			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.Append, startOffset, data.length, 0,
-				data.length, vvr), attachment);
+			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.Append, startOffset, data.length, 0, data.length, vvr),
+				attachment);
 			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		} catch (IOException ioe) {
 			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
@@ -412,13 +408,12 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
-		return new AppendResponse(new TransferInformationType(byteIOAttrs, append.getTransferInformation()
-			.getTransferMechanism()));
+		return new AppendResponse(new TransferInformationType(byteIOAttrs, append.getTransferInformation().getTransferMechanism()));
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public TruncAppendResponse truncAppend(TruncAppend truncAppend) throws RemoteException, CustomFaultType,
-		WriteNotPermittedFaultType, TruncateNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
+	public TruncAppendResponse truncAppend(TruncAppend truncAppend) throws RemoteException, CustomFaultType, WriteNotPermittedFaultType,
+		TruncateNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
 	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
@@ -427,7 +422,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		}
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("RandomByteIO: TruncAppend from "+caller);
+		StatsLogger.logStats("RandomByteIO: TruncAppend from " + caller);
 		// End logging
 		long startOffset = truncAppend.getOffset();
 		TransferInformationType transferInformation = truncAppend.getTransferInformation();
@@ -450,8 +445,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			GeniiAttachment attachment = new GeniiAttachment(data);
 			TopicSet space = TopicSet.forPublisher(getClass());
 			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.TruncAppend, startOffset, data.length, 0,
-				data.length, vvr), attachment);
+			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.TruncAppend, startOffset, data.length, 0, data.length,
+				vvr), attachment);
 			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		} catch (IOException ioe) {
 			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
@@ -459,8 +454,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
-		return new TruncAppendResponse(new TransferInformationType(byteIOAttrs, truncAppend.getTransferInformation()
-			.getTransferMechanism()));
+		return new TruncAppendResponse(new TransferInformationType(byteIOAttrs, truncAppend.getTransferInformation().getTransferMechanism()));
 	}
 
 	/**
@@ -618,15 +612,14 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 					_logger.debug("RandomByteIOServiceImpl.notify: replay message");
 				TopicSet space = TopicSet.forPublisher(RandomByteIOServiceImpl.class);
 				PublisherTopic publisherTopic = space.createPublisherTopic(topicPath);
-				publisherTopic.publish(new ByteIOContentsChangedContents(operation, offset, bytesPerBlock, stride, size, vvr),
-					attachment);
+				publisherTopic.publish(new ByteIOContentsChangedContents(operation, offset, bytesPerBlock, stride, size, vvr), attachment);
 			}
 			return NotificationConstants.OK;
 		}
 
 		/**
-		 * For each block that would be written, clear that block in the bitmap. If this would write
-		 * past the end of the file, then pad the file to its new length.
+		 * For each block that would be written, clear that block in the bitmap. If this would write past the end of the file, then pad the
+		 * file to its new length.
 		 */
 		private void updateBitmap(File file, RandomAccessFile raf, long offset, int bytesPerBlock, long stride, int dataSize)
 			throws IOException
@@ -659,12 +652,10 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	}
 
 	/*
-	 * This method publish attributes update notification message and also return the updated
-	 * attributes as set of MessageElements. We use a single function instead of two for this two
-	 * operations in order to reduce the number of database access.
+	 * This method publish attributes update notification message and also return the updated attributes as set of MessageElements. We use a
+	 * single function instead of two for this two operations in order to reduce the number of database access.
 	 */
-	private MessageElement[] notifyAttributesUpdateAndGetMetadata(File currentFile, IRByteIOResource resource)
-		throws ResourceException
+	private MessageElement[] notifyAttributesUpdateAndGetMetadata(File currentFile, IRByteIOResource resource) throws ResourceException
 	{
 
 		MessageElement[] attributes = new MessageElement[4];

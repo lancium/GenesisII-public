@@ -7,8 +7,7 @@ class MethodDescription
 	private int _hashCode;
 
 	/**
-	 * The method name and parameter types passed in here are assumed to be from the port type
-	 * interface
+	 * The method name and parameter types passed in here are assumed to be from the port type interface
 	 * 
 	 * @param methodName
 	 * @param parameterTypes

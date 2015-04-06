@@ -31,8 +31,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 /**
- * The asynchronous worker that actually makes the outcall to the bes container to see if a job has
- * finished or failed.
+ * The asynchronous worker that actually makes the outcall to the bes container to see if a job has finished or failed.
  * 
  * @author mmm2a
  */
@@ -49,9 +48,8 @@ public class JobUpdateWorker implements OutcallHandler
 
 	private LoggingContext _context;
 
-	public JobUpdateWorker(JobManager jobManager, IBESPortTypeResolver clientStubResolver,
-		IJobEndpointResolver jobEndpointResolver, ServerDatabaseConnectionPool connectionPool, JobCommunicationInfo jobInfo,
-		JobData data)
+	public JobUpdateWorker(JobManager jobManager, IBESPortTypeResolver clientStubResolver, IJobEndpointResolver jobEndpointResolver,
+		ServerDatabaseConnectionPool connectionPool, JobCommunicationInfo jobInfo, JobData data)
 	{
 		_jobManager = jobManager;
 		_clientStubResolver = clientStubResolver;
@@ -103,8 +101,7 @@ public class JobUpdateWorker implements OutcallHandler
 				_logger.debug("Checking status of job " + _data);
 
 			/*
-			 * Get a connection from the connection pool and then ask the resolvers to get the
-			 * memory "large" information from the database.
+			 * Get a connection from the connection pool and then ask the resolvers to get the memory "large" information from the database.
 			 */
 			connection = _connectionPool.acquire(false);
 			EndpointReferenceType jobEndpoint = null;
@@ -112,8 +109,8 @@ public class JobUpdateWorker implements OutcallHandler
 				jobEndpoint = _jobEndpointResolver.getJobEndpoint(connection, _jobInfo.getJobID());
 			} catch (Throwable cause) {
 				String message =
-					String.format("Failure to get job endpoint on job %s with connection=%s jobId=%s", _data, connection,
-						_jobInfo.getJobID());
+					String
+						.format("Failure to get job endpoint on job %s with connection=%s jobId=%s", _data, connection, _jobInfo.getJobID());
 				_logger.error(message);
 				history.error(message);
 				throw cause;
@@ -132,8 +129,8 @@ public class JobUpdateWorker implements OutcallHandler
 
 				// Another thread has removed this from the database.
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Asked to check status on job %s which is "
-						+ "no longer running according to the database.", _data));
+					_logger.debug(String.format("Asked to check status on job %s which is " + "no longer running according to the database.",
+						_data));
 				_jobManager.failJob(connection, _jobInfo.getJobID(), false, false, false);
 				return;
 			}
@@ -141,8 +138,8 @@ public class JobUpdateWorker implements OutcallHandler
 			String oldAction = _data.setJobAction("Checking");
 			if (oldAction != null) {
 				history.debug("Job Busy Doing %s", oldAction);
-				_logger.error(String.format("Attempting to check job status for %s, found that "
-					+ "we are in the process of doing action:  " + oldAction, _data));
+				_logger.error(String.format("Attempting to check job status for %s, found that " + "we are in the process of doing action:  "
+					+ oldAction, _data));
 				return;
 			}
 
@@ -153,8 +150,8 @@ public class JobUpdateWorker implements OutcallHandler
 					_logger.debug(String.format("Making grid outcall to check status of job %s", _data));
 				/* call the BES container to get the activity's status. */
 				activityStatuses =
-					clientStub.getActivityStatuses(
-						new GetActivityStatusesType(new EndpointReferenceType[] { jobEndpoint }, null)).getResponse();
+					clientStub.getActivityStatuses(new GetActivityStatusesType(new EndpointReferenceType[] { jobEndpoint }, null))
+						.getResponse();
 				_jobManager.resetJobCommunicationAttempts(connection, _jobInfo.getJobID());
 				connection.commit();
 			} catch (GenesisIISecurityException gse) {
@@ -165,8 +162,8 @@ public class JobUpdateWorker implements OutcallHandler
 					_logger.debug(String.format("There was a security exception checking on status of job %s.", _data), gse);
 				wasSecurityException = true;
 				activityStatuses =
-					new GetActivityStatusResponseType[] { new GetActivityStatusResponseType(jobEndpoint,
-						new ActivityStatusType(null, ActivityStateEnumeration.Failed), null, null) };
+					new GetActivityStatusResponseType[] { new GetActivityStatusResponseType(jobEndpoint, new ActivityStatusType(null,
+						ActivityStateEnumeration.Failed), null, null) };
 			} finally {
 				_data.clearJobAction();
 			}
@@ -175,8 +172,7 @@ public class JobUpdateWorker implements OutcallHandler
 			 * If we didn't get one back, then there was a weird internal error.
 			 */
 			if (activityStatuses == null || activityStatuses.length != 1) {
-				history.createWarnWriter("Job Status Check Failed")
-					.format("BES didn't return the expected information for the job.").close();
+				history.createWarnWriter("Job Status Check Failed").format("BES didn't return the expected information for the job.").close();
 				_logger.error("Unable to get activity status for job " + _data);
 			} else {
 				if (_logger.isDebugEnabled())
@@ -209,17 +205,15 @@ public class JobUpdateWorker implements OutcallHandler
 				}
 
 				/*
-				 * if (faults == null) faults = new Vector<String>(1); faults.add(0,
-				 * String.format("Job ran on BES resource %s.", besName == null ? "<unknown>" :
-				 * besName));
+				 * if (faults == null) faults = new Vector<String>(1); faults.add(0, String.format("Job ran on BES resource %s.", besName ==
+				 * null ? "<unknown>" : besName));
 				 */
 				if (faults != null && faults.size() > 0) {
 					_jobManager.addJobErrorInformation(connection, _jobInfo.getJobID(), _data.getRunAttempts(), faults);
 				}
 
 				if (wasSecurityException) {
-					history.createDebugWriter("Certificate Expired").format(
-						"It looks like the certificate for the job might have expired.");
+					history.createDebugWriter("Certificate Expired").format("It looks like the certificate for the job might have expired.");
 
 					Collection<String> messages = new Vector<String>();
 					messages.add("The certificates for this job have expired.");
@@ -227,8 +221,7 @@ public class JobUpdateWorker implements OutcallHandler
 				}
 
 				/*
-				 * We have it's status, convert it to a more reasonable data type (not the auto
-				 * generated from WSDL one which is worthless).
+				 * We have it's status, convert it to a more reasonable data type (not the auto generated from WSDL one which is worthless).
 				 */
 				ActivityState state = new ActivityState(activityStatuses[0].getActivityStatus());
 

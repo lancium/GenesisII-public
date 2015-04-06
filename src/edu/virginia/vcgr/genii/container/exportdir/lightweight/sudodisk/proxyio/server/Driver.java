@@ -14,10 +14,9 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.commons.Constants;
 
 /**
- * IMPORTANT: Do not write to stdout other than what's already there! Use PSFileWriter.writeToFile
- * to write to file and debug there! This is because stdout is piped back to the parent. Writing to
- * stdout continuously will cause threads in this process to block waiting for parent to read (out
- * of the pipe), and that will never happen causing a stall!
+ * IMPORTANT: Do not write to stdout other than what's already there! Use PSFileWriter.writeToFile to write to file and debug there! This is
+ * because stdout is piped back to the parent. Writing to stdout continuously will cause threads in this process to block waiting for parent
+ * to read (out of the pipe), and that will never happen causing a stall!
  * 
  * The stdouts that exist in main are for writing port number back to parent
  * 
@@ -91,12 +90,12 @@ public class Driver
 					_logger.debug("accept gives us a client socket on port " + connxn.getPort());
 
 				/*
-				 * only localhost requests are supported. this should be ensured by construction of
-				 * server socket above, but we're still checking just to make sure we never see a
-				 * connection from elsewhere.
+				 * only localhost requests are supported. this should be ensured by construction of server socket above, but we're still
+				 * checking just to make sure we never see a connection from elsewhere.
 				 */
 				if (!connxn.getInetAddress().isLoopbackAddress()) {
-					_logger.error("Not loopback request - ignoring!  (how did this happen?)  address is: " + connxn.getInetAddress().getHostAddress());
+					_logger.error("Not loopback request - ignoring!  (how did this happen?)  address is: "
+						+ connxn.getInetAddress().getHostAddress());
 					continue;
 				} else {
 					Monitor.setLastReqTime(System.currentTimeMillis());

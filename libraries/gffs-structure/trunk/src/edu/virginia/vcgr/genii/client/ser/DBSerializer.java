@@ -40,8 +40,8 @@ public class DBSerializer
 		try {
 			blob = new SerialBlob(serialize(obj, maxLength));
 			if (_logger.isTraceEnabled())
-				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a "
-					+ "max length of %d bytes.", blob.length(), tableName, columnName, maxLength));
+				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a " + "max length of %d bytes.",
+					blob.length(), tableName, columnName, maxLength));
 			if (blob.length() > maxLength) {
 				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
 					+ "but the maximum length for that column is %d bytes.", blob.length(), tableName, columnName, maxLength));
@@ -192,8 +192,8 @@ public class DBSerializer
 			byte[] data = xmlSerialize(obj);
 
 			if (_logger.isTraceEnabled())
-				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a "
-					+ "max length of %d bytes.", data.length, tableName, columnName, maxLength));
+				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a " + "max length of %d bytes.",
+					data.length, tableName, columnName, maxLength));
 			if (data.length > maxLength) {
 				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
 					+ "but the maximum length for that column is %d bytes.", data.length, tableName, columnName, maxLength));

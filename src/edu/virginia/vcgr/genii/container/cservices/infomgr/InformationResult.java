@@ -7,8 +7,8 @@ import java.util.Calendar;
 import org.morgan.util.io.StreamUtils;
 
 /**
- * A bundle class that wraps together information about an endpoint, Any exceptions that occurred
- * the last time the endpoint was communicated with, and the timestamp of the last update attempt.
+ * A bundle class that wraps together information about an endpoint, Any exceptions that occurred the last time the endpoint was communicated
+ * with, and the timestamp of the last update attempt.
  * 
  * @author mmm2a
  * 
@@ -43,10 +43,9 @@ public class InformationResult<InfoType>
 		StringWriter writer = new StringWriter();
 		PrintWriter pw = new PrintWriter(writer);
 
-		pw.format(
-			"%sLast Updated:  %tc\n",
-			(_exception == null) ? "" : String.format("[(%s) %s] ", _exception.getClass().getName(),
-				_exception.getLocalizedMessage()), _lastUpdated);
+		pw.format("%sLast Updated:  %tc\n",
+			(_exception == null) ? "" : String.format("[(%s) %s] ", _exception.getClass().getName(), _exception.getLocalizedMessage()),
+			_lastUpdated);
 		pw.format("Information?  %s\n", _information);
 
 		StreamUtils.close(pw);
@@ -55,8 +54,7 @@ public class InformationResult<InfoType>
 	}
 
 	/**
-	 * Construct a new result with the given parameters. This is equivalent to constructing a result
-	 * with a null exception parameter.
+	 * Construct a new result with the given parameters. This is equivalent to constructing a result with a null exception parameter.
 	 * 
 	 * @param information
 	 *            The information (if available) for the result.
@@ -71,8 +69,7 @@ public class InformationResult<InfoType>
 	/**
 	 * Was their an exception on the last update attempt?
 	 * 
-	 * @return True if the endpoint successfully responded to the last update request, false
-	 *         otherwise.
+	 * @return True if the endpoint successfully responded to the last update request, false otherwise.
 	 */
 	final public boolean wasResponsive()
 	{
@@ -100,9 +97,8 @@ public class InformationResult<InfoType>
 	}
 
 	/**
-	 * Retrieve any information stored with this result. This information is not guaranteed to be up
-	 * to date unless "wasResponsive" returns true. If an attempt to update results fails, and old
-	 * information exists, then the old information is re-used.
+	 * Retrieve any information stored with this result. This information is not guaranteed to be up to date unless "wasResponsive" returns
+	 * true. If an attempt to update results fails, and old information exists, then the old information is re-used.
 	 * 
 	 * @return Any information (possibly null) available.
 	 */
@@ -112,11 +108,9 @@ public class InformationResult<InfoType>
 	}
 
 	/**
-	 * The exception (if any) that occurred the last time this information was updated (or
-	 * attempted).
+	 * The exception (if any) that occurred the last time this information was updated (or attempted).
 	 * 
-	 * @return The exception (or null) that occurred the last time we tried to update this
-	 *         information.
+	 * @return The exception (or null) that occurred the last time we tried to update this information.
 	 */
 	final public Throwable exception()
 	{

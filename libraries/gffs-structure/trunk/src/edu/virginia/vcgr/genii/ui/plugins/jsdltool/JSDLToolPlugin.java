@@ -58,8 +58,7 @@ public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		try {
 			Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
-			JobTool.launch(null, new JobDefinitionListenerImpl(context.uiContext().callingContext(), paths.iterator().next()),
-				null);
+			JobTool.launch(null, new JobDefinitionListenerImpl(context.uiContext().callingContext(), paths.iterator().next()), null);
 		} catch (IOException ioe) {
 			throw new UIPluginException("Unable to run Grid Job Tool.", ioe);
 		}

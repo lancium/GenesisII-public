@@ -69,8 +69,7 @@ public class ResourceManager
 	private static Properties p = null;
 	static final String NO_X509_CLASS_LIST = "NO_X509_CLASS_LIST";
 
-	static public ResourceKey getTargetResource(String serviceName, String resourceKey) throws ResourceException,
-		ResourceUnknownFaultType
+	static public ResourceKey getTargetResource(String serviceName, String resourceKey) throws ResourceException, ResourceUnknownFaultType
 	{
 		try {
 			WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
@@ -135,8 +134,7 @@ public class ResourceManager
 		return rKey;
 	}
 
-	static public ResourceKey createServiceResource(String serviceName, GenesisHashMap constructionParameters)
-		throws ResourceException
+	static public ResourceKey createServiceResource(String serviceName, GenesisHashMap constructionParameters) throws ResourceException
 	{
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
 
@@ -147,8 +145,7 @@ public class ResourceManager
 		return rKey;
 	}
 
-	static public ResourceKey createNewResource(String serviceName, GenesisHashMap constructionParameters)
-		throws ResourceException
+	static public ResourceKey createNewResource(String serviceName, GenesisHashMap constructionParameters) throws ResourceException
 	{
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
 
@@ -158,8 +155,8 @@ public class ResourceManager
 		return rKey;
 	}
 
-	static public EndpointReferenceType createEPR(ResourceKey resource, String targetServiceURL,
-		PortType[] implementedPortTypes, String masterType) throws ResourceException
+	static public EndpointReferenceType createEPR(ResourceKey resource, String targetServiceURL, PortType[] implementedPortTypes,
+		String masterType) throws ResourceException
 	{
 		ReferenceParametersType refParams = null;
 		AttributedURIType address = new AttributedURITypeSmart(targetServiceURL);
@@ -173,13 +170,11 @@ public class ResourceManager
 	}
 
 	/**
-	 * Added 2014-01-09 by ASG to allow us to selectively not put X.509 SecurityTokens in EPR's. It
-	 * would be great if we could use "if ((this instanceof GeniiNoOutCalls))" instead of the kludge
-	 * with class names, but we don't have a reference to the class For now we must explicitly list
-	 * every type we want to avoid. The list should come out of a configuration file.
+	 * Added 2014-01-09 by ASG to allow us to selectively not put X.509 SecurityTokens in EPR's. It would be great if we could use
+	 * "if ((this instanceof GeniiNoOutCalls))" instead of the kludge with class names, but we don't have a reference to the class For now we
+	 * must explicitly list every type we want to avoid. The list should come out of a configuration file.
 	 */
-	static private void MetaDataSecurityToken(ArrayList<MessageElement> metaDataAny, IResource resource)
-		throws ResourceException
+	static private void MetaDataSecurityToken(ArrayList<MessageElement> metaDataAny, IResource resource) throws ResourceException
 	{
 		String serviceName = ((ResourceKey) resource.getParentResourceKey()).getServiceName();
 		// ASG 2014-01-11
@@ -188,8 +183,7 @@ public class ResourceManager
 		// Let's first load the EPRConstruction properties file
 		if (p == null) {
 			p = new Properties();
-			InputStream in =
-				HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/EPRConstruction.properties");
+			InputStream in = HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/EPRConstruction.properties");
 			try {
 				p.load(in);
 			} catch (IOException e) {
@@ -215,8 +209,7 @@ public class ResourceManager
 			try {
 				// Go ahead and put in the security stuff
 				// add Security Token Reference
-				X509Certificate[] certChain =
-					(X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+				X509Certificate[] certChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 
 				if (certChain != null) {
 					// ASG: This is where the X.509 embedded security token gets added
@@ -234,18 +227,15 @@ public class ResourceManager
 		}
 	}
 
-	static private void addSecureAddressingElements(ArrayList<MessageElement> metaDataAny, IResource resource)
-		throws ResourceException
+	static private void addSecureAddressingElements(ArrayList<MessageElement> metaDataAny, IResource resource) throws ResourceException
 	{
 
 		MetaDataSecurityToken(metaDataAny, resource);
 
 		try {
 			// get authz/enc requirements
-			IAuthZProvider handler =
-				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
-			MessageLevelSecurityRequirements minMsgSec =
-				new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
+			IAuthZProvider handler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+			MessageLevelSecurityRequirements minMsgSec = new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 			if ((handler != null) && (handler.getMinIncomingMsgLevelSecurity(resource) != null)) {
 				minMsgSec = handler.getMinIncomingMsgLevelSecurity(resource);
 			}
@@ -300,18 +290,15 @@ public class ResourceManager
 					// create policy
 					Policy samlPolicy = new Policy();
 					MessageElement[] policySubEls =
-						{ new MessageElement(TokenAssertionType.getTypeDesc().getXmlType().getNamespaceURI(), "SamlToken",
-							samlToken) };
+						{ new MessageElement(TokenAssertionType.getTypeDesc().getXmlType().getNamespaceURI(), "SamlToken", samlToken) };
 					samlPolicy.set_any(policySubEls);
 
 					// create SignedSupporting Tokens
 					MessageElement signedSupportingTokensMel =
-						new MessageElement(new QName(NestedPolicyType.getTypeDesc().getXmlType().getNamespaceURI(),
-							"SignedSupportingTokens"));
-					signedSupportingTokensMel.setAttribute(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Optional",
-						"true");
-					signedSupportingTokensMel.addChild(new MessageElement(Policy.getTypeDesc().getXmlType().getNamespaceURI(),
-						"Policy", samlPolicy));
+						new MessageElement(new QName(NestedPolicyType.getTypeDesc().getXmlType().getNamespaceURI(), "SignedSupportingTokens"));
+					signedSupportingTokensMel.setAttribute(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Optional", "true");
+					signedSupportingTokensMel.addChild(new MessageElement(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Policy",
+						samlPolicy));
 
 					policyComponents.add(signedSupportingTokensMel);
 				}
@@ -321,14 +308,12 @@ public class ResourceManager
 					SePartsType encryptedParts = new SePartsType();
 					encryptedParts.setBody(new EmptyType());
 					MessageElement encryptMel =
-						new MessageElement(SePartsType.getTypeDesc().getXmlType().getNamespaceURI(), "EncryptedParts",
-							encryptedParts);
+						new MessageElement(SePartsType.getTypeDesc().getXmlType().getNamespaceURI(), "EncryptedParts", encryptedParts);
 					policyComponents.add(encryptMel);
 				}
 
 				// add optional username/token
-				org.apache.axis.types.URI usernameTokenUri =
-					new org.apache.axis.types.URI(SecurityConstants.USERNAME_TOKEN_URI);
+				org.apache.axis.types.URI usernameTokenUri = new org.apache.axis.types.URI(SecurityConstants.USERNAME_TOKEN_URI);
 				PolicyReference usernameTokenReference = new PolicyReference();
 				usernameTokenReference.setURI(usernameTokenUri);
 				MessageElement usernameTokenMel =
@@ -350,8 +335,7 @@ public class ResourceManager
 				PolicyAttachment policyAttachment = new PolicyAttachment();
 				policyAttachment.setAppliesTo(appliesTo);
 				policyAttachment.setPolicy(metaPolicy);
-				MessageElement policyAttachmentMel =
-					new MessageElement(PolicyAttachment.getTypeDesc().getXmlType(), policyAttachment);
+				MessageElement policyAttachmentMel = new MessageElement(PolicyAttachment.getTypeDesc().getXmlType(), policyAttachment);
 
 				metaDataAny.add(policyAttachmentMel);
 			}
@@ -364,8 +348,7 @@ public class ResourceManager
 		}
 	}
 
-	static private void addOriginalSecurityElements(ArrayList<MessageElement> metaDataAny, IResource resource)
-		throws ResourceException
+	static private void addOriginalSecurityElements(ArrayList<MessageElement> metaDataAny, IResource resource) throws ResourceException
 	{
 
 		MetaDataSecurityToken(metaDataAny, resource);
@@ -373,8 +356,7 @@ public class ResourceManager
 		try {
 
 			// add minimum level of message level security
-			IAuthZProvider handler =
-				AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+			IAuthZProvider handler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 			if (handler != null) {
 				MessageLevelSecurityRequirements minMsgSec = handler.getMinIncomingMsgLevelSecurity(resource);
 
@@ -394,22 +376,20 @@ public class ResourceManager
 
 	}
 
-	static public MetadataType createMetadata(PortType[] portTypes, ResourceKey resourceKey, String masterType)
-		throws ResourceException
+	static public MetadataType createMetadata(PortType[] portTypes, ResourceKey resourceKey, String masterType) throws ResourceException
 	{
 		if (portTypes == null)
 			portTypes = new PortType[0];
 
 		ArrayList<MessageElement> any = new ArrayList<MessageElement>();
 
-		any.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory().translate(
-			portTypes)));
+		any.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory().translate(portTypes)));
 		if (resourceKey != null) {
 			String porttypeString = "unknown"; // ASG Added
 
 			if (portTypes.length == 0) {
-				any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
-					GenesisIIConstants.GENESISII_NS, porttypeString = "NullPortType")));
+				any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(GenesisIIConstants.GENESISII_NS,
+					porttypeString = "NullPortType")));
 			} else {
 				if (masterType == null) // handles the case for RootRNSForks !
 				{
@@ -433,8 +413,8 @@ public class ResourceManager
 			IResource resource = resourceKey.dereference();
 
 			// add epi
-			any.add(new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, resource.getProperty(
-				IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME).toString()));
+			any.add(new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME)
+				.toString()));
 
 			// add security metadata (Use OGSA Secure Addressing depending on
 			// config setting)
@@ -463,9 +443,8 @@ public class ResourceManager
 	}
 
 	/**
-	 * returns a textual name for the resource specified. this is very limited in capabilities, and
-	 * currently only returns the key name for the resource. there seems to be no general and simple
-	 * way to map a resource to its RNS path.
+	 * returns a textual name for the resource specified. this is very limited in capabilities, and currently only returns the key name for
+	 * the resource. there seems to be no general and simple way to map a resource to its RNS path.
 	 */
 	static public String getResourceName(IResource resource)
 	{

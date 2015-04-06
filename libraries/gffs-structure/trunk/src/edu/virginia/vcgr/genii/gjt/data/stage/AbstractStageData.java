@@ -68,8 +68,7 @@ public abstract class AbstractStageData extends DefaultDataItem implements Stage
 	}
 
 	@Override
-	public void generateAdditionalJSDL(DataStaging jsdlStaging, XPathBuilder builder,
-		Map<String, List<SweepParameter>> variables)
+	public void generateAdditionalJSDL(DataStaging jsdlStaging, XPathBuilder builder, Map<String, List<SweepParameter>> variables)
 	{
 		// Don't do anything
 	}

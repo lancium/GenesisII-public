@@ -28,18 +28,15 @@ final public class CallingContextUtilities
 		}
 		CredentialWallet creds = null;
 		if (workingContext != null) {
-			creds =
-				(CredentialWallet) workingContext
-					.getProperty(SAMLConstants.SAML_CREDENTIALS_WORKING_CONTEXT_CREDS_PROPERTY_NAME);
+			creds = (CredentialWallet) workingContext.getProperty(SAMLConstants.SAML_CREDENTIALS_WORKING_CONTEXT_CREDS_PROPERTY_NAME);
 		}
 		ArrayList<NuCredential> callerCredentials = new ArrayList<NuCredential>();
 		if (creds != null) {
 			Collection<TrustCredential> assertions = creds.getCredentials();
 
 			/*
-			 * Deserialize the encoded caller-credentials and add them to a "caller-only" cred-set:
-			 * they will be added to the transient cred-set later (along with any other creds
-			 * conveyed outside the calling-context) during security-processing.
+			 * Deserialize the encoded caller-credentials and add them to a "caller-only" cred-set: they will be added to the transient
+			 * cred-set later (along with any other creds conveyed outside the calling-context) during security-processing.
 			 */
 			if (assertions != null) {
 				Iterator<TrustCredential> itr = assertions.iterator();
@@ -59,8 +56,7 @@ final public class CallingContextUtilities
 	}
 
 	/*
-	 * This method augments any new trust delegation retrieved from some RPC exchange in the calling
-	 * context of the current GRID user.
+	 * This method augments any new trust delegation retrieved from some RPC exchange in the calling context of the current GRID user.
 	 */
 	public static void updateCallingContext(TrustCredential assertion) throws Exception
 	{
@@ -72,8 +68,7 @@ final public class CallingContextUtilities
 		}
 
 		// retrieve the credentials wallet from the context and update it
-		CredentialWallet wallet =
-			(CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
+		CredentialWallet wallet = (CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
 		if (wallet == null) {
 			wallet = new CredentialWallet();
 		}

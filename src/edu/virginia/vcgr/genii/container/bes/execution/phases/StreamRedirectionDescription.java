@@ -40,8 +40,7 @@ public class StreamRedirectionDescription implements Serializable
 	{
 		if (source != null) {
 			try {
-				Thread thread =
-					new Thread(new StreamRedirector(source.openSource(context), sink), "BES Stream Redirector Thread");
+				Thread thread = new Thread(new StreamRedirector(source.openSource(context), sink), "BES Stream Redirector Thread");
 				thread.setDaemon(false);
 				thread.start();
 
@@ -58,8 +57,7 @@ public class StreamRedirectionDescription implements Serializable
 	{
 		try {
 			Thread thread =
-				new Thread(new StreamRedirector(source, sink == null ? null : sink.openSink(context)),
-					"BES Stream Redirector Thread");
+				new Thread(new StreamRedirector(source, sink == null ? null : sink.openSink(context)), "BES Stream Redirector Thread");
 			thread.setDaemon(false);
 			thread.start();
 

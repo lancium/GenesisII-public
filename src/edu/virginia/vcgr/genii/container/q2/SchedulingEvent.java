@@ -3,9 +3,9 @@ package edu.virginia.vcgr.genii.container.q2;
 import java.util.Date;
 
 /**
- * This class is used to wait on, and notify threads about scheduling opportunities. An opportunity
- * is not a guarantee that a job can be schedule, but rather a strong suspician that one can. It's
- * up to the scheduler to determine if this is true and to actually do the matching.
+ * This class is used to wait on, and notify threads about scheduling opportunities. An opportunity is not a guarantee that a job can be
+ * schedule, but rather a strong suspician that one can. It's up to the scheduler to determine if this is true and to actually do the
+ * matching.
  * 
  * @author mmm2a
  */
@@ -17,8 +17,7 @@ public class SchedulingEvent
 	private boolean _schedulingEvent = false;
 
 	/**
-	 * A Java Object instances whose sole purpose in life is to give us an object to lock, wait on,
-	 * and signal on.
+	 * A Java Object instances whose sole purpose in life is to give us an object to lock, wait on, and signal on.
 	 */
 	private Object _lock = new Object();
 

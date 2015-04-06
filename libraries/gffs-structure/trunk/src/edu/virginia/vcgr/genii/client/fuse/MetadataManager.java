@@ -30,17 +30,14 @@ import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 import fuse.FuseStat;
 
 /*
- * This is the helper class for propagating ByteIO attribute updates to the local cache. Note that
- * when an update is made directly on the RP interface by calling some setProperty method, this
- * class is not needed. It is only used when update is made by some call that changes some attribute
- * of the underlying resource directly. Like truncate or write system calls from FUSE. Additionally,
- * the ByteIO to Unix file permission conversion, and INode number generation are abstracted in this
- * class. This is done just to give a clean appearance outside.
+ * This is the helper class for propagating ByteIO attribute updates to the local cache. Note that when an update is made directly on the RP
+ * interface by calling some setProperty method, this class is not needed. It is only used when update is made by some call that changes some
+ * attribute of the underlying resource directly. Like truncate or write system calls from FUSE. Additionally, the ByteIO to Unix file
+ * permission conversion, and INode number generation are abstracted in this class. This is done just to give a clean appearance outside.
  * 
- * One of the most important responsibilities of this helper class is to bridge the RP-attribute
- * cache with the INode of Unix file system. As the cache is modeled to support both the Grid-Shell
- * and the FUSE driver, and therefore works at the RP- attributes level, we needed a bridging
- * facility that can derive INodes from the cached attributes.
+ * One of the most important responsibilities of this helper class is to bridge the RP-attribute cache with the INode of Unix file system. As
+ * the cache is modeled to support both the Grid-Shell and the FUSE driver, and therefore works at the RP- attributes level, we needed a
+ * bridging facility that can derive INodes from the cached attributes.
  */
 public class MetadataManager
 {
@@ -77,16 +74,14 @@ public class MetadataManager
 	{
 		String nameSpaceForAttributes = CacheUtils.getNamespaceForByteIOAttributes(EPR);
 		if (nameSpaceForAttributes != null) {
-			CacheManager.removeItemFromCache(EPR, new QName(nameSpaceForAttributes, ByteIOConstants.SIZE_ATTR_NAME),
-				MessageElement.class);
+			CacheManager.removeItemFromCache(EPR, new QName(nameSpaceForAttributes, ByteIOConstants.SIZE_ATTR_NAME), MessageElement.class);
 
 			Calendar modificationTime = Calendar.getInstance();
 			QName modTimeQName = new QName(nameSpaceForAttributes, ByteIOConstants.MODTIME_ATTR_NAME);
 			MessageElement modTimeElement = new MessageElement(modTimeQName, modificationTime);
 			CacheManager.putItemInCache(EPR, modTimeQName, modTimeElement);
 
-			CacheManager.putItemInCache(EPR, new QName(nameSpaceForAttributes, ByteIOConstants.ACCESSTIME_ATTR_NAME),
-				modTimeElement);
+			CacheManager.putItemInCache(EPR, new QName(nameSpaceForAttributes, ByteIOConstants.ACCESSTIME_ATTR_NAME), modTimeElement);
 		}
 	}
 
@@ -157,8 +152,8 @@ public class MetadataManager
 	}
 
 	/*
-	 * TODO: We have to modify the implementation to support caching of resource configurations of
-	 * EndPointReferences that do not have any EndPointIdentifier.
+	 * TODO: We have to modify the implementation to support caching of resource configurations of EndPointReferences that do not have any
+	 * EndPointIdentifier.
 	 */
 	public static int generateInodeNumber(EndpointReferenceType target)
 	{
@@ -168,12 +163,10 @@ public class MetadataManager
 			int inodeNumber = endpointIdentifier.toString().hashCode();
 
 			/*
-			 * Updating or storing the resource configuration object in the cache. It is important
-			 * to update the cache here as we do not expect to regenerate the INode number again as
-			 * long as our concerned resource is already in the cache.
+			 * Updating or storing the resource configuration object in the cache. It is important to update the cache here as we do not
+			 * expect to regenerate the INode number again as long as our concerned resource is already in the cache.
 			 */
-			WSResourceConfig config =
-				(WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifier, WSResourceConfig.class);
+			WSResourceConfig config = (WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifier, WSResourceConfig.class);
 			if (config == null) {
 				config = new WSResourceConfig(name);
 			}
@@ -182,8 +175,7 @@ public class MetadataManager
 
 			return inodeNumber;
 		} else {
-			_logger.warn("Trying to generate an INode number of a target which"
-				+ "does not implement the WS-Naming specification.");
+			_logger.warn("Trying to generate an INode number of a target which" + "does not implement the WS-Naming specification.");
 			try {
 				byte[] array = EPRUtils.toBytes(target);
 				long result = 0;
@@ -199,11 +191,10 @@ public class MetadataManager
 	}
 
 	/*
-	 * This is the bridge between FUSE and RP-level cache. Here, we construct a file system INode
-	 * structure from information stored in the resource configuration and the RP-attribute caches.
-	 * The method returns null if any required attribute is found missing; in that case an RPC is
-	 * initiated by the caller to retrieve the missing piece information, and INode is constructed
-	 * in a normal fashion without the supervision of MetadataManager.
+	 * This is the bridge between FUSE and RP-level cache. Here, we construct a file system INode structure from information stored in the
+	 * resource configuration and the RP-attribute caches. The method returns null if any required attribute is found missing; in that case an
+	 * RPC is initiated by the caller to retrieve the missing piece information, and INode is constructed in a normal fashion without the
+	 * supervision of MetadataManager.
 	 */
 	public static FilesystemStatStructure retrieveStat(String rnsPathString)
 	{
@@ -232,9 +223,7 @@ public class MetadataManager
 				created = 0L;
 				modified = accessed = System.currentTimeMillis();
 			} else {
-				size =
-					(Long) getDeserializedAttributeFromCache(Long.class, wsIdentifier, ByteIOConstants.rsize,
-						ByteIOConstants.ssize);
+				size = (Long) getDeserializedAttributeFromCache(Long.class, wsIdentifier, ByteIOConstants.rsize, ByteIOConstants.ssize);
 				if (size == null)
 					return null;
 
@@ -287,16 +276,14 @@ public class MetadataManager
 	{
 		for (QName name : names) {
 			MessageElement element =
-				(MessageElement) CacheManager
-					.getItemFromCache(wsIdentifier, name, org.apache.axis.message.MessageElement.class);
+				(MessageElement) CacheManager.getItemFromCache(wsIdentifier, name, org.apache.axis.message.MessageElement.class);
 			if (element != null)
 				return element;
 		}
 		return null;
 	}
 
-	private static Object getDeserializedAttributeFromCache(Class<?> attributeType, URI wsIdentifier, QName... names)
-		throws Exception
+	private static Object getDeserializedAttributeFromCache(Class<?> attributeType, URI wsIdentifier, QName... names) throws Exception
 	{
 		MessageElement element = getAttributeFromCache(wsIdentifier, names);
 		if (element == null)
@@ -305,8 +292,8 @@ public class MetadataManager
 	}
 
 	/*
-	 * This method is adequate for Unix, but not for Windows. If in future we managed to make FUSE
-	 * works for Windows, we will have to change the implementation.
+	 * This method is adequate for Unix, but not for Windows. If in future we managed to make FUSE works for Windows, we will have to change
+	 * the implementation.
 	 */
 	private static String getNameFromPath(String path)
 	{

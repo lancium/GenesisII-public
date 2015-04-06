@@ -238,8 +238,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		}
 
 		if (froot == null)
-			throw new ConfigurationException("Service class \"" + cl.getName()
-				+ "\" does not have the required ForkRoot annotation.");
+			throw new ConfigurationException("Service class \"" + cl.getName() + "\" does not have the required ForkRoot annotation.");
 
 		return froot.value();
 	}
@@ -256,8 +255,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		}
 
 		if (froot == null)
-			throw new ConfigurationException("Service class \"" + getClass().getName()
-				+ "\" does not have the required ForkRoot annotation.");
+			throw new ConfigurationException("Service class \"" + getClass().getName() + "\" does not have the required ForkRoot annotation.");
 
 		try {
 			Class<? extends RNSResourceFork> forkClass = froot.value();
@@ -355,8 +353,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		else if (fork instanceof StreamableByteIOResourceFork)
 			return new PortType[] { WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE() };
 		else
-			throw new ConfigurationException("Class \"" + fork.getClass() + "\" does not implement one "
-				+ "of the resource fork types.");
+			throw new ConfigurationException("Class \"" + fork.getClass() + "\" does not implement one " + "of the resource fork types.");
 	}
 
 	private PortType[] getPortType(ResourceForkInformation rif) throws ResourceException
@@ -388,8 +385,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 
 	static final private Pattern EPI_PATTERN = Pattern.compile("^(.+):fork-path:.+$");
 
-	public EndpointReferenceType modifyEPI(EndpointReferenceType epr, String forkPath) throws ResourceException,
-		ResourceUnknownFaultType
+	public EndpointReferenceType modifyEPI(EndpointReferenceType epr, String forkPath) throws ResourceException, ResourceUnknownFaultType
 	{
 		Collection<MessageElement> attributes;
 
@@ -447,14 +443,14 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			}
 		}
 
-		mdtList.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory()
-			.translate(portTypes)));
+		mdtList
+			.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory().translate(portTypes)));
 
-		mdtList.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
-			GenesisIIConstants.GENESISII_NS, rif.forkClass().getSimpleName())));
+		mdtList.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(GenesisIIConstants.GENESISII_NS, rif
+			.forkClass().getSimpleName())));
 
-		return new EndpointReferenceType(epr.getAddress(), epr.getReferenceParameters(), new MetadataType(
-			Elementals.toArray(mdtList)), epr.get_any());
+		return new EndpointReferenceType(epr.getAddress(), epr.getReferenceParameters(), new MetadataType(Elementals.toArray(mdtList)),
+			epr.get_any());
 	}
 
 	@Override
@@ -486,8 +482,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 
 	@Override
 	@RWXMappingResolver(DestroyForkMappingResolver.class)
-	public DestroyResponse destroy(Destroy destroyRequest) throws RemoteException, ResourceUnknownFaultType,
-		ResourceNotDestroyedFaultType, ResourceUnavailableFaultType
+	public DestroyResponse destroy(Destroy destroyRequest) throws RemoteException, ResourceUnknownFaultType, ResourceNotDestroyedFaultType,
+		ResourceUnavailableFaultType
 	{
 		ResourceFork fork = getResourceFork();
 		fork.destroy();
@@ -510,11 +506,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		EndpointReferenceType target = entryType.getEndpoint();
 		try {
 			if (target == null)
-				return new RNSEntryResponseType(fork.mkdir(getExemplarEPR(), entryName), entryType.getMetadata(), null,
-					entryName);
+				return new RNSEntryResponseType(fork.mkdir(getExemplarEPR(), entryName), entryType.getMetadata(), null, entryName);
 			else
-				return new RNSEntryResponseType(fork.add(getExemplarEPR(), entryName, target), entryType.getMetadata(), null,
-					entryName);
+				return new RNSEntryResponseType(fork.add(getExemplarEPR(), entryName, target), entryType.getMetadata(), null, entryName);
 		} catch (IOException ioe) {
 			_logger.error("failure during add request", ioe);
 			throw new RemoteException("Unable to add entry: " + ioe.getMessage(), ioe);
@@ -524,8 +518,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "add")
-	final public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException,
-		org.ggf.rns.WriteNotPermittedFaultType
+	final public RNSEntryResponseType[] add(RNSEntryType[] addRequest) throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
 	{
 		RNSEntryResponseType[] ret = new RNSEntryResponseType[addRequest.length];
 		for (int lcv = 0; lcv < ret.length; lcv++) {
@@ -536,9 +529,10 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			} catch (Throwable cause) {
 				_logger.error("failure during add request", cause);
 				ret[lcv] =
-					new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: "
-							+ cause.getMessage()) }, null)), addRequest[lcv].getEntryName());
+					new RNSEntryResponseType(null, null,
+						FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: " + cause.getMessage()) },
+							null)), addRequest[lcv].getEntryName());
 			}
 		}
 
@@ -548,8 +542,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "list")
-	final public LookupResponseType lookup(String[] lookupRequest) throws RemoteException,
-		org.ggf.rns.ReadNotPermittedFaultType
+	final public LookupResponseType lookup(String[] lookupRequest) throws RemoteException, org.ggf.rns.ReadNotPermittedFaultType
 	{
 		TimingSink tSink = TimingSink.sink();
 		Timer timer = null;
@@ -649,15 +642,12 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			timer = tSink.getTimer("Prepare Entries");
 
 			/*
-			 * ASG: May 10, 2014, at Aumeister in English Garden. Instead of iterating, if it is a
-			 * light weight, lets call public static Collection<Pair<Long, MessageElement>>
-			 * getEntries(List<InMemoryIteratorEntry> imieList, int firstElement, int
-			 * numElements,Object[] EprAndService, boolean shortForm) throws IOException { entries
-			 * is an Iterable<InternalEntry> , we need to convert it into a
-			 * List<InMemoryIteratorEngry>
+			 * ASG: May 10, 2014, at Aumeister in English Garden. Instead of iterating, if it is a light weight, lets call public static
+			 * Collection<Pair<Long, MessageElement>> getEntries(List<InMemoryIteratorEntry> imieList, int firstElement, int
+			 * numElements,Object[] EprAndService, boolean shortForm) throws IOException { entries is an Iterable<InternalEntry> , we need to
+			 * convert it into a List<InMemoryIteratorEngry>
 			 * 
-			 * CAK: note that this only works with non-proxyio exports, since they do not have a
-			 * file target we can use as the dirPath below.
+			 * CAK: note that this only works with non-proxyio exports, since they do not have a file target we can use as the dirPath below.
 			 */
 			if ((dirPath != null) && fork.describe().forkClass().getCanonicalName().indexOf("LightWeight") != -1) {
 				resultEntries = LightWeightExportDirFork.getEntries(entries, getResourceKey(), requestedShortForm, dirPath);
@@ -667,8 +657,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 					if (internalEntry.isExistent()) {
 						EndpointReferenceType epr = internalEntry.getEntryReference();
 						RNSEntryResponseType entry =
-							new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr, Prefetcher.preFetch(epr,
-								internalEntry.getAttributes(), factory, null, null, requestedShortForm)), null,
+							new RNSEntryResponseType(epr, RNSUtilities.createMetadata(epr,
+								Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm)), null,
 								internalEntry.getName());
 						// Remove EPR from entry when short form is requested.
 						if (requestedShortForm) {
@@ -678,10 +668,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 					} else {
 						String name = internalEntry.getName();
 						RNSEntryResponseType entry =
-							new RNSEntryResponseType(null, null,
-								FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
-									new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format(
-										"Entry %s does not exist!", name)) }, null, name)), name);
+							new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null,
+								null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format(
+									"Entry %s does not exist!", name)) }, null, name)), name);
 						resultEntries.add(entry);
 					}
 				}
@@ -689,8 +678,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 				timer = tSink.getTimer("Create Iterator");
 
 			}
-			return RNSContainerUtilities.indexedTranslate(resultEntries, iteratorBuilder(RNSEntryResponseType.getTypeDesc()
-				.getXmlType()), wrapper);
+			return RNSContainerUtilities.indexedTranslate(resultEntries, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()),
+				wrapper);
 		} catch (IOException ioe) {
 			throw new RemoteException("Unable to list contents.", ioe);
 		} finally {
@@ -710,8 +699,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "createFile")
-	final public CreateFileResponseType createFile(CreateFileRequestType request) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType
+	final public CreateFileResponseType createFile(CreateFileRequestType request) throws RemoteException, RNSEntryExistsFaultType,
+		ResourceUnknownFaultType
 	{
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof RNSResourceFork))
@@ -729,8 +718,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "remove")
-	final public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException,
-		org.ggf.rns.WriteNotPermittedFaultType
+	final public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
 	{
 		RNSEntryResponseType[] ret = new RNSEntryResponseType[removeRequest.length];
 
@@ -745,10 +733,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 					ret[lcv] = new RNSEntryResponseType(null, null, null, removeRequest[lcv]);
 				else
 					ret[lcv] =
-						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(
-							null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String
-								.format("Entry %s does not exist!", removeRequest[lcv])) }, null, removeRequest[lcv])),
-							removeRequest[lcv]);
+						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null,
+							null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry %s does not exist!",
+								removeRequest[lcv])) }, null, removeRequest[lcv])), removeRequest[lcv]);
 			} catch (BaseFaultType bft) {
 				ret[lcv] = new RNSEntryResponseType(null, null, bft, removeRequest[lcv]);
 			} catch (Throwable cause) {
@@ -774,8 +761,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "truncAppend")
-	final public AppendResponse append(Append arg0) throws RemoteException, ResourceUnknownFaultType,
-		WriteNotPermittedFaultType, UnsupportedTransferFaultType, CustomFaultType
+	final public AppendResponse append(Append arg0) throws RemoteException, ResourceUnknownFaultType, WriteNotPermittedFaultType,
+		UnsupportedTransferFaultType, CustomFaultType
 	{
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof RandomByteIOResourceFork))
@@ -843,8 +830,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		RandomByteIOResourceFork fork = (RandomByteIOResourceFork) tFork;
 		try {
 			fork.truncAppend(arg0.getOffset(), ByteBuffer.wrap(TransferAgent.receiveData(arg0.getTransferInformation())));
-			return new TruncAppendResponse(new TransferInformationType(null, arg0.getTransferInformation()
-				.getTransferMechanism()));
+			return new TruncAppendResponse(new TransferInformationType(null, arg0.getTransferInformation().getTransferMechanism()));
 		} catch (IOException ioe) {
 			throw new RemoteException("Unable to truncAppend data.", ioe);
 		}
@@ -954,8 +940,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 	/* Streamable ByteIO Factory Operations */
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	final public OpenStreamResponse openStream(Object arg0) throws RemoteException, ResourceUnknownFaultType,
-		ResourceCreationFaultType
+	final public OpenStreamResponse openStream(Object arg0) throws RemoteException, ResourceUnknownFaultType, ResourceCreationFaultType
 	{
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof StreamableByteIOFactoryResourceFork))
@@ -1015,8 +1000,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 	{
 		@Override
 		/* The last two parameters are unused! */
-		public AttributePreFetcher getPreFetcher(EndpointReferenceType epr, ResourceKey rKey, ResourceForkService service)
-			throws Throwable
+		public AttributePreFetcher getPreFetcher(EndpointReferenceType epr, ResourceKey rKey, ResourceForkService service) throws Throwable
 		{
 			ResourceFork fork = null;
 
@@ -1024,11 +1008,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 				return new DefaultRandomByteIOAttributePreFetcher(epr);
 			} else if ((fork = getMyByteIOFork(epr)) != null) {
 				if (fork instanceof RandomByteIOResourceFork) {
-					return new RandomByteIOForkAttributePreFetcher(getResourceKey().dereference(),
-						(RandomByteIOResourceFork) fork);
+					return new RandomByteIOForkAttributePreFetcher(getResourceKey().dereference(), (RandomByteIOResourceFork) fork);
 				} else if (fork instanceof StreamableByteIOResourceFork) {
-					return new StreamableByteIOForkAttributePreFetcher(getResourceKey().dereference(),
-						(StreamableByteIOResourceFork) fork);
+					return new StreamableByteIOForkAttributePreFetcher(getResourceKey().dereference(), (StreamableByteIOResourceFork) fork);
 				} else if (fork instanceof StreamableByteIOFactoryResourceFork) {
 					return new StreamableByteIOFactoryForkAttributePreFetcher(getResourceKey().dereference(),
 						(StreamableByteIOFactoryResourceFork) fork);

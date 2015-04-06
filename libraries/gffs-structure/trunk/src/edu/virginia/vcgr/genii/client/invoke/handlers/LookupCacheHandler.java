@@ -13,8 +13,8 @@ import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
 /*
- * Like the AttributeCacheHandler, this class intercepts RPC to GenesisII containers. Its sole
- * purpose is to propagate all RNS related update to local RNS lookup caches.
+ * Like the AttributeCacheHandler, this class intercepts RPC to GenesisII containers. Its sole purpose is to propagate all RNS related update
+ * to local RNS lookup caches.
  */
 public class LookupCacheHandler
 {

@@ -20,8 +20,8 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 public class CopyMachine
 {
@@ -40,11 +40,11 @@ public class CopyMachine
 	final static int MAX_COPY_DEPTH = 16; // we do not try to copy hierarchies deeper than this.
 
 	/**
-	 * Constructs a copy machine for making a copy of the source to the target. If the sink is
-	 * non-null, we will use it to record updates as files and directories are seen.
+	 * Constructs a copy machine for making a copy of the source to the target. If the sink is non-null, we will use it to record updates as
+	 * files and directories are seen.
 	 */
-	public CopyMachine(String sourceIn, String targetIn, TaskProgressListener updateSink, boolean forceIn,
-		PrintWriter stderrIn, RNSPath logLocation)
+	public CopyMachine(String sourceIn, String targetIn, TaskProgressListener updateSink, boolean forceIn, PrintWriter stderrIn,
+		RNSPath logLocation)
 	{
 		_source = sourceIn;
 		_target = targetIn;
@@ -63,8 +63,8 @@ public class CopyMachine
 	}
 
 	/**
-	 * traverses a directory tree at the source (even if just a file) and replicates the source into
-	 * the target path, which must be a directory.
+	 * traverses a directory tree at the source (even if just a file) and replicates the source into the target path, which must be a
+	 * directory.
 	 */
 	public PathOutcome copyTree()
 	{
@@ -76,8 +76,8 @@ public class CopyMachine
 		// we create paths in target on directory entry, and we copy files when
 		// we hit them.
 		GeniiPathRecurser cloner =
-			new GeniiPathRecurser(new EnterDirectoryGeniiPath(this), new ExitDirectoryGeniiPath(this, _logLocation),
-				new CopyFileGeniiPath(this, _logLocation), null);
+			new GeniiPathRecurser(new EnterDirectoryGeniiPath(this), new ExitDirectoryGeniiPath(this, _logLocation), new CopyFileGeniiPath(
+				this, _logLocation), null);
 		cloner.setMaximumRecursionDepth(MAX_COPY_DEPTH);
 		GeniiPath targetCheck = new GeniiPath(_target);
 		if (targetCheck.exists()) {
@@ -120,8 +120,8 @@ public class CopyMachine
 	}
 
 	/**
-	 * copies a single file from the source location to the target. if the target is a directory,
-	 * the file will be created inside of it. if the target is a file, then it is overwritten.
+	 * copies a single file from the source location to the target. if the target is a directory, the file will be created inside of it. if
+	 * the target is a file, then it is overwritten.
 	 */
 	public static PathOutcome copyOneFile(String sourceIn, String targetIn, RNSPath logLocation)
 	{

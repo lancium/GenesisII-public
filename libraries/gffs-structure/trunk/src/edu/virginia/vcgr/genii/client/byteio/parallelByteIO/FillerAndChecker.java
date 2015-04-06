@@ -33,8 +33,7 @@ public class FillerAndChecker
 	}
 
 	/*
-	 * Method to aid in checking if fetch was satisfied completely, partially or not satisfied at
-	 * all
+	 * Method to aid in checking if fetch was satisfied completely, partially or not satisfied at all
 	 */
 
 	synchronized private void setLastFilledBufferIndex(int index)

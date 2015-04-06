@@ -22,8 +22,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 
 /**
- * This is the main data structure for keeping all information about a job that is small enough to
- * store in memory.
+ * This is the main data structure for keeping all information about a job that is small enough to store in memory.
  * 
  * @author mmm2a
  */
@@ -38,9 +37,8 @@ public class JobData
 	private LoggingContext _loggingContext = null;
 
 	/**
-	 * This variable is used internally by the queue to maintain the current "active" state of a
-	 * job. Is it in the process of being created or having it's status checked? If the value is
-	 * null, then no action is going on.
+	 * This variable is used internally by the queue to maintain the current "active" state of a job. Is it in the process of being created or
+	 * having it's status checked? If the value is null, then no action is going on.
 	 */
 	private String _jobAction = null;
 
@@ -77,23 +75,21 @@ public class JobData
 	private QueueStates _jobState;
 
 	/**
-	 * The time at which the job was submitted to the queue. This information is kept so that we can
-	 * ORDER jobs by submit time (after taking priority into account).
+	 * The time at which the job was submitted to the queue. This information is kept so that we can ORDER jobs by submit time (after taking
+	 * priority into account).
 	 */
 	private Date _submitTime;
 
 	/**
-	 * The BES ID associated with this job. Notice that we use the wrapper class for longs here
-	 * which allows this field to be null. If it is null, then the job hasn't been matched to a
-	 * resource yet. If the besID is non-null, then it is in fact the bes key of the bes resource
+	 * The BES ID associated with this job. Notice that we use the wrapper class for longs here which allows this field to be null. If it is
+	 * null, then the job hasn't been matched to a resource yet. If the besID is non-null, then it is in fact the bes key of the bes resource
 	 * that we are running on (or starting on).
 	 */
 	private Long _besID;
 
 	/**
-	 * This date is used for exponential backoff. If a job fails for a reason that increases the
-	 * attempt number, then we exponentially back off the next time at which we can try running it.
-	 * This helps with resource contention.
+	 * This date is used for exponential backoff. If a job fails for a reason that increases the attempt number, then we exponentially back
+	 * off the next time at which we can try running it. This helps with resource contention.
 	 */
 	private Date _nextValidRunTime = null;
 
@@ -101,8 +97,8 @@ public class JobData
 
 	private ActivityStatusType _besActivityStatus = null;
 
-	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, Long besID, HistoryContext history, LoggingContext loggingContext)
+	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
+		Long besID, HistoryContext history, LoggingContext loggingContext)
 	{
 		_jobName = jobName;
 		_killed = false;
@@ -117,8 +113,8 @@ public class JobData
 		_loggingContext = loggingContext;
 	}
 
-	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, HistoryContext history, LoggingContext loggingContext)
+	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
+		HistoryContext history, LoggingContext loggingContext)
 	{
 		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, loggingContext);
 	}
@@ -215,8 +211,7 @@ public class JobData
 			StringWriter writer = new StringWriter();
 			ObjectSerializer.serialize(writer, ast, tmp);
 			StringReader reader = new StringReader(writer.toString());
-			_besActivityStatus =
-				(ActivityStatusType) ObjectDeserializer.deserialize(new InputSource(reader), ActivityStatusType.class);
+			_besActivityStatus = (ActivityStatusType) ObjectDeserializer.deserialize(new InputSource(reader), ActivityStatusType.class);
 		} catch (Throwable cause) {
 			_besActivityStatus = null;
 		}
@@ -256,8 +251,7 @@ public class JobData
 		incrementRunAttempts(1);
 	}
 
-	synchronized public JobResourceRequirements getResourceRequirements(JobManager _jobManager) throws ResourceException,
-		SQLException
+	synchronized public JobResourceRequirements getResourceRequirements(JobManager _jobManager) throws ResourceException, SQLException
 	{
 		if (_resourceRequirements == null) {
 			JobDefinition_Type jsdl = _jobManager.getJSDL(_jobID);

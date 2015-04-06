@@ -14,8 +14,7 @@ import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 
 /**
- * This class is used to extract common behavior of all caches that saves attributes in a single
- * location.
+ * This class is used to extract common behavior of all caches that saves attributes in a single location.
  */
 public abstract class CommonAttributeCache extends CommonCache
 {
@@ -81,18 +80,15 @@ public abstract class CommonAttributeCache extends CommonCache
 	}
 
 	/*
-	 * Since we only subscribe to RNS, not to byteIOs, byteIO attribute changes are propagated
-	 * through subscription on container directories. As a result, the lifetime of a byteIO
-	 * attribute depends on subscription on parent RNS directory. Meanwhile, the lifetime of an RNS
-	 * directory attribute depends subscription on the RNS itself and on the parent directory as we
-	 * propagate RNS attributes updates through parent directories too. This is done to avoid making
-	 * RPCs for attributes of RNS directories that lie on some directory user has traversed, but the
-	 * not the RNS directories themselves.
+	 * Since we only subscribe to RNS, not to byteIOs, byteIO attribute changes are propagated through subscription on container directories.
+	 * As a result, the lifetime of a byteIO attribute depends on subscription on parent RNS directory. Meanwhile, the lifetime of an RNS
+	 * directory attribute depends subscription on the RNS itself and on the parent directory as we propagate RNS attributes updates through
+	 * parent directories too. This is done to avoid making RPCs for attributes of RNS directories that lie on some directory user has
+	 * traversed, but the not the RNS directories themselves.
 	 */
 	protected long getCacheLifeTime(URI endpointIdentifierURI)
 	{
-		WSResourceConfig resourceConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifierURI, WSResourceConfig.class);
+		WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(endpointIdentifierURI, WSResourceConfig.class);
 		if (resourceConfig == null)
 			return cacheLifeTime;
 
@@ -117,8 +113,7 @@ public abstract class CommonAttributeCache extends CommonCache
 
 	protected Collection<String> getCacheKeysForLifetimeUpdateRequest(URI commonIdentifier)
 	{
-		WSResourceConfig commonConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(commonIdentifier, WSResourceConfig.class);
+		WSResourceConfig commonConfig = (WSResourceConfig) CacheManager.getItemFromCache(commonIdentifier, WSResourceConfig.class);
 		if (commonConfig == null)
 			return Collections.emptyList();
 
@@ -133,8 +128,7 @@ public abstract class CommonAttributeCache extends CommonCache
 			String childPaths = DirectoryManager.getPathForDirectoryEntry(rnsPath, "[^//]+");
 
 			@SuppressWarnings("unchecked")
-			Map<String, WSResourceConfig> matchingChildConfigs =
-				CacheManager.getMatchingItemsWithKeys(childPaths, WSResourceConfig.class);
+			Map<String, WSResourceConfig> matchingChildConfigs = CacheManager.getMatchingItemsWithKeys(childPaths, WSResourceConfig.class);
 
 			if (matchingChildConfigs != null) {
 				for (Map.Entry<String, WSResourceConfig> entry : matchingChildConfigs.entrySet()) {

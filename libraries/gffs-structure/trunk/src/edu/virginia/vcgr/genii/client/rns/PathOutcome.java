@@ -3,13 +3,13 @@ package edu.virginia.vcgr.genii.client.rns;
 /**
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /*
- * These values are standard returns for recursePath. There can also be other values returned by an
- * ActionAlert that are specific to higher-level types.
+ * These values are standard returns for recursePath. There can also be other values returned by an ActionAlert that are specific to
+ * higher-level types.
  */
 public class PathOutcome
 {

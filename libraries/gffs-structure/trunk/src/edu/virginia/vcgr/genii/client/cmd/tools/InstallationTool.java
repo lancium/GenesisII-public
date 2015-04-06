@@ -29,14 +29,12 @@ public class InstallationTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		HashMap<String, ContainerInformation> runningContainers = InstallationState.getRunningContainers();
 		for (String deploymentName : runningContainers.keySet()) {
-			stdout.println("Container \"" + deploymentName + "\" is running at "
-				+ runningContainers.get(deploymentName).getContainerURL());
+			stdout.println("Container \"" + deploymentName + "\" is running at " + runningContainers.get(deploymentName).getContainerURL());
 		}
 
 		return 0;

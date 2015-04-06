@@ -112,8 +112,7 @@ public class SecurityUtilities implements CertificateValidator
 	@Override
 	public boolean validateTrustedByKeystore(X509Certificate[] certChain, KeyStore store)
 	{
-		return simpleCertificateValidation(certChain) && creatorInStore(certChain, store)
-			&& isAnchoredInKeystore(certChain, store);
+		return simpleCertificateValidation(certChain) && creatorInStore(certChain, store) && isAnchoredInKeystore(certChain, store);
 	}
 
 	/**
@@ -153,8 +152,9 @@ public class SecurityUtilities implements CertificateValidator
 			try {
 				certChain[i].verify(certChain[i + 1].getPublicKey());
 			} catch (Throwable e) {
-				_logger.error("failure to validate internal consistency of this cert " + certChain[i].getSubjectDN()
-					+ " error is: " + e.getMessage(), e);
+				_logger.error(
+					"failure to validate internal consistency of this cert " + certChain[i].getSubjectDN() + " error is: " + e.getMessage(),
+					e);
 				return false;
 			}
 		}
@@ -181,8 +181,7 @@ public class SecurityUtilities implements CertificateValidator
 						try {
 							certChain[0].verify(c.getPublicKey());
 							if (_logger.isTraceEnabled())
-								_logger.trace("found creator for " + certChain[0].getSubjectDN() + " in store under alias '"
-									+ alias + "'");
+								_logger.trace("found creator for " + certChain[0].getSubjectDN() + " in store under alias '" + alias + "'");
 							return true;
 						} catch (Throwable e) {
 							// stomp the exception since that wasn't the creator.
@@ -307,8 +306,7 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
-	static public final X509Certificate[] deserializeX509CertificateChain(byte[][] data) throws IOException,
-		ClassNotFoundException
+	static public final X509Certificate[] deserializeX509CertificateChain(byte[][] data) throws IOException, ClassNotFoundException
 	{
 		X509Certificate[] ret = new X509Certificate[data.length];
 
@@ -319,10 +317,8 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
-	static final public Pattern GROUP_TOKEN_PATTERN = Pattern
-		.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
-	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$",
-		Pattern.CASE_INSENSITIVE);
+	static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
+	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$", Pattern.CASE_INSENSITIVE);
 
 	static private boolean matches(Identity identity, Pattern[] patterns)
 	{
@@ -510,8 +506,8 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * finds all of the files named "*.r0" in the directory specified and attempts to load them into
-	 * an array as X509CRL (certificate revocation) objects.
+	 * finds all of the files named "*.r0" in the directory specified and attempts to load them into an array as X509CRL (certificate
+	 * revocation) objects.
 	 */
 	static public List<X509CRL> loadCRLsFromDirectory(File directory)
 	{
@@ -627,8 +623,8 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * returns true if the certificate has been revoked. false is returned if the certificate has
-	 * not been revoked or if its CRL was not found.
+	 * returns true if the certificate has been revoked. false is returned if the certificate has not been revoked or if its CRL was not
+	 * found.
 	 */
 	static public void isCertRevoked(CertStore crls, X509Certificate cert) throws CertificateException
 	{
@@ -654,8 +650,8 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * returns true if the certificate chain has been revoked. false is returned if the certificate
-	 * has not been revoked or if its CRL was not found.
+	 * returns true if the certificate chain has been revoked. false is returned if the certificate has not been revoked or if its CRL was not
+	 * found.
 	 */
 	static public void isCertChainRevoked(CertStore crls, X509Certificate[] certs) throws CertificateException
 	{
@@ -664,8 +660,8 @@ public class SecurityUtilities implements CertificateValidator
 		}
 	}
 
-	static public KeyStore createTrustStoreFromCertificates(String proposedTrustStoreType, String password,
-		List<Certificate> certificateList)
+	static public KeyStore
+		createTrustStoreFromCertificates(String proposedTrustStoreType, String password, List<Certificate> certificateList)
 	{
 		KeyStore trustStore = null;
 		char[] trustStorePassword = (password == null) ? "genesisII".toCharArray() : password.toCharArray();

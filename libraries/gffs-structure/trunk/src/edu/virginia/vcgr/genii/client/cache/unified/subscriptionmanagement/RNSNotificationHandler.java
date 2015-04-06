@@ -27,17 +27,15 @@ import edu.virginia.vcgr.genii.client.rns.RNSOperation.OperationType;
 import fuse.FuseDirEnt;
 
 /*
- * RNSNotificationHandler is used to update the RNS-lookup cache for both local and remote changes
- * on RNS entries. For local changes the various pipelined processors directly call the appropriate
- * methods of this handler class. Meanwhile, for remote changes the handler interprets the
- * notification message and takes the appropriate actions.
+ * RNSNotificationHandler is used to update the RNS-lookup cache for both local and remote changes on RNS entries. For local changes the
+ * various pipelined processors directly call the appropriate methods of this handler class. Meanwhile, for remote changes the handler
+ * interprets the notification message and takes the appropriate actions.
  */
 public class RNSNotificationHandler
 {
 	private static Log _logger = LogFactory.getLog(RNSNotificationHandler.class);
 
-	public static void handleContentChangeNotification(RNSContentChangeNotification notification,
-		EndpointReferenceType publisher)
+	public static void handleContentChangeNotification(RNSContentChangeNotification notification, EndpointReferenceType publisher)
 	{
 
 		RNSOperation operation = notification.getOperation();
@@ -74,27 +72,23 @@ public class RNSNotificationHandler
 		CacheManager.putItemInCache(publisher, RNSConstants.ELEMENT_COUNT_QNAME, element);
 	}
 
-	private static void handleEntryAddition(RNSContentChangeNotification notification, EndpointReferenceType publisher,
-		RNSOperation operation)
+	private static void
+		handleEntryAddition(RNSContentChangeNotification notification, EndpointReferenceType publisher, RNSOperation operation)
 	{
 
 		EndpointReferenceType newEntry = notification.getEntry();
 		String entryName = operation.getAffectedEntry();
 
 		/*
-		 * We store all the attributes of the added RNS entry except the elementCount property. This
-		 * is done to avoid the pitfall of having stuck with an empty directory when there exists
-		 * some elements within it. As an example, if the client has a subscription in '/home/a' and
-		 * someone extracts an archive 'b' there then the initial notification the client will
-		 * receive is an empty directory 'b' has been added in '/home/a'. It will not receive any
-		 * notification for update under '/home/a/b' done by the other client as 'b' is not within
-		 * the subscribed list of resources. Therefore, if the current client goes to '/home/a/b'
-		 * before the initially retrieved elementCount property has been expired, directory listing
-		 * will show incorrect result. Furthermore, to make things worse, a subscription will be
-		 * created for 'b' and the wrong element count will become permanent in the cache.
+		 * We store all the attributes of the added RNS entry except the elementCount property. This is done to avoid the pitfall of having
+		 * stuck with an empty directory when there exists some elements within it. As an example, if the client has a subscription in
+		 * '/home/a' and someone extracts an archive 'b' there then the initial notification the client will receive is an empty directory 'b'
+		 * has been added in '/home/a'. It will not receive any notification for update under '/home/a/b' done by the other client as 'b' is
+		 * not within the subscribed list of resources. Therefore, if the current client goes to '/home/a/b' before the initially retrieved
+		 * elementCount property has been expired, directory listing will show incorrect result. Furthermore, to make things worse, a
+		 * subscription will be created for 'b' and the wrong element count will become permanent in the cache.
 		 * 
-		 * Note that, if 'b' was an already subscribed existing archive moved from one directory to
-		 * another the above problem will not occur.
+		 * Note that, if 'b' was an already subscribed existing archive moved from one directory to another the above problem will not occur.
 		 */
 		MessageElement[] additionalAttributes = notification.getAdditionalAttributes();
 		if (additionalAttributes != null) {
@@ -113,8 +107,8 @@ public class RNSNotificationHandler
 		updateCacheAfterEntryRemoval(publisher, removedEntries);
 	}
 
-	public static void updateLookupAndDirectoryCacheAfterEntryAddition(EndpointReferenceType target,
-		EndpointReferenceType newEntry, String entryName)
+	public static void updateLookupAndDirectoryCacheAfterEntryAddition(EndpointReferenceType target, EndpointReferenceType newEntry,
+		String entryName)
 	{
 
 		WSName targetResourceName = new WSName(target);
@@ -122,8 +116,7 @@ public class RNSNotificationHandler
 			return;
 
 		URI wsIdentifier = targetResourceName.getEndpointIdentifier();
-		WSResourceConfig publisherConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(wsIdentifier, WSResourceConfig.class);
+		WSResourceConfig publisherConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsIdentifier, WSResourceConfig.class);
 		if (publisherConfig == null)
 			return;
 
@@ -147,8 +140,7 @@ public class RNSNotificationHandler
 		}
 	}
 
-	private static void updateDirectoryCacheAfterAddition(EndpointReferenceType newEntry, String rnsPathOfPublisher,
-		String pathForEntry)
+	private static void updateDirectoryCacheAfterAddition(EndpointReferenceType newEntry, String rnsPathOfPublisher, String pathForEntry)
 	{
 
 		UnixDirectory parentDirectory = (UnixDirectory) CacheManager.getItemFromCache(rnsPathOfPublisher, UnixDirectory.class);
@@ -177,8 +169,7 @@ public class RNSNotificationHandler
 			return;
 
 		URI wsIdentifier = targetResourceName.getEndpointIdentifier();
-		WSResourceConfig publisherConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(wsIdentifier, WSResourceConfig.class);
+		WSResourceConfig publisherConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsIdentifier, WSResourceConfig.class);
 		if (publisherConfig == null)
 			return;
 
@@ -187,8 +178,7 @@ public class RNSNotificationHandler
 		for (String rnsPathOfPublisher : publisherConfig.getRnsPaths()) {
 
 			// update the cached directory to reflect the removal of entries
-			UnixDirectory publisherDirectory =
-				(UnixDirectory) CacheManager.getItemFromCache(rnsPathOfPublisher, UnixDirectory.class);
+			UnixDirectory publisherDirectory = (UnixDirectory) CacheManager.getItemFromCache(rnsPathOfPublisher, UnixDirectory.class);
 			if (publisherDirectory != null) {
 				for (String affectedEntry : removedEntries) {
 					publisherDirectory.removeEntry(affectedEntry);
@@ -208,8 +198,7 @@ public class RNSNotificationHandler
 				// Remove the resource configuration and attributes only when the removed entry is
 				// not accessible through
 				// another RNS path.
-				WSResourceConfig entryConfig =
-					(WSResourceConfig) CacheManager.getItemFromCache(pathForEntry, WSResourceConfig.class);
+				WSResourceConfig entryConfig = (WSResourceConfig) CacheManager.getItemFromCache(pathForEntry, WSResourceConfig.class);
 				if (entryConfig != null) {
 					if (entryConfig.isMappedToMultiplePath()) {
 
@@ -228,8 +217,8 @@ public class RNSNotificationHandler
 							String rnsPathOfCurrentParent = DirectoryManager.getParentPath(otherEntryPath);
 							String entryNameInParent = DirectoryManager.getEntryName(otherEntryPath);
 							String entryNameInPublisherDirectory = affectedEntry;
-							renameDescendantsOfRenamedEntry(rnsPathOfPublisher, entryNameInPublisherDirectory,
-								entryNameInParent, rnsPathOfCurrentParent);
+							renameDescendantsOfRenamedEntry(rnsPathOfPublisher, entryNameInPublisherDirectory, entryNameInParent,
+								rnsPathOfCurrentParent);
 						}
 					} else {
 						// When the entry was not mapped to multiple paths, we always have a normal
@@ -250,8 +239,7 @@ public class RNSNotificationHandler
 			return;
 
 		MessageElement element =
-			(MessageElement) CacheManager.getItemFromCache(targetResourceName, RNSConstants.ELEMENT_COUNT_QNAME,
-				MessageElement.class);
+			(MessageElement) CacheManager.getItemFromCache(targetResourceName, RNSConstants.ELEMENT_COUNT_QNAME, MessageElement.class);
 		if (element == null)
 			return;
 		int elementCount = Integer.parseInt(element.getValue());
@@ -288,8 +276,7 @@ public class RNSNotificationHandler
 			final String newEntryPath = DirectoryManager.getPathForDirectoryEntry(rnsPathOfTarget, newEntryName);
 
 			// update the RNSPath list of the renamed entry.
-			WSResourceConfig entryConfig =
-				(WSResourceConfig) CacheManager.getItemFromCache(oldEntryPath, WSResourceConfig.class);
+			WSResourceConfig entryConfig = (WSResourceConfig) CacheManager.getItemFromCache(oldEntryPath, WSResourceConfig.class);
 			if (entryConfig != null) {
 				entryConfig.removeRNSPath(oldEntryPath);
 				entryConfig.addRNSPath(newEntryPath);
@@ -297,8 +284,7 @@ public class RNSNotificationHandler
 			}
 
 			// store the EPR for entry under the new RNSPath name
-			EndpointReferenceType entryEPR =
-				(EndpointReferenceType) CacheManager.getItemFromCache(oldEntryPath, EndpointReferenceType.class);
+			EndpointReferenceType entryEPR = (EndpointReferenceType) CacheManager.getItemFromCache(oldEntryPath, EndpointReferenceType.class);
 			if (entryEPR != null) {
 				CacheManager.removeItemFromCache(oldEntryPath, EndpointReferenceType.class);
 				CacheManager.putItemInCache(newEntryPath, entryEPR);
@@ -318,8 +304,7 @@ public class RNSNotificationHandler
 		// outcall.
 		CacheManager.removeItemFromCache(wsEndpointIdentifier, RNSConstants.ELEMENT_COUNT_QNAME, MessageElement.class);
 
-		WSResourceConfig resourceConfig =
-			(WSResourceConfig) CacheManager.getItemFromCache(wsEndpointIdentifier, WSResourceConfig.class);
+		WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsEndpointIdentifier, WSResourceConfig.class);
 		if (resourceConfig == null) {
 			_logger.info("A notification blocking request received for a resource that has no cached configuration!");
 		}
@@ -342,13 +327,11 @@ public class RNSNotificationHandler
 	private static void removeAllAttributesOfRemovedEntry(String pathForEntry)
 	{
 		URI entryURI = null;
-		EndpointReferenceType entryEPR =
-			(EndpointReferenceType) CacheManager.getItemFromCache(pathForEntry, EndpointReferenceType.class);
+		EndpointReferenceType entryEPR = (EndpointReferenceType) CacheManager.getItemFromCache(pathForEntry, EndpointReferenceType.class);
 		if (entryEPR != null) {
 			entryURI = CacheUtils.getEPI(entryEPR);
 		} else {
-			WSResourceConfig entryConfig =
-				(WSResourceConfig) CacheManager.getItemFromCache(pathForEntry, WSResourceConfig.class);
+			WSResourceConfig entryConfig = (WSResourceConfig) CacheManager.getItemFromCache(pathForEntry, WSResourceConfig.class);
 			if (entryConfig != null) {
 				entryURI = entryConfig.getWsIdentifier();
 			}
@@ -359,11 +342,10 @@ public class RNSNotificationHandler
 	}
 
 	/*
-	 * After a directory rename, all elements that are within the RNS namespace rooted under the
-	 * renamed directory get invalid path reference. This method find all those descendant elements
-	 * and update their RNS paths to reflected the name change. When the parameter 'targetParentDir'
-	 * is null it is assumed the rename was done within a single directory (RNS rename operation),
-	 * and across directories otherwise (a rename simulated by an add followed by a remove).
+	 * After a directory rename, all elements that are within the RNS namespace rooted under the renamed directory get invalid path reference.
+	 * This method find all those descendant elements and update their RNS paths to reflected the name change. When the parameter
+	 * 'targetParentDir' is null it is assumed the rename was done within a single directory (RNS rename operation), and across directories
+	 * otherwise (a rename simulated by an add followed by a remove).
 	 */
 	@SuppressWarnings("unchecked")
 	private static void renameDescendantsOfRenamedEntry(String srcParentDir, String nameInSourceDir, String nameInTargetDir,
@@ -373,11 +355,9 @@ public class RNSNotificationHandler
 		String oldPathForEntry = DirectoryManager.getPathForDirectoryEntry(srcParentDir, nameInSourceDir);
 		String descendantPaths = DirectoryManager.getPathForDirectoryEntry(oldPathForEntry, ".+");
 		String newPathForEntry =
-			DirectoryManager.getPathForDirectoryEntry((targetParentDir == null) ? srcParentDir : targetParentDir,
-				nameInTargetDir);
+			DirectoryManager.getPathForDirectoryEntry((targetParentDir == null) ? srcParentDir : targetParentDir, nameInTargetDir);
 
-		Map<String, EndpointReferenceType> matchingEPRs =
-			CacheManager.getMatchingItemsWithKeys(descendantPaths, EndpointReferenceType.class);
+		Map<String, EndpointReferenceType> matchingEPRs = CacheManager.getMatchingItemsWithKeys(descendantPaths, EndpointReferenceType.class);
 		if (matchingEPRs != null) {
 			for (Map.Entry<String, EndpointReferenceType> entry : matchingEPRs.entrySet()) {
 				String oldDescendantPath = entry.getKey();
@@ -387,8 +367,7 @@ public class RNSNotificationHandler
 			}
 		}
 
-		Map<String, WSResourceConfig> matchingConfigs =
-			CacheManager.getMatchingItemsWithKeys(descendantPaths, WSResourceConfig.class);
+		Map<String, WSResourceConfig> matchingConfigs = CacheManager.getMatchingItemsWithKeys(descendantPaths, WSResourceConfig.class);
 		if (matchingConfigs != null) {
 			for (Map.Entry<String, WSResourceConfig> entry : matchingConfigs.entrySet()) {
 				WSResourceConfig descendant = entry.getValue();
@@ -400,8 +379,7 @@ public class RNSNotificationHandler
 			}
 		}
 
-		Map<String, UnixDirectory> matchingDirectories =
-			CacheManager.getMatchingItemsWithKeys(descendantPaths, UnixDirectory.class);
+		Map<String, UnixDirectory> matchingDirectories = CacheManager.getMatchingItemsWithKeys(descendantPaths, UnixDirectory.class);
 		if (matchingDirectories != null) {
 			for (Map.Entry<String, UnixDirectory> entry : matchingDirectories.entrySet()) {
 				String oldDescendantPath = entry.getKey();
@@ -418,16 +396,14 @@ public class RNSNotificationHandler
 
 		String descendantPaths = DirectoryManager.getPathForDirectoryEntry(pathOfRemovedEntry, ".+");
 
-		Map<String, EndpointReferenceType> matchingEPRs =
-			CacheManager.getMatchingItemsWithKeys(descendantPaths, EndpointReferenceType.class);
+		Map<String, EndpointReferenceType> matchingEPRs = CacheManager.getMatchingItemsWithKeys(descendantPaths, EndpointReferenceType.class);
 		if (matchingEPRs != null) {
 			for (Map.Entry<String, EndpointReferenceType> entry : matchingEPRs.entrySet()) {
 				CacheManager.removeItemFromCache(entry.getKey(), EndpointReferenceType.class);
 			}
 		}
 
-		Map<String, WSResourceConfig> matchingConfigs =
-			CacheManager.getMatchingItemsWithKeys(descendantPaths, WSResourceConfig.class);
+		Map<String, WSResourceConfig> matchingConfigs = CacheManager.getMatchingItemsWithKeys(descendantPaths, WSResourceConfig.class);
 		if (matchingConfigs != null) {
 			for (Map.Entry<String, WSResourceConfig> entry : matchingConfigs.entrySet()) {
 				WSResourceConfig descendant = entry.getValue();
@@ -435,8 +411,7 @@ public class RNSNotificationHandler
 			}
 		}
 
-		Map<String, UnixDirectory> matchingDirectories =
-			CacheManager.getMatchingItemsWithKeys(descendantPaths, UnixDirectory.class);
+		Map<String, UnixDirectory> matchingDirectories = CacheManager.getMatchingItemsWithKeys(descendantPaths, UnixDirectory.class);
 		if (matchingDirectories != null) {
 			for (Map.Entry<String, UnixDirectory> entry : matchingDirectories.entrySet()) {
 				CacheManager.removeItemFromCache(entry.getKey(), UnixDirectory.class);

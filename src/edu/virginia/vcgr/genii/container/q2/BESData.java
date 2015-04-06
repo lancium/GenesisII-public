@@ -1,9 +1,8 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 /**
- * The BESData structure is the main data structure for storing "in-memory" information about BES
- * resources in the queue. The information in this data structure is considered "small" enough to
- * keep in memory while the container is alive.
+ * The BESData structure is the main data structure for storing "in-memory" information about BES resources in the queue. The information in
+ * this data structure is considered "small" enough to keep in memory while the container is alive.
  * 
  * @author mmm2a
  */
@@ -20,8 +19,8 @@ public class BESData
 	private String _besName;
 
 	/**
-	 * The total number of slots this container has allocated to it (not the number available for
-	 * use right now as some may be allocated to jobs).
+	 * The total number of slots this container has allocated to it (not the number available for use right now as some may be allocated to
+	 * jobs).
 	 */
 	private int _totalSlots;
 

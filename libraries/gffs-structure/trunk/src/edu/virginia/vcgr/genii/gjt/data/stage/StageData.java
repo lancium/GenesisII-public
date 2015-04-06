@@ -24,8 +24,7 @@ public interface StageData
 
 	public void analyze(String filename, Analysis analysis);
 
-	public void generateAdditionalJSDL(DataStaging jsdlStaging, XPathBuilder builder,
-		Map<String, List<SweepParameter>> variables);
+	public void generateAdditionalJSDL(DataStaging jsdlStaging, XPathBuilder builder, Map<String, List<SweepParameter>> variables);
 
 	public String getJSDLURI();
 

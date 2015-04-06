@@ -144,9 +144,9 @@ public class JobInformationFork extends AbstractStreamableByteIOFactoryResourceF
 					}
 
 					jInfo =
-						new JobInformation(ticket, jit.getJobName(), identities, QueueStates.fromQueueStateType(jit
-							.getJobStatus()), (int) jit.getPriority(), jit.getSubmitTime(), jit.getStartTime(),
-							jit.getFinishTime(), jit.getAttempts().intValue(), jit.getBesStatus(), jit.getScheduledOn());
+						new JobInformation(ticket, jit.getJobName(), identities, QueueStates.fromQueueStateType(jit.getJobStatus()),
+							(int) jit.getPriority(), jit.getSubmitTime(), jit.getStartTime(), jit.getFinishTime(), jit.getAttempts()
+								.intValue(), jit.getBesStatus(), jit.getScheduledOn());
 				}
 			} else {
 				for (ReducedJobInformationType rjit : mgr.listJobs(jobTicket)) {

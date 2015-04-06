@@ -38,8 +38,8 @@ public class ContainerStatsTool extends BaseGridTool
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, ClassNotFoundException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, ClassNotFoundException
 	{
 		RNSPath container = lookup(new GeniiPath(getArgument(0)), RNSPathQueryFlags.MUST_EXIST);
 
@@ -55,8 +55,8 @@ public class ContainerStatsTool extends BaseGridTool
 		for (TimeInterval ti : dbReport.keySet()) {
 			stdout.format("  %s:\n", ti.longDescription());
 			DatabaseStatisticsReport report = dbReport.get(ti);
-			stdout.format("    Num Opened = %d, Num Closed = %d, Average Duration = %d ms\n", report.numOpened(),
-				report.numClosed(), report.averageDuration());
+			stdout.format("    Num Opened = %d, Num Closed = %d, Average Duration = %d ms\n", report.numOpened(), report.numClosed(),
+				report.averageDuration());
 		}
 		stdout.format("Method Statistics:\n");
 		for (TimeInterval ti : methodReport.keySet()) {

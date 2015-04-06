@@ -143,9 +143,8 @@ public class JobResourceRequirements
 	}
 
 	/*
-	 * private ProcessorArchitectureEnumeration _arch = null; private OperatingSystemTypeEnumeration
-	 * _osType = null; private String _osVersion = null; private Double _memoryRequirement = null;
-	 * private MatchingParameter []_matchingParameters = null;
+	 * private ProcessorArchitectureEnumeration _arch = null; private OperatingSystemTypeEnumeration _osType = null; private String _osVersion
+	 * = null; private Double _memoryRequirement = null; private MatchingParameter []_matchingParameters = null;
 	 */
 
 	@Override

@@ -16,8 +16,7 @@ final class InjectionPointDatabase
 	{
 		if (injectionInformation.lazy()) {
 			if (injectionInformation.recursive())
-				throw new InjectionException(String.format(
-					"Invalid injection annotation on %s -- cannot be both lazy and recursive.", field));
+				throw new InjectionException(String.format("Invalid injection annotation on %s -- cannot be both lazy and recursive.", field));
 
 			Class<?>[] ifaces = injectionInformation.lazyTypes();
 			if (ifaces == null || ifaces.length == 0)
@@ -25,8 +24,7 @@ final class InjectionPointDatabase
 
 			for (Class<?> iface : ifaces) {
 				if (!iface.isInterface())
-					throw new InjectionException(String.format("Cannot lazily inject %s because %s is not an interface.",
-						field, iface));
+					throw new InjectionException(String.format("Cannot lazily inject %s because %s is not an interface.", field, iface));
 			}
 		}
 	}
@@ -34,13 +32,13 @@ final class InjectionPointDatabase
 	static private void validateInjectionInformation(Method method, MInject injectionInformation) throws InjectionException
 	{
 		if (injectionInformation.recursive())
-			throw new InjectionException(String.format(
-				"Invalid injection annotation on %s -- methods cannot be recursively injected.", method));
+			throw new InjectionException(String.format("Invalid injection annotation on %s -- methods cannot be recursively injected.",
+				method));
 
 		Class<?>[] paramTypes = method.getParameterTypes();
 		if (paramTypes.length != 1)
-			throw new InjectionException(String.format(
-				"Method %s is not a valid injection target -- must have exactly one parameter.", method));
+			throw new InjectionException(String.format("Method %s is not a valid injection target -- must have exactly one parameter.",
+				method));
 
 		if (injectionInformation.lazy()) {
 			Class<?>[] ifaces = injectionInformation.lazyTypes();
@@ -49,8 +47,7 @@ final class InjectionPointDatabase
 
 			for (Class<?> iface : ifaces)
 				if (!iface.isInterface())
-					throw new InjectionException(String.format("Cannot lazily inject %s because %s is not an interface.",
-						method, iface));
+					throw new InjectionException(String.format("Cannot lazily inject %s because %s is not an interface.", method, iface));
 		}
 	}
 

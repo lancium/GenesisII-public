@@ -72,8 +72,8 @@ public class BESActivity implements Closeable
 	private ActivityRunner _runner;
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
-		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName,
-		String jobName, boolean suspendRequested, boolean terminateRequested)
+		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName,
+		boolean suspendRequested, boolean terminateRequested)
 	{
 		_connectionPool = connectionPool;
 
@@ -149,8 +149,8 @@ public class BESActivity implements Closeable
 				throw new SQLException("Unable to load owner information from database " + "for bes activity.");
 
 			if (!QueueSecurity.isOwner((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1))))
-				throw new GenesisIISecurityException("Caller does not have permission to get "
-					+ "activity status for activity \"" + _activityid + "\".");
+				throw new GenesisIISecurityException("Caller does not have permission to get " + "activity status for activity \""
+					+ _activityid + "\".");
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
@@ -320,8 +320,7 @@ public class BESActivity implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt =
-				connection.prepareStatement("UPDATE besactivitiestable SET nextphase = ?, state = ? " + "WHERE activityid = ?");
+			stmt = connection.prepareStatement("UPDATE besactivitiestable SET nextphase = ?, state = ? " + "WHERE activityid = ?");
 			stmt.setInt(1, nextPhase);
 			stmt.setBlob(2, DBSerializer.toBlob(state, "besactivitiestable", "state"));
 			stmt.setString(3, _activityid);
@@ -351,9 +350,7 @@ public class BESActivity implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt =
-				connection.prepareStatement("SELECT callingcontext, activityepr " + "FROM besactivitiestable "
-					+ "WHERE activityid = ?");
+			stmt = connection.prepareStatement("SELECT callingcontext, activityepr " + "FROM besactivitiestable " + "WHERE activityid = ?");
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			if (!rs.next())
@@ -380,8 +377,8 @@ public class BESActivity implements Closeable
 		WorkingContext ctxt = createWorkingContext();
 
 		try {
-			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, new ResourceKey(_activityServiceName,
-				new AddressingParameters(_activityid, null, null)));
+			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, new ResourceKey(_activityServiceName, new AddressingParameters(_activityid,
+				null, null)));
 			WorkingContext.setCurrentWorkingContext(ctxt);
 			phase.execute(getExecutionContext());
 		} finally {
@@ -430,8 +427,7 @@ public class BESActivity implements Closeable
 
 				try {
 					connection = _connectionPool.acquire(true);
-					stmt =
-						connection.prepareStatement("SELECT callingcontext FROM besactivitiestable " + "WHERE activityid = ?");
+					stmt = connection.prepareStatement("SELECT callingcontext FROM besactivitiestable " + "WHERE activityid = ?");
 					stmt.setString(1, _activityid);
 					rs = stmt.executeQuery();
 					if (!rs.next())
@@ -495,8 +491,7 @@ public class BESActivity implements Closeable
 				try {
 					connection = _connectionPool.acquire(false);
 					stmt =
-						connection.prepareStatement("DELETE FROM besactivitypropertiestable "
-							+ "WHERE activityid = ? AND propertyname = ?");
+						connection.prepareStatement("DELETE FROM besactivitypropertiestable " + "WHERE activityid = ? AND propertyname = ?");
 					stmt.setString(1, _activityid);
 					stmt.setString(2, name);
 					stmt.executeUpdate();
@@ -543,8 +538,7 @@ public class BESActivity implements Closeable
 				return;
 			}
 
-			stmt =
-				connection.prepareStatement("INSERT INTO besactivityfaultstable " + "(besactivityid, fault) " + "VALUES(?, ?)");
+			stmt = connection.prepareStatement("INSERT INTO besactivityfaultstable " + "(besactivityid, fault) " + "VALUES(?, ?)");
 			stmt.setString(1, _activityid);
 			stmt.setBlob(2, blob);
 			stmt.executeUpdate();
@@ -563,9 +557,8 @@ public class BESActivity implements Closeable
 		// we no longer need to use.
 
 		/*
-		 * These either can't be free'd (they aren't objects), or they are merely references to
-		 * objects that are held in other places: _connectionPool; _suspendRequested;
-		 * _terminateRequested; _nextPhase; _bes
+		 * These either can't be free'd (they aren't objects), or they are merely references to objects that are held in other places:
+		 * _connectionPool; _suspendRequested; _terminateRequested; _nextPhase; _bes
 		 */
 
 		if (_policyListener != null) {
@@ -613,8 +606,7 @@ public class BESActivity implements Closeable
 					if (!containsIgnoreableFault(faults)) {
 						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null, false));
 					} else {
-						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, "Ignoreable",
-							false));
+						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, "Ignoreable", false));
 					}
 				} else
 					updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Finished, null, false));
@@ -730,8 +722,7 @@ public class BESActivity implements Closeable
 							break;
 
 						if (_terminateRequested) {
-							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null,
-								false));
+							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null, false));
 
 							// Ensure Cloud Resources Cleaned up
 							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
@@ -749,8 +740,7 @@ public class BESActivity implements Closeable
 						_suspended = false;
 
 						if (_terminateRequested) {
-							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null,
-								false));
+							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null, false));
 
 							// Ensure Cloud Resource cleaned up
 							CloudMonitor.freeActivity(_activityid, _bes.getBESID());

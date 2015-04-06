@@ -38,8 +38,8 @@ class GridStageEditor extends StageEditor<GridStageData>
 		// Let's see if we can work out the prefix
 		String goodPath = path.getValidPrefix(pathString);
 		/*
-		 * System.out.println("Starting stage out processing "); System.out.println("pathString = "
-		 * + pathString); System.out.println("valid prefix is " + goodPath);
+		 * System.out.println("Starting stage out processing "); System.out.println("pathString = " + pathString);
+		 * System.out.println("valid prefix is " + goodPath);
 		 */
 		try {
 			path = path.lookup(pathString, RNSPathQueryFlags.MUST_EXIST);
@@ -59,11 +59,10 @@ class GridStageEditor extends StageEditor<GridStageData>
 			String errString = "";
 			if (!exists)
 				errString =
-					"WARNING!!\n Path " + pathString + " does not exist OR you do not have permission.\n The prefix ["
-						+ goodPath + "] exists.\nThis will likely cause your job to fail!";
+					"WARNING!!\n Path " + pathString + " does not exist OR you do not have permission.\n The prefix [" + goodPath
+						+ "] exists.\nThis will likely cause your job to fail!";
 			else if (!isByteIO)
-				errString =
-					"WARNING!!\n Path " + pathString + " is NOT a ByteIO file\nThis will likely cause your job to fail!";
+				errString = "WARNING!!\n Path " + pathString + " is NOT a ByteIO file\nThis will likely cause your job to fail!";
 			// Note it cannot be a byteio and not exists
 			JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 		} else {
@@ -93,14 +92,13 @@ class GridStageEditor extends StageEditor<GridStageData>
 					// Everything to the left is the path
 					String parentPath = pathString.substring(0, baseOffset);
 					/*
-					 * System.out.println("parent path = " + parentPath);
-					 * System.out.println("valid prefix is " + goodPath);
+					 * System.out.println("parent path = " + parentPath); System.out.println("valid prefix is " + goodPath);
 					 */
 					if (parentPath.compareToIgnoreCase(goodPath) != 0) {
 						errString =
 							"WARNING!!\n Path " + pathString
-								+ " does not exist, its parent does not exist, OR you do not have permission.\n The prefix ["
-								+ goodPath + "] exists.\nThis will likely cause your job to fail!";
+								+ " does not exist, its parent does not exist, OR you do not have permission.\n The prefix [" + goodPath
+								+ "] exists.\nThis will likely cause your job to fail!";
 						JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 					}
 				}
@@ -115,10 +113,10 @@ class GridStageEditor extends StageEditor<GridStageData>
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new JLabel("Grid Path"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(_path, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Grid Path"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_path, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
+			5, 5, 5, 5), 5, 5));
 
 		// content.add(new BrowseRNSPathAction(container,"Path to file", _path, "Another Path"),new
 		// GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
@@ -126,8 +124,8 @@ class GridStageEditor extends StageEditor<GridStageData>
 
 		JButton okButton = new JButton(createDefaultOKAction());
 		getRootPane().setDefaultButton(okButton);
-		content.add(ButtonPanel.createHorizontalPanel(okButton, createDefaultCancelAction()), new GridBagConstraints(0, 3, 2,
-			1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(ButtonPanel.createHorizontalPanel(okButton, createDefaultCancelAction()), new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0,
+			GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	@Override

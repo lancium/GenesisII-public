@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package edu.virginia.vcgr.genii.container.kerbauthn;
@@ -70,15 +69,14 @@ public class KerbAuthZProvider extends AclAuthZProvider
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation)
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, Class<?> serviceClass,
+		Method operation)
 	{
 		// Try regular ACLs for administrative access.
 		try {
 			/*
-			 * we cannot let the credentials be used intact, because the myproxy identity could be
-			 * in here, which would lead us to think we authenticated already when we have not yet.
-			 * thus we strip out that credential if we see it and force the user/password
+			 * we cannot let the credentials be used intact, because the myproxy identity could be in here, which would lead us to think we
+			 * authenticated already when we have not yet. thus we strip out that credential if we see it and force the user/password
 			 * authentication process to occur.
 			 */
 			ArrayList<NuCredential> prunedCredentials = new ArrayList<NuCredential>();
@@ -86,8 +84,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			try {
 				resourceCertChain = (X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			} catch (ResourceException e) {
-				_logger.error("failed to load resource certificate chain for kerberos auth.  resource is: "
-					+ resource.toString());
+				_logger.error("failed to load resource certificate chain for kerberos auth.  resource is: " + resource.toString());
 				// this seems really pretty bad. the resource is bogus.
 				return false;
 			}
@@ -100,8 +97,8 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			}
 
 			/*
-			 * we must check that the resource is writable if we're going to skip authentication.
-			 * this must only be true for the admin of the STS.
+			 * we must check that the resource is writable if we're going to skip authentication. this must only be true for the admin of the
+			 * STS.
 			 */
 			boolean accessOkay = checkAccess(prunedCredentials, resource, RWXCategory.WRITE);
 			if (accessOkay) {
@@ -199,19 +196,16 @@ public class KerbAuthZProvider extends AclAuthZProvider
 						serverOptions.put("useTicketCache", "false");
 						serverOptions.put("refreshKrb5Config", "true");
 
-						_logger.info("Kerberos: authenticating with service principal '" + keypr._principal + "' for realm '"
-							+ realm + "'");
+						_logger.info("Kerberos: authenticating with service principal '" + keypr._principal + "' for realm '" + realm + "'");
 						serverOptions.put("useKeyTab", "true");
-						File fullKeytabPath =
-							Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keypr._keytab);
+						File fullKeytabPath = Installation.getDeployment(new DeploymentName()).security().getSecurityFile(keypr._keytab);
 						if (!(new File(fullKeytabPath.getAbsolutePath())).exists()) {
 							_logger.error("Failing authentication on kerberos because keytab file does not exist: "
 								+ fullKeytabPath.getAbsolutePath());
 							return false;
 						}
 						if (_logger.isDebugEnabled())
-							_logger.debug("Kerberos keytab for realm " + realm + " is at path: "
-								+ fullKeytabPath.getAbsolutePath());
+							_logger.debug("Kerberos keytab for realm " + realm + " is at path: " + fullKeytabPath.getAbsolutePath());
 						serverOptions.put("keyTab", fullKeytabPath.getAbsolutePath());
 						serverOptions.put("principal", keypr._principal);
 						serverOptions.put("doNotPrompt", "true");
@@ -220,18 +214,14 @@ public class KerbAuthZProvider extends AclAuthZProvider
 							Krb5LoginModule serverLoginCtx = new Krb5LoginModule();
 							Subject serverSubject = new Subject();
 							// user and password apparently do not matter for server login.
-							serverLoginCtx.initialize(serverSubject, new LoginCallbackHandler("boink", "doink"), state,
-								serverOptions);
+							serverLoginCtx.initialize(serverSubject, new LoginCallbackHandler("boink", "doink"), state, serverOptions);
 							/*
-							 * ignoring always "true" return from login; will catch exception if
-							 * login failure.
+							 * ignoring always "true" return from login; will catch exception if login failure.
 							 */
 							serverLoginCtx.login();
-							_logger.info("Success authenticating service principal '" + keypr._principal + "' into realm '"
-								+ realm + "'");
+							_logger.info("Success authenticating service principal '" + keypr._principal + "' into realm '" + realm + "'");
 						} catch (LoginException e) {
-							_logger.error("Failure authenticating service principal '" + keypr._principal + "' into realm '"
-								+ realm + "'");
+							_logger.error("Failure authenticating service principal '" + keypr._principal + "' into realm '" + realm + "'");
 							return false;
 						}
 					}
@@ -248,8 +238,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 					Subject userSubject = new Subject();
 					userLoginCtx.initialize(userSubject, new LoginCallbackHandler(username, password), state, userOptions);
 					/*
-					 * ignoring always "true" return from login; will catch exception if login
-					 * failure.
+					 * ignoring always "true" return from login; will catch exception if login failure.
 					 */
 					userLoginCtx.login();
 

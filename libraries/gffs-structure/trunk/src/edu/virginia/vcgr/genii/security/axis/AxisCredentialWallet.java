@@ -47,8 +47,7 @@ public class AxisCredentialWallet
 	}
 
 	/**
-	 * constructor for re-creating SAML credentials from a received SOAP message: useful for the
-	 * container.
+	 * constructor for re-creating SAML credentials from a received SOAP message: useful for the container.
 	 */
 	public AxisCredentialWallet(MessageElement encodedCredentials)
 	{
@@ -96,9 +95,8 @@ public class AxisCredentialWallet
 	}
 
 	/*
-	 * The XML node representation of a trust delegation produced by UNICORE security library is not
-	 * compatible with our Axis library. Therefore, a conversion is needed before we can use them in
-	 * a SOAP message. This method does this conversion.
+	 * The XML node representation of a trust delegation produced by UNICORE security library is not compatible with our Axis library.
+	 * Therefore, a conversion is needed before we can use them in a SOAP message. This method does this conversion.
 	 */
 	public static NodeImpl convertToAxis(MessageElement placeHolder, AssertionDocument assertion)
 	{
@@ -132,11 +130,9 @@ public class AxisCredentialWallet
 	private void constructFromSOAPHeaderElement(MessageElement encodedCredentials)
 	{
 		/*
-		 * CAK: this was our first crashing point with new unicore code. resolved, at least
-		 * temporarily, by turning the message element into a document and using that instead of the
-		 * original element. doing this keeps the expected xmlns:xs field in place on the
-		 * AttributeValue, whereas iterating the child nodes of the original starts losing important
-		 * namespace tags.
+		 * CAK: this was our first crashing point with new unicore code. resolved, at least temporarily, by turning the message element into a
+		 * document and using that instead of the original element. doing this keeps the expected xmlns:xs field in place on the
+		 * AttributeValue, whereas iterating the child nodes of the original starts losing important namespace tags.
 		 */
 
 		Document diffway = null;
@@ -157,9 +153,8 @@ public class AxisCredentialWallet
 		Map<String, TrustCredential> detachedDelegations = new HashMap<String, TrustCredential>();
 
 		/*
-		 * a desperate attempt to get something to work; this printed fine, so let's try using it...
-		 * and that works. original traversal of getChildNodes or getChildElements using the
-		 * original from axis was missing xmlns:xs fields, but traversing a copy is okay(?!).
+		 * a desperate attempt to get something to work; this printed fine, so let's try using it... and that works. original traversal of
+		 * getChildNodes or getChildElements using the original from axis was missing xmlns:xs fields, but traversing a copy is okay(?!).
 		 */
 		NodeList childIter = diffway.getDocumentElement().getChildNodes();
 		int delegationCount = childIter.getLength();

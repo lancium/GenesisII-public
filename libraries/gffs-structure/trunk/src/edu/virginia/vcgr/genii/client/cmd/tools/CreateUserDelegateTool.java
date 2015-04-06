@@ -32,8 +32,7 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 
 /**
- * This is almost the same tool as the create-user tool, except that it creates a new IDP instance
- * by delegating an existing credential to it.
+ * This is almost the same tool as the create-user tool, except that it creates a new IDP instance by delegating an existing credential to it.
  * 
  * @author mmm2a
  */
@@ -74,8 +73,7 @@ public class CreateUserDelegateTool extends CreateUserTool
 			throw new InvalidToolUsageException("Too many arguments.");
 
 		if (_storeType != null) {
-			if (!_storeType.equalsIgnoreCase("WIN") && !_storeType.equalsIgnoreCase("JKS")
-				&& !_storeType.equalsIgnoreCase("PKCS12"))
+			if (!_storeType.equalsIgnoreCase("WIN") && !_storeType.equalsIgnoreCase("JKS") && !_storeType.equalsIgnoreCase("PKCS12"))
 				throw new InvalidToolUsageException();
 
 		}
@@ -90,9 +88,8 @@ public class CreateUserDelegateTool extends CreateUserTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException,
-		ClassNotFoundException, DialogException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 		LinkedList<String> args = new LinkedList<String>(getArguments());
@@ -212,8 +209,7 @@ public class CreateUserDelegateTool extends CreateUserTool
 	private String getSourceURIFromUser(DialogProvider wp) throws DialogException, UserCancelException
 	{
 		InputDialog input = wp.createInputDialog("Source URI", "Source keystore URI?");
-		input.setHelp(new TextContent("The Source URI is the path to the source keystore from which",
-			"a certificate will be delegated."));
+		input.setHelp(new TextContent("The Source URI is the path to the source keystore from which", "a certificate will be delegated."));
 		input.setInputValidator(new NonEmptyValidator("You must enter a source URI!"));
 
 		while (true) {

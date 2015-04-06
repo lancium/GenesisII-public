@@ -60,8 +60,8 @@ class LocalContainerPanel extends JPanel
 			_buttons[lcv] = new JRadioButton(containerName, selected);
 			group.add(_buttons[lcv]);
 
-			add(_buttons[lcv], new GridBagConstraints(0, lcv, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
+			add(_buttons[lcv], new GridBagConstraints(0, lcv, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
+				5, 5, 5), 5, 5));
 		}
 
 		if (!selectedOne && _buttons.length > 0)

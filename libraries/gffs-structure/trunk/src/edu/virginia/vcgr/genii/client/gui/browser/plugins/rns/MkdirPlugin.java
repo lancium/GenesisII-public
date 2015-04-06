@@ -14,16 +14,14 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 /**
- * This plugin is a relatively simple menu plugin which makes it easier for users to create new RNS
- * directories.
+ * This plugin is a relatively simple menu plugin which makes it easier for users to create new RNS directories.
  * 
  * @author mmm2a
  */
 public class MkdirPlugin implements IMenuPlugin
 {
 	@Override
-	public void performAction(RNSPath[] selectedResources, JFrame ownerDialog, IActionContext actionContext)
-		throws PluginException
+	public void performAction(RNSPath[] selectedResources, JFrame ownerDialog, IActionContext actionContext) throws PluginException
 	{
 		/*
 		 * Prompt the user with an input dialog to get the name of the new directory.
@@ -33,8 +31,7 @@ public class MkdirPlugin implements IMenuPlugin
 			return;
 
 		/*
-		 * Once we have the new directory's name, we have to create a long-running action to
-		 * actually create the new path.
+		 * Once we have the new directory's name, we have to create a long-running action to actually create the new path.
 		 */
 		actionContext.performLongRunningAction(new DirectoryMaker(selectedResources[0], name));
 	}
@@ -49,16 +46,14 @@ public class MkdirPlugin implements IMenuPlugin
 					return PluginStatus.ACTIVTE;
 			}
 		} catch (RNSPathDoesNotExistException e) {
-			throw new PluginException("Unexpected RNSPath referring to non-existant directory \"" + selectedResources[0].pwd()
-				+ "\".", e);
+			throw new PluginException("Unexpected RNSPath referring to non-existant directory \"" + selectedResources[0].pwd() + "\".", e);
 		}
 
 		return PluginStatus.INACTIVE;
 	}
 
 	/**
-	 * The DirectoryMaker is a long running action that takes care of actually calling out to the
-	 * grid to make the requested directory.
+	 * The DirectoryMaker is a long running action that takes care of actually calling out to the grid to make the requested directory.
 	 * 
 	 * @author mmm2a
 	 */
@@ -68,8 +63,7 @@ public class MkdirPlugin implements IMenuPlugin
 		private String _newName;
 
 		/**
-		 * Create a new directory maker task with a given RNSPath as a parent, and the given
-		 * directory name as the new directory to create.
+		 * Create a new directory maker task with a given RNSPath as a parent, and the given directory name as the new directory to create.
 		 * 
 		 * @param parent
 		 *            The existing parent directory under which the new directory is to be created.
@@ -90,14 +84,12 @@ public class MkdirPlugin implements IMenuPlugin
 				newPath.mkdir();
 
 				/*
-				 * We need to tell the rns tree in the main browser to update since we have changed
-				 * its internal structure.
+				 * We need to tell the rns tree in the main browser to update since we have changed its internal structure.
 				 */
 				actionContext.refreshSubTree(_parent);
 			} catch (RNSPathAlreadyExistsException e) {
 				/*
-				 * We explicitly deal with this exception as we have a little more information about
-				 * what went wrong here.
+				 * We explicitly deal with this exception as we have a little more information about what went wrong here.
 				 */
 				actionContext.reportError("Directory already exists.", e);
 			}

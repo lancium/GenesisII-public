@@ -120,8 +120,7 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 			for (int row : _table.getSelectedRows())
 				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
 
-			String answer =
-				JOptionPane.showInputDialog((Component) e.getSource(), "Where would you like to store the history dump?");
+			String answer = JOptionPane.showInputDialog((Component) e.getSource(), "Where would you like to store the history dump?");
 			if (answer == null)
 				return;
 
@@ -197,8 +196,7 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		popup.show(_table, e.getX(), e.getY());
 	}
 
-	public QueueManagerPanel(UIPluginContext context) throws ResourceException, GenesisIISecurityException,
-		RNSPathDoesNotExistException
+	public QueueManagerPanel(UIPluginContext context) throws ResourceException, GenesisIISecurityException, RNSPathDoesNotExistException
 	{
 		super(new GridBagLayout());
 
@@ -217,10 +215,10 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 
 		JScrollPane pane = new JScrollPane(_table);
 
-		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-			5, 5, 5, 5), 5, 5));
-		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5,
+			5));
+		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		setPreferredSize(TABLE_SIZE);
 	}

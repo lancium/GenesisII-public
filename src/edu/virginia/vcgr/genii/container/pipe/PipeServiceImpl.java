@@ -47,8 +47,7 @@ public class PipeServiceImpl extends GenesisIIBase implements PipePortType
 	private PipeBuffer createPipeBuffer(ResourceKey rKey) throws ResourceException
 	{
 		IResource resource = rKey.dereference();
-		PipeConstructionParameters consParms =
-			(PipeConstructionParameters) resource.constructionParameters(PipeServiceImpl.class);
+		PipeConstructionParameters consParms = (PipeConstructionParameters) resource.constructionParameters(PipeServiceImpl.class);
 		return new PipeBuffer(consParms.pipeSize());
 	}
 
@@ -115,8 +114,8 @@ public class PipeServiceImpl extends GenesisIIBase implements PipePortType
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public SeekReadResponse seekRead(SeekRead seekReadRequest) throws RemoteException, ReadNotPermittedFaultType,
-		SeekNotPermittedFaultType, ResourceUnknownFaultType, UnsupportedTransferFaultType, CustomFaultType
+	public SeekReadResponse seekRead(SeekRead seekReadRequest) throws RemoteException, ReadNotPermittedFaultType, SeekNotPermittedFaultType,
+		ResourceUnknownFaultType, UnsupportedTransferFaultType, CustomFaultType
 	{
 		int numBytes = seekReadRequest.getNumBytes().intValue();
 		TransferInformationType xType = seekReadRequest.getTransferInformation();

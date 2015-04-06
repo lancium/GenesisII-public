@@ -52,8 +52,7 @@ class TrashTransferHandler extends TransferHandler
 		if (action == MOVE) {
 			try {
 				DefaultListModel model = (DefaultListModel) ((JList) source).getModel();
-				TrashCanEntryWrapper[] wrappers =
-					(TrashCanEntryWrapper[]) data.getTransferData(TrashTransferable.TRASH_TRANSFER_FLAVOR);
+				TrashCanEntryWrapper[] wrappers = (TrashCanEntryWrapper[]) data.getTransferData(TrashTransferable.TRASH_TRANSFER_FLAVOR);
 				for (TrashCanEntryWrapper wrapper : wrappers)
 					model.removeElement(wrapper);
 			} catch (IOException ioe) {
@@ -106,8 +105,7 @@ class TrashTransferHandler extends TransferHandler
 			if (support.getDropAction() == MOVE) {
 				try {
 					TrashCanEntryWrapper[] wrappers =
-						(TrashCanEntryWrapper[]) support.getTransferable().getTransferData(
-							TrashTransferable.TRASH_TRANSFER_FLAVOR);
+						(TrashCanEntryWrapper[]) support.getTransferable().getTransferData(TrashTransferable.TRASH_TRANSFER_FLAVOR);
 
 					ListModel lModel = ((JList) (support.getComponent())).getModel();
 					DefaultListModel model = (DefaultListModel) lModel;

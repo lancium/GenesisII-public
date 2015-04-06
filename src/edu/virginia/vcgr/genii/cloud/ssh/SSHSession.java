@@ -34,8 +34,7 @@ public class SSHSession implements ResourceController
 
 	static private Log _logger = LogFactory.getLog(SSHSession.class);
 
-	public SSHSession(String username, int port, String host, String password, Boolean strictHostKeyChecking,
-		String keyStorePath)
+	public SSHSession(String username, int port, String host, String password, Boolean strictHostKeyChecking, String keyStorePath)
 	{
 
 		_user = username;

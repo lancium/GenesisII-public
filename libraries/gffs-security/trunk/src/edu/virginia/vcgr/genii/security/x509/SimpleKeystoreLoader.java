@@ -39,8 +39,8 @@ public class SimpleKeystoreLoader implements CallbackHandler
 	{
 	}
 
-	private void addEntriesFromFile(Collection<CertEntry> entries, InputStream storeInput, String storeType)
-		throws GeneralSecurityException, IOException
+	private void addEntriesFromFile(Collection<CertEntry> entries, InputStream storeInput, String storeType) throws GeneralSecurityException,
+		IOException
 	{
 		KeyStore specifiedKs = null;
 
@@ -50,8 +50,7 @@ public class SimpleKeystoreLoader implements CallbackHandler
 		}
 
 		KeyStore.Builder builder =
-			new InputStreamBuilder(storeType, null, storeInput, new KeyStore.CallbackHandlerProtection(this),
-				AccessController.getContext());
+			new InputStreamBuilder(storeType, null, storeInput, new KeyStore.CallbackHandlerProtection(this), AccessController.getContext());
 		specifiedKs = builder.getKeyStore();
 
 		if (specifiedKs != null) {
@@ -85,8 +84,8 @@ public class SimpleKeystoreLoader implements CallbackHandler
 		}
 	}
 
-	protected Collection<CertEntry> retrieveCertEntries(InputStream storeInput, String storeType)
-		throws GeneralSecurityException, IOException
+	protected Collection<CertEntry> retrieveCertEntries(InputStream storeInput, String storeType) throws GeneralSecurityException,
+		IOException
 	{
 		ArrayList<CertEntry> list = new ArrayList<CertEntry>();
 
@@ -99,8 +98,8 @@ public class SimpleKeystoreLoader implements CallbackHandler
 		return list;
 	}
 
-	public CertEntry selectCert(InputStream storeInput, String storeType, String password, boolean isAliasPattern,
-		String entryPattern) throws GeneralSecurityException, IOException
+	public CertEntry selectCert(InputStream storeInput, String storeType, String password, boolean isAliasPattern, String entryPattern)
+		throws GeneralSecurityException, IOException
 	{
 		_passwordChars = password.toCharArray();
 		Collection<CertEntry> entries = retrieveCertEntries(storeInput, storeType);

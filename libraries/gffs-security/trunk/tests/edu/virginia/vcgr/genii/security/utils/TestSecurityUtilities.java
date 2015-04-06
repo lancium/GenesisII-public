@@ -20,8 +20,7 @@ public class TestSecurityUtilities
 	static private Log _logger = LogFactory.getLog(TestSecurityUtilities.class);
 
 	/*
-	 * future: test is currently tied to the xsede official certs dir. this needs to be fixed for
-	 * generality.
+	 * future: test is currently tied to the xsede official certs dir. this needs to be fixed for generality.
 	 */
 	// future: make this into a junit based unit test.
 
@@ -85,8 +84,7 @@ public class TestSecurityUtilities
 		}
 	}
 
-	String certExample_3deda549 = "-----BEGIN CERTIFICATE-----\n"
-		+ "MIIEDjCCAvagAwIBAgIBADANBgkqhkiG9w0BAQQFADBnMQswCQYDVQQGEwJVUzEN\n"
+	String certExample_3deda549 = "-----BEGIN CERTIFICATE-----\n" + "MIIEDjCCAvagAwIBAgIBADANBgkqhkiG9w0BAQQFADBnMQswCQYDVQQGEwJVUzEN\n"
 		+ "MAsGA1UEChMEU0RTQzEQMA4GA1UECxMHU0RTQy1DQTEeMBwGA1UEAxMVQ2VydGlm\n"
 		+ "aWNhdGUgQXV0aG9yaXR5MRcwFQYKCZImiZPyLGQBARMHY2VydG1hbjAeFw0wNDA5\n"
 		+ "MDkwMjQyMjlaFw0xNDA5MDkwMjQyMjlaMGcxCzAJBgNVBAYTAlVTMQ0wCwYDVQQK\n"
@@ -106,8 +104,8 @@ public class TestSecurityUtilities
 		+ "prD23yq8WXClIzKbOxBpRETr1kkeQbzX2R5quFLTTMd6GNqP+I28sklM9FUCLqKV\n"
 		+ "DD75UjTqa0AVPgbNdRUECrm2wXXWTVpNIzTgX1M/uVX3yyQRHyi5gj7pqsESOTZ1\n"
 		+ "0xyOx4YnpCjrG9HCWIp0wjigWGw8I/GXe0UEPbAJTcPY844Z7E/PfyZuwcdYQSZF\n"
-		+ "L030oKjrlWbKm/vGywbqt5QahKM1J60Z6WyIh7VeJV4YuvsP3bT0Sd4FXzmnhybq\n"
-		+ "ca98K+/TyIvcWUgD/BGv4XYaUTOYWQRWOZGRSgGfwRq0FQ==\n" + "-----END CERTIFICATE-----";
+		+ "L030oKjrlWbKm/vGywbqt5QahKM1J60Z6WyIh7VeJV4YuvsP3bT0Sd4FXzmnhybq\n" + "ca98K+/TyIvcWUgD/BGv4XYaUTOYWQRWOZGRSgGfwRq0FQ==\n"
+		+ "-----END CERTIFICATE-----";
 
 	@Test
 	public void testIsCertRevoked()

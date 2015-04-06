@@ -13,9 +13,9 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class RNSDBResourceFactory extends BasicDBResourceFactory implements IResourceFactory
 {
-	static private final String _CREATE_ENTRY_TABLE_STMT = "CREATE TABLE entries (" + "resourceid VARCHAR(128), "
-		+ "name VARCHAR(256), " + "endpoint BLOB (2G), " + "endpoint_id VARCHAR(128), " + "id VARCHAR(40), "
-		+ "attrs VARCHAR (8192) FOR BIT DATA, " + "CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
+	static private final String _CREATE_ENTRY_TABLE_STMT = "CREATE TABLE entries (" + "resourceid VARCHAR(128), " + "name VARCHAR(256), "
+		+ "endpoint BLOB (2G), " + "endpoint_id VARCHAR(128), " + "id VARCHAR(40), " + "attrs VARCHAR (8192) FOR BIT DATA, "
+		+ "CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
 
 	static private String _CREATE_ENTRY_INDEX_STMT = "CREATE INDEX idx ON entries (id)";
 

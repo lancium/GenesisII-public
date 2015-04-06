@@ -57,8 +57,7 @@ public class GenesisIIEPRBuilder extends OGSAEPRBuilder
 			ret = new LinkedList<Element>();
 
 		/* Add port types */
-		ret.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory().translate(
-			_portTypes)));
+		ret.add(new MessageElement(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType.portTypeFactory().translate(_portTypes)));
 
 		/* Add container ID */
 		if (_containerID != null)

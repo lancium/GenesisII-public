@@ -21,12 +21,12 @@ public class ProgressMonitorFactory
 		_executor = executor;
 	}
 
-	public <ResultType> ProgressMonitor createMonitor(Component parentComponent, String dialogTitle, String dialogSubTitle,
-		long dialogDelay, Task<ResultType> task, TaskCompletionListener<ResultType> completionListener)
+	public <ResultType> ProgressMonitor createMonitor(Component parentComponent, String dialogTitle, String dialogSubTitle, long dialogDelay,
+		Task<ResultType> task, TaskCompletionListener<ResultType> completionListener)
 	{
 		ProgressMonitorWorker<ResultType> worker =
-			new ProgressMonitorWorker<ResultType>(SwingUtilities.getWindowAncestor(parentComponent), dialogTitle,
-				dialogSubTitle, dialogDelay, task, completionListener);
+			new ProgressMonitorWorker<ResultType>(SwingUtilities.getWindowAncestor(parentComponent), dialogTitle, dialogSubTitle,
+				dialogDelay, task, completionListener);
 		return worker;
 	}
 
@@ -141,8 +141,8 @@ public class ProgressMonitorFactory
 		private Task<ResultType> _task;
 		private ResultType _result;
 
-		private TaskCompletedWorker(AbstractTaskProgressMonitor monitor, TaskCompletionListener<ResultType> listener,
-			Task<ResultType> task, ResultType result)
+		private TaskCompletedWorker(AbstractTaskProgressMonitor monitor, TaskCompletionListener<ResultType> listener, Task<ResultType> task,
+			ResultType result)
 		{
 			_monitor = monitor;
 			_listener = listener;
@@ -172,8 +172,7 @@ public class ProgressMonitorFactory
 		private TaskCompletionListener<ResultType> _listener;
 		private Task<ResultType> _task;
 
-		private TaskCancelledWorker(AbstractTaskProgressMonitor monitor, TaskCompletionListener<ResultType> listener,
-			Task<ResultType> task)
+		private TaskCancelledWorker(AbstractTaskProgressMonitor monitor, TaskCompletionListener<ResultType> listener, Task<ResultType> task)
 		{
 			_monitor = monitor;
 			_listener = listener;
@@ -200,8 +199,8 @@ public class ProgressMonitorFactory
 		private Task<ResultType> _task;
 		private Throwable _exception;
 
-		private TaskExceptedWorker(AbstractTaskProgressMonitor monitor, TaskCompletionListener<ResultType> listener,
-			Task<ResultType> task, Throwable exception)
+		private TaskExceptedWorker(AbstractTaskProgressMonitor monitor, TaskCompletionListener<ResultType> listener, Task<ResultType> task,
+			Throwable exception)
 		{
 			_monitor = monitor;
 			_listener = listener;

@@ -27,8 +27,8 @@ final class SSHFSViewStreamableAccessFileEntry extends AbstractFSViewStreamableF
 		return (_attrs.getPermissions() & 0222) > 0;
 	}
 
-	SSHFSViewStreamableAccessFileEntry(SSHFSViewSession session, FSViewDirectoryEntry parentEntry, String entryName,
-		String sshPath, SftpATTRS attrs)
+	SSHFSViewStreamableAccessFileEntry(SSHFSViewSession session, FSViewDirectoryEntry parentEntry, String entryName, String sshPath,
+		SftpATTRS attrs)
 	{
 		super(SSHFSViewSession.class, session, parentEntry, entryName);
 

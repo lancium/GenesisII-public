@@ -33,8 +33,8 @@ public class SecurityUIPreferenceSetEditor extends JPanel
 		for (int lcv = 0; lcv < levels.length; lcv++) {
 			JRadioButton button = new JRadioButton(new LevelAction(levels[lcv]));
 			group.add(button);
-			panel.add(button, new GridBagConstraints(0, lcv, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
+			panel.add(button, new GridBagConstraints(0, lcv, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
+				5, 5, 5), 5, 5));
 
 			if (levels[lcv] == level)
 				button.setSelected(true);

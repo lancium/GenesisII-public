@@ -23,8 +23,7 @@ public class CommonDataStagingFacet extends DefaultDataStagingFacet
 	public void consumeCreationFlag(Object currentUnderstanding, CreationFlagEnumeration creationFlag) throws JSDLException
 	{
 		if (creationFlag.equals(CreationFlagEnumeration.append))
-			throw new UnsupportedJSDLElement("Creation flag \"append\" is not supported.", new QName(JSDLConstants.JSDL_NS,
-				"CreationFlag"));
+			throw new UnsupportedJSDLElement("Creation flag \"append\" is not supported.", new QName(JSDLConstants.JSDL_NS, "CreationFlag"));
 
 		((DataStagingUnderstanding) currentUnderstanding).setCreationFlag(creationFlag);
 	}

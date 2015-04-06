@@ -92,8 +92,8 @@ public class ResolverTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		if (_query)
 			return runQuery();
@@ -131,8 +131,7 @@ public class ResolverTool extends BaseGridTool
 		return 0;
 	}
 
-	private void addResolver(RNSPath sourceRNS, EndpointReferenceType resolverEPR, Stack<RNSPath> stack) throws IOException,
-		RNSException
+	private void addResolver(RNSPath sourceRNS, EndpointReferenceType resolverEPR, Stack<RNSPath> stack) throws IOException, RNSException
 	{
 		EndpointReferenceType sourceEPR = sourceRNS.getEndpoint();
 		WSName sourceName = new WSName(sourceEPR);
@@ -159,11 +158,9 @@ public class ResolverTool extends BaseGridTool
 		if (sourceRNS.isRoot()) {
 			stdout.println("Added resolver to root directory.");
 			/*
-			 * Store the new EPR in the client's calling context, so this client will see a root
-			 * directory with a resolver element. Using the new EPR, the root directory can be
-			 * replicated, and failover will work. Other existing clients will continue using the
-			 * old root EPR, which still works as the root directory, but it does not support
-			 * replication or failover.
+			 * Store the new EPR in the client's calling context, so this client will see a root directory with a resolver element. Using the
+			 * new EPR, the root directory can be replicated, and failover will work. Other existing clients will continue using the old root
+			 * EPR, which still works as the root directory, but it does not support replication or failover.
 			 */
 			RNSPath rootPath = new RNSPath(finalEPR);
 			String pwd = RNSPath.getCurrent().pwd();

@@ -30,8 +30,7 @@ public class SerializedContext implements Serializable
 		if (_logger.isTraceEnabled()) {
 
 			StringBuilder builder = new StringBuilder();
-			builder.append("SerializedContext created with raw data of size " + data.length
-				+ " bytes and the following transients.\n");
+			builder.append("SerializedContext created with raw data of size " + data.length + " bytes and the following transients.\n");
 			for (String key : transientProperties.keySet()) {
 				try {
 					byte[] sData = DBSerializer.serialize(transientProperties.get(key), Long.MAX_VALUE);
@@ -60,8 +59,7 @@ public class SerializedContext implements Serializable
 		try {
 			bais = new ByteArrayInputStream(_data);
 			/*
-			 * CallingContextImpl context = (CallingContextImpl)ContextStreamUtils.load( new
-			 * InflaterInputStream(bais));
+			 * CallingContextImpl context = (CallingContextImpl)ContextStreamUtils.load( new InflaterInputStream(bais));
 			 */
 			CallingContextImpl context = (CallingContextImpl) ContextStreamUtils.load(bais);
 			context.setTransientProperties(_transientProperties);

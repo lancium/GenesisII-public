@@ -17,8 +17,7 @@ public class SimpleTopicQueryExpressionFactory implements TopicQueryExpressionFa
 	public TopicQueryExpression createFromElement(Element e) throws TopicNotSupportedFaultType
 	{
 		/*
-		 * This is SO stupid, but somehow Apache Axis doesn't actually implement the correct
-		 * functionality.
+		 * This is SO stupid, but somehow Apache Axis doesn't actually implement the correct functionality.
 		 */
 		if (e instanceof MessageElement) {
 			try {

@@ -16,8 +16,8 @@ public class ResourceCreator
 {
 	static private Log _logger = LogFactory.getLog(ResourceCreator.class);
 
-	static public EndpointReferenceType createNewResource(EndpointReferenceType serviceEPR,
-		MessageElement[] creationParameters, ResourceCreationContext creationContext) throws CreationException
+	static public EndpointReferenceType createNewResource(EndpointReferenceType serviceEPR, MessageElement[] creationParameters,
+		ResourceCreationContext creationContext) throws CreationException
 	{
 		if (creationContext == null)
 			creationContext = new ResourceCreationContext();
@@ -38,8 +38,7 @@ public class ResourceCreator
 		if (creationContext == null)
 			creationContext = new ResourceCreationContext();
 
-		String fullPath =
-			creationContext.getDefaultContainerPath() + "/" + creationContext.getServiceRelativePath() + "/" + serviceName;
+		String fullPath = creationContext.getDefaultContainerPath() + "/" + creationContext.getServiceRelativePath() + "/" + serviceName;
 
 		try {
 			RNSPath path = RNSPath.getCurrent().lookup(fullPath, RNSPathQueryFlags.MUST_EXIST);

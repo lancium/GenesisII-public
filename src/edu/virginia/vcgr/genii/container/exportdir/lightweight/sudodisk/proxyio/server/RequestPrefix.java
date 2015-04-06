@@ -5,9 +5,8 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.utils.PathType;
 
 /**
- * The prefix part of a request between GFFS container and the FileServer. Each request is unique
- * depending on the type of operation it performs. But the prefix contains fields which are common
- * to every request. However the length of these fields need not be the same.
+ * The prefix part of a request between GFFS container and the FileServer. Each request is unique depending on the type of operation it
+ * performs. But the prefix contains fields which are common to every request. However the length of these fields need not be the same.
  * 
  * Request prefix is of the form: |nonce|file/dir|command|path-len|path
  * 

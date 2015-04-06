@@ -147,8 +147,7 @@ public class BlobLimits
 	{
 		long value = getLimit(tableName, columnName);
 		if (blobSize >= value)
-			_logger.debug(String.format(
-				"Warning:  Recommended BLOB limit (%d) for table %s and column %s was exceeded (%d).\n", value, tableName,
-				columnName, blobSize));
+			_logger.debug(String.format("Warning:  Recommended BLOB limit (%d) for table %s and column %s was exceeded (%d).\n", value,
+				tableName, columnName, blobSize));
 	}
 }

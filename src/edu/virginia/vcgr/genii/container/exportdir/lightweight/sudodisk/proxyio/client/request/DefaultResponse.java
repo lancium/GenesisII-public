@@ -1,8 +1,8 @@
 package edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.client.request;
 
 /**
- * Associated with default recv. Error code indicates error code of the given FS operation and error
- * msg indicates the error msg on why the given FS operation wasn't successful
+ * Associated with default recv. Error code indicates error code of the given FS operation and error msg indicates the error msg on why the
+ * given FS operation wasn't successful
  */
 public class DefaultResponse
 {

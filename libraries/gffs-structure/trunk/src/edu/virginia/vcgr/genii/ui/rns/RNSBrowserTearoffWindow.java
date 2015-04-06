@@ -35,8 +35,8 @@ class RNSBrowserTearoffWindow extends UIFrame
 		scroller.setMinimumSize(RNSTree.DESIRED_BROWSER_SIZE);
 		scroller.setPreferredSize(RNSTree.DESIRED_BROWSER_SIZE);
 
-		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
+			5, 5, 5), 5, 5));
 
 		UIPlugins plugins = new UIPlugins(new UIPluginContext(_uiContext, tree, tree));
 		plugins.addTopLevelMenus(getJMenuBar());

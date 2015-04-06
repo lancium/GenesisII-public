@@ -36,8 +36,7 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 	{
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
-		history.createTraceWriter("Creating Job Working Directory")
-			.format("Creating job working directory:  %s", _workingDirectory).close();
+		history.createTraceWriter("Creating Job Working Directory").format("Creating job working directory:  %s", _workingDirectory).close();
 
 		_logger.info(String.format("Creating job working directory \"%s\".", _workingDirectory));
 		try {
@@ -46,8 +45,11 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 			if (OperatingSystemType.isWindows())
 				cwd.setWritable(true, false);
 
-			else{
-				FileSystemUtils.chmod(cwd.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE | FileSystemUtils.MODE_USER_EXECUTE | FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE | FileSystemUtils.MODE_GROUP_EXECUTE); }
+			else {
+				FileSystemUtils.chmod(cwd.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+					| FileSystemUtils.MODE_USER_EXECUTE | FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE
+					| FileSystemUtils.MODE_GROUP_EXECUTE);
+			}
 
 		} catch (Throwable cause) {
 			history.createErrorWriter(cause, "Unable to create directory.")

@@ -18,8 +18,8 @@ import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
  * 
  * @author Chris Koeritz
  * @copyright Copyright (c) 2012-$now By University of Virginia
- * @license This file is free software; you can modify and redistribute it under the terms of the
- *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
+ * @license This file is free software; you can modify and redistribute it under the terms of the Apache License v2.0:
+ *          http://www.apache.org/licenses/LICENSE-2.0
  */
 @SuppressWarnings("rawtypes")
 public class LoggingLinkage implements ILoggingRecipient
@@ -38,8 +38,7 @@ public class LoggingLinkage implements ILoggingRecipient
 	}
 
 	/**
-	 * extremely limited list model for our logging here. this does not support anything besides
-	 * appends right now.
+	 * extremely limited list model for our logging here. this does not support anything besides appends right now.
 	 */
 	@SuppressWarnings("serial")
 	public static class LoggingListModel extends DefaultListModel
@@ -77,8 +76,8 @@ public class LoggingLinkage implements ILoggingRecipient
 					if (target.getTopLevelAncestor() instanceof ClientApplication) {
 						ClientApplication parent = (ClientApplication) target.getTopLevelAncestor();
 						LoggingListModel lm = (LoggingListModel) _appLoggingTarget.getModel();
-						ReportableErrorHandler.displayError(parent.getContext(), target, model.get(indies[0]).toString(), lm
-							.getCauses().get(indies[0]));
+						ReportableErrorHandler.displayError(parent.getContext(), target, model.get(indies[0]).toString(),
+							lm.getCauses().get(indies[0]));
 					}
 				}
 				me.consume();

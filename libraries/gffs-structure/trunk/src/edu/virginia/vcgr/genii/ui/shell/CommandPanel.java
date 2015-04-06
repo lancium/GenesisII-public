@@ -30,8 +30,7 @@ public class CommandPanel extends JPanel
 		label.setMinimumSize(label.getMinimumSize());
 		label.setPreferredSize(label.getPreferredSize());
 		label.setMaximumSize(label.getMaximumSize());
-		CommandField field =
-			new CommandField(uiContext, label, display.display(), new GridExecutionContext(uiContext.callingContext()), 32);
+		CommandField field = new CommandField(uiContext, label, display.display(), new GridExecutionContext(uiContext.callingContext()), 32);
 
 		JScrollPane scroller = new JScrollPane(display);
 		scroller.setMinimumSize(OUTPUT_SIZE);
@@ -39,9 +38,9 @@ public class CommandPanel extends JPanel
 
 		add(GUIUtils.addTitle("Output", scroller), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		add(label, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
-		add(field, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(label, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5,
+			5));
+		add(field, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5,
+			5), 5, 5));
 	}
 }

@@ -25,8 +25,7 @@ public class ResourcesRNSFork extends AbstractRNSResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
-		throws IOException
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry) throws IOException
 	{
 		ResourceKey rKey = getService().getResourceKey();
 

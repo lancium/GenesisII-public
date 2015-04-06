@@ -1,10 +1,10 @@
 /*
- * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright
- * 1999-2005 The University of Southern California.
+ * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright 1999-2005 The University of Southern
+ * California.
  * 
- * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public
- * License, found at http://www.globus.org/toolkit/download/license.html. If you redistribute this
- * file, with or without modifications, you must include this notice in the file.
+ * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public License, found at
+ * http://www.globus.org/toolkit/download/license.html. If you redistribute this file, with or without modifications, you must include this
+ * notice in the file.
  */
 package edu.virginia.vcgr.genii.client.ser;
 
@@ -31,9 +31,8 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 /**
- * Converts Java DOM Elements and SOAP Elements to Java objects. The objects must be compliant with
- * the Axis Bean model, i.e. generated using the WSDL2Java tool from an XML Schema definition or
- * must be of simple type.
+ * Converts Java DOM Elements and SOAP Elements to Java objects. The objects must be compliant with the Axis Bean model, i.e. generated using
+ * the WSDL2Java tool from an XML Schema definition or must be of simple type.
  */
 public class ObjectDeserializer
 {
@@ -41,8 +40,7 @@ public class ObjectDeserializer
 
 	/**
 	 * Converts a DOM Element object into a Java object. <br>
-	 * <b>Note:</b> This operation is slow as it converts the DOM Element into a string which then
-	 * is deserialized into a Java object.
+	 * <b>Note:</b> This operation is slow as it converts the DOM Element into a string which then is deserialized into a Java object.
 	 */
 	public static Object toObject(Element element, Class<?> javaClass) throws ResourceException
 	{
@@ -56,15 +54,13 @@ public class ObjectDeserializer
 	}
 
 	/**
-	 * Converts a SOAPElement object into a Java object of specified type. The class of the object
-	 * must have been generated from an XML Schema, and thus contain the appropriate meta data to
-	 * make deserialization possible.
+	 * Converts a SOAPElement object into a Java object of specified type. The class of the object must have been generated from an XML
+	 * Schema, and thus contain the appropriate meta data to make deserialization possible.
 	 * 
 	 * @param element
 	 *            SOAPElement to be converted
 	 * @param javaClass
-	 *            Class containing meta data about how to deserialize the object or can be of a
-	 *            simple type such as Integer.
+	 *            Class containing meta data about how to deserialize the object or can be of a simple type such as Integer.
 	 * @return Java object that maps to the XML representation of the input
 	 * @throws ResourceException
 	 *             if the input could not be deserialized into a Java type.
@@ -97,8 +93,8 @@ public class ObjectDeserializer
 	}
 
 	/**
-	 * Converts an array of SOAPElement objects into a set of Java objects. The type of the Java
-	 * object will be determined from the <i>xsi:type</i> attribute of the specified element.
+	 * Converts an array of SOAPElement objects into a set of Java objects. The type of the Java object will be determined from the
+	 * <i>xsi:type</i> attribute of the specified element.
 	 * 
 	 * @see #toObject(SOAPElement, Class)
 	 */
@@ -125,8 +121,8 @@ public class ObjectDeserializer
 	}
 
 	/**
-	 * Converts a AnyContentType object into a set of Java objects. The type of the Java object will
-	 * be determined from the <i>xsi:type</i> attribute of the specified element.
+	 * Converts a AnyContentType object into a set of Java objects. The type of the Java object will be determined from the <i>xsi:type</i>
+	 * attribute of the specified element.
 	 * 
 	 * @see #toObject(SOAPElement, Class)
 	 */
@@ -149,8 +145,8 @@ public class ObjectDeserializer
 	}
 
 	/**
-	 * Converts the first element of AnyContentType object into a Java object. The type of the Java
-	 * object will be determined from the <i>xsi:type</i> attribute of the specified element.
+	 * Converts the first element of AnyContentType object into a Java object. The type of the Java object will be determined from the
+	 * <i>xsi:type</i> attribute of the specified element.
 	 * 
 	 * @see #toObject(SOAPElement, Class)
 	 */
@@ -173,9 +169,8 @@ public class ObjectDeserializer
 	}
 
 	/**
-	 * Checks to see whether the any element is of type javaClass. The javaClass must be generated
-	 * from an XML Schema representation. This operation could be seen as the instanceof equivalent
-	 * for xsd:any types
+	 * Checks to see whether the any element is of type javaClass. The javaClass must be generated from an XML Schema representation. This
+	 * operation could be seen as the instanceof equivalent for xsd:any types
 	 */
 	public static boolean contains(SOAPElement element, Class<?> javaClass)
 	{
@@ -300,8 +295,7 @@ public class ObjectDeserializer
 		/*
 		 * results:
 		 * 
-		 * 2013-12-20: no memory leaks seen. memory periodically returned to near baseline, and
-		 * nothing persistent was seen.
+		 * 2013-12-20: no memory leaks seen. memory periodically returned to near baseline, and nothing persistent was seen.
 		 */
 	}
 }

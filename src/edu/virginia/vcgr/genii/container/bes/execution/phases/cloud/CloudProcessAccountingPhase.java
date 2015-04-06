@@ -38,8 +38,8 @@ public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase imp
 
 	static private Log _logger = LogFactory.getLog(CloudProcessAccountingPhase.class);
 
-	public CloudProcessAccountingPhase(String activityID, String besid, String remoteFile, String localFile,
-		Collection<String> commandLine, BESConstructionParameters constructionParameters)
+	public CloudProcessAccountingPhase(String activityID, String besid, String remoteFile, String localFile, Collection<String> commandLine,
+		BESConstructionParameters constructionParameters)
 	{
 
 		_activityID = activityID;
@@ -84,9 +84,8 @@ public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase imp
 
 					ProcessorArchitecture arch = _constructionParameters.getResourceOverrides().cpuArchitecture();
 
-					acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null,
-						_commandLine, exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(),
-						eResults.maximumRSS());
+					acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null, _commandLine,
+						exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(), eResults.maximumRSS());
 				}
 
 			} catch (ProcessWrapperException pwe) {

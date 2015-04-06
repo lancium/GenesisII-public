@@ -31,9 +31,7 @@ public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
 		String url;
 
 		try {
-			url =
-				context.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint().getAddress().get_value()
-					.toString();
+			url = context.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint().getAddress().get_value().toString();
 
 			while (true) {
 				Properties info = new Properties();
@@ -48,8 +46,7 @@ public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
 				}
 			}
 
-			Collection<CredentialBundle> dirtyBundles =
-				CredentialDialog.manageCredentials(context.ownerComponent(), connection);
+			Collection<CredentialBundle> dirtyBundles = CredentialDialog.manageCredentials(context.ownerComponent(), connection);
 			if (dirtyBundles != null && dirtyBundles.size() > 0) {
 				stmt = connection.prepareStatement("UPDATE xcgcredentials SET credentialtype = ? " + "WHERE cid = ?");
 

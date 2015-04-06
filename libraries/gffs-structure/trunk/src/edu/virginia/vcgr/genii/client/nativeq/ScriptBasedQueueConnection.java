@@ -41,8 +41,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	static public final String QUEUE_SCRIPT_RESULT_FILENAME = "queue.script.result";
 
 	protected ScriptBasedQueueConnection(File workingDirectory, ResourceOverrides resourceOverrides,
-		CmdLineManipulatorConfiguration cmdLineManipulatorConf, NativeQueueConfiguration queueConfig,
-		ProviderConfigType providerConfig) throws NativeQueueException
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf, NativeQueueConfiguration queueConfig, ProviderConfigType providerConfig)
+		throws NativeQueueException
 	{
 		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, queueConfig, providerConfig);
 	}
@@ -61,15 +61,15 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		checkBinary(bashBinary);
 	}
 
-        final protected File getSubmitScript(File workingDirectory) throws IOException
-        {
-                String submitScriptName = providerConfiguration().submitScriptName();
+	final protected File getSubmitScript(File workingDirectory) throws IOException
+	{
+		String submitScriptName = providerConfiguration().submitScriptName();
 
-                if (submitScriptName == null)
-                        return File.createTempFile("qsub", ".sh", workingDirectory);
+		if (submitScriptName == null)
+			return File.createTempFile("qsub", ".sh", workingDirectory);
 
-                return new File(workingDirectory, submitScriptName);
-        }
+		return new File(workingDirectory, submitScriptName);
+	}
 
 	final protected File getBashBinary()
 	{
@@ -112,9 +112,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	{
 	}
 
-	protected void
-		generateQueueApplicationHeader(PrintStream script, File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException
+	protected void generateQueueApplicationHeader(PrintStream script, File workingDirectory, ApplicationDescription application)
+		throws NativeQueueException, IOException
 	{
 		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 
@@ -135,9 +134,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		script.format("export QUEUE_SCRIPT_RESULT=0\n");
 	}
 
-	protected void
-		generateQueueApplicationFooter(PrintStream script, File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException
+	protected void generateQueueApplicationFooter(PrintStream script, File workingDirectory, ApplicationDescription application)
+		throws NativeQueueException, IOException
 	{
 		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 
@@ -149,9 +147,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			script.format("\nexport QUEUE_SCRIPT_RESULT=$?\n");
 	}
 
-	protected List<String>
-		generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException
+	protected List<String> generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
+		throws NativeQueueException, IOException
 	{
 		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 		List<String> newCmdLine = new Vector<String>();
@@ -168,8 +165,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				overrides = new ResourceOverrides();
 
 			ProcessWrapper wrapper =
-				ProcessWrapperFactory.createWrapper(getCommonDirectory(), overrides.operatingSystemName(),
-					overrides.cpuArchitecture());
+				ProcessWrapperFactory.createWrapper(getCommonDirectory(), overrides.operatingSystemName(), overrides.cpuArchitecture());
 
 			// assemble job properties for cmdLineManipulators
 			Map<String, Object> jobProperties = new HashMap<String, Object>();
@@ -177,8 +173,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 			OperatingSystemNames desiredOperatingSystemType = overrides.operatingSystemName();
 			OperatingSystemNames operatingSystemType =
-				(desiredOperatingSystemType != null) ? desiredOperatingSystemType : OperatingSystemNames
-					.getCurrentOperatingSystem();
+				(desiredOperatingSystemType != null) ? desiredOperatingSystemType : OperatingSystemNames.getCurrentOperatingSystem();
 
 			File stdoutRedirect = application.getStdoutRedirect(workingDirectory);
 			if (stdoutRedirect == null && operatingSystemType == OperatingSystemNames.LINUX) {
@@ -195,11 +190,11 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				stderrRedirect = null;
 			}
 
-			CmdLineManipulatorUtils.addEnvProperties(jobProperties, application.getFuseMountPoint(),
-				application.getEnvironment(), workingDirectory, application.getStdinRedirect(workingDirectory), stdoutRedirect,
-				stderrRedirect, application.getResourceUsagePath(), wrapper.getPathToWrapper());
-			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, application.getSPMDVariation(),
-				application.getNumProcesses(), application.getNumProcessesPerHost());
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties, application.getFuseMountPoint(), application.getEnvironment(),
+				workingDirectory, application.getStdinRedirect(workingDirectory), stdoutRedirect, stderrRedirect,
+				application.getResourceUsagePath(), wrapper.getPathToWrapper());
+			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, application.getSPMDVariation(), application.getNumProcesses(),
+				application.getNumProcessesPerHost());
 
 			if (_logger.isDebugEnabled())
 				_logger.debug("Trying to call cmdLine manipulators.");
@@ -212,9 +207,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			// for testing only - default cmdLine format to compare to transform
 			Vector<String> testCmdLine =
 				wrapper.formCommandLine(application.getFuseMountPoint(), application.getEnvironment(), workingDirectory,
-					application.getStdinRedirect(workingDirectory), stdoutRedirect, stderrRedirect,
-					application.getResourceUsagePath(), execName,
-					application.getArguments().toArray(new String[application.getArguments().size()]));
+					application.getStdinRedirect(workingDirectory), stdoutRedirect, stderrRedirect, application.getResourceUsagePath(),
+					execName, application.getArguments().toArray(new String[application.getArguments().size()]));
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Pervious cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
 

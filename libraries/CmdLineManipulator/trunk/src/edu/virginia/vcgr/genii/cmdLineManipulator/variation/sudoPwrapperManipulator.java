@@ -30,8 +30,8 @@ public class sudoPwrapperManipulator extends AbstractCmdLineManipulator<SudoPwra
 	}
 
 	@Override
-	public List<String> transform(Map<String, Object> jobProperties, CmdLineManipulatorConfiguration manipulatorConfig,
-		String variationName) throws CmdLineManipulatorException
+	public List<String> transform(Map<String, Object> jobProperties, CmdLineManipulatorConfiguration manipulatorConfig, String variationName)
+		throws CmdLineManipulatorException
 	{
 
 		_logger.debug("**Transforming with Sudo-PWrapper CmdLine Manipulator");
@@ -55,7 +55,7 @@ public class sudoPwrapperManipulator extends AbstractCmdLineManipulator<SudoPwra
 		if (_logger.isTraceEnabled()) {
 			_logger.debug("sudo pwrapper command line about to issue is:");
 			int line = 0;
-			for (String cmd: cmds) {
+			for (String cmd : cmds) {
 				_logger.debug(line++ + "  " + cmd);
 			}
 		}

@@ -36,8 +36,8 @@ public class CreateFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 	private class RNSTreeSelectionContainerFilter implements RNSSelectionFilter
 	{
 		@Override
-		public boolean accept(RNSPath path, EndpointReferenceType epr, TypeInformation typeInformation,
-			EndpointType displayType, boolean isLocal)
+		public boolean accept(RNSPath path, EndpointReferenceType epr, TypeInformation typeInformation, EndpointType displayType,
+			boolean isLocal)
 		{
 			return typeInformation.isContainer();
 		}
@@ -52,8 +52,7 @@ public class CreateFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 			try {
 				assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 
-				FSViewCreatorDialog dialog =
-					new FSViewCreatorDialog(SwingUtilities.getWindowAncestor(context.ownerComponent()));
+				FSViewCreatorDialog dialog = new FSViewCreatorDialog(SwingUtilities.getWindowAncestor(context.ownerComponent()));
 				dialog.pack();
 				dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 				GUIUtils.centerWindow(dialog);
@@ -62,8 +61,7 @@ public class CreateFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 
 				if (connectInfo != null) {
 					String answer =
-						JOptionPane.showInputDialog(context.ownerComponent(),
-							"What would you like to call the filesystem proxy mount?");
+						JOptionPane.showInputDialog(context.ownerComponent(), "What would you like to call the filesystem proxy mount?");
 					if (answer == null)
 						return;
 

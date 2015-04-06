@@ -26,9 +26,8 @@ public class GeniiFuse
 {
 	static private Log _logger = LogFactory.getLog(GeniiFuse.class);
 
-	static public GeniiFuseConnection mountGenesisII(File mountPoint, String[] additionalArguments,
-		ICallingContext callingContext, String sandbox, int uid, boolean daemon) throws IOException, RemoteException,
-		RNSException, AuthZSecurityException
+	static public GeniiFuseConnection mountGenesisII(File mountPoint, String[] additionalArguments, ICallingContext callingContext,
+		String sandbox, int uid, boolean daemon) throws IOException, RemoteException, RNSException, AuthZSecurityException
 	{
 		if (!mountPoint.exists())
 			throw new FileNotFoundException(String.format("Unable to locate mount point \"%s\".", mountPoint.getAbsolutePath()));
@@ -103,10 +102,8 @@ public class GeniiFuse
 
 				if (results.getExitCode() == 0) {
 					if (_logger.isDebugEnabled()) {
-						_logger
-							.debug(String.format("Fuse unmount succeeded:\n" + "Output:\n%s\nError:\n%s",
-								ExecutionEngine.formatOutput(results.getOutput()),
-								ExecutionEngine.formatOutput(results.getError())));
+						_logger.debug(String.format("Fuse unmount succeeded:\n" + "Output:\n%s\nError:\n%s",
+							ExecutionEngine.formatOutput(results.getOutput()), ExecutionEngine.formatOutput(results.getError())));
 					}
 				} else {
 					_logger.error(String.format("Unable to unmount fuse filesystem:\n" + "Output:\n%s\nError:\n%s",

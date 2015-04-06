@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package edu.virginia.vcgr.genii.container.axis;
@@ -60,8 +59,8 @@ public class WorkingContextHandler extends BasicHandler
 						_isRequest = Boolean.FALSE;
 					else
 						fault =
-							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE
-								+ " or " + _FLOW_SIDE_RESPONSE_VALUE);
+							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE + " or "
+								+ _FLOW_SIDE_RESPONSE_VALUE);
 				} else {
 					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY + " parameter.");
 				}
@@ -90,19 +89,17 @@ public class WorkingContextHandler extends BasicHandler
 		WorkingContext newContext = new WorkingContext();
 		WorkingContext.setCurrentWorkingContext(newContext);
 
-		EndpointReferenceType epr =
-			(EndpointReferenceType) ctxt.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
+		EndpointReferenceType epr = (EndpointReferenceType) ctxt.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
 		if (epr == null) {
-			throw new AxisFault("Couldn't find \"" + WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY
-				+ "\" property in message context.");
+			throw new AxisFault("Couldn't find \"" + WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY + "\" property in message context.");
 		}
-		
+
 		// 2014-11-05 ASG - code added to place calling host dns/ip into working context
-		HttpServletRequest req = (HttpServletRequest)ctxt.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+		HttpServletRequest req = (HttpServletRequest) ctxt.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
 		String host = req.getRemoteHost();
 		newContext.setProperty(WorkingContext.CALLING_HOST, host);
 		// ASG end of updates
-		
+
 		newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 
 		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME, EPRUtils.extractServiceName(epr));

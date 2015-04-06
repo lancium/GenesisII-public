@@ -33,7 +33,7 @@ class PersistentOutcallJobKiller
 	static boolean killJob(String besName, EndpointReferenceType bes, String historyKey, HistoryEventToken historyToken,
 		EndpointReferenceType activity, ICallingContext context)
 	{
-		return PersistentOutcallContainerService.schedulePersistentOutcall(new BESActivityTerminatorActor(historyKey,
-			historyToken, besName, activity), SCHEDULER(), bes, context);
+		return PersistentOutcallContainerService.schedulePersistentOutcall(new BESActivityTerminatorActor(historyKey, historyToken, besName,
+			activity), SCHEDULER(), bes, context);
 	}
 }

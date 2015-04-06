@@ -59,8 +59,8 @@ public class OGRSHException extends Exception implements IPackable
 			_exceptionNumber = OGRSHException.EXCEPTION_UNKNOWN;
 
 		if (_logger.isDebugEnabled())
-			_logger.debug("OGRSHException(" + getLocalizedMessage() + ", " + _exceptionNumber
-				+ ") thrown because of another exception.", cause);
+			_logger.debug("OGRSHException(" + getLocalizedMessage() + ", " + _exceptionNumber + ") thrown because of another exception.",
+				cause);
 	}
 
 	public OGRSHException(Throwable cause)

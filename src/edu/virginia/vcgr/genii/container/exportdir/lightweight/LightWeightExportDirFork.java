@@ -72,8 +72,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
-		throws IOException
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry) throws IOException
 	{
 		throw new IOException("Not allowed to add arbitrary endpoints to a " + "light-weight export.");
 	}
@@ -85,8 +84,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		VExportDir dir = getTarget();
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("LightWeightExport: File Create \"" + newFileName + "\" in \"" + dir.getName() + "\" from "
-			+ caller);
+		StatsLogger.logStats("LightWeightExport: File Create \"" + newFileName + "\" in \"" + dir.getName() + "\" from " + caller);
 		// End logging
 
 		if (dir.createFile(newFileName)) {
@@ -234,9 +232,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		InMemoryIteratorWrapper imiw = null;
 
 		if (imieList.size() > 0) {
-			imiw =
-				new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(),
-					myKey });
+			imiw = new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(), myKey });
 		}
 
 		return new IterableSnapshot(entries, imiw, dirPath);
@@ -263,8 +259,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		};
 	}
 
-	public static Collection<RNSEntryResponseType> getEntries(Iterable<InternalEntry> entries, ResourceKey rKey,
-		boolean requestedShortForm, String dirPath) throws ResourceException
+	public static Collection<RNSEntryResponseType> getEntries(Iterable<InternalEntry> entries, ResourceKey rKey, boolean requestedShortForm,
+		String dirPath) throws ResourceException
 	{
 		LinkedList<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
 		RNSEntryResponseType lastF = null;
@@ -296,8 +292,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 					AttributesPreFetcherFactory factory = new LightWeightExportAttributePrefetcherFactoryImpl();
 					RNSEntryResponseType entry =
 						new RNSEntryResponseType(requestedShortForm ? null : epr, RNSUtilities.createMetadata(epr,
-							Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, rKey, null, requestedShortForm)),
-							null, internalEntry.getName());
+							Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, rKey, null, requestedShortForm)), null,
+							internalEntry.getName());
 					// ---------------------------------------------------------------------------------------------
 					// Removing EPR from entry when short form is requested
 					if (requestedShortForm)
@@ -382,16 +378,14 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 						int elements = -1;
 						ExportMechanisms expMech =
-							ExportMechanisms.parse((String) rKey.dereference().getProperty(
-								LightWeightExportConstants.EXPORT_MECHANISM));
+							ExportMechanisms.parse((String) rKey.dereference().getProperty(LightWeightExportConstants.EXPORT_MECHANISM));
 						if ((expMech == null) || expMech.equals(ExportMechanisms.EXPORT_MECH_ACL)
 							|| expMech.equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
 							// normal exports just go directly to a File.
 							elements = forkFile.list().length;
 						} else if (expMech.equals(ExportMechanisms.EXPORT_MECH_PROXYIO)) {
 							// this export is in proxyio mode which uses sudo and a co-process.
-							String user =
-								(String) rKey.dereference().getProperty(LightWeightExportConstants.EXPORT_OWNER_UNIX_NAME);
+							String user = (String) rKey.dereference().getProperty(LightWeightExportConstants.EXPORT_OWNER_UNIX_NAME);
 							if (_logger.isTraceEnabled())
 								_logger.debug("trying short-circuit to proxyio, user=" + user + " path='" + forkFile + "'");
 							SudoDiskExportEntry sdee;
@@ -440,17 +434,15 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		return resultEntries;
 	}
 
-	public static Collection<Pair<Long, MessageElement>> getEntries(List<InMemoryIteratorEntry> imieList, int firstElement,
-		int numElements, Object[] EprAndService, boolean shortForm) throws IOException
+	public static Collection<Pair<Long, MessageElement>> getEntries(List<InMemoryIteratorEntry> imieList, int firstElement, int numElements,
+		Object[] EprAndService, boolean shortForm) throws IOException
 	{
 		/*
-		 * ASG May, 2014. New code to hoist common operations out of getIndexedContent and ws
-		 * iterator iterate. We will exploit the fact that this is a light weight export ... in
-		 * other words that the only things that change from one RNSEntryResponse to another is the
-		 * entry name, the size, and the times. Most importantly, the permissions do not change, and
-		 * those take 50% of the time required to build an iterate response. The other major factor
-		 * is CreateForkEPR that takes 7% of the 80% used by iterate. Since only one field of the
-		 * EPR changes, we will change only that field.
+		 * ASG May, 2014. New code to hoist common operations out of getIndexedContent and ws iterator iterate. We will exploit the fact that
+		 * this is a light weight export ... in other words that the only things that change from one RNSEntryResponse to another is the entry
+		 * name, the size, and the times. Most importantly, the permissions do not change, and those take 50% of the time required to build an
+		 * iterate response. The other major factor is CreateForkEPR that takes 7% of the 80% used by iterate. Since only one field of the EPR
+		 * changes, we will change only that field.
 		 */
 
 		Collection<Pair<Long, MessageElement>> ret = new ArrayList<Pair<Long, MessageElement>>(numElements);
@@ -511,12 +503,11 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 							info = lweff.describe();
 						} else {
 							resp =
-								new RNSEntryResponseType(null, null,
-									FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
-										new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry"
-											+ " %s does not exist!", dName)) }, null, dName)), dName);
-							ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(
-								RNSEntryResponseType.getTypeDesc().getXmlType(), resp)));
+								new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null,
+									null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry"
+										+ " %s does not exist!", dName)) }, null, dName)), dName);
+							ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType
+								.getTypeDesc().getXmlType(), resp)));
 							continue;
 						}
 					}
@@ -527,8 +518,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				}
 
 				else if (fd == FileOrDir.DIRECTORY) {
-					LightWeightExportDirFork lwedf =
-						new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
+					LightWeightExportDirFork lwedf = new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 					info = lwedf.describe();
 				} else if (fd == FileOrDir.FILE) {
 					LightWeightExportFileFork lweff =
@@ -537,12 +527,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				}
 				// Now the code where we hoist out and reuse the values from the first time around
 				// We also want to do this the old way if shortForm==false
-				if ((fd == FileOrDir.FILE && lastF == null) || (fd == FileOrDir.DIRECTORY && lastD == null)
-					|| shortForm == false) {
+				if ((fd == FileOrDir.FILE && lastF == null) || (fd == FileOrDir.DIRECTORY && lastD == null) || shortForm == false) {
 					try {
-						ie =
-							new InternalEntry(dName, service.createForkEPR(RForkUtils.formForkPathFromPath(forkPath, dName),
-								info), null);
+						ie = new InternalEntry(dName, service.createForkEPR(RForkUtils.formForkPathFromPath(forkPath, dName), info), null);
 
 					} catch (ResourceUnknownFaultType e) {
 						throw new ResourceException("Unable to list directory contents");
@@ -553,10 +540,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 					resp =
 						new RNSEntryResponseType(shortForm ? null : epr, RNSUtilities.createMetadata(epr,
-							Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service, shortForm)), null,
-							ie.getName());
-					ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType
-						.getTypeDesc().getXmlType(), resp)));
+							Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service, shortForm)), null, ie.getName());
+					ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc()
+						.getXmlType(), resp)));
 
 					if (fd == FileOrDir.FILE) {
 						lastF = resp;
@@ -626,8 +612,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						}
 						next.setMetadata(new RNSMetadataType(ent.getMetadata().getSupportsRns(), me));
 
-						ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(
-							RNSEntryResponseType.getTypeDesc().getXmlType(), next)));
+						ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType
+							.getTypeDesc().getXmlType(), next)));
 
 					} else if (fd == FileOrDir.DIRECTORY) {
 						int elements = forkFile.list().length;
@@ -657,8 +643,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						}
 						next.setMetadata(new RNSMetadataType(ent.getMetadata().getSupportsRns(), me));
 
-						ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(
-							RNSEntryResponseType.getTypeDesc().getXmlType(), ent)));
+						ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType
+							.getTypeDesc().getXmlType(), ent)));
 
 					}
 				}
@@ -704,8 +690,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 			try {
 				FileOrDir stat = statify(dName, forkPath, rKey);
 				if (stat == FileOrDir.DIRECTORY) {
-					LightWeightExportDirFork lwedf =
-						new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
+					LightWeightExportDirFork lwedf = new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 					info = lwedf.describe();
 				}
 
@@ -719,9 +704,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				else {
 
 					resp =
-						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(
-							null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String
-								.format("Entry" + " %s does not exist!", dName)) }, null, dName)), dName);
+						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null,
+							null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format(
+								"Entry" + " %s does not exist!", dName)) }, null, dName)), dName);
 
 					return MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp);
 				}
@@ -733,15 +718,13 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		}
 
 		else if (fd == FileOrDir.DIRECTORY) {
-			LightWeightExportDirFork lwedf =
-				new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
+			LightWeightExportDirFork lwedf = new LightWeightExportDirFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 			info = lwedf.describe();
 
 		}
 
 		else if (fd == FileOrDir.FILE) {
-			LightWeightExportFileFork lweff =
-				new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
+			LightWeightExportFileFork lweff = new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 
 			info = lweff.describe();
 		}
@@ -796,9 +779,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 		List<InMemoryIteratorEntry> imieList = new LinkedList<InMemoryIteratorEntry>();
 
-		int min =
-			(lookupRequest.length > RNSConstants.PREFERRED_BATCH_SIZE) ? RNSConstants.PREFERRED_BATCH_SIZE
-				: lookupRequest.length;
+		int min = (lookupRequest.length > RNSConstants.PREFERRED_BATCH_SIZE) ? RNSConstants.PREFERRED_BATCH_SIZE : lookupRequest.length;
 
 		for (int lcv = 0; lcv < min; lcv++) {
 			String request = lookupRequest[lcv];
@@ -818,17 +799,14 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				String request = lookupRequest[lcv];
 
 				/*
-				 * We put a true for exists! It does not matter if it is a false. We will identify
-				 * and throw a fault during iteration!
+				 * We put a true for exists! It does not matter if it is a false. We will identify and throw a fault during iteration!
 				 */
 
 				InMemoryIteratorEntry imie = new InMemoryIteratorEntry(request, getForkPath(), true, FileOrDir.UNKNOWN);
 				imieList.add(imie);
 			}
 
-			imiw =
-				new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(),
-					resourceKey });
+			imiw = new InMemoryIteratorWrapper(this.getClass().getName(), imieList, new Object[] { exemplarEPR, getService(), resourceKey });
 
 			return new IterableSnapshot(entries, imiw, getForkPath());
 		}

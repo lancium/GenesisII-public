@@ -8,6 +8,5 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 
 public interface AttributesPreFetcherFactory
 {
-	public AttributePreFetcher getPreFetcher(EndpointReferenceType target, ResourceKey rKey, ResourceForkService service)
-		throws Throwable;
+	public AttributePreFetcher getPreFetcher(EndpointReferenceType target, ResourceKey rKey, ResourceForkService service) throws Throwable;
 }

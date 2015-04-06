@@ -45,8 +45,7 @@ import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 
 public class BasicDBResource implements IResource
 {
-	static protected final String _SPECIAL_SERVICE_KEY_TEMPLATE =
-		"edu.virginia.vcgr.genii.container.resource.db.special-service-key.";
+	static protected final String _SPECIAL_SERVICE_KEY_TEMPLATE = "edu.virginia.vcgr.genii.container.resource.db.special-service-key.";
 
 	static private final String _VERIFY_STMT = "SELECT createtime FROM resources WHERE resourceid = ?";
 	static private final String _CREATE_STMT = "INSERT INTO resources VALUES(?, ?)";
@@ -156,8 +155,7 @@ public class BasicDBResource implements IResource
 					_logger.debug("did not find resource '" + _resourceKey + "'.");
 				}
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Resource \"" + _resourceKey
-						+ "\" is unknown.") }, null));
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Resource \"" + _resourceKey + "\" is unknown.") }, null));
 			}
 		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
@@ -167,8 +165,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 
-	static public void setProperty(Connection connection, String resourceKey, String propertyName, Object value)
-		throws SQLException
+	static public void setProperty(Connection connection, String resourceKey, String propertyName, Object value) throws SQLException
 	{
 		PreparedStatement stmt = null;
 
@@ -190,11 +187,10 @@ public class BasicDBResource implements IResource
 				if (_logger.isTraceEnabled())
 					_logger.trace("Serializing " + b.length() + " bytes into property database.");
 				if (b.length() <= 0) {
-					_logger.error("Attempt to serialize property \"" + propertyName
-						+ "\" with 0 bytes into the property database.");
+					_logger.error("Attempt to serialize property \"" + propertyName + "\" with 0 bytes into the property database.");
 				} else if (b.length() >= 128 * 1024) {
-					_logger.error("Attempt to serialize property \"" + propertyName + "\" of length " + b.length()
-						+ " bytes into a " + "128K space.");
+					_logger.error("Attempt to serialize property \"" + propertyName + "\" of length " + b.length() + " bytes into a "
+						+ "128K space.");
 				}
 			}
 
@@ -412,9 +408,7 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				_connection.prepareStatement("INSERT INTO matchingparams" + "(resourceid, paramname, paramvalue) "
-					+ "VALUES (?, ?, ?)");
+			stmt = _connection.prepareStatement("INSERT INTO matchingparams" + "(resourceid, paramname, paramvalue) " + "VALUES (?, ?, ?)");
 
 			for (MatchingParameter param : parameters) {
 				stmt.setString(1, _resourceKey);
@@ -438,8 +432,8 @@ public class BasicDBResource implements IResource
 
 		try {
 			stmt =
-				_connection.prepareStatement("DELETE FROM matchingparams " + "WHERE resourceid = ? AND paramname = ? "
-					+ "AND paramvalue = ?");
+				_connection
+					.prepareStatement("DELETE FROM matchingparams " + "WHERE resourceid = ? AND paramname = ? " + "AND paramvalue = ?");
 
 			for (MatchingParameter param : parameters) {
 				stmt.setString(1, _resourceKey);
@@ -538,12 +532,11 @@ public class BasicDBResource implements IResource
 		}
 	}
 
-	static public ConstructionParameters
-		constructionParameters(Connection connection, Class<?> serviceClass, String resourceid) throws SQLException
+	static public ConstructionParameters constructionParameters(Connection connection, Class<?> serviceClass, String resourceid)
+		throws SQLException
 	{
 		ConstructionParameters cParams =
-			(ConstructionParameters) getProperty(connection, resourceid,
-				ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
+			(ConstructionParameters) getProperty(connection, resourceid, ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
 
 		if (cParams == null)
 			cParams = ConstructionParameters.instantiateDefault(serviceClass);

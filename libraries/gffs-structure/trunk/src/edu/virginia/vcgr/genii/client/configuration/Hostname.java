@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.configuration;
 
@@ -34,8 +33,7 @@ import edu.virginia.vcgr.genii.client.InstallationProperties;
 
 public class Hostname
 {
-	static private final String _EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY =
-		"edu.virginia.vcgr.genii.container.external-hostname-override";
+	static private final String _EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY = "edu.virginia.vcgr.genii.container.external-hostname-override";
 	static private final String _EPR_ADDRESSING_MODE_PROPERTY = "edu.virginia.vcgr.genii.container.epr-addressing-mode";
 	static private final String _EPR_ADDRESSING_MODE_DEFAULT_VALUE = "auto";
 
@@ -238,8 +236,7 @@ public class Hostname
 		Matcher urlMatcher = _URL_PATTERN.matcher(url);
 		if (!urlMatcher.matches()) {
 			/*
-			 * This doesn't allow for URI's in the name throw new IllegalArgumentException( "url \""
-			 * + url + "\" does not appear valid.");
+			 * This doesn't allow for URI's in the name throw new IllegalArgumentException( "url \"" + url + "\" does not appear valid.");
 			 */
 			return url;
 		}

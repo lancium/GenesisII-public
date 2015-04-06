@@ -11,7 +11,6 @@ public interface SubscriptionFactory
 	public SubscribeRequest createRequest(TopicQueryExpression topicFilter, TerminationTimeType terminationTime,
 		AdditionalUserData additionalUserData, SubscriptionPolicy... policies);
 
-	public Subscription subscribe(EndpointReferenceType publisher, TopicQueryExpression topicFilter,
-		TerminationTimeType terminationTime, AdditionalUserData additionalUserData, SubscriptionPolicy... policies)
-		throws SubscribeException;
+	public Subscription subscribe(EndpointReferenceType publisher, TopicQueryExpression topicFilter, TerminationTimeType terminationTime,
+		AdditionalUserData additionalUserData, SubscriptionPolicy... policies) throws SubscribeException;
 }

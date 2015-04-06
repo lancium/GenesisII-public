@@ -22,10 +22,9 @@ import edu.virginia.vcgr.genii.client.gfs.cache.handles.GeniiOpenFileHandle;
 import edu.virginia.vcgr.genii.client.gfs.cache.handles.GeniiOpenHandle;
 
 /**
- * This class is responsible for caching all information obtained from RNS for a directory This
- * class has optimized synchronization and assume that all dirHandles access this from different
- * threads. It assumes the common case for access to its directory entries are reads i.e. reading
- * the entries versus modifying the list.
+ * This class is responsible for caching all information obtained from RNS for a directory This class has optimized synchronization and assume
+ * that all dirHandles access this from different threads. It assumes the common case for access to its directory entries are reads i.e.
+ * reading the entries versus modifying the list.
  */
 public class GeniiCachedDir extends GeniiCachedResource
 {
@@ -37,8 +36,7 @@ public class GeniiCachedDir extends GeniiCachedResource
 	public GeniiCachedDir(String[] path, Permissions permissions, boolean isMkDir) throws FSException
 	{
 		super(path);
-		_logger
-			.debug(String.format("Creating new cache item for %s", UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
+		_logger.debug(String.format("Creating new cache item for %s", UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
 		if (isMkDir) {
 			_fs.mkdir(path, permissions);
 		}
@@ -59,8 +57,7 @@ public class GeniiCachedDir extends GeniiCachedResource
 	public synchronized void refreshDirectoryEntries() throws FSException
 	{
 		if (_logger.isDebugEnabled())
-			_logger
-				.debug(String.format("Refreshing entries for %s", UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
+			_logger.debug(String.format("Refreshing entries for %s", UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
 		if (directoryEntries != null) {
 			merge();
 		} else {

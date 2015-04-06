@@ -27,8 +27,8 @@ public class ResolverUtils
 {
 	static private Log _logger = LogFactory.getLog(ResolverUtils.class);
 
-	static public EndpointReferenceType resolve(EndpointReferenceType originalEPR) throws NameResolutionFailedException,
-		ResourceException, GenesisIISecurityException, ConfigurationException, RemoteException
+	static public EndpointReferenceType resolve(EndpointReferenceType originalEPR) throws NameResolutionFailedException, ResourceException,
+		GenesisIISecurityException, ConfigurationException, RemoteException
 	{
 		WSName wsname = new WSName(originalEPR);
 		List<ResolverDescription> resolvers = wsname.getResolvers();
@@ -43,13 +43,12 @@ public class ResolverUtils
 		return null;
 	}
 
-	static public EndpointReferenceType resolve(ResolverDescription resolver) throws NameResolutionFailedException,
-		ResourceException, GenesisIISecurityException, ConfigurationException, RemoteException
+	static public EndpointReferenceType resolve(ResolverDescription resolver) throws NameResolutionFailedException, ResourceException,
+		GenesisIISecurityException, ConfigurationException, RemoteException
 	{
 		try {
 			if (resolver.getType() == ResolverDescription.ResolverType.EPI_RESOLVER) {
-				EndpointIdentifierResolver resolverPT =
-					ClientUtils.createProxy(EndpointIdentifierResolver.class, resolver.getEPR());
+				EndpointIdentifierResolver resolverPT = ClientUtils.createProxy(EndpointIdentifierResolver.class, resolver.getEPR());
 				return resolverPT.resolveEPI(resolver.getEPI());
 			}
 			if (resolver.getType() == ResolverDescription.ResolverType.REFERENCE_RESOLVER) {
@@ -126,8 +125,8 @@ public class ResolverUtils
 	}
 
 	/**
-	 * Register the given EPR with the given resolver resource. This returns an EPR with the address
-	 * of the given EPR, and with a Resolver element.
+	 * Register the given EPR with the given resolver resource. This returns an EPR with the address of the given EPR, and with a Resolver
+	 * element.
 	 */
 	static public UpdateResponseType updateResolver(EndpointReferenceType resolverEPR, EndpointReferenceType entryReference)
 		throws RemoteException
@@ -137,11 +136,10 @@ public class ResolverUtils
 	}
 
 	/**
-	 * Call primaryName.getResolvers(). Also, deal with the special case where primaryName does not
-	 * have a resolver element because it can resolve itself.
+	 * Call primaryName.getResolvers(). Also, deal with the special case where primaryName does not have a resolver element because it can
+	 * resolve itself.
 	 * 
-	 * Perhaps all of the calls to wsname.getResolvers() throughout ResolverUtils should be changed
-	 * to calls to getResolvers(wsname)?
+	 * Perhaps all of the calls to wsname.getResolvers() throughout ResolverUtils should be changed to calls to getResolvers(wsname)?
 	 */
 	public static List<ResolverDescription> getResolvers(WSName primaryName)
 	{

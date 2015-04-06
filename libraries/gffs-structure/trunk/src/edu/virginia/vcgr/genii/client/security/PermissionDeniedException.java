@@ -13,8 +13,7 @@ public class PermissionDeniedException extends AuthZSecurityException
 
 	static final private Pattern METHOD_EXTRACTOR_PATTERN = Pattern.compile("^.*Access denied on .*.in method ([^ )]+).\\..*$",
 		Pattern.DOTALL);
-	static final private Pattern ASSET_EXTRACTOR_PATTERN = Pattern.compile("^.*Access denied on (.+) .in method .*\\..*$",
-		Pattern.DOTALL);
+	static final private Pattern ASSET_EXTRACTOR_PATTERN = Pattern.compile("^.*Access denied on (.+) .in method .*\\..*$", Pattern.DOTALL);
 
 	public PermissionDeniedException(String methodName, String assetDenied)
 	{

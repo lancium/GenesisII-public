@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 package edu.virginia.vcgr.genii.client.context;
 
@@ -35,8 +34,8 @@ public interface ICallingContext
 	public Collection<Serializable> getProperty(String name);
 
 	/**
-	 * Sets a multi-value property. Overwrites any prevous properties at this level (Overloads, but
-	 * does not overwrite a same-named parent property.)
+	 * Sets a multi-value property. Overwrites any prevous properties at this level (Overloads, but does not overwrite a same-named parent
+	 * property.)
 	 */
 	public void setProperty(String name, Collection<Serializable> values);
 
@@ -46,14 +45,13 @@ public interface ICallingContext
 	public void removeProperty(String name);
 
 	/**
-	 * Gets a single-value property. If the name refers to a mulit-value property, the first value
-	 * is returned. Returns null if does not exist
+	 * Gets a single-value property. If the name refers to a mulit-value property, the first value is returned. Returns null if does not exist
 	 */
 	public Serializable getSingleValueProperty(String name);
 
 	/**
-	 * Sets a single-value property. Overwrites any prevous properties at this level (Overloads, but
-	 * does not overwrite a same-named parent property.)
+	 * Sets a single-value property. Overwrites any prevous properties at this level (Overloads, but does not overwrite a same-named parent
+	 * property.)
 	 */
 	public void setSingleValueProperty(String name, Serializable value);
 

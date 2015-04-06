@@ -39,8 +39,7 @@ public class BESConstructionParameters extends ConstructionParameters implements
 
 	private CloudConfiguration _cloudBES = null;
 
-	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE, name = "environment-export", nillable = true,
-		required = false)
+	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE, name = "environment-export", nillable = true, required = false)
 	private EnvironmentExport _environmentExport = null;
 
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "pre-execution-delay", required = false, nillable = true)

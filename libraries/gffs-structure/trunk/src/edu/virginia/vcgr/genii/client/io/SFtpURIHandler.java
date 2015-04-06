@@ -34,8 +34,7 @@ public class SFtpURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	protected DataTransferStatistics getInternal(URI source, File target, UsernamePasswordIdentity credential)
-		throws IOException
+	protected DataTransferStatistics getInternal(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
 		String user = null;
 		String password = null;
@@ -72,8 +71,7 @@ public class SFtpURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential)
-		throws IOException
+	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential) throws IOException
 	{
 		String user = null;
 		String password = null;

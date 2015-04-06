@@ -144,14 +144,13 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	 */
 	@Override
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
+		RemoteException
 	{
 		super.postCreate(rKey, myEPR, cParams, constructionParameters, resolverCreationParams);
 
 		IGeniiResolverResource resource = (IGeniiResolverResource) rKey.dereference();
-		EndpointReferenceType primaryEPR =
-			(EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
+		EndpointReferenceType primaryEPR = (EndpointReferenceType) constructionParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		EndpointReferenceType targetEPR = (EndpointReferenceType) constructionParameters.get(TARGET_EPR_PARAMETER);
 		if (primaryEPR != null) {
 			VersionedResourceUtils.initializeReplica(resource, primaryEPR, 0);
@@ -184,16 +183,14 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 
 	/* EndpointIdentifierResolver port type. */
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType resolveEPI(URI resolveEPI) throws RemoteException, ResourceUnknownFaultType,
-		ResolveFailedFaultType
+	public EndpointReferenceType resolveEPI(URI resolveEPI) throws RemoteException, ResourceUnknownFaultType, ResolveFailedFaultType
 	{
 		return doResolve(resolveEPI);
 	}
 
 	/* ReferenceResolver port type. */
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType resolve(Object resolveRequest) throws RemoteException, ResourceUnknownFaultType,
-		ResolveFailedFaultType
+	public EndpointReferenceType resolve(Object resolveRequest) throws RemoteException, ResourceUnknownFaultType, ResolveFailedFaultType
 	{
 		return doResolve(null);
 	}
@@ -205,7 +202,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	{
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("GeniiResolver: Resolving an EPR from "+caller);
+		StatsLogger.logStats("GeniiResolver: Resolving an EPR from " + caller);
 		// End logging
 		fixMetadataInWorkingContext();
 		if (targetEPI == null) {
@@ -296,8 +293,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	/**
 	 * Add an EPR to the resource's list of targets.
 	 */
-	private int addEPR(IGeniiResolverResource resource, EndpointReferenceType targetEPR) throws RemoteException,
-		InvalidWSNameFaultType
+	private int addEPR(IGeniiResolverResource resource, EndpointReferenceType targetEPR) throws RemoteException, InvalidWSNameFaultType
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("SimpleResolver addEPR");
@@ -390,8 +386,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 			GUID guid = EPRUtils.extractContainerID(targetEPR);
 			if (guid.toString().equals(containerID)) {
 				EndpointReferenceType myEPR =
-					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(
-						WorkingContext.EPR_PROPERTY_NAME);
+					(EndpointReferenceType) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.EPR_PROPERTY_NAME);
 				return GeniiResolverUtils.createResolutionEPR(resource, targetEPR, myEPR, targetID);
 			}
 		}
@@ -430,10 +425,8 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 					if (requestContainsFilename(lookupRequest, targetEPI.toString())) {
 						String entryResourceKey = mapEntry.getValue();
 						ResourceKey entryKey = ResourceManager.getTargetResource(serviceName, entryResourceKey);
-						EndpointReferenceType resolverEPR =
-							ResourceManager.createEPR(entryKey, currentURL, implementedPortTypes, null);
-						resolverEPR =
-							GeniiResolverUtils.createUserInfoEPR(resolverEPR, GENII_RESOLVER_TARGET_EPI_KEY, targetEPI, true);
+						EndpointReferenceType resolverEPR = ResourceManager.createEPR(entryKey, currentURL, implementedPortTypes, null);
+						resolverEPR = GeniiResolverUtils.createUserInfoEPR(resolverEPR, GENII_RESOLVER_TARGET_EPI_KEY, targetEPI, true);
 						result.add(new RNSEntryResponseType(resolverEPR, null, null, targetEPI.toString()));
 					}
 				}
@@ -499,8 +492,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException,
-		WriteNotPermittedFaultType
+	public RNSEntryResponseType[] setMetadata(MetadataMappingType[] setMetadataRequest) throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("setMetadata operation not supported!");
 	}
@@ -518,8 +510,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 
 		multiplexer.registerNotificationHandler(GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
 			new LegacyResourceTerminationNotificationHandler());
-		multiplexer.registerNotificationHandler(RESOLVER_UPDATE_TOPIC.asConcreteQueryExpression(),
-			new ResolverUpdateNotificationHandler());
+		multiplexer.registerNotificationHandler(RESOLVER_UPDATE_TOPIC.asConcreteQueryExpression(), new ResolverUpdateNotificationHandler());
 		multiplexer.registerNotificationHandler(AclTopics.GENII_ACL_CHANGE_TOPIC.asConcreteQueryExpression(),
 			new AclChangeNotificationHandler());
 	}
@@ -622,12 +613,11 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 	}
 
 	/**
-	 * Write the entire contents of the resolverentries table to an output stream so another
-	 * resolver resource can become a replica of this resource.
+	 * Write the entire contents of the resolverentries table to an output stream so another resolver resource can become a replica of this
+	 * resource.
 	 */
 	@RWXMapping(RWXCategory.READ)
-	public OpenStreamResponse openStream(Object request) throws RemoteException, ResourceUnknownFaultType,
-		ResourceCreationFaultType
+	public OpenStreamResponse openStream(Object request) throws RemoteException, ResourceUnknownFaultType, ResourceCreationFaultType
 	{
 		ObjectOutputStream ostream = null;
 		try {

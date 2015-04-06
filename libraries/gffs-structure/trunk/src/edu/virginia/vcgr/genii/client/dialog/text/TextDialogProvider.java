@@ -26,8 +26,7 @@ public class TextDialogProvider implements DialogProvider
 	}
 
 	@Override
-	public InformationDialog createErrorDialog(String title, TextContent errorContent) throws DialogException,
-		UserCancelException
+	public InformationDialog createErrorDialog(String title, TextContent errorContent) throws DialogException, UserCancelException
 	{
 		return new TextInformationDialog(title, _package, errorContent, true);
 	}
@@ -55,8 +54,8 @@ public class TextDialogProvider implements DialogProvider
 	}
 
 	@Override
-	public ComboBoxDialog createComboBoxDialog(String title, String prompt, MenuItem defaultItem, MenuItem... items)
-		throws DialogException, UserCancelException
+	public ComboBoxDialog createComboBoxDialog(String title, String prompt, MenuItem defaultItem, MenuItem... items) throws DialogException,
+		UserCancelException
 	{
 		return new TextComboBoxDialog(title, _package, prompt, defaultItem, items);
 	}

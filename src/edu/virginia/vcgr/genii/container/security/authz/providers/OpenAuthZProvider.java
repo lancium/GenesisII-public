@@ -1,15 +1,14 @@
 /*
  * Copyright 2006 University of Virginia
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  */
 
 package edu.virginia.vcgr.genii.container.security.authz.providers;
@@ -50,9 +49,8 @@ public class OpenAuthZProvider implements IAuthZProvider
 	}
 
 	/**
-	 * Presently configures the specified resource to have default access allowed for every
-	 * credential in the bag of credentials. We may want to look at restricting this in the future
-	 * to special credentials.
+	 * Presently configures the specified resource to have default access allowed for every credential in the bag of credentials. We may want
+	 * to look at restricting this in the future to special credentials.
 	 */
 	public void setDefaultAccess(ICallingContext callingContext, IResource resource, X509Certificate[] serviceCertChain)
 		throws AuthZSecurityException, ResourceException
@@ -60,15 +58,14 @@ public class OpenAuthZProvider implements IAuthZProvider
 	}
 
 	@Override
-	public boolean
-		checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, RWXCategory category)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource,
-		Class<?> serviceClass, Method operation)
+	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, Class<?> serviceClass,
+		Method operation)
 	{
 		return true; // all is allowed.
 	}
@@ -94,13 +91,12 @@ public class OpenAuthZProvider implements IAuthZProvider
 	{
 	}
 
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
-		throws AuthZSecurityException, ResourceException
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource) throws AuthZSecurityException,
+		ResourceException
 	{
 	}
 
-	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException,
-		AuthZSecurityException
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException, AuthZSecurityException
 	{
 	}
 }

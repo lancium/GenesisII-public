@@ -8,9 +8,8 @@ import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigura
 import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigurationFactory;
 
 /**
- * This class is simply a repository for providers for given services. Each service will have
- * associated with it it's own resource provider. This allows each one to have its authorization
- * provider.
+ * This class is simply a repository for providers for given services. Each service will have associated with it it's own resource provider.
+ * This allows each one to have its authorization provider.
  * 
  */
 public class AuthZProviders
@@ -46,8 +45,8 @@ public class AuthZProviders
 		provider = conf.defaultAuthZProvider();
 
 		if (provider == null)
-			throw new ResourceException(String.format("Unable to find resource provider for service %s "
-				+ "(implemented by class %s).", serviceName, serviceClass));
+			throw new ResourceException(String.format("Unable to find resource provider for service %s " + "(implemented by class %s).",
+				serviceName, serviceClass));
 
 		synchronized (_providerCache) {
 			_providerCache.put(serviceName, provider);

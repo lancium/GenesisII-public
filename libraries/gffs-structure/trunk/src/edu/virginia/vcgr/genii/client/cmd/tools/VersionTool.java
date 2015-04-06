@@ -25,8 +25,8 @@ public class VersionTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		Version v = ApplicationLauncher.getAppVersion();
 		String softwareName = ApplicationLauncher.getAppName();

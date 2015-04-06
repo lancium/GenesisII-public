@@ -39,8 +39,7 @@ public class GridCommandStatement implements ParseStatement
 			cLine[lcv++] = stmt.evaluate(context).toString();
 
 		try {
-			return new CommandLineRunner()
-				.runCommand(cLine, context.getWriter(), context.getErrorWriter(), context.getReader());
+			return new CommandLineRunner().runCommand(cLine, context.getWriter(), context.getErrorWriter(), context.getReader());
 		} catch (ToolException se) {
 			throw new ScriptException(se);
 		} catch (RuntimeException re) {

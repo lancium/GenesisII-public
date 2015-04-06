@@ -41,8 +41,7 @@ public abstract class UnitableValue<U extends Enum<U>> implements Serializable
 		String units = textRepresentation.substring(lcv + 1).trim();
 
 		if (numbers.length() == 0)
-			throw new IllegalArgumentException(String.format("Can't parse %s into a %s", textRepresentation, getClass()
-				.getName()));
+			throw new IllegalArgumentException(String.format("Can't parse %s into a %s", textRepresentation, getClass().getName()));
 
 		double value = Double.parseDouble(numbers);
 		U u = defaultUnits();

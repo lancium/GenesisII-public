@@ -145,21 +145,21 @@ public class QueueManagerDialog extends JFrame
 		prepareColumns(_table);
 		JScrollPane scroller = new JScrollPane(_table);
 		scroller.setPreferredSize(new Dimension(1000, 500));
-		content.add(scroller, new GridBagConstraints(0, 0, 5, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new ShowLogAction(_table)), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new ShowErrorsAction(_table)), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new CompleteAction(_table)), new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new DeleteAction(_table)), new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(scroller, new GridBagConstraints(0, 0, 5, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
+			5, 5, 5), 5, 5));
+		content.add(new JButton(new ShowLogAction(_table)), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new ShowErrorsAction(_table)), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new CompleteAction(_table)), new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new DeleteAction(_table)), new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(new JButton(new RefreshAction()), new GridBagConstraints(4, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(status, new GridBagConstraints(0, 2, 5, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(status, new GridBagConstraints(0, 2, 5, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5,
+			5, 5), 5, 5));
 	}
 
 	private class CompleteAction extends AbstractAction implements ListSelectionListener
@@ -310,8 +310,7 @@ public class QueueManagerDialog extends JFrame
 		{
 			int index = _table.getSelectedRow();
 
-			LogDisplay display =
-				new LogDisplay(QueueManagerDialog.this, _queueEPR, new JobTicket(_table.getValueAt(index, 0).toString()));
+			LogDisplay display = new LogDisplay(QueueManagerDialog.this, _queueEPR, new JobTicket(_table.getValueAt(index, 0).toString()));
 			display.pack();
 			GuiUtils.centerComponent(display);
 			display.setModalityType(ModalityType.DOCUMENT_MODAL);

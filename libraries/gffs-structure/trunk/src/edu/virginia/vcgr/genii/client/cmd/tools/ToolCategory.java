@@ -1,8 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 /*
- * Enum that has all categories tools can be grouped in this data should never be persistently
- * stored or replied upon to allow easy configuration/grouping changes in the future mts5x
+ * Enum that has all categories tools can be grouped in this data should never be persistently stored or replied upon to allow easy
+ * configuration/grouping changes in the future mts5x
  */
 public enum ToolCategory {
 
@@ -12,7 +12,7 @@ public enum ToolCategory {
 	MISC(false, "Misc"),
 	INTERNAL(false, "Internal Use"),
 	EXECUTION(false, "Job/Execution"),
-//	ANTIQUATED(false, "Antiquated"),
+	// ANTIQUATED(false, "Antiquated"),
 	GENERAL(false, "General"),
 	ADMINISTRATION(false, "Administration");
 

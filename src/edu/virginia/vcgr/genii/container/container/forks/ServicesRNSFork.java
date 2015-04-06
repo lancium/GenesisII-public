@@ -65,9 +65,8 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 			String serviceName = desc.getName();
 
 			/*
-			 * example of making certain port types disappear. this needs to be done with a list
-			 * instead. there are several port types that are deprecated and should no longer be
-			 * shown in the list of services.
+			 * example of making certain port types disappear. this needs to be done with a list instead. there are several port types that
+			 * are deprecated and should no longer be shown in the list of services.
 			 */
 			/*
 			 * if (serviceName.equals("JNDIAuthnPortType")) continue;
@@ -77,9 +76,10 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 				ResourceKey targetKey = ResourceManager.getServiceResource(serviceName);
 
 				EndpointReferenceType targetEPR =
-					ResourceManager.createEPR(targetKey, String.format("%s%s?%s=%s", shortenedURL(), serviceName,
-						EPRUtils.GENII_CONTAINER_ID_PARAMETER, Container.getContainerID()), findImplementedPortTypes(desc
-						.getImplClass()), serviceName);
+					ResourceManager.createEPR(
+						targetKey,
+						String.format("%s%s?%s=%s", shortenedURL(), serviceName, EPRUtils.GENII_CONTAINER_ID_PARAMETER,
+							Container.getContainerID()), findImplementedPortTypes(desc.getImplClass()), serviceName);
 				ret.add(new InternalEntry(serviceName, targetEPR));
 			}
 		}

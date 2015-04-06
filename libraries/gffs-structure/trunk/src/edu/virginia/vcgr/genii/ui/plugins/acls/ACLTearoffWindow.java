@@ -20,8 +20,8 @@ class ACLTearoffWindow extends UIFrame
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(newPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(newPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
+			5, 5, 5), 5, 5));
 
 		getMenuFactory().addHelpMenu(_uiContext, getJMenuBar());
 	}

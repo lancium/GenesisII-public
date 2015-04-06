@@ -8,8 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A type of scheduler that implements an exponential backoff on scheduling (with the possibility of
- * a random jitter or twitter added to the schedule).
+ * A type of scheduler that implements an exponential backoff on scheduling (with the possibility of a random jitter or twitter added to the
+ * schedule).
  * 
  * @author morgan
  */
@@ -27,8 +27,8 @@ public class ExponentialBackoffScheduler implements AttemptScheduler
 
 	static private Log _logger = LogFactory.getLog(ExponentialBackoffScheduler.class);
 
-	public ExponentialBackoffScheduler(Calendar lifetime, Integer maxFailedAttempts, Integer exponentAttemptCap,
-		long backoffBase, TimeUnit backoffBaseUnits, Long backoffTwitterBase, TimeUnit backoffTwitterBaseUnits)
+	public ExponentialBackoffScheduler(Calendar lifetime, Integer maxFailedAttempts, Integer exponentAttemptCap, long backoffBase,
+		TimeUnit backoffBaseUnits, Long backoffTwitterBase, TimeUnit backoffTwitterBaseUnits)
 	{
 		if (backoffBaseUnits == null)
 			backoffBaseUnits = TimeUnit.MILLISECONDS;
@@ -44,9 +44,8 @@ public class ExponentialBackoffScheduler implements AttemptScheduler
 			(backoffTwitterBase == null) ? null : TimeUnit.MILLISECONDS.convert(backoffTwitterBase, backoffTwitterBaseUnits);
 	}
 
-	public ExponentialBackoffScheduler(long lifetime, TimeUnit lifetimeUnits, Integer maxFailedAttempts,
-		Integer exponentAttemptCap, long backoffBase, TimeUnit backoffBaseUnits, Long backoffTwitterBase,
-		TimeUnit backoffTwitterBaseUnits)
+	public ExponentialBackoffScheduler(long lifetime, TimeUnit lifetimeUnits, Integer maxFailedAttempts, Integer exponentAttemptCap,
+		long backoffBase, TimeUnit backoffBaseUnits, Long backoffTwitterBase, TimeUnit backoffTwitterBaseUnits)
 	{
 		if (backoffBaseUnits == null)
 			backoffBaseUnits = TimeUnit.MILLISECONDS;

@@ -16,8 +16,7 @@ public class TypeCommandHandler extends AbstractCommandHandler
 	}
 
 	@Override
-	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out)
-		throws FTPException
+	public void handleCommand(FTPSessionState sessionState, String verb, String parameters, PrintStream out) throws FTPException
 	{
 		if (parameters.equals("A") || parameters.equals("A N"))
 			out.println("200 OK");

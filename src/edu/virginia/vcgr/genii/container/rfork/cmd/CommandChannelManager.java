@@ -122,21 +122,18 @@ public class CommandChannelManager
 				handler.invoke(target, args);
 			} catch (IllegalArgumentException e) {
 				_logger.error(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), e);
-				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()),
-					e);
+				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), e);
 
 			} catch (IllegalAccessException e) {
 				_logger.error(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), e);
-				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()),
-					e);
+				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), e);
 			} catch (InvocationTargetException e) {
 				Throwable cause = e.getCause();
 				if (cause instanceof IOException)
 					throw ((IOException) cause);
 
 				_logger.error(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), cause);
-				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()),
-					cause);
+				throw new IOException(String.format("Unable to invoke command handler for command '%s'.", builder.toString()), cause);
 			}
 		}
 	}

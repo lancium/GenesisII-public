@@ -24,15 +24,13 @@ public class UpdateTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
 	{
 		/*
-		 * ApplicationLauncherConsole console = ApplicationLauncher.getConsole(); Version oldVersion
-		 * = console.currentVersion(); if (!Version.EMPTY_VERSION.equals(oldVersion)) {
-		 * console.doUpdates(); if (!oldVersion.equals(console.currentVersion()))
-		 * stdout.println("You need to restart your client in order " +
-		 * "to update it to the newest version."); }
+		 * ApplicationLauncherConsole console = ApplicationLauncher.getConsole(); Version oldVersion = console.currentVersion(); if
+		 * (!Version.EMPTY_VERSION.equals(oldVersion)) { console.doUpdates(); if (!oldVersion.equals(console.currentVersion()))
+		 * stdout.println("You need to restart your client in order " + "to update it to the newest version."); }
 		 * 
 		 * return 0;
 		 */

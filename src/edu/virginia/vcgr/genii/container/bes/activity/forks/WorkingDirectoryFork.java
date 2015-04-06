@@ -58,8 +58,7 @@ public class WorkingDirectoryFork extends AbstractRNSResourceFork
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry)
-		throws IOException
+	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry) throws IOException
 	{
 		throw new IOException("Not allowed to add arbitrary endpoints to a " + "bes-activity working directory.");
 	}

@@ -10,11 +10,9 @@ class FilesystemSandboxImpl implements FilesystemSandbox
 	FilesystemSandboxImpl(File sandboxRoot, boolean doCreate) throws FileNotFoundException
 	{
 		/*
-		 * Mark Morgan -- We're not ready to fully do this yet. if (!sandboxRoot.exists())
-		 * sandboxRoot.mkdirs(); if (!sandboxRoot.exists()) throw new
-		 * FileNotFoundException(String.format( "Unable to locate sandbox root at \"%s\".",
-		 * sandboxRoot)); else if (!sandboxRoot.isDirectory()) throw new
-		 * FileNotFoundException(String.format( "Unable to locate sandbox root at \"%s\".",
+		 * Mark Morgan -- We're not ready to fully do this yet. if (!sandboxRoot.exists()) sandboxRoot.mkdirs(); if (!sandboxRoot.exists())
+		 * throw new FileNotFoundException(String.format( "Unable to locate sandbox root at \"%s\".", sandboxRoot)); else if
+		 * (!sandboxRoot.isDirectory()) throw new FileNotFoundException(String.format( "Unable to locate sandbox root at \"%s\".",
 		 * sandboxRoot));
 		 */
 

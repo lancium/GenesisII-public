@@ -76,8 +76,7 @@ public class DLogDatabase
 	{
 	}
 
-	public DLogDatabase(String _dbUrl, String _dbUser, String _dbPass, String _entryTable, String _metadataTable,
-		String _hierarchyTable)
+	public DLogDatabase(String _dbUrl, String _dbUser, String _dbPass, String _entryTable, String _metadataTable, String _hierarchyTable)
 	{
 		dbUrl = _dbUrl;
 		dbUser = _dbUser;
@@ -116,24 +115,21 @@ public class DLogDatabase
 	protected void initQueries()
 	{
 		hierarchySql =
-			"INSERT INTO " + hierarchyTable + " (" + DLogConstants.DLOG_HIERARCHY_CHILD + ", "
-				+ DLogConstants.DLOG_HIERARCHY_PARENT + ", " + DLogConstants.DLOG_HIERARCHY_DATE + ") "
-				+ "VALUES (?, ?, CURRENT_TIMESTAMP)";
+			"INSERT INTO " + hierarchyTable + " (" + DLogConstants.DLOG_HIERARCHY_CHILD + ", " + DLogConstants.DLOG_HIERARCHY_PARENT + ", "
+				+ DLogConstants.DLOG_HIERARCHY_DATE + ") " + "VALUES (?, ?, CURRENT_TIMESTAMP)";
 
 		metadataSql1 =
-			"INSERT INTO " + metadataTable + " (" + DLogConstants.DLOG_METADATA_RPCID + ", "
-				+ DLogConstants.DLOG_METADATA_DATE_SENT + ", " + DLogConstants.DLOG_METADATA_EPR + ", "
-				+ DLogConstants.DLOG_METADATA_REQUEST + ", " + DLogConstants.DLOG_METADATA_OP_NAME + ") "
-				+ "VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)";
+			"INSERT INTO " + metadataTable + " (" + DLogConstants.DLOG_METADATA_RPCID + ", " + DLogConstants.DLOG_METADATA_DATE_SENT + ", "
+				+ DLogConstants.DLOG_METADATA_EPR + ", " + DLogConstants.DLOG_METADATA_REQUEST + ", " + DLogConstants.DLOG_METADATA_OP_NAME
+				+ ") " + "VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)";
 
 		metadataSql2 =
-			"UPDATE " + metadataTable + " SET " + DLogConstants.DLOG_METADATA_RPCID + " = ?, "
-				+ DLogConstants.DLOG_METADATA_DATE_RCVD + " = CURRENT_TIMESTAMP, " + DLogConstants.DLOG_METADATA_RESPONSE
-				+ " = ? " + "WHERE " + DLogConstants.DLOG_METADATA_RPCID + " = ?";
+			"UPDATE " + metadataTable + " SET " + DLogConstants.DLOG_METADATA_RPCID + " = ?, " + DLogConstants.DLOG_METADATA_DATE_RCVD
+				+ " = CURRENT_TIMESTAMP, " + DLogConstants.DLOG_METADATA_RESPONSE + " = ? " + "WHERE " + DLogConstants.DLOG_METADATA_RPCID
+				+ " = ?";
 
 		selectEPR =
-			"SELECT " + DLogConstants.DLOG_METADATA_EPR + " FROM " + metadataTable + " WHERE "
-				+ DLogConstants.DLOG_METADATA_RPCID + " = ?";
+			"SELECT " + DLogConstants.DLOG_METADATA_EPR + " FROM " + metadataTable + " WHERE " + DLogConstants.DLOG_METADATA_RPCID + " = ?";
 
 		selectChildIDs = "SELECT * FROM " + hierarchyTable;
 		whereChildIDs = " WHERE " + DLogConstants.DLOG_HIERARCHY_PARENT + " = ?";
@@ -150,13 +146,12 @@ public class DLogDatabase
 		selectParent = "SELECT DISTINCT " + DLogConstants.DLOG_ENTRY_FIELD_RPCID + " FROM " + entryTable;
 
 		selectParentCmd =
-			"SELECT " + DLogConstants.DLOG_METADATA_OP_NAME + " FROM " + metadataTable + " WHERE "
-				+ DLogConstants.DLOG_METADATA_RPCID + " = ?";
+			"SELECT " + DLogConstants.DLOG_METADATA_OP_NAME + " FROM " + metadataTable + " WHERE " + DLogConstants.DLOG_METADATA_RPCID
+				+ " = ?";
 
 		insertCmd =
-			"INSERT INTO " + metadataTable + " ( " + DLogConstants.DLOG_METADATA_RPCID + ", "
-				+ DLogConstants.DLOG_METADATA_OP_NAME + ", " + DLogConstants.DLOG_METADATA_DATE_SENT + " ) "
-				+ " VALUES (?, ?, CURRENT_TIMESTAMP)";
+			"INSERT INTO " + metadataTable + " ( " + DLogConstants.DLOG_METADATA_RPCID + ", " + DLogConstants.DLOG_METADATA_OP_NAME + ", "
+				+ DLogConstants.DLOG_METADATA_DATE_SENT + " ) " + " VALUES (?, ?, CURRENT_TIMESTAMP)";
 	}
 
 	public Connection getConnection() throws SQLException
@@ -190,10 +185,9 @@ public class DLogDatabase
 			if (res != null) {
 				while (res.next()) {
 					ret.add(new LogEntryType(res.getString(DLogConstants.DLOG_ENTRY_FIELD_DATE), res
-						.getString(DLogConstants.DLOG_ENTRY_FIELD_MESSAGE), res
-						.getString(DLogConstants.DLOG_ENTRY_FIELD_LOGGER), res.getString(DLogConstants.DLOG_ENTRY_FIELD_LEVEL),
-						res.getString(DLogConstants.DLOG_ENTRY_FIELD_RPCID), res
-							.getString(DLogConstants.DLOG_ENTRY_FIELD_STACK_TRACE)));
+						.getString(DLogConstants.DLOG_ENTRY_FIELD_MESSAGE), res.getString(DLogConstants.DLOG_ENTRY_FIELD_LOGGER), res
+						.getString(DLogConstants.DLOG_ENTRY_FIELD_LEVEL), res.getString(DLogConstants.DLOG_ENTRY_FIELD_RPCID), res
+						.getString(DLogConstants.DLOG_ENTRY_FIELD_STACK_TRACE)));
 				}
 			}
 		} finally {
@@ -288,8 +282,7 @@ public class DLogDatabase
 					if (!ret.containsKey(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT))) {
 						ret.put(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT), new ArrayList<String>());
 					}
-					ret.get(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT)).add(
-						res.getString(DLogConstants.DLOG_HIERARCHY_CHILD));
+					ret.get(res.getString(DLogConstants.DLOG_HIERARCHY_PARENT)).add(res.getString(DLogConstants.DLOG_HIERARCHY_CHILD));
 				}
 			}
 		} finally {
@@ -416,8 +409,7 @@ public class DLogDatabase
 		}
 	}
 
-	public void recordMeta1(String tempID, byte[] body, EndpointReferenceType epr, String op) throws SQLException, AxisFault,
-		SOAPException
+	public void recordMeta1(String tempID, byte[] body, EndpointReferenceType epr, String op) throws SQLException, AxisFault, SOAPException
 	{
 		Connection con = null;
 		PreparedStatement stmt = null;

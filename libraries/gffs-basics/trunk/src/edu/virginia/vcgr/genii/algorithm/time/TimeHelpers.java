@@ -25,8 +25,7 @@ public class TimeHelpers
 	}
 
 	/**
-	 * returns the number of milliseconds since the program started. this is usually a much nicer
-	 * number than the milliseconds since boot.
+	 * returns the number of milliseconds since the program started. this is usually a much nicer number than the milliseconds since boot.
 	 */
 	public static long millisSinceAppStart()
 	{

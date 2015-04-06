@@ -50,18 +50,16 @@ public class AboutDialog extends JDialog
 		icon.setMaximumSize(ICON_SIZE);
 
 		JTextArea text =
-			new JTextArea("Grid Job Tool\n\n" + VERSION_STRING + "\n\n"
-				+ "This software is licensed under the Apache 2.0 license and\n"
+			new JTextArea("Grid Job Tool\n\n" + VERSION_STRING + "\n\n" + "This software is licensed under the Apache 2.0 license and\n"
 				+ "may be modified and/or distributed freely so long as this\n"
 				+ "license agreement and the University of Virginia CS department\n"
-				+ "logo and the Genesis II logo remain intact and displayed.\n\n"
-				+ "This software product was developed by Mark Morgan.");
+				+ "logo and the Genesis II logo remain intact and displayed.\n\n" + "This software product was developed by Mark Morgan.");
 		text.setEditable(false);
 
-		container.add(icon, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		container.add(text, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		container.add(icon, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.NONE, new Insets(5, 5,
+			5, 5), 5, 5));
+		container.add(text, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.BOTH, new Insets(5, 5,
+			5, 5), 5, 5));
 		container.add(new JButton(new OKAction()), new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTHEAST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 	}

@@ -38,8 +38,7 @@ class Version1ContainerService
 	{
 		Properties ret = new Properties();
 		for (Version1Property property : _properties)
-			ret.setProperty(MacroUtils.replaceMacros(macros, property.name()),
-				MacroUtils.replaceMacros(macros, property.value()));
+			ret.setProperty(MacroUtils.replaceMacros(macros, property.name()), MacroUtils.replaceMacros(macros, property.value()));
 
 		return ret;
 	}

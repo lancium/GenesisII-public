@@ -26,8 +26,7 @@ public class ClassSpecificResourcesRNSFork extends ReadOnlyRNSResourceFork
 {
 	static private Log _logger = LogFactory.getLog(ClassSpecificResourcesRNSFork.class);
 
-	static private Collection<ResourceSummaryInformation> getSummaryInfo(Connection connection, String forkPath)
-		throws SQLException
+	static private Collection<ResourceSummaryInformation> getSummaryInfo(Connection connection, String forkPath) throws SQLException
 	{
 		Map<String, Collection<ResourceSummaryInformation>> map = ResourceSummary.resources(connection);
 		for (String originalName : map.keySet()) {

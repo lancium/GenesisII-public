@@ -1,10 +1,10 @@
 /*
- * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright
- * 1999-2005 The University of Southern California.
+ * Portions of this file Copyright 1999-2005 University of Chicago Portions of this file Copyright 1999-2005 The University of Southern
+ * California.
  * 
- * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public
- * License, found at http://www.globus.org/toolkit/download/license.html. If you redistribute this
- * file, with or without modifications, you must include this notice in the file.
+ * This file or a portion of this file is licensed under the terms of the Globus Toolkit Public License, found at
+ * http://www.globus.org/toolkit/download/license.html. If you redistribute this file, with or without modifications, you must include this
+ * notice in the file.
  */
 package edu.virginia.vcgr.genii.client.ser;
 
@@ -34,8 +34,7 @@ public class ObjectDeserializationContext extends DeserializationContext
 		this(element, null);
 	}
 
-	public ObjectDeserializationContext(org.apache.axis.message.MessageElement element, Class<?> javaClass)
-		throws ResourceException
+	public ObjectDeserializationContext(org.apache.axis.message.MessageElement element, Class<?> javaClass) throws ResourceException
 	{
 		super(Config.getContext(), new SOAPHandler());
 		init(element.getType(), javaClass);

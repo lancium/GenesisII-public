@@ -42,8 +42,8 @@ public class CloudJobWrapper
 
 	static private Log _logger = LogFactory.getLog(CloudJobWrapper.class);
 
-	public static void generateWrapperScript(OutputStream tStream, File workingDir, File resourceUsage, JobRequest job,
-		File tmpDir, CmdLineManipulatorConfiguration manipulatorConfiguration) throws Exception
+	public static void generateWrapperScript(OutputStream tStream, File workingDir, File resourceUsage, JobRequest job, File tmpDir,
+		CmdLineManipulatorConfiguration manipulatorConfiguration) throws Exception
 	{
 		try {
 
@@ -69,14 +69,12 @@ public class CloudJobWrapper
 			Map<String, Object> jobProperties = new HashMap<String, Object>();
 			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, execName,
 				getArguments(getArguments(new String[job.getArguments().size()], job.getArguments())));
-			CmdLineManipulatorUtils.addEnvProperties(jobProperties, null, null, workingDir,
-				getRedirect(job.getStdinRedirect(), workingDir), getRedirect(job.getStdoutRedirect(), workingDir),
-				getRedirect(job.getStderrRedirect(), workingDir), resourceUsage, wrapper.getPathToWrapper());
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties, null, null, workingDir, getRedirect(job.getStdinRedirect(), workingDir),
+				getRedirect(job.getStdoutRedirect(), workingDir), getRedirect(job.getStderrRedirect(), workingDir), resourceUsage,
+				wrapper.getPathToWrapper());
 			/*
-			 * //Add for MPI, taken from JSDL
-			 * CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties,
-			 * application.getSPMDVariation(), application.getNumProcesses(),
-			 * application.getNumProcessesPerHost());
+			 * //Add for MPI, taken from JSDL CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, application.getSPMDVariation(),
+			 * application.getNumProcesses(), application.getNumProcessesPerHost());
 			 */
 
 			List<String> newCmdLine = new Vector<String>();
@@ -144,8 +142,8 @@ public class CloudJobWrapper
 		ret.add(new CloudGetResourcePhase(activityID, besid));
 
 		// Generate runScript
-		ret.add(new CloudGenerateRunScriptPhase(scratchDir, runScript, remoteDir, resourceFile, job, stageInFile, stageOutFile,
-			genState, jobFile, cConfig.getRemoteClientDir(), constructionParameters.getCmdLineManipulatorConfiguration()));
+		ret.add(new CloudGenerateRunScriptPhase(scratchDir, runScript, remoteDir, resourceFile, job, stageInFile, stageOutFile, genState,
+			jobFile, cConfig.getRemoteClientDir(), constructionParameters.getCmdLineManipulatorConfiguration()));
 
 		// Move local scratch to remote scratch
 		ret.add(new CloudCopyDirectoryPhase(scratchDir, remoteDir, activityID, besid));
@@ -187,8 +185,8 @@ public class CloudJobWrapper
 
 		// Get Accounting Back (Phase 5)
 		ArrayList<String> commandLine = new ArrayList<String>();
-		ret.add(new CloudProcessAccountingPhase(activityID, besid, remoteDir + resourceFile, scratchDir + resourceFile,
-			commandLine, constructionParameters));
+		ret.add(new CloudProcessAccountingPhase(activityID, besid, remoteDir + resourceFile, scratchDir + resourceFile, commandLine,
+			constructionParameters));
 
 		// Release Resource
 		ret.add(new CloudReleaseResourcePhase(activityID, besid));

@@ -67,8 +67,7 @@ class DynamicPagePackage implements Closeable
 		InputStream in = null;
 		JarEntry entry = p.getJarEntry(PAGE_CONFIGURATION_FILE_PATH);
 		if (entry == null)
-			throw new FileNotFoundException(String.format("Unable to locate configuration file \"%s\".",
-				PAGE_CONFIGURATION_FILE_PATH));
+			throw new FileNotFoundException(String.format("Unable to locate configuration file \"%s\".", PAGE_CONFIGURATION_FILE_PATH));
 		try {
 			in = p.getInputStream(entry);
 			return PageConfigurationParser.parse(in);

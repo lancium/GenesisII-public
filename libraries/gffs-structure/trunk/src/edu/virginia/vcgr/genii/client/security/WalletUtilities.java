@@ -22,13 +22,11 @@ public class WalletUtilities
 	private static Log _logger = LogFactory.getLog(WalletUtilities.class);
 
 	/**
-	 * retrieves the owner identities that we care about for exports. this should at most be two
-	 * items. the first is the grid user who is creating the export (so this function only makes
-	 * sense to call at creation time!) and the second is any memorable TLS identity creating the
-	 * export. the second identity should not be populated if this is just a self-signed
-	 * certificate. if the "justChooseFirst" parameter is true, then a missing filter will be
-	 * ignored when there is more than one USER credential and the first found will be returned.
-	 * note that the first user credential found is *not* necessarily the real owner.
+	 * retrieves the owner identities that we care about for exports. this should at most be two items. the first is the grid user who is
+	 * creating the export (so this function only makes sense to call at creation time!) and the second is any memorable TLS identity creating
+	 * the export. the second identity should not be populated if this is just a self-signed certificate. if the "justChooseFirst" parameter
+	 * is true, then a missing filter will be ignored when there is more than one USER credential and the first found will be returned. note
+	 * that the first user credential found is *not* necessarily the real owner.
 	 */
 	public static ArrayList<String> extractOwnersFromCredentials(String filter, boolean justChooseFirst) throws IOException
 	{

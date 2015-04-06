@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio
 import java.nio.ByteBuffer;
 
 /**
- * Helper methods for getting a long and int from 4 or 8 bytes respectively which have come from an
- * endpoint in network byte order (big endian)
+ * Helper methods for getting a long and int from 4 or 8 bytes respectively which have come from an endpoint in network byte order (big
+ * endian)
  * 
  * @author avinash
  * 

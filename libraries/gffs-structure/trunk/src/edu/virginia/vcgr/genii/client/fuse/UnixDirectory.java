@@ -9,10 +9,9 @@ import java.util.List;
 import fuse.FuseDirEnt;
 
 /*
- * This class is used for caching results of RNS listing in native file-system equivalent format. We
- * use this, instead of directly caching the response of an RNS listing, as directory caching is
- * mostly useful for the FUSE driver where we need a much lighter representation of data than an
- * RNSEntryResponse.
+ * This class is used for caching results of RNS listing in native file-system equivalent format. We use this, instead of directly caching the
+ * response of an RNS listing, as directory caching is mostly useful for the FUSE driver where we need a much lighter representation of data
+ * than an RNSEntryResponse.
  */
 public class UnixDirectory
 {

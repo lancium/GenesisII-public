@@ -159,19 +159,15 @@ public class TopicPath implements Serializable
 	 * This is a helper function that makes creating topic paths MUCH easier.
 	 * 
 	 * @param pathElements
-	 *            An arbitrary number of parameters that identify the topic path. For the most part,
-	 *            any of these elements can either be a QName, a String, or a NamespaceContext. The
-	 *            very first non-namespace context element can also be a TopicPath representing a
-	 *            parent for the new path. If an element is a NamespaceContext, it then becomes the
-	 *            authoritative entity for describing how to map prefixes to namespace URIs for
-	 *            elements that follow it. If an element is a QName, then it represents itself in
-	 *            the topic path, but also becomes the authoritative namespace for elements in the
-	 *            path that follow that do not have a namespace or prefix given. If an element is a
-	 *            string, then it is a string of the form:
-	 *            [ns-prefix:]topicName[/[ns-prefix:]topicName...].
+	 *            An arbitrary number of parameters that identify the topic path. For the most part, any of these elements can either be a
+	 *            QName, a String, or a NamespaceContext. The very first non-namespace context element can also be a TopicPath representing a
+	 *            parent for the new path. If an element is a NamespaceContext, it then becomes the authoritative entity for describing how to
+	 *            map prefixes to namespace URIs for elements that follow it. If an element is a QName, then it represents itself in the topic
+	 *            path, but also becomes the authoritative namespace for elements in the path that follow that do not have a namespace or
+	 *            prefix given. If an element is a string, then it is a string of the form: [ns-prefix:]topicName[/[ns-prefix:]topicName...].
 	 * 
-	 *            This list of path elements must have at least one QName, or one string
-	 *            representation that resolves to a valid QName using the rules defined above.
+	 *            This list of path elements must have at least one QName, or one string representation that resolves to a valid QName using
+	 *            the rules defined above.
 	 * 
 	 * @return The resultant Topic path.
 	 */
@@ -187,8 +183,7 @@ public class TopicPath implements Serializable
 				currentContext = (NamespaceContext) element;
 			else if (element instanceof TopicPath) {
 				if (current != null)
-					throw new IllegalArgumentException("Encountered a TopicPath element after the"
-						+ " root topic was already resolved.");
+					throw new IllegalArgumentException("Encountered a TopicPath element after the" + " root topic was already resolved.");
 
 				current = (TopicPath) element;
 				currentNamespaceURI = current.root().getNamespaceURI();

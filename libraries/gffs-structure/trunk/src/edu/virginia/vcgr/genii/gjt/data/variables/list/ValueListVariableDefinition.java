@@ -30,8 +30,7 @@ public class ValueListVariableDefinition extends AbstractVariableDefinition impl
 			if (verbosity <= 0)
 				return "...";
 			else if (verbosity == 1)
-				return String.format("%s, %s, ... %s", type._values.get(0), type._values.get(1),
-					type._values.get(type.size() - 1));
+				return String.format("%s, %s, ... %s", type._values.get(0), type._values.get(1), type._values.get(type.size() - 1));
 			else {
 				StringBuilder builder = new StringBuilder();
 				for (String value : type._values) {

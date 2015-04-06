@@ -49,8 +49,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 
 			if (didInit) {
 				if (USE_CACHE_FS) {
-					_fs =
-						new GenesisIICachedFilesystem(new GenesisIIFilesystem(callingContext.getCurrentPath().getRoot(), null));
+					_fs = new GenesisIICachedFilesystem(new GenesisIIFilesystem(callingContext.getCurrentPath().getRoot(), null));
 				} else {
 					_fs = new GenesisIIFilesystem(callingContext.getCurrentPath().getRoot(), null);
 				}

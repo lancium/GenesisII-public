@@ -67,16 +67,13 @@ import edu.virginia.vcgr.genii.iterator.IterateResponseType;
 import edu.virginia.vcgr.genii.iterator.WSIteratorPortType;
 
 /*
- * This class intercepts RPC calls to GenesisII containers. Its only purpose is to fill up the
- * attribute cache by propagating local modifications of attributes and storing prefetched
- * attributes to the unified client side cache. An intercepter is used to keep the rest of the code
- * oblivious of the attribute caching. Furthermore, it is easier to ensure that all relevant
- * attributes are cached when a single intercepter handles the task, instead of put-to-cache calls
- * from arbitrary locations.
+ * This class intercepts RPC calls to GenesisII containers. Its only purpose is to fill up the attribute cache by propagating local
+ * modifications of attributes and storing prefetched attributes to the unified client side cache. An intercepter is used to keep the rest of
+ * the code oblivious of the attribute caching. Furthermore, it is easier to ensure that all relevant attributes are cached when a single
+ * intercepter handles the task, instead of put-to-cache calls from arbitrary locations.
  * 
- * One of the most important task of this handler is to reconfigure the getMultipleAttributes call
- * and requests for additional attributes that we hope the client will look for immediately or that
- * may come useful for managing the cache.
+ * One of the most important task of this handler is to reconfigure the getMultipleAttributes call and requests for additional attributes that
+ * we hope the client will look for immediately or that may come useful for managing the cache.
  */
 public class AttributeCacheHandler2
 {
@@ -107,14 +104,13 @@ public class AttributeCacheHandler2
 	}
 
 	/*
-	 * In new implementation this is the only method that lost the ability to retrieve the response
-	 * from the cache. However, we don't think it is not a likely scenario that this method will be
-	 * called multiple times from anywhere within our code base. So the loss of caching should not
-	 * have any significant impact.
+	 * In new implementation this is the only method that lost the ability to retrieve the response from the cache. However, we don't think it
+	 * is not a likely scenario that this method will be called multiple times from anywhere within our code base. So the loss of caching
+	 * should not have any significant impact.
 	 */
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(InvocationContext ctxt,
-		GetResourcePropertyDocument request) throws Throwable
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(InvocationContext ctxt, GetResourcePropertyDocument request)
+		throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		GetResourcePropertyDocumentResponse resp = (GetResourcePropertyDocumentResponse) ctxt.proceed();
@@ -124,8 +120,8 @@ public class AttributeCacheHandler2
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public UpdateResourcePropertiesResponse updateResourceProperties(InvocationContext ctxt,
-		UpdateResourceProperties updateRequest) throws Throwable
+	public UpdateResourcePropertiesResponse updateResourceProperties(InvocationContext ctxt, UpdateResourceProperties updateRequest)
+		throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		UpdateResourcePropertiesResponse response = (UpdateResourcePropertiesResponse) ctxt.proceed();
@@ -134,8 +130,8 @@ public class AttributeCacheHandler2
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public DeleteResourcePropertiesResponse deleteResourceProperties(InvocationContext ctxt,
-		DeleteResourceProperties deleteRequest) throws Throwable
+	public DeleteResourcePropertiesResponse deleteResourceProperties(InvocationContext ctxt, DeleteResourceProperties deleteRequest)
+		throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		DeleteResourcePropertiesResponse response = (DeleteResourcePropertiesResponse) ctxt.proceed();
@@ -144,8 +140,8 @@ public class AttributeCacheHandler2
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public InsertResourcePropertiesResponse insertResourceProperties(InvocationContext ctxt,
-		InsertResourceProperties insertRequest) throws Throwable
+	public InsertResourcePropertiesResponse insertResourceProperties(InvocationContext ctxt, InsertResourceProperties insertRequest)
+		throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		InsertResourcePropertiesResponse response = (InsertResourcePropertiesResponse) ctxt.proceed();
@@ -154,8 +150,7 @@ public class AttributeCacheHandler2
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public SetResourcePropertiesResponse setResourceProperties(InvocationContext ctxt, SetResourceProperties setRequest)
-		throws Throwable
+	public SetResourcePropertiesResponse setResourceProperties(InvocationContext ctxt, SetResourceProperties setRequest) throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		SetResourcePropertiesResponse response = (SetResourcePropertiesResponse) ctxt.proceed();
@@ -193,8 +188,7 @@ public class AttributeCacheHandler2
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetResourcePropertyResponse getResourceProperty(InvocationContext ctxt, QName getResourcePropertyRequest)
-		throws Throwable
+	public GetResourcePropertyResponse getResourceProperty(InvocationContext ctxt, QName getResourcePropertyRequest) throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		Collection<MessageElement> result = findAttribute(target, getResourcePropertyRequest);
@@ -220,8 +214,7 @@ public class AttributeCacheHandler2
 		WSName wsName = new WSName(target);
 		WSResourceConfig targetConfig = null;
 		if (wsName.isValidWSName()) {
-			targetConfig =
-				(WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
+			targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
 		}
 
 		if (initMembers != null) {
@@ -248,8 +241,7 @@ public class AttributeCacheHandler2
 		WSName wsName = new WSName(target);
 		WSResourceConfig targetConfig = null;
 		if (wsName.isValidWSName()) {
-			targetConfig =
-				(WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
+			targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
 		}
 
 		if (resp.getIterableElement() != null) {
@@ -408,18 +400,15 @@ public class AttributeCacheHandler2
 	}
 
 	/*
-	 * reconfigureToPrefetchAdditionalAttributes and filterAddedAttributesFromTheResponse are the
-	 * two methods that deal with prefetching additional attributes with a getMultipleAttributes
-	 * request and remove those extra attributes from the response to keep the process transparent
-	 * to the caller. Note that, we are relying on the fact that retrieving these additional
-	 * attributes will not increase the cost on the container significantly and most often the
-	 * client will need to access the added attributes subsequently.
+	 * reconfigureToPrefetchAdditionalAttributes and filterAddedAttributesFromTheResponse are the two methods that deal with prefetching
+	 * additional attributes with a getMultipleAttributes request and remove those extra attributes from the response to keep the process
+	 * transparent to the caller. Note that, we are relying on the fact that retrieving these additional attributes will not increase the cost
+	 * on the container significantly and most often the client will need to access the added attributes subsequently.
 	 * 
-	 * Note that we are not checking whether or not the requested attributes are already in the
-	 * cache. This is done to improve the freshness of the cached attributes.
+	 * Note that we are not checking whether or not the requested attributes are already in the cache. This is done to improve the freshness
+	 * of the cached attributes.
 	 */
-	private List<QName>
-		reconfigureToPrefetchAdditionalAttributes(InvocationContext ctxt, QName[] originallyRequestedAttributes)
+	private List<QName> reconfigureToPrefetchAdditionalAttributes(InvocationContext ctxt, QName[] originallyRequestedAttributes)
 	{
 
 		EndpointReferenceType target = ctxt.getTarget();
@@ -478,8 +467,7 @@ public class AttributeCacheHandler2
 		return null;
 	}
 
-	private void filterAddedAttributesFromTheResponse(GetMultipleResourcePropertiesResponse response,
-		List<QName> addedAttributeList)
+	private void filterAddedAttributesFromTheResponse(GetMultipleResourcePropertiesResponse response, List<QName> addedAttributeList)
 	{
 		MessageElement[] elements = response.get_any();
 		if (elements == null)
@@ -498,12 +486,10 @@ public class AttributeCacheHandler2
 	}
 
 	/*
-	 * Ideally any port-type that extends byteIO or enhanced-RNS port-types should have the
-	 * additional attributes that we chunk with a request for retrieving resource properties.
-	 * Unfortunately, this is not the case. For many port-types in our system we don't have the
-	 * required attributes of byteIOs or enhanced-RNSes, depending on which one is applicable.
-	 * Therefore, this method is used to explicitly validate that the target is a ByteIO or
-	 * Enhanced-RNS, where our property aggregation operation is safe to do.
+	 * Ideally any port-type that extends byteIO or enhanced-RNS port-types should have the additional attributes that we chunk with a request
+	 * for retrieving resource properties. Unfortunately, this is not the case. For many port-types in our system we don't have the required
+	 * attributes of byteIOs or enhanced-RNSes, depending on which one is applicable. Therefore, this method is used to explicitly validate
+	 * that the target is a ByteIO or Enhanced-RNS, where our property aggregation operation is safe to do.
 	 */
 	private boolean isSafePortTypeForCallAggregation(TypeInformation typeInfo, EndpointReferenceType target)
 	{

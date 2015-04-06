@@ -22,8 +22,8 @@ import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
  * 
  * @author mmm2a
  */
-public class MTOMSByteIOTransferer extends AbstractByteIOTransferer<StreamableByteIOPortType> implements
-	StreamableByteIOTransferer, MTOMByteIOTransferer
+public class MTOMSByteIOTransferer extends AbstractByteIOTransferer<StreamableByteIOPortType> implements StreamableByteIOTransferer,
+	MTOMByteIOTransferer
 {
 	/**
 	 * Create a new MTOMSByteIO transferer.
@@ -76,8 +76,7 @@ public class MTOMSByteIOTransferer extends AbstractByteIOTransferer<StreamableBy
 
 		sendRequestAttachmentData(_clientStub, data, AttachmentType.MTOM);
 
-		TransferInformationType transType =
-			new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
+		TransferInformationType transType = new TransferInformationType(Elementals.getEmptyArray(), ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
 		SeekWrite seekWriteRequest = new SeekWrite(offset, seekOrigin, transType);
 
 		_clientStub.seekWrite(seekWriteRequest);

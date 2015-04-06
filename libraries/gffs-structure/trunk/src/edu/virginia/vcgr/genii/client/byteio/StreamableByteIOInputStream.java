@@ -23,8 +23,7 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 /**
- * An implementation of the standard Java Input stream that reads from remote Streamable ByteIO
- * resources.
+ * An implementation of the standard Java Input stream that reads from remote Streamable ByteIO resources.
  * 
  * @author mmm2a
  */
@@ -51,8 +50,7 @@ public class StreamableByteIOInputStream extends InputStream
 	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
-	public StreamableByteIOInputStream(EndpointReferenceType epr, URI desiredTransferProtocol) throws IOException,
-		RemoteException
+	public StreamableByteIOInputStream(EndpointReferenceType epr, URI desiredTransferProtocol) throws IOException, RemoteException
 	{
 		TypeInformation tInfo = new TypeInformation(epr);
 
@@ -209,8 +207,7 @@ public class StreamableByteIOInputStream extends InputStream
 	}
 
 	/**
-	 * Create a new buffered input stream based off of this input stream using the target
-	 * transferer's preferred transfer size.
+	 * Create a new buffered input stream based off of this input stream using the target transferer's preferred transfer size.
 	 * 
 	 * @return The newly created buffered input stream.
 	 */
@@ -220,10 +217,9 @@ public class StreamableByteIOInputStream extends InputStream
 	}
 
 	/**
-	 * Determines whether or not this streamable byteIO should be destroyed (the target resource
-	 * that is) when closed. This depends on a number of factors including whether or not the target
-	 * resource was actually a streamable ByteIO when it started, or merely a factory that could
-	 * create then (as snapshots).
+	 * Determines whether or not this streamable byteIO should be destroyed (the target resource that is) when closed. This depends on a
+	 * number of factors including whether or not the target resource was actually a streamable ByteIO when it started, or merely a factory
+	 * that could create then (as snapshots).
 	 * 
 	 * @return true if the target should be destroyed when closed, false otherwise.
 	 */
@@ -240,10 +236,9 @@ public class StreamableByteIOInputStream extends InputStream
 	}
 
 	/**
-	 * Determines whether or not this streamable byteIO should be destroyed (the target resource
-	 * that is) when closed. This depends on a number of factors including whether or not the target
-	 * resource was actually a streamable ByteIO when it started, or merely a factory that could
-	 * create then (as snapshots).
+	 * Determines whether or not this streamable byteIO should be destroyed (the target resource that is) when closed. This depends on a
+	 * number of factors including whether or not the target resource was actually a streamable ByteIO when it started, or merely a factory
+	 * that could create then (as snapshots).
 	 */
 	private void discoverDestroyOnCloseFromEPR(MetadataType mdt)
 	{

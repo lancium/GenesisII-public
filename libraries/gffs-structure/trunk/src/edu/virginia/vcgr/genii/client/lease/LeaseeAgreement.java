@@ -1,11 +1,9 @@
 package edu.virginia.vcgr.genii.client.lease;
 
 /**
- * A lease agreement is an agreement made by a leasee which allows the leaser to reclaim a resource
- * that was leased out. All leasee's MUST support this interface and are required to pass an
- * instance of this interface to the leaser to use at his/her own discretion. No guarantees are made
- * by the leaser about the length of leases and all leasees must be prepared to relinquish a
- * resource at any time.
+ * A lease agreement is an agreement made by a leasee which allows the leaser to reclaim a resource that was leased out. All leasee's MUST
+ * support this interface and are required to pass an instance of this interface to the leaser to use at his/her own discretion. No guarantees
+ * are made by the leaser about the length of leases and all leasees must be prepared to relinquish a resource at any time.
  * 
  * @author mmm2a
  * 

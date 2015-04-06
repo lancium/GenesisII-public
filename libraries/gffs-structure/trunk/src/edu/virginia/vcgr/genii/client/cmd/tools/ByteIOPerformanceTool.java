@@ -66,8 +66,8 @@ public class ByteIOPerformanceTool extends BaseGridTool
 		private ByteBuffer _block;
 		private RandomByteIOTransferer _source;
 
-		private Worker(RandomByteIOTransferer source, int blockSize) throws ResourceException, GenesisIISecurityException,
-			RemoteException, IOException
+		private Worker(RandomByteIOTransferer source, int blockSize) throws ResourceException, GenesisIISecurityException, RemoteException,
+			IOException
 		{
 			_block = ByteBuffer.allocate(blockSize);
 			_source = source;
@@ -147,8 +147,8 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	}
 
 	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException
 	{
 		RNSPath source = lookup(new GeniiPath(getArgument(0)));
 

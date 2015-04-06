@@ -13,8 +13,7 @@ public class CmdLineManipulators
 	@SuppressWarnings("rawtypes")
 	static private ServiceLoader<CmdLineManipulator> loader = ServiceLoader.load(CmdLineManipulator.class);
 
-	synchronized static public CmdLineManipulator<?> getCmdLineManipulator(String manipulatorType)
-		throws CmdLineManipulatorException
+	synchronized static public CmdLineManipulator<?> getCmdLineManipulator(String manipulatorType) throws CmdLineManipulatorException
 	{
 		for (CmdLineManipulator<?> manipulator : loader) {
 			if (manipulator.getManipulatorType().equals(manipulatorType)) {
@@ -22,7 +21,6 @@ public class CmdLineManipulators
 				return manipulator;
 			}
 		}
-		throw new CmdLineManipulatorException(String.format("Could not locate manipulator of type \"%s\" for loading.",
-			manipulatorType));
+		throw new CmdLineManipulatorException(String.format("Could not locate manipulator of type \"%s\" for loading.", manipulatorType));
 	}
 }

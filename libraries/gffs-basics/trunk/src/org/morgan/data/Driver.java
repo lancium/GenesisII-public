@@ -17,7 +17,8 @@ public class Driver
 			Thread.sleep(1000L);
 		}
 
-		System.out.format("Histogram:\n%s\n", data.histogram(5, TimeUnit.SECONDS, HistogramDataCombiners.AverageCombiner,
-			new RelativeTimeRangeLabelDelegate(TimeUnit.SECONDS)));
+		System.out
+			.format("Histogram:\n%s\n", data.histogram(5, TimeUnit.SECONDS, HistogramDataCombiners.AverageCombiner,
+				new RelativeTimeRangeLabelDelegate(TimeUnit.SECONDS)));
 	}
 }

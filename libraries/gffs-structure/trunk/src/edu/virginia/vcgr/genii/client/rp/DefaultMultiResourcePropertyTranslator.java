@@ -24,8 +24,7 @@ public class DefaultMultiResourcePropertyTranslator implements MultiResourceProp
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <Type> Collection<Type> deserialize(Class<Type> clazz, Collection<MessageElement> elements)
-		throws ResourcePropertyException
+	public <Type> Collection<Type> deserialize(Class<Type> clazz, Collection<MessageElement> elements) throws ResourcePropertyException
 	{
 		if (elements == null)
 			elements = new Vector<MessageElement>();

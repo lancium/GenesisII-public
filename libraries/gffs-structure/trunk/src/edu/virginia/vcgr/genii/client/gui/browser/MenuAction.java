@@ -36,8 +36,7 @@ class MenuAction extends AbstractAction implements TreeSelectionListener
 	 * @param ownerDialog
 	 *            The Browser that owns this menu action.
 	 * @param selectionCallback
-	 *            The selectioncallback that can be used to determine which RNS paths are currently
-	 *            selected.
+	 *            The selectioncallback that can be used to determine which RNS paths are currently selected.
 	 * @param descriptor
 	 *            The plugin descriptor for this menu (can be a context menu, or the main menu.
 	 */
