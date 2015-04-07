@@ -15,25 +15,22 @@
  */
 package edu.virginia.vcgr.jsdl;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.w3c.dom.Element;
-
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Element;
+
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public abstract class CommonJSDLElement implements Serializable
+public abstract class CommonJSDLElement
 {
-	static final long serialVersionUID = 0L;
-
 	@XmlAnyAttribute
 	private Map<QName, String> _anyAttributes = new HashMap<QName, String>();
 

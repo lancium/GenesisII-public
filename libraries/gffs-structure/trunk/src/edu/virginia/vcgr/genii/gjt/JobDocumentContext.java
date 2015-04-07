@@ -85,7 +85,7 @@ public class JobDocumentContext
 			_document = new JobDocument();
 			_document.postUnmarshall(pBroker, mBroker);
 		}
-
+		_document.stageIns().setStageIn();
 		if (_file != null && _file.length() == 0)
 			_modified = true;
 

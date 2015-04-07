@@ -3,8 +3,15 @@ package edu.virginia.vcgr.appmgr.os;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.appmgr.io.IOUtils;
 
+/**
+ * This class provides a number of helper methods for checking the operating system that is currently running (as seen by the java application
+ * and jvm) and deciding what type it is.
+ */
 public class OperatingSystemType
 {
 	public enum OperatingSystemTypes {
@@ -83,13 +90,16 @@ public class OperatingSystemType
 
 	}
 
+	static private Log _logger = LogFactory.getLog(OperatingSystemType.class);
+
 	static final private String _OS_NAME_PREFIX = "os.name.";
 	static private Properties _propertyMap;
+	static private final String OS_MAP_PROPERTIES_FILE = "edu/virginia/vcgr/appmgr/os/os-map.properties";
 
 	static {
 		InputStream in = null;
 		try {
-			in = Thread.currentThread().getContextClassLoader().getResourceAsStream("edu/virginia/vcgr/appmgr/os/os-map.properties");
+			in = Thread.currentThread().getContextClassLoader().getResourceAsStream(OS_MAP_PROPERTIES_FILE);
 			_propertyMap = new Properties();
 			_propertyMap.load(in);
 		} catch (Exception e) {
@@ -119,11 +129,18 @@ public class OperatingSystemType
 		return _osName;
 	}
 
+	static private boolean showedOS = false;
+
 	static public OperatingSystemTypes getCurrent()
 	{
 		try {
 			String ostypename = _propertyMap.getProperty(_OS_NAME_PREFIX + getOpsysName());
-			return OperatingSystemTypes.valueOf(ostypename);
+			OperatingSystemTypes toReturn = OperatingSystemTypes.valueOf(ostypename);
+			if (!showedOS) {
+				_logger.info("Decided that operating system is: '" + toReturn + "'");
+				showedOS = true;
+			}
+			return toReturn;
 		} catch (Throwable cause) {
 			throw new RuntimeException("Unable to determine current Operating System type.", cause);
 		}
@@ -132,14 +149,18 @@ public class OperatingSystemType
 	static public boolean isWindows()
 	{
 		OperatingSystemTypes current = getCurrent();
-		return OperatingSystemTypes.Windows_XP.equals(current) || OperatingSystemTypes.WINNT.equals(current)
-			|| OperatingSystemTypes.Windows_2000.equals(current) || OperatingSystemTypes.Windows_R_Me.equals(current)
-			|| OperatingSystemTypes.WINCE.equals(current) || OperatingSystemTypes.WIN98.equals(current)
-			|| OperatingSystemTypes.Windows_VISTA.equals(current) || OperatingSystemTypes.Windows_7.equals(current)
-			|| OperatingSystemTypes.Windows_8.equals(current) || OperatingSystemTypes.WIN95.equals(current)
-			|| OperatingSystemTypes.WIN3x.equals(current)
-			/* catch-all for windows OS with newer names. */
-			|| current.toString().startsWith("Windows");
+		/* catch-all for all types of MS windows so far... */
+		return current.toString().startsWith("Windows");
+	}
+
+	static public boolean isLinux()
+	{
+		return OperatingSystemTypes.LINUX.equals(getCurrent());
+	}
+
+	static public boolean isMacOSX()
+	{
+		return OperatingSystemTypes.MACOS.equals(getCurrent());
 	}
 
 	static public void main(String[] args) throws Throwable

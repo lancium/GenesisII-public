@@ -15,9 +15,18 @@
  */
 package edu.virginia.vcgr.jsdl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.jsdl.mapping.Mappings;
 
 /**
+ * This class is intended to represent a requested operating system in a JSDL file. It should not care about the current machine's operating
+ * system, unless this machine is a BES that was just handed the OperatingSystemName for comparison. In that case, the mapFromOperatingSystem
+ * function can determine the enum value corresponding to the machine's current OS. Most other queries about the machine's current OS should
+ * be using the OperatingSystemType class insteda.
+ * 
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
 public enum OperatingSystemNames {
@@ -94,6 +103,8 @@ public enum OperatingSystemNames {
 	z_OS("z OS"),
 	other;
 
+	static private Log _logger = LogFactory.getLog(OperatingSystemNames.class);
+
 	private String _label;
 
 	private OperatingSystemNames()
@@ -117,34 +128,29 @@ public enum OperatingSystemNames {
 
 	public boolean isWindows()
 	{
-		return (this == OperatingSystemNames.Windows_XP) || (this == OperatingSystemNames.Windows_7)
-			|| (this == OperatingSystemNames.Windows_8) || (this == OperatingSystemNames.Windows_VISTA)
-			|| (this == OperatingSystemNames.WINNT) || (this == OperatingSystemNames.Windows_2000)
-			|| (this == OperatingSystemNames.Windows_R_Me) || (this == OperatingSystemNames.WINCE) || (this == OperatingSystemNames.WIN98)
-			|| (this == OperatingSystemNames.WIN95) || (this == OperatingSystemNames.WIN3x);
+		/*
+		 * catch-all for windows OS. currently every enum value that starts with Windows is MS windows.
+		 */
+		return (_label != null) && _label.startsWith("Windows");
 	}
 
 	public boolean isMacOSX()
 	{
-		return (this == OperatingSystemNames.MACOS);
+		return OperatingSystemNames.MACOS.equals(this);
 	}
 
 	public boolean isLinux()
 	{
-		return (this == OperatingSystemNames.LINUX);
+		return OperatingSystemNames.LINUX.equals(this);
 	}
 
-	static public OperatingSystemNames getCurrentOperatingSystem()
+	static public OperatingSystemNames mapFromCurrentOperatingSystem()
 	{
-		String javaValue = System.getProperty("os.name");
-		if (javaValue == null)
-			return null;
-
+		String javaValue = OperatingSystemType.getOpsysName();
+		if (javaValue == null) {
+			_logger.debug("unexpected null value when querying operating system name");
+			return Unknown;
+		}
 		return Mappings.osMap().get(javaValue);
-	}
-
-	static public String getCurrentVersion()
-	{
-		return System.getProperty("os.version");
 	}
 }

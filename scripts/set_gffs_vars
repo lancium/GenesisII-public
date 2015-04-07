@@ -4,10 +4,12 @@
 
 export GENII_INSTALL_DIR="${installer:sys.installationDir}"
 
-export PATH=$PATH:$GENII_INSTALL_DIR
+export PATH=$GENII_INSTALL_DIR:$PATH
 
 if [ "${TERM}" != "dumb" -a -z "$PBS_ENVIRONMENT" ]; then
-  source $GENII_INSTALL_DIR/xsede_tools/prepare_tools.sh $GENII_INSTALL_DIR/xsede_tools/prepare_tools.sh 
+  export SILENT_RUNNING=true
 fi
+
+source $GENII_INSTALL_DIR/xsede_tools/prepare_tools.sh $GENII_INSTALL_DIR/xsede_tools/prepare_tools.sh 
 
 

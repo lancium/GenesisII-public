@@ -20,6 +20,7 @@ import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.cmd.tools.SetTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -228,6 +229,7 @@ public class LoginTool extends BaseLoginTool
 			String userHome = _authnUri.replaceFirst("users", "home");
 			try {
 				CdTool.chdir(userHome);
+				SetTool.set_var("HOME", userHome);
 			} catch (Throwable e) {
 			}
 		}

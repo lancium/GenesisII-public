@@ -194,26 +194,14 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 			ExportMechanisms exportType = ExportProperties.getExportProperties().getExportMechanism();
 			if (exportType == ExportMechanisms.EXPORT_MECH_PROXYIO) {
 				// test whether this is an OS where we support proxyio exports.
-				// String osName = System.getProperty("os.name");
 				boolean isCompatibleOS = false;
-				// _logger.debug("property says OS name is: " + osName);
 				if (!OperatingSystemType.isWindows()) {
-					// osName.contains("Windows")) {
 					isCompatibleOS = true;
-
-					/*
-					 * this is a very simple decision currently. if we had another OS that didn't support sudo, we would want to exclude it
-					 * here.
-					 */
-
-					// } else if (osName.contains("OS X") || osName.contains("")) {
-					// linux and mac
-					// isCompatibleOS = true;
 				}
-
 				if (!isCompatibleOS) {
 					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Sudo export " + "unsupported on this OS") }, null));
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Sudo export " + "unsupported on this OS ("
+							+ OperatingSystemType.getOpsysName() + ")") }, null));
 				}
 
 				if (!SudoExportUtils.dirReadable(initInfo.getPath(), key)) {

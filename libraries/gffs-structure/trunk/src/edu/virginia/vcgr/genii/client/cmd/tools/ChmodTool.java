@@ -91,7 +91,8 @@ public class ChmodTool extends BaseGridTool
 		_recursive = true;
 	}
 
-	// the following three methods assist our command line parsing, which hoses up the chmod -rwx style of removing rights.
+	// the following three methods assist our command line parsing, which hoses up the chmod -rwx
+	// style of removing rights.
 
 	@Option({ "r" })
 	public void setReadRemove()

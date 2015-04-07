@@ -27,18 +27,10 @@ public class SetTool extends BaseGridTool
 		addManPage(new LoadFileResource(MANPAGE));
 	}
 
-	@Override
-	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
-		IOException, ResourcePropertyException, CreationException
+	public static void set_var(String key, String value) throws ReloadShellException, ToolException, UserCancelException, RNSException,
+		AuthZSecurityException, IOException, ResourcePropertyException, CreationException
 	{
-		String arg = getArgument(0);
-		int index = arg.indexOf('=');
-		if (index <= 0)
-			throw new InvalidToolUsageException("Argument not in correct format.");
-
 		Map<String, String> env = GridUserEnvironment.getGridUserEnvironment();
-		String key = arg.substring(0, index);
-		String value = arg.substring(index + 1);
 
 		if (value != null && value.length() > 0)
 			env.put(key, value);
@@ -46,6 +38,28 @@ public class SetTool extends BaseGridTool
 			env.remove(key);
 
 		ContextManager.storeCurrentContext(ContextManager.getExistingContext());
+	}
+
+	@Override
+	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
+		IOException, ResourcePropertyException, CreationException
+	{
+		// Updated by ASG 2015/02/07 to use a static member that is available to other functions to
+		// set variables.
+		String arg = getArgument(0);
+		int index = arg.indexOf('=');
+		if (index <= 0)
+			throw new InvalidToolUsageException("Argument not in correct format.");
+
+		// Map<String, String> env = GridUserEnvironment.getGridUserEnvironment();
+		String key = arg.substring(0, index);
+		String value = arg.substring(index + 1);
+		set_var(key, value);
+		/*
+		 * if (value != null && value.length() > 0) env.put(key, value); else env.remove(key);
+		 * 
+		 * ContextManager.storeCurrentContext(ContextManager.getExistingContext());
+		 */
 		return 0;
 	}
 

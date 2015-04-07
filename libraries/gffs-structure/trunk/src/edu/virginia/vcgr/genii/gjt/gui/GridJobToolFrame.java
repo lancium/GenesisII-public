@@ -301,9 +301,8 @@ public abstract class GridJobToolFrame extends JFrame
 
 	static public GridJobToolFrame createNewFrame(JobDocumentContext documentContext)
 	{
-		OperatingSystemNames os = OperatingSystemNames.getCurrentOperatingSystem();
-
-		if (os == OperatingSystemNames.MACOS)
+		OperatingSystemNames os = OperatingSystemNames.mapFromCurrentOperatingSystem();
+		if ((os != null) && os.isMacOSX())
 			return new MacOSXGridJobToolFrame(documentContext);
 		else
 			return new WinLinGridJobToolFrame(documentContext);

@@ -173,7 +173,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 			OperatingSystemNames desiredOperatingSystemType = overrides.operatingSystemName();
 			OperatingSystemNames operatingSystemType =
-				(desiredOperatingSystemType != null) ? desiredOperatingSystemType : OperatingSystemNames.getCurrentOperatingSystem();
+				(desiredOperatingSystemType != null) ? desiredOperatingSystemType : OperatingSystemNames.mapFromCurrentOperatingSystem();
 
 			File stdoutRedirect = application.getStdoutRedirect(workingDirectory);
 			if (stdoutRedirect == null && operatingSystemType == OperatingSystemNames.LINUX) {

@@ -84,7 +84,7 @@ LOCAL_CONTAINER=/resources/$FOLDERSPACE/containers/BootstrapContainer
 # on that path for the container-running user id must match the desired export
 # permissions (e.g., container's unix user should have write access to the
 # export path if the export path would ever be written to *from* the grid).
-EXPORTPATH=$HOME/export-path
+EXPORTPATH=/home/xcg3root/export-path
 
 ##############
 
@@ -157,15 +157,19 @@ MULTI_PASSWORD_LIST=(eep1 eep2 eep3)
 # to the $DEPLOYMENT_DIR container except for the port number,
 # set the container name and port number here, and run bootstrap_backup.sh.
 # The script will create the necessary configuration and deployment files.
+# If the backup deployment name is commented out, then no replication
+# configuration will be established for the bootstrapped test grid.
 #BACKUP_DEPLOYMENT_NAME=backup
-#BACKUP_PORT_NUMBER=21003
+
+# The backup container opens this port for TLS communication.
+BACKUP_PORT_NUMBER=21003
 
 # The bootstrap script will link the container at localhost:backup_port
 # into the default container's RNS namespace under this name.
-#BACKUP_CONTAINER=/resources/$FOLDERSPACE/containers/backup
+BACKUP_CONTAINER=/resources/$FOLDERSPACE/containers/backup
 
 # Set the location of the runtime directory of the second container.
-#BACKUP_USER_DIR=$HOME/.backup-genesisII-2.0
+BACKUP_USER_DIR=$HOME/.backup-genesisII-2.0
 
 ##############
 

@@ -32,8 +32,8 @@ import edu.virginia.vcgr.jsdl.JSDLConstants;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.JobDescription;
 import edu.virginia.vcgr.jsdl.JobIdentification;
-import edu.virginia.vcgr.jsdl.OperatingSystem;
-import edu.virginia.vcgr.jsdl.OperatingSystemTypeElement;
+import edu.virginia.vcgr.jsdl.OperatingSystemJSDLElement;
+import edu.virginia.vcgr.jsdl.OperatingSystemNameElement;
 import edu.virginia.vcgr.jsdl.Resources;
 import edu.virginia.vcgr.jsdl.SourceTarget;
 import edu.virginia.vcgr.jsdl.hpc.HPCConstants;
@@ -122,15 +122,15 @@ public class JSDLEventGenerator
 		}
 	}
 
-	static private void generateOperatingSystemEvents(XMLDocumentPathImpl path, OperatingSystem operatingSystem, JSDLEventReceiver receiver)
-		throws JSDLValidationException
+	static private void generateOperatingSystemEvents(XMLDocumentPathImpl path, OperatingSystemJSDLElement operatingSystem,
+		JSDLEventReceiver receiver) throws JSDLValidationException
 	{
 		if (operatingSystem != null) {
 			path.push(path.formQNameFromPrevious("OperatingSystem"));
 			receiver.startOperatingSystem(path, operatingSystem.osVersion(), operatingSystem.description());
 			handleAnys(path, operatingSystem.any(), operatingSystem.anyAttributes(), receiver);
 
-			OperatingSystemTypeElement osType = operatingSystem.osType();
+			OperatingSystemNameElement osType = operatingSystem.osType();
 			if (osType != null) {
 				path.push(path.formQNameFromPrevious("OperatingSystemType"));
 				receiver.startOperatingSystemType(path, osType.osName());

@@ -396,6 +396,12 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 
 		/*
+		 * now zero out any transient credentials that are stored in the copied context still, since those cannot be deserialized using the
+		 * old scheme with unicore6 security lib. plus these are just baggage and are not used for any authorization decisions.
+		 */
+		TransientCredentials.setTransientCredentials(callContext, null);
+
+		/*
 		 * process the transient credentials to prepare the serializable portion of the calling context for them.
 		 */
 		MessageSecurity msgSecData = (MessageSecurity) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);

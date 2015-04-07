@@ -48,7 +48,7 @@ public class Resources extends CommonJSDLElement implements Serializable
 	private Boolean _exclusiveExecution = null;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "OperatingSystem")
-	private OperatingSystem _os = null;
+	private OperatingSystemJSDLElement _os = null;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "CPUArchitecture")
 	private CPUArchitecture _arch = null;
@@ -127,12 +127,12 @@ public class Resources extends CommonJSDLElement implements Serializable
 		return (_exclusiveExecution == null) ? false : _exclusiveExecution;
 	}
 
-	final public void operatingSystem(OperatingSystem os)
+	final public void operatingSystem(OperatingSystemJSDLElement os)
 	{
 		_os = os;
 	}
 
-	final public OperatingSystem operatingSystem()
+	final public OperatingSystemJSDLElement operatingSystem()
 	{
 		return _os;
 	}

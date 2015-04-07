@@ -30,6 +30,14 @@ public class RNSTreeModel extends DefaultTreeModel
 		_appContext = appContext;
 	}
 
+	public RNSTreeModel(ApplicationContext appContext, UIContext uiContext, String startPath) throws RNSPathDoesNotExistException
+	{
+		// First we need to create an RNSPath from the string
+		super(new RNSTreeNode(new RNSFilledInTreeObject(uiContext.callingContext().getCurrentPath().lookup(startPath))), true);
+		_uiContext = uiContext;
+		_appContext = appContext;
+	}
+
 	public UIContext uiContext()
 	{
 		return _uiContext;

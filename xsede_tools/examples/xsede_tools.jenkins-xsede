@@ -11,19 +11,6 @@
 # This section defines variables that are used throughout the tests.
 # Many of these need to change to suit your particular configuration.
 
-# The installation location for the GenesisII package (client or container).
-# This setting is not needed if the environment defines GENII_INSTALL_DIR.
-# Update this if Genesis is installed elsewhere, e.g. the installation path on
-# Mac OSX is instead "/Applications/GenesisII".
-#old: GENII_INSTALL_DIR=replace
-
-# The user state directory for Genesis.  If not set, the default will be used.
-# This setting is not needed if the environment defines GENII_USER_DIR.
-# This directory should never be stored on an NFS or other mounted location,
-# as that imposes significant performance issues and may cause problems for
-# the Derby embedded database.
-#old: GENII_USER_DIR=replace
-
 # The name of the deployment to use.  The modern XSEDE and XCG installers use
 # the name "current_grid" for this.  Other installers may provide a different
 # deployment name.
@@ -170,7 +157,11 @@ MULTI_PASSWORD_LIST=(eep1 eep2 eep3)
 # to the $DEPLOYMENT_DIR container except for the port number,
 # set the container name and port number here, and run bootstrap_backup.sh.
 # The script will create the necessary configuration and deployment files.
+# If the backup deployment name is commented out, then no replication
+# configuration will be established for the bootstrapped test grid.
 BACKUP_DEPLOYMENT_NAME=backup
+
+# The backup container opens this port for TLS communication.
 BACKUP_PORT_NUMBER=28000
 
 # The bootstrap script will link the container at localhost:backup_port

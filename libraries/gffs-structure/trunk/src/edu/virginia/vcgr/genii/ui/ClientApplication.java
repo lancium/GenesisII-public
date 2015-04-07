@@ -22,6 +22,8 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.utils.gui.GUIUtils;
 import org.morgan.utils.gui.tearoff.TearoffPanel;
 
@@ -46,66 +48,45 @@ import edu.virginia.vcgr.genii.ui.trash.TrashCanWidget;
 public class ClientApplication extends UIFrame
 {
 	static final long serialVersionUID = 0L;
-
-	// static private Log _logger = LogFactory.getLog(ClientApplication.class);
+	static private Log _logger = LogFactory.getLog(ClientApplication.class);
 
 	static final private Dimension TABBED_PANE_SIZE = new Dimension(700, 500);
 
 	private Object _joinLock = new Object();
+	// set to true if the full application should close.
 	private boolean _exit = false;
+
 	private RNSTree _browserTree;
 	private JTabbedPane _tabbedPane = new JTabbedPane();
 	private JList _debugTarget; // text area that is targeted for informative updates.
 	private LoggingLinkage _debugLinkage; // connects our debugging target to logging.
-
-	private void setupMacApplication()
-	{
-		MacOSXSpecifics.setupMacOSApplication(_context);
-	}
-
-	/*
-	 * shows a new status line in the message window at the bottom of the UI.
-	 */
-	public void addStatusLine(String message, String detail)
-	{
-		_debugLinkage.consumeLogging(message, new Exception(detail));
-	}
-
-	/*
-	 * add a status line without extra detail.
-	 */
-	public void addStatusLine(String message)
-	{
-		addStatusLine(message, "status message");
-	}
-
-	protected boolean handleQuit()
-	{
-		if (!_context.fireQuitRequested())
-			return false;
-
-		synchronized (_joinLock) {
-			_exit = true;
-			_joinLock.notifyAll();
-		}
-
-		return true;
-	}
 
 	public ClientApplication(boolean launchShell) throws FileNotFoundException, RNSPathDoesNotExistException, IOException
 	{
 		this(new UIContext(new ApplicationContext()), launchShell);
 	}
 
-	@SuppressWarnings("unchecked")
 	public ClientApplication(UIContext context, boolean launchShell) throws FileNotFoundException, IOException, RNSPathDoesNotExistException
 	{
-		super(context, "XSEDE GFFS GUI - Provided as part of Genesis II from the University of Virginia");
+		this(context, launchShell, null);
+	}
 
-		if (!_context.isInitialized()) {
-			_context.setApplicationEventListener(new ApplicationEventListenerImpl());
+	@SuppressWarnings("unchecked")
+	public ClientApplication(UIContext context, boolean launchShell, String startPath) throws FileNotFoundException, IOException,
+		RNSPathDoesNotExistException
+	{
+		super(context, "XSEDE GFFS Browser");
 
-			if (_context.isMacOS())
+		// hmmm: this should also go to a help about dialog.
+		// XSEDE GFFS GUI - Provided as part of Genesis II from the University of Virginia");
+
+		// write a brag in the log file.
+		_logger.info("XSEDE GFFS Client GUI Is Provided as part of Genesis II from the University of Virginia.");
+
+		if (!getUIContext().applicationContext().isInitialized()) {
+			getUIContext().applicationContext().setApplicationEventListener(new ApplicationEventListenerImpl());
+
+			if (getUIContext().applicationContext().isMacOS())
 				setupMacApplication();
 		}
 
@@ -122,8 +103,13 @@ public class ClientApplication extends UIFrame
 					((LazilyLoadedTab) jc).load();
 			}
 		});
-
-		_browserTree = new RNSTree(_context, _uiContext);
+		if (startPath != null) {
+			// We're opening a particular directory, not root
+			_browserTree = new RNSTree(getUIContext().applicationContext(), _uiContext, startPath);
+		} else {
+			// We are starting with the root.
+			_browserTree = new RNSTree(getUIContext().applicationContext(), _uiContext);
+		}
 		JScrollPane scroller = new JScrollPane(_browserTree);
 		scroller.setMinimumSize(RNSTree.DESIRED_BROWSER_SIZE);
 		scroller.setPreferredSize(RNSTree.DESIRED_BROWSER_SIZE);
@@ -132,7 +118,7 @@ public class ClientApplication extends UIFrame
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		splitPane.setLeftComponent(GUIUtils.addTitle("GFFS Directory Structure",
-			new TearoffPanel(scroller, _browserTree.createTearoffHandler(_context), new IconBasedTearoffThumb())));
+			new TearoffPanel(scroller, _browserTree.createTearoffHandler(getUIContext().applicationContext()), new IconBasedTearoffThumb())));
 		splitPane.setRightComponent(_tabbedPane);
 
 		content.add(splitPane, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
@@ -141,8 +127,8 @@ public class ClientApplication extends UIFrame
 		content.add(new CredentialManagementButton(_uiContext), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new TrashCanWidget(_context, _uiContext), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new TrashCanWidget(getUIContext().applicationContext(), _uiContext), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
+			GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		// new code to add a diagnostics logging view.
 		LoggingListModel listModel = new LoggingListModel();
@@ -176,8 +162,42 @@ public class ClientApplication extends UIFrame
 	@Override
 	public void dispose()
 	{
-		if (handleQuit())
-			_context.fireDispose();
+		if (handleQuit()) {
+			getUIContext().applicationContext().fireDispose();
+		}
+	}
+
+	private void setupMacApplication()
+	{
+		MacOSXSpecifics.setupMacOSApplication(getUIContext().applicationContext());
+	}
+
+	/*
+	 * shows a new status line in the message window at the bottom of the UI.
+	 */
+	public void addStatusLine(String message, String detail)
+	{
+		_debugLinkage.consumeLogging(message, new Exception(detail));
+	}
+
+	/*
+	 * add a status line without extra detail.
+	 */
+	public void addStatusLine(String message)
+	{
+		addStatusLine(message, "status message");
+	}
+
+	protected boolean handleQuit()
+	{
+		if (!getUIContext().applicationContext().fireQuitRequested()) {
+			return false;
+		}
+		synchronized (_joinLock) {
+			_exit = true;
+			_joinLock.notifyAll();
+		}
+		return true;
 	}
 
 	public void join() throws InterruptedException
@@ -199,7 +219,6 @@ public class ClientApplication extends UIFrame
 		public void aboutRequested()
 		{
 			GuiHelpAction.DisplayUrlHelp(HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.MAIN_HELP));
-			// System.err.println("About not implemented.");
 		}
 
 		@Override
@@ -217,8 +236,9 @@ public class ClientApplication extends UIFrame
 		public boolean quitRequested()
 		{
 			boolean ret = handleQuit();
-			if (ret)
-				_context.fireDispose();
+			if (ret) {
+				getUIContext().applicationContext().fireDispose();
+			}
 			return ret;
 		}
 	}

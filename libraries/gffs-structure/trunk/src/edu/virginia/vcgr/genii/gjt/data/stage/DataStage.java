@@ -55,6 +55,11 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 		_history.put(StageProtocol.undefined, new UndefinedStageData());
 	}
 
+	public void setStageIn()
+	{
+		_stageIn = true;
+	}
+
 	public DataStage(ParameterizableBroker pBroker, ModificationBroker mBroker, boolean stageIn)
 	{
 		this();

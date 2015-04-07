@@ -40,7 +40,8 @@ public class JobApplicationContext
 	{
 		_preferences = new ToolPreferences();
 
-		if (OperatingSystemNames.getCurrentOperatingSystem() == OperatingSystemNames.MACOS) {
+		OperatingSystemNames current = OperatingSystemNames.mapFromCurrentOperatingSystem();
+		if ((current != null) && current.isMacOSX()) {
 			MacOSXGuiSetup.setupMacOSXGuiApplication("Grid Job Tool", true, true, true, false);
 
 			Application.getApplication().setEnabledPreferencesMenu(true);

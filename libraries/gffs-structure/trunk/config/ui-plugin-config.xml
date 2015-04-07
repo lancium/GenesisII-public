@@ -1,4 +1,12 @@
 <plugins>
+
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.BrowseHomeDirectoryPlugin">
+		<top-menu menu-name="Jump" group="Basic File" item-name="Open Home Directory"/>
+	</plugin>
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.BrowseRootDirectoryPlugin">
+		<top-menu menu-name="Jump" group="Basic File" item-name="Open GFFS Root"/>
+	</plugin>
+	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.EditPlugin">
 		<top-menu menu-name="File" group="Basic File" item-name="Edit"/>
 		<popup-menu group="Basic File" item-name="Edit"/>
@@ -10,6 +18,16 @@
 	</plugin>
 
 
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.view.RefreshPlugin">
+		<top-menu menu-name="Directory" group="Basic File" item-name="Refresh Directory (F5)"/>
+		<popup-menu group="Basic File" item-name="Refresh Directory (F5)"/>
+	</plugin>
+	
+		<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.BrowseSelectedDirectoryPlugin">
+		<top-menu menu-name="Directory" group="Basic File" item-name="Browse Selected Directory"/>
+		<popup-menu group="Basic File" item-name="Browse Directory in New Window"/>
+	</plugin>
+	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeFilePlugin">
 		<top-menu menu-name="Directory" group="Basic File" item-name="Create New File"/>
 		<popup-menu group="Basic File" item-name="Create New File"/>
@@ -25,11 +43,8 @@
 		<top-menu menu-name="Directory" group="Basic File" item-name="Create Directory"/>
 		<popup-menu group="Basic File" item-name="Create Directory"/>
 	</plugin>
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.CreateExportPlugin">
-		<top-menu menu-name="Directory" group="Basic File" item-name="Create Export"/>
-		<popup-menu group="Basic File" item-name="Create Export"/>
-	</plugin>
 	
+
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.SaveToDialog">
 		<top-menu menu-name="File" group="Basic File" item-name="Copy To Local File System From GFFS"/>
 		<top-menu menu-name="Directory" group="Basic File" item-name="Copy To Local File System From GFFS"/>
@@ -43,6 +58,12 @@
 	</plugin>
 
 
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.CreateExportPlugin">
+		<top-menu menu-name="Directory" group="Basic File" item-name="Create Export"/>
+		<popup-menu group="Basic File" item-name="Create Export"/>
+	</plugin>
+	
 		
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.fsproxy.CreateFSProxyPlugin">
 		<popup-menu menu-name="FSProxy" item-name="Create Filesystem Proxy"/>
@@ -62,12 +83,8 @@
 		<top-menu menu-name="File" group="Basic File" item-name="Delete File"/>	
 		<popup-menu group="Basic File" item-name="Delete File"/>
 	</plugin>
-	
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.view.RefreshPlugin">
-		<top-menu menu-name="Directory" group="Basic File" item-name="Refresh Directory (F5)"/>
-		<popup-menu group="Basic File" item-name="Refresh Directory (F5)"/>
-	</plugin>
-	
+
+
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jobs.JobHistoryPlugin">
 		<top-menu menu-name="Jobs" group="Job History" item-name="View Job History"/>
 		<popup-menu group="Job History" item-name="View Job History"/>
@@ -168,6 +185,14 @@
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.JobCreateHelp">
 		<top-menu menu-name="Help" group="Basic File" item-name="How do I create a job?"/>
 	</plugin>
-
+	
+	
+	<!--  
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.BrowseHomeDirectoryPlugin">
+		<top-menu menu-name="Directory" group="Basic File" item-name="Browse Home Directory"/>
+		<popup-menu group="Basic File" item-name="Open Directory in New Window"/>
+	</plugin>
+	-->
+	
 
 </plugins>

@@ -53,13 +53,15 @@ class ApplicationRegistry
 
 		ExternalApplication ret = null;
 
-		OperatingSystemNames myOS = OperatingSystemNames.getCurrentOperatingSystem();
-		if (myOS.isWindows())
-			ret = apps.get(ApplicationRegistrationTypes.Windows);
-		else if (myOS.isLinux())
-			ret = apps.get(ApplicationRegistrationTypes.Linux);
-		else if (myOS.isMacOSX())
-			ret = apps.get(ApplicationRegistrationTypes.MacOSX);
+		OperatingSystemNames myOS = OperatingSystemNames.mapFromCurrentOperatingSystem();
+		if (myOS != null) {
+			if (myOS.isWindows())
+				ret = apps.get(ApplicationRegistrationTypes.Windows);
+			else if (myOS.isLinux())
+				ret = apps.get(ApplicationRegistrationTypes.Linux);
+			else if (myOS.isMacOSX())
+				ret = apps.get(ApplicationRegistrationTypes.MacOSX);
+		}
 
 		if (ret == null)
 			ret = apps.get(ApplicationRegistrationTypes.Common);

@@ -5,16 +5,25 @@
 	<property file="${basedir}/build.properties"/>
 
 	<!-- Static Classpath -->
-	<path id="log4j.classpath">
+<!--	<path id="log4j.classpath">
 		<fileset dir="${ext.dir}"
 			includes="**/log4j*.jar"/>
 	</path>
+	<path id="commonslogging.classpath">
+		<fileset dir="${ext.dir}"
+			includes="**/commons-logging*.jar"/>
+	</path>
+-->
+
+        <path id="ext.classpath">
+                <fileset dir="${ext.dir}" includes="**/*.jar"/>
+        </path>
 
 	<path id="project.classpath">
 		<pathelement location="${obj-dir}"/>
-		<path refid="log4j.classpath"/>
+<!-- <path refid="log4j.classpath"/> -->
+		<path refid="ext.classpath"/>
 	</path>
-			
 
 	<!-- Build Targets -->
 	<target name="build" depends="jars,api.doc"/>

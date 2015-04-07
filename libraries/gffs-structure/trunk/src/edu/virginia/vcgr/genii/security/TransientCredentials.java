@@ -81,20 +81,23 @@ public class TransientCredentials implements Serializable
 	}
 
 	/**
-	 * Retrieves the credentials from the calling context. Guaranteed to not be null (may be empty, however)
-	 * 
-	 * @param callingContext
-	 * @return
+	 * Retrieves the credentials from the calling context. Guaranteed to not be null (may be empty of any credentials, however)
 	 */
 	public static synchronized TransientCredentials getTransientCredentials(ICallingContext callingContext)
 	{
 		TransientCredentials retval =
 			(TransientCredentials) callingContext.getTransientProperty(TransientCredentials.TRANSIENT_CRED_PROP_NAME);
 		if (retval == null) {
+			// we need to make up a new empty set of transient credentials.
 			retval = new TransientCredentials();
-			callingContext.setTransientProperty(TransientCredentials.TRANSIENT_CRED_PROP_NAME, retval);
+			setTransientCredentials(callingContext, retval);
 		}
 		return retval;
+	}
+
+	public static synchronized void setTransientCredentials(ICallingContext callingContext, TransientCredentials newCreds)
+	{
+		callingContext.setTransientProperty(TransientCredentials.TRANSIENT_CRED_PROP_NAME, newCreds);
 	}
 
 	public static synchronized void globalLogout(ICallingContext callingContext)

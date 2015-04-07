@@ -95,6 +95,14 @@ public class UIContext implements Cloneable
 		return _applicationContext;
 	}
 
+	/**
+	 * allows this UI context to be made disjoint from the stock ApplicationContext object to have a separate lifetime.
+	 */
+	final public void setApplicationContext(ApplicationContext newContext)
+	{
+		_applicationContext = newContext;
+	}
+
 	static private class InternalThreadFactory implements ThreadFactory
 	{
 		@Override

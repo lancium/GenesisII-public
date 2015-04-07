@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.ui;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -13,13 +15,15 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 
 public class ApplicationContext
 {
+	static private Log _logger = LogFactory.getLog(ApplicationContext.class);
+
 	private Collection<QuitListener> _quitListeners = new LinkedList<QuitListener>();
 	private Collection<DisposeListener> _disposeListeners = new LinkedList<DisposeListener>();
 	private GUID _localContainerID;
 
 	private ApplicationEventListener _applicationEventListener = null;
 
-	ApplicationContext()
+	public ApplicationContext()
 	{
 		_localContainerID = ContainerIDFile.containerID();
 	}
@@ -54,8 +58,9 @@ public class ApplicationContext
 		}
 
 		for (QuitListener listener : listeners) {
-			if (!listener.quitRequested())
+			if (!listener.quitRequested()) {
 				return false;
+			}
 		}
 
 		return true;
@@ -83,8 +88,11 @@ public class ApplicationContext
 			listeners = _disposeListeners.toArray(new DisposeListener[_disposeListeners.size()]);
 		}
 
-		for (DisposeListener listener : listeners)
+		for (DisposeListener listener : listeners) {
+			_logger.debug("fireDispose calling dispose on " + listener);
+
 			listener.dispose();
+		}
 	}
 
 	public void setApplicationEventListener(ApplicationEventListener listener)

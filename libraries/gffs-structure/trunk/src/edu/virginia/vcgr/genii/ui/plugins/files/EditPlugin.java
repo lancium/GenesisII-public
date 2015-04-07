@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
@@ -178,20 +179,19 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 				try {
 					String line;
 					Process p;
-
-					String osName = System.getProperty("os.name");
-					if (osName.contains("OS X")) {
+					if (OperatingSystemType.isMacOSX()) {
 						/* Mac OS code */
 						p = Runtime.getRuntime().exec("ps ef ");
-					} else if (osName.contains("Windows")) {
+					} else if (OperatingSystemType.isWindows()) {
 						/* Windows code */
-
 						p = Runtime.getRuntime().exec(System.getenv("windir") + "\\system32\\" + "tasklist.exe /v");
-					} else if (osName.contains("")) {
-						p = Runtime.getRuntime().exec("ps x ");
+					} else if (OperatingSystemType.isLinux()) {
 						/* Unix OS code */
-					} else
+						p = Runtime.getRuntime().exec("ps x ");
+					} else {
+						_logger.error("failure to determine operating system from name: " + OperatingSystemType.getOpsysName());
 						return -1;
+					}
 					BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 					while ((line = input.readLine()) != null) {
 						if (line.indexOf(filestr) >= 0) {

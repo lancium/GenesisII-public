@@ -29,7 +29,6 @@ public class Monitor implements Runnable
 			public void run()
 			{
 				long currentTime = System.currentTimeMillis();
-				// System.out.println(currentTime);
 				if (currentTime > (lastReqTime + idleTime)) {
 					// committing harakiri. Parent may have died!
 					// PSFileWriter.writeToFile("ProxyServer: No request for long time. Proxy"

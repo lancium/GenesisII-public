@@ -125,7 +125,7 @@ public abstract class BaseGridTool implements ITool
 		return parent.lookup(path.path(), queryFlags);
 	}
 
-	static protected RNSPath lookup(GeniiPath path, RNSPathQueryFlags queryFlags) throws InvalidToolUsageException,
+	public static RNSPath lookup(GeniiPath path, RNSPathQueryFlags queryFlags) throws InvalidToolUsageException,
 		RNSPathDoesNotExistException, RNSPathAlreadyExistsException
 	{
 		return lookup(RNSPath.getCurrent(), path, queryFlags);

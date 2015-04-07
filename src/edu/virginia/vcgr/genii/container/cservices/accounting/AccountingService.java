@@ -65,7 +65,7 @@ public class AccountingService extends AbstractContainerService
 			arch = ProcessorArchitecture.x86_64;
 
 		if (os == null)
-			os = OperatingSystemNames.getCurrentOperatingSystem();
+			os = OperatingSystemNames.mapFromCurrentOperatingSystem();
 		if (machineName == null)
 			machineName = BESAttributesHandler.getName();
 

@@ -43,6 +43,14 @@ public class StageList extends DefaultDataItem implements Clearable, PostUnmarsh
 		addModificationListener(mBroker);
 	}
 
+	public void setStageIn()
+	{
+		_stageIn = true;
+		for (DataStage stage : _stages)
+			stage.setStageIn();
+
+	}
+
 	public DataStage add()
 	{
 		DataStage newStage = new DataStage(_pBroker, _mBroker, _stageIn);

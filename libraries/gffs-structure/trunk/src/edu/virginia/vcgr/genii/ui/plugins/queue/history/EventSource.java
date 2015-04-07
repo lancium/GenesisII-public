@@ -16,13 +16,15 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEventSource;
 import edu.virginia.vcgr.genii.client.history.SimpleStringHistoryEventSource;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
+import edu.virginia.vcgr.genii.ui.ApplicationContext;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
 import edu.virginia.vcgr.genii.ui.EndpointType;
 import edu.virginia.vcgr.genii.ui.UIContext;
@@ -30,9 +32,6 @@ import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPlugins;
 import edu.virginia.vcgr.genii.ui.rns.RNSIcons;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 class EventSource extends JLabel
 {
@@ -196,10 +195,11 @@ class EventSource extends JLabel
 		{
 			try {
 				UIContext context = (UIContext) _context.clone();
+				context.setApplicationContext(new ApplicationContext());
 				context.callingContext().setCurrentPath(_rnsRoot);
 				ClientApplication app = new ClientApplication(context, false);
 				app.pack();
-				GUIUtils.centerComponent(app);
+				app.centerWindowAndMarch();
 				app.setVisible(true);
 			} catch (Throwable cause) {
 				// Ignore

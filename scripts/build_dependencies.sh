@@ -14,7 +14,6 @@ pushd "$TOPDIR"
 if [ -z "$GENII_INSTALL_DIR" ]; then
   export GENII_INSTALL_DIR="$TOPDIR"
 fi
-
 # set up some important variables for the success of the build.
 export ANT_OPTS='-Xms512m -Xmx768m -XX:MaxPermSize=768m'
 
@@ -69,8 +68,9 @@ fi
 
 for subproject in \
 \
-  CmdLineManipulator FSViewII GeniiJSDL GeniiProcessMgmt MacOSXSwing MNaming \
+  CmdLineManipulator FSViewII GeniiProcessMgmt MacOSXSwing MNaming \
   gffs-basics \
+  GeniiJSDL \
   gffs-webservices gffs-security \
   gffs-structure \
   DPage \

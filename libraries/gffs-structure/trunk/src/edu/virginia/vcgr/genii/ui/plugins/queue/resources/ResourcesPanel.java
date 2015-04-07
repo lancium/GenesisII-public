@@ -22,11 +22,14 @@ import javax.swing.KeyStroke;
 import javax.swing.RowSorter;
 import javax.swing.table.TableModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
+import edu.virginia.vcgr.genii.ui.ApplicationContext;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
@@ -36,9 +39,6 @@ import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
 import edu.virginia.vcgr.genii.ui.progress.Task;
 import edu.virginia.vcgr.genii.ui.progress.TaskCompletionListener;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 {
@@ -176,11 +176,11 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 				int row = _table.getSelectedRow();
 				if (sorter != null)
 					row = sorter.convertRowIndexToModel(row);
-
+				context.setApplicationContext(new ApplicationContext());
 				context.callingContext().setCurrentPath(new RNSPath(_model.row(row).endpoint()));
 				ClientApplication app = new ClientApplication(context, false);
 				app.pack();
-				GUIUtils.centerComponent(app);
+				app.centerWindowAndMarch();
 				app.setVisible(true);
 			} catch (Throwable cause) {
 				// Ignore

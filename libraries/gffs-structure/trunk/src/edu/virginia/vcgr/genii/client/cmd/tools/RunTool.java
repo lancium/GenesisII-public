@@ -440,6 +440,7 @@ public class RunTool extends BaseGridTool
 	public EndpointReferenceType submitJob(JobDefinition_Type jobDef, EndpointReferenceType besContainer, SubscribeRequest subscribeRequest)
 		throws ResourceException, RNSException, RemoteException
 	{
+		// hmmm: drop this debugging.
 		if (_logger.isDebugEnabled()) {
 			TransientCredentials transientCredentials = null;
 			try {

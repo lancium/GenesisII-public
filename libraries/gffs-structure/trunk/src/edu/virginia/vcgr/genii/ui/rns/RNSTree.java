@@ -214,6 +214,11 @@ public class RNSTree extends JTree implements EndpointRetriever
 		this(new RNSTreeModel(appContext, uiContext));
 	}
 
+	public RNSTree(ApplicationContext appContext, UIContext uiContext, String startPath) throws RNSPathDoesNotExistException
+	{
+		this(new RNSTreeModel(appContext, uiContext, startPath));
+	}
+
 	public void addRNSTreeListener(RNSTreeListener listener)
 	{
 		synchronized (_listeners) {

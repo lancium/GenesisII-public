@@ -54,9 +54,9 @@ import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.JobDescription;
 import edu.virginia.vcgr.jsdl.JobIdentification;
 import edu.virginia.vcgr.jsdl.MatchingParameter;
-import edu.virginia.vcgr.jsdl.OperatingSystem;
+import edu.virginia.vcgr.jsdl.OperatingSystemJSDLElement;
+import edu.virginia.vcgr.jsdl.OperatingSystemNameElement;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
-import edu.virginia.vcgr.jsdl.OperatingSystemTypeElement;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 import edu.virginia.vcgr.jsdl.Resources;
 import edu.virginia.vcgr.jsdl.SourceTarget;
@@ -242,14 +242,14 @@ public class JobDocument implements PostUnmarshallListener
 			if (resources == null)
 				resources = new Resources();
 
-			OperatingSystem os = new OperatingSystem();
+			OperatingSystemJSDLElement os = new OperatingSystemJSDLElement();
 
 			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystem"));
 
 			if (_operatingSystem != null) {
 				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystemType"));
 				builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "OperatingSystemName"));
-				os.osType(new OperatingSystemTypeElement(_operatingSystem));
+				os.osType(new OperatingSystemNameElement(_operatingSystem));
 				builder.pop();
 				builder.pop();
 			}
@@ -766,6 +766,7 @@ public class JobDocument implements PostUnmarshallListener
 
 		if (_stageIns == null)
 			_stageIns = new StageList(parameterBroker, modificationBroker, true);
+		_stageIns.setStageIn();
 
 		if (_stageOuts == null)
 			_stageOuts = new StageList(parameterBroker, modificationBroker, false);
@@ -1038,7 +1039,9 @@ public class JobDocument implements PostUnmarshallListener
 			Unmarshaller unmarshaller = context.createUnmarshaller();
 			unmarshaller.setListener(new UnmarshallListener(parameterBroker, modificationBroker));
 			result = (JobDocument) unmarshaller.unmarshal(source);
+			result.stageIns().setStageIn();
 			Recents.instance.addRecent(source);
+			result.stageIns().setStageIn();
 			return result;
 		} catch (JAXBException e) {
 			throw new IOException(String.format("Unable to load project from file \"%s\".", source), e);

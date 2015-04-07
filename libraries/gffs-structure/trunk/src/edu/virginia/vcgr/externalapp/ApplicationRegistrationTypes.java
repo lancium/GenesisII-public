@@ -24,6 +24,6 @@ public enum ApplicationRegistrationTypes {
 
 	public boolean matches()
 	{
-		return matches(OperatingSystemNames.getCurrentOperatingSystem());
+		return matches(OperatingSystemNames.mapFromCurrentOperatingSystem());
 	}
 }

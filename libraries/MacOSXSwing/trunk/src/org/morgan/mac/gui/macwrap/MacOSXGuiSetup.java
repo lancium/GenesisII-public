@@ -10,6 +10,7 @@ public class MacOSXGuiSetup
 
 	static public boolean isMacOSX()
 	{
+		// future: rearrange build order so this can just use the OperatingSystemType class.
 		return System.getProperty("os.name").equalsIgnoreCase("Mac OS X");
 	}
 

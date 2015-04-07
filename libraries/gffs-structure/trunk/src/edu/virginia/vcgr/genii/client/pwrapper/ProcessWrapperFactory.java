@@ -77,7 +77,7 @@ public class ProcessWrapperFactory
 			throw new IllegalArgumentException("Common Directory cannot be null.");
 
 		if (desiredOSName == null)
-			desiredOSName = OperatingSystemNames.getCurrentOperatingSystem();
+			desiredOSName = OperatingSystemNames.mapFromCurrentOperatingSystem();
 
 		if (desiredArch == null)
 			desiredArch = ProcessorArchitecture.getCurrentArchitecture();
