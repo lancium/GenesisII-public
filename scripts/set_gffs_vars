@@ -6,7 +6,7 @@ export GENII_INSTALL_DIR="${installer:sys.installationDir}"
 
 export PATH=$GENII_INSTALL_DIR:$PATH
 
-if [ "${TERM}" != "dumb" -a -z "$PBS_ENVIRONMENT" ]; then
+if [ "${TERM}" == "dumb" -o ! -z "$PBS_ENVIRONMENT" ]; then
   export SILENT_RUNNING=true
 fi
 
