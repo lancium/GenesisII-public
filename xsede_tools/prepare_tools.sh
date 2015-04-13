@@ -60,11 +60,19 @@ if [ ! -d "$TMP" ]; then
   exit 1
 fi
 
+##############
+
+# commonly used environment variables...
+
 # TEST_TEMP is a folder where we can generate a collection of junk files.
 export TEST_TEMP="$TMP/xsede_test_output_${USER}"
 if [ ! -d "$TEST_TEMP" ]; then
   mkdir -p "$TEST_TEMP"
 fi
+
+# this variable points to the last output from a grid command.
+export GRID_OUTPUT_FILE="$TEST_TEMP/grid_output.log"
+export GRID_TIMING_FILE="$TEST_TEMP/grid_times.log"
 
 # the location where our munged jsdl files will reside.
 export GENERATED_JSDL_FOLDER="$TEST_TEMP/patched_jsdl"
@@ -72,8 +80,12 @@ if [ ! -d "$GENERATED_JSDL_FOLDER" ]; then
   mkdir -p "$GENERATED_JSDL_FOLDER"
 fi
 
+##############
+
 # uncomment this to enable extra output.
 export DEBUGGING=true
+
+##############
 
 # turn this printout off in non-debugging mode or if the terminal setting
 # seems to indicate that we're running in a login environment (where any

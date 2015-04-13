@@ -175,8 +175,6 @@ function create_pfx_using_CA()
   # and create its certificate file.
   local cert_file="$(dirname "$NEW_PFX")/$(basename "$NEW_PFX" ".pfx").cer"
   export_certificate_from_pfx "$cert_file" "$NEW_PFX" "$NEW_PASS" "$NEW_ALIAS"
-#  run_any_command keytool -export "-file '$cert_file'" "-keystore '$NEW_PFX'" "-storepass '$NEW_PASS'" "-alias '$NEW_ALIAS'" -storetype PKCS12
-#  check_if_failed "generating certificate file $cert_file for $NEW_PFX"
 }
 
 ##############

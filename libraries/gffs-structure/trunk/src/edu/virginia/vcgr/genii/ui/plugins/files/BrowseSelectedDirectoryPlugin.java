@@ -1,15 +1,11 @@
 package edu.virginia.vcgr.genii.ui.plugins.files;
 
-import java.io.Closeable;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.ui.ApplicationContext;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
@@ -27,31 +23,30 @@ public class BrowseSelectedDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
-
 		if (context == null)
 			return;
 		if (_logger.isDebugEnabled())
 			_logger.debug("Browse Selected Directory performMenuAction called.");
-		Closeable assumedContextToken = null;
+
 		try {
-			assumedContextToken = ContextManager.temporarilyAssumeContext(context.uiContext().callingContext());
 			Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 
 			RNSPath path = paths.iterator().next();
 			TypeInformation typeInfo = new TypeInformation(path.getEndpoint());
 			if (!typeInfo.isRNS())
-				throw new RNSException("Path \"" + path.pwd() + "\" is not an RNS directory.");
+				throw new UIPluginException("Path \"" + path.pwd() + "\" is not an RNS directory.");
 			UIContext newcontext = (UIContext) context.uiContext().clone();
 			newcontext.setApplicationContext(new ApplicationContext());
 			ClientApplication app = new ClientApplication(newcontext, false, path.pwd());
 			app.pack();
 			app.centerWindowAndMarch();
 			app.setVisible(true);
+		} catch (UIPluginException e) {
+			// pass this one along.
+			throw e;
 		} catch (Throwable cause) {
-			// Ignore
-			_logger.info("exception occurred in BrowseHomeDirectory", cause);
-		} finally {
-			StreamUtils.close(assumedContextToken);
+			// we don't know what went wrong but log it.
+			_logger.error("exception occurred while jumping to selected directory", cause);
 		}
 	}
 

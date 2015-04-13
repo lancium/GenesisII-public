@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 import edu.virginia.vcgr.genii.ui.ApplicationContext;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
 import edu.virginia.vcgr.genii.ui.UIContext;
@@ -25,6 +24,11 @@ public class BrowseRootDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 	@Override
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
+		if (context == null)
+			return;
+		if (_logger.isDebugEnabled())
+			_logger.debug("Browse Root Directory performMenuAction called.");
+
 		String TargetPath = "/";
 		try {
 			RNSPath path = RNSPath.getCurrent().lookup(TargetPath, RNSPathQueryFlags.MUST_EXIST);
@@ -36,7 +40,7 @@ public class BrowseRootDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 			newcontext.setApplicationContext(new ApplicationContext());
 			ClientApplication app = new ClientApplication(newcontext, false, path.pwd());
 			app.pack();
-			GUIUtils.centerComponent(app);
+			app.centerWindowAndMarch();
 			app.setVisible(true);
 		} catch (UIPluginException e) {
 			// pass this one along.

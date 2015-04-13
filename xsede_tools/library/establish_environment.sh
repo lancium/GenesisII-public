@@ -6,15 +6,6 @@
 
 ##############
 
-# commonly used environment variables...
-
-# this variable points to the last output from a grid command.
-export GRID_OUTPUT_FILE="$TEST_TEMP/grid_output.log"
-
-export GRID_TIMING_FILE="$TEST_TEMP/grid_times.log"
-
-##############
-
 # pull in the really basic helper functions...
 source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
 
