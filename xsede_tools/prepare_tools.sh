@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # Author: Chris Koeritz
-# Author: Vanamala Venkataswamy
-
+#
 # Note:
-# we do not want to "exit" from this file at all, since it is used with the
-# bash source command and that will exit from the calling shell as well.
-# there is a variable below called BADNESS that indicates when errors
+# We do not want to "exit" from this file at all (nor from any file that it
+# invokes either), since this script is intended for use by the bash 'source'
+# command.  If we exit, that will exit from the calling shell as well, which
+# torpedoes whatever one was doing in that shell.
+# There is a variable below called BADNESS that indicates when errors
 # occurred during processing, and if it's not empty at the end of the script
 # then we will consider this a failed run, and we will not set the test's
 # sentinel variable which other scripts check to see if the environment
