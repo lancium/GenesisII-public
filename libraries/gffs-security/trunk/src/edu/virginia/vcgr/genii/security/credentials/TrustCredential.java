@@ -883,14 +883,14 @@ public class TrustCredential implements NuCredential, RWXAccessible
 						+ ", orig=" + toCheck.getDelegationDepth());
 				}
 
-				if (!tc.getIssuer()[0].getSubjectDN().toString().equals(toCheck.getIssuer()[0].getSubjectDN().toString())) {
-					throw new IOException("issuer disagrees in reconstituted credential: original=" + toCheck.getIssuer()[0].getSubjectDN()
-						+ " recons=" + tc.getIssuer()[0].getSubjectDN());
+				if (!tc.getIssuer()[0].getSubjectX500Principal().toString().equals(toCheck.getIssuer()[0].getSubjectX500Principal().toString())) {
+					throw new IOException("issuer disagrees in reconstituted credential: original=" + toCheck.getIssuer()[0].getSubjectX500Principal()
+						+ " recons=" + tc.getIssuer()[0].getSubjectX500Principal());
 				}
 
-				if (!tc.getDelegatee()[0].getSubjectDN().toString().equals(toCheck.getDelegatee()[0].getSubjectDN().toString())) {
+				if (!tc.getDelegatee()[0].getSubjectX500Principal().toString().equals(toCheck.getDelegatee()[0].getSubjectX500Principal().toString())) {
 					throw new IOException("delegatee disagrees in reconstituted credential: original="
-						+ toCheck.getDelegatee()[0].getSubjectDN() + " recons=" + tc.getDelegatee()[0].getSubjectDN());
+						+ toCheck.getDelegatee()[0].getSubjectX500Principal() + " recons=" + tc.getDelegatee()[0].getSubjectX500Principal());
 				}
 
 				if (_logger.isDebugEnabled())
