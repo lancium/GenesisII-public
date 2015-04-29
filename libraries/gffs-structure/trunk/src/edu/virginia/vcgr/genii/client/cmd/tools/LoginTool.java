@@ -39,6 +39,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
@@ -176,6 +177,8 @@ public class LoginTool extends BaseLoginTool
 
 		// temporary context to hold username password junk.
 		Closeable assumedContextToken = null;
+		// identity filled in during login.
+		PreferredIdentity prefId = null;
 
 		try {
 			// we will make a clone of our context now to avoid having this credential stick around.
@@ -189,8 +192,6 @@ public class LoginTool extends BaseLoginTool
 
 				TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(newContext);
 			transientCredentials.add(utCredential);
-
-				// goodness no. ContextManager.storeCurrentContext(callContext);
 
 				/*
 				 * we're going to use the WS-TRUST token-issue operation to log in to a security tokens service
@@ -223,11 +224,9 @@ public class LoginTool extends BaseLoginTool
 					}
 				}
 
-				// insert the assertion into the calling context's transient creds
-					// hmmm: not here. transientCredentials.addAll(creds);
-
+					// grab the preferred id so we can put it in the real context.
+					prefId = PreferredIdentity.getCurrent();
 			} finally {
-
 				if (utCredential != null) {
 					// the UT credential was used only to log into the IDP, remove it
 					transientCredentials.remove(utCredential);
@@ -241,6 +240,7 @@ public class LoginTool extends BaseLoginTool
 
 		// re-acquire our context.
 		realCallingContext = ContextManager.getCurrentContext();
+		PreferredIdentity.setInContext(realCallingContext, prefId);
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(realCallingContext);
 
 		// now add the credentials that we picked up from the login.

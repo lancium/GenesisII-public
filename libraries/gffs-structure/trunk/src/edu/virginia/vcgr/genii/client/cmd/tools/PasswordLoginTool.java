@@ -63,9 +63,7 @@ public class PasswordLoginTool extends BaseLoginTool
 			utCredential = new UsernamePasswordIdentity(uname, pass);
 			return utCredential;
 		}
-
 		return null;
-
 	}
 
 	@Override

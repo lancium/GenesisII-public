@@ -215,9 +215,12 @@ public class IDPLoginTool extends BaseLoginTool
 					_logger.debug("setting preferred identity at login time with: " + newIdentity.toString());
 					PreferredIdentity.setInContext(callContext, newIdentity);
 				}
+			} else {
+				_logger.debug("already has preferred identity: " + PreferredIdentity.getCurrent().toString());
 			}
 
 		}
+		
 		return retval;
 	}
 
