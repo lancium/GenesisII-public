@@ -23,7 +23,7 @@ Source1: BUILDME
 
 Requires: expect fuse fuse-libs java
 
-BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
+#BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
 
 %description
 The Genesis II Project is intended to provide the grid user community with free, easy-to-use tools to leverage grid technology to fulfill their computation and data management needs. The platform is designed to support a wide range of potential application domains from simple data sharing to multi-platform, multi-organizational high-throughput computing.
