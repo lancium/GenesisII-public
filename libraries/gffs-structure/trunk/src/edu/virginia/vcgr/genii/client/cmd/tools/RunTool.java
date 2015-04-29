@@ -440,14 +440,13 @@ public class RunTool extends BaseGridTool
 	public EndpointReferenceType submitJob(JobDefinition_Type jobDef, EndpointReferenceType besContainer, SubscribeRequest subscribeRequest)
 		throws ResourceException, RNSException, RemoteException
 	{
-		// hmmm: drop this debugging.
-		if (_logger.isDebugEnabled()) {
+		if (_logger.isTraceEnabled()) {
 			TransientCredentials transientCredentials = null;
 			try {
 				ICallingContext callContext = ContextManager.getExistingContext();
 				transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 			} catch (Exception e) {
-				_logger.error("failure to load credentials for printing in submitJob");
+				_logger.warn("failure to load credentials for printing in submitJob");
 			}
 			if (transientCredentials != null) {
 				_logger.debug("submitting job with these credentials:\n" + transientCredentials.toString());

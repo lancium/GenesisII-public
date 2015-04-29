@@ -82,7 +82,8 @@ public class AxisBasedContextResolver implements IContextResolver
 	}
 
 	@SuppressWarnings("unchecked")
-	public ICallingContext load() throws ResourceException, IOException, FileNotFoundException
+	@Override
+	public ICallingContext resolveContext() throws ResourceException, IOException, FileNotFoundException
 	{
 		WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
 
@@ -156,7 +157,8 @@ public class AxisBasedContextResolver implements IContextResolver
 		return retval;
 	}
 
-	public void store(ICallingContext ctxt) throws ResourceException, IOException
+	@Override
+	public void storeCurrentContext(ICallingContext ctxt) throws ResourceException, IOException
 	{
 		ResourceManager.getCurrentResource().dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, ctxt);
 	}

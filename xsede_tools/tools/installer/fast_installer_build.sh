@@ -78,29 +78,30 @@ echo "Will build installers in $OUTPUT_DIRECTORY"
 
 ##############
 
-# build 32-bit:
-#skip
+# build the code:
 
-##############
-
-# build 64-bit:
-
-echo Building 64 bit Genesis...
+echo Building Genesis...
 
 pushd "$GENII_INSTALL_DIR"
 #ant clean
 #check_if_failed "ant clean failed"
 replace_compiler_variables
 check_if_failed "compiler variable replacement failed"
-#ant -Dbuild.targetArch=64 build
-#check_if_failed "ant build failed"
+ant -Dbuild.targetArch=64 build
+check_if_failed "ant build failed"
 popd
 
-build_installer 5991 "genesis2-gffs-amd64-${simple_name}-deb"
 build_installer 3416 "genesis2-gffs-linux-amd64-${simple_name}"
+build_installer 11295 "genesis2-gffs-linux-x86-32-${simple_name}"
+
 build_installer 2088 "genesis2-gffs-macosx-amd64-${simple_name}"
+
+build_installer 5991 "genesis2-gffs-amd64-${simple_name}-deb"
+
 build_installer 8974 "genesis2-gffs-windows-amd64-${simple_name}"
-build_installer 8972 "genesis2-gffs-linux-powerpc-${simple_name}"
+build_installer 11297 "genesis2-gffs-windows-x86-32-${simple_name}"
+
+#build_installer 8972 "genesis2-gffs-linux-powerpc-${simple_name}"
 
 ##############
 
@@ -111,6 +112,8 @@ cp "$GENII_INSTALL_DIR/current.deployment" "$OUTPUT_DIRECTORY"
 fix_endings
 
 generate_md5sums
+
+chmod 755 "$OUTPUT_DIRECTORY"/*.deb "$OUTPUT_DIRECTORY"/*.script "$OUTPUT_DIRECTORY"/*.rpm "$OUTPUT_DIRECTORY"/*.dmg "$OUTPUT_DIRECTORY"/*.exe 
 
 # toss temporary files.
 rm "$generated_installer_name"

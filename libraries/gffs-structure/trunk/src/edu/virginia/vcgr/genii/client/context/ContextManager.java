@@ -66,7 +66,7 @@ public class ContextManager
 	{
 		IContextResolver res = getResolver();
 		// _logger.debug("type of resolver here is: " + res.getClass().getCanonicalName());
-		return res.load();
+		return res.resolveContext();
 	}
 
 	static public void storeCurrentContext(ICallingContext context) throws FileNotFoundException, IOException
@@ -76,7 +76,7 @@ public class ContextManager
 				+ ProgramTools.showLastFewOnStack(15));
 		}
 
-		getResolver().store(context);
+		getResolver().storeCurrentContext(context);
 	}
 
 	static public ICallingContext bootstrap(RNSPath root) throws IOException

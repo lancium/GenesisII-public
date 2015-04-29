@@ -248,13 +248,21 @@ echo dir has:
 # this might not work, especially if java is not installed, in which case we'll complain.
 if [ -z "$JAVA_HOME" -o ! -d "$JAVA_HOME" -o ! -d "$JAVA_HOME/bin" ]; then
   # we try and guess the variable based on the location of java, if we can.
-  export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java) ) ) )
-echo "calculated JAVA_HOME as: $JAVA_HOME"
-  if [ -z "$JAVA_HOME" -o ! -d "$JAVA_HOME" -o ! -d "$JAVA_HOME/bin" ]; then
-    echo "The JAVA_HOME variable must be set to point at the Java install location"
-    echo "on this computer.  It is standard for there to be a bin folder under"
-    echo "that location."
-    exit 1
+  export JAVA_HOME="$GENII_INSTALL_DIR/jre"
+  if [ ! -d "$JAVA_HOME" -o ! -d "$JAVA_HOME/bin" ]; then
+
+    export JAVA_HOME="$GENII_INSTALL_DIR/.install4j/jre.bundle/Contents/Home/jre"
+    if [ ! -d "$JAVA_HOME" -o ! -d "$JAVA_HOME/bin" ]; then
+
+      export JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(which java)" )" )" )"
+echo "calculated JAVA_HOME as: '$JAVA_HOME'"
+      if [ -z "$JAVA_HOME" -o ! -d "$JAVA_HOME" -o ! -d "$JAVA_HOME/bin" ]; then
+        echo "The JAVA_HOME variable must be set to point at the Java install location"
+        echo "on this computer.  It is standard for there to be a bin folder under"
+        echo "that location."
+        exit 1
+      fi
+    fi
   fi
 fi
 

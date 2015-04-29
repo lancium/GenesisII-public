@@ -18,12 +18,12 @@ public class OGRSHContextResolver implements IContextResolver
 
 	static private ContextThreadLocal _localCallingContext = new ContextThreadLocal();
 
-	public ICallingContext load() throws IOException, FileNotFoundException
+	public ICallingContext resolveContext() throws IOException, FileNotFoundException
 	{
 		return _localCallingContext.get();
 	}
 
-	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
+	public void storeCurrentContext(ICallingContext ctxt) throws FileNotFoundException, IOException
 	{
 		_localCallingContext.set(ctxt);
 	}

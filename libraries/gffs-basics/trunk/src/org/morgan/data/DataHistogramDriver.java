@@ -2,7 +2,7 @@ package org.morgan.data;
 
 import java.util.concurrent.TimeUnit;
 
-public class Driver
+public class DataHistogramDriver
 {
 	static public void main(String[] args) throws Throwable
 	{

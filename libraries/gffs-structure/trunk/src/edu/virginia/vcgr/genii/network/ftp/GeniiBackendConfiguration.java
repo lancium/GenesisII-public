@@ -46,8 +46,8 @@ public class GeniiBackendConfiguration implements Cloneable
 			IContextResolver newResolver = new InMemorySerializedContextResolver();
 			ContextManager.setResolver(newResolver);
 
-			newResolver.store(callingContext);
-			_callingContext = newResolver.load();
+			newResolver.storeCurrentContext(callingContext);
+			_callingContext = newResolver.resolveContext();
 
 			_root = _callingContext.getCurrentPath().getRoot();
 			_callingContext.setCurrentPath(_root);
@@ -69,7 +69,7 @@ public class GeniiBackendConfiguration implements Cloneable
 				_logger.error(msg);
 				throw new AuthZSecurityException(msg);
 			}
-			_callingContext = newResolver.load();
+			_callingContext = newResolver.resolveContext();
 		} catch (FileNotFoundException e) {
 			throw new IOException(e.getLocalizedMessage(), e);
 		} catch (ToolException e) {

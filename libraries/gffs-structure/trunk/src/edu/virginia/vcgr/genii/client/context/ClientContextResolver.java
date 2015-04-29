@@ -18,8 +18,10 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.utils.flock.FileLock;
 
 public class ClientContextResolver implements IContextResolver
 {
@@ -45,27 +47,46 @@ public class ClientContextResolver implements IContextResolver
 	}
 
 	@Override
-	public ICallingContext load() throws FileNotFoundException, IOException
+	public ICallingContext resolveContext() throws FileNotFoundException, IOException
 	{
+		ICallingContext toReturn = null;
 		if (_logger.isTraceEnabled())
 			_logger.trace("<into calling context load>");
 		File contextFile = getContextFile();
-		ICallingContext toReturn = null;
-		if (contextFile == null || !contextFile.exists() || contextFile.length() == 0) {
-			File combinedFile = getCombinedFile();
-			if (combinedFile == null || combinedFile.length() == 0)
-				return null;
-			toReturn = ContextFileSystem.load(combinedFile);
-		} else {
-			toReturn = ContextFileSystem.load(contextFile, getContextTransientFile());
+		FileLock fl = null;
+		try {
+			fl = FileLock.lockFile(contextFile);
+
+			// if we don't have split context files, we will try to load a combined on. 
+			if (contextFile == null || !contextFile.exists() || contextFile.length() == 0) {
+				File combinedFile = getCombinedFile();
+				// make sure we could actually try loading the combined one.
+				if (combinedFile == null || combinedFile.length() == 0) {
+					_logger.info("unable to find a context to load, either split or combined style.");
+					return null;
+				}
+				// we must unlock the file again before letting the context load occur (since it also locks).
+				StreamUtils.close(fl);
+				// now load the combined context.
+				toReturn = ContextFileSystem.load(combinedFile);
+			} else {
+				// we must unlock the file again before letting the context load occur (since it also locks).
+				StreamUtils.close(fl);
+				// load the more modern split context from two files. 
+				toReturn = ContextFileSystem.load(contextFile, getContextTransientFile());
+			}
+			
+		} finally {
+			StreamUtils.close(fl);
+			if (_logger.isTraceEnabled())
+				_logger.trace(">out of calling context load<");
 		}
-		if (_logger.isTraceEnabled())
-			_logger.trace(">out of calling context load<");
+		
 		return toReturn;
 	}
 
 	@Override
-	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
+	public void storeCurrentContext(ICallingContext ctxt) throws FileNotFoundException, IOException
 	{
 		ContextFileSystem.store(getContextFile(), getContextTransientFile(), ctxt);
 	}

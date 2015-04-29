@@ -86,6 +86,12 @@ public class XSEDELoginTool extends BaseLoginTool
 		 */
 		callContext = ContextManager.getCurrentContext();
 
+		if (callContext == null) {
+			String msg = "received a null calling context from ContextManager";
+			_logger.error(msg);
+			throw new ToolException(msg);
+		}
+
 		// reset any pass-through credential that had been established during login, since it's no
 		// longer needed.
 		callContext.removeProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);

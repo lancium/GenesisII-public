@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -124,9 +125,10 @@ public class LoginTool extends BaseLoginTool
 	{
 
 		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
+		ICallingContext realCallingContext = ContextManager.getCurrentContext();
+		if (realCallingContext == null) {
+			realCallingContext = new CallingContextImpl(new ContextType());
+			ContextManager.storeCurrentContext(realCallingContext);
 		}
 
 		aquireUsername();
@@ -142,7 +144,8 @@ public class LoginTool extends BaseLoginTool
 				throw new ToolException("failure to convert path: " + e.getLocalizedMessage(), e);
 			}
 
-			if (!callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists())
+			if ((realCallingContext.getCurrentPath() == null)
+				|| !realCallingContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists())
 				throw new ToolException("Invalid IDP path specified: " + authnSource.getSchemeSpecificPart());
 
 		} else {
@@ -156,7 +159,8 @@ public class LoginTool extends BaseLoginTool
 				} catch (URISyntaxException e) {
 					throw new ToolException("failure to convert path: " + e.getLocalizedMessage(), e);
 				}
-				if (callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists()) {
+				if ((realCallingContext.getCurrentPath() != null)
+					&& realCallingContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists()) {
 					_authnUri = authURI;
 					break;
 				}
@@ -166,19 +170,31 @@ public class LoginTool extends BaseLoginTool
 				throw new ToolException(
 					"Could not authenticate to login service, ensure your username is correct or manually specify IDP path");
 		}
+		
+		// we will fill out this list if the login is successful.
+		ArrayList<NuCredential> creds = null;
+
+		// temporary context to hold username password junk.
+		Closeable assumedContextToken = null;
+
+		try {
+			// we will make a clone of our context now to avoid having this credential stick around.
+			ICallingContext newContext = realCallingContext.deriveNewContext();
+
+			assumedContextToken = ContextManager.temporarilyAssumeContext(newContext);
 
 		// Do password Login
 		UsernamePasswordIdentity utCredential = new PasswordLoginTool().doPasswordLogin(_username, _password);
-
 		if (utCredential != null) {
 
-			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
+				TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(newContext);
 			transientCredentials.add(utCredential);
 
-			ContextManager.storeCurrentContext(callContext);
+				// goodness no. ContextManager.storeCurrentContext(callContext);
 
-			// we're going to use the WS-TRUST token-issue operation
-			// to log in to a security tokens service
+				/*
+				 * we're going to use the WS-TRUST token-issue operation to log in to a security tokens service
+				 */
 			URI authnSource;
 			try {
 				authnSource = PathUtils.pathToURI(_authnUri);
@@ -186,15 +202,18 @@ public class LoginTool extends BaseLoginTool
 				throw new ToolException("failure to convert path: " + e.getLocalizedMessage(), e);
 			}
 			KeyAndCertMaterial clientKeyMaterial =
-				ClientUtils.checkAndRenewCredentials(callContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+					ClientUtils.checkAndRenewCredentials(newContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 
-			RNSPath authnPath = callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
+				if (newContext.getCurrentPath() == null)
+					throw new ToolException("Failure to getCurrentPath in context");
+
+				RNSPath authnPath = newContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
 			EndpointReferenceType epr = authnPath.getEndpoint();
 
 			try {
 
 				// Do IDP login
-				ArrayList<NuCredential> creds = IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
+					creds = IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
 
 				if (creds == null) {
 					return 0;
@@ -205,7 +224,7 @@ public class LoginTool extends BaseLoginTool
 				}
 
 				// insert the assertion into the calling context's transient creds
-				transientCredentials.addAll(creds);
+					// hmmm: not here. transientCredentials.addAll(creds);
 
 			} finally {
 
@@ -214,17 +233,28 @@ public class LoginTool extends BaseLoginTool
 					transientCredentials.remove(utCredential);
 					_logger.debug("Removing temporary username-token credential from current calling context credentials.");
 				}
+				}
+			}
+		} finally {
+			StreamUtils.close(assumedContextToken);
 			}
 
+		// re-acquire our context.
+		realCallingContext = ContextManager.getCurrentContext();
+		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(realCallingContext);
+
+		// now add the credentials that we picked up from the login.
+		if (creds != null) {
+			transientCredentials.addAll(creds);
 		}
 
 		// drop any notification brokers or other cached info after credential change.
 		CacheManager.resetCachingSystem();
 
-		ContextManager.storeCurrentContext(callContext);
+		ContextManager.storeCurrentContext(realCallingContext);
 
-		// jumpToUserHomeIfExists(_username);
 		{
+			// jumps to the user's home directory.
 			// Assumption is that user idp's are off /user and homes off /home
 			String userHome = _authnUri.replaceFirst("users", "home");
 			try {

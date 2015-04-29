@@ -22,9 +22,9 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.
  * 
  * @author avinash
  */
-public class Driver
+public class ProxyIOServerDriver
 {
-	static private Log _logger = LogFactory.getLog(Driver.class);
+	static private Log _logger = LogFactory.getLog(ProxyIOServerDriver.class);
 
 	static final int SOCKET_BACKLOG = 50;
 

@@ -59,8 +59,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 	private CallingContextImpl _parent = null;
 
-	// list of name-value properties to be kept separate from the
-	// outgoing message properties
+	/* list of name-value properties to be kept separate from the
+	 outgoing message properties. */
 	private HashMap<String, Serializable> _transientProperties = new HashMap<String, Serializable>();
 
 	public CallingContextImpl(CallingContextImpl parent)

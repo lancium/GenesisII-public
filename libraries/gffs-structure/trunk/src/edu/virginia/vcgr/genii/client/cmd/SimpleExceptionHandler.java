@@ -5,11 +5,14 @@ import java.io.PrintWriter;
 import java.io.Writer;
 
 import org.apache.axis.AxisFault;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
+import edu.virginia.vcgr.genii.client.fuse.exceptions.FuseNoSuchEntryException;
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.utils.DetailedLogger;
 
 public class SimpleExceptionHandler implements IExceptionHandler
 {
@@ -23,6 +26,10 @@ public class SimpleExceptionHandler implements IExceptionHandler
 		StringBuilder builder = new StringBuilder();
 
 		int toReturn = 0; // assume we can recover by default.
+
+		// before we do anything else, add the whole thing to the detailed log.
+		DetailedLogger.detailed().info(
+			"simple handler processing exception: " + cause.getLocalizedMessage() + "\n" + ExceptionUtils.getStackTrace(cause));
 
 		/*
 		 * remembers the last message we printed so we don't echo duplicates (which can happen when exceptions are wrapped repeatedly at
@@ -48,6 +55,8 @@ public class SimpleExceptionHandler implements IExceptionHandler
 				nextToAdd = "File Not Found:  " + cause.getLocalizedMessage() + "\n";
 			} else if (cause instanceof BaseFaultType) {
 				nextToAdd = ((BaseFaultType) cause).getDescription(0).get_value() + "\n";
+			} else if (cause instanceof FuseNoSuchEntryException) {
+				nextToAdd = "Fuse exception: " + cause.getLocalizedMessage() + "\n";
 			} else if (cause instanceof AxisFault) {
 				String message = cause.getLocalizedMessage();
 

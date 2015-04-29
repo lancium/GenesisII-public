@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.12" transformSequenceNumber="4">
   <directoryPresets config="../scripts/proxyio.launcher.template" />
-  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.bitSize}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
+  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -17,12 +17,8 @@
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
       <variable name="genii.container-memory.lower-limit" value="1024" description="" category="" />
-      <variable name="genii.isWindows" value="false" description="" category="" />
-      <variable name="genii.isLinux" value="false" description="" category="" />
-      <variable name="genii.isMacOSX" value="false" description="" category="" />
-      <variable name="genii.bitSize" value="" description="" category="" />
       <variable name="genii.client-memory.normal" value="2048" description="" category="" />
-      <variable name="genii.client-memory.win32" value="1000" description="" category="" />
+      <variable name="genii.client-memory.win32" value="2040" description="" category="" />
       <variable name="genii.app-version" value="0.0.0" description="The version of this GenesisII installer release." category="" />
       <variable name="genii.new-deployment" value="currant_urgh" description="" category="" />
       <variable name="genii.publisher" value="the-publisher" description="" category="" />
@@ -34,44 +30,27 @@
       <variable name="genii.generate-certs" value="true" description="" category="" />
       <variable name="genii.simple-name" value="testing" description="" category="" />
       <variable name="genii.release-number" value="8" description="" category="" />
+      <variable name="genii.name-addin" value="nothing" description="" category="" />
     </variables>
     <mergedProjects />
     <codeSigning macEnabled="false" macPkcs12File="" windowsEnabled="false" windowsKeySource="pkcs12" windowsPvkFile="" windowsSpcFile="" windowsPkcs12File="" />
   </application>
   <files keepModificationTimes="true" missingFilesStrategy="warn" globalExcludeSuffixes="*.keytab,*.tmp,.svn,.git" defaultOverwriteMode="4" defaultUninstallMode="0" launcherOverwriteMode="3" defaultFileMode="644" defaultDirMode="755">
     <filesets>
-      <fileset name="Windows32 Only Files" id="19" customizedId="" />
-      <fileset name="Linux64 Only Files" id="21" customizedId="" />
-      <fileset name="Mac OS X Only Files" id="23" customizedId="" />
-      <fileset name="Linux32 Only Files" id="3620" customizedId="" />
       <fileset name="Deployment Files" id="5992" customizedId="" />
       <fileset name="Careful lib folder" id="8166" customizedId="" />
       <fileset name="xsede tools" id="8738" customizedId="" />
-      <fileset name="Windows64 Only Files" id="8975" customizedId="" />
     </filesets>
     <roots>
-      <root id="20" fileset="19" location="" />
-      <root id="22" fileset="21" location="" />
-      <root id="24" fileset="23" location="" />
-      <root id="3621" fileset="3620" location="" />
       <root id="5993" fileset="5992" location="" />
       <root id="8167" fileset="8166" location="" />
       <root id="8739" fileset="8738" location="" />
-      <root id="8976" fileset="8975" location="" />
     </roots>
     <mountPoints>
       <mountPoint id="7606" root="" location="ext" mode="755" />
       <mountPoint id="3944" root="" location="jre-addin" mode="755" />
       <mountPoint id="7211" root="" location="scripts" mode="755" />
       <mountPoint id="34" root="" location="" mode="755" />
-      <mountPoint id="35" root="20" location="jni-lib" mode="755" />
-      <mountPoint id="251" root="20" location="JavaServiceWrapper" mode="755" />
-      <mountPoint id="37" root="22" location="jni-lib" mode="755" />
-      <mountPoint id="252" root="22" location="JavaServiceWrapper" mode="755" />
-      <mountPoint id="38" root="24" location="jni-lib" mode="755" />
-      <mountPoint id="253" root="24" location="JavaServiceWrapper" mode="755" />
-      <mountPoint id="3622" root="3621" location="jni-lib" mode="755" />
-      <mountPoint id="3623" root="3621" location="JavaServiceWrapper" mode="755" />
       <mountPoint id="5994" root="5993" location="deployments" mode="755" />
       <mountPoint id="5995" root="5993" location="deployments/default" mode="755" />
       <mountPoint id="7004" root="5993" location="deployments/${compiler:genii.new-deployment}" mode="755" />
@@ -80,8 +59,6 @@
       <mountPoint id="8168" root="8167" location="lib" mode="755" />
       <mountPoint id="8169" root="8167" location="lib/META-INF" mode="755" />
       <mountPoint id="8740" root="8739" location="" mode="755" />
-      <mountPoint id="8977" root="8976" location="jni-lib" mode="755" />
-      <mountPoint id="8978" root="8976" location="JavaServiceWrapper" mode="755" />
     </mountPoints>
     <entries>
       <fileEntry mountPoint="7606" file="../scripts/genii-base-application.properties" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -101,6 +78,7 @@
       <fileEntry mountPoint="7211" file="../scripts/proxyio.launcher.template" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp, *.fred" dirMode="755" overrideDirMode="true">
         <exclude>
+          <entry location="current.deployment.lock" fileType="regular" />
           <entry location="tests" fileType="regular" />
           <entry location="gffschown" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
@@ -118,7 +96,11 @@
           <entry location="ext/genii-certtool-application.properties" fileType="regular" />
           <entry location="ext/genii-container-application.properties" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
-          <entry location="JavaServiceWrapper" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper/jdoc" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper/src" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper/jdoc.tar.gz" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper/doc" fileType="regular" />
           <entry location="xsede_tools" fileType="regular" />
           <entry location="unit-test-reports" fileType="regular" />
           <entry location="scripts" fileType="regular" />
@@ -138,235 +120,13 @@
           <entry location="runContainer.sh" fileType="regular" />
           <entry location="libraries" fileType="regular" />
           <entry location="change-port.sh" fileType="regular" />
+          <entry location="context.xml.lock" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="34" file="./data_files/container.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="34" file="../scripts/cert-tool" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="34" file="../scripts/set_gffs_vars" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
-      <dirEntry mountPoint="35" file="../jni-libs/win32" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="win32" excludeSuffixes="" dirMode="755" overrideDirMode="false">
-        <exclude>
-          <entry location=".svn" fileType="regular" />
-          <entry location="IFS/.svn" fileType="regular" />
-        </exclude>
-      </dirEntry>
-      <dirEntry mountPoint="251" file="../JavaServiceWrapper" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn" dirMode="755" overrideDirMode="true">
-        <exclude>
-          <entry location="wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
-          <entry location="wrapper/logs" fileType="regular" />
-          <entry location="wrapper/doc" fileType="regular" />
-          <entry location="wrapper/jdoc" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/UninstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/StopTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/ResumeTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-64" fileType="regular" />
-          <entry location="wrapper/bin/PauseTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-32" fileType="regular" />
-          <entry location="wrapper/bin/GFFSContainer" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/InstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/StartTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapperNoWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/testwrapper" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-64" fileType="regular" />
-          <entry location="wrapper/jdoc.tar.gz" fileType="regular" />
-          <entry location="wrapper/src" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-64.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-ia-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-64.sl" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-ppc-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-x86-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-aix-ppc-32.a" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-freebsd-x86-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-x86-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-solaris-x86-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-ia-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-ppc-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-32.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-solaris-sparc-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-freebsd-x86-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-solaris-sparc-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-solaris-x86-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-aix-ppc-64.a" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-32.sl" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-ia-32.so" fileType="regular" />
-        </exclude>
-      </dirEntry>
-      <dirEntry mountPoint="37" file="../jni-libs/lin64" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="lin32" excludeSuffixes="" dirMode="755" overrideDirMode="false">
-        <exclude>
-          <entry location=".svn" fileType="regular" />
-        </exclude>
-      </dirEntry>
-      <dirEntry mountPoint="252" file="../JavaServiceWrapper" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn" dirMode="755" overrideDirMode="true">
-        <exclude>
-          <entry location="wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
-          <entry location="wrapper/jdoc" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/StartTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/ResumeTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-windows-x86-32.exe" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-32" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapperNoWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-32" fileType="regular" />
-          <entry location="wrapper/bin/PauseTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/testwrapper" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-64" fileType="regular" />
-          <entry location="wrapper/bin/StopTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/InstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/UninstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-32.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-32.sl" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-64.sl" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-64.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-x86-32.so" fileType="regular" />
-          <entry location="wrapper/lib/wrapper-windows-x86-32.dll" fileType="regular" />
-          <entry location="wrapper/src" fileType="regular" />
-          <entry location="wrapper/jdoc.tar.gz" fileType="regular" />
-          <entry location="wrapper/doc" fileType="regular" />
-        </exclude>
-      </dirEntry>
-      <dirEntry mountPoint="38" file="../jni-libs/osx64" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="osx64" excludeSuffixes="" dirMode="755" overrideDirMode="false">
-        <exclude>
-          <entry location=".svn" fileType="regular" />
-        </exclude>
-      </dirEntry>
-      <dirEntry mountPoint="253" file="../JavaServiceWrapper" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn" dirMode="755" overrideDirMode="true">
-        <exclude>
-          <entry location="wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
-          <entry location="wrapper/logs" fileType="regular" />
-          <entry location="wrapper/doc" fileType="regular" />
-          <entry location="wrapper/jdoc" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/UninstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/StopTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/ResumeTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-64" fileType="regular" />
-          <entry location="wrapper/bin/PauseTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/InstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/StartTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapperNoWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-windows-x86-32.exe" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/testwrapper" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-64" fileType="regular" />
-          <entry location="wrapper/jdoc.tar.gz" fileType="regular" />
-          <entry location="wrapper/src" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-ia-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-64.sl" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-ppc-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-x86-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-aix-ppc-32.a" fileType="regular" />
-          <entry location="wrapper/lib/wrapper-windows-x86-32.dll" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-freebsd-x86-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-x86-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-solaris-x86-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-ia-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-ppc-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-32.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-solaris-sparc-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-freebsd-x86-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-solaris-sparc-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-solaris-x86-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-aix-ppc-64.a" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-32.sl" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-ia-32.so" fileType="regular" />
-        </exclude>
-      </dirEntry>
-      <dirEntry mountPoint="3622" file="../jni-libs/lin32" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="lin32" excludeSuffixes="" dirMode="755" overrideDirMode="false">
-        <exclude>
-          <entry location=".svn" fileType="regular" />
-        </exclude>
-      </dirEntry>
-      <dirEntry mountPoint="3623" file="../JavaServiceWrapper" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn" dirMode="755" overrideDirMode="true">
-        <exclude>
-          <entry location="wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
-          <entry location="wrapper/doc" fileType="regular" />
-          <entry location="wrapper/jdoc.tar.gz" fileType="regular" />
-          <entry location="wrapper/logs" fileType="regular" />
-          <entry location="wrapper/jdoc" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-windows-x86-32.exe" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/PauseTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/testwrapper" fileType="regular" />
-          <entry location="wrapper/bin/StopTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-32" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapperNoWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-32" fileType="regular" />
-          <entry location="wrapper/bin/InstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/UninstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-32" fileType="regular" />
-          <entry location="wrapper/bin/ResumeTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/StartTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/src" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-x86-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-32.sl" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-32.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-64.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-64.sl" fileType="regular" />
-          <entry location="wrapper/lib/wrapper-windows-x86-32.dll" fileType="regular" />
-        </exclude>
-      </dirEntry>
       <dirEntry mountPoint="5995" file="../deployments/default" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude>
           <entry location="configuration/bootstrap.xml" fileType="regular" />
@@ -401,53 +161,6 @@
           <entry location="xsede_tools.cfg" fileType="regular" />
         </exclude>
       </dirEntry>
-      <dirEntry mountPoint="8977" file="../jni-libs/win64" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="win32" excludeSuffixes="" dirMode="755" overrideDirMode="false">
-        <exclude />
-      </dirEntry>
-      <dirEntry mountPoint="8978" file="../JavaServiceWrapper" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn" dirMode="755" overrideDirMode="true">
-        <exclude>
-          <entry location="wrapper/jdoc" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-32.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-32.sl" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-macosx-universal-64.jnilib" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-x86-32.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-linux-x86-64.so" fileType="regular" />
-          <entry location="wrapper/lib/libwrapper-hpux-parisc-64.sl" fileType="regular" />
-          <entry location="wrapper/bin/testwrapper" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/UninstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/StopTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/ResumeTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/StartTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-freebsd-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-sparc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-32" fileType="regular" />
-          <entry location="wrapper/bin/TestWrapperNoWrapper.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-parisc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-macosx-universal-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-64" fileType="regular" />
-          <entry location="wrapper/bin/GFFSContainer" fileType="regular" />
-          <entry location="wrapper/bin/PauseTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-aix-ppc-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-ppc-64" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-64" fileType="regular" />
-          <entry location="wrapper/bin/InstallTestWrapper-NT.bat" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-hpux-ia-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-linux-x86-32" fileType="regular" />
-          <entry location="wrapper/bin/wrapper-solaris-x86-32" fileType="regular" />
-          <entry location="wrapper/src" fileType="regular" />
-          <entry location="wrapper/jdoc.tar.gz" fileType="regular" />
-          <entry location="wrapper/doc" fileType="regular" />
-          <entry location="wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
-        </exclude>
-      </dirEntry>
     </entries>
     <components>
       <component name="GenesisII Core" id="28" customizedId="" displayDescription="true" hideHelpButton="false" selected="true" changeable="false" downloadable="false" hidden="false">
@@ -461,6 +174,7 @@
           <entry location="jni-libs" fileType="regular" />
           <entry location="current.version" fileType="regular" />
           <entry location="ext" fileType="regular" />
+          <entry location="JavaServiceWrapper" fileType="regular" />
           <entry location="INSTALL" fileType="regular" />
           <entry location="current.deployment" fileType="regular" />
           <entry location="eclipse" fileType="regular" />
@@ -474,21 +188,8 @@
           <entry location="set_gffs_vars" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="client-ui" fileType="launcher" />
-          <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/VcgrClientLib.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/msvcr71.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/nulmrxnp.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/libdb_java45.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/libdb_java45d.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/GeniiProcessMgmt.dll" fileType="regular" />
-          <entry location=".i4j_external_22/jni-lib" fileType="regular" />
-          <entry location=".i4j_external_24/jni-lib" fileType="regular" />
-          <entry location=".i4j_external_3621/jni-lib" fileType="regular" />
           <entry location=".i4j_fileset_8166" fileType="regular" />
           <entry location=".i4j_fileset_8738" fileType="regular" />
-          <entry location=".i4j_external_8976/jni-lib" fileType="regular" />
         </include>
         <dependencies />
       </component>
@@ -844,6 +545,141 @@ return true;</string>
                 </serializedBean>
                 <condition />
               </action>
+              <action name="set genii.jnipath to default" id="10900" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetVariableAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.SetVariableAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>// sets default to unusable path to make sure we fill it in.
+context.setVariable("genii.jnipath", "junk");
+return true;
+</string>
+                          </void>
+                        </object>
+                      </void>
+                      <void property="variableName">
+                        <string>genii.jnipath</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="set genii.platform to default" id="10901" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetVariableAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.SetVariableAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>// sets default to bogus value to make sure we fill it in.
+context.setVariable("genii.platform", "nothing");
+return true;</string>
+                          </void>
+                        </object>
+                      </void>
+                      <void property="variableName">
+                        <string>genii.platform</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Decide on platform details" id="11092" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>
+try {
+    String targetDir = context.getInstallationDirectory() +  "/jni-lib";
+    String baseJni = context.getInstallationDirectory() +  "/jni-libs/";
+
+    // where we will get the jni binaries from.    
+    File finalSourceDir = null;
+    
+    if (Util.isLinux()) {
+        // this is linux...  is it 32 or 64 bits?        
+        Runtime runt = Runtime.getRuntime();
+        String[] cmds = {"arch"};
+        Process proc = runt.exec(cmds);
+        
+        // we assume 64 bit until proven otherwise.
+        boolean is64bits = true;
+        
+        BufferedReader output = new BufferedReader(new 
+             InputStreamReader(proc.getInputStream()));
+        String s = null;
+        while ((s = output.readLine()) != null) {
+            if ( (s != null) &amp;&amp; (s.length() &gt; 0)) {
+                if (s.equals("i686") || s.equals("i586") || s.equals("i386")) {
+                    is64bits = false;
+                }
+                break;                
+            }
+        }
+        output.close();
+        
+        if (is64bits) {
+            // install the linux64 jni.
+            finalSourceDir = new File(baseJni + "lin64");
+            context.setVariable("genii.platform", "linux64");
+        } else {
+            // install the linux32 jni.
+            finalSourceDir = new File(baseJni + "lin32");
+            context.setVariable("genii.platform", "linux32");
+        }
+        
+    } else if (Util.isAtLeastWindowsXP()) {
+        // windows xp or later...
+        
+        if (Util.is64BitWindows()) {
+            // 64 bit windows.
+            finalSourceDir = new File(baseJni + "win64");
+            context.setVariable("genii.platform", "windows64");
+        } else {
+            // 32 bit windows.
+            finalSourceDir = new File(baseJni + "win32");
+            context.setVariable("genii.platform", "windows32");
+        }
+        
+    } else if (Util.isMacOS()) {
+        // mac os x....
+        // we only support 64 bit mac os x currently...
+        finalSourceDir = new File(baseJni + "osx64");
+        context.setVariable("genii.platform", "macosx64");
+    } else {
+        Util.logInfo(null, "unknown OS platform so cannot copy JNI libraries appropriately");
+        context.setVariable("genii.platform", "unknown");
+    }
+    
+    if (finalSourceDir != null) {
+        // we can do the copy now.  but don't know how to get it done in install4j.
+        // we save the location to a variable and use that.
+        context.setVariable("genii.jnipath", finalSourceDir.getAbsolutePath());        
+        Util.logInfo(null, "found platform is " + context.getVariable("genii.platform") + " and the jni dir is " +  context.getVariable("genii.jnipath"));
+    }
+    
+    
+} catch(Exception e) {
+    Util.logInfo(null, "exception occurred while copying JNI libraries for the OS platform");
+}
+
+return true;
+</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
             </actions>
             <formComponents>
               <formComponent name="" id="8399" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
@@ -909,9 +745,7 @@ return true;</string>
                 </object>
               </java>
             </serializedBean>
-            <condition>String ismac = context.getCompilerVariable("genii.isMacOSX");
-if (ismac == null) return true;
-return ismac.equals("false");
+            <condition>!context.getVariable("genii.platform").equals("macosx64") 
 </condition>
             <validation />
             <preActivation />
@@ -949,7 +783,7 @@ return true;</string>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
                       <void property="labelText">
-                        <string>Installing GFFS software and grid deployment for ${compiler:genii.deployment-name} Grid.</string>
+                        <string>Installing GFFS software and grid deployment for ${compiler:genii.deployment-name} Grid on ${installer:genii.platform} platform.</string>
                       </void>
                     </object>
                   </java>
@@ -1026,6 +860,14 @@ return true;</string>
             <preActivation />
             <postActivation />
             <actions>
+              <action name="Set Progress to 0%" id="1064" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.SetProgressAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
               <action name="Set deployment variables" id="3026" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -1083,7 +925,8 @@ return true;</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+                <condition>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64") 
+</condition>
               </action>
               <action name="Stop unix service" id="7826" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -1112,7 +955,8 @@ return true;</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>!context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+                <condition>context.getVariable("genii.platform").equals("linux32") || context.getVariable("genii.platform").equals("linux64") 
+</condition>
               </action>
               <action name="Stop older unix service" id="7996" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -1141,7 +985,8 @@ return true;</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>!context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+                <condition>context.getVariable("genii.platform").equals("linux32") || context.getVariable("genii.platform").equals("linux64") 
+</condition>
               </action>
               <action name="" id="5813" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SleepAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -1153,7 +998,8 @@ return true;</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+                <condition>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64") 
+</condition>
               </action>
               <action name="Backup deployments et al" id="4839" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CreateZipFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -1235,6 +1081,18 @@ return true;</string>
                 </serializedBean>
                 <condition />
               </action>
+              <action name="Set Progress to 12%" id="1065" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                      <void property="percentValue">
+                        <int>12</int>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
               <action name="Set Initialization Variables" id="309" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -1244,11 +1102,7 @@ return true;</string>
                           <void property="value">
                             <string>context.setVariable("genii.username", System.getProperty("user.name"));
 
-FileSetSetup windowsFileset = context.getFileSetById("19");
-FileSetSetup linuxFileset = context.getFileSetById("21");
-FileSetSetup macosFileset = context.getFileSetById("23");
-
-if (context.getCompilerVariable("genii.isWindows").equals("true"))
+if (context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64") )
 {
     String domain = System.getenv("USERDOMAIN");
     String machine = System.getenv("COMPUTERNAME");
@@ -1256,8 +1110,7 @@ if (context.getCompilerVariable("genii.isWindows").equals("true"))
         domain = ".";
     context.setVariable("genii.wrapperdomain", domain);
    
-   //com.install4j.api.Util.showMessage("user name is '"+ context.getVariable("genii.username") + "' and domain is '" +context.getVariable("genii.wrapperdomain") + "'");  
-
+   //com.install4j.api.Util.showMessage("user name is '"+ context.getVariable("genii.username") + "' and domain is '" +context.getVariable("genii.wrapperdomain") + "'");
 }
 
 return true;</string>
@@ -1276,6 +1129,62 @@ return true;</string>
                   </java>
                 </serializedBean>
                 <beans>
+                  <action name="Set Progress to 16%" id="10897" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                          <void property="percentValue">
+                            <int>16</int>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="toss old jni bin dir" id="10895" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                          <void property="files">
+                            <array class="java.io.File" length="1">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>jni-lib</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="recursive">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Copy the chosen jni directory to final place" id="10899" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                          <void property="destinationFile">
+                            <object class="java.io.File">
+                              <string>jni-lib</string>
+                            </object>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="1">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>${installer:genii.jnipath}</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
                   <action name="Create export.properties if doesn't exist" id="9687" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Failed to create export.properties from the template">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
@@ -1776,7 +1685,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="" id="8585" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.RegexTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch database conn pool" id="8585" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.RegexTextFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.RegexTextFileAction">
@@ -1845,6 +1754,18 @@ return true;
 </string>
                               </void>
                             </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Set Progress to 25%" id="10898" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                          <void property="percentValue">
+                            <int>25</int>
                           </void>
                         </object>
                       </java>
@@ -1966,6 +1887,18 @@ return true;
                           </void>
                           <void property="text">
                             <string>https://${installer:genii.hostname}:${installer:genii.xcg-port}/axis/services/VCGRContainerPortType</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Set Progress to 32%" id="1066" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                          <void property="percentValue">
+                            <int>32</int>
                           </void>
                         </object>
                       </java>
@@ -2127,14 +2060,7 @@ return true;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>//String medium = context.getMediaName();
-//return ! medium.startsWith("genesis2-gffs-macosx");
-
-String mac = (String)context.getCompilerVariable("genii.isMacOSX");
-
-//System.out.println("nonmac case, mac value is set to " + mac);
-
-return !mac.equals("true");
+                    <condition>! context.getVariable("genii.platform").equals("macosx64") 
 </condition>
                   </action>
                   <action name="Copy JCE Unlimited Jars - mac" id="5310" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
@@ -2169,14 +2095,7 @@ return !mac.equals("true");
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>//String medium = context.getMediaName();
-//return medium.startsWith("genesis2-gffs-macosx");
-
-String mac = (String)context.getCompilerVariable("genii.isMacOSX");
-
-//System.out.println("mac case, mac value is set to " + mac);
-
-return mac.equals("true");
+                    <condition>context.getVariable("genii.platform").equals("macosx64") 
 </condition>
                   </action>
                   <action name="fix installation dir" id="4474" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
@@ -2957,7 +2876,8 @@ return !signer.exists() || !tls.exists();
                           <void property="conditionExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
-                                <string>context.getCompilerVariable("genii.isWindows").equals("true")</string>
+                                <string>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64") 
+</string>
                               </void>
                             </object>
                           </void>
@@ -3072,14 +2992,14 @@ port for you.</string>
                       </screen>
                     </beans>
                   </group>
-                  <group name="Non-Windows Service Configuration" id="1026" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+                  <group name="Unix Service Configuration" id="1026" customizedId="" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.groups.ScreenGroup">
                           <void property="conditionExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
-                                <string>!(context.getCompilerVariable("genii.isWindows").equals("true") || context.getCompilerVariable("genii.isMacOSX").equals("true"))</string>
+                                <string>context.getVariable("genii.platform").equals("linux32") || context.getVariable("genii.platform").equals("linux64")</string>
                               </void>
                             </object>
                           </void>
@@ -3139,10 +3059,14 @@ port for you.</string>
                 <preActivation />
                 <postActivation />
                 <actions>
-                  <action name="Set Progress to 0%" id="1064" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Set Progress to 37%" id="1067" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction" />
+                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                          <void property="percentValue">
+                            <int>37</int>
+                          </void>
+                        </object>
                       </java>
                     </serializedBean>
                     <condition />
@@ -3179,18 +3103,6 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Set Progress to 12%" id="1065" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
-                          <void property="percentValue">
-                            <int>12</int>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition />
-                  </action>
                   <action name="Replace Variables in wrapper.conf" id="1045" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
@@ -3212,79 +3124,7 @@ return memory;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Set Progress to 25%" id="1066" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
-                          <void property="percentValue">
-                            <int>25</int>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition />
-                  </action>
-                  <action name="Patch broken properties" id="1046" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
-                          <void property="files">
-                            <array class="java.io.File" length="1">
-                              <void index="0">
-                                <object class="java.io.File">
-                                  <string>JavaServiceWrapper/wrapper/conf/wrapper.conf</string>
-                                </object>
-                              </void>
-                            </array>
-                          </void>
-                          <void property="replaceValue">
-                            <string>\\</string>
-                          </void>
-                          <void property="searchValue">
-                            <string>\</string>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition />
-                  </action>
-                  <action name="Re-patch wrapper.conf" id="1149" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="false" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
-                          <void property="files">
-                            <array class="java.io.File" length="1">
-                              <void index="0">
-                                <object class="java.io.File">
-                                  <string>JavaServiceWrapper/wrapper/conf/wrapper.conf</string>
-                                </object>
-                              </void>
-                            </array>
-                          </void>
-                          <void property="replaceValue">
-                            <string>\</string>
-                          </void>
-                          <void property="searchValue">
-                            <string>MOOCH</string>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition />
-                  </action>
-                  <action name="Set Progress to 37%" id="1067" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                    <serializedBean>
-                      <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
-                          <void property="percentValue">
-                            <int>37</int>
-                          </void>
-                        </object>
-                      </java>
-                    </serializedBean>
-                    <condition />
-                  </action>
-                  <action name="" id="1047" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
+                  <action name="Set service wrapper permissions" id="1047" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
@@ -3292,7 +3132,7 @@ return memory;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>JavaServiceWrapper/wrapper/bin/wrapper-linux-x86-${compiler:genii.bitSize}</string>
+                                  <string>JavaServiceWrapper/wrapper/bin</string>
                                 </object>
                               </void>
                             </array>
@@ -3300,10 +3140,14 @@ return memory;</string>
                           <void property="mode">
                             <string>755</string>
                           </void>
+                          <void property="recursive">
+                            <boolean>true</boolean>
+                          </void>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>context.getCompilerVariable("genii.isLinux").equals("true")</condition>
+                    <condition>context.getVariable("genii.platform").equals("linux32") || context.getVariable("genii.platform").equals("linux64")
+</condition>
                   </action>
                   <action name="Set the MacOS access permissions" id="1372" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
                     <serializedBean>
@@ -3324,7 +3168,8 @@ return memory;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>context.getCompilerVariable("genii.isMacOSX").equals("true")</condition>
+                    <condition>context.getVariable("genii.platform").equals("macosx64") 
+</condition>
                   </action>
                   <action name="Set Progress to 50%" id="1068" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
@@ -3345,7 +3190,9 @@ return memory;</string>
                           <void property="conditionExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
-                                <string>!(context.getCompilerVariable("genii.isWindows").equals("true"))</string>
+                                <string>
+context.getVariable("genii.platform").equals("linux32") ||context.getVariable("genii.platform").equals("linux64")
+</string>
                               </void>
                             </object>
                           </void>
@@ -3696,11 +3543,11 @@ return memory;</string>
                           <void property="conditionExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
-                                <string>boolean isWindows = context.getCompilerVariable("genii.isWindows").equals("true");
+                                <string>boolean onWindows = context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64");
 boolean startService = context.getBooleanVariable("genii.startService");
 boolean installService = context.getBooleanVariable("genii.installAsService");
 
-if (isWindows)
+if (onWindows)
     return startService &amp;&amp; installService;
 else
 return startService;</string>
@@ -3736,7 +3583,7 @@ return startService;</string>
                               <void property="conditionExpression">
                                 <object class="com.install4j.api.beans.ScriptProperty">
                                   <void property="value">
-                                    <string>context.getCompilerVariable("genii.isWindows").equals("true")</string>
+                                    <string>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64")</string>
                                   </void>
                                 </object>
                               </void>
@@ -3778,14 +3625,14 @@ return startService;</string>
                           </action>
                         </beans>
                       </group>
-                      <group name="Start Non-WIndows Service" id="1062" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+                      <group name="Start Unix Service" id="1062" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.groups.ActionGroup">
                               <void property="conditionExpression">
                                 <object class="com.install4j.api.beans.ScriptProperty">
                                   <void property="value">
-                                    <string>!(context.getCompilerVariable("genii.isWindows").equals("true"))</string>
+                                    <string>context.getVariable("genii.platform").equals("linux32") || context.getVariable("genii.platform").equals("linux64")</string>
                                   </void>
                                 </object>
                               </void>
@@ -3870,22 +3717,22 @@ return startService;</string>
                             <string>genii.username</string>
                           </void>
                           <void index="3">
-                            <string>genii.isWindows</string>
+                            <string>genii.platform</string>
                           </void>
                           <void index="4">
-                            <string>genii.isLinux</string>
-                          </void>
-                          <void index="5">
-                            <string>genii.isMacos</string>
-                          </void>
-                          <void index="6">
                             <string>genii.hasContainer</string>
                           </void>
-                          <void index="7">
+                          <void index="5">
                             <string>genii.openFirewall</string>
                           </void>
-                          <void index="8">
+                          <void index="6">
                             <string>genii.xcg-port</string>
+                          </void>
+                          <void index="7">
+                            <string>genii.jnipath</string>
+                          </void>
+                          <void index="8">
+                            <string>genii.isContainer</string>
                           </void>
                         </array>
                       </void>
@@ -4028,7 +3875,7 @@ return startService;</string>
                       <void property="conditionExpression">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>context.getCompilerVariable("genii.isWindows").equals("true")</string>
+                            <string>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64") </string>
                           </void>
                         </object>
                       </void>
@@ -4097,14 +3944,14 @@ return startService;</string>
                   </action>
                 </beans>
               </group>
-              <group name="Non-Windows Container Management" id="337" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+              <group name="Unix Container Management" id="337" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ActionGroup">
                       <void property="conditionExpression">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>!(context.getCompilerVariable("genii.isWindows").equals("true"))</string>
+                            <string>context.getVariable("genii.platform").equals("linux32") || context.getVariable("genii.platform").equals("linux64")</string>
                           </void>
                         </object>
                       </void>
@@ -4165,7 +4012,8 @@ return startService;</string>
                       <void property="conditionExpression">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>context.getCompilerVariable("genii.isWindows").equals("true") &amp;&amp; context.getBooleanVariable("genii.installAsService")</string>
+                            <string>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64") 
+ &amp;&amp; context.getBooleanVariable("genii.installAsService")</string>
                           </void>
                         </object>
                       </void>
@@ -4266,7 +4114,7 @@ return startService;</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+                <condition>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64")</condition>
               </action>
               <action name="" id="5812" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SleepAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -4278,7 +4126,7 @@ return startService;</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+                <condition>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64")</condition>
               </action>
               <action name="Remove windows service" id="5810" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -4310,7 +4158,7 @@ return startService;</string>
                     </object>
                   </java>
                 </serializedBean>
-                <condition>context.getCompilerVariable("genii.isWindows").equals("true")</condition>
+                <condition>context.getVariable("genii.platform").equals("windows32") || context.getVariable("genii.platform").equals("windows64")</condition>
               </action>
               <action name="Delete Deployments" id="514" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
@@ -4453,68 +4301,7 @@ return startService;</string>
     </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="linux_gui_x86_32" id="2078" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-x86_${compiler:genii.bitSize}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
-      <excludedLaunchers>
-        <launcher id="1450" />
-        <launcher id="5619" />
-        <launcher id="5622" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location=".i4j_fileset_19" fileType="regular" />
-        <entry location=".i4j_fileset_21" fileType="regular" />
-        <entry location=".i4j_fileset_23" fileType="regular" />
-        <entry location=".i4j_fileset_8975" fileType="regular" />
-      </exclude>
-      <variables>
-        <variable name="genii.isLInux" value="true" description="" category="" />
-        <variable name="genii.isLinux" value="true" description="" category="" />
-        <variable name="genii.isContainer" value="true" description="" category="" />
-        <variable name="genii.bitSize" value="32" description="" category="" />
-      </variables>
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-      <installerScript mode="1" file="">
-        <content />
-      </installerScript>
-    </unixInstaller>
-    <windows name="windows_gui_x86_32" id="2084" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-x86_${compiler:genii.bitSize}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
-      <excludedLaunchers>
-        <launcher id="1450" />
-        <launcher id="39" />
-        <launcher id="1773" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location=".i4j_fileset_21" fileType="regular" />
-        <entry location=".i4j_fileset_23" fileType="regular" />
-        <entry location=".i4j_fileset_3620" fileType="regular" />
-        <entry location=".i4j_fileset_8975" fileType="regular" />
-      </exclude>
-      <variables>
-        <variable name="genii.isWindows" value="true" description="" category="" />
-        <variable name="genii.container-memory.upper-limit" value="1536" description="" category="" />
-        <variable name="genii.isContainer" value="true" description="" category="" />
-        <variable name="genii.bitSize" value="32" description="" category="" />
-      </variables>
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-    </windows>
-    <macosFolder name="mac_gui_amd_64" id="2088" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-macosx-x86_${compiler:genii.bitSize}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
+    <macosFolder name="mac64_gui" id="2088" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-macosx-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4523,15 +4310,9 @@ return startService;</string>
       </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location=".i4j_fileset_19" fileType="regular" />
-        <entry location=".i4j_fileset_21" fileType="regular" />
-        <entry location=".i4j_fileset_3620" fileType="regular" />
-        <entry location=".i4j_fileset_8975" fileType="regular" />
-      </exclude>
+      <exclude />
       <variables>
-        <variable name="genii.isMacOSX" value="true" description="" category="" />
-        <variable name="genii.bitSize" value="64" description="" category="" />
+        <variable name="genii.name-addin" value="x86_64" description="" category="" />
       </variables>
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
         <commentFiles />
@@ -4543,7 +4324,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </macosFolder>
-    <unixInstaller name="linux_gui_amd_64" id="3416" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-x86_${compiler:genii.bitSize}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux64_gui" id="3416" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4558,10 +4339,7 @@ return startService;</string>
         <entry location=".i4j_fileset_8975" fileType="regular" />
       </exclude>
       <variables>
-        <variable name="genii.isLInux" value="true" description="" category="" />
-        <variable name="genii.isLinux" value="true" description="" category="" />
-        <variable name="genii.isContainer" value="true" description="" category="" />
-        <variable name="genii.bitSize" value="64" description="" category="" />
+        <variable name="genii.name-addin" value="x86_64" description="" category="" />
       </variables>
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
         <commentFiles />
@@ -4575,7 +4353,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <linuxRPM name="gffs_rpm_amd_64" id="5987" customizedId="" mediaFileName="${compiler:sys.shortName}-gffs-${compiler:genii.simple-name}-${compiler:sys.version}-${compiler:genii.release-number}-x86_64" installDir="/opt/genesis2" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" os="linux" arch="i386">
+    <linuxDeb name="gffs_deb" id="5991" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-${compiler:genii.release-number}-x86_64" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bzip="false" description="GenesisII GFFS Client Software" dependencies="bash" maintainerEmail="xcghelp@cs.virginia.edu" architectureSet="false" architecture="">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4590,40 +4368,9 @@ return startService;</string>
         <entry location=".i4j_fileset_3620" fileType="regular" />
         <entry location=".i4j_fileset_8975" fileType="regular" />
       </exclude>
-      <variables />
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <preInstallScript mode="2" file="./scripts/software_pre_install.sh">
-        <content />
-      </preInstallScript>
-      <postInstallScript mode="2" file="./scripts/software_post_install.sh">
-        <content />
-      </postInstallScript>
-      <preUninstallScript mode="2" file="./scripts/software_pre_uninstall.sh">
-        <content />
-      </preUninstallScript>
-      <postUninstallScript mode="2" file="./scripts/software_post_uninstall.sh">
-        <content />
-      </postUninstallScript>
-    </linuxRPM>
-    <linuxDeb name="gffs_deb_amd_64" id="5991" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-${compiler:genii.release-number}-x86_64" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bzip="false" description="GenesisII GFFS Client Software" dependencies="bash" maintainerEmail="xcghelp@cs.virginia.edu" architectureSet="false" architecture="">
-      <excludedLaunchers>
-        <launcher id="264" />
-        <launcher id="1450" />
-        <launcher id="5619" />
-        <launcher id="5622" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location=".i4j_fileset_19" fileType="regular" />
-        <entry location=".i4j_fileset_23" fileType="regular" />
-        <entry location=".i4j_fileset_3620" fileType="regular" />
-        <entry location=".i4j_fileset_8975" fileType="regular" />
-      </exclude>
-      <variables />
+      <variables>
+        <variable name="genii.name-addin" value="x86_64" description="" category="" />
+      </variables>
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
         <commentFiles />
         <customAttributes />
@@ -4641,39 +4388,7 @@ return startService;</string>
         <content />
       </postUninstallScript>
     </linuxDeb>
-    <unixInstaller name="linux_gui_powerpc_64" id="8972" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-ppc${compiler:genii.bitSize}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
-      <excludedLaunchers>
-        <launcher id="1450" />
-        <launcher id="5619" />
-        <launcher id="5622" />
-      </excludedLaunchers>
-      <excludedBeans />
-      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
-      <exclude>
-        <entry location=".i4j_fileset_19" fileType="regular" />
-        <entry location=".i4j_fileset_23" fileType="regular" />
-        <entry location=".i4j_fileset_3620" fileType="regular" />
-        <entry location=".i4j_fileset_8975" fileType="regular" />
-      </exclude>
-      <variables>
-        <variable name="genii.isLInux" value="true" description="" category="" />
-        <variable name="genii.isLinux" value="true" description="" category="" />
-        <variable name="genii.isContainer" value="true" description="" category="" />
-        <variable name="genii.bitSize" value="64" description="" category="" />
-      </variables>
-      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
-        <commentFiles />
-        <customAttributes />
-      </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-      </excludedComponents>
-      <includedDownloadableComponents />
-      <installerScript mode="1" file="">
-        <content />
-      </installerScript>
-    </unixInstaller>
-    <windows name="windows_gui_amd_64" id="8974" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-x86_${compiler:genii.bitSize}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows64_gui" id="8974" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="39" />
@@ -4688,10 +4403,64 @@ return startService;</string>
         <entry location=".i4j_fileset_3620" fileType="regular" />
       </exclude>
       <variables>
-        <variable name="genii.isWindows" value="true" description="" category="" />
-        <variable name="genii.isContainer" value="true" description="" category="" />
-        <variable name="genii.bitSize" value="64" description="" category="" />
         <variable name="genii.client-memory.win32" value="2048" description="" category="" />
+        <variable name="genii.name-addin" value="x86_64" description="" category="" />
+      </variables>
+      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
+        <commentFiles />
+        <customAttributes />
+      </autoUpdate>
+      <excludedComponents>
+        <component id="30" />
+      </excludedComponents>
+      <includedDownloadableComponents />
+    </windows>
+    <unixInstaller name="linux32_gui" id="11295" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+      <excludedLaunchers>
+        <launcher id="1450" />
+        <launcher id="5619" />
+        <launcher id="5622" />
+      </excludedLaunchers>
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location=".i4j_fileset_19" fileType="regular" />
+        <entry location=".i4j_fileset_23" fileType="regular" />
+        <entry location=".i4j_fileset_3620" fileType="regular" />
+        <entry location=".i4j_fileset_8975" fileType="regular" />
+      </exclude>
+      <variables>
+        <variable name="genii.name-addin" value="x86_32" description="" category="" />
+      </variables>
+      <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
+        <commentFiles />
+        <customAttributes />
+      </autoUpdate>
+      <excludedComponents>
+        <component id="30" />
+      </excludedComponents>
+      <includedDownloadableComponents />
+      <installerScript mode="1" file="">
+        <content />
+      </installerScript>
+    </unixInstaller>
+    <windows name="windows32_gui" id="11297" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+      <excludedLaunchers>
+        <launcher id="1450" />
+        <launcher id="39" />
+        <launcher id="1773" />
+      </excludedLaunchers>
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location=".i4j_fileset_19" fileType="regular" />
+        <entry location=".i4j_fileset_21" fileType="regular" />
+        <entry location=".i4j_fileset_23" fileType="regular" />
+        <entry location=".i4j_fileset_3620" fileType="regular" />
+      </exclude>
+      <variables>
+        <variable name="genii.name-addin" value="x86_32" description="" category="" />
+        <variable name="genii.client-memory.win32" value="1000" description="" category="" />
       </variables>
       <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
         <commentFiles />

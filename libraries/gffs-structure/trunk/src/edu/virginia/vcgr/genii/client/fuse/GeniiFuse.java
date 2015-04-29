@@ -52,8 +52,9 @@ public class GeniiFuse
 			th.setName("Genesis II FUSE Mount Runner");
 			th.setDaemon(false);
 			th.start();
-		} else
+		} else {
 			runner.run();
+		}
 
 		return new GeniiFuseConnectionImpl(mountPoint);
 	}

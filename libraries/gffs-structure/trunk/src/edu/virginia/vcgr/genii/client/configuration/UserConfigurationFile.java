@@ -175,6 +175,7 @@ public class UserConfigurationFile
 	/**
 	 * grabs a lock on the sentinel file for our configuration file.
 	 */
+	//hmmm: this is more general than for just user config files; move to a handier place.
 	static private FileLock acquireLock(File fileToLock) throws FileLockException
 	{
 		try {

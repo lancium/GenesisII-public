@@ -16,13 +16,13 @@ public class MemoryBasedContextResolver implements IContextResolver
 	}
 
 	@Override
-	public ICallingContext load() throws IOException, FileNotFoundException
+	public ICallingContext resolveContext() throws IOException, FileNotFoundException
 	{
 		return _context.deriveNewContext();
 	}
 
 	@Override
-	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
+	public void storeCurrentContext(ICallingContext ctxt) throws FileNotFoundException, IOException
 	{
 		if (ctxt == null)
 			throw new IllegalArgumentException("Context cannot be null.");

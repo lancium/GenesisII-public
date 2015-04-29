@@ -5,8 +5,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
+
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+
 public class FileLock implements Closeable
 {
+	static private Log _logger = LogFactory.getLog(FileLock.class);
+
 	private FileOutputStream _internalFile = null;
 	private java.nio.channels.FileLock _internalLock = null;
 
@@ -20,7 +28,7 @@ public class FileLock implements Closeable
 	 *            The maximum number of attempts to make at locking before giving up
 	 * @param pollInterval
 	 *            The interval (in milliseconds) to wait between attempts to lock the file before giving up. This value can be 0 indicating
-	 *            infinitee).
+	 *            infinity).
 	 * @throws FileLockException
 	 */
 	public FileLock(File fileToLock, int maxAttempts, long pollInterval) throws FileLockException, InterruptedException
@@ -78,6 +86,50 @@ public class FileLock implements Closeable
 			} catch (Throwable cause) {
 			}
 			_internalLock = null;
+		}
+	}
+
+	static private final int MAX_LOCK_ATTEMPTS = 10;
+
+	/**
+	 * attempts to lock a file "toLock" using java nio locking. this must be later unlocked using the unlockFile method.
+	 */
+	static public FileLock lockFile(File toLock)
+	{
+		FileLock flock = null;
+		try {
+			flock = acquireLock(toLock);
+			if (!toLock.isFile() || !toLock.canRead()) {
+				if (_logger.isTraceEnabled())
+					_logger.debug("either configuration file does not exist or is not readable: '" + toLock + "'");
+				return flock;
+			}
+		} catch (FileLockException fle) {
+			_logger.error("could not lock user configuration file '" + toLock + "'", fle);
+			return flock;
+		}
+		return flock;
+	}
+
+	/**
+	 * unlocks a previously locked file.
+	 */
+	static public void unlockFile(FileLock toUnlock)
+	{
+		StreamUtils.close(toUnlock);
+	}
+
+	/**
+	 * attempts to lock the file fileToLock using our default number of attempts.
+	 */
+	static private FileLock acquireLock(File fileToLock) throws FileLockException
+	{
+		try {
+			return new FileLock(fileToLock, MAX_LOCK_ATTEMPTS, GenesisIIConstants.DEFAULT_FILE_LOCK);
+		} catch (InterruptedException ie) {
+			String msg = "Unexpected interruption exception while locking config file: '" + fileToLock + "'";
+			_logger.error(msg, ie);
+			throw new FileLockException(msg, ie);
 		}
 	}
 }

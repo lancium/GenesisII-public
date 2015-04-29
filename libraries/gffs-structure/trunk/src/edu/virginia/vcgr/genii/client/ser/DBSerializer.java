@@ -76,12 +76,9 @@ public class DBSerializer
 				// 2694770099055262044 is the old version of the unicore assertion class.
 				_logger.warn("caught serialization issue; older format unicore TrustDelegation detected: " + e.getMessage());
 
-				// so far we have seen things be happiest by being given a calling context
-				// implementation here.
+				/* the most likely screw-up is that an old calling context had a deserialization problem, so let's try to repair this. */
 				CallingContextImpl substituteContext = new CallingContextImpl((CallingContextImpl) null);
 				// see if we can just use the container resource.
-				// SecurityUtilities secu =
-				// (SecurityUtilities)CertificateValidatorFactory.getValidator();
 				TrustStoreLinkage tsl = (TrustStoreLinkage) CertificateValidatorFactory.getValidator().getTrustStoreProvider();
 				if (tsl != null) {
 					try {

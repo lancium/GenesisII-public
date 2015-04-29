@@ -23,7 +23,7 @@ public class InMemorySerializedContextResolver implements IContextResolver
 	}
 
 	@Override
-	public ICallingContext load() throws IOException, FileNotFoundException
+	public ICallingContext resolveContext() throws IOException, FileNotFoundException
 	{
 		if (_storedContext == null)
 			return null;
@@ -38,7 +38,7 @@ public class InMemorySerializedContextResolver implements IContextResolver
 	}
 
 	@Override
-	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
+	public void storeCurrentContext(ICallingContext ctxt) throws FileNotFoundException, IOException
 	{
 		if (ctxt == null)
 			_storedContext = null;

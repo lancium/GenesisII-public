@@ -5,7 +5,7 @@ import java.io.File;
 import org.morgan.ftp.FTPConfiguration;
 import org.morgan.ftp.FTPDaemon;
 
-public class Driver
+public class FtpDriver
 {
 	static public void main(String[] args) throws Throwable
 	{
