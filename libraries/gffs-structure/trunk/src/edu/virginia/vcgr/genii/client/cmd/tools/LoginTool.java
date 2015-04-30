@@ -171,7 +171,7 @@ public class LoginTool extends BaseLoginTool
 				throw new ToolException(
 					"Could not authenticate to login service, ensure your username is correct or manually specify IDP path");
 		}
-		
+
 		// we will fill out this list if the login is successful.
 		ArrayList<NuCredential> creds = null;
 
@@ -186,57 +186,57 @@ public class LoginTool extends BaseLoginTool
 
 			assumedContextToken = ContextManager.temporarilyAssumeContext(newContext);
 
-		// Do password Login
-		UsernamePasswordIdentity utCredential = new PasswordLoginTool().doPasswordLogin(_username, _password);
-		if (utCredential != null) {
+			// Do password Login
+			UsernamePasswordIdentity utCredential = new PasswordLoginTool().doPasswordLogin(_username, _password);
+			if (utCredential != null) {
 
 				TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(newContext);
-			transientCredentials.add(utCredential);
+				transientCredentials.add(utCredential);
 
 				/*
 				 * we're going to use the WS-TRUST token-issue operation to log in to a security tokens service
 				 */
-			URI authnSource;
-			try {
-				authnSource = PathUtils.pathToURI(_authnUri);
-			} catch (URISyntaxException e) {
-				throw new ToolException("failure to convert path: " + e.getLocalizedMessage(), e);
-			}
-			KeyAndCertMaterial clientKeyMaterial =
+				URI authnSource;
+				try {
+					authnSource = PathUtils.pathToURI(_authnUri);
+				} catch (URISyntaxException e) {
+					throw new ToolException("failure to convert path: " + e.getLocalizedMessage(), e);
+				}
+				KeyAndCertMaterial clientKeyMaterial =
 					ClientUtils.checkAndRenewCredentials(newContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 
 				if (newContext.getCurrentPath() == null)
 					throw new ToolException("Failure to getCurrentPath in context");
 
 				RNSPath authnPath = newContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
-			EndpointReferenceType epr = authnPath.getEndpoint();
+				EndpointReferenceType epr = authnPath.getEndpoint();
 
-			try {
+				try {
 
-				// Do IDP login
+					// Do IDP login
 					creds = IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
 
-				if (creds == null) {
-					return 0;
-				} else {
-					for (NuCredential q : creds) {
-						_logger.info("login cred: " + q);
+					if (creds == null) {
+						return 0;
+					} else {
+						for (NuCredential q : creds) {
+							_logger.info("login cred: " + q);
+						}
 					}
-				}
 
 					// grab the preferred id so we can put it in the real context.
 					prefId = PreferredIdentity.getCurrent();
-			} finally {
-				if (utCredential != null) {
-					// the UT credential was used only to log into the IDP, remove it
-					transientCredentials.remove(utCredential);
-					_logger.debug("Removing temporary username-token credential from current calling context credentials.");
-				}
+				} finally {
+					if (utCredential != null) {
+						// the UT credential was used only to log into the IDP, remove it
+						transientCredentials.remove(utCredential);
+						_logger.debug("Removing temporary username-token credential from current calling context credentials.");
+					}
 				}
 			}
 		} finally {
 			StreamUtils.close(assumedContextToken);
-			}
+		}
 
 		// re-acquire our context.
 		realCallingContext = ContextManager.getCurrentContext();

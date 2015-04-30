@@ -26,7 +26,7 @@ public class FuseNoSuchEntryException extends FuseException
 		 * any useful information; it just always gets spewed by the fuse-j.jar which we currently cannot change since we don't have source
 		 * code.
 		 */
-		
+
 		System.err.println(": " + getLocalizedMessage());
 	}
 }

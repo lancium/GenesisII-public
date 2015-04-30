@@ -220,7 +220,7 @@ public class IDPLoginTool extends BaseLoginTool
 			}
 
 		}
-		
+
 		return retval;
 	}
 

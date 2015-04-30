@@ -57,7 +57,7 @@ public class ClientContextResolver implements IContextResolver
 		try {
 			fl = FileLock.lockFile(contextFile);
 
-			// if we don't have split context files, we will try to load a combined on. 
+			// if we don't have split context files, we will try to load a combined on.
 			if (contextFile == null || !contextFile.exists() || contextFile.length() == 0) {
 				File combinedFile = getCombinedFile();
 				// make sure we could actually try loading the combined one.
@@ -72,16 +72,16 @@ public class ClientContextResolver implements IContextResolver
 			} else {
 				// we must unlock the file again before letting the context load occur (since it also locks).
 				StreamUtils.close(fl);
-				// load the more modern split context from two files. 
+				// load the more modern split context from two files.
 				toReturn = ContextFileSystem.load(contextFile, getContextTransientFile());
 			}
-			
+
 		} finally {
 			StreamUtils.close(fl);
 			if (_logger.isTraceEnabled())
 				_logger.trace(">out of calling context load<");
 		}
-		
+
 		return toReturn;
 	}
 
