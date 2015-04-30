@@ -146,6 +146,7 @@ check_if_failed "checking if the modified local file and grid copy are the same"
 echo "step 7 success."
 
 echo -e "\n\n8. Modify the file within the grid side this time.  We will just overwrite the file."
+grid rm "$othergridfile"
 # this resets the file to a single copy of our test data.
 grid cp local:"$temp_file" "$othergridfile"
 check_if_failed "overwriting data file within grid"
