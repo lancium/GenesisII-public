@@ -16,8 +16,6 @@
 user="$1"; shift
 path="$1"; shift
 
-####>>>  detaint user name and file name here somehow.
-
 # echoes the "detainted" version of the single input parameter.
 # this string will not retain any characters which are problematic for
 # shell expansion.
@@ -56,7 +54,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # actually perform the chown operation.
-/bin/chown "$1" "$path"
+/bin/chown "$user" "$path"
 if [ $? -ne 0 ]; then
   echo "Failure to chown the file: $path"
 fi
