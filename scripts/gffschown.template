@@ -41,13 +41,8 @@ function detaint()
 user="$(detaint "$user")"
 path="$(detaint "$path")"
 
-
-echo "untainted user is now '$user'"
-echo "untainted path is now '$path'"
-echo bailing
-exit 1
-
-
+#echo "untainted user is now '$user'"
+#echo "untainted path is now '$path'"
 
 if [ ! -f "$path" ]; then
   echo "The file provided does not exist: $path"
