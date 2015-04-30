@@ -161,6 +161,7 @@ echo "step 9 success."
 echo -e "\n\n\nThe export has been tested and seems fully functional for reading and writing.\n\n"
 
 # clean up
-rm -f "$temp_file" "$temp_file2" "$outfile1" "$outfile2" "$local_path/$shortaltname" "$local_file"
+#no: rm -f "$temp_file" "$temp_file2" "$outfile1" "$outfile2" "$local_path/$shortaltname" "$local_file"
+# if we clean up, they can't see any new files under the export.
 
 
