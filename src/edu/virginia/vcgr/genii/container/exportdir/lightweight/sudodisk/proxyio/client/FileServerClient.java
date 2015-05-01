@@ -464,6 +464,7 @@ public class FileServerClient
 
 		try {
 			pb.redirectOutput(Redirect.PIPE);
+			pb.redirectErrorStream(true);
 			p = pb.start();
 		} catch (Exception e) {
 			_logger.error("got exception from launching of proxy io process", e);
