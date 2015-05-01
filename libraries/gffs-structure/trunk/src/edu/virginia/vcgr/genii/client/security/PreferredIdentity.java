@@ -176,16 +176,21 @@ public class PreferredIdentity implements Serializable
 			return null;
 		try {
 			Object prefChunk = context.getSingleValueProperty(PREFERRED_IDENTITY_PROPERTY_NAME);
-			if ((prefChunk != null) && (prefChunk instanceof String)) {
+			// if nothing's there, just bail out.
+			if (prefChunk == null)
+				return null;
+			if (prefChunk instanceof String) {
 				_logger.debug("found preferred identity blob in calling context:" + prefChunk.toString());
 				return PreferredIdentity.decodePrefId((String) prefChunk);
-			} else if ((prefChunk != null) && (prefChunk instanceof PreferredIdentity)) {
+			} else if (prefChunk instanceof PreferredIdentity) {
 				/*
 				 * older school version. we will trust that it's still the right format. but next time we store it, it goes in as a string.
 				 */
 				return (PreferredIdentity) prefChunk;
 			} else {
-				_logger.debug("got something called a preferred identity in calling context, but it's the wrong type of object!");
+				_logger
+					.debug("got something called a preferred identity in calling context, but it's the wrong type of object!  object type is: "
+						+ prefChunk.getClass().getCanonicalName());
 				return null;
 			}
 		} catch (Exception e) {
