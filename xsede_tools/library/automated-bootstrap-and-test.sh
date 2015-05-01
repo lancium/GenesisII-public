@@ -77,7 +77,7 @@ function bail_on_fail()
 
 # need to fix up an input file to use for all our testing.
 
-INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/xsede_tools.jenkins-xsede"
+INPUTFILE_FOR_JENKINS="$GRITTY_TESTING_TOP_LEVEL/examples/xsede_tools.cfg-jenkins-xsede"
 
 # give the build an input file it can use.  this one relies on our having set
 # the crucial variables beforehand in the code above; they will percolate down

@@ -15,14 +15,14 @@ source "$XSEDE_TEST_ROOT/library/helper_methods.sh"
 function create_work_area()
 {
   echo -e "\nCurrently logged in to the grid as:"
-  grid whoami
+  silent_grid whoami
   cat $GRID_OUTPUT_FILE
   echo
   if [ $(grep -ic "additional credentials" <$GRID_OUTPUT_FILE) -gt 0 ]; then
     # set up the RNSPATH folder, in case it doesn't already exist.
     echo Checking work area in $RNSPATH
-    grid mkdir --parents grid:$RNSPATH &>/dev/null
-    grid chmod grid:$RNSPATH +rwx $USERPATH
+    silent_grid mkdir --parents grid:$RNSPATH &>/dev/null
+    silent_grid chmod grid:$RNSPATH +rwx $USERPATH
     check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
   else
     echo Failed to find any credentials for running the regression tests.

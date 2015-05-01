@@ -126,7 +126,7 @@ check_if_failed "granting admin privileges to $new_admin_name"
 # that user, since the admin should have been given complete control over all services
 # on the container.
 grid_chk logout --all
-grid login --username="$(basename $new_admin_name)" --password="$new_password"
+silent_grid login --username="$(basename $new_admin_name)" --password="$new_password"
 check_if_failed Logging in as $new_admin_name
 
 ##############

@@ -66,12 +66,12 @@ bash "$XSEDE_TEST_ROOT/library/setup_test_infrastructure.sh" $CONTAINERPATH $NOR
 check_if_failed "setting up test infrastructure"
 
 # set up the RNSPATH folder for testing.
-grid chmod -R grid:$RNSPATH +rwx $USERPATH
+silent_grid chmod -R grid:$RNSPATH +rwx $USERPATH
 check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
 
 # logout and get into normal garb.
-grid logout --all 
-grid login --username=$(basename $USERPATH) --password=$NORMAL_ACCOUNT_PASSWD
+silent_grid logout --all 
+silent_grid login --username=$(basename $USERPATH) --password=$NORMAL_ACCOUNT_PASSWD
 check_if_failed "logging in as $USERPATH"
 
 # now add a second container for replication if desired.

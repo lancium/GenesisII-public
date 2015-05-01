@@ -41,7 +41,7 @@ testDeleteUsers()
     echo "Whacking user '$username'..."
     passwd="${MULTI_PASSWORD_LIST[$x]}"
     # now do the heavy lifting to get that user set up.
-    grid script "local:'$XSEDE_TEST_ROOT/library/delete_one_user.xml'" "$CONTAINERPATH" "$(basename $username)" "$username" "$SUBMIT_GROUP"
+    silent_grid script "local:'$XSEDE_TEST_ROOT/library/delete_one_user.xml'" "$CONTAINERPATH" "$(basename $username)" "$username" "$SUBMIT_GROUP"
     assertEquals "Should delete user '$username' successfully" 0 $?
   done
 }
@@ -50,7 +50,7 @@ testDeleteUsers()
 testLogoutAgain()
 {
   if [ -z "$NON_INTERACTIVE" ]; then
-    grid logout --all
+    silent_grid logout --all
     assertEquals "Final logout of the grid" 0 $?
   fi
 }

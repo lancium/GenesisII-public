@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
@@ -440,13 +441,23 @@ public class FileServerClient
 				return fsid;
 			}
 		}
+		
+		// try to locate sudo before we call.
+		File sudoPath = new File("/usr/bin/sudo");
+		if (!sudoPath.exists()) {
+			sudoPath = new File("/bin/sudo");
+			if (!sudoPath.exists()) {
+				sudoPath = new File("sudo");
+				_logger.warn("could not definitively locate sudo; trying to find on PATH");
+			}
+		}
 
 		// prepare a command line for launching the proxyio server.
 		List<String> cmds = new ArrayList<String>();
-		cmds.add("sudo");
+		cmds.add(sudoPath.getAbsolutePath()); // the command.
 		cmds.add("-n"); // non-interactive, don't break out for a password prompt.
-		cmds.add("-u");
-		cmds.add(uname);
+		cmds.add("-u"); // flag for user name.
+		cmds.add(uname); // the user name.
 		cmds.add(ExportProperties.getExportProperties().getProxyIOLauncherFilePath());
 
 		if (_logger.isDebugEnabled()) {
@@ -471,17 +482,41 @@ public class FileServerClient
 			return null;
 		}
 
-		// slight pause to avoid jumping on server too quickly.
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
-			// ignored.
-		}
+//		// slight pause to avoid jumping on server too quickly.
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e1) {
+//			// ignored.
+//		}
 
 		BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 		BufferedOutputStream stdin = new BufferedOutputStream(p.getOutputStream());
 
+		try {
+			int sleep_count = 0;
+			// wait for the stream to become ready, or die.
+			while (!stdout.ready()) {
+				Thread.sleep(1000);
+				sleep_count++;
+				if (sleep_count > 30) {
+					throw new IOException("sleep count exceeded in waiting for proxyio process to signal readiness");
+				}
+			}
+			// now get the startup signal.
+			String line = stdout.readLine();
+			if (line != "ready") {
+				// this is not right.
+				throw new IOException("got erroneous response from proxyio startup, said '" + line + "' instead of 'ready'");
+			}
+		} catch (Exception eep) {
+			// kill the bad process we created!
+			_logger.error("got exception reading startup line from proxy io process, aborting it", eep);
+			p.destroy();
+			return null;
+		}
+		
+		
 		try {
 			new Random().nextBytes(nonce);
 			stdin.write(nonce);

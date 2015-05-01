@@ -102,7 +102,7 @@ testLoginNormalUser()
 {
   if [ -z "$NON_INTERACTIVE" ]; then
     echo "[$(date)]"
-    grid logout --all
+    silent_grid logout --all
     login_a_user normal
   fi
 }

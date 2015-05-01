@@ -48,7 +48,7 @@ put_on_hat()
   fi
 
   echo "I now am logged in as this guy:"
-  grid whoami
+  silent_grid whoami
   cat $GRID_OUTPUT_FILE
 
   return 0
@@ -66,7 +66,7 @@ function establish_identity()
   fi
 #echo "establish_identity: idp_path is: $idp_path"
   # now toss any old creds.
-  grid logout --all
+  silent_grid logout --all
 #retired:  if [ "$BES_TYPE" = "Unicore" ]; then
 #retired:    # make sure we do the extra step for unicore authentication, if it seems
 #retired:    # needed.  this step has to be done inside one grid client activation to
@@ -79,7 +79,7 @@ function establish_identity()
 #retired:  else
 
     # assert the new identity.  this is the big one that had better work.
-    grid login --username=${user} --password=${password} $idp_path
+    silent_grid login --username=${user} --password=${password} $idp_path
 
 #retired:  fi
 }
@@ -100,7 +100,7 @@ take_off_hat()
   fi
   echo "About to log out from $GENII_USER_DIR"
   # drop the login now, since that user is done.
-  grid logout --all
+  silent_grid logout --all
   echo "Logged out, now cleaning up $GENII_USER_DIR"
   # removing the copy of the directory, we fervently hope.
   rm -rf "$GENII_USER_DIR"
@@ -113,7 +113,7 @@ take_off_hat()
 function login_a_user()
 {
   admin="$1"; shift
-  grid logout --all
+  silent_grid logout --all
   assertEquals "Logging out of the grid" 0 $?
   echo "You are about to be requested to login."
   if [ "$admin" == "admin" ]; then
@@ -123,7 +123,7 @@ function login_a_user()
     echo "Please ensure that you log in as a normal (non-admin) user.  This account will"
     echo "be used for all further testing in this test suite."
   fi
-  grid login
+  silent_grid login
   local retval=$?
   assertEquals "Logging in to the grid as an administrative user" 0 $retval
   if [ $retval == 0 ]; then
@@ -160,7 +160,7 @@ function create_user() {
     full_group="$GROUPS_LOC/$grp"
   fi
 
-  grid script "local:'$XSEDE_TEST_ROOT/library/create_one_user.xml'" "$STS_LOC" "$user" "$full_user" "$passwd" "$grp" "$full_group" "$HOMES_LOC" "$(dirname "$full_user")"
+  silent_grid script "local:'$XSEDE_TEST_ROOT/library/create_one_user.xml'" "$STS_LOC" "$user" "$full_user" "$passwd" "$grp" "$full_group" "$HOMES_LOC" "$(dirname "$full_user")"
 }
 
 # creates a group in the grid.  this group is not expected to have any special
@@ -173,7 +173,7 @@ function create_group()
     exit 1
   fi
   local grp="$(basename $full_group)"
-  grid ls "$STS_LOC/Services/X509AuthnPortType/$grp" &>/dev/null
+  silent_grid ls "$STS_LOC/Services/X509AuthnPortType/$grp" &>/dev/null
   if [ $? -ne 0 ]; then
     multi_grid <<eof
       idp --validDuration=10years $STS_LOC/Services/X509AuthnPortType "$grp"

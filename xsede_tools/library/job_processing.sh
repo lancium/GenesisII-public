@@ -58,12 +58,12 @@ function cancel_all_in_queue()
   local queue_path=$1; shift
 
   # start by clearing out all those that are finished already.
-  grid qcomplete $queue_path --all
+  silent_grid qcomplete $queue_path --all
 
   # get a listing of all the stuff in the queue.
   holding="$GRID_OUTPUT_FILE"
   GRID_OUTPUT_FILE="$(mktemp $TEST_TEMP/job_processing/cancellation_list.XXXXXX)"
-  grid qstat $queue_path
+  silent_grid qstat $queue_path
   tickets=($(gawk '{ print $1 }' <$GRID_OUTPUT_FILE))
   # show what we're going to whack.
   echo "Cancelling $(expr ${#tickets[*]} - 1) queue jobs:"
@@ -76,11 +76,11 @@ function cancel_all_in_queue()
       zaps+=(${tickets[j]})
     done
     echo "batch $(expr $i / $BATCH_SIZE): ${zaps[*]}"
-    grid qkill $queue_path ${zaps[*]}
+    silent_grid qkill $queue_path ${zaps[*]}
   done
 
-  grid qcomplete $queue_path --all
-  grid qstat $queue_path
+  silent_grid qcomplete $queue_path --all
+  silent_grid qstat $queue_path
   
   # show any refugees if something managed to escape our queue crushing.
   if [ $(compute_remaining_jobs $queue_path) -ne 0 ]; then
@@ -122,7 +122,7 @@ function wait_for_all_pending_jobs()
   local error_count=0
 
   # start by clearing out any that are finished.
-  grid qcomplete $queue_path --all
+  silent_grid qcomplete $queue_path --all
 
   local left=$(compute_remaining_jobs $queue_path)
   local last_left=$left
@@ -152,7 +152,7 @@ function wait_for_all_pending_jobs()
     last_left=$left
     # try dropping any that are already complete, so we don't have to keep looking at them.
     if [ ! -z "$whack_jobs" ]; then
-      grid qcomplete $queue_path --all
+      silent_grid qcomplete $queue_path --all
     fi
   done
   
@@ -163,7 +163,7 @@ function wait_for_all_pending_jobs()
     # make sure we track the presence of an error job _as_ an error.
     if [ $? -ne 0 ]; then ((error_count++)); fi
   fi
-  grid qcomplete --all $queue_path
+  silent_grid qcomplete --all $queue_path
   if [ $? -ne 0 ]; then ((error_count++)); fi
   return $error_count
 }
@@ -181,7 +181,7 @@ function submit_asynchronous_job_on_BES()
   jsdl_file="$1"; shift
   resource_name="$1"; shift
   ASYNCHRONOUS_BES_PENDING_JOBS+=($jobname)
-  grid run --async-name=$jobname --jsdl=local:$GENERATED_JSDL_FOLDER/$jsdl_file "$resource_name"
+  silent_grid run --async-name=$jobname --jsdl=local:$GENERATED_JSDL_FOLDER/$jsdl_file "$resource_name"
   assertEquals "Submitting job: $jobname" 0 $?
 }
 
@@ -231,7 +231,7 @@ function poll_job_dirs_until_finished()
       for jobname in ${pending[*]}; do
         echo -e "\n------------------------------\n" 2>&1 >>$JOB_OUTPUT_FILE
         echo "$jobname..." 2>&1 >>$JOB_OUTPUT_FILE
-        grid cat $jobname/status
+        silent_grid cat $jobname/status
         \mv -f "$GRID_OUTPUT_FILE" "$my_output"
         cat "$my_output" 2>&1 >>$JOB_OUTPUT_FILE
         sleep 3  # no point in crushing the machine.
@@ -241,9 +241,9 @@ function poll_job_dirs_until_finished()
           pending=(${pending[*]#${jobname}})
           echo "successfully finished: $jobname" >>$JOB_OUTPUT_FILE
 #echo here is thing before remove: $jobname
-#grid ls $jobname
+#silent_grid ls $jobname
 #cat $GRID_OUTPUT_FILE
-          grid rm -rf $jobname
+          silent_grid rm -rf $jobname
           assertEquals "clear folder for job: $jobname" 0 $?
         else
           echo "job not done yet: $jobname" >>$JOB_OUTPUT_FILE
@@ -268,7 +268,7 @@ function get_job_list_from_queue()
 {
   # this path will show all our submitted tickets.  we want to get that list as
   # a set of job tickets to use.
-  grid ls $QUEUE_PATH/jobs/mine/all
+  silent_grid ls $QUEUE_PATH/jobs/mine/all
   assertEquals "Getting list of my tickets in queue." 0 $?
   # scarf up the job ids we found.
   SUBMISSION_POINT_JOB_LIST=($(cat $GRID_OUTPUT_FILE | tail -n +2))
@@ -299,7 +299,7 @@ function drain_my_jobs_out_of_queue()
       done
       # run the test of showing a job's submitted file.
       single_job=${SUBMISSION_POINT_JOB_LIST[0]}
-      grid ls $QUEUE_PATH/jobs/mine/all/$single_job
+      silent_grid ls $QUEUE_PATH/jobs/mine/all/$single_job
       local retval=$?
       echo "Contents of first job's file..."
       cat $GRID_OUTPUT_FILE
@@ -329,7 +329,7 @@ function drain_my_jobs_out_of_queue()
         if [[ "$jobStatus" =~ .*FINISHED.* ]]; then
 #echo "  saw job in finished state"
             count=-1
-            grid qcomplete $QUEUE_PATH $i
+            silent_grid qcomplete $QUEUE_PATH $i
             retval=$?
             # bail out if we see any error when asking it to complete.
             if [ $retval -ne 0 ]; then break; fi
@@ -338,7 +338,7 @@ function drain_my_jobs_out_of_queue()
         if [[ "$jobStatus" =~ .*ERROR.* ]]; then
 #echo "  saw job in error state"
             count=-1
-            grid qkill $QUEUE_PATH $i
+            silent_grid qkill $QUEUE_PATH $i
             retval=$?
             # bail out if we see any error when asking it to complete.
             if [ $retval -ne 0 ]; then break; fi
@@ -387,7 +387,7 @@ get_BES_resources()
     return 0
   fi
   local RESRC_FILE="$(mktemp "$TEST_TEMP/job_processing/queue_resources.XXXXXX")"
-  grid ls $QUEUE_PATH/resources 
+  silent_grid ls $QUEUE_PATH/resources 
   # check for a failure of the resource check.
   if [ $? -ne 0 ]; then echo ""; return 1; fi
   \cp -f $GRID_OUTPUT_FILE "$RESRC_FILE"

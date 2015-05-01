@@ -29,7 +29,7 @@ function pick_grid_app()
 # this is a helper function that hides the grid command's output unless an error
 # is detected.  it does not do error checking, but it will return with the grid
 # command's exit value.
-function grid()
+function silent_grid()
 {
   grid_base \"$(pick_grid_app)\" "${@}"
 }
@@ -53,8 +53,24 @@ function timed_grid()
 function grid_chk()
 {
   echo "    g> $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
-  grid $*
+  silent_grid $*
   check_if_failed "'grid ${1}...' exited with exit code $?"
+}
+
+function noisy_grid()
+{
+  echo "    g> $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
+  silent_grid $*
+  local retval=$?
+  # show the output from the silent_grid command above, regardless of success.
+  cat "$GRID_OUTPUT_FILE"
+  return $retval
+}
+
+# default grid command is an alias for the noisy_grid method.
+function grid()
+{
+  noisy_grid $*
 }
 
 # this function accepts a long stream of stuff from standard input which is passed
