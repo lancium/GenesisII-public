@@ -441,7 +441,7 @@ public class FileServerClient
 				return fsid;
 			}
 		}
-		
+
 		// try to locate sudo before we call.
 		File sudoPath = new File("/usr/bin/sudo");
 		if (!sudoPath.exists()) {
@@ -482,12 +482,12 @@ public class FileServerClient
 			return null;
 		}
 
-//		// slight pause to avoid jumping on server too quickly.
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e1) {
-//			// ignored.
-//		}
+		// // slight pause to avoid jumping on server too quickly.
+		// try {
+		// Thread.sleep(1000);
+		// } catch (InterruptedException e1) {
+		// // ignored.
+		// }
 
 		BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
@@ -505,7 +505,7 @@ public class FileServerClient
 			}
 			// now get the startup signal.
 			String line = stdout.readLine();
-			if (line != "ready") {
+			if (!line.equals("ready")) {
 				// this is not right.
 				throw new IOException("got erroneous response from proxyio startup, said '" + line + "' instead of 'ready'");
 			}
@@ -515,8 +515,7 @@ public class FileServerClient
 			p.destroy();
 			return null;
 		}
-		
-		
+
 		try {
 			new Random().nextBytes(nonce);
 			stdin.write(nonce);
