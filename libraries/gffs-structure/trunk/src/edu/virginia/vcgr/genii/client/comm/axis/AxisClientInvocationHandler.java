@@ -444,7 +444,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				try {
 					context = ContextManager.getCurrentContext();
 					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
-					_logger.error("failed invoke has these creds in call context: " + tc.toString());
+					_logger.debug("invocation that was denied has these creds in call context: " + tc.toString());
 				} catch (Exception e2) {
 					String msg2 = "could not load calling context to inspect credentials for failed IDP.";
 					_logger.error(msg2, e2);

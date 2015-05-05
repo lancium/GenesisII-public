@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement;
 
 import java.rmi.RemoteException;
 
+import org.apache.axis.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -14,18 +15,18 @@ import org.oasis_open.wsn.base.UnableToGetMessagesFaultType;
 
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
+import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPortType;
 import edu.virginia.vcgr.genii.notification.broker.TestNotificationRequest;
 
-/*
+/**
  * This is a wrapper class around the notification broker port-type that keep tracks of broker end-point's properties and manage periodic
  * polling of notification messages when there is some NAT or firewall in the network. Apart from active or passive-polling modes, broker
  * resource properties are stored to determine the lifetime of subscriptions made via the broker and to handle loss of messages.
  */
 public class NotificationBrokerWrapper
 {
-
 	private static Log _logger = LogFactory.getLog(NotificationBrokerWrapper.class);
 
 	private static final int MAX_NUMBER_OF_TRIES_TO_CHANGE_MODE = 3;
@@ -56,6 +57,9 @@ public class NotificationBrokerWrapper
 		brokerCreationTime = System.currentTimeMillis();
 		this.lastReceivedMessageIndex = 0;
 		new NotificationPoller().start();
+		if (_logger.isDebugEnabled())
+			_logger.debug("wrapping notification broker: container=" + containerId + " lifetime=" + brokerResourceLifeTime + "activeMode="
+				+ brokerInActiveMode);
 	}
 
 	public void setBrokerInActiveMode(boolean brokerInActiveMode)
@@ -117,7 +121,7 @@ public class NotificationBrokerWrapper
 			lastModeTestTrialTimeInMillis = System.currentTimeMillis();
 		} catch (RemoteException e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("failed to test the broker for notification");
+				_logger.debug("could not successfully test the broker for notification");
 		}
 	}
 
@@ -138,22 +142,22 @@ public class NotificationBrokerWrapper
 
 	public void destroyBroker()
 	{
-
-		// This line is important as the container automatically deletes the broker if a timeout
-		// occurs. In that case, calling this method will result in an error. Rather this method
-		// is supposed to be called when broker is extant and we want an early termination. To
-		// avoid any mishap that may arise from an unintended use, the following conditional is
-		// applied.
+		/*
+		 * This line is important as the container automatically deletes the broker if a timeout occurs. In that case, calling this method
+		 * will result in an error. Rather this method is supposed to be called when broker is extant and we want an early termination. To
+		 * avoid any mishap that may arise from an unintended use, the following conditional is applied.
+		 */
 		if (brokerDestroyed || brokerExpired())
 			return;
 
 		try {
 			if (_logger.isDebugEnabled())
-				_logger.debug("destroying notification broker");
+				_logger.debug("destroying wrapped notification broker: container=" + containerId + " terminationTime="
+					+ brokerResourceTerminationTime + "activeMode=" + brokerInActiveMode);
 			brokerPortType.destroy(new Destroy());
 		} catch (Exception ex) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Failed to destroy the broker manually, relying on resource timeout.");
+				_logger.debug("Could not destroy the broker manually, relying on resource timeout.");
 		}
 		brokerDestroyed = true;
 	}
@@ -165,13 +169,11 @@ public class NotificationBrokerWrapper
 		public void run()
 		{
 
-			// Every cache management related thread that load or store information from the Cache
-			// should have
-			// unaccounted access to both CachedManager and RPCs to avoid getting mingled with Cache
-			// access and
-			// RPCs initiated by some user action. This is important to provide accurate statistics
-			// on per container
-			// resource usage.
+			/*
+			 * Every cache management related thread that load or store information from the Cache should have unaccounted access to both
+			 * CachedManager and RPCs to avoid getting mingled with Cache access and RPCs initiated by some user action. This is important to
+			 * provide accurate statistics on per container resource usage.
+			 */
 			ResourceAccessMonitor.getUnaccountedAccessRight();
 
 			PollingIntervalDirectory.storePollingTimeSettings(new PollingTimeSettings(containerId));
@@ -205,6 +207,15 @@ public class NotificationBrokerWrapper
 				} catch (ResourceUnknownFaultType e) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("There is some problem with the broker. Conservatively resetting the cache.", e);
+					CacheManager.resetCachingSystem();
+				} catch (AxisFault e) {
+					if (e instanceof PermissionDeniedException) {
+						if (_logger.isDebugEnabled())
+							_logger.debug("Permission denied on destroying broker. Conservatively resetting the cache.");
+					} else {
+						if (_logger.isDebugEnabled())
+							_logger.debug("Unexpected AxisFault. Conservatively resetting the cache.", e);
+					}
 					CacheManager.resetCachingSystem();
 				} catch (RemoteException e) {
 					if (_logger.isDebugEnabled())

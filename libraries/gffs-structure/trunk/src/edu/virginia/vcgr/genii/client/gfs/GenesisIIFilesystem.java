@@ -263,28 +263,34 @@ public class GenesisIIFilesystem implements FSFilesystem
 				ICallingContext context = ContextManager.getCurrentContext();
 
 				/*
+				 * hmmm: indeed, the problem with seeing sizes of files on windows export went away when this was turned off. and it seemed
+				 * that what we were seeing was that the last file in the list would get its real size, but so would every other file in the
+				 * list. so a copy gone astray?
 				 * 
-				 * ///hmmm: holding to check if this is the problem-- context.setSingleValueProperty("RNSShortForm", true); //hmmm: indeed,
-				 * the problem with seeing sizes of files on windows export went away // when this was turned off. and it seemed that what we
-				 * were seeing was that the // last file in the list would get its real size, but so would every other file in // the list. so
-				 * a copy gone astray? //why windows only though? is that real? need to test a linux export.
-				 * 
-				 * 
-				 * // Due to a problem the the context resolver, we have explicitly store the context // to make property // update visible in
-				 * the rest of the code. ContextManager.storeCurrentContext(context);
+				 * tested and found that this is not just windows, but affects any export viewed through fuse. it's easy to reproduce with a
+				 * bootstrapped grid.
 				 */
+				boolean shortFormEnabledHere = false; // debugging switch to enable/disable fuse short form.
+				if (shortFormEnabledHere) {
+					context.setSingleValueProperty("RNSShortForm", true);
+					/*
+					 * Due to a problem the the context resolver, we have explicitly store the context to make property update visible in the
+					 * rest of the code.
+					 */
+					ContextManager.storeCurrentContext(context);
+				}
 
 				EnhancedRNSPortType pt = ClientUtils.createProxy(EnhancedRNSPortType.class, target.getEndpoint());
 				RNSIterable entries = new RNSIterable(fullPath, pt.lookup(null), context, RNSConstants.PREFERRED_BATCH_SIZE);
 				directoryHandle = new EnhancedRNSHandle(this, entries, fullPath);
 
-				/*
-				 * // For the similar problem, we have to do another store after removing the property // to have the // proper effect.
-				 * 
-				 * ///hmmm: holding to check if this is the problem-- context.removeProperty("RNSShortForm"); //hmmm: yes, see above note.
-				 * this seems to be the problem, and its a client side only issue... so far. ContextManager.storeCurrentContext(context);
-				 */
-
+				if (shortFormEnabledHere) {
+					context.removeProperty("RNSShortForm");
+					/*
+					 * For the similar problem, we have to do another store after removing the property to have the proper effect.
+					 */
+					ContextManager.storeCurrentContext(context);
+				}
 			} else if (info.isRNS()) {
 				directoryHandle = new DefaultRNSHandle(this, target.listContents(true));
 			} else {

@@ -395,7 +395,8 @@ public class CredentialWallet implements Externalizable, Describable
 		for (TrustCredential trustDelegation : assertionChains.values())
 			howManyTotal += trustDelegation.getDelegationDepth();
 		if (howManyTotal == 0) {
-			_logger.warn("writeExternal saw no credentials to write during wallet serialization.");
+			if (_logger.isDebugEnabled())
+				_logger.debug("writeExternal saw no credentials to write during wallet serialization.");
 			return;
 		}
 		try {
