@@ -1,4 +1,5 @@
 # Path UserID [Options]
-# Default exports file allows any user to export on any path.
-/ * rw
+# Default exports file disallows all paths and all users for creating exports.
+# Edit to add directories which users are allowed to export, such as /home.
+/ * n
 
