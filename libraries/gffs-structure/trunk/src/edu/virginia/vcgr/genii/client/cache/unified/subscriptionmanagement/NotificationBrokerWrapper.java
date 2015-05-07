@@ -58,7 +58,7 @@ public class NotificationBrokerWrapper
 		this.lastReceivedMessageIndex = 0;
 		new NotificationPoller().start();
 		if (_logger.isDebugEnabled())
-			_logger.debug("wrapping notification broker: container=" + containerId + " lifetime=" + brokerResourceLifeTime + "activeMode="
+			_logger.debug("wrapping notification broker: container=" + containerId + " lifetime=" + brokerResourceLifeTime + " activeMode="
 				+ brokerInActiveMode);
 	}
 
