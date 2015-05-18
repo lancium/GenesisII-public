@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -27,6 +28,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.ExportProperties.ExportMechanisms;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -344,7 +346,17 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						for (int pos = 0; pos < me.length; pos++) {
 							MessageElement element = ent.getMetadata().get_any()[pos];
 							QName name = element.getQName();
-							if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
+							// 5/13/2015 ASG	
+							if (name.equals(GenesisIIConstants.RESOURCE_URI_QNAME)) {
+								String epi = element.getValue();
+								Matcher matcher = EPI_PATTERN.matcher(epi);
+								if (matcher.matches())
+									epi = matcher.group(1);
+								java.net.URI forkFileURI = forkFile.toURI();
+								epi += ":fork-path:" + forkFileURI.getRawPath();
+								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);									
+							}
+							else if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
 								// Found the EPI
 								String epi = element.getValue();
 								Matcher matcher = EPI_PATTERN.matcher(epi);
@@ -403,7 +415,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						for (int pos = 0; pos < me.length; pos++) {
 							MessageElement element = ent.getMetadata().get_any()[pos];
 							QName name = element.getQName();
-							if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
+//	5/13/2015 ASG			if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
+							if (name.equals(GenesisIIConstants.RESOURCE_URI_QNAME)) {
 								// Found the EPI
 								String epi = element.getValue();
 								Matcher matcher = EPI_PATTERN.matcher(epi);
@@ -412,7 +425,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 								java.net.URI forkFileURI = forkFile.toURI();
 								epi += ":fork-path:" + forkFileURI.getRawPath();
-								me[pos] = new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, epi);
+// 5/13/2015 ASG				me[pos] = new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, epi);
+								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);
 								// Ok, we have updated the EPI, not lets fill in the other things
 								// that need filling
 							} else if (name.equals(RNSConstants.ELEMENT_COUNT_QNAME)) {
@@ -585,7 +599,18 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						for (int pos = 0; pos < me.length; pos++) {
 							MessageElement element = ent.getMetadata().get_any()[pos];
 							QName name = element.getQName();
-							if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
+							// 5/13/2015 ASG	
+							if (name.equals(GenesisIIConstants.RESOURCE_URI_QNAME)) {
+								String epi = element.getValue();
+								Matcher matcher = EPI_PATTERN.matcher(epi);
+								if (matcher.matches())
+									epi = matcher.group(1);
+								java.net.URI forkFileURI = forkFile.toURI();
+								epi += ":fork-path:" + forkFileURI.getRawPath();
+								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);									
+							}
+							// End update
+							else if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
 								// Found the EPI
 								String epi = element.getValue();
 								Matcher matcher = EPI_PATTERN.matcher(epi);
@@ -594,6 +619,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 								java.net.URI forkFileURI = forkFile.toURI();
 								epi += ":fork-path:" + forkFileURI.getRawPath();
+//								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);
 								me[pos] = new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, epi);
 								// Ok, we have updated the EPI, not lets fill in the other things
 								// that need filling

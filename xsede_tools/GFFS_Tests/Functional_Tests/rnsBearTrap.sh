@@ -202,7 +202,7 @@ testSimpleCopyToGrid()
 
   grid cp -r local:$TEST_TEMP/garp $RNSPATH
   assertEquals "copy directory up to rns" 0 $?
-  grid cat $RNSPATH/garp/froon/razmo
+  silent_grid cat $RNSPATH/garp/froon/razmo
   assertEquals "one copied file is accessible in rns" 0 $?
 
 #apparently we do not pass this test yet; the file does get copied.
@@ -217,7 +217,7 @@ testSimpleCopyToGrid()
   mkdir $TEST_TEMP/junk
   grid cp -r $RNSPATH/garp local:$TEST_TEMP/junk
   assertEquals "copy back from rns to local" 0 $?
-  grid cat local:$TEST_TEMP/junk/garp/froon/razmo
+  silent_grid cat local:$TEST_TEMP/junk/garp/froon/razmo
   assertEquals "one copied file is accessible in local path" 0 $?
 
   \rm -rf $TEST_TEMP/junk

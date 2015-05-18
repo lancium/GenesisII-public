@@ -10,7 +10,15 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.InstallationProperties;
+import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 
+/**
+ * warning: this class only supports process synchronization and does not handle thread locking in same application.
+ * 
+ * hmmm: probably should get similar implementation to ThreadAndProcessSynchronizer. 
+ * hmmm: can use the TAPSync class directly if we add notion of max attempts and polling interval to that class.
+ */
 public class FileLock implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(FileLock.class);
@@ -19,8 +27,8 @@ public class FileLock implements Closeable
 	private java.nio.channels.FileLock _internalLock = null;
 
 	/**
-	 * Creates a file lock that can be used for both reading and writing (by creating a new file with the same name as the input file but
-	 * .lock at the end) and locking it.
+	 * Creates a file lock that can be used for both reading and writing (by creating a new file based on the real file's name but ending in
+	 * ".lock" in the state directory).
 	 * 
 	 * @param fileToLock
 	 *            The file to create a lock for.
@@ -33,7 +41,7 @@ public class FileLock implements Closeable
 	 */
 	public FileLock(File fileToLock, int maxAttempts, long pollInterval) throws FileLockException, InterruptedException
 	{
-		File lockFile = determineFileLock(fileToLock);
+		File lockFile = determineLockfileName(fileToLock);
 
 		try {
 			_internalFile = new FileOutputStream(lockFile);
@@ -57,9 +65,9 @@ public class FileLock implements Closeable
 				_internalFile.close();
 			} catch (Throwable cause) {
 			}
-			throw new FileLockException("Unable to create lock for file \"" + fileToLock + "\".");
+			throw new FileLockException("Unable to create lock for file '" + fileToLock + "' using lock file '" + lockFile + "'.");
 		} catch (IOException ioe) {
-			throw new FileLockException("Unable to create lock for \"" + fileToLock + "\".", ioe);
+			throw new FileLockException("Unable to create lock for '" + fileToLock + "' using lock file '" + lockFile + "'.", ioe);
 		}
 	}
 
@@ -68,9 +76,12 @@ public class FileLock implements Closeable
 		close();
 	}
 
-	static private File determineFileLock(File file)
+	static private File determineLockfileName(File file)
 	{
-		return new File(file.getAbsolutePath() + ".lock");
+		File toReturn = OSGiSupport.chopUpPath(InstallationProperties.getUserDir(), new File(file.getAbsolutePath() + ".lock"), "flock");
+		if (_logger.isDebugEnabled())
+			_logger.debug("lock file calculated as: '" + toReturn.getAbsolutePath() + "'");
+		return toReturn;
 	}
 
 	@Override
@@ -89,10 +100,11 @@ public class FileLock implements Closeable
 		}
 	}
 
-	static private final int MAX_LOCK_ATTEMPTS = 10;
+	static private final int DEFAULT_MAX_LOCK_ATTEMPTS = 10;
 
 	/**
-	 * attempts to lock a file "toLock" using java nio locking. this must be later unlocked using the unlockFile method.
+	 * attempts to lock a file "toLock" using java nio locking and a separate lock file. this must be later unlocked using the unlockFile
+	 * method.
 	 */
 	static public FileLock lockFile(File toLock)
 	{
@@ -120,12 +132,13 @@ public class FileLock implements Closeable
 	}
 
 	/**
-	 * attempts to lock the file fileToLock using our default number of attempts.
+	 * attempts to lock the file fileToLock using our default number of attempts. the FileLock must be closed once activity on the file is
+	 * finished (for example, with StreamUtils.close(flock);).
 	 */
-	static private FileLock acquireLock(File fileToLock) throws FileLockException
+	static public FileLock acquireLock(File fileToLock) throws FileLockException
 	{
 		try {
-			return new FileLock(fileToLock, MAX_LOCK_ATTEMPTS, GenesisIIConstants.DEFAULT_FILE_LOCK);
+			return new FileLock(fileToLock, DEFAULT_MAX_LOCK_ATTEMPTS, GenesisIIConstants.DEFAULT_FILE_LOCK);
 		} catch (InterruptedException ie) {
 			String msg = "Unexpected interruption exception while locking config file: '" + fileToLock + "'";
 			_logger.error(msg, ie);

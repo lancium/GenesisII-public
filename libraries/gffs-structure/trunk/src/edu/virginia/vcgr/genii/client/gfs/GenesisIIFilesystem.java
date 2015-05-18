@@ -262,35 +262,22 @@ public class GenesisIIFilesystem implements FSFilesystem
 				_logger.trace("Using Short form for Enhanced-RNS handle.");
 				ICallingContext context = ContextManager.getCurrentContext();
 
+				context.setSingleValueProperty("RNSShortForm", true);
 				/*
-				 * hmmm: indeed, the problem with seeing sizes of files on windows export went away when this was turned off. and it seemed
-				 * that what we were seeing was that the last file in the list would get its real size, but so would every other file in the
-				 * list. so a copy gone astray?
-				 * 
-				 * tested and found that this is not just windows, but affects any export viewed through fuse. it's easy to reproduce with a
-				 * bootstrapped grid.
+				 * Due to a problem the the context resolver, we have explicitly store the context to make property update visible in the
+				 * rest of the code.
 				 */
-				boolean shortFormEnabledHere = true; // debugging switch to enable/disable fuse short form.
-				if (shortFormEnabledHere) {
-					context.setSingleValueProperty("RNSShortForm", true);
-					/*
-					 * Due to a problem the the context resolver, we have explicitly store the context to make property update visible in the
-					 * rest of the code.
-					 */
-					ContextManager.storeCurrentContext(context);
-				}
+				ContextManager.storeCurrentContext(context);
 
 				EnhancedRNSPortType pt = ClientUtils.createProxy(EnhancedRNSPortType.class, target.getEndpoint());
 				RNSIterable entries = new RNSIterable(fullPath, pt.lookup(null), context, RNSConstants.PREFERRED_BATCH_SIZE);
 				directoryHandle = new EnhancedRNSHandle(this, entries, fullPath);
 
-				if (shortFormEnabledHere) {
-					context.removeProperty("RNSShortForm");
-					/*
-					 * For the similar problem, we have to do another store after removing the property to have the proper effect.
-					 */
-					ContextManager.storeCurrentContext(context);
-				}
+				context.removeProperty("RNSShortForm");
+				/*
+				 * For the similar problem, we have to do another store after removing the property to have the proper effect.
+				 */
+				ContextManager.storeCurrentContext(context);
 			} else if (info.isRNS()) {
 				directoryHandle = new DefaultRNSHandle(this, target.listContents(true));
 			} else {

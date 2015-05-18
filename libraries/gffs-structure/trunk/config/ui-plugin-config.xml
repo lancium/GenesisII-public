@@ -1,12 +1,5 @@
 <plugins>
 
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.BrowseHomeDirectoryPlugin">
-		<top-menu menu-name="Jump" group="Basic File" item-name="Open Home Directory"/>
-	</plugin>
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.BrowseRootDirectoryPlugin">
-		<top-menu menu-name="Jump" group="Basic File" item-name="Open GFFS Root"/>
-	</plugin>
-	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.EditPlugin">
 		<top-menu menu-name="File" group="Basic File" item-name="Edit"/>
 		<popup-menu group="Basic File" item-name="Edit"/>
@@ -17,6 +10,12 @@
 		<popup-menu group="Basic File" item-name="View"/>
 	</plugin>
 
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.BrowseHomeDirectoryPlugin">
+		<top-menu menu-name="Jump" group="Basic File" item-name="Open Home Directory"/>
+	</plugin>
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.BrowseRootDirectoryPlugin">
+		<top-menu menu-name="Jump" group="Basic File" item-name="Open GFFS Root"/>
+	</plugin>
 
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.view.RefreshPlugin">
 		<top-menu menu-name="Directory" group="Basic File" item-name="Refresh Directory (F5)"/>

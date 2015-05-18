@@ -52,14 +52,14 @@ function timed_grid()
 # this bails out if an error occurs.
 function grid_chk()
 {
-  echo "    g> $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
+  echo "[grid] $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
   silent_grid $*
   check_if_failed "'grid ${1}...' exited with exit code $?"
 }
 
 function noisy_grid()
 {
-  echo "    g> $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
+  echo "[grid] $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
   silent_grid $*
   local retval=$?
   # show the output from the silent_grid command above, regardless of success.

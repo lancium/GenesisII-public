@@ -32,6 +32,31 @@ public class OSGiSupport
 	static private String _bundleDir;
 
 	/**
+	 * provides a chewed form of the "originalPath" that will be a unique path based on that name and which will reside under the storageArea
+	 * provided. The "tag" is used to uniquify the first portion of the name by purpose.
+	 */
+	static public File chopUpPath(String storageArea, File originalPath, String tag)
+	{
+		String username = System.getProperty("user.name");
+		String justChewedPath = originalPath.getAbsolutePath().replaceAll("[/\\: ()]", "-");
+		if (_logger.isTraceEnabled())
+			_logger.trace("gotta chopped path of: " + justChewedPath);
+		String tmpDir = storageArea;
+		tmpDir = tmpDir.replace('\\', '/');
+		File newParent = new File(tmpDir + "/" + tag + "-" + username);
+		if (!newParent.exists()) {
+			boolean parentOkay = newParent.mkdirs();
+			if (!parentOkay) {
+				throw new RuntimeException("parent directory could not be created for chopped path: '" + newParent.getAbsolutePath() + "'");
+			}
+		}
+		File newPath = new File(newParent, justChewedPath);
+		if (_logger.isTraceEnabled())
+			_logger.debug("new chopped path: '" + newPath.getAbsolutePath() + "'");
+		return newPath;
+	}
+
+	/**
 	 * starts up the OSGi framework and loads the bundles required by our application.
 	 * 
 	 * @return true on success of loading bundles and startup
@@ -44,21 +69,21 @@ public class OSGiSupport
 		 * manually by cleaning out the storage area, but that's pretty crass. instead, we will try to clean it out once, and if that fails,
 		 * then we really do need to fail.
 		 */
-		String username = System.getProperty("user.name");
+		// String username = System.getProperty("user.name");
 		String installDir = ApplicationDescription.getInstallationDirectory();
 		File pathChow = new File(installDir);
 		if (_logger.isTraceEnabled())
 			_logger.trace("gotta path of: " + pathChow);
 
-		// let's not forget ugly paths windows and others might hand us.
-		String justDir = pathChow.getAbsolutePath().replaceAll("[/\\: ()]", "-");
-		if (_logger.isTraceEnabled())
-			_logger.trace("gotta chopped path of: " + justDir);
-		String tmpDir = System.getProperty("java.io.tmpdir");
-		tmpDir = tmpDir.replace('\\', '/');
-		File osgiStorageDir = new File(tmpDir + "/osgi-genII-" + username + "/" + justDir);
-		if (_logger.isTraceEnabled())
-			_logger.trace("osgi storage area is: " + osgiStorageDir.getAbsolutePath());
+		File osgiStorageDir = chopUpPath(System.getProperty("java.io.tmpdir"), pathChow, "osgi-genII");
+
+		/*
+		 * // let's not forget ugly paths windows and others might hand us. String justDir =
+		 * pathChow.getAbsolutePath().replaceAll("[/\\: ()]", "-"); if (_logger.isTraceEnabled()) _logger.trace("gotta chopped path of: " +
+		 * justDir); String tmpDir = System.getProperty("java.io.tmpdir"); tmpDir = tmpDir.replace('\\', '/'); File osgiStorageDir = new
+		 * File(tmpDir + "/osgi-genII-" + username + "/" + justDir); if (_logger.isTraceEnabled()) _logger.trace("osgi storage area is: " +
+		 * osgiStorageDir.getAbsolutePath());
+		 */
 		osgiStorageDir.mkdirs();
 
 		// see if we're running under eclipse or know our installation directory.

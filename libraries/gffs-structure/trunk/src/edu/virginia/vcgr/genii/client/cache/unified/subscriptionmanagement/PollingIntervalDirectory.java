@@ -22,19 +22,20 @@ public class PollingIntervalDirectory
 
 	// The poller should test and update its polling interval every now and then. Otherwise
 	// the system will throw exception to block polling requests.
-	private static final long MAX_DEVIATION_FROM_MISSED_POLLING_DEADLINE = 15 * 1000L; // fifteen
-																						// seconds
+	private static final long MAX_DEVIATION_FROM_MISSED_POLLING_DEADLINE = 15 * 1000L; /* fifteen seconds */
 
 	private static final Map<String, PollingTimeSettings> POLLING_TIME_CONFIGURATIONS = new ConcurrentHashMap<String, PollingTimeSettings>();
 
 	public static void storePollingTimeSettings(PollingTimeSettings pollingTimeSettings)
 	{
 		String containerId = pollingTimeSettings.getContainerId();
+		_logger.debug("storing polling time settings for container: " + containerId); 
 		POLLING_TIME_CONFIGURATIONS.put(containerId, pollingTimeSettings);
 	}
 
 	public static void deletePollingTimeSettings(String containerId)
 	{
+		_logger.debug("deleting polling time settings for container: " + containerId); 
 		POLLING_TIME_CONFIGURATIONS.remove(containerId);
 	}
 
@@ -73,7 +74,8 @@ public class PollingIntervalDirectory
 	{
 		PollingTimeSettings pollingTimeSettings = POLLING_TIME_CONFIGURATIONS.get(containerId);
 		if (pollingTimeSettings == null) {
-			throw new RuntimeException("Missing required polling time settings information.");
+			// this error message should stay as defined here, since it is used in NotificationBrokerWrapper for disambiguation.
+			throw new RuntimeException("Missing polling time settings for container id: " + containerId);
 		}
 		synchronized (pollingTimeSettings) {
 			Date nextPollingTime = pollingTimeSettings.getNextPollingTime();

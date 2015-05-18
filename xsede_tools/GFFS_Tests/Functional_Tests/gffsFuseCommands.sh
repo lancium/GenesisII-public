@@ -79,7 +79,7 @@ testMakingDirectoryOnMount()
   echo "Current directories (local and grid):"
   pwd
   grid pwd
-  cat $GRID_OUTPUT_FILE
+  #cat $GRID_OUTPUT_FILE
   echo "Mount directory:"
   ls "$MOUNT_POINT"
   echo "RNS (home) path:"
