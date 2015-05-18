@@ -2,8 +2,9 @@
 
 # This test will verify that an export is operational for read and write.
 # It requires two parameters: (1) a local system path where the export actually
-# lives and the corresponding GFFS path in the grid where that export is visible.
-# The unix user who runs this script must have visibility of the path in (1).
+# lives and (2) the corresponding GFFS path in the grid where that export is
+# visible.  The unix user who runs this script must have visibility of the path
+# in (1).
 # The tester running the script must also be logged into the GFFS as the owner
 # of the export.  The installation should be located at $GENII_INSTALL_DIR
 # (with state directory in $GENII_USER_DIR), which can be established by
@@ -35,13 +36,14 @@ function print_instructions()
   echo
   echo "This test will verify that an export is operational for read and write."
   echo "It requires two parameters: (1) a local system path where the export actually"
-  echo "lives and the corresponding GFFS path in the grid where that export is visible."
-  echo "The unix user who runs this script must have read and write access on the path"
-  echo "in (1).  The tester running the script must also be logged into the GFFS as"
-  echo "the owner of the export.  The installation should be located at the value of"
-  echo "the \$GENII_INSTALL_DIR environment variable (and should have a state directory"
-  echo "in \$GENII_USER_DIR).  The environment variables can be established by running"
-  echo "the script set_gffs_vars, which is included in the install.  For example:"
+  echo "lives and (2) the corresponding GFFS path in the grid where that export is"
+  echo "visible.  The unix user who runs this script must have read and write access"
+  echo "on the path in (1).  The tester running the script must also be logged into"
+  echo "the GFFS as the owner of the export.  The installation should be located at the"
+  echo "value of the \$GENII_INSTALL_DIR environment variable (and should have a state"
+  echo "directory in \$GENII_USER_DIR).  The environment variables can be established"
+  echo "by running the script set_gffs_vars, which is included in the install.  For"
+  echo "example:"
   echo "   source ~/GenesisII/set_gffs_vars"
   echo "Each step of the test must succeed for the export to be considered viable."
   echo
@@ -158,6 +160,41 @@ diff -s "$local_path/$shortaltname" "$temp_file"
 check_if_failed "checking if the local file and modified grid copy are the same"
 
 echo "step 9 success."
+
+echo -e "\n\n10. Create a file on grid side, delete on local side, verify disappears."
+# make a new file inside the grid within the export.
+shortaltname="delete-test"
+othergridfile="$grid_path/$shortaltname"
+grid cp local:"$temp_file" "$othergridfile"
+check_if_failed "preparing a file within the grid at: $othergridfile"
+grid ls "$othergridfile" &>/dev/null
+check_if_failed "listing file within the grid at: $othergridfile"
+\rm "$local_path/$shortaltname"
+check_if_failed "removing local file: $local_path/$shortaltname"
+grid ls "$othergridfile" &>/dev/null
+# invert sense of return.
+if [ $? -eq 0 ]; then false; else true; fi
+check_if_failed "listing file that should be gone in grid succeded when should have failed: $othergridfile"
+
+echo "step 10 success."
+
+echo -e "\n\n11. Create a file on local side, delete on grid side, verify disappears."
+# make a new file locally.
+shortaltname="delete-test"
+othergridfile="$grid_path/$shortaltname"
+cp "$temp_file" "$local_path/$shortaltname"
+check_if_failed "creating a local file at: $local_path/$shortaltname"
+ls "$local_path/$shortaltname" &>/dev/null
+check_if_failed "listing local file at: $local_path/$shortaltname"
+grid rm "$othergridfile"
+check_if_failed "removing grid file: $othergridfile"
+ls "$local_path/$shortaltname" &>/dev/null
+# invert sense of return.
+if [ $? -eq 0 ]; then false; else true; fi
+check_if_failed "listing file that should be gone locally succeded when should have failed: $local_path/$shortaltname"
+
+echo "step 11 success."
+
 
 echo -e "\n\n\nThe export has been tested and seems fully functional for reading and writing.\n\n"
 

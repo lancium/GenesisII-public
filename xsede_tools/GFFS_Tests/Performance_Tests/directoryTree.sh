@@ -93,9 +93,9 @@ testListingExportViaFuse()
   size2=$(cat "$outfile" | grep length-test-2 | awk '{print $5'})
   size3=$(cat "$outfile" | grep length-test-3 | awk '{print $5'})
   #echo "size1 = $size1   size2 = $size2   size3 = $size3"
-  assertNotEquals "non-unique sizes for files in export viewed on fuse (1 vs 2)" $size1 $size2
-  assertNotEquals "non-unique sizes for files in export viewed on fuse (1 vs 3)" $size1 $size3
-  assertNotEquals "non-unique sizes for files in export viewed on fuse (2 vs 3)" $size2 $size3
+  assertNotEquals "test for unique sizes on export viewed via fuse (1 vs 2)" $size1 $size2
+  assertNotEquals "test for unique sizes on export viewed via fuse (1 vs 3)" $size1 $size3
+  assertNotEquals "test for unique sizes on export viewed via fuse (2 vs 3)" $size2 $size3
 }
 
 testFuseRecursiveCp() {
