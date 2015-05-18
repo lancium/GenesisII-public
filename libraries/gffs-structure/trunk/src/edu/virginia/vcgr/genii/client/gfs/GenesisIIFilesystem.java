@@ -270,7 +270,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 				 * tested and found that this is not just windows, but affects any export viewed through fuse. it's easy to reproduce with a
 				 * bootstrapped grid.
 				 */
-				boolean shortFormEnabledHere = false; // debugging switch to enable/disable fuse short form.
+				boolean shortFormEnabledHere = true; // debugging switch to enable/disable fuse short form.
 				if (shortFormEnabledHere) {
 					context.setSingleValueProperty("RNSShortForm", true);
 					/*
