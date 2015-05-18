@@ -1,7 +1,7 @@
 #!/bin/bash
 
-##Author: Vanamala Venkataswamy
-#mods: Chris Koeritz
+# Author: Chris Koeritz
+# Author: Vanamala Venkataswamy
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
@@ -28,6 +28,8 @@ GRID_TEST_DIR=$RNSPATH/fuse-test
 oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.
+
+  if ! fuse_supported; then return 0; fi
 
   # need to just go for it and try to unmount; the directory left for a dead mount
   # is still present but is not seen by checks.
@@ -103,10 +105,6 @@ testCreatingFileOnMount()
   cp $TEST_TEMP/local-file.txt "$TESTING_DIR/grid-file.txt"
   assertEquals "Testing copy of local file to mounted grid folder." 0 $?
 
-  # give fuse process a chance to check it in...
-#  sync
-# is above sync still necessary??
-
   diff "$TESTING_DIR/grid-file.txt" "$TEST_TEMP/local-file.txt"
   assertEquals "Checking contents of new file" 0 $?
 }
@@ -117,8 +115,6 @@ testCopyingFromMountToLocal()
   echo "Testing 'cp' file from mounted dir to local dir"
   cp "$TESTING_DIR/grid-file.txt" "$TEST_TEMP/local-file1.txt"
   cat $TEST_TEMP/local-file1.txt
-#  # let the fuse mount check in the change.
-#  sync
 }
 
 testCheckDiffsOnFiles()
@@ -236,6 +232,19 @@ testRemovingDirectory()
   assertEquals "Testing 'rmdir $TESTING_DIR_ALTERNATE' on mounted dir" 0 $?
   ls -l "$HOME_DIR"
   assertEquals "Testing ls on outer folder" 0 $?
+}
+
+testNewFileInGridShowsUp()
+{
+  local newfile=new-file-testing-fuse-yo
+  if ! fuse_supported; then return 0; fi
+  grid echo this is a new file in the grid. \\\> $RNSPATH/$newfile
+  ls -1 "$HOME_DIR" | grep $newfile
+  assertEquals "Testing that newly created file shows up in fuse directory listing" 0 $?
+  grid rm $RNSPATH/$newfile
+  assertEquals "Cleaning up newly created file" 0 $?
+  ls -1 "$HOME_DIR" | grep $newfile
+  assertNotEquals "Testing that newly deleted file is missing in fuse directory listing" 0 $?
 }
 
 testUnmountingFuseMount()

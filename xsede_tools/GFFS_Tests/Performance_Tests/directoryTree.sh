@@ -81,6 +81,23 @@ testCreateDirectory () {
   fan_out_directories $TEST_TEMP/testDir 3 6 3
 }
 
+testListingExportViaFuse()
+{
+  if ! fuse_supported; then return 0; fi
+  grid echo "This is a line of text of a certain length" \\\> $FULL_EXPORT_PATH/length-test-1
+  grid echo "line of different length" \\\> $FULL_EXPORT_PATH/length-test-2
+  grid echo "shorty" \\\> $FULL_EXPORT_PATH/length-test-3
+  local outfile="$(mktemp "$TEST_TEMP/export-test-out.XXXXXX")"
+  \ls -1al "$MOUNT_POINT/$FULL_EXPORT_PATH" | grep length-test >"$outfile"
+  size1=$(cat "$outfile" | grep length-test-1 | awk '{print $5'})
+  size2=$(cat "$outfile" | grep length-test-2 | awk '{print $5'})
+  size3=$(cat "$outfile" | grep length-test-3 | awk '{print $5'})
+  #echo "size1 = $size1   size2 = $size2   size3 = $size3"
+  assertNotEquals "non-unique sizes for files in export viewed on fuse (1 vs 2)" $size1 $size2
+  assertNotEquals "non-unique sizes for files in export viewed on fuse (1 vs 3)" $size1 $size3
+  assertNotEquals "non-unique sizes for files in export viewed on fuse (2 vs 3)" $size2 $size3
+}
+
 testFuseRecursiveCp() {
   if ! fuse_supported; then return 0; fi
   # Recursively copy files from $1 into the $2
@@ -102,8 +119,9 @@ testFuseRecursiveCpOntoExport()
   assertEquals "directory copied to export was listable" 0 $?
 }
 
-notReady_testRecursiveCopyAndDeleteOnExport()
+testRecursiveCopyAndDeleteOnExport()
 {
+  if ! fuse_supported; then return 0; fi
   grid cp -r local:"$XSEDE_TEST_ROOT/EMS_Tests" $FULL_EXPORT_PATH
   assertEquals "copy directory recursively to export path" 0 $?
   grid ls $FULL_EXPORT_PATH/EMS_Tests/besFunctionality &>/dev/null
