@@ -16,8 +16,8 @@ import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 /**
  * warning: this class only supports process synchronization and does not handle thread locking in same application.
  * 
- * hmmm: probably should get similar implementation to ThreadAndProcessSynchronizer. 
- * hmmm: can use the TAPSync class directly if we add notion of max attempts and polling interval to that class.
+ * hmmm: probably should get similar implementation to ThreadAndProcessSynchronizer. hmmm: can use the T&PSync class directly if we add notion
+ * of max attempts and polling interval to that class.
  */
 public class FileLock implements Closeable
 {
@@ -78,7 +78,24 @@ public class FileLock implements Closeable
 
 	static private File determineLockfileName(File file)
 	{
-		File toReturn = OSGiSupport.chopUpPath(InstallationProperties.getUserDir(), new File(file.getAbsolutePath() + ".lock"), "flock");
+		File toReturn = null;
+
+		String path = file.getAbsolutePath();
+		if (path.startsWith(System.getProperty("user.home"))) {
+			/*
+			 * special case for files in known home folder; we will make the lock right there, since that should work. assumption is that the
+			 * file really should be fixed in that location, which means file locking could be cross-container, so the state dir is not an
+			 * appropriate place to store the lock file.
+			 */
+			toReturn = new File(path + ".lock");
+		} else {
+			/*
+			 * more standard case of a file somewhere in the file system, and where we do not expect to ever need to share the lock with a
+			 * different container. it's just too bad if we do need to share the lock file with a different container for most arbitrary
+			 * paths, since we cannot guarantee we can create the lock file in read-only locations such as the system-wide install directory.
+			 */
+			toReturn = OSGiSupport.chopUpPath(InstallationProperties.getUserDir(), new File(file.getAbsolutePath() + ".lock"), "flock");
+		}
 		if (_logger.isDebugEnabled())
 			_logger.debug("lock file calculated as: '" + toReturn.getAbsolutePath() + "'");
 		return toReturn;

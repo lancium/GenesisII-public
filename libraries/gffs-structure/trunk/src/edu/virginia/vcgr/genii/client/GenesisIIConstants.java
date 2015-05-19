@@ -103,7 +103,7 @@ public class GenesisIIConstants
 	static public final QName INTERMEDIATE_WSE_NS_SECURITY_QNAME = new QName(INTERMEDIATE_WSE_NS, "SecurityTokenReference");
 
 	// default time for snoozes while waiting for a lock on a file.
-	static public final int DEFAULT_FILE_LOCK = 40;
+	static public final int DEFAULT_FILE_LOCK = 100;
 
 	static public final String CRYPTO_ALIAS = "CRYPTO_ALIAS";
 
