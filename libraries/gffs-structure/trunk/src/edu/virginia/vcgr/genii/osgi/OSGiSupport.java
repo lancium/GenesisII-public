@@ -38,12 +38,14 @@ public class OSGiSupport
 	static public File chopUpPath(String storageArea, File originalPath, String tag)
 	{
 		String username = System.getProperty("user.name");
-		String justChewedPath = originalPath.getAbsolutePath().replaceAll("[/\\: ()]", "-");
+		String justChewedPath = originalPath.getAbsolutePath().replaceAll("[/\\\\: ()]", "-");
 		if (_logger.isTraceEnabled())
-			_logger.trace("gotta chopped path of: " + justChewedPath);
+			_logger.debug("got a chopped path of: " + justChewedPath);
 		String tmpDir = storageArea;
 		tmpDir = tmpDir.replace('\\', '/');
 		File newParent = new File(tmpDir + "/" + tag + "-" + username);
+		if (_logger.isTraceEnabled())
+			_logger.debug("got new parent location: " + newParent.getAbsolutePath());
 		if (!newParent.exists()) {
 			boolean parentOkay = newParent.mkdirs();
 			if (!parentOkay) {
@@ -51,8 +53,8 @@ public class OSGiSupport
 			}
 		}
 		File newPath = new File(newParent, justChewedPath);
-		if (_logger.isTraceEnabled())
-			_logger.debug("new chopped path: '" + newPath.getAbsolutePath() + "'");
+		if (_logger.isDebugEnabled())
+			_logger.debug("new fully chopped path: '" + newPath.getAbsolutePath() + "'");
 		return newPath;
 	}
 
