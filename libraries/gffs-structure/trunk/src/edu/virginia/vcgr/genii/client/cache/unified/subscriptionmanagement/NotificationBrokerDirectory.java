@@ -101,7 +101,7 @@ public class NotificationBrokerDirectory
 		containerIdToBrokerFactoryMapping.put(containerId, factoryUrl);
 	}
 
-	public static NotificationBrokerWrapper getNotificationBrokerForEndpoint(EndpointReferenceType epr, EndpointReferenceType forwardingPort)
+	public static synchronized NotificationBrokerWrapper getNotificationBrokerForEndpoint(EndpointReferenceType epr, EndpointReferenceType forwardingPort)
 	{
 
 		String containerId = CacheUtils.getContainerId(epr);

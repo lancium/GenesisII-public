@@ -96,7 +96,7 @@ public class FileLock implements Closeable
 			 */
 			toReturn = OSGiSupport.chopUpPath(InstallationProperties.getUserDir(), new File(file.getAbsolutePath() + ".lock"), "flock");
 		}
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("lock file calculated as: '" + toReturn.getAbsolutePath() + "'");
 		return toReturn;
 	}

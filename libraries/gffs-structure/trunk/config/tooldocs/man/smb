@@ -1,0 +1,3 @@
+Description:
+
+Allows the user to control whether the SMB server is currently running. The SMB server is an automated interface between Windows and the Grid.

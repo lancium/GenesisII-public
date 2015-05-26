@@ -4,7 +4,6 @@ import java.util.Date;
 
 public class PollingTimeSettings
 {
-
 	private String containerId;
 	private long pollingRPCInterval;
 	private Date nextPollingTime;

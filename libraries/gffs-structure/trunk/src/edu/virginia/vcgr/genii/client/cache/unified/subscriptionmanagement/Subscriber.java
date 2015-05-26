@@ -63,7 +63,7 @@ public class Subscriber
 		}
 	}
 
-	public static Subscriber getInstance()
+	public static synchronized Subscriber getInstance()
 	{
 		if (subscriber == null) {
 			subscriber = new Subscriber();

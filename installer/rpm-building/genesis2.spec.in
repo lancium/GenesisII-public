@@ -23,6 +23,7 @@ Source1: BUILDME
 
 Requires: expect fuse fuse-libs java
 
+#temp disabled
 #BuildRequires: ant ant-contrib ant-nodeps ant-jsch ant-trax ant-junit java
 
 %description
