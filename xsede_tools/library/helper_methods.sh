@@ -12,21 +12,54 @@ function date_string()
   date +"%Y_%b_%e_%H%M_%S" | sed -e 's/ //g'
 }
 
-# displays the value of a variable in bash friendly format.
+
+########
 # (donated by the feisty meow scripts at http://feistymeow.org)
+
+  function is_array() {
+    [[ "$(declare -p $1)" =~ "declare -a" ]]
+  }
+
+  function is_alias() {
+    alias $1 &>/dev/null
+    return $?
+  }
+
+# displays the value of a variable in bash friendly format.
 function var() {
+    HOLDIFS="$IFS"
+    IFS=""
   while true; do
     local varname="$1"; shift
     if [ -z "$varname" ]; then
       break
     fi
-    if [ -z "${!varname}" ]; then
+
+      if is_alias "$varname"; then
+#echo found $varname is alias
+        local tmpfile="$(mktemp $TMP/aliasout.XXXXXX)"
+        alias $varname | sed -e 's/.*=//' >$tmpfile
+        echo "alias $varname=$(cat $tmpfile)"
+        \rm $tmpfile
+      elif [ -z "${!varname}" ]; then
       echo "$varname undefined"
     else
+        if is_array "$varname"; then
+#echo found $varname is array var 
+          local temparray
+          eval temparray="(\${$varname[@]})"
+          echo "$varname=(${temparray[@]})"
+#hmmm: would be nice to print above with elements enclosed in quotes, so that we can properly
+# see ones that have spaces in them.
+        else
+#echo found $varname is simple
       echo "$varname=${!varname}"
     fi
+      fi
   done
+    IFS="$HOLDIFS"
 }
+########
 
 # given a file name and a phrase to look for, this replaces all instances of
 # it with a piece of replacement text.  note that slashes are okay in the two
