@@ -201,7 +201,7 @@
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 
 		<copy file="${scripts.dir}/set_gffs_vars"
-			tofile="${basedir}/set_gffs_vars"/>
+			tofile="${basedir}/set_gffs_vars" overwrite="true"/>
 		<replace file="${basedir}/set_gffs_vars"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 
