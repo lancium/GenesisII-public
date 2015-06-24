@@ -169,6 +169,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CdTool</mconf:class>		
 		<mconf:class name="mkdir"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MkdirTool</mconf:class>
+		<mconf:class name="md"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MkdirTool</mconf:class>
 		<mconf:class name="ping"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PingTool</mconf:class>
 		<mconf:class name="ln"
@@ -325,6 +327,14 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IdentityTool</mconf:class>
 		<mconf:class name="mst"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MetadataSearchTool</mconf:class>
+		<mconf:class name="smb"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SMBTool</mconf:class>
+		<mconf:class name="void"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.HungryVoidTool</mconf:class>
+		<mconf:class name="#"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.HungryVoidTool</mconf:class>
+		<mconf:class name="rem"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.HungryVoidTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

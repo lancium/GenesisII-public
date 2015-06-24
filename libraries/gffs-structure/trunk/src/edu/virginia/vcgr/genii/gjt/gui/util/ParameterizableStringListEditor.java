@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.gjt.data.ParameterizableStringList;
 
 public class ParameterizableStringListEditor implements DescribedFieldEditor<ParameterizableStringList>
@@ -26,7 +27,7 @@ public class ParameterizableStringListEditor implements DescribedFieldEditor<Par
 			new ParameterizableStringListEditorDialog(SwingUtilities.getWindowAncestor(parentComponent), _title, _prompt, currentValue);
 		dialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 		dialog.pack();
-		GUIUtils.centerComponent(dialog);
+		GuiUtils.centerComponent(dialog);
 		dialog.setVisible(true);
 
 		Set<String> results = dialog.getResults();

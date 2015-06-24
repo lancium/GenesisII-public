@@ -70,7 +70,20 @@ Inputs for the script:
 	</else>
 	</if>
 
-        <!-- link the group name under the user's sts, so that they will try to log in. -->
+        <!-- remove any existing group of same name under the user's sts. -->
+        <try>
+          <block>
+            <geniix:unlink>
+              <param>${USER_PATH}/${GROUP}</param>
+            </geniix:unlink>
+          </block>
+          <catch class="java.lang.Exception">
+<!-- don't say anything, since this is expected. -->
+            <!-- echo message="No pre-existing group link in ${USER_PATH}/${GROUP} needed removal."/ -->
+          </catch>
+        </try>
+
+        <!-- link the group name under the user's sts, so that they will automatically log in to the group. -->
         <try>
           <block>
             <geniix:ln>

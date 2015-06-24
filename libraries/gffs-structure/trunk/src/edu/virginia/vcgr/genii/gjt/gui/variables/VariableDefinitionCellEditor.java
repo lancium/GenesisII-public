@@ -12,10 +12,10 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellEditor;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.gjt.data.variables.VariableDefinition;
 import edu.virginia.vcgr.genii.gjt.data.variables.VariableDefinitionEditor;
 import edu.virginia.vcgr.genii.gjt.data.variables.VariableDefinitionType;
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 
 public class VariableDefinitionCellEditor extends AbstractCellEditor implements TableCellEditor
 {
@@ -59,7 +59,7 @@ public class VariableDefinitionCellEditor extends AbstractCellEditor implements 
 			editor.setFromVariableDefinition(current);
 			editor.pack();
 			editor.setModalityType(ModalityType.DOCUMENT_MODAL);
-			GUIUtils.centerComponent(editor);
+			GuiUtils.centerComponent(editor);
 			editor.setVisible(true);
 			current = editor.getVariableDefinition();
 			if (current != null) {

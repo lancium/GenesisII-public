@@ -1,7 +1,10 @@
 package edu.virginia.vcgr.smb.server;
+
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -11,112 +14,124 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 
+// TODO: not finished?
+public class SMBTree
+{
+	static private Log _logger = LogFactory.getLog(SMBTree.class);
 
-// TODO
-public class SMBTree {
 	private RNSPath root;
 	private HashMap<Integer, SMBFile> files = new HashMap<Integer, SMBFile>();
 	private HashMap<Integer, SMBSearchState> searches = new HashMap<Integer, SMBSearchState>();
-	
-	public SMBTree(RNSPath root) {
+
+	public SMBTree(RNSPath root)
+	{
 		this.root = root;
 	}
-	
-	public RNSPath getRoot() {
+
+	public RNSPath getRoot()
+	{
 		return root;
 	}
-	
-	public int allocateFID(SMBFile file) throws SMBException {
+
+	public int allocateFID(SMBFile file) throws SMBException
+	{
 		/* TODO: improve */
-		for (int i = 0; i < 0x10000;i++) {
+		for (int i = 0; i < 0x10000; i++) {
 			if (files.get(i) == null) {
 				files.put(i, file);
-				
+
 				return i;
 			}
 		}
 
 		throw new SMBException(NTStatus.INSUFF_SERVER_RESOURCES);
 	}
-	
-	public SMBFile verifyFID(int FID) throws SMBException {
+
+	public SMBFile verifyFID(int FID) throws SMBException
+	{
 		SMBFile file = files.get(FID);
 		if (file == null)
 			// The CIFS document reports to use FID
 			throw new SMBException(NTStatus.SMB_BAD_FID);
 		return file;
 	}
-	
-	public int allocateSID(SMBSearchState search) throws SMBException {
+
+	public int allocateSID(SMBSearchState search) throws SMBException
+	{
 		/* TODO: improve */
-		for (int i = 0; i < 0x10000;i++) {
+		for (int i = 0; i < 0x10000; i++) {
 			if (searches.get(i) == null) {
 				searches.put(i, search);
-				
+
 				return i;
 			}
 		}
 
 		throw new SMBException(NTStatus.INSUFF_SERVER_RESOURCES);// XXX: maybe OS2_NO_MORE_SIDS
 	}
-	
-	public SMBSearchState verifySID(int SID) throws SMBException {
+
+	public SMBSearchState verifySID(int SID) throws SMBException
+	{
 		SMBSearchState search = searches.get(SID);
 		if (search == null)
 			// The CIFS document reports to use FID
 			throw new SMBException(NTStatus.SMB_BAD_FID);
 		return search;
 	}
-	
-	public void releaseFID(int FID) {
+
+	public void releaseFID(int FID)
+	{
 		files.remove(FID);
 	}
-	
-	public void releaseSID(int SID) {
+
+	public void releaseSID(int SID)
+	{
 		searches.remove(SID);
 	}
 
-	public static String pathNormalize(String path) {
+	public static String pathNormalize(String path)
+	{
 		// TODO: improve this
 		path = path.replace('\\', '/');
 		while (path.length() > 0 && path.charAt(0) == '/')
 			path = path.substring(1);
-		
+
 		return path;
 	}
-	
-	private static RNSPath lookupInsensitive(RNSPath dir, String file) {
+
+	private static RNSPath lookupInsensitive(RNSPath dir, String file)
+	{
 		SMBWildcard pattern = new SMBWildcard(file);
-		
+
 		RNSPath trivial = dir.lookup(file);
 		if (trivial.exists())
 			return trivial;
-		
+
 		try {
 			Collection<RNSPath> list = dir.listContents(pattern);
 			if (list.isEmpty())
 				return trivial;
-			
+
 			return list.iterator().next();
 		} catch (RNSPathDoesNotExistException e) {
 			if (dir.isRoot())
 				return trivial;
-			
+
 			// Maybe this directory needs to be resolved
 			dir = lookupInsensitive(dir.getParent(), dir.getName());
 		} catch (RNSException e) {
 			return trivial;
 		}
-		
+
 		trivial = dir.lookup(file);
 		if (trivial.exists())
 			return trivial;
-		
+
 		try {
 			Collection<RNSPath> list = dir.listContents(pattern);
 			if (list.isEmpty())
 				return trivial;
-			
+
 			return list.iterator().next();
 		} catch (RNSPathDoesNotExistException e) {
 			return trivial;
@@ -124,49 +139,59 @@ public class SMBTree {
 			return trivial;
 		}
 	}
-	
-	private static RNSPath lookup(RNSPath root, String path) {
+
+	private static RNSPath lookup(RNSPath root, String path)
+	{
 		if (path.isEmpty())
 			return root;
-		
+
 		// TODO: improve this
 		path = path.replace('\\', '/');
 		while (path.length() > 0 && path.charAt(0) == '/')
 			path = path.substring(1);
-		
+
+		if (_logger.isDebugEnabled())
+			_logger.debug("SMBTree looking up path(2): " + path);
 		return root.lookup(path);
 	}
-	
-	public static RNSPath lookup(RNSPath root, String path, boolean caseSensitive) {
+
+	public static RNSPath lookup(RNSPath root, String path, boolean caseSensitive)
+	{
+		if (_logger.isDebugEnabled())
+			_logger.debug("SMBTree looking up path(3): " + path);
+
 		RNSPath file = lookup(root, path);
-		
+
 		// File exists no case-insensitive search needed
 		if (caseSensitive || file.exists())
 			return file;
-		
+
 		return lookupInsensitive(file.getParent(), file.getName());
 	}
-	
-	public RNSPath lookup(String path, boolean caseSensitive) {
+
+	public RNSPath lookup(String path, boolean caseSensitive)
+	{
 		return SMBTree.lookup(root, path, caseSensitive);
 	}
 
-	public static TypeInformation stat(RNSPath file) throws SMBException {
+	public static TypeInformation stat(RNSPath file) throws SMBException
+	{
 		try {
 			return new TypeInformation(file.getEndpoint());
 		} catch (RNSPathDoesNotExistException e) {
 			throw new SMBException(NTStatus.OBJECT_PATH_NOT_FOUND);
 		}
 	}
-	
-	public static SMBFile open(RNSPath file, int fileAttr, boolean create, boolean excl, boolean trunc) throws SMBException {
+
+	public static SMBFile open(RNSPath file, int fileAttr, boolean create, boolean excl, boolean trunc) throws SMBException
+	{
 		EndpointReferenceType epr;
-		
+
 		try {
 			if (create) {
 				if ((fileAttr & SMBFileAttributes.DIRECTORY) != 0) {
 					file.mkdir();
-					
+
 					epr = file.getEndpoint();
 				} else {
 					epr = file.createNewFile();
@@ -195,7 +220,7 @@ public class SMBTree {
 			// Guess
 			throw new SMBException(NTStatus.ACCESS_DENIED);
 		}
-		
+
 		TypeInformation info = new TypeInformation(epr);
 		SMBFile handle;
 		if (info.isRByteIO()) {
@@ -203,14 +228,15 @@ public class SMBTree {
 		} else {
 			handle = new SMBGenericIOFile(file, epr);
 		}
-		
+
 		if (trunc)
 			handle.truncate();
-		
+
 		return handle;
 	}
 
-	public static void rm(RNSPath dir) throws SMBException {
+	public static void rm(RNSPath dir) throws SMBException
+	{
 		try {
 			// XXX: is this correct
 			dir.delete();
@@ -221,7 +247,8 @@ public class SMBTree {
 		}
 	}
 
-	public static Collection<RNSPath> listContents(RNSPath dir, RNSFilter pattern) throws SMBException {
+	public static Collection<RNSPath> listContents(RNSPath dir, RNSFilter pattern) throws SMBException
+	{
 		try {
 			return dir.listContents(pattern);
 		} catch (RNSPathDoesNotExistException e) {
@@ -231,8 +258,9 @@ public class SMBTree {
 			throw new SMBException(NTStatus.ACCESS_DENIED);
 		}
 	}
-	
-	public Collection<RNSPath> listContents(String path, boolean caseSensitive) throws SMBException {
+
+	public Collection<RNSPath> listContents(String path, boolean caseSensitive) throws SMBException
+	{
 		int sep = path.lastIndexOf('\\');
 		if (sep == -1) {
 			// Only filename
@@ -242,8 +270,9 @@ public class SMBTree {
 			return SMBTree.listContents(dir, new SMBWildcard(path.substring(sep + 1)));
 		}
 	}
-	
-	public Collection<RNSPath> listContents(String path, RNSFilter filter, boolean caseSensitive) throws SMBException {
+
+	public Collection<RNSPath> listContents(String path, RNSFilter filter, boolean caseSensitive) throws SMBException
+	{
 		int sep = path.lastIndexOf('\\');
 		if (sep == -1) {
 			// Only filename
@@ -253,34 +282,37 @@ public class SMBTree {
 			return SMBTree.listContents(dir, new SMBSearchFilter(new SMBWildcard(path.substring(sep + 1)), filter));
 		}
 	}
-	
-	public static SMBSearchState search(RNSPath dir, SMBWildcard pattern) throws SMBException {
+
+	public static SMBSearchState search(RNSPath dir, SMBWildcard pattern) throws SMBException
+	{
 		Collection<RNSPath> list = listContents(dir, pattern);
-		
+
 		RNSPath dot = null, dotdot = null;
 		// Seems to work; probably wrong
 		if (pattern.matches("")) {
 			dot = dir;
 			dotdot = dir.getParent();
 		}
-		
+
 		return new SMBSearchState(dot, dotdot, list);
 	}
-	
-	public static SMBSearchState search(RNSPath dir, SMBWildcard pattern, RNSFilter filter) throws SMBException {
+
+	public static SMBSearchState search(RNSPath dir, SMBWildcard pattern, RNSFilter filter) throws SMBException
+	{
 		Collection<RNSPath> list = listContents(dir, new SMBSearchFilter(pattern, filter));
-		
+
 		RNSPath dot = null, dotdot = null;
 		// Seems to work; probably wrong
 		if (pattern.matches("")) {
 			dot = dir;
 			dotdot = dir.getParent();
 		}
-		
+
 		return new SMBSearchState(dot, dotdot, list);
 	}
-	
-	public SMBSearchState search(String path, boolean caseSensitive) throws SMBException {
+
+	public SMBSearchState search(String path, boolean caseSensitive) throws SMBException
+	{
 		int sep = path.lastIndexOf('\\');
 		if (sep == -1) {
 			// Only filename
@@ -290,8 +322,9 @@ public class SMBTree {
 			return SMBTree.search(dir, new SMBWildcard(path.substring(sep + 1)));
 		}
 	}
-	
-	public SMBSearchState search(String path, RNSFilter filter, boolean caseSensitive) throws SMBException {
+
+	public SMBSearchState search(String path, RNSFilter filter, boolean caseSensitive) throws SMBException
+	{
 		int sep = path.lastIndexOf('\\');
 		if (sep == -1) {
 			// Only filename
@@ -302,14 +335,15 @@ public class SMBTree {
 		}
 	}
 
-	public void rename(RNSPath oldPath, RNSPath newPath) throws SMBException {
+	public void rename(RNSPath oldPath, RNSPath newPath) throws SMBException
+	{
 		EndpointReferenceType epr;
 		try {
 			epr = oldPath.getEndpoint();
 		} catch (RNSPathDoesNotExistException e) {
 			throw new SMBException(NTStatus.NO_SUCH_FILE);
 		}
-		
+
 		try {
 			newPath.link(epr);
 		} catch (RNSPathAlreadyExistsException e) {
@@ -319,7 +353,7 @@ public class SMBTree {
 		} catch (RNSException e) {
 			throw new SMBException(NTStatus.ACCESS_DENIED);
 		}
-		
+
 		try {
 			oldPath.unlink();
 		} catch (RNSPathDoesNotExistException e) {

@@ -274,7 +274,7 @@ public class ServiceDeployer extends Thread
 		}
 
 		if (_logger.isTraceEnabled())
-			_logger.trace("Deploying \"" + className + "\".");
+			_logger.debug("Deploying \"" + className + "\".");
 		return className;
 	}
 

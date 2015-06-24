@@ -2,7 +2,8 @@ package edu.virginia.vcgr.smb.server;
 
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 
-public class SMBExtFileAttributes {
+public class SMBExtFileAttributes
+{
 	public final static int READONLY = 0x1;
 	public final static int HIDDEN = 0x2;
 	public final static int SYSTEM = 0x4;
@@ -18,8 +19,9 @@ public class SMBExtFileAttributes {
 	public final static int RANDOM_ACCESS = 0x10000000;
 	public final static int NO_BUFFERING = 0x20000000;
 	public final static int WRITE_THROUGH = 0x80000000;
-	
-	public static int fromTypeInfo(TypeInformation info) {
+
+	public static int fromTypeInfo(TypeInformation info)
+	{
 		if (info.isRNS()) {
 			return DIRECTORY;
 		} else if (info.isByteIO()) {

@@ -175,9 +175,13 @@ fan_out_directories()
   # locates a process given a search pattern to match in the process list.
   function psfind() {
     local -a patterns=("${@}")
+#echo ====
+#echo patterns list is: "${patterns[@]}"
+#echo ====
     local PID_DUMP="$(mktemp "$TMP/zz_pidlist.XXXXXX")"
     local -a PIDS_SOUGHT
     if [ "$OS" == "Windows_NT" ]; then
+      # windows case has some odd gyrations to get the user list.
       if [ ! -d c:/tmp ]; then
         mkdir c:/tmp
       fi
@@ -196,28 +200,38 @@ fan_out_directories()
       # needs to be a windows format filename for 'type' to work.
       cmd $flag type "$tmppid" >$PID_DUMP
       \rm "$tmppid"
-#      local CR='
-#'  # embedded carriage return.
-#      local appropriate_pattern="s/^.*  *\([0-9][0-9]*\)[ $CR]*\$/\1/p"
-      local appropriate_pattern="s/^.*  *\([0-9][0-9]*\) *\$/\1/p"
+      local appropriate_pattern='s/^.*[[:space:]][[:space:]]*\([0-9][0-9]*\) *\$/\1/p'
+      local i
       for i in "${patterns[@]}"; do
         PIDS_SOUGHT+=($(cat $PID_DUMP \
           | grep -i "$i" \
           | sed -n -e "$appropriate_pattern"))
       done
     else
-      /bin/ps $extra_flags wux >$PID_DUMP
+      /bin/ps $extra_flags wuax >$PID_DUMP
+#echo ====
+#echo got all this stuff in the pid dump file:
+#cat $PID_DUMP
+#echo ====
       # pattern to use for peeling off the process numbers.
-      local appropriate_pattern='s/^[-a-zA-Z_0-9][-a-zA-Z_0-9]*  *\([0-9][0-9]*\).*$/\1/p'
+      local appropriate_pattern='s/^[-+a-zA-Z_0-9][-+a-zA-Z_0-9]*[[:space:]][[:space:]]*\([0-9][0-9]*\).*$/\1/p'
       # remove the first line of the file, search for the pattern the
       # user wants to find, and just pluck the process ids out of the
       # results.
+      local i
       for i in "${patterns[@]}"; do
+#echo pattern is $i
+#echo phase 1: $(cat $PID_DUMP | sed -e '1d' )
+#echo phase 2: $(cat $PID_DUMP | sed -e '1d' | grep -i "$i" )
         PIDS_SOUGHT+=($(cat $PID_DUMP \
           | sed -e '1d' \
           | grep -i "$i" \
           | sed -n -e "$appropriate_pattern"))
       done
+#echo ====
+#echo pids sought list became:
+#echo "${PIDS_SOUGHT[@]}"
+#echo ====
     fi
     if [ ${#PIDS_SOUGHT[*]} -ne 0 ]; then
       local PIDS_SOUGHT2=$(printf -- '%s\n' ${PIDS_SOUGHT[@]} | sort | uniq)

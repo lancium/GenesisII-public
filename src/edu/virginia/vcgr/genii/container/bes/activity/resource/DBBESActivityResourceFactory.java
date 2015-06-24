@@ -51,7 +51,9 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		super.createTables();
+
+		// makes no sense to dip down to recreate base tables every time!
+		// super.createTables();
 
 		try {
 			conn = _pool.acquire(false);

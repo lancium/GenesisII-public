@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.gjt.data.DefaultDataItem;
 import edu.virginia.vcgr.genii.gjt.data.ModificationBroker;
 import edu.virginia.vcgr.genii.gjt.data.Modifyable;
@@ -19,7 +20,6 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.Parameterizable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 import edu.virginia.vcgr.jsdl.CreationFlag;
 
 public class DataStage extends DefaultDataItem implements PostUnmarshallListener, Clearable
@@ -126,7 +126,7 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 				editor.setModalityType(ModalityType.DOCUMENT_MODAL);
 				if (_stageIn)
 					editor.setStageIn();
-				GUIUtils.centerComponent(editor);
+				GuiUtils.centerComponent(editor);
 				editor.setVisible(true);
 				current = editor.getStageData();
 				if (current != null) {
@@ -152,7 +152,7 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 			StageEditor<? extends StageData> editor = protocol.factory().createEditor(owner);
 			editor.setModalityType(ModalityType.DOCUMENT_MODAL);
 			editor.pack();
-			GUIUtils.centerComponent(editor);
+			GuiUtils.centerComponent(editor);
 			if (_stageIn)
 				editor.setStageIn();
 			editor.setVisible(true);

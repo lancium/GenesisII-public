@@ -10,6 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.gjt.JobDocumentContext;
 import edu.virginia.vcgr.genii.gjt.data.JobDocument;
 import edu.virginia.vcgr.genii.gjt.data.ModificationBroker;
@@ -19,7 +20,6 @@ import edu.virginia.vcgr.genii.gjt.data.variables.VariableDefinitionType;
 import edu.virginia.vcgr.genii.gjt.data.variables.VariableListener;
 import edu.virginia.vcgr.genii.gjt.data.variables.VariableManager;
 import edu.virginia.vcgr.genii.gjt.data.variables.undef.UndefinedVariableDefinition;
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 
 class VariableTableModel extends AbstractTableModel
 {
@@ -123,7 +123,7 @@ class VariableTableModel extends AbstractTableModel
 						SwingUtilities.getWindowAncestor(_owner));
 				editor.pack();
 				editor.setModalityType(ModalityType.DOCUMENT_MODAL);
-				GUIUtils.centerComponent(editor);
+				GuiUtils.centerComponent(editor);
 				editor.setVisible(true);
 				definition = editor.getVariableDefinition();
 			}

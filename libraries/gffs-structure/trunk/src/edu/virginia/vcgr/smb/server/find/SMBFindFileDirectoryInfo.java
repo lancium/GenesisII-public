@@ -12,25 +12,27 @@ import edu.virginia.vcgr.smb.server.SMBExtFileAttributes;
 import edu.virginia.vcgr.smb.server.SMBSearchState;
 import edu.virginia.vcgr.smb.server.SMBSearchState.Entry;
 
-public class SMBFindFileDirectoryInfo {
-	public static int encode(SMBSearchState search, int searchCount, boolean unicode, SMBBuffer buffer) throws SMBException {
+public class SMBFindFileDirectoryInfo
+{
+	public static int encode(SMBSearchState search, int searchCount, boolean unicode, SMBBuffer buffer) throws SMBException
+	{
 		int count = 0;
 		int nextOffsetLoc = 0;
 		while (count < searchCount) {
 			if (!search.hasNext())
 				break;
-			
+
 			Entry cur = search.next();
 			String fileName = cur.getName();
 			RNSPath path = cur.getPath();
-			
+
 			Date create = new Date(), access = create, write = create, attrChange = create;
 			long fileSize = 0;
 			int attrs = SMBExtFileAttributes.SYSTEM;
-			
+
 			try {
 				TypeInformation type = new TypeInformation(path.getEndpoint());
-				
+
 				if (type.isByteIO()) {
 					create = type.getByteIOCreateTime();
 					access = type.getByteIOAccessTime();
@@ -38,14 +40,14 @@ public class SMBFindFileDirectoryInfo {
 					attrChange = write;
 					fileSize = type.getByteIOSize();
 				}
-				
+
 				attrs = SMBExtFileAttributes.fromTypeInfo(type);
 			} catch (RNSException e) {
-				
+
 			}
-				
+
 			long allocationSize = fileSize;
-				
+
 			nextOffsetLoc = buffer.skip(4);
 			buffer.putInt(0);
 			FileTime.fromDate(create).encode(buffer);
@@ -59,13 +61,13 @@ public class SMBFindFileDirectoryInfo {
 			buffer.putString(fileName, unicode);
 
 			buffer.putInt(nextOffsetLoc, buffer.position() - nextOffsetLoc);
-			
+
 			count++;
 		}
-		
+
 		if (count > 0)
 			buffer.putInt(nextOffsetLoc, 0);
-		
+
 		return count;
 	}
 }

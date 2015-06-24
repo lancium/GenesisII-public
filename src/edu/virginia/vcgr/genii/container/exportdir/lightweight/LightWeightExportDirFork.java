@@ -354,8 +354,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 								java.net.URI forkFileURI = forkFile.toURI();
 								epi += ":fork-path:" + forkFileURI.getRawPath();
 								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);									
-							}
-							else if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
+							} else if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
 								// Found the EPI
 								String epi = element.getValue();
 								Matcher matcher = EPI_PATTERN.matcher(epi);

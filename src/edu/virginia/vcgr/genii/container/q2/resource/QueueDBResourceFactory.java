@@ -62,7 +62,7 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		super.createTables();
+		// super.createTables();
 
 		try {
 			conn = _pool.acquire(false);

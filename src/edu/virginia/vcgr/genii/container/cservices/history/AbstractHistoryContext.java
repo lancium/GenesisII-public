@@ -224,6 +224,14 @@ abstract class AbstractHistoryContext implements HistoryContext
 	}
 
 	@Override
+	final public String getProperty(String propertyName)
+	{
+		synchronized (_properties) {
+			return _properties.get(propertyName);
+		}
+	}
+
+	@Override
 	final public String removeProperty(String propertyName)
 	{
 		synchronized (_properties) {

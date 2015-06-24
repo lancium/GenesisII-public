@@ -141,8 +141,15 @@ public class ResourceKey implements Closeable, Rollbackable
 
 		try {
 			_provider = ResourceProviders.getProvider(serviceName);
+			if (_logger.isTraceEnabled())
+				_logger.debug("ResKey: got provider");
+			// hmmm: getFactory() below was the slowest part of startup.
 			_factory = _provider.getFactory();
+			if (_logger.isTraceEnabled())
+				_logger.debug("ResKey: got factory");
 			_cachedResource = _factory.instantiate(this);
+			if (_logger.isTraceEnabled())
+				_logger.debug("ResKey: instantiated factory");
 			_cachedResource.load(addrParams.getResourceKey());
 			incrementCounter(_cachedResource);
 			_incrementedCounter = true;
@@ -155,7 +162,7 @@ public class ResourceKey implements Closeable, Rollbackable
 		} finally {
 			if (!noExceptions) {
 				if (_logger.isTraceEnabled())
-					_logger.trace("ResourceKey: An exception occured in ctor(string,addrParms), so closing the resource.");
+					_logger.debug("ResourceKey: An exception occured in ctor(string,addrParms), so closing the resource.");
 				StreamUtils.close(_cachedResource);
 			}
 		}

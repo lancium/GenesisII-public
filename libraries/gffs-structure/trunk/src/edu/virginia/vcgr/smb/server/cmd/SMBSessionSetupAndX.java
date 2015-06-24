@@ -29,13 +29,12 @@ public class SMBSessionSetupAndX implements SMBCommand
 		int passOEMLen = params.getUShort();
 
 		String username = "?", domain = "?", osName = "?", smbClient = "?";
-		
-		if (username == null || domain == null || smbClient == null || osName == null
-			|| maxBufferSize==0 || vcNumber==0 || sessionKey==0) {
-			//silence unused var warning.
+
+		if (username == null || domain == null || smbClient == null || osName == null || maxBufferSize == 0 || vcNumber == 0
+			|| sessionKey == 0) {
+			// silence unused var warning.
 		}
 
-		
 		if (dialect.atLeast(SMBDialect.NTLM)) {
 			int passSMBLen = params.getUShort();
 			params.getInt();

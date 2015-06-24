@@ -205,75 +205,76 @@ final class IDPLoginPanel extends LoginPanel
 			UsernamePasswordIdentity upt = null;
 			TransientCredentials transientCredentials = null;
 
-			try {
-				// we're going to use the WS-TRUST token-issue operation
-				// to log in to a security tokens service
-				KeyAndCertMaterial clientKeyMaterial =
-					ClientUtils.checkAndRenewCredentials(context, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+			// we're going to use the WS-TRUST token-issue operation
+			// to log in to a security tokens service
+			KeyAndCertMaterial clientKeyMaterial =
+				ClientUtils.checkAndRenewCredentials(context, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 
-				if ((_type == ProxyTypes.XSEDE_MYPROXY) || (_type == ProxyTypes.LRZ_MYPROXY)) {
-					MyProxyLoginTool lt = new MyProxyLoginTool();
-					lt.establishStandardIO(null, null, null);
-					lt.setUsername(_username.getText());
-					lt.setPassword(new String(_password.getPassword()));
-					lt.setPort(_proxyPort);
-					lt.setHost(_proxyHost);
+			if ((_type == ProxyTypes.XSEDE_MYPROXY) || (_type == ProxyTypes.LRZ_MYPROXY)) {
+				MyProxyLoginTool lt = new MyProxyLoginTool();
+				lt.establishStandardIO(null, null, null);
+				lt.setUsername(_username.getText());
+				lt.setPassword(new String(_password.getPassword()));
+				lt.setPort(_proxyPort);
+				lt.setHost(_proxyHost);
 
-					lt.doMyproxyLogin(context);
-
-					if (_logger.isDebugEnabled())
-						_logger.debug("before reloading have cert: " + clientKeyMaterial._clientCertChain[0].getSubjectDN());
-
-					// reload the key material after myproxy changes it.
-					clientKeyMaterial =
-						ClientUtils.checkAndRenewCredentials(context, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
-				}
-
-				upt = new UsernamePasswordIdentity(_username.getText(), new String(_password.getPassword()));
-
-				transientCredentials = TransientCredentials.getTransientCredentials(context);
-				transientCredentials.add(upt);
-
-				ContextManager.storeCurrentContext(context);
-
-				EndpointReferenceType epr = path.getEndpoint();
+				lt.doMyproxyLogin(context);
 
 				if (_logger.isDebugEnabled())
-					_logger.debug("about to do idplogin with cert: " + clientKeyMaterial._clientCertChain[0].getSubjectDN());
+					_logger.debug("before reloading have cert: " + clientKeyMaterial._clientCertChain[0].getSubjectDN());
 
-				// login to the STS path that we've been given and see if our credentials allow it.
-				ArrayList<NuCredential> creds =
-					IDPLoginTool.doIdpLogin(epr, SecurityConstants.CredentialExpirationMillis, clientKeyMaterial._clientCertChain);
+				// reload the key material after myproxy changes it.
+				clientKeyMaterial =
+					ClientUtils.checkAndRenewCredentials(context, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+			}
 
-				// reload the context now, which is crucial for this method to see the most recent.
-				StreamUtils.close(assumedContextToken);
-				context = ContextManager.getCurrentContext();
+			upt = new UsernamePasswordIdentity(_username.getText(), new String(_password.getPassword()));
 
-				/*
-				 * try to leave the user in the right current directory. Changed by ASAG March 6, 2014
-				 */
-				{
-					// Assumption is that user idp's are off /user and homes off /home
-					String userHome = _rnsPath.getText().replaceFirst("users", "home");
+			transientCredentials = TransientCredentials.getTransientCredentials(context);
+			transientCredentials.add(upt);
 
-					if (_logger.isDebugEnabled()) {
-						_logger.debug("guessing user home directory from sts gets: '" + userHome + "'");
-					}
+			// hmmm: this is in question; we have assumed a new context, why are we storing it!!!!
+			// this is probably source of bogus username token showing up in outside context, console's context, after the
+			// in-ui login process is successful.
+			// ContextManager.storeCurrentContext(context);
 
-					try {
-						CdTool.chdir(userHome);
-					} catch (Throwable e) {
-						_logger.debug("problem seen jumping to user home after login", e);
-					}
+			EndpointReferenceType epr = path.getEndpoint();
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("about to do idplogin with cert: " + clientKeyMaterial._clientCertChain[0].getSubjectDN());
+
+			// login to the STS path that we've been given and see if our credentials allow it.
+			ArrayList<NuCredential> creds =
+				IDPLoginTool.doIdpLogin(epr, SecurityConstants.CredentialExpirationMillis, clientKeyMaterial._clientCertChain);
+
+			if ((upt != null) && (transientCredentials != null)) {
+				// the UT credential was used only to log into the IDP, remove it
+				transientCredentials.remove(upt);
+			}
+
+			// reload the context now, which is crucial for this method to see the most recent.
+			StreamUtils.close(assumedContextToken);
+			context = ContextManager.getCurrentContext();
+
+			/*
+			 * try to leave the user in the right current directory. Changed by ASAG March 6, 2014
+			 */
+			{
+				// Assumption is that user idp's are off /user and homes off /home
+				String userHome = _rnsPath.getText().replaceFirst("users", "home");
+
+				if (_logger.isDebugEnabled()) {
+					_logger.debug("guessing user home directory from sts gets: '" + userHome + "'");
 				}
 
-				return creds;
-			} finally {
-				if ((upt != null) && (transientCredentials != null)) {
-					// the UT credential was used only to log into the IDP, remove it
-					transientCredentials.remove(upt);
+				try {
+					CdTool.chdir(userHome);
+				} catch (Throwable e) {
+					_logger.debug("problem seen jumping to user home after login", e);
 				}
 			}
+
+			return creds;
 		} finally {
 			StreamUtils.close(assumedContextToken);
 		}

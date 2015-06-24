@@ -11,20 +11,21 @@ import edu.virginia.vcgr.smb.server.SMBFileAttributes;
 import edu.virginia.vcgr.smb.server.SMBHeader;
 import edu.virginia.vcgr.smb.server.SMBTree;
 
-public class SMBCreateDirectory implements SMBCommand {
+public class SMBCreateDirectory implements SMBCommand
+{
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params,
-			SMBBuffer data, SMBBuffer message, SMBBuffer acc)
-			throws IOException, SMBException {
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
+		SMBException
+	{
 		String path = data.getSMBString(h.isUnicode());
-		
+
 		SMBTree tree = c.verifyTID(h.tid);
 		RNSPath dir = tree.lookup(path, h.isCaseSensitive());
 		SMBTree.open(dir, SMBFileAttributes.DIRECTORY, true, true, false);
-		
+
 		acc.emptyParamBlock();
 		acc.emptyDataBlock();
-		
+
 		c.sendSuccess(h, acc);
 	}
 }

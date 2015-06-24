@@ -281,7 +281,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 								accessCategories, trustDelegation);
 
 						if (newTC != null) {
-							if (_logger.isDebugEnabled())
+							if (_logger.isTraceEnabled())
 								_logger.debug("after delegation, cred for outcall is: " + newTC.describe(VerbosityLevel.HIGH));
 						}
 					}

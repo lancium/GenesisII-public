@@ -317,8 +317,12 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
-	static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
+	//broken from gaml days: static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
+
+	//hmmm: below may be broken also.
 	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$", Pattern.CASE_INSENSITIVE);
+
+	static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^\\(group\\).*$", Pattern.CASE_INSENSITIVE);
 
 	static private boolean matches(Identity identity, Pattern[] patterns)
 	{
@@ -331,13 +335,20 @@ public class SecurityUtilities implements CertificateValidator
 		return false;
 	}
 
+	/**
+	 * filters out any credentials in the list "in" that match any of the "patterns" and returns the result.
+	 */
 	static public Collection<Identity> filterCredentials(Collection<Identity> in, Pattern... patterns)
 	{
 		Collection<Identity> ret = new ArrayList<Identity>(in.size());
 
 		for (Identity test : in) {
-			if (!matches(test, patterns))
+			if (!matches(test, patterns)) {
+				_logger.debug("pattern did not match so adding: " + test);
 				ret.add(test);
+			} else {
+				_logger.debug("pattern matched so NOT adding: " + test);				
+			}
 		}
 
 		return ret;

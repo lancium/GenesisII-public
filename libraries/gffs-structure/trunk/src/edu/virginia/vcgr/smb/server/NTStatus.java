@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.smb.server;
 
-public class NTStatus {
+public class NTStatus
+{
 	public static final int SUCCESS = 0;
 	public static final int NOT_IMPLEMENTED = 0xC0000002;
 	public static final int INVALID_SMB = 0x00010002;

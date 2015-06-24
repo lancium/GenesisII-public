@@ -36,11 +36,22 @@ public class BasicDBResourceFactory implements IResourceFactory
 
 	protected ServerDatabaseConnectionPool _pool;
 
+	static boolean tablesRefreshed = false;
+
 	public BasicDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
 		_pool = pool;
+		establishBasicTables();
 		createTables();
 		upgradeTables();
+	}
+
+	private synchronized void establishBasicTables() throws SQLException
+	{
+		if (tablesRefreshed)
+			return;
+		baseCreateTables();
+		tablesRefreshed = true;
 	}
 
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
@@ -53,6 +64,11 @@ public class BasicDBResourceFactory implements IResourceFactory
 	}
 
 	protected void createTables() throws SQLException
+	{
+		/* for derived classes' additional tables. */
+	}
+
+	private void baseCreateTables() throws SQLException
 	{
 		Connection conn = null;
 

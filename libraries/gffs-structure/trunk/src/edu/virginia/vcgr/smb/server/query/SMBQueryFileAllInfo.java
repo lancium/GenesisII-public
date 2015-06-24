@@ -5,8 +5,10 @@ import edu.virginia.vcgr.smb.server.SMBBuffer;
 import edu.virginia.vcgr.smb.server.SMBException;
 import edu.virginia.vcgr.smb.server.SMBFile;
 
-public class SMBQueryFileAllInfo {
-	public static void encode(SMBFile fd, SMBBuffer buffer) throws SMBException {
+public class SMBQueryFileAllInfo
+{
+	public static void encode(SMBFile fd, SMBBuffer buffer) throws SMBException
+	{
 		long fileSize = fd.getSize();
 		long create = fd.getCreateTime();
 		long access = fd.getAccessTime();
@@ -15,7 +17,7 @@ public class SMBQueryFileAllInfo {
 		long allocSize = fileSize;
 		String fileName = fd.getPath().getName();
 		int length = fileName.length();
-			
+
 		FileTime.fromMillis(create).encode(buffer);
 		FileTime.fromMillis(access).encode(buffer);
 		FileTime.fromMillis(write).encode(buffer);
@@ -26,12 +28,12 @@ public class SMBQueryFileAllInfo {
 		buffer.putLong(fileSize);
 		// No hardlinks
 		buffer.putInt(1);
-		buffer.put((byte)(fd.getDeletePending()?1:0));
+		buffer.put((byte) (fd.getDeletePending() ? 1 : 0));
 		if (fd.getPath().isRNS())
-			buffer.put((byte)1);
+			buffer.put((byte) 1);
 		else
-			buffer.put((byte)0);
-		buffer.putShort((short)0);
+			buffer.put((byte) 0);
+		buffer.putShort((short) 0);
 		// No EAs
 		buffer.putInt(0);
 		buffer.putInt(length * 2);

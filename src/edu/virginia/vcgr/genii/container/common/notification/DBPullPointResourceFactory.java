@@ -10,10 +10,10 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class DBPullPointResourceFactory extends BasicDBResourceFactory
 {
-	@Override
-	protected void createTables() throws SQLException
-	{
-	}
+	// @Override
+	// protected void createTables() throws SQLException
+	// {
+	// }
 
 	public DBPullPointResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{

@@ -264,8 +264,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 
 				context.setSingleValueProperty("RNSShortForm", true);
 				/*
-				 * Due to a problem the the context resolver, we have explicitly store the context to make property update visible in the
-				 * rest of the code.
+				 * Due to a problem the the context resolver, we have explicitly store the context to make property update visible in the rest
+				 * of the code.
 				 */
 				ContextManager.storeCurrentContext(context);
 

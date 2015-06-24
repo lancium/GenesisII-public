@@ -64,8 +64,9 @@ public class TransientCredentials implements Serializable
 
 	public void addAll(Collection<NuCredential> newCreds)
 	{
-		// we intentionally invoke our own function, rather than addAll on the list, in order to
-		// check on things.
+		/*
+		 * we intentionally invoke our own function, rather than addAll on the list, in order to check on things.
+		 */
 		for (NuCredential cred : newCreds)
 			add(cred);
 	}

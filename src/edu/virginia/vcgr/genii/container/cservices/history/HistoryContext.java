@@ -59,6 +59,8 @@ public interface HistoryContext extends Cloneable
 
 	public void setProperty(String propertyName, String propertyValue);
 
+	public String getProperty(String propertyName);
+
 	public String removeProperty(String propertyName);
 
 	public ICallingContext setContextProperties(ICallingContext ctxt);

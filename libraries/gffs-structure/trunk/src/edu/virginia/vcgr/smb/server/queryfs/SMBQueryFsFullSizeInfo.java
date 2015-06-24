@@ -3,8 +3,10 @@ package edu.virginia.vcgr.smb.server.queryfs;
 import edu.virginia.vcgr.smb.server.SMBBuffer;
 import edu.virginia.vcgr.smb.server.SMBException;
 
-public class SMBQueryFsFullSizeInfo {
-	public static void encode(SMBBuffer output) throws SMBException {
+public class SMBQueryFsFullSizeInfo
+{
+	public static void encode(SMBBuffer output) throws SMBException
+	{
 		output.putLong(SMBQueryFs.TOTAL_UNITS);
 		output.putLong(SMBQueryFs.TOTAL_UNITS);
 		output.putLong(SMBQueryFs.TOTAL_UNITS);

@@ -13,6 +13,8 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -27,8 +29,13 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 
 public class CommandLineRunner
 {
+	static private Log _logger = LogFactory.getLog(CommandLineRunner.class);
+
 	private Map<String, ToolDescription> _tools;
 	private static ArrayList<String[]> _history = new ArrayList<String[]>();
+
+	// hmmm: should be configurable.
+	public static int MAXIMUM_HISTORY_SIZE = 20000;
 
 	static private String[] editCommandLine(String[] commandLine) throws FileNotFoundException, IOException
 	{
@@ -100,9 +107,20 @@ public class CommandLineRunner
 			}
 		}
 
-		if (_history.size() > 500)
+		if (_history.size() > MAXIMUM_HISTORY_SIZE)
 			_history.remove(0);
 		_history.add(cLine);
+
+		if (cLine[0].equals("grid")) {
+			// this code just eats any redundant "grid" word that is in front of a real command.
+
+			// hmmm: temp logging.
+			_logger.debug("eating 'grid' command in front of command since this is bogus usage.");
+
+			String[] newcline = new String[cLine.length - 1];
+			System.arraycopy(cLine, 1, newcline, 0, cLine.length - 1);
+			cLine = newcline;
+		}
 
 		ToolDescription desc = _tools.get(cLine[0]);
 		if (desc == null)
@@ -121,7 +139,6 @@ public class CommandLineRunner
 					target = openRedirect(redirectTarget);
 					break;
 				}
-
 				instance.addArgument(argument);
 			}
 

@@ -29,7 +29,9 @@ public class UserPreferences
 
 	static final private boolean DEFAULT_PREFER_GUI = true;
 	static final private IExceptionHandler DEFAULT_EXCEPTION_HANDLER = new SimpleExceptionHandler();
-	static final private String DEFAULT_SHELL_PROMPT_TEMPLATE = "${net.name}:\\$>";
+	
+	// the shell prompt should not include a space, since one is automatically printed.
+	static final private String DEFAULT_SHELL_PROMPT_TEMPLATE = "[${net.name}]";
 
 	static private class GridEnvironmentMacroResolver implements MacroResolver
 	{

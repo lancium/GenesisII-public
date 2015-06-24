@@ -8,12 +8,9 @@
 	<classpathentry kind="lib" path="../../../ext/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="../../../ext/axis/jaxrpc.jar"/>
 	<classpathentry kind="lib" path="../../../ext/wss4j-1.5.6.jar"/>
-	<classpathentry kind="lib" path="../../../ext/CmdLineManipulator.jar"/>
-	<classpathentry kind="lib" path="../../../ext/GeniiJSDL.jar"/>
 	<classpathentry kind="lib" path="../../../ext/fuse-j.jar"/>
 	<classpathentry kind="lib" path="../../../ext/MorganUtilities.jar"/>
 	<classpathentry kind="lib" path="../../../bundles/org.eclipse.osgi_3.8.0.v20120529-1548.jar" sourcepath="/home/fred/.m2/repository/org/eclipse/tycho/org.eclipse.osgi/3.8.0.v20120529-1548/org.eclipse.osgi-3.8.0.v20120529-1548-sources.jar"/>
-	<classpathentry kind="lib" path="../../../ext/GeniiProcMgmt.jar"/>
 	<classpathentry kind="lib" path="../../../ext/jetty/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="../../../ext/axis/mail.jar"/>
 	<classpathentry kind="lib" path="../../../ext/jetty/jetty-6.1.26.jar"/>
@@ -39,5 +36,8 @@
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/xmlsec-1.4.6.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/bundle-u6security_1.0.74.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CmdLineManipulator"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GeniiJSDL"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GeniiProcessMgmt"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

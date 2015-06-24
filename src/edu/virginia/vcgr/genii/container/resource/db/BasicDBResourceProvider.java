@@ -20,7 +20,6 @@ public class BasicDBResourceProvider implements IResourceProvider, Initializable
 	}
 
 	private ServerDatabaseConnectionPool createConnectionPool()
-
 	{
 		ServerDatabaseConnectionPool pool = null;
 
@@ -37,7 +36,8 @@ public class BasicDBResourceProvider implements IResourceProvider, Initializable
 	{
 		if (_factory == null) {
 			try {
-				_factory = instantiateResourceFactory(createConnectionPool());
+				ServerDatabaseConnectionPool pool = createConnectionPool();
+				_factory = instantiateResourceFactory(pool);
 			} catch (Exception e) {
 				throw new RuntimeException(e.getLocalizedMessage(), e);
 			}

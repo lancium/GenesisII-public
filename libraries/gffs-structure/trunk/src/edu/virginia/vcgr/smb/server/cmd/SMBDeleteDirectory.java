@@ -14,23 +14,24 @@ import edu.virginia.vcgr.smb.server.SMBException;
 import edu.virginia.vcgr.smb.server.SMBHeader;
 import edu.virginia.vcgr.smb.server.SMBTree;
 
-public class SMBDeleteDirectory implements SMBCommand {
+public class SMBDeleteDirectory implements SMBCommand
+{
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params,
-			SMBBuffer data, SMBBuffer message, SMBBuffer acc)
-			throws IOException, SMBException {
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
+		SMBException
+	{
 		String path = data.getSMBString(h.isUnicode());
-		
+
 		SMBTree tree = c.verifyTID(h.tid);
 		RNSPath dir = tree.lookup(path, h.isCaseSensitive());
-		
+
 		// It better be an empty directory
 		try {
 			TypeInformation info = new TypeInformation(dir.getEndpoint());
-			
+
 			if (!info.isRNS())
 				throw new SMBException(NTStatus.NO_SUCH_FILE);
-			
+
 			if (!dir.listContents().isEmpty())
 				throw new SMBException(NTStatus.DIRECTORY_NOT_EMPTY);
 		} catch (RNSPathDoesNotExistException e) {
@@ -38,12 +39,12 @@ public class SMBDeleteDirectory implements SMBCommand {
 		} catch (RNSException e) {
 			throw new SMBException(NTStatus.ACCESS_DENIED);
 		}
-		
+
 		SMBTree.rm(dir);
-		
+
 		acc.emptyParamBlock();
 		acc.emptyDataBlock();
-		
+
 		c.sendSuccess(h, acc);
 	}
 }

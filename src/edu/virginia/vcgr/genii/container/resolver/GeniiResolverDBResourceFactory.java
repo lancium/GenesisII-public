@@ -34,7 +34,7 @@ public class GeniiResolverDBResourceFactory extends BasicDBResourceFactory imple
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		super.createTables();
+		// super.createTables();
 		try {
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_TABLE_STMT);

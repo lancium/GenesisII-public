@@ -13,6 +13,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.gjt.data.JobDocument;
 import edu.virginia.vcgr.genii.gjt.data.ModificationBroker;
 import edu.virginia.vcgr.genii.gjt.data.ModificationListener;
@@ -20,7 +21,6 @@ import edu.virginia.vcgr.genii.gjt.data.analyze.Analysis;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.variables.VariableManager;
 import edu.virginia.vcgr.genii.gjt.gui.GridJobToolFrame;
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 import edu.virginia.vcgr.genii.gjt.prefs.ToolPreference;
 import edu.virginia.vcgr.jsdl.JSDLUtility;
 import edu.virginia.vcgr.jsdl.JobDefinition;
@@ -111,7 +111,7 @@ public class JobDocumentContext
 	void start()
 	{
 		_frame.pack();
-		GUIUtils.centerComponent(_frame);
+		GuiUtils.centerComponent(_frame);
 		_frame.setVisible(true);
 	}
 

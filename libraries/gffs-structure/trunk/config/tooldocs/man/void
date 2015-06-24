@@ -1,0 +1,5 @@
+
+Description:
+
+The void command simply eats all parameters and input passed to it.  It is used as a method for commenting inside of the grid command, which is particularly useful for documenting within long strings of commands.
+

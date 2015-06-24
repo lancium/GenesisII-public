@@ -6,6 +6,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -13,7 +14,7 @@ import javax.swing.JMenuBar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 
 public class UIFrame extends JFrame
 {
@@ -25,7 +26,8 @@ public class UIFrame extends JFrame
 	protected UIContext _uiContext;
 
 	// track how many frames have been created. we won't exit until the last one is gone.
-	static private Integer _uiFrameCount = 0;
+	// static private Integer _uiFrameCount = 0;
+	static private ArrayList<UIFrame> _frameList = new ArrayList<UIFrame>();
 
 	// tracks last offset used so we can not drop windows all on top of each other.
 	static private double xOffset = 0.0;
@@ -68,8 +70,8 @@ public class UIFrame extends JFrame
 	 */
 	public static int activeFrames()
 	{
-		synchronized (_uiFrameCount) {
-			return _uiFrameCount;
+		synchronized (_frameList) {
+			return _frameList.size();
 		}
 	}
 
@@ -77,10 +79,14 @@ public class UIFrame extends JFrame
 	{
 		_uiContext.applicationContext().removeDisposeListener(_disposeListener);
 		super.dispose();
-		synchronized (_uiFrameCount) {
-			// checking out now, since this is the last frame window.
-			_uiFrameCount--;
-			_logger.debug("UIFrame count reduced to " + _uiFrameCount);
+		synchronized (_frameList) {
+			if (_frameList.contains(this)) {
+				_frameList.remove(this);
+			} else {
+				_logger.error("somehow was asked to destroy frame that's not in our list.");
+				return;
+			}
+			_logger.debug("UIFrame count reduced to " + _frameList.size());
 		}
 	}
 
@@ -89,12 +95,21 @@ public class UIFrame extends JFrame
 		return new DefaultJMenuBarFactory(_uiContext.applicationContext());
 	}
 
+	/**
+	 * returns a copy of the current list of frames. this is not locked, so the real frames could change after the list is returned.
+	 */
+	@SuppressWarnings("unchecked")
+	static public ArrayList<UIFrame> getFrameList()
+	{
+		return (ArrayList<UIFrame>) _frameList.clone();
+	}
+
 	protected void initializeUIFrame(ApplicationContext context, UIContext uiContext)
 	{
-		synchronized (_uiFrameCount) {
+		synchronized (_frameList) {
 			// we're a new frame, so up the count.
-			_uiFrameCount++;
-			_logger.debug("UIFrame count increased to " + _uiFrameCount);
+			_frameList.add(this);
+			_logger.debug("UIFrame count increased to " + _frameList.size());
 		}
 
 		_uiContext = uiContext;
@@ -119,7 +134,7 @@ public class UIFrame extends JFrame
 	public void centerWindowAndMarch()
 	{
 		_logger.debug("current offset: [" + xOffset + ", " + yOffset + "]");
-		GUIUtils.centerComponentWithOffset(this, (int) xOffset, (int) yOffset);
+		GuiUtils.centerComponentWithOffset(this, (int) xOffset, (int) yOffset);
 		_logger.debug("updated offset before checking: [" + xOffset + ", " + yOffset + "]");
 		xOffset += MARCH_IN_X_DIRECTION;
 		yOffset += MARCH_IN_Y_DIRECTION;

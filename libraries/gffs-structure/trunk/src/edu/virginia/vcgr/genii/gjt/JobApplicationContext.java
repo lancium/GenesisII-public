@@ -17,9 +17,9 @@ import org.morgan.mac.gui.macwrap.ApplicationAdapter;
 import org.morgan.mac.gui.macwrap.ApplicationEvent;
 import org.morgan.mac.gui.macwrap.MacOSXGuiSetup;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.gjt.gui.about.AboutDialog;
 import edu.virginia.vcgr.genii.gjt.gui.prefs.PreferencesEditor;
-import edu.virginia.vcgr.genii.gjt.gui.util.GUIUtils;
 import edu.virginia.vcgr.genii.gjt.prefs.ToolPreferences;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 
@@ -160,7 +160,7 @@ public class JobApplicationContext
 		PreferencesEditor editor = new PreferencesEditor(_preferences);
 		editor.setModalityType(ModalityType.APPLICATION_MODAL);
 		editor.pack();
-		GUIUtils.centerComponent(editor);
+		GuiUtils.centerComponent(editor);
 		editor.setVisible(true);
 	}
 
@@ -169,7 +169,7 @@ public class JobApplicationContext
 		AboutDialog dialog = new AboutDialog(null);
 		dialog.pack();
 		dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-		GUIUtils.centerComponent(dialog);
+		GuiUtils.centerComponent(dialog);
 		dialog.setVisible(true);
 	}
 
