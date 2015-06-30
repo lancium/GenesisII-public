@@ -222,15 +222,6 @@ public class NotificationBrokerWrapper
 						_logger.debug("Unexpected RPC error. Conservatively resetting the cache.", e);
 					CacheManager.resetCachingSystem();
 				} catch (Exception e) {
-					if ((e instanceof RuntimeException) && (e.getMessage() != null) && (e.getMessage().contains("Missing polling time settings"))
-						&& (brokerInActiveMode || brokerDestroyed || brokerExpired())) {
-						/*
-						 * error caused by asynchrony coming from the notifications that active updates are working. we just ignore it in this
-						 * case and allow the loop to exit.
-						 */
-						continue;
-					}
-
 					if (_logger.isDebugEnabled())
 						_logger.debug("Unexpected error. Conservatively resetting the cache.", e);
 					CacheManager.resetCachingSystem();
