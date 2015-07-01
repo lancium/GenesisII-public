@@ -35,7 +35,7 @@ public class ProxyIOServerDriver
 
 		// startup sentinel that we print to tell server we're running.
 		System.out.println("ready");
-		
+
 		BufferedInputStream bis = new BufferedInputStream(System.in);
 
 		byte[] nonce = new byte[Constants.NONCE_SIZE];

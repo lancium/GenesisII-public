@@ -56,7 +56,7 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 	{
 		Connection conn = null;
 
-		//hmmm: nothing exists at base...
+		// hmmm: nothing exists at base...
 		// super.createTables();
 
 		try {

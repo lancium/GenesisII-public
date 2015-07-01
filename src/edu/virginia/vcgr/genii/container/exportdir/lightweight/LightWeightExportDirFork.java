@@ -345,7 +345,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						for (int pos = 0; pos < me.length; pos++) {
 							MessageElement element = ent.getMetadata().get_any()[pos];
 							QName name = element.getQName();
-							// 5/13/2015 ASG	
+							// 5/13/2015 ASG
 							if (name.equals(GenesisIIConstants.RESOURCE_URI_QNAME)) {
 								String epi = element.getValue();
 								Matcher matcher = EPI_PATTERN.matcher(epi);
@@ -353,7 +353,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 									epi = matcher.group(1);
 								java.net.URI forkFileURI = forkFile.toURI();
 								epi += ":fork-path:" + forkFileURI.getRawPath();
-								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);									
+								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);
 							} else if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
 								// Found the EPI
 								String epi = element.getValue();
@@ -413,7 +413,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						for (int pos = 0; pos < me.length; pos++) {
 							MessageElement element = ent.getMetadata().get_any()[pos];
 							QName name = element.getQName();
-//	5/13/2015 ASG			if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
+							// 5/13/2015 ASG if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
 							if (name.equals(GenesisIIConstants.RESOURCE_URI_QNAME)) {
 								// Found the EPI
 								String epi = element.getValue();
@@ -423,7 +423,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 								java.net.URI forkFileURI = forkFile.toURI();
 								epi += ":fork-path:" + forkFileURI.getRawPath();
-// 5/13/2015 ASG				me[pos] = new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, epi);
+								// 5/13/2015 ASG me[pos] = new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, epi);
 								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);
 								// Ok, we have updated the EPI, not lets fill in the other things
 								// that need filling
@@ -597,7 +597,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						for (int pos = 0; pos < me.length; pos++) {
 							MessageElement element = ent.getMetadata().get_any()[pos];
 							QName name = element.getQName();
-							// 5/13/2015 ASG	
+							// 5/13/2015 ASG
 							if (name.equals(GenesisIIConstants.RESOURCE_URI_QNAME)) {
 								String epi = element.getValue();
 								Matcher matcher = EPI_PATTERN.matcher(epi);
@@ -605,7 +605,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 									epi = matcher.group(1);
 								java.net.URI forkFileURI = forkFile.toURI();
 								epi += ":fork-path:" + forkFileURI.getRawPath();
-								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);									
+								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);
 							}
 							// End update
 							else if (name.equals(WSName.ENDPOINT_IDENTIFIER_QNAME)) {
@@ -617,7 +617,7 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 								java.net.URI forkFileURI = forkFile.toURI();
 								epi += ":fork-path:" + forkFileURI.getRawPath();
-//								me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);
+								// me[pos] = new MessageElement(GenesisIIConstants.RESOURCE_URI_QNAME, epi);
 								me[pos] = new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, epi);
 								// Ok, we have updated the EPI, not lets fill in the other things
 								// that need filling

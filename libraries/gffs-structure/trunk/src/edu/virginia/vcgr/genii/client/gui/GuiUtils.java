@@ -41,16 +41,16 @@ public class GuiUtils
 	static public void centerComponentWithOffset(Component comp, int xOffset, int yOffset)
 	{
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-	
+
 		Point p = new Point(center.x - (comp.getWidth() / 2) + xOffset, center.y - (comp.getHeight() / 2) + yOffset);
 		comp.setLocation(p);
 	}
-//
-//	static public void canterComponent(Component comp)
-//	{
-//		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-//	
-//		Point p = new Point(center.x - (comp.getWidth() / 2), center.y - (comp.getHeight() / 2));
-//		comp.setLocation(p);
-//	}
+	//
+	// static public void canterComponent(Component comp)
+	// {
+	// Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+	//
+	// Point p = new Point(center.x - (comp.getWidth() / 2), center.y - (comp.getHeight() / 2));
+	// comp.setLocation(p);
+	// }
 }

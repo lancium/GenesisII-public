@@ -317,9 +317,10 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
-	//broken from gaml days: static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
+	// broken from gaml days: static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$",
+	// Pattern.CASE_INSENSITIVE);
 
-	//hmmm: below may be broken also.
+	// hmmm: below may be broken also.
 	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$", Pattern.CASE_INSENSITIVE);
 
 	static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^\\(group\\).*$", Pattern.CASE_INSENSITIVE);
@@ -347,7 +348,7 @@ public class SecurityUtilities implements CertificateValidator
 				_logger.debug("pattern did not match so adding: " + test);
 				ret.add(test);
 			} else {
-				_logger.debug("pattern matched so NOT adding: " + test);				
+				_logger.debug("pattern matched so NOT adding: " + test);
 			}
 		}
 

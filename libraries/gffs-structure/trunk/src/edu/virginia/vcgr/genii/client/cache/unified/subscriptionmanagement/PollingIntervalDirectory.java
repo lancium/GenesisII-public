@@ -29,13 +29,13 @@ public class PollingIntervalDirectory
 	public static void storePollingTimeSettings(PollingTimeSettings pollingTimeSettings)
 	{
 		String containerId = pollingTimeSettings.getContainerId();
-		_logger.debug("storing polling time settings for container: " + containerId); 
+		_logger.debug("storing polling time settings for container: " + containerId);
 		POLLING_TIME_CONFIGURATIONS.put(containerId, pollingTimeSettings);
 	}
 
 	public static void deletePollingTimeSettings(String containerId)
 	{
-		_logger.debug("deleting polling time settings for container: " + containerId); 
+		_logger.debug("deleting polling time settings for container: " + containerId);
 		POLLING_TIME_CONFIGURATIONS.remove(containerId);
 	}
 
