@@ -260,7 +260,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			 * do the first authentication against this resource, which should be an STS, and decide if the caller has the right to assume
 			 * that identity.
 			 */
-			RequestSecurityTokenResponseType response = delegateCredential(theThis, resource, delegateToChain, created, expiry);
+			TrustCredential tc = delegateCredential(theThis, resource, delegateToChain, created, expiry);
+			RequestSecurityTokenResponseType response = createResponse(theThis, tc);
 			responseArray.add(response);
 
 			/*
@@ -278,6 +279,10 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			throw new AxisFault(se.getLocalizedMessage(), se);
 		} catch (ConfigurationException ce) {
 			throw new RemoteException(ce.getMessage(), ce);
+			// } catch (FileNotFoundException e) {
+			// throw new AxisFault(e.getLocalizedMessage(), e);
+		} catch (IOException e) {
+			throw new AxisFault(e.getLocalizedMessage(), e);
 		}
 
 		return responseArray.toArray(new RequestSecurityTokenResponseType[responseArray.size()]);
@@ -447,63 +452,66 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	}
 
 	/**
-	 * builds the initial credential that the STS trusts the TLS cert that we were told to delegate to.
+	 * builds the initial credential for the client that states that the STS trusts the client's TLS cert.
 	 */
-	public static RequestSecurityTokenResponseType delegateCredential(BaseAuthenticationServiceImpl theThis, IRNSResource resource,
+	public static TrustCredential delegateCredential(BaseAuthenticationServiceImpl theThis, IRNSResource resource,
 		X509Certificate[] delegateToChain, Date created, Date expiry) throws AuthZSecurityException, SOAPException, ConfigurationException,
 		RemoteException
 	{
+		TrustCredential newTC = null;
+
 		if (delegateToChain != null)
 			_logger.info("delegating to " + delegateToChain[0].getSubjectDN());
 
-		NuCredential credential = RNSContainerUtilities.loadRNSResourceCredential(resource);
-		AxisCredentialWallet creds = new AxisCredentialWallet();
-		_logger.debug("resource's credential is: " + credential.toString());
+		NuCredential resourceCred = RNSContainerUtilities.loadRNSResourceCredential(resource);
+		_logger.debug("resource's credential is: " + resourceCred.toString());
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("X509AuthnServiceImpl: authenticating " + credential.getOriginalAsserter()[0].getSubjectDN() + " to client at "
-			+ caller);
+		StatsLogger.logStats("X509AuthnServiceImpl: authenticating " + resourceCred.getOriginalAsserter()[0].getSubjectDN()
+			+ " to client at " + caller);
 		// End logging
+
+		KeyAndCertMaterial resourceKeyMaterial = null;
 		if (delegateToChain == null) {
 			_logger.debug("delegate to chain was null...  ignoring credential.");
 		} else {
 			// delegate to the chain we were given...
 			// Get this resource's assertion, key and cert material
 			ICallingContext callingContext = null;
-			KeyAndCertMaterial resourceKeyMaterial = null;
 			try {
 				callingContext = ContextManager.getExistingContext();
 				resourceKeyMaterial = callingContext.getActiveKeyAndCertMaterial();
+				if (resourceKeyMaterial == null)
+					throw new IOException("failed to load resource's key material!");
 			} catch (IOException e) {
 				throw new AuthZSecurityException(e.getMessage(), e);
 			}
 
 			// to be filled with a valid delegated credential, if possible.
-			TrustCredential newTC = null;
-			if (credential instanceof TrustCredential) {
+			if (resourceCred instanceof TrustCredential) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("wrapping this trust credential: " + credential.toString());
-				TrustCredential wrapped = (TrustCredential) credential;
+					_logger.debug("wrapping this trust credential: " + resourceCred.toString());
+				TrustCredential wrapped = (TrustCredential) resourceCred;
 				// Delegate the assertion to delegateTo.
 				newTC =
 					new TrustCredential(delegateToChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
 						wrapped.getDelegateeType(), new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
 							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
-			} else if (credential instanceof FullX509Identity) {
+			} else if (resourceCred instanceof FullX509Identity) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("creating trust credential from full x509 with key: " + credential.toString());
-				FullX509Identity realId = (FullX509Identity) credential;
+					_logger.debug("creating trust credential from full x509 with key: " + resourceCred.toString());
+				FullX509Identity realId = (FullX509Identity) resourceCred;
 				// Delegate the assertion to delegateTo.
 				newTC =
 					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
 						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(), SecurityConstants.MaxDelegationDepth),
 						RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(realId.getKey());
-			} else if (credential instanceof X509Identity) {
+			} else if (resourceCred instanceof X509Identity) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("creating trust credential from x509: " + credential.toString());
-				X509Identity realId = (X509Identity) credential;
+					_logger.debug("creating trust credential from x509: " + resourceCred.toString());
+				X509Identity realId = (X509Identity) resourceCred;
 				// Delegate the assertion to delegateTo.
 				newTC =
 					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
@@ -513,10 +521,18 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 			} else {
 				_logger.error("failure, unknown type of assertion found.");
 			}
-			if (newTC != null) {
-				// add the newly minted credential into the list to send back.
-				creds.getRealCreds().addCredential(newTC);
-			}
+		}
+		return newTC;
+	}
+
+	public static RequestSecurityTokenResponseType createResponse(BaseAuthenticationServiceImpl theThis, TrustCredential newTC)
+		throws AuthZSecurityException
+	{
+		AxisCredentialWallet creds = new AxisCredentialWallet();
+		// the wallet will come back empty unless the newTC is non-null.
+		if (newTC != null) {
+			// add the newly minted credential into the list to send back.
+			creds.getRealCreds().addCredential(newTC);
 		}
 
 		// assemble the response document
@@ -524,9 +540,9 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		MessageElement[] elements = new MessageElement[2];
 
 		// Add TokenType element
-		XMLCompatible xup = XMLConverter.upscaleCredential(credential);
+		XMLCompatible xup = XMLConverter.upscaleCredential(newTC);
 		if (xup == null) {
-			String msg = "unknown type of credential; cannot upscale to XMLCompatible: " + credential.toString();
+			String msg = "unknown type of credential; cannot upscale to XMLCompatible: " + newTC.toString();
 			_logger.error(msg);
 			throw new AuthZSecurityException(msg);
 		}
@@ -551,4 +567,5 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 		return response;
 	}
+
 }

@@ -25,15 +25,15 @@ function date_string()
     return $?
   }
 
-# displays the value of a variable in bash friendly format.
-function var() {
+  # displays the value of a variable in bash friendly format.
+  function var() {
     HOLDIFS="$IFS"
     IFS=""
-  while true; do
-    local varname="$1"; shift
-    if [ -z "$varname" ]; then
-      break
-    fi
+    while true; do
+      local varname="$1"; shift
+      if [ -z "$varname" ]; then
+        break
+      fi
 
       if is_alias "$varname"; then
 #echo found $varname is alias
@@ -42,8 +42,8 @@ function var() {
         echo "alias $varname=$(cat $tmpfile)"
         \rm $tmpfile
       elif [ -z "${!varname}" ]; then
-      echo "$varname undefined"
-    else
+        echo "$varname undefined"
+      else
         if is_array "$varname"; then
 #echo found $varname is array var 
           local temparray
@@ -53,12 +53,12 @@ function var() {
 # see ones that have spaces in them.
         else
 #echo found $varname is simple
-      echo "$varname=${!varname}"
-    fi
+          echo "$varname=${!varname}"
+        fi
       fi
-  done
+    done
     IFS="$HOLDIFS"
-}
+  }
 ########
 
 # given a file name and a phrase to look for, this replaces all instances of
@@ -173,14 +173,34 @@ fan_out_directories()
 
   # copied from open source codebase at: http://feistymeow.org
   # locates a process given a search pattern to match in the process list.
+  # supports a single command line flag style parameter of "-u USERNAME";
+  # if the -u flag is found, a username is expected afterwards, and only the
+  # processes of that user are considered.
   function psfind() {
     local -a patterns=("${@}")
 #echo ====
 #echo patterns list is: "${patterns[@]}"
 #echo ====
+
+    local user_flag
+    if [ "${patterns[0]}" == "-u" ]; then
+      user_flag="-u ${patterns[1]}" 
+#echo "found a -u parm and user=${patterns[1]}" 
+      # void the two elements with that user flag so we don't use them as patterns.
+      unset patterns[0] patterns[1]=
+    else
+      # select all users.
+      user_flag="-e"
+    fi
+
     local PID_DUMP="$(mktemp "$TMP/zz_pidlist.XXXXXX")"
     local -a PIDS_SOUGHT
     if [ "$OS" == "Windows_NT" ]; then
+
+#hmmm: windows isn't implementing the user flag yet!
+#try collapsing back to the ps implementation from cygwin?
+# that would simplify things a lot, if we can get it to print the right output.
+
       # windows case has some odd gyrations to get the user list.
       if [ ! -d c:/tmp ]; then
         mkdir c:/tmp
@@ -200,21 +220,21 @@ fan_out_directories()
       # needs to be a windows format filename for 'type' to work.
       cmd $flag type "$tmppid" >$PID_DUMP
       \rm "$tmppid"
-      local appropriate_pattern='s/^.*[[:space:]][[:space:]]*\([0-9][0-9]*\) *\$/\1/p'
+      local pid_finder_pattern='s/^.*[[:space:]][[:space:]]*\([0-9][0-9]*\) *\$/\1/p'
       local i
       for i in "${patterns[@]}"; do
         PIDS_SOUGHT+=($(cat $PID_DUMP \
           | grep -i "$i" \
-          | sed -n -e "$appropriate_pattern"))
+          | sed -n -e "$pid_finder_pattern"))
       done
     else
-      /bin/ps $extra_flags wuax >$PID_DUMP
+      /bin/ps $user_flag -o pid,args >$PID_DUMP
 #echo ====
 #echo got all this stuff in the pid dump file:
 #cat $PID_DUMP
 #echo ====
       # pattern to use for peeling off the process numbers.
-      local appropriate_pattern='s/^[-+a-zA-Z_0-9][-+a-zA-Z_0-9]*[[:space:]][[:space:]]*\([0-9][0-9]*\).*$/\1/p'
+      local pid_finder_pattern='s/^[[:space:]]*\([0-9][0-9]*\).*$/\1/p'
       # remove the first line of the file, search for the pattern the
       # user wants to find, and just pluck the process ids out of the
       # results.
@@ -226,7 +246,7 @@ fan_out_directories()
         PIDS_SOUGHT+=($(cat $PID_DUMP \
           | sed -e '1d' \
           | grep -i "$i" \
-          | sed -n -e "$appropriate_pattern"))
+          | sed -n -e "$pid_finder_pattern"))
       done
 #echo ====
 #echo pids sought list became:

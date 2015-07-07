@@ -54,6 +54,15 @@ class SubscriptionOutcallHandler extends Thread
 	private ICallingContext callingContext;
 	private EndpointReferenceType localEndpoint;
 
+	public void updateCallingContext()
+	{
+		try {
+			callingContext = ContextManager.getExistingContext();
+		} catch (Exception e) {
+			_logger.warn("Could not update the calling context.", e);
+		}
+	}
+
 	public SubscriptionOutcallHandler(LinkedBlockingQueue<PendingSubscription> queue, LightweightNotificationServer notificationServer,
 		boolean controlledRateMode)
 	{

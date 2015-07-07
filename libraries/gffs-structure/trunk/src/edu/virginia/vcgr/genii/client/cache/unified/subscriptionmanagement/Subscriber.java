@@ -23,6 +23,7 @@ public class Subscriber
 	private static Log _logger = LogFactory.getLog(Subscriber.class);
 
 	private static Subscriber subscriber;
+	private SubscriptionOutcallHandler handler = null;
 
 	/*
 	 * This is producer-consumer type queue for managing subscription requests. The subscriber acts as a producer while the
@@ -57,7 +58,7 @@ public class Subscriber
 		 */
 		if (serverStartedSuccessfully) {
 			queue = new LinkedBlockingQueue<PendingSubscription>();
-			SubscriptionOutcallHandler handler = new SubscriptionOutcallHandler(queue, notificationServer, true);
+			handler = new SubscriptionOutcallHandler(queue, notificationServer, true);
 			handler.start();
 			new PollingFrequencyAdjuster().start();
 		}
@@ -87,6 +88,13 @@ public class Subscriber
 			queue.put(request);
 		} catch (InterruptedException e) {
 			_logger.info("could not submit subcription request", e);
+		}
+	}
+
+	public static void resetCallingContext()
+	{
+		if (subscriber != null) {
+			subscriber.handler.updateCallingContext();
 		}
 	}
 

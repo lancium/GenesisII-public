@@ -15,6 +15,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.uiuc.ncsa.myproxy.MyProxyLogon;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -180,6 +181,9 @@ public class MyProxyLoginTool extends BaseLoginTool
 		// reset any previous pass-through credential.
 		callContext.removeProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 		ContextManager.storeCurrentContext(callContext);
+
+		// drop any notification brokers or other cached info after credential change.
+		CacheManager.resetCachingSystem();
 
 		X509Certificate[] keyMat = new X509Certificate[1];
 		keyMat[0] = mp.getCertificate();

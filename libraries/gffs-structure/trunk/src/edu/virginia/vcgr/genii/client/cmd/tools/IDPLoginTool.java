@@ -28,6 +28,7 @@ import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -254,6 +255,10 @@ public class IDPLoginTool extends BaseLoginTool
 
 		// log in
 		ArrayList<NuCredential> creds = doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
+
+		// drop any notification brokers or other cached info after credential change.
+		CacheManager.resetCachingSystem();
+
 		if (creds == null) {
 			return 0;
 		}
@@ -261,6 +266,7 @@ public class IDPLoginTool extends BaseLoginTool
 		// insert the assertion into the calling context's transient creds
 		transientCredentials.addAll(creds);
 		ContextManager.storeCurrentContext(callContext);
+
 		return 0;
 	}
 

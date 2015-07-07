@@ -871,6 +871,9 @@ public class RNSPath implements Serializable, Cloneable
 			}
 
 			entries = proxy.iterateList();
+			if (entries == null) {
+				throw new RNSException("Unable to list contents -- received empty list.");
+			}
 			for (RNSEntryResponseType entry : entries) {
 				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), !getShortForm);
 				newEntry.extractPortTypesAndURIFromMetadata(entry, translator);
@@ -886,7 +889,8 @@ public class RNSPath implements Serializable, Cloneable
 			throw new RNSException("Unable to list contents.", re);
 		} finally {
 			try {
-				StreamUtils.close(entries.getIterable());
+				if (entries != null)
+					StreamUtils.close(entries.getIterable());
 			} catch (Exception e) {
 				_logger.warn("exception during attempt to close stream", e);
 			}

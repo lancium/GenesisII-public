@@ -63,7 +63,7 @@
 <!-- hmmm: does the jni xml file above matter if it's 32 or 64 bits? -->
 
 	<!-- Build Targets -->
-	<target name="build" depends="announce,libraries,jars,lib-setup,scripts,run.unit.tests"/>
+	<target name="build" depends="announce,libraries,jars,lib-setup,scripts,run.unit.tests,conclude"/>
 
 	<target name="announce" >
 		<exec executable="java">
@@ -71,14 +71,11 @@
 		</exec>
 	</target>
 
-	<!-- a helper target that gets out the latest libraries from svn and builds them. -->
-<!--	<target name="update" >
-		<exec executable="bash" failonerror="true">
-			<arg value="scripts/build_dependencies.sh"/>
-			<arg value="update"/>
-			<arg value="trunk"/>
+	<target name="conclude" >
+		<!-- echo the time the build finished. -->
+		<exec executable="/bin/date">
 		</exec>
-	</target> -->
+	</target>
 
 	<!-- main target for building the libraries. -->
 	<target name="libraries" >

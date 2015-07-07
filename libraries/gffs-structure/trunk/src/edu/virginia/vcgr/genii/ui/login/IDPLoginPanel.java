@@ -23,6 +23,7 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.InstallationProperties;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.CdTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.IDPLoginTool;
@@ -255,6 +256,9 @@ final class IDPLoginPanel extends LoginPanel
 			// reload the context now, which is crucial for this method to see the most recent.
 			StreamUtils.close(assumedContextToken);
 			context = ContextManager.getCurrentContext();
+
+			// drop any notification brokers or other cached info after credential change.
+			CacheManager.resetCachingSystem();
 
 			/*
 			 * try to leave the user in the right current directory. Changed by ASAG March 6, 2014

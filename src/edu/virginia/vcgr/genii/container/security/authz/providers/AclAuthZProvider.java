@@ -246,7 +246,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				try {
 					if (entry.isPermitted(identity)) {
 						if (_logger.isDebugEnabled())
-							_logger.debug("passing ACL access check due to permission for identity: "
+							_logger.debug("passing ACL access check due to permission (for " + entry.toString() + ") on identity: "
 								+ ((identity != null) ? identity.describe(VerbosityLevel.HIGH) : "null"));
 						return true;
 					}

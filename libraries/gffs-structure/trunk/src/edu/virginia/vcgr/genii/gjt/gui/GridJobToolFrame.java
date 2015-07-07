@@ -101,6 +101,15 @@ public abstract class GridJobToolFrame extends JFrame
 		menu.add(new SaveAllDocumentsAction());
 		menu.addSeparator();
 		menu.add(generateJSDLAction);
+		GenerateJSDLAction action = (GenerateJSDLAction) generateJSDLAction;
+		if ((action != null) && action.willLaunch()) {
+			/*
+			 * if the generate jsdl actor is "for real" and hooked to a queue or BES, then we'll add a menu for generating jsdl separately. we
+			 * always want to be able to store the project as a jsdl file, but when hooked to a queue that menu item becomes "submit job"
+			 * instead.
+			 */
+			menu.add(new GenerateJSDLAction(false));
+		}
 
 		Action preferencesAction = getPreferencesAction();
 		if (preferencesAction != null) {
@@ -280,22 +289,35 @@ public abstract class GridJobToolFrame extends JFrame
 		}
 	}
 
-	private class GenerateJSDLAction extends AbstractAction
+	public class GenerateJSDLAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
+
+		private boolean _willLaunch;
 
 		private GenerateJSDLAction(boolean willLaunch)
 		{
 			super(willLaunch ? "Submit Job" : "Generate JSDL");
+			_willLaunch = willLaunch;
 
-			putValue(Action.MNEMONIC_KEY, KeyEvent.VK_G);
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			if (_willLaunch) {
+				putValue(Action.MNEMONIC_KEY, KeyEvent.VK_J);
+				putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			} else {
+				putValue(Action.MNEMONIC_KEY, KeyEvent.VK_G);
+				putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			}
+		};
+
+		public boolean willLaunch()
+		{
+			return _willLaunch;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			_documentContext.generateJSDL();
+			_documentContext.generateJSDL(_willLaunch);
 		}
 	}
 

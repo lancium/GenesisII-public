@@ -21,6 +21,7 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
  * authenticated certificate chains, caller credentials and credentials for the target.
  * 
  * @author dmerrill
+ * @author ckoeritz
  */
 public class TransientCredentials implements Serializable
 {

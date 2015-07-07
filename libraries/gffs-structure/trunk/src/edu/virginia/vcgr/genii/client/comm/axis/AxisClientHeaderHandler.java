@@ -299,21 +299,17 @@ public class AxisClientHeaderHandler extends BasicHandler
 				_logger.error("failed to find a TLS certificate to delegate to for outcall");
 			} else {
 				/*
-				 * possible extra credential 1: the idea here is that we need at least one assurance that the source resource trusts this tls
-				 * certificate and therefore the recipient should also. we only add this certificate if we didn't already add other
-				 * credentials delegated to the tls cert.
+				 * possible extra credential 1: the idea here is that we need assurance that the source resource trusts this tls
+				 * certificate and therefore the recipient should also.
 				 */
-				if (!foundAny) {
-					// this credential says that the resource trusts the tls connection cert.
-					TrustCredential newTC =
-						CredentialCache.getCachedCredential(tlsKey._certChain, IdentityType.CONNECTION,
-							clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
-							RWXCategory.FULL_ACCESS);
-					walletForResource.getRealCreds().addCredential(newTC);
-					if (_logger.isTraceEnabled())
-						_logger.debug("made extra credential for connection: " + newTC);
-					foundAny = true;
-				}
+				// this credential says that the resource trusts the tls connection cert.
+				TrustCredential newTC =
+					CredentialCache.getCachedCredential(tlsKey._certChain, IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain,
+						clientKeyAndCertificate._clientPrivateKey, restrictions, RWXCategory.FULL_ACCESS);
+				walletForResource.getRealCreds().addCredential(newTC);
+				if (_logger.isDebugEnabled())
+					_logger.debug("made extra credential for connection: " + newTC);
+				foundAny = true;
 
 				/*
 				 * possible extra credential 2: this credential says that the tls connection cert trusts a pass-through tls identity, if any.

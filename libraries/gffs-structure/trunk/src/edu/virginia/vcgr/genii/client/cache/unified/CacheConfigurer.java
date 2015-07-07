@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subscriber;
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -190,8 +191,13 @@ public class CacheConfigurer
 	public static void resetCaches()
 	{
 		try {
+			boolean subscriptionStatus = isSubscriptionEnabled();
 			disableCaching();
+			if (subscriptionStatus) {
+				Subscriber.resetCallingContext();
+			}
 			enableCaching();
+			setSubscriptionBasedCaching(subscriptionStatus);
 		} catch (Exception ex) {
 			_logger.error("Exception occurred while resetting the cache management system " + ex.getMessage());
 		}

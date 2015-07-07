@@ -190,6 +190,8 @@ public class NotificationBrokerWrapper
 							if (notificationMessage != null && notificationMessage.length != 0) {
 								Notify notification = new Notify(notificationMessage, response.get_any());
 								NotificationBrokerDirectory.pushNotificationMessageToMultiplexerQueue(notification);
+								if (_logger.isDebugEnabled())
+									_logger.debug("received positive confirmation that direct notifications will work");
 							} else {
 								if (_logger.isTraceEnabled())
 									_logger.trace("vain notification pulling request");
@@ -203,11 +205,11 @@ public class NotificationBrokerWrapper
 				} catch (UnableToGetMessagesFaultType e) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Couldn't pull notification messages. Conservatively resetting the cache.");
-					CacheManager.resetCachingSystem();
+					CacheManager.resetCachingForContainer(containerId);
 				} catch (ResourceUnknownFaultType e) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("There is some problem with the broker. Conservatively resetting the cache.", e);
-					CacheManager.resetCachingSystem();
+					CacheManager.resetCachingForContainer(containerId);
 				} catch (AxisFault e) {
 					if (e instanceof PermissionDeniedException) {
 						if (_logger.isDebugEnabled())
@@ -216,15 +218,15 @@ public class NotificationBrokerWrapper
 						if (_logger.isDebugEnabled())
 							_logger.debug("Unexpected AxisFault. Conservatively resetting the cache.", e);
 					}
-					CacheManager.resetCachingSystem();
+					CacheManager.resetCachingForContainer(containerId);
 				} catch (RemoteException e) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Unexpected RPC error. Conservatively resetting the cache.", e);
-					CacheManager.resetCachingSystem();
+					CacheManager.resetCachingForContainer(containerId);
 				} catch (Exception e) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Unexpected error. Conservatively resetting the cache.", e);
-					CacheManager.resetCachingSystem();
+					CacheManager.resetCachingForContainer(containerId);
 				}
 			}
 		}

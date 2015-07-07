@@ -216,6 +216,9 @@ public class LoginTool extends BaseLoginTool
 					// Do IDP login
 					creds = IDPLoginTool.doIdpLogin(epr, _credentialValidMillis, clientKeyMaterial._clientCertChain);
 
+					// drop any notification brokers or other cached info after credential change.
+					CacheManager.resetCachingSystem();
+
 					if (creds == null) {
 						return 0;
 					} else {
@@ -247,9 +250,6 @@ public class LoginTool extends BaseLoginTool
 		if (creds != null) {
 			transientCredentials.addAll(creds);
 		}
-
-		// drop any notification brokers or other cached info after credential change.
-		CacheManager.resetCachingSystem();
 
 		ContextManager.storeCurrentContext(realCallingContext);
 

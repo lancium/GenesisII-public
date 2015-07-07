@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
@@ -256,6 +258,59 @@ public class CacheManager
 		}
 	}
 
+	public static void resetCachingForContainer(EndpointReferenceType epr)
+	{
+		String containerId = CacheUtils.getContainerId(epr);
+		if (containerId == null) {
+			_logger.debug("nothing has been removed from the cache as container ID has not been found in the epr");
+		} else {
+			resetCachingForContainer(containerId);
+		}
+	}
+
+	public static void resetCachingForContainer(String containerId)
+	{
+
+		_logger.debug("going to clear all cache information and resources for container: " + containerId);
+		NotificationBrokerDirectory.removeBrokerForContainer(containerId);
+
+		CacheConfigurer.getCaches();
+		ResourceConfigCache configCache = null;
+		Collection<CommonCache> cacheList = CacheConfigurer.getCaches();
+		for (CommonCache cache : cacheList) {
+			if (cache instanceof ResourceConfigCache) {
+				configCache = (ResourceConfigCache) cache;
+				break;
+			}
+		}
+
+		if (configCache != null) {
+			Collection<WSResourceConfig> configList = configCache.getAllConfigsForContainer(containerId);
+			for (WSResourceConfig config : configList) {
+				removeRelevantStoredItems(config);
+				URI wsIdentifier = config.getWsIdentifier();
+				Collection<String> rnsPaths = config.getRnsPaths();
+				if (wsIdentifier != null) {
+					configCache.invalidateCachedItem(wsIdentifier, null);
+				} else if (rnsPaths != null && !rnsPaths.isEmpty()) {
+					for (String rnsPath : rnsPaths) {
+						configCache.invalidateCachedItem(rnsPath, null);
+					}
+				}
+				String rnsPath = config.getRnsPath();
+				if (rnsPath != null) {
+					_logger.debug("removed all cached item for the resource on path: " + rnsPath);
+				} else if (wsIdentifier != null) {
+					_logger.debug("removed all cached item for the resource with id: " + wsIdentifier);
+				}
+
+				SubscriptionDirectory.invalidateSubscription(config);
+			}
+		} else {
+			_logger.debug("could not remove items for container as resource config cache is not configured");
+		}
+	}
+
 	public static void resetCachingSystem()
 	{
 		try {
@@ -265,6 +320,38 @@ public class CacheManager
 		} catch (Exception ex) {
 			_logger.error("Alarm: couldn't reset the caching system after a failure. " + "To avoid seeing, possibly, stale contents, "
 				+ "restart the grid client: " + ex.getMessage());
+		}
+	}
+
+	private static void removeRelevantStoredItems(WSResourceConfig resourceConfig)
+	{
+		if (CacheConfigurer.isCachingEnabled()) {
+			try {
+				Collection<CommonCache> cacheList = CacheConfigurer.getCaches();
+				for (CommonCache cache : cacheList) {
+					if (cache instanceof ResourceConfigCache) {
+						continue;
+					}
+					IdentifierType cachedItemIdentifier = cache.getCachedItemIdentifier();
+					URI wsIdentifier = resourceConfig.getWsIdentifier();
+					Collection<String> rnsPaths = resourceConfig.getRnsPaths();
+					if (cachedItemIdentifier == null) {
+						continue;
+					}
+					if (cachedItemIdentifier == WSResourceConfig.IdentifierType.WS_ENDPOINT_IDENTIFIER && wsIdentifier != null) {
+						cache.invalidateCachedItem(wsIdentifier);
+					} else if (cachedItemIdentifier == WSResourceConfig.IdentifierType.RNS_PATH_IDENTIFIER
+						&& (rnsPaths != null && !rnsPaths.isEmpty())) {
+						for (String rnsPath : rnsPaths) {
+							cache.invalidateCachedItem(rnsPath, null);
+						}
+					}
+				}
+			} catch (Exception ex) {
+				if (_logger.isDebugEnabled()) {
+					_logger.debug("Could not remove items from cache", ex);
+				}
+			}
 		}
 	}
 

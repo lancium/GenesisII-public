@@ -228,7 +228,7 @@ public class JobDocumentContext
 		_frame.dispose();
 	}
 
-	final public void generateJSDL()
+	final public void generateJSDL(final boolean willLaunch)
 	{
 		if (!_frame.hasFocus()) {
 			_frame.requestFocusInWindow();
@@ -237,7 +237,7 @@ public class JobDocumentContext
 				@Override
 				public void run()
 				{
-					generateJSDL();
+					generateJSDL(willLaunch);
 				}
 			});
 			return;
@@ -274,7 +274,7 @@ public class JobDocumentContext
 		}
 
 		JobDefinitionListener generationListener = _applicationContext.getGenerationListener();
-		if (generationListener != null) {
+		if (willLaunch && (generationListener != null)) {
 			generationListener.jobDefinitionGenerated(jobDef);
 		} else {
 			while (true) {

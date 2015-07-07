@@ -92,6 +92,21 @@ public class SubscriptionDirectory
 		CacheManager.updateCacheLifeTimeOfRelevantStoredItems(resourceConfig);
 	}
 
+	/*
+	 * This function is used during selective cache flush. If for some reason, e.g., a specific container has become unresponsive, specific
+	 * resources are invalidated in the cache and their existing subscriptions are no longer valid then the system need to call this function
+	 * to removes the subscription entries correspond to those deleted resources.
+	 */
+	public static void invalidateSubscription(WSResourceConfig resourceConfig)
+	{
+		URI endpointIdentifier = resourceConfig.getWsIdentifier();
+		if (endpointIdentifier != null) {
+			String EPI = endpointIdentifier.toString();
+			SUBSCRIBED_RESOURCE_TO_SUBSCRIPTION_END_TIME_MAP.remove(EPI);
+			SUBSCRIBED_RESOURCE_TO_SUBSCRIPTION_REFERENCE_MAP.remove(EPI);
+		}
+	}
+
 	public static void notifySubscriptionFailure(EndpointReferenceType EPR)
 	{
 		String EPI = CacheUtils.getEPIString(EPR);

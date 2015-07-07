@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.client.exec.install.windows;
 import edu.virginia.vcgr.genii.client.exec.AbstractExecutionTask;
 import edu.virginia.vcgr.genii.client.exec.ExecutionTask;
 
+// hmmm: likely this is dead code.
+
 public class WindowsFirewall
 {
 	static public enum FirewallPortTypes {

@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.client.invoke.handlers;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.LookupResponseType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSMetadataType;
@@ -10,12 +12,15 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cache.unified.RNSCacheLookupHandler;
+import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.NotificationBrokerDirectory;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.PendingRNSSubscription;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subscriber;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
+import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
 /*
@@ -24,6 +29,8 @@ import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
  */
 public class SubscriptionInfoProcessor
 {
+
+	private static Log _logger = LogFactory.getLog(SubscriptionInfoProcessor.class);
 
 	/*
 	 * This intercepter method first tries to satisfy a lookup request from the cache. If it fails then let the RPC to proceed. Then it search
@@ -46,6 +53,15 @@ public class SubscriptionInfoProcessor
 			if (initMembers != null) {
 				for (RNSEntryResponseType member : initMembers) {
 					searchAndStoreNotificationBrokerFactoryAddress(member);
+				}
+			}
+			EndpointReferenceType target = ctxt.getTarget();
+			WSName wsName = new WSName(target);
+			WSResourceConfig targetConfig = null;
+			if (wsName.isValidWSName()) {
+				targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
+				if (targetConfig != null) {
+					_logger.debug("Did a lookup call for: " + targetConfig.getRnsPath());
 				}
 			}
 		}

@@ -19,6 +19,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.algorithm.time.TimeHelpers;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -184,6 +185,10 @@ public class IdpTool extends BaseLoginTool
 						}
 					}
 				}
+
+				// drop any notification brokers or other cached info after credential change.
+				CacheManager.resetCachingSystem();
+
 			} catch (URISyntaxException e) {
 				throw new ToolException("failure in URI: " + e.getLocalizedMessage(), e);
 			}

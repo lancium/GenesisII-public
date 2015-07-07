@@ -48,6 +48,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
+import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
@@ -434,7 +435,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			String method = edu.virginia.vcgr.genii.client.security.PermissionDeniedException.extractMethodName(t.getMessage());
 			if ((method != null) && (asset != null)) {
 				msg = t.getLocalizedMessage() + "; permission denied on \"" + asset + "\" (in method \"" + method;
-				_logger.info(msg);
+				_logger.info(msg + " -- " + ProgramTools.showLastFewOnStack(8));
 			} else {
 				_logger.error(msg, t);
 			}
@@ -596,7 +597,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						 * itself use WS-resources that are destroyed with a cache refresh and invocation of destroy on those resources can
 						 * fail too. Meanwhile, notification management methods are ignored to avoid redundant cache refreshes.
 						 */
-						CacheManager.resetCachingSystem();
+						CacheManager.resetCachingForContainer(context.getOriginalEPR());
 					}
 				}
 			}

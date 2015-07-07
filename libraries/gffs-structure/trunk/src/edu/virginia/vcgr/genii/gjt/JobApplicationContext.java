@@ -213,9 +213,8 @@ public class JobApplicationContext
 		@Override
 		public boolean accept(File f)
 		{
-			boolean ret = f.getName().endsWith(".gjp");
+			boolean ret = f.isDirectory() || f.getName().endsWith(".gjp");
 			return ret;
-
 		}
 
 		@Override

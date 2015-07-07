@@ -29,15 +29,11 @@
 	<classpathentry kind="lib" path="ext/jetty/jetty-6.1.26.jar" sourcepath="/home/fred/.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-sources.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/jetty-util-6.1.26.jar"/>
 	<classpathentry kind="lib" path="ext/junit-4.11.jar"/>
-	<classpathentry kind="lib" path="ext/GeniiProcMgmt.jar"/>
-	<classpathentry kind="lib" path="ext/GeniiJSDL.jar"/>
 	<classpathentry kind="lib" path="ext/MorganUtilities.jar"/>
-	<classpathentry kind="lib" path="ext/CmdLineManipulator.jar"/>
 	<classpathentry kind="lib" path="ext/svnkit.jar"/>
 	<classpathentry kind="lib" path="ext/typica.jar"/>
 	<classpathentry kind="lib" path="ext/fuse-j.jar"/>
 	<classpathentry kind="lib" path="ext/fsview.jar"/>
-	<classpathentry kind="lib" path="ext/MNaming.jar"/>
 	<classpathentry kind="lib" path="ext/derby.jar"/>
 	<classpathentry kind="lib" path="ext/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="ext/dpage.jar"/>
@@ -47,8 +43,14 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-structure"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-webservices"/>
 	<classpathentry kind="lib" path="lib"/>
-	<classpathentry kind="lib" path="ext/MacOSXSwing.jar"/>
 	<classpathentry kind="lib" path="ext/bcpkix-jdk15on-149.jar"/>
 	<classpathentry kind="lib" path="ext/bcprov-jdk15on-149.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CmdLineManipulator"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DPage"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/FSViewII"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GeniiJSDL"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GeniiProcessMgmt"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MacOSXSwing"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MNaming"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

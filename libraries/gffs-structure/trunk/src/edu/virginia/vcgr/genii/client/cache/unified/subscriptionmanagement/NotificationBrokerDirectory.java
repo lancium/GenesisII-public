@@ -135,6 +135,7 @@ public class NotificationBrokerDirectory
 			NotificationBrokerWrapper wrapper =
 				new NotificationBrokerWrapper(brokerPortType, containerId, LIFETIME_OF_BROKER, false, notificationMultiplexer);
 			containerIdToBrokerMapping.put(containerId, wrapper);
+			_logger.debug("created a notification broker for container: " + containerId);
 			return wrapper;
 		} catch (Exception ex) {
 			if (_logger.isDebugEnabled())
@@ -200,6 +201,16 @@ public class NotificationBrokerDirectory
 			broker.destroyBroker();
 		}
 		containerIdToBrokerMapping.clear();
+	}
+
+	public static void removeBrokerForContainer(String containerId)
+	{
+		NotificationBrokerWrapper broker = containerIdToBrokerMapping.get(containerId);
+		if (broker != null) {
+			broker.destroyBroker();
+		}
+		containerIdToBrokerMapping.remove(containerId);
+		_logger.debug("removed the notification broker for container: " + containerId);
 	}
 
 	private static EnhancedNotificationBrokerPortType createNewBroker(EndpointReferenceType forwardingPort, EndpointReferenceType factoryEPR)

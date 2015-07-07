@@ -1,8 +1,11 @@
 package edu.virginia.vcgr.genii.client.cache.unified;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -168,6 +171,26 @@ public class ResourceConfigCache extends CommonCache
 	public void updateCacheLifeTimeOfItems(Object commonIdentifierForItems, long newCacheLifeTime)
 	{
 		// do nothing
+	}
+
+	public Collection<WSResourceConfig> getAllConfigsForContainer(String containerId)
+	{
+		List<WSResourceConfig> configList = new ArrayList<WSResourceConfig>();
+		final Set<String> fileCachedKeys = new HashSet<String>(fileConfigCache.keySet());
+		for (String primaryIdentifier : fileCachedKeys) {
+			WSResourceConfig config = fileConfigCache.get(primaryIdentifier);
+			if (config != null && config.getContainerId() != null && containerId.equals(config.getContainerId())) {
+				configList.add(config);
+			}
+		}
+		final Set<String> dirCachedKeys = new HashSet<String>(directoryConfigCache.keySet());
+		for (String primaryIdentifier : dirCachedKeys) {
+			WSResourceConfig config = directoryConfigCache.get(primaryIdentifier);
+			if (config != null && config.getContainerId() != null && containerId.equals(config.getContainerId())) {
+				configList.add(config);
+			}
+		}
+		return configList;
 	}
 
 	private Object getItem(Object cacheKey, Object target, TimedOutLRUCache<String, WSResourceConfig> cache)

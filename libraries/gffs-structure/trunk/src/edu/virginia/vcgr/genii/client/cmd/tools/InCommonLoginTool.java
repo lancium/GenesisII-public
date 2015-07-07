@@ -40,6 +40,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
@@ -195,6 +196,9 @@ public class InCommonLoginTool extends BaseLoginTool
 				transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 				transientCredentials.addAll(creds);
 			}
+
+			// drop any notification brokers or other cached info after credential change.
+			CacheManager.resetCachingSystem();
 
 			return 0;
 
