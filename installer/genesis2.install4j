@@ -3231,10 +3231,14 @@ context.getVariable("genii.platform").equals("linux32") ||context.getVariable("g
 String plat = (String)context.getVariable("genii.platform");
 String dir = context.getInstallationDirectory() + "/JavaServiceWrapper/wrapper/bin/";
 
+File toDel = null;
 if (plat == "linux32") {
-    File toDel = new File(dir, "wrapper-linux-x86-64");
+    toDel = new File(dir, "wrapper-linux-x86-64");
 } else if (plat == "linux64") {
-    File toDel = new File(dir, "wrapper-linux-x86-32");
+    toDel = new File(dir, "wrapper-linux-x86-32");
+}
+if (toDel != null) {
+    toDel.delete();
 }
 
 return true;
