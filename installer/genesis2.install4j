@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.1.12" transformSequenceNumber="4">
+<install4j version="5.1.15" transformSequenceNumber="4">
   <directoryPresets config="../scripts/proxyio.launcher.template" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
@@ -261,7 +261,7 @@
   <launchers>
     <launcher name="GFFSContainer" id="264" customizedId="" external="true" excludeFromMenu="true" unixMode="755" menuName="" externalFile="JavaServiceWrapper/wrapper/bin/GFFSContainer" />
     <launcher name="runContainer" id="1450" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="23" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="runContainer" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+      <executable name="runContainer" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -295,7 +295,7 @@
       <iconImageFiles />
     </launcher>
     <launcher name="grid" id="39" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -329,7 +329,7 @@
       <iconImageFiles />
     </launcher>
     <launcher name="client-ui" id="1773" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -363,7 +363,7 @@
       <iconImageFiles />
     </launcher>
     <launcher name="grid-win32" id="5619" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -397,7 +397,7 @@
       <iconImageFiles />
     </launcher>
     <launcher name="client-ui-win32" id="5622" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -1734,7 +1734,7 @@ try {
     String line = null;
     BufferedReader br = new BufferedReader(new FileReader(secProp));
     while ( (line = br.readLine()) != null) {
-         if (line.matches("edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location")) {
+         if (line.contains("edu.virginia.vcgr.genii.client.security.ssl.grid-certificates.location")) {
              gridCertsLineFound = true;
          }
     }
@@ -3212,6 +3212,35 @@ context.getVariable("genii.platform").equals("linux32") ||context.getVariable("g
                               </void>
                               <void property="useStatus">
                                 <boolean>true</boolean>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <condition />
+                      </action>
+                      <action name="Remove unneeded wrappers" id="11298" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                              <void property="script">
+                                <object class="com.install4j.api.beans.ScriptProperty">
+                                  <void property="value">
+                                    <string>
+// if we don't clean up the other bit-size version of the wrapper binary on linux, then the wrapper picks the wrong one.
+
+String plat = (String)context.getVariable("genii.platform");
+String dir = context.getInstallationDirectory() + "/JavaServiceWrapper/wrapper/bin/";
+
+if (plat == "linux32") {
+    File toDel = new File(dir, "wrapper-linux-x86-64");
+} else if (plat == "linux64") {
+    File toDel = new File(dir, "wrapper-linux-x86-32");
+}
+
+return true;
+</string>
+                                  </void>
+                                </object>
                               </void>
                             </object>
                           </java>
