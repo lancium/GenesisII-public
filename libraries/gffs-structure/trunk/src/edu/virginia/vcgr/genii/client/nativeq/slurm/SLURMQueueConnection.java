@@ -199,8 +199,8 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			if (numProcs != null) {
 				if (numProcsPerHost != null) {
 					Integer hosts = numProcs / numProcsPerHost;
-					script.format("#SBATCH -n %d:ppn=%d\n", hosts.intValue());
-					script.format("#SBATCH --ntasks %d\n", numProcsPerHost.intValue());
+					script.format("#SBATCH --nodes %d\n", hosts.intValue());
+					script.format("#SBATCH --ntasks-per-node %d\n", numProcsPerHost.intValue());
 				} else {
 					script.format("#SBATCH -n %d\n", numProcs.intValue());
 				}
