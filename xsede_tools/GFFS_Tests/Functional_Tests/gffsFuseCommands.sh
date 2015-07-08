@@ -25,6 +25,13 @@ TESTING_DIR_ALTERNATE="$HOME_DIR/fuse-test-alt"
 # the main testing directory from grid's perspective.
 GRID_TEST_DIR=$RNSPATH/fuse-test
 
+# how long should we snooze before checking that fuse has gotten the
+# notification that new files are available?
+FUSE_SNOOZE_TIME=11
+# how many times we should test that fuse sees a new file in the grid.
+FUSE_COPY_COUNT=1
+#FUSE_COPY_COUNT=100
+
 oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.
@@ -236,15 +243,23 @@ testRemovingDirectory()
 
 testNewFileInGridShowsUp()
 {
-  local newfile=new-file-testing-fuse-yo
   if ! fuse_supported; then return 0; fi
-  grid echo this is a new file in the grid. \\\> $RNSPATH/$newfile
-  ls -1 "$HOME_DIR" | grep $newfile
-  assertEquals "Testing that newly created file shows up in fuse directory listing" 0 $?
-  grid rm $RNSPATH/$newfile
-  assertEquals "Cleaning up newly created file" 0 $?
-  ls -1 "$HOME_DIR" | grep $newfile
-  assertNotEquals "Testing that newly deleted file is missing in fuse directory listing" 0 $?
+  local newfile=new-file-testing-fuse-yo
+  for ((i=0; i < $FUSE_COPY_COUNT; i++)); do
+    local currfile=$newfile-$i
+    grid echo this is a new file in the grid. \\\> $RNSPATH/$currfile
+    assertEquals "Writing a new file in the grid" 0 $?
+    # pause needed since fuse must see notification over network before it updates cache.
+    sleep $FUSE_SNOOZE_TIME
+    ls -1 "$HOME_DIR" | grep $currfile
+    assertEquals "Testing that newly created file shows up in fuse directory listing" 0 $?
+    grid rm $RNSPATH/$currfile
+    assertEquals "Cleaning up newly created file" 0 $?
+    # pause needed since fuse must see notification over network before it updates cache.
+    sleep $FUSE_SNOOZE_TIME
+    ls -1 "$HOME_DIR" | grep $currfile
+    assertNotEquals "Testing that newly deleted file is missing in fuse directory listing" 0 $?
+  done
 }
 
 testUnmountingFuseMount()
