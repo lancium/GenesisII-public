@@ -10,7 +10,7 @@
 source "$FEISTY_MEOW_SCRIPTS/core/functions.sh"
 
 # we only try to do something if trac is missing.
-if [ "$(psfind tracd)" ]; then
+if [ "$(psfind -u $USER tracd)" ]; then
   exit 0
 fi
 

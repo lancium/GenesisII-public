@@ -236,8 +236,8 @@ public class GeniiFuseMount implements Filesystem
 	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("read(%s, %d, %s, %d)", path, fileHandle, buffer, offset));
-		if ((path != null) && (buffer != null))
-			System.out.printf("read(%s, %d, %s, %d)\n", path, fileHandle, buffer, offset);
+//		if ((path != null) && (buffer != null))
+//			System.out.printf("read(%s, %d, %s, %d)\n", path, fileHandle, buffer, offset);
 		try {
 			_fs.read(fileHandle, offset, buffer);
 		} catch (Throwable cause) {

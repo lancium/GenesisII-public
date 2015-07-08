@@ -74,7 +74,6 @@ public class PollingIntervalDirectory
 	{
 		PollingTimeSettings pollingTimeSettings = POLLING_TIME_CONFIGURATIONS.get(containerId);
 		if (pollingTimeSettings == null) {
-			// this error message should stay as defined here, since it is used in NotificationBrokerWrapper for disambiguation.
 			throw new RuntimeException("Missing polling time settings for container id: " + containerId);
 		}
 		synchronized (pollingTimeSettings) {

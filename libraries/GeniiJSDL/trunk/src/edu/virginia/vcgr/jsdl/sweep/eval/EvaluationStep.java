@@ -36,7 +36,8 @@ public class EvaluationStep implements Evaluable
 	@Override
 	final public void evaluate(EvaluationContext context) throws SweepException
 	{
-		for (SweepTargetIdentifier identifier : _identifiers)
+		for (SweepTargetIdentifier identifier : _identifiers) {
 			identifier.identify(context.document()).replace(_value);
+		}
 	}
 }

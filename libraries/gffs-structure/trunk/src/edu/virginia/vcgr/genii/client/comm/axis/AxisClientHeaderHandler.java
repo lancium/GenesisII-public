@@ -299,7 +299,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 				_logger.error("failed to find a TLS certificate to delegate to for outcall");
 			} else {
 				/*
-				 * possible extra credential 1: the idea here is that we need assurance that the source resource trusts this tls
+				 * extra credential 1: the idea here is that we need assurance that the source resource trusts this tls
 				 * certificate and therefore the recipient should also.
 				 */
 				// this credential says that the resource trusts the tls connection cert.

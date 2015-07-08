@@ -255,8 +255,6 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				}
 			}
 		}
-		if (_logger.isTraceEnabled())
-			_logger.trace("bailing on ACL access check after exhausting all options.");
 		return false;
 	}
 
