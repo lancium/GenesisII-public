@@ -143,7 +143,10 @@ public class ResourceKey implements Closeable, Rollbackable
 			_provider = ResourceProviders.getProvider(serviceName);
 			if (_logger.isTraceEnabled())
 				_logger.debug("ResKey: got provider");
-			// hmmm: getFactory() below was the slowest part of startup.
+			/*
+			 * future: getFactory() below was the slowest part of startup. this has been helped a bit by not recreating tables every single
+			 * time a table is opened, but we could speed it up further by removing antiquated table upgrade code.
+			 */
 			_factory = _provider.getFactory();
 			if (_logger.isTraceEnabled())
 				_logger.debug("ResKey: got factory");

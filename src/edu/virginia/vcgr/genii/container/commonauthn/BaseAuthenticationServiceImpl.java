@@ -126,6 +126,20 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		for (InternalEntry entry : entries) {
 			try {
 				EndpointReferenceType idpEpr = entry.getEntryReference();
+
+				if (_logger.isTraceEnabled()) {
+					ICallingContext context;
+					try {
+						context = ContextManager.getCurrentContext();
+						TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
+						_logger.debug("calling context has these creds before aggregation: "
+							+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
+					} catch (Exception e2) {
+						String msg = "could not load calling context to inspect credentials.";
+						_logger.error(msg, e2);
+					}
+				}
+
 				// create a proxy to the remote idp and invoke it.
 				X509AuthnPortType idp = ClientUtils.createProxy(X509AuthnPortType.class, idpEpr);
 				RequestSecurityTokenResponseType[] responses = idp.requestSecurityToken2(request);

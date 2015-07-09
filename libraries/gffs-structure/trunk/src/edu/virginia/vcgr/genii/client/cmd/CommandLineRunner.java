@@ -34,7 +34,7 @@ public class CommandLineRunner
 	private Map<String, ToolDescription> _tools;
 	private static ArrayList<String[]> _history = new ArrayList<String[]>();
 
-	// hmmm: should be configurable.
+	// future: should be configurable in a config file.
 	public static int MAXIMUM_HISTORY_SIZE = 20000;
 
 	static private String[] editCommandLine(String[] commandLine) throws FileNotFoundException, IOException
@@ -113,10 +113,7 @@ public class CommandLineRunner
 
 		if (cLine[0].equals("grid")) {
 			// this code just eats any redundant "grid" word that is in front of a real command.
-
-			// hmmm: temp logging.
-			_logger.debug("eating 'grid' command in front of command since this is bogus usage.");
-
+			_logger.trace("eating 'grid' command in front of command since this is bogus usage.");
 			String[] newcline = new String[cLine.length - 1];
 			System.arraycopy(cLine, 1, newcline, 0, cLine.length - 1);
 			cLine = newcline;

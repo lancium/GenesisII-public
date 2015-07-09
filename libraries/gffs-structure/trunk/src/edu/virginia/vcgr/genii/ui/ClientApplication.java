@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.prefs.BackingStoreException;
@@ -39,6 +40,7 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPlugins;
 import edu.virginia.vcgr.genii.ui.plugins.shell.GridShellPlugin;
 import edu.virginia.vcgr.genii.ui.rns.RNSFilledInTreeObject;
 import edu.virginia.vcgr.genii.ui.rns.RNSTree;
+import edu.virginia.vcgr.genii.ui.rns.RNSTreeModel.ShowWhichTypes;
 import edu.virginia.vcgr.genii.ui.rns.RNSTreeNode;
 import edu.virginia.vcgr.genii.ui.rns.RNSTreeObject;
 import edu.virginia.vcgr.genii.ui.rns.RNSTreeObjectType;
@@ -53,6 +55,7 @@ public class ClientApplication extends UIFrame
 	static final private Dimension TABBED_PANE_SIZE = new Dimension(700, 500);
 
 	private Object _joinLock = new Object();
+
 	// set to true if the full application should close.
 	private boolean _exit = false;
 
@@ -60,6 +63,8 @@ public class ClientApplication extends UIFrame
 	private JTabbedPane _tabbedPane = new JTabbedPane();
 	private JList _debugTarget; // text area that is targeted for informative updates.
 	private LoggingLinkage _debugLinkage; // connects our debugging target to logging.
+
+	private ArrayList<String> _activities = new ArrayList<String>(); // queued actions for UI to take.
 
 	public ClientApplication(boolean launchShell) throws FileNotFoundException, RNSPathDoesNotExistException, IOException
 	{
@@ -103,13 +108,10 @@ public class ClientApplication extends UIFrame
 					((LazilyLoadedTab) jc).load();
 			}
 		});
-		if (startPath != null) {
-			// We're opening a particular directory, not root
-			_browserTree = new RNSTree(getUIContext().applicationContext(), _uiContext, startPath);
-		} else {
-			// We are starting with the root.
-			_browserTree = new RNSTree(getUIContext().applicationContext(), _uiContext);
-		}
+		
+		// We're opening a particular directory, not root
+		_browserTree = new RNSTree(getUIContext().applicationContext(), _uiContext, startPath, ShowWhichTypes.DIRECTORIES_AND_FILES);
+		
 		JScrollPane scroller = new JScrollPane(_browserTree);
 		scroller.setMinimumSize(RNSTree.DESIRED_BROWSER_SIZE);
 		scroller.setPreferredSize(RNSTree.DESIRED_BROWSER_SIZE);
@@ -157,6 +159,33 @@ public class ClientApplication extends UIFrame
 		 * (EntryType entry : resp.getEntryList()) { System.err.format("Entry:  %s\n", entry.getEntry_name()); } } catch
 		 * (ContainerNotRunningException cnre) { _logger.info("exception in ClientApplication", cnre); }
 		 */
+	}
+
+	public static String SELECT_FILEBROWSER_TOP = "seltop";
+
+	/**
+	 * adds a new activity for the UI to take once the main thread calls the pulseActivity method.
+	 */
+	public void addActivity(String toAdd)
+	{
+		_activities.add(toAdd);
+	}
+
+	/**
+	 * called by the main thread periodically to get pending activities done.
+	 */
+	public void pulseActivities()
+	{
+		// swap out any pending activities with an empty list.
+		ArrayList<String> pending = _activities;
+		_activities = new ArrayList<String>();
+		// process the pending activities.
+		for (String activity : pending) {
+			if (activity.equals(SELECT_FILEBROWSER_TOP)) {
+				// update to select the file list's first element.
+//not here yet:				_fileList.setSelectionPath(_fileList.getPathForRow(0));
+			}
+		}
 	}
 
 	@Override
@@ -272,4 +301,5 @@ public class ClientApplication extends UIFrame
 			_plugins.setTabPanes(_tabbedPane, descriptions);
 		}
 	}
+
 }

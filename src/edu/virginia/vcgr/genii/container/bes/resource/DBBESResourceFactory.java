@@ -55,10 +55,6 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-
-		// hmmm: nothing exists at base...
-		// super.createTables();
-
 		try {
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_STMTS);

@@ -7,6 +7,8 @@ import java.util.Date;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.xml.sax.InputSource;
@@ -28,6 +30,8 @@ import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
  */
 public class JobData
 {
+	static private Log _logger = LogFactory.getLog(JobData.class);
+
 	static private final long BACKOFF = 60 * 1000L;
 
 	private HistoryContext _history;
@@ -97,6 +101,9 @@ public class JobData
 
 	private ActivityStatusType _besActivityStatus = null;
 
+	// _sweepState is only set if this is a sweeping job rather than a normal bes-submitted job.
+	private String _sweepState = null;
+
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
 		Long besID, HistoryContext history, LoggingContext loggingContext)
 	{
@@ -119,6 +126,24 @@ public class JobData
 		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, loggingContext);
 	}
 
+	public JobData(SweepingJob sweep, long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
+		short runAttempts, HistoryContext history, LoggingContext loggingContext)
+	{
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, loggingContext);
+		if (sweep == null) {
+			_logger.error("not adding sweep job since sweep object is null!");
+			/* important to keep the state non-null, since this is supposedly a sweep even if broken. we don't want this sent to a BES. */
+			_sweepState = "broken sweep";
+			return;
+		}
+		_sweepState = sweep.getEncodedSweepState();
+	}
+
+	public boolean isSweepingJob()
+	{
+		return _sweepState != null;
+	}
+
 	final public String jobName()
 	{
 		return _jobName;
@@ -127,7 +152,6 @@ public class JobData
 	final public HistoryContext history(HistoryEventCategory category)
 	{
 		HistoryContext ret = (HistoryContext) _history.clone();
-
 		ret.category(category);
 		return ret;
 	}
@@ -306,6 +330,6 @@ public class JobData
 	@Override
 	public String toString()
 	{
-		return String.format("Job %s(id = %d)", _jobTicket, _jobID);
+		return String.format("Job %s (id = %d)", _jobTicket, _jobID);
 	}
 }

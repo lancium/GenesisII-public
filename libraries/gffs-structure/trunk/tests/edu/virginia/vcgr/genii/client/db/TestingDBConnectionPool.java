@@ -25,7 +25,7 @@ public class TestingDBConnectionPool
 
 	static public void main(String[] args) throws Throwable
 	{
-		// TODO: currently disabled due to failing when run as unit test.
+		// future: currently disabled due to failing when run as unit test. fix this.
 		boolean fud = true;
 		if (fud)
 			return;

@@ -40,7 +40,7 @@ public class SMBGenericIOFile extends SMBFile
 	@Override
 	public IO getIO()
 	{
-		// TODO Auto-generated method stub
+		//future: this may not be a real implementation yet.
 		return new IO();
 	}
 

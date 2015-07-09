@@ -9,7 +9,7 @@ import java.util.Map;
 
 import edu.virginia.vcgr.genii.client.exec.AbstractExecutionTask;
 
-// hmmm: likely this is dead code.
+// future: likely this is dead code.
 
 public class JavaServiceWrapper
 {

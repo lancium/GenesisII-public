@@ -18,7 +18,7 @@ public class SMBLogoffAndX implements SMBCommand
 	{
 		SMBAndX chain = SMBAndX.decode(acc);
 
-		// TODO: check UID and close
+		// future: check UID and close.
 
 		acc.startParameterBlock();
 		int andx = SMBAndX.reserve(acc);

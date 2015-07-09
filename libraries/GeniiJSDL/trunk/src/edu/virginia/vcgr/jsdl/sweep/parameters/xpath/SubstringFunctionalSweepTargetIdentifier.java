@@ -22,6 +22,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Node;
 
 import edu.virginia.vcgr.jsdl.sweep.SweepException;
@@ -33,6 +35,8 @@ import edu.virginia.vcgr.jsdl.sweep.eval.SweepTargetIdentifier;
  */
 class SubstringNodeSweepTarget implements SweepTarget
 {
+	static private Log _logger = LogFactory.getLog(SubstringNodeSweepTarget.class);
+
 	private Node _node;
 	private int _start;
 	private int _length;
@@ -62,6 +66,10 @@ class SubstringNodeSweepTarget implements SweepTarget
 			_node.setUserData(DeltaInformation.USER_HANDLER_KEY, dInfo = new DeltaInformation(), DeltaInformation.USER_DATA_HANDLER);
 
 		newValue = dInfo.replace(original, stringValue, _start, _length);
+
+		if (_logger.isDebugEnabled())
+			_logger.debug("replacing original string '" + original + "' with new value '" + newValue + "'");
+
 		_node.setTextContent(newValue);
 	}
 }

@@ -37,7 +37,7 @@ public class ApplicationDescription
 	 * the optional environment variable that points at the installation location. this becomes required if one is running the software under
 	 * eclipse.
 	 */
-	static public final String INSTALLATION_DIR_ENVIRONMENT_VARIABLE = "GENII_INSTALL_DIR";
+	// static public final String INSTALLATION_DIR_ENVIRONMENT_VARIABLE = "GENII_INSTALL_DIR";
 
 	private VersionManager _versionManager;
 	private String _applicationName;
@@ -155,56 +155,47 @@ public class ApplicationDescription
 	}
 
 	/**
-	 * returns the location where the code is running, as best as can be determined. this uses the GENII_INSTALL_DIR if set, but it also can
+	 * returns the location where the code is running, as best as can be determined.
+	 * 
+	 * old: this uses the GENII_INSTALL_DIR if set, but it also can
+	 * 
 	 * find the running location based on jar files. this cannot use the properties to look up the path, because this function needs to
 	 * operate before anything else is loaded (for OSGi usage).
 	 */
 	static public String getInstallationDirectory()
 	{
-		String appPath = getEclipseTrunkFromEnvironment();
-		if (appPath != null) {
-			// so the variable is telling us where we live. we choose to believe it.
-			if (_logger.isTraceEnabled())
-				_logger.trace("found path in GENII_INSTALL_DIR: " + appPath);
-		} else {
-			// okay, that was a bust. see if we can intuit our location from living in a jar.
-			URL url = ApplicationDescription.class.getProtectionDomain().getCodeSource().getLocation();
-			try {
-				appPath = new File(url.toURI().getSchemeSpecificPart()).toString();
-			} catch (URISyntaxException e) {
-				appPath = "";
-				_logger.error("failed to convert code source url to app path: " + url);
-			}
-			if (_logger.isTraceEnabled())
-				_logger.trace("got source path as: " + appPath);
-			if (appPath.endsWith(".jar")) {
-				// we need to chop off the jar file part of the name.
-				int lastSlash = appPath.lastIndexOf("/");
-				if (lastSlash < 0)
-					lastSlash = appPath.lastIndexOf("\\");
-				if (lastSlash < 0) {
-					String msg = "could not find a slash character in the path: " + appPath;
-					_logger.error(msg);
-					throw new RuntimeException(msg);
-				}
-				appPath = appPath.substring(0, lastSlash);
-				if (_logger.isTraceEnabled())
-					_logger.trace("truncated path since inside jar: " + appPath);
-			}
-			appPath = appPath.concat("/..");
-			if (_logger.isTraceEnabled())
-				_logger.trace("jar-intuited startup bundle path: " + appPath);
+		String appPath = null;
+		// see if we can intuit our location from living in a jar.
+		URL url = ApplicationDescription.class.getProtectionDomain().getCodeSource().getLocation();
+		try {
+			appPath = new File(url.toURI().getSchemeSpecificPart()).toString();
+		} catch (URISyntaxException e) {
+			String msg = "failed to convert code source url to app path: " + url;
+			_logger.error(msg);
+			throw new RuntimeException(msg);
 		}
+		if (_logger.isTraceEnabled())
+			_logger.trace("got source path as: " + appPath);
+		if (appPath.endsWith(".jar")) {
+			// we need to chop off the jar file part of the name.
+			int lastSlash = appPath.lastIndexOf("/");
+			if (lastSlash < 0)
+				lastSlash = appPath.lastIndexOf("\\");
+			if (lastSlash < 0) {
+				String msg = "could not find a slash character in the path: " + appPath;
+				_logger.error(msg);
+				throw new RuntimeException(msg);
+			}
+			appPath = appPath.substring(0, lastSlash);
+			if (_logger.isTraceEnabled())
+				_logger.trace("truncated path since inside jar: " + appPath);
+		}
+		appPath = appPath.concat("/..");
+		if (_logger.isTraceEnabled())
+			_logger.trace("jar-intuited startup bundle path: " + appPath);
+
 		appPath = appPath.replace('\\', '/');
 		return appPath;
 	}
-
-	/*
-	 * this provides a way for the osgi support to know we're running inside eclipse, which imposes a different structure on the locations of
-	 * files.
-	 */
-	static public String getEclipseTrunkFromEnvironment()
-	{
-		return System.getenv(INSTALLATION_DIR_ENVIRONMENT_VARIABLE);
-	}
+	
 }

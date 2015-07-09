@@ -320,10 +320,11 @@ public class SecurityUtilities implements CertificateValidator
 	// broken from gaml days: static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$",
 	// Pattern.CASE_INSENSITIVE);
 
+	// correct pattern for current credential printing as of 2015-07-09.
+	static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^\\(group\\).*$", Pattern.CASE_INSENSITIVE);
+
 	// hmmm: below may be broken also.
 	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$", Pattern.CASE_INSENSITIVE);
-
-	static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^\\(group\\).*$", Pattern.CASE_INSENSITIVE);
 
 	static private boolean matches(Identity identity, Pattern[] patterns)
 	{

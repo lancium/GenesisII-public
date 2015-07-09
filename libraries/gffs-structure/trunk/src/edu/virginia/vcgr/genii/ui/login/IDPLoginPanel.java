@@ -234,11 +234,6 @@ final class IDPLoginPanel extends LoginPanel
 			transientCredentials = TransientCredentials.getTransientCredentials(context);
 			transientCredentials.add(upt);
 
-			// hmmm: this is in question; we have assumed a new context, why are we storing it!!!!
-			// this is probably source of bogus username token showing up in outside context, console's context, after the
-			// in-ui login process is successful.
-			// ContextManager.storeCurrentContext(context);
-
 			EndpointReferenceType epr = path.getEndpoint();
 
 			if (_logger.isDebugEnabled())

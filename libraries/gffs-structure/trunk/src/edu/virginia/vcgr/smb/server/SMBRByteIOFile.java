@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rbyteio.RandomByteIOPortType;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -21,6 +23,8 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 public class SMBRByteIOFile extends SMBFile
 {
+	static private Log _logger = LogFactory.getLog(SMBRByteIOFile.class);
+
 	private RandomByteIORP rp;
 	private SMBIOCache cache;
 
@@ -129,18 +133,18 @@ public class SMBRByteIOFile extends SMBFile
 			RandomByteIORP rp = (RandomByteIORP) ResourcePropertyManager.createRPInterface(fileEPR, RandomByteIORP.class);
 			return new SMBRByteIOFile(path, fileEPR, transferer, rp);
 		} catch (ResourceException e) {
-			// TODO:
+			_logger.error("exception in fromRNS", e);
 			throw new SMBException(NTStatus.DATA_ERROR);
 		} catch (GenesisIISecurityException e) {
 			throw new SMBException(NTStatus.ACCESS_DENIED);
 		} catch (RemoteException e) {
-			// TODO:
+			_logger.error("exception in fromRNS", e);
 			throw new SMBException(NTStatus.DATA_ERROR);
 		} catch (IOException e) {
-			// TODO:
+			_logger.error("exception in fromRNS", e);
 			throw new SMBException(NTStatus.DATA_ERROR);
 		} catch (ResourcePropertyException e) {
-			// TODO:
+			_logger.error("exception in fromRNS", e);
 			throw new SMBException(NTStatus.DATA_ERROR);
 		}
 	}

@@ -109,4 +109,9 @@ public class GenesisIIConstants
 
 	// all picture resources are expected to live in this path (within jars, generally).
 	static public final String IMAGE_RELATIVE_LOCATION = "config/images/";
+
+	/*
+	 * a string encoding of the sweep job's state. this is only valid for serialized job definitions of "sweeping jobs".
+	 */
+	static public final String SWEEP_JOB_STATE = "edu.virginia.vcgr.genii.container.q2.sweep_state";
 }

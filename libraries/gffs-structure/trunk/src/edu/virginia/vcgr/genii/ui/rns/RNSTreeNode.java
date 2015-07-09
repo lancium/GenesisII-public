@@ -14,12 +14,14 @@ import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
 import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
+import edu.virginia.vcgr.genii.ui.ClientApplication;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
 import edu.virginia.vcgr.genii.ui.progress.Task;
 import edu.virginia.vcgr.genii.ui.progress.TaskCompletionListener;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
+import edu.virginia.vcgr.genii.ui.rns.RNSTreeModel.ShowWhichTypes;
 
 public class RNSTreeNode extends DefaultMutableTreeNode
 {
@@ -173,6 +175,13 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 			removeAllChildren();
 			for (RNSPath entry : result) {
 				try {
+					if (model.whichTypes().equals(ShowWhichTypes.JUST_DIRECTORIES) && entry.isByteIO()) {
+						continue;
+					}
+					if (model.whichTypes().equals(ShowWhichTypes.JUST_FILES) && entry.isRNS()) {
+						continue;
+					}
+
 					add(new RNSTreeNode(new RNSFilledInTreeObject(entry)));
 					_nodeState = RNSTreeNodeState.EXPANDED;
 					noteExpansion();
@@ -182,6 +191,12 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 			}
 
 			model.reload(RNSTreeNode.this);
+
+			ClientApplication top = (ClientApplication) _tree.getTopLevelAncestor();
+			if (top != null) {
+				top.addActivity(ClientApplication.SELECT_FILEBROWSER_TOP);
+			}
+
 		}
 
 		@Override

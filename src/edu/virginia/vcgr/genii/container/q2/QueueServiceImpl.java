@@ -1,7 +1,5 @@
 package edu.virginia.vcgr.genii.container.q2;
 
-import java.io.Closeable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
@@ -43,7 +41,6 @@ import org.ggf.bes.management.StopAcceptingNewActivitiesType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobMultiDefinition_Type;
 import org.morgan.inject.MInject;
-import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
@@ -66,12 +63,8 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
-import edu.virginia.vcgr.genii.client.context.ContextException;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstructionParameters;
@@ -112,9 +105,6 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.sweep.SweepException;
-import edu.virginia.vcgr.jsdl.sweep.SweepListener;
-import edu.virginia.vcgr.jsdl.sweep.SweepToken;
-import edu.virginia.vcgr.jsdl.sweep.SweepUtility;
 
 /**
  * This is the service class that the container redirects SOAP messages to.
@@ -318,32 +308,33 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		return super.iterateHistoryEvents(arg0);
 	}
 
+	// hmmm: support restoring sweep job from database on restart of queue!
+
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
 	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest) throws RemoteException
 	{
 		String ticket;
-		SweepListenerImpl listener;
 
 		try {
 			if (!_resource.isAcceptingNewActivites())
 				throw new RemoteException("Queue is not accepting activities at the moment!");
 
 			JobDefinition jobDefinition = JSDLUtils.convert(submitJobRequest.getJobDefinition());
+			// decide if the job has any parameter sweeps so we'll handle the sweeps properly.
 			if (jobDefinition.parameterSweeps().size() > 0) {
-				SweepToken token;
-				token = SweepUtility.performSweep(jobDefinition, listener = new SweepListenerImpl(_queueMgr, submitJobRequest.getPriority()));
-				token.join();
-				ticket = listener.firstTicket();
+				// create a sweeping job object and use specialized submit.
+				SweepingJob sj = new SweepingJob(jobDefinition, submitJobRequest, _queueMgr);
+				ticket = _queueMgr.submitJob(sj, submitJobRequest.getPriority(), submitJobRequest.getJobDefinition());
+				sj.setOwnTicket(ticket);
 			} else {
+				// create a "normal" job and submit it.
 				ticket = _queueMgr.submitJob(submitJobRequest.getPriority(), submitJobRequest.getJobDefinition());
 			}
 
 			return new SubmitJobResponseType(ticket);
 		} catch (IOException ioe) {
 			throw new RemoteException("Unable to submit job to queue.", ioe);
-		} catch (InterruptedException ie) {
-			throw new RemoteException("Unable to wait for first ticket to get generated.", ie);
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to submit job to queue.", sqe);
 		} catch (JAXBException e) {
@@ -468,70 +459,6 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 		submitJob(new SubmitJobRequestType(jobDef, (byte) 0x0));
 		return true;
-	}
-
-	private class SweepListenerImpl implements SweepListener
-	{
-		private WorkingContext _workingContext;
-		private ICallingContext _callingContext;
-		private QueueManager _queueManager;
-		private Collection<String> _tickets;
-		private short _prioroity;
-		private int _count = 0;
-		private LoggingContext _context;
-
-		private String firstTicket() throws InterruptedException
-		{
-			synchronized (_tickets) {
-				while (_tickets.isEmpty())
-					_tickets.wait();
-
-				return _tickets.iterator().next();
-			}
-		}
-
-		private SweepListenerImpl(QueueManager queueManager, short priority) throws FileNotFoundException, IOException
-		{
-			_queueManager = queueManager;
-			_tickets = new LinkedList<String>();
-			_prioroity = priority;
-			_callingContext = ContextManager.getExistingContext();
-			_workingContext = (WorkingContext) WorkingContext.getCurrentWorkingContext().clone();
-			try {
-				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
-			} catch (ContextException e) {
-				_context = new LoggingContext();
-			}
-		}
-
-		@Override
-		public void emitSweepInstance(JobDefinition jobDefinition) throws SweepException
-		{
-			Closeable assumedContextToken = null;
-
-			try {
-				LoggingContext.assumeLoggingContext(_context);
-				WorkingContext.setCurrentWorkingContext(_workingContext);
-				assumedContextToken = ContextManager.temporarilyAssumeContext(_callingContext);
-				synchronized (_tickets) {
-					_tickets.add(_queueManager.submitJob(_prioroity, JSDLUtils.convert(jobDefinition)));
-					_tickets.notifyAll();
-				}
-				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Submitted job %d from a parameter sweep.", ++_count));
-			} catch (JAXBException je) {
-				throw new SweepException("Unable to convert JAXB type to Axis type.", je);
-			} catch (ResourceException e) {
-				throw new SweepException("Unable to submit job.", e);
-			} catch (SQLException e) {
-				throw new SweepException("Unable to submit job.", e);
-			} catch (IOException e) {
-				throw new SweepException("Unable to submit job.", e);
-			} finally {
-				StreamUtils.close(assumedContextToken);
-				WorkingContext.setCurrentWorkingContext(null);
-			}
-		}
 	}
 
 	@Override
@@ -671,8 +598,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			new QueueAsBESFactoryAttributesUtilities(_queueMgr.getBESManager().allBESInformation(), (QueueConstructionParameters) baseCP);
 		boolean isAcceptingNewActivities = _resource.isAcceptingNewActivites();
 		long totalNumberOfActivities = _queueMgr.getJobCount();
-		return new GetFactoryAttributesDocumentResponseType(
-			utils.factoryResourceAttributes(isAcceptingNewActivities, totalNumberOfActivities), null);
+		return new GetFactoryAttributesDocumentResponseType(utils
+			.factoryResourceAttributes(isAcceptingNewActivities, totalNumberOfActivities), null);
 	}
 
 	@Override

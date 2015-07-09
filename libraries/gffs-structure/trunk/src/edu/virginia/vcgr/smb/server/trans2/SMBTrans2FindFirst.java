@@ -74,11 +74,14 @@ public class SMBTrans2FindFirst implements SMBTrans2Command
 		paramOut.putShort((short) wrote);
 		paramOut.putShort((short) ((eos) ? 1 : 0));
 		paramOut.putShort((short) 0);
+		
+		//future: fill this in if needed:
 		// if (close) {
 		// paramOut.putShort((short)0);
 		// } else {
-		// paramOut.putShort((short)123);//TODO
+		// paramOut.putShort((short)123);
 		// }
+		
 		// This is strange; the [MS-CIFS] says it's needed if search can be resumed; others say this should be included if no resumeKey
 		paramOut.putShort((short) 0);
 		paramOut.flip();

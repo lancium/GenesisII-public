@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.ui.rns;
 
 import java.awt.Component;
-import java.awt.Font;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -31,17 +30,14 @@ public class RNSTreeCellRenderer extends DefaultTreeCellRenderer
 
 		if (value instanceof RNSTreeObject) {
 			RNSTreeObject obj = (RNSTreeObject) value;
+
 			if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT) {
 				RNSFilledInTreeObject fObj = (RNSFilledInTreeObject) obj;
 				setIcon(RNSIcons.RNSIconsFactory().getIcon(fObj.endpointType(), fObj.isLocal(_appContext)));
 			} else if (obj.objectType() == RNSTreeObjectType.EXPANDING_OBJECT) {
 				setIcon(RNSIcons.RNSIconsFactory().getQuestionIcon());
-				Font f = getFont();
-				setFont(f.deriveFont(Font.ITALIC).deriveFont(20.0f));
 			} else {
 				setIcon(RNSIcons.RNSIconsFactory().getErrorIcon());
-				Font f = getFont();
-				setFont(f.deriveFont(Font.ITALIC).deriveFont(20.0f));
 			}
 		}
 

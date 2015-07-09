@@ -25,7 +25,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
-// hmmm: likely this is dead code.
+// future: likely this is dead code.
 
 public class ManageWindowsContainerServiceTool extends BaseGridTool
 {

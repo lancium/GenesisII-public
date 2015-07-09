@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.ui.rns;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -32,6 +33,8 @@ import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Pair;
 import org.morgan.utils.gui.tearoff.TearoffHandler;
 
@@ -48,6 +51,7 @@ import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointRetriever;
 import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
+import edu.virginia.vcgr.genii.ui.rns.RNSTreeModel.ShowWhichTypes;
 import edu.virginia.vcgr.genii.ui.rns.dnd.RNSTransferHandler;
 import edu.virginia.vcgr.genii.ui.utils.CommonKeyStrokes;
 
@@ -55,55 +59,18 @@ public class RNSTree extends JTree implements EndpointRetriever
 {
 	static final long serialVersionUID = 0L;
 
-	static final public Dimension DESIRED_BROWSER_SIZE = new Dimension(300, 300);
+	static final public Dimension DESIRED_BROWSER_SIZE = new Dimension(200, 300);
+
+	static final public int FONT_READABILITY_BUMP = 7;
 
 	private Collection<RNSTreeListener> _listeners = new LinkedList<RNSTreeListener>();
-
-	private void setupInputMap(InputMap iMap)
-	{
-		iMap.put(CommonKeyStrokes.REFRESH, _refreshAction.getValue(Action.NAME));
-		// TODO: should be converted to 'go up one level'. ==> iMap.put(CommonKeyStrokes.BACKSPACE,
-		// no! do not delete for backspace: _deleteAction.getValue(Action.NAME));
-		iMap.put(CommonKeyStrokes.DELETE, _deleteAction.getValue(Action.NAME));
-		/* for now, we ignore cut/copy/paste */
-		/*
-		 * iMap.put(KeyStroke.getKeyStroke("ctrl X"), TransferHandler.getCutAction().getValue(Action.NAME));
-		 * iMap.put(KeyStroke.getKeyStroke("ctrl C"), TransferHandler.getCopyAction().getValue(Action.NAME));
-		 */
-	}
-
-	private void setupActionMap(ActionMap aMap)
-	{
-		aMap.put(_refreshAction.getValue(Action.NAME), _refreshAction);
-		aMap.put(_deleteAction.getValue(Action.NAME), _deleteAction);
-		/* for now, we ignore cut/copy/paste */
-		/*
-		 * aMap.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
-		 * aMap.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
-		 */
-	}
 
 	private RefreshAction _refreshAction = new RefreshAction();
 	private DeleteAction _deleteAction = new DeleteAction();
 
-	private void checkPathExpansion(RNSTree original, TreePath originalPath, TreePath newPath)
-	{
-		if (original.isExpanded(originalPath)) {
-			setExpandedState(newPath, true);
-
-			RNSTreeNode originalNode = (RNSTreeNode) originalPath.getLastPathComponent();
-			RNSTreeNode newNode = (RNSTreeNode) newPath.getLastPathComponent();
-
-			int size = originalNode.getChildCount();
-			for (int lcv = 0; lcv < size; lcv++) {
-				RNSTreeNode originalChild = (RNSTreeNode) originalNode.getChildAt(lcv);
-				RNSTreeNode newChild = (RNSTreeNode) newNode.getChildAt(lcv);
-				checkPathExpansion(original, originalPath.pathByAddingChild(originalChild), newPath.pathByAddingChild(newChild));
-			}
-		}
-	}
-
 	private DirectoryChangeListenerImpl _dChangeListener = new DirectoryChangeListenerImpl();
+
+	static private Log _logger = LogFactory.getLog(RNSTree.class);
 
 	private RNSTree(RNSTreeModel model)
 	{
@@ -118,10 +85,18 @@ public class RNSTree extends JTree implements EndpointRetriever
 		setCellRenderer(new RNSTreeCellRenderer(model.appContext()));
 		setAutoscrolls(true);
 		setEditable(false);
-		setShowsRootHandles(true);
+
+		// this is actually crucial to make tree know it needs expanding.
 		setExpandedState(new TreePath(((RNSTreeNode) model.getRoot()).getPath()), false);
 
+		// bump the default font size up for readability.
+		final Font currentFont = getFont();
+		final Font biggerFont = new Font(currentFont.getName(), currentFont.getStyle(), currentFont.getSize() + FONT_READABILITY_BUMP);
+		setFont(biggerFont);
+
 		addTreeWillExpandListener(new TreeWillExpandListenerImpl());
+
+		setShowsRootHandles(true);
 
 		setupInputMap(getInputMap());
 		setupActionMap(getActionMap());
@@ -152,8 +127,29 @@ public class RNSTree extends JTree implements EndpointRetriever
 		this.expandRow(0);
 	}
 
+	/**
+	 * resets the tree's position at a new path.
+	 */
+	public void remodel(RNSTreeModel model)
+	{
+		this.setModel(model);
+
+		setCellRenderer(new RNSTreeCellRenderer(model.appContext()));
+		setAutoscrolls(true);
+		setEditable(false);
+
+		// have to start in non-expanded state for the node to later realize it should expand.
+		setExpandedState(new TreePath(((RNSTreeNode) model.getRoot()).getPath()), false);
+
+		this.invalidate();
+
+		// expand the top-level node so that we can see the tree a bit better.
+		this.expandRow(0);
+	}
+
 	private void fireRNSTreePathClicked(RNSFilledInTreeObject fObj)
 	{
+		_logger.debug("firing rns tree path clicked event: " + fObj);
 		RNSTreeModel model = (RNSTreeModel) getModel();
 
 		Collection<RNSTreeListener> listeners;
@@ -168,6 +164,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 
 	private void fireRNSTreePathDoubleClicked(RNSFilledInTreeObject fObj)
 	{
+		_logger.debug("firing rns tree path double clicked event: " + fObj);
+
 		RNSTreeModel model = (RNSTreeModel) getModel();
 
 		Collection<RNSTreeListener> listeners;
@@ -182,6 +180,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 
 	private void fireRNSTreePathClicked(int row, TreePath path)
 	{
+		_logger.debug("firing rns tree path clicked event: row=" + row + " path=" + path);
+
 		RNSTreeNode node = (RNSTreeNode) (path.getLastPathComponent());
 		RNSTreeObject obj = (RNSTreeObject) node.getUserObject();
 		if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT) {
@@ -192,6 +192,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 
 	private void fireRNSTreePathDoubleClicked(int row, TreePath path)
 	{
+		_logger.debug("firing rns tree path double clicked event: row=" + row + " path=" + path);
+
 		RNSTreeNode node = (RNSTreeNode) (path.getLastPathComponent());
 		RNSTreeObject obj = (RNSTreeObject) node.getUserObject();
 		if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT) {
@@ -209,14 +211,10 @@ public class RNSTree extends JTree implements EndpointRetriever
 		checkPathExpansion(original, originalPath, newPath);
 	}
 
-	public RNSTree(ApplicationContext appContext, UIContext uiContext) throws RNSPathDoesNotExistException
+	public RNSTree(ApplicationContext appContext, UIContext uiContext, String startPath, ShowWhichTypes showFiles)
+		throws RNSPathDoesNotExistException
 	{
-		this(new RNSTreeModel(appContext, uiContext));
-	}
-
-	public RNSTree(ApplicationContext appContext, UIContext uiContext, String startPath) throws RNSPathDoesNotExistException
-	{
-		this(new RNSTreeModel(appContext, uiContext, startPath));
+		this(new RNSTreeModel(appContext, uiContext, startPath, showFiles));
 	}
 
 	public void addRNSTreeListener(RNSTreeListener listener)
@@ -519,4 +517,47 @@ public class RNSTree extends JTree implements EndpointRetriever
 		}
 	}
 
+	private void setupInputMap(InputMap iMap)
+	{
+		iMap.put(CommonKeyStrokes.REFRESH, _refreshAction.getValue(Action.NAME));
+
+		// TODO: should be converted to 'go up one level'. ==> iMap.put(CommonKeyStrokes.BACKSPACE,
+		// no! do not delete for backspace: _deleteAction.getValue(Action.NAME));
+
+		iMap.put(CommonKeyStrokes.DELETE, _deleteAction.getValue(Action.NAME));
+		/* for now, we ignore cut/copy/paste */
+		/*
+		 * iMap.put(KeyStroke.getKeyStroke("ctrl X"), TransferHandler.getCutAction().getValue(Action.NAME));
+		 * iMap.put(KeyStroke.getKeyStroke("ctrl C"), TransferHandler.getCopyAction().getValue(Action.NAME));
+		 */
+	}
+
+	private void setupActionMap(ActionMap aMap)
+	{
+		aMap.put(_refreshAction.getValue(Action.NAME), _refreshAction);
+		aMap.put(_deleteAction.getValue(Action.NAME), _deleteAction);
+
+		/* for now, we ignore cut/copy/paste */
+		/*
+		 * aMap.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
+		 * aMap.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
+		 */
+	}
+
+	private void checkPathExpansion(RNSTree original, TreePath originalPath, TreePath newPath)
+	{
+		if (original.isExpanded(originalPath)) {
+			setExpandedState(newPath, true);
+
+			RNSTreeNode originalNode = (RNSTreeNode) originalPath.getLastPathComponent();
+			RNSTreeNode newNode = (RNSTreeNode) newPath.getLastPathComponent();
+
+			int size = originalNode.getChildCount();
+			for (int lcv = 0; lcv < size; lcv++) {
+				RNSTreeNode originalChild = (RNSTreeNode) originalNode.getChildAt(lcv);
+				RNSTreeNode newChild = (RNSTreeNode) newNode.getChildAt(lcv);
+				checkPathExpansion(original, originalPath.pathByAddingChild(originalChild), newPath.pathByAddingChild(newChild));
+			}
+		}
+	}
 }

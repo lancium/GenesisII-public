@@ -412,6 +412,20 @@ public class QueueManager implements Closeable
 		}
 	}
 
+	/**
+	 * specialized job submission for a parameter sweep job. the queue determines this and makes the appropriate submit call.
+	 */
+	public String submitJob(SweepingJob sweep, short priority, JobDefinition_Type jsdl) throws SQLException, ResourceException
+	{
+		Connection connection = null;
+		try {
+			connection = _connectionPool.acquire(false);
+			return _jobManager.submitJob(sweep, connection, jsdl, priority);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+
 	public String submitJob(short priority, JobDefinition_Type jsdl) throws SQLException, ResourceException
 	{
 		Connection connection = null;
@@ -424,6 +438,23 @@ public class QueueManager implements Closeable
 		}
 	}
 
+	/**
+	 * this variant accepts a pre-arranged ticket id for the job, which must be guaranteed unique externally.
+	 */
+	public String submitJob(short priority, JobDefinition_Type jsdl, String ticket) throws SQLException, ResourceException
+	{
+		Connection connection = null;
+
+		try {
+			connection = _connectionPool.acquire(false);
+			return _jobManager.submitJob(connection, jsdl, priority, ticket);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+
+
+	
 	public Collection<ReducedJobInformationType> listJobs(String ticket) throws SQLException, ResourceException
 	{
 		Connection connection = null;
@@ -631,8 +662,8 @@ public class QueueManager implements Closeable
 			for (Long besID : hostSlotSummary.keySet()) {
 				BESInformation info = _besManager.getBESInformation(besID);
 				if (info != null) {
-					summary.add(new HostDescription(info.getProcessorArchitecture(), info.getOperatingSystemType()),
-						hostSlotSummary.get(besID));
+					summary.add(new HostDescription(info.getProcessorArchitecture(), info.getOperatingSystemType()), hostSlotSummary
+						.get(besID));
 				}
 			}
 		}
@@ -643,5 +674,10 @@ public class QueueManager implements Closeable
 	public BESManager getBESManager()
 	{
 		return _besManager;
+	}
+
+	public JobManager getJobManager()
+	{
+		return _jobManager;
 	}
 }

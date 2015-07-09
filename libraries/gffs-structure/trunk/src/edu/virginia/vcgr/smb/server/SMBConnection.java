@@ -266,7 +266,7 @@ public class SMBConnection implements Runnable
 		prefix += "      ";
 		prefix = prefix.substring(0, 6);
 
-		// TODO:
+		// future: simple prefix addition here needs to be more sensible.
 		prefix += "~1";
 
 		return prefix.toUpperCase() + "." + suffix.toUpperCase();
@@ -468,7 +468,7 @@ public class SMBConnection implements Runnable
 					break;
 			}
 		} catch (IOException e) {
-			/* TODO */
+			_logger.error("io exception in run()", e);
 		} finally {
 			try {
 				_logger.info("SMB connection closed");

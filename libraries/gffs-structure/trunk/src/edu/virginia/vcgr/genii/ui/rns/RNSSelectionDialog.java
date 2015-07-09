@@ -20,6 +20,7 @@ import org.morgan.utils.gui.ButtonPanel;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.ui.UIContext;
+import edu.virginia.vcgr.genii.ui.rns.RNSTreeModel.ShowWhichTypes;
 
 final public class RNSSelectionDialog extends JDialog
 {
@@ -61,7 +62,8 @@ final public class RNSSelectionDialog extends JDialog
 
 		_filter = filter;
 		uiContext = (UIContext) uiContext.clone();
-		_tree = new RNSTree(uiContext.applicationContext(), uiContext);
+		// hmmm: do we want to show both dirs and files here?
+		_tree = new RNSTree(uiContext.applicationContext(), uiContext, "/", ShowWhichTypes.DIRECTORIES_AND_FILES);
 
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());

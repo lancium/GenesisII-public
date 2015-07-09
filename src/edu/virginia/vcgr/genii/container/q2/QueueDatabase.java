@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -21,6 +22,7 @@ import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
@@ -306,11 +308,42 @@ public class QueueDatabase
 					_logger.warn("Error getting JSDL for job.", cause);
 				}
 
-				JobData data =
-					new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
-						new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7), HistoryContextFactory.createContext(
-							HistoryEventCategory.Default, DBSerializer.fromBlob(rs.getBlob(9)), historyKey(jobTicket)), new LoggingContext(
-							rs.getString(11)));
+				ICallingContext callContext = (ICallingContext) DBSerializer.fromBlob(rs.getBlob(9));
+				// retrieve our brains here for the sweep by getting the properties that are unique to the sweeping job.
+				String sweepState = (String) callContext.getSingleValueProperty(GenesisIIConstants.SWEEP_JOB_STATE);
+				if (sweepState != null) {
+					if (_logger.isDebugEnabled())
+						_logger.debug("found sweep state in call context, and state is: " + sweepState);
+				}
+
+				JobData data = null;
+				if (sweepState != null) {
+
+					// recreate the sweeping job for this state.
+					SweepingJob sweep = new SweepingJob(jobTicket);
+
+					QueueStates state = QueueStates.valueOf(rs.getString(4));
+					/*
+					 * if the state wasn't finished yet, then we set it to an error state, since we currently do not resume from a stopped
+					 * sweep.
+					 */
+					if (state != QueueStates.FINISHED) {
+						state = QueueStates.ERROR;
+					}
+
+					data =
+						new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket, rs
+							.getShort(3), state, new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), HistoryContextFactory.createContext(
+							HistoryEventCategory.Default, callContext, historyKey(jobTicket)), new LoggingContext(rs.getString(11)));
+
+				} else {
+
+					data =
+						new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
+							new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7), HistoryContextFactory
+								.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)), new LoggingContext(rs
+								.getString(11)));
+				}
 
 				Blob blob = rs.getBlob(8);
 				if (blob != null) {
@@ -501,6 +534,67 @@ public class QueueDatabase
 		}
 	}
 
+	public long submitJob(SweepingJob sweep, Connection connection, String ticket, short priority, JobDefinition_Type jsdl,
+		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime, String rpcid)
+		throws SQLException, IOException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		try {
+			// add in specialized info for the sweep job.
+			String sweepState = sweep.getEncodedSweepState();
+			callingContext.setSingleValueProperty(GenesisIIConstants.SWEEP_JOB_STATE, sweepState);
+			// more members go here...
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("loaded sweep job state of: " + sweepState);
+
+			stmt =
+				connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
+					+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
+			stmt.setString(1, ticket);
+			stmt.setString(2, _queueID);
+			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));
+			stmt.setBlob(4, DBSerializer.xmlToBlob(jsdl, "q2jobs", "jsdl"));
+			stmt.setBlob(5, DBSerializer.toBlob(identities, "q2jobs", "owners"));
+			stmt.setShort(6, priority);
+			stmt.setString(7, state.name());
+			stmt.setTimestamp(8, new Timestamp(submitTime.getTime()));
+			stmt.setString(9, rpcid);
+
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException("Unable to add job to the queue database.");
+
+			stmt.close();
+			stmt = null;
+
+			stmt = connection.prepareStatement("values IDENTITY_VAL_LOCAL()");
+			rs = stmt.executeQuery();
+			if (!rs.next())
+				throw new SQLException("Unable to determine last added job's ID.");
+
+			long jobid = rs.getLong(1);
+
+			stmt.close();
+			stmt = null;
+
+			stmt = connection.prepareStatement("INSERT INTO q2jobpings (jobid, failedcommattempts) " + "VALUES (?, 0)");
+			stmt.setLong(1, jobid);
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException("Unable to set job communication attempts.");
+
+			return jobid;
+		} finally {
+			if (callingContext != null) {
+				callingContext.removeProperty(GenesisIIConstants.SWEEP_JOB_STATE);
+			}
+
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+
 	/**
 	 * Get the partial large-memory information for a given list of jobs.
 	 * 
@@ -535,8 +629,8 @@ public class QueueDatabase
 					break;
 				}
 
-				ret.put(jobID,
-					new PartialJobInfo((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1)), rs.getTimestamp(2), rs.getTimestamp(3)));
+				ret.put(jobID, new PartialJobInfo((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1)), rs.getTimestamp(2), rs
+					.getTimestamp(3)));
 
 				rs.close();
 				rs = null;
@@ -601,7 +695,8 @@ public class QueueDatabase
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	public void markStarting(Connection connection, Collection<ResourceMatch> matches) throws SQLException, ResourceException
+	public void markStarting(Connection connection, Collection<ResourceMatch> matches, Set<ResourceMatch> badMatches) throws SQLException,
+		ResourceException
 	{
 		PreparedStatement query = null;
 		ResultSet rs = null;
@@ -614,6 +709,11 @@ public class QueueDatabase
 					+ "resourceid = ?, resourceendpoint = ? WHERE jobid = ?");
 
 			for (ResourceMatch match : matches) {
+				if (badMatches.contains(match)) {
+					_logger.debug("skipping and not starting a bad match: " + match);
+					continue;
+				}
+
 				query.setLong(1, match.getBESID());
 				rs = query.executeQuery();
 				if (!rs.next()) {
