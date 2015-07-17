@@ -10,7 +10,7 @@
 		<fileset dir="${ant.home.override}" includes="**/*.jar"/>
 	</path>
 
-	<path id="bundles.classpath">
+<!--	<path id="bundles.classpath">
 		<fileset dir="${bundles.home}" includes="com.jcraft.jsch*.jar"/>
 		<fileset dir="${bundles.home}" includes="org.eclipse.osgi*.jar"/>
 		<fileset dir="${bundles.home}" includes="org.apache.commons.logging*.jar"/>
@@ -18,6 +18,7 @@
 		<fileset dir="${bundles.home}" includes="org.apache.log4j*.jar"/>
 		<fileset dir="${bundles.home}" includes="org.slf4j*.jar"/>
 	</path>
+-->
 
 	<path id="ext.classpath">
 		<fileset dir="${ext.dir}" includes="*.jar"/>
@@ -28,7 +29,7 @@
 		<pathelement location="${generated.obj.dir}"/>
 		<path refid="ant.classpath"/>
 		<path refid="ext.classpath"/>
-		<path refid="bundles.classpath"/>
+<!--		<path refid="bundles.classpath"/> -->
 	</path>
 			
 	<!-- Imports -->	
@@ -108,8 +109,11 @@
 				includes="**/*.log"/>
 			<fileset dir="${basedir}"
 				includes="**/*.log.*" />
-			<fileset dir="${bundles.home}"
+
+<!--			<fileset dir="${bundles.home}"
 				includes="endorsed/**/*" />
+-->
+
 			<fileset dir="${basedir}"
 				includes="unit-test-reports/**/*" />
 		</delete>
