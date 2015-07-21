@@ -9,7 +9,8 @@
 
 # this first section of functions is related to jobs that have been submitted to a queue.
 
-# echoes an integer for the count of jobs remaining in an unfinished state.
+# echoes an integer for the count of jobs remaining in an unfinished state for the
+# current user.
 compute_remaining_jobs()
 {
   local queue_path=$1
