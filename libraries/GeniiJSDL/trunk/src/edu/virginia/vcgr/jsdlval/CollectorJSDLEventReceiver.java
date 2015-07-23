@@ -140,7 +140,7 @@ public class CollectorJSDLEventReceiver implements JSDLEventReceiver
 
 	@Override
 	public void startDataStaging(XMLDocumentPath path, String stageName, String filename, String filesystemName, CreationFlag creationFlag,
-		Boolean deleteOnTermination) throws JSDLValidationException
+		Boolean deleteOnTermination, Boolean handleAsArchive) throws JSDLValidationException
 	{
 		add(path);
 	}

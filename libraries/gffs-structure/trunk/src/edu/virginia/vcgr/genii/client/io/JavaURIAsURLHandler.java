@@ -12,6 +12,7 @@
  */
 package edu.virginia.vcgr.genii.client.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.DataTransferStatistics;
 
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
@@ -114,5 +116,34 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 				return true;
 		}
 		return false;
+	}
+
+	@Override
+	public boolean isDirectory(URI uri) 
+	{
+		// hmmm: can we determine for any of the protocols (http, https, ftp) if it's file or directory?  
+		return false;
+	}
+
+	@Override
+	public DataTransferStatistics copyDirectoryDown(URI source, File target, UsernamePasswordIdentity credential) throws IOException
+	{
+		
+		// hmmm: implement this!  do we need to handle file: types here???
+		return null;
+	}
+
+	@Override
+	public DataTransferStatistics copyDirectoryUp(File source, URI target, UsernamePasswordIdentity credential) throws IOException
+	{
+		// hmmm: implement this!  do we need to handle file: types here???
+		return null;
+	}
+
+	@Override
+	public String getLocalPath(URI uri) throws IOException
+	{
+		//hmmm: is there any more accurate version of this?
+		return uri.getSchemeSpecificPart();
 	}
 }

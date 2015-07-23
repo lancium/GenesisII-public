@@ -276,6 +276,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 			<xsd:element ref="jsdl:FilesystemName" minOccurs="0"/>
 			<xsd:element ref="jsdl:CreationFlag"/>
 			<xsd:element ref="jsdl:DeleteOnTermination" minOccurs="0"/>
+			<xsd:element ref="jsdl:HandleAsArchive" minOccurs="0"/>
 			<xsd:element ref="jsdl:Source" minOccurs="0"/>
 			<xsd:element ref="jsdl:Target" minOccurs="0"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -335,6 +336,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 	<xsd:element name="FilesystemName" type="xsd:NCName"/>
 	<xsd:element name="CreationFlag" type="jsdl:CreationFlagEnumeration"/>
 	<xsd:element name="DeleteOnTermination" type="xsd:boolean"/>
+	<xsd:element name="HandleAsArchive" type="xsd:boolean"/>
 	<xsd:element name="Source" type="jsdl:SourceTarget_Type"/>
 	<xsd:element name="Target" type="jsdl:SourceTarget_Type"/>
 	<xsd:element name="URI" type="xsd:anyURI"/>

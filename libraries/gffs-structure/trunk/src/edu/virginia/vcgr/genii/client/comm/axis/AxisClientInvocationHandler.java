@@ -21,6 +21,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
@@ -45,6 +46,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
+
+import com.sun.mail.iap.ConnectionException;
 
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
@@ -100,7 +103,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	/*
 	 * the amount of time that any particular client request is allowed to take before time expires. default was raised from 2 minutes to 6.
 	 */
-	static private int _DEFAULT_CLIENT_REQUEST_TIMEOUT = 1000 * 60 * 6;
+	static private int _DEFAULT_CLIENT_REQUEST_TIMEOUT = 1000 * 600; // Was 1000 * 60 * 6
 
 	/**
 	 * We'll wait 16 seconds for a connection failure before it's considered TOO long for the exponential back-off retry.
@@ -108,6 +111,20 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	static private final long MAX_FAILURE_TIME_RETRY = 1000L * 16;
 
 	static private MessageLevelSecurityRequirements __minClientMessageSec = null;
+	
+	static final HashMap<String,RetryInfo> deadHosts = new HashMap<String,RetryInfo>();
+	
+	public class RetryInfo {
+		public long nextTime;
+		public boolean trying;
+		public int delay;
+		public RetryInfo() {
+			// We just failed, so double to timeout, and try again after two timeout intervals
+			delay=2*_DEFAULT_CLIENT_REQUEST_TIMEOUT;
+			nextTime=System.currentTimeMillis()+delay;
+			trying=false;
+		}
+	}
 
 	/**
 	 * Class to wipe our loaded config stuff in the event the config manager reloads.
@@ -487,6 +504,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		TypeInformation type = null;
 
 		ResourceAccessMonitor.reportResourceUsage(origEPR);
+		
 
 		while (true) {
 			attempt++;
@@ -503,6 +521,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				} else {
 					// Presumably, here I need to invalidate the cache for all entries that
 					// belongs to that particular container.
+					// ASG July 2015, this is done in resolveandinvoke 
 				}
 				if (type == null)
 					type = new TypeInformation(_epr);
@@ -562,6 +581,24 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					firstException = throwable;
 				throw firstException;
 			}
+			// Added July 14, 2015 by ASG to deal with dead hosts and not bother trying to talk to them. The timeouts kill us.
+			synchronized(deadHosts) {
+				if (deadHosts.containsKey(handler.getTargetEPR().getAddress().get_value().getHost())) {
+					RetryInfo inf=deadHosts.get(handler.getTargetEPR().getAddress().get_value().getHost());
+					if (inf!=null) {
+						if (System.currentTimeMillis()>inf.nextTime) {
+							// Need to give it another try .. prepare to be slow
+							inf.trying=true;
+						}
+						else {
+							// So let's give up in advance
+							System.err.println("Host "+ handler.getTargetEPR().getAddress().get_value().getHost() + " is known to be down, skipping");
+							throw new ConnectionException("Host "+ handler.getTargetEPR().getAddress().get_value().getHost() + " is known to be down, skipping");
+						}
+					}
+				}
+			}
+			// End ASG updates
 			try {
 				return handler.doInvoke(calledMethod, arguments, timeout);
 			} catch (Throwable throwable) {
@@ -571,7 +608,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						throwable = throwable.getCause();
 				}
 				if (_logger.isDebugEnabled())
-					_logger.debug("doInvoke fault due to: " + throwable.getMessage());
+					_logger.debug("doInvoke fault on "+ calledMethod.getName() + "due to: " + throwable.getMessage());
 				if ((throwable instanceof TryAgainFaultType) && (!tryAgain)) {
 					tryAgain = true;
 				} else {
@@ -587,9 +624,47 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					 * subscriptions and the notification broker.
 					 */
 					String methodName = calledMethod.getName();
-					if (!"destroy".equalsIgnoreCase(methodName) && !"createIndirectSubscriptions".equalsIgnoreCase(methodName)
+					String throwmsg=throwable.getMessage()==null?"Null message":throwable.getMessage();
+					Boolean securityException = (throwmsg.indexOf("Access denied") >=0);
+					Boolean connectionProblem = (throwmsg.indexOf("ConnectException") >=0);
+					//System.err.println("maybe dumping the cache - cause is " + throwable.getMessage());
+					Boolean SSLProblem = (throwmsg.indexOf("SSLHandshakeException") >=0);
+
+					// Added July 14, 2015 by ASG to deal with dead hosts and not bother trying to talk to them. The timeouts kill us.
+					if (throwable instanceof ConnectionException|| throwable instanceof UnknownHostException || connectionProblem) {
+						synchronized(deadHosts) {
+							RetryInfo inf = deadHosts.get(handler.getTargetEPR().getAddress().get_value().getHost());
+							if (inf==null) {
+								// Not there, set it up and add it
+								deadHosts.put(handler.getTargetEPR().getAddress().get_value().getHost(),new RetryInfo());
+							}
+							else {
+								inf.delay*=2;
+								inf.nextTime=System.currentTimeMillis()+inf.delay;
+							}
+						}
+						System.err.println("Communication failure for  " + handler.getTargetEPR().getAddress().get_value().getHost());
+						throw new ConnectionException("Host "+ handler.getTargetEPR().getAddress().get_value().getHost() + " is known to be down, skipping");
+					}
+					else {
+						// Well, there is something there, check if it is in deadHosts, if so, remove it
+						synchronized(deadHosts) {
+							deadHosts.remove(handler.getTargetEPR().getAddress().get_value().getHost());
+						}
+					}
+					// End of ASG deadHosts updates
+/*					
+					if (!securityException 
+						&& !"destroy".equalsIgnoreCase(methodName) && !"createIndirectSubscriptions".equalsIgnoreCase(methodName)
+						&& !"read".equalsIgnoreCase(methodName)
 						&& !"createNotificationBrokerWithForwardingPort".equalsIgnoreCase(methodName)
 						&& !"getMessages".equalsIgnoreCase(methodName) && !"updateMode".equalsIgnoreCase(methodName)) {
+					*/
+					if (!(securityException 
+							|| "destroy".equalsIgnoreCase(methodName) || "createIndirectSubscriptions".equalsIgnoreCase(methodName)
+							|| "read".equalsIgnoreCase(methodName)
+							|| "createNotificationBrokerWithForwardingPort".equalsIgnoreCase(methodName)
+							|| "getMessages".equalsIgnoreCase(methodName) || "updateMode".equalsIgnoreCase(methodName))) {
 
 						/*
 						 * If the method is not the destroy method or any notification management method only then cache has been refreshed.
@@ -597,7 +672,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						 * itself use WS-resources that are destroyed with a cache refresh and invocation of destroy on those resources can
 						 * fail too. Meanwhile, notification management methods are ignored to avoid redundant cache refreshes.
 						 */
-						CacheManager.resetCachingForContainer(context.getOriginalEPR());
+
+						CacheManager.resetCachingForContainer(handler.getTargetEPR());
 					}
 				}
 			}
@@ -631,9 +707,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				stubInstance.addAttachment(new DataHandler(ds));
 			}
 		}
-
+		//System.err.println("Time out is " + timeout);
 		stubInstance.setTimeout(timeout);
-
+		//if (!calledMethod.getName().equals("getMessages")) System.err.println("Starting an outcall to host " + _epr.getAddress().get_value().getHost() + " on " + calledMethod.getName());
 		/*
 		 * Set calling context so that the socket factory has access to it.
 		 */
@@ -644,6 +720,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		VcgrSslSocketFactory.threadCallingContext.set(_callContext);
 		Object ret = calledMethod.invoke(stubInstance, arguments);
 		VcgrSslSocketFactory.threadCallingContext.set(null);
+		/*
+		 * if (!calledMethod.getName().equals("getMessages")) System.err.println(String.format("Finished an outcall for %s on thread [%x]%s (duration %d ms).", calledMethod.getName(), Thread
+					.currentThread().getId(), Thread.currentThread(), System.currentTimeMillis() - start));
+		 */
+
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("Finished an outcall for %s on thread [%x]%s (duration %d ms).", calledMethod.getName(), Thread
 				.currentThread().getId(), Thread.currentThread(), System.currentTimeMillis() - start));

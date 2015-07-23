@@ -322,14 +322,20 @@ public class QueueDatabase
 					// recreate the sweeping job for this state.
 					SweepingJob sweep = new SweepingJob(jobTicket);
 
+					
 					QueueStates state = QueueStates.valueOf(rs.getString(4));
+
+					//hmmm: remove this again
+					_logger.info("queue state of sweeping job on reload is: "  + state);
+					
 					/*
 					 * if the state wasn't finished yet, then we set it to an error state, since we currently do not resume from a stopped
 					 * sweep.
 					 */
-					if (state != QueueStates.FINISHED) {
+					if (!state.isFinalState() ) {						
 						state = QueueStates.ERROR;
 					}
+					
 
 					data =
 						new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket, rs

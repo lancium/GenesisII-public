@@ -762,9 +762,13 @@ public class JSDLInterpreter
 		if (e != null)
 			facet.consumeCreationFlag(understanding, e);
 
-		Boolean b = stage.getDeleteOnTermination();
-		if (b != null)
-			facet.consumeDeleteOnTerminateFlag(understanding, b.booleanValue());
+		Boolean b1 = stage.getDeleteOnTermination();
+		if (b1 != null)
+			facet.consumeDeleteOnTerminateFlag(understanding, b1.booleanValue());
+		
+		Boolean b2 = stage.getHandleAsArchive();
+		if (b2 != null)
+			facet.consumeHandleAsArchiveFlag(understanding, b2.booleanValue());
 
 		understandSource(provider, understanding, stage.getSource());
 		understandTarget(provider, understanding, stage.getTarget());

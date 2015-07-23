@@ -432,9 +432,26 @@ public class JobManager implements Closeable
 
 		Connection connection = null;
 
+		// get info about the BES if there is one.
+		String besName = null;
+		Long besID = job.getBESID();
+		if (besID != null)
+			besName = _besManager.getBESName(besID);
+
 		try {
 			connection = _connectionPool.acquire(false);
 			_database.incrementFinishCount(connection);
+
+			if (besName == null) {
+				
+				//hmmm: clean up.
+				_logger.debug("going to call modify job state for the non-bes job now!");
+				
+				/* handle a non-BES job by setting the state right now. this is because there is no job killer to deal with this later for us. */
+				_database
+					.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null, null);
+			}
+
 			connection.commit();
 		} catch (SQLException sqe) {
 			_logger.warn("Unable to update total jobs finished count.", sqe);
@@ -459,18 +476,16 @@ public class JobManager implements Closeable
 		/*
 		 * See failJob for a complete discussion of why we enqueue an outcall worker at this point -- the reasons are the same.
 		 */
-		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("Creating a JobKiller for finished job %s.", job));
-
-		String besName = null;
-		Long besID = job.getBESID();
-		if (besID != null)
-			besName = _besManager.getBESName(besID);
-
 		if (besName != null) {
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Creating a JobKiller for finished job %s.", job));
+
 			job.history(HistoryEventCategory.Terminating).debug("Finishing Job with JobKiller");
 			_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, besName, null));
 		} else {
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Setting job %s to finished state without job killer (non-BES job).", job));
+
 			job.setJobState(QueueStates.FINISHED);
 			job.history(HistoryEventCategory.Terminating).debug("Finishing non-BES Job without JobKiller");
 		}

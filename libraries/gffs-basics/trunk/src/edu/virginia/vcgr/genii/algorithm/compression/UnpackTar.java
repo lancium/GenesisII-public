@@ -6,8 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,12 +21,16 @@ public class UnpackTar
 	/**
 	 * takes a tar.gz file as the "tarFile" parameter, then decompresses and unpacks the file into the "dest" location.
 	 */
-	public static void uncompressTarGZ(File tarFile, File dest) throws IOException
-	{
-		dest.mkdir();
-		TarArchiveInputStream tarIn = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(tarFile)));
+	
+	public static void uncompressArchive(ArchiveInputStream tarIn, File dest) throws IOException {
 
-		TarArchiveEntry tarEntry = tarIn.getNextTarEntry();
+		if (dest.exists()) {
+			// Don't unpack into an existing directory
+			throw new IOException("Directory " + dest.getAbsolutePath() + " already exists. Unpacking exiting");
+		}
+		dest.mkdir();
+
+		ArchiveEntry tarEntry = tarIn.getNextEntry();
 		while (tarEntry != null) {
 			// create a file with the same name as the tarEntry
 			File destPath = new File(dest, tarEntry.getName());
@@ -51,9 +57,30 @@ public class UnpackTar
 
 				bout.close();
 			}
-			tarEntry = tarIn.getNextTarEntry();
+			tarEntry = tarIn.getNextEntry();
 		}
 		tarIn.close();
+		
+	}
+	public synchronized static void uncompressTarGZ(File tarFile, File dest) throws IOException
+	{
+		TarArchiveInputStream tarIn = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(tarFile)));
+
+		uncompressArchive(tarIn, dest);
+	}
+	
+	public synchronized static void uncompressTar(File tarFile, File dest) throws IOException
+	{
+		TarArchiveInputStream tarIn = new TarArchiveInputStream(new FileInputStream(tarFile));
+
+		uncompressArchive(tarIn, dest);
+	}
+	
+	public synchronized static void uncompressZip(File zipFile, File dest) throws IOException
+	{
+		ZipArchiveInputStream tarIn = new ZipArchiveInputStream(new FileInputStream(zipFile));
+
+		uncompressArchive(tarIn, dest);
 	}
 
 	static public void main(String[] args) throws Throwable

@@ -67,7 +67,7 @@ public interface JSDLEventReceiver
 	public void endApplication(XMLDocumentPath path) throws JSDLValidationException;
 
 	public void startDataStaging(XMLDocumentPath path, String stageName, String filename, String filesystemName, CreationFlag creationFlag,
-		Boolean deleteOnTermination) throws JSDLValidationException;
+		Boolean deleteOnTermination, Boolean handleAsArchive) throws JSDLValidationException;
 
 	public void endDataStaging(XMLDocumentPath path) throws JSDLValidationException;
 

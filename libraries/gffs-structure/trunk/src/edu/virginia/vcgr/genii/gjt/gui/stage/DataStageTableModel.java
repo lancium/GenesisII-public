@@ -32,7 +32,7 @@ class DataStageTableModel extends AbstractTableModel
 	@Override
 	public int getColumnCount()
 	{
-		return 6;
+		return 7;
 	}
 
 	@Override
@@ -63,6 +63,9 @@ class DataStageTableModel extends AbstractTableModel
 				return stage.deleteOnTerminate();
 
 			case 5:
+				return stage.handleAsArchive();
+				
+			case 6:
 				return stage.filesystemType();
 		}
 
@@ -99,8 +102,12 @@ class DataStageTableModel extends AbstractTableModel
 			case 4:
 				stage.deleteOnTerminate(((Boolean) aValue).booleanValue());
 				break;
-
+				
 			case 5:
+				stage.handleAsArchive(((Boolean) aValue).booleanValue());
+				break;
+
+			case 6:
 				stage.filesystemType((FilesystemType) aValue);
 				break;
 		}
@@ -129,6 +136,8 @@ class DataStageTableModel extends AbstractTableModel
 			case 4:
 				return Boolean.class;
 			case 5:
+				return Boolean.class;
+			case 6:
 				return FilesystemType.class;
 		}
 

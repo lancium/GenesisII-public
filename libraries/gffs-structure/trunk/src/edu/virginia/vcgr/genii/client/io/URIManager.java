@@ -90,7 +90,11 @@ public class URIManager
 
 	static public DataTransferStatistics get(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
-		_logger.info(String.format("Attempting to copy file from %s to %s.", source, target));
+		
+		//hmmm: support directories here also!!!!
+
+		
+		_logger.info(String.format("Attempting to copy from '%s' to '%s'.", source, target));
 		String scheme = source.getScheme();
 		if (scheme == null)
 			throw new IOException("Don't know how to handle \"" + source + "\".");
@@ -110,7 +114,7 @@ public class URIManager
 
 	static public DataTransferStatistics put(File source, URI target, UsernamePasswordIdentity credential) throws IOException
 	{
-		_logger.info(String.format("Attempting to copy file from %s to %s.", source, target));
+		_logger.info(String.format("Attempting to copy from '%s' to '%s'.", source, target));
 
 		String scheme = target.getScheme();
 		if (scheme == null)

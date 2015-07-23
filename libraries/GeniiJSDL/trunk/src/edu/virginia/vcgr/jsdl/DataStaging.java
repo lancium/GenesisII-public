@@ -27,7 +27,7 @@ import edu.virginia.vcgr.jsdl.hpcfse.HPCFSEConstants;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_filename", "_filesystemName", "_creationFlag", "_deleteOnTermination", "_source", "_target", "_credentials" })
+@XmlType(propOrder = { "_filename", "_filesystemName", "_creationFlag", "_deleteOnTermination", "_handleAsArchive", "_source", "_target", "_credentials" })
 public class DataStaging extends CommonJSDLElement
 {
 	static final long serialVersionUID = 0L;
@@ -49,6 +49,9 @@ public class DataStaging extends CommonJSDLElement
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "DeleteOnTermination")
 	private Boolean _deleteOnTermination;
 
+	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "HandleAsArchive")
+	private Boolean _handleAsArchive;
+
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "Source")
 	private SourceTarget _source;
 
@@ -67,7 +70,7 @@ public class DataStaging extends CommonJSDLElement
 	}
 
 	public DataStaging(String name, String filename, String filesystemName, CreationFlag creationFlag, boolean deleteOnTermination,
-		SourceTarget source, SourceTarget target)
+		boolean handleAsArchive, SourceTarget source, SourceTarget target)
 	{
 		if (filename == null)
 			throw new IllegalArgumentException("Filename cannot be null.");
@@ -80,24 +83,25 @@ public class DataStaging extends CommonJSDLElement
 		_filesystemName = filesystemName;
 		_creationFlag = creationFlag;
 		_deleteOnTermination = deleteOnTermination;
+		_handleAsArchive = handleAsArchive;
 		_source = source;
 		_target = target;
 	}
 
-	public DataStaging(String filename, String filesystemName, CreationFlag creationFlag, boolean deleteOnTermination, SourceTarget source,
+	public DataStaging(String filename, String filesystemName, CreationFlag creationFlag, boolean deleteOnTermination, boolean handleAsArchive, SourceTarget source,
 		SourceTarget target)
 	{
-		this(null, filename, filesystemName, creationFlag, deleteOnTermination, source, target);
+		this(null, filename, filesystemName, creationFlag, deleteOnTermination, handleAsArchive, source, target);
 	}
 
-	public DataStaging(String filename, CreationFlag creationFlag, boolean deleteOnTermination, SourceTarget source, SourceTarget target)
+	public DataStaging(String filename, CreationFlag creationFlag, boolean deleteOnTermination, boolean handleAsArchive, SourceTarget source, SourceTarget target)
 	{
-		this(filename, null, creationFlag, deleteOnTermination, source, target);
+		this(filename, null, creationFlag, deleteOnTermination, handleAsArchive, source, target);
 	}
 
-	public DataStaging(String filename, CreationFlag creationFlag, boolean deleteOnTerminate)
+	public DataStaging(String filename, CreationFlag creationFlag, boolean deleteOnTerminate, boolean handleAsArchive)
 	{
-		this(filename, creationFlag, deleteOnTerminate, null, null);
+		this(filename, creationFlag, deleteOnTerminate, handleAsArchive, null, null);
 	}
 
 	final public void name(String name)
@@ -114,7 +118,6 @@ public class DataStaging extends CommonJSDLElement
 	{
 		if (filename == null)
 			throw new IllegalArgumentException("Filename cannot be null.");
-
 		_filename = filename;
 	}
 
@@ -137,7 +140,6 @@ public class DataStaging extends CommonJSDLElement
 	{
 		if (creationFlag == null)
 			throw new IllegalArgumentException("Creation flag cannot be null.");
-
 		_creationFlag = creationFlag;
 	}
 
@@ -154,6 +156,16 @@ public class DataStaging extends CommonJSDLElement
 	final public Boolean deleteOnTermionation()
 	{
 		return _deleteOnTermination;
+	}
+
+	final public void handleAsArchive(Boolean handleAsArchive)
+	{
+		_handleAsArchive = handleAsArchive;
+	}
+	
+	final public Boolean handleAsArchive()
+	{
+		return _handleAsArchive;
 	}
 
 	final public void source(SourceTarget source)

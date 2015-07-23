@@ -99,7 +99,7 @@ public class WritableBuffer implements Closeable
 				}
 				_lease.cancel();
 			}
-
+			_resolver.drain();	// Waits for all pending writes to this file to complete
 			_blockOffsetInFile = -1L;
 			_lease = null;
 		}

@@ -30,6 +30,9 @@ public abstract class AbstractURIHandler implements IURIHandler
 	public abstract InputStream openInputStream(URI source, UsernamePasswordIdentity credential) throws IOException;
 
 	public abstract OutputStream openOutputStream(URI target, UsernamePasswordIdentity credential) throws IOException;
+	
+	@Override
+	public abstract String getLocalPath(URI uri) throws IOException;
 
 	static private long generateBackoff(int attempt)
 	{
@@ -41,6 +44,13 @@ public abstract class AbstractURIHandler implements IURIHandler
 	final public DataTransferStatistics get(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
 		IOException lastException = null;
+
+		// hmmm: support directories here also!!!!
+
+		// hmmm: right here does seem like the place to fork;
+		// the existing methods are all calling getinternal which goes directory to creating streams and expecting that to work.
+
+		// hmmm: we need new methods on uri handler for copying a directory!
 
 		int attempt = 0;
 
@@ -88,42 +98,58 @@ public abstract class AbstractURIHandler implements IURIHandler
 
 	protected DataTransferStatistics getInternal(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
-		FileOutputStream fos = null;
-		InputStream in = null;
+		if (_logger.isDebugEnabled())
+			_logger.debug("getInternal: source='" +  source.getSchemeSpecificPart() + "' target='" + target.getAbsolutePath()+ "'");
+		
+		if (isDirectory(source)) {
+			return copyDirectoryDown(source, target, credential);
+		} else {
 
-		try {
-			fos = new FileOutputStream(target);
-			in = openInputStream(source, credential);
-			return StreamUtils.copyStream(in, fos);
-		} finally {
-			StreamUtils.close(fos);
-			StreamUtils.close(in);
+			FileOutputStream fos = null;
+			InputStream in = null;
+
+			try {
+				fos = new FileOutputStream(target);
+				in = openInputStream(source, credential);
+				return StreamUtils.copyStream(in, fos);
+			} finally {
+				StreamUtils.close(fos);
+				StreamUtils.close(in);
+			}
 		}
 	}
 
 	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential) throws IOException
 	{
-		FileInputStream fin = null;
-		OutputStream out = null;
+		if (_logger.isDebugEnabled())
+			_logger.debug("putInternal: source='" +  source.getAbsolutePath() + "' target='" + target.getSchemeSpecificPart()+ "'");
 
-		try {
-			fin = new FileInputStream(source);
-			out = openOutputStream(target, credential);
+		if (source.isDirectory()) {
+			return copyDirectoryUp(source, target, credential);
+		} else {
 
-			DataTransferStatistics toReturn = StreamUtils.copyStream(fin, out);
-			HttpURLConnection conn = JavaURIAsURLHandler.getActiveConns().get(target);
-			if (conn != null) {
-				String msg = conn.getResponseMessage();
-				_logger.debug("web server response: " + msg);
-				// disconnect so everything is flushed and completed.
-				conn.disconnect();
-				// clean out the connection info.
-				JavaURIAsURLHandler.getActiveConns().remove(target);
+			FileInputStream fin = null;
+			OutputStream out = null;
+
+			try {
+				fin = new FileInputStream(source);
+				out = openOutputStream(target, credential);
+
+				DataTransferStatistics toReturn = StreamUtils.copyStream(fin, out);
+				HttpURLConnection conn = JavaURIAsURLHandler.getActiveConns().get(target);
+				if (conn != null) {
+					String msg = conn.getResponseMessage();
+					_logger.debug("web server response: " + msg);
+					// disconnect so everything is flushed and completed.
+					conn.disconnect();
+					// clean out the connection info.
+					JavaURIAsURLHandler.getActiveConns().remove(target);
+				}
+				return toReturn;
+			} finally {
+				StreamUtils.close(fin);
+				StreamUtils.close(out);
 			}
-			return toReturn;
-		} finally {
-			StreamUtils.close(fin);
-			StreamUtils.close(out);
 		}
 	}
 }

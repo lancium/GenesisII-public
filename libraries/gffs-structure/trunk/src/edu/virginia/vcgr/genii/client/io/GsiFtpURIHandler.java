@@ -38,6 +38,9 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 	@Override
 	protected DataTransferStatistics getInternal(URI source, File destination, UsernamePasswordIdentity credential) throws IOException
 	{
+		
+		// hmmm: handle directories here if possible.
+
 		String host = null;
 		int port;
 		String localPath = null;
@@ -63,6 +66,9 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 	@Override
 	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential) throws IOException
 	{
+		// hmmm: handle directories here if possible.
+
+		
 		String host = null;
 		int port;
 		String remotePath = null;
@@ -95,5 +101,33 @@ public class GsiFtpURIHandler extends AbstractURIHandler
 	public OutputStream openOutputStream(URI target, UsernamePasswordIdentity credential) throws IOException
 	{
 		throw new RuntimeException("openOutputStream should never be called on a GSIFTPURIHandler.");
+	}
+
+	@Override
+	public boolean isDirectory(URI uri)
+	{
+		// hmmm: can we tell file from dir for gsiftp?
+		return false;
+	}
+
+	@Override
+	public DataTransferStatistics copyDirectoryDown(URI source, File target, UsernamePasswordIdentity credential) throws IOException
+	{
+		// hmmm: can we do this with gsiftp?
+		throw new IOException("unimplemented method copyDirectoryDown on gsiftp: scheme");
+	}
+
+	@Override
+	public DataTransferStatistics copyDirectoryUp(File source, URI target, UsernamePasswordIdentity credential) throws IOException
+	{
+		// hmmm: can we do this with gsiftp?
+		throw new IOException("unimplemented method copyDirectoryDown on gsiftp: scheme");
+	}
+
+	@Override
+	public String getLocalPath(URI uri) throws IOException
+	{
+		//hmmm: is there any more accurate version of this?
+		return uri.getSchemeSpecificPart();
 	}
 }

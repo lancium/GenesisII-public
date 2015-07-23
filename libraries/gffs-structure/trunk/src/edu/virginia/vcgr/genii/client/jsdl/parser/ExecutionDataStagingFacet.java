@@ -17,6 +17,7 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 {
 	private CreationFlagEnumeration _creationFlag = null;
 	private Boolean _deleteOnTerminate = null;
+	private Boolean _handleAsArchive = null;
 	private String _filesystemName = null;
 	private String _fileName = null;
 	private UsernamePasswordIdentity _credential = null;
@@ -55,6 +56,12 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 	}
 
 	@Override
+	public void consumeHandleAsArchiveFlag(Object currentUnderstanding, boolean handleAsArchive)
+	{
+		_handleAsArchive = new Boolean(handleAsArchive);
+	}
+
+	@Override
 	public void consumeFileSystemName(Object currentUnderstanding, String filesystemName)
 	{
 		_filesystemName = filesystemName;
@@ -76,7 +83,7 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 	public void completeFacet(Object parentUnderstanding, Object currentUnderstanding)
 	{
 		JobRequest jr = (JobRequest) parentUnderstanding;
-		jr.addDataStage(new ContainerDataStage(new FilesystemRelative<String>(_filesystemName, _fileName), _deleteOnTerminate, _creationFlag,
+		jr.addDataStage(new ContainerDataStage(new FilesystemRelative<String>(_filesystemName, _fileName), _deleteOnTerminate, _handleAsArchive, _creationFlag,
 			_sourceURI, _targetURI, _credential));
 	}
 }

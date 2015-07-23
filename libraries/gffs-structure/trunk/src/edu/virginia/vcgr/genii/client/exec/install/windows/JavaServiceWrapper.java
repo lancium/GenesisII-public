@@ -9,8 +9,6 @@ import java.util.Map;
 
 import edu.virginia.vcgr.genii.client.exec.AbstractExecutionTask;
 
-// future: likely this is dead code.
-
 public class JavaServiceWrapper
 {
 	static public abstract class JavaServiceWrapperTask extends AbstractExecutionTask

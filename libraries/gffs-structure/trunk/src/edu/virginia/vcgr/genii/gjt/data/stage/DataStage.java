@@ -39,6 +39,9 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 	@XmlAttribute(name = "delete-on-terminate")
 	private boolean _deleteOnTerminate = true;
 
+	@XmlAttribute(name = "handle-as-archive")
+	private boolean _handleAsArchive = false;
+
 	@XmlAttribute(name = "creation-flag")
 	private CreationFlag _creationFlag = CreationFlag.overwrite;
 
@@ -96,6 +99,18 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 		_deleteOnTerminate = deleteOnTerminate;
 	}
 
+	public boolean handleAsArchive()
+	{
+		return _handleAsArchive;
+	}
+
+	public void handleAsArchive(boolean handleAsArchive)
+	{
+		if (_handleAsArchive != handleAsArchive)
+			fireJobDescriptionModified();
+		_handleAsArchive = handleAsArchive;
+	}
+	
 	public CreationFlag creationFlag()
 	{
 		return _creationFlag;

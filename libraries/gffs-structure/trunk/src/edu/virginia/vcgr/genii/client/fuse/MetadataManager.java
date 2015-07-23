@@ -295,7 +295,7 @@ public class MetadataManager
 	 * This method is adequate for Unix, but not for Windows. If in future we managed to make FUSE works for Windows, we will have to change
 	 * the implementation.
 	 */
-	private static String getNameFromPath(String path)
+	public static String getNameFromPath(String path)
 	{
 		if (path == null)
 			return "/";

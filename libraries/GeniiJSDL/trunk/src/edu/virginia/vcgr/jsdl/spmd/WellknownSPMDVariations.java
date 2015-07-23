@@ -22,7 +22,7 @@ import java.net.URI;
  */
 public interface WellknownSPMDVariations
 {
-	static final String BASE_URI = "http://www.ogf/org/jsdl/2007/02/jsdl-spmd/";
+	static final String BASE_URI = "http://www.ogf.org/jsdl/2007/02/jsdl-spmd/";
 
 	static final public URI MPI = URI.create(BASE_URI + "MPI");
 	static final public URI GridMPI = URI.create(BASE_URI + "GridMPI");

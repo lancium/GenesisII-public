@@ -56,12 +56,13 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 public class GenesisIIFilesystem implements FSFilesystem
 {
 	static private Log _logger = LogFactory.getLog(GenesisIIFilesystem.class);
+	static final int FILE_TABLE_SIZE=256;
 
 	private RNSPath _root;
 	private RNSPath _lastPath;
 	private Collection<Identity> _callerIdentities;
 
-	private FileHandleTable<GeniiOpenFile> _fileTable = new FileHandleTable<GeniiOpenFile>(256);
+	private FileHandleTable<GeniiOpenFile> _fileTable = new FileHandleTable<GeniiOpenFile>(FILE_TABLE_SIZE);
 
 	final static private long toNonNull(Long l)
 	{
@@ -185,6 +186,26 @@ public class GenesisIIFilesystem implements FSFilesystem
 			throw new FSInvalidFileHandleException(String.format("Invalid file handle (%d).", fileHandle));
 
 		return gof;
+	}
+	
+	protected GeniiOpenFile lookupGOF(String[] pathComponents) {
+		// Lets look and see if the path already exists as an open file in the open file table, if so return it
+		int i;
+		GeniiOpenFile gof;
+		for (i=0;i<FILE_TABLE_SIZE;i++) {
+			gof = _fileTable.get(i);
+			if (gof!=null) {
+				// Check if it is the same file
+				// if so, return gof
+				if (pathComponents.length == gof.getPath().length) {
+					for (int j=0;j<pathComponents.length;j++) {
+						if (!pathComponents[j].equals(gof.getPath()[j])) continue;
+					}
+					return gof;
+				}		
+			}			
+		}
+		return null;
 	}
 
 	public RNSPath lookup(String[] pathComponents) throws FSException
@@ -315,8 +336,10 @@ public class GenesisIIFilesystem implements FSFilesystem
 		GeniiOpenFile gof;
 
 		TypeInformation tInfo = new TypeInformation(epr);
-		if (tInfo.isRByteIO())
+
+		if (tInfo.isRByteIO()) {
 			gof = new RandomByteIOOpenFile(path, epr, true, mode == OpenModes.READ_WRITE, flags.isAppend());
+		}
 		else if (tInfo.isSByteIO())
 			gof = new StreamableByteIOOpenFile(path, wasCreated, epr, true, mode == OpenModes.READ_WRITE, flags.isAppend());
 		else if (tInfo.isSByteIOFactory())

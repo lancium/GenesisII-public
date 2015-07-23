@@ -159,11 +159,6 @@ public class CreateDirDialog extends JDialog
 				path = path.lookup(containerPath, RNSPathQueryFlags.MUST_EXIST);
 				path = path.lookup(containerPath + "/Services/EnhancedRNSPortType", RNSPathQueryFlags.MUST_EXIST);
 			} catch (RNSPathDoesNotExistException r) {
-				// JOptionPane.showMessageDialog(null, containerPath,
-				// "Storage container path you selected does not exist or you do not have permission",
-				// JOptionPane.ERROR_MESSAGE);
-				// lets keep what they already typed and let them edit it instead
-				// containerPath = null;
 				return false;
 			} catch (RNSPathAlreadyExistsException er) {
 			}

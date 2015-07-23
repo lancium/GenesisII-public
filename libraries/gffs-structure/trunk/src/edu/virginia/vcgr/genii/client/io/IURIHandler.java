@@ -44,7 +44,30 @@ public interface IURIHandler
 	 */
 	public boolean canWrite(String uriScheme);
 
+	/**
+	 * returns true if we can determine that the URI represents a directory. this check is not supported on all schemes and will return false on those.
+	 * returning false here means that either the uri is not a directory or does not exist or the scheme cannot tell.
+	 */
+	public boolean isDirectory(URI uri);
+
+	/**
+	 * returns the "most local" path of the URI, without any scheme information. this requires that the "uri" actually exists, since this may
+	 * be implemented with a live query.
+	 */
+	public String getLocalPath(URI uri) throws IOException;
+
 	public DataTransferStatistics get(URI source, File target, UsernamePasswordIdentity credential) throws IOException;
 
 	public DataTransferStatistics put(File source, URI target, UsernamePasswordIdentity credential) throws IOException;
+
+	/**
+	 * uri-specific downloading of remote directory to local target. not supported on all schemes.
+	 */
+	public DataTransferStatistics copyDirectoryDown(URI source, File target, UsernamePasswordIdentity credential) throws IOException;
+
+	/**
+	 * uri-specific uploading of local directory to remote target. not supported on all schemes.
+	 */
+	public DataTransferStatistics copyDirectoryUp(File source, URI target, UsernamePasswordIdentity credential) throws IOException;
+
 }

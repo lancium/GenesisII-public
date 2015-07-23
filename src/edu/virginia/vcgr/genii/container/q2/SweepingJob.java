@@ -110,6 +110,7 @@ public class SweepingJob extends ethread
 		}
 
 		try {
+			_logger.debug("marking sweep job as finished: " + _jobID);
 			_queueMgr.getJobManager().finishJob(_jobID);
 		} catch (Exception e) {
 			_logger.error("caught an exception when attempting to finish sweep", e);

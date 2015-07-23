@@ -12,12 +12,14 @@ public class ContainerDataStage implements Serializable
 
 	private FilesystemRelative<String> _name;
 	private Boolean _deleteOnTerminate;
+	private Boolean _handleAsArchive;
 	private CreationFlagEnumeration _creationFlag;
 	private String _sourceURI;
 	private String _targetURI;
 	private UsernamePasswordIdentity _credentials;
 
-	public ContainerDataStage(FilesystemRelative<String> name, Boolean deleteOnTerminate, CreationFlagEnumeration creationFlag,
+	public ContainerDataStage(FilesystemRelative<String> name, Boolean deleteOnTerminate,
+		Boolean handleAsArchive, CreationFlagEnumeration creationFlag,
 		String sourceURI, String targetURI, UsernamePasswordIdentity credentials)
 	{
 		if (name == null)
@@ -25,6 +27,7 @@ public class ContainerDataStage implements Serializable
 
 		_name = name;
 		_deleteOnTerminate = deleteOnTerminate;
+		_handleAsArchive = handleAsArchive;
 		_creationFlag = creationFlag;
 		_sourceURI = sourceURI;
 		_targetURI = targetURI;
@@ -42,6 +45,11 @@ public class ContainerDataStage implements Serializable
 	final public boolean deleteOnTerminate(boolean defaultValue)
 	{
 		return (_deleteOnTerminate == null) ? defaultValue : _deleteOnTerminate.booleanValue();
+	}
+
+	final public boolean handleAsArchive(boolean defaultValue)
+	{
+		return (_handleAsArchive== null) ? defaultValue : _handleAsArchive.booleanValue();
 	}
 
 	final public CreationFlagEnumeration getCreationFlag(CreationFlagEnumeration defaultValue)

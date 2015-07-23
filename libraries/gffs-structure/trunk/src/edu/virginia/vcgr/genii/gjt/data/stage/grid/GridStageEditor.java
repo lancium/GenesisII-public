@@ -57,13 +57,11 @@ class GridStageEditor extends StageEditor<GridStageData>
 				return ret;
 			// Need to warn them and print out prefix
 			String errString = "";
+			// Note it cannot _be_ a byteio and not exist.
 			if (!exists)
 				errString =
 					"WARNING!!\n Path " + pathString + " does not exist OR you do not have permission.\n The prefix [" + goodPath
 						+ "] exists.\nThis will likely cause your job to fail!";
-			else if (!isByteIO)
-				errString = "WARNING!!\n Path " + pathString + " is NOT a ByteIO file\nThis will likely cause your job to fail!";
-			// Note it cannot be a byteio and not exists
 			JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 		} else {
 			// This is a stage out. Need to make sure the target directory exists and is a directory

@@ -36,6 +36,9 @@ public class ScpURIHandler extends AbstractURIHandler
 	@Override
 	protected DataTransferStatistics getInternal(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
+		
+		// hmmm: handle directories here if possible.
+
 		String user = null;
 		String password = null;
 		String host = null;
@@ -52,7 +55,7 @@ public class ScpURIHandler extends AbstractURIHandler
 			throw new IOException("No authentication information provided for URL \"" + source + "\".");
 
 		if (password == null)
-			throw new IOException("No passwrod given for URL \"" + source + "\".");
+			throw new IOException("No password given for URL \"" + source + "\".");
 
 		host = source.getHost();
 		port = source.getPort();
@@ -71,7 +74,10 @@ public class ScpURIHandler extends AbstractURIHandler
 
 	@Override
 	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential) throws IOException
-	{
+	{		
+		
+		// hmmm: handle directories here if possible.
+
 		String user = null;
 		String password = null;
 		String host = null;
@@ -88,7 +94,7 @@ public class ScpURIHandler extends AbstractURIHandler
 			throw new IOException("No authentication information provided for URL \"" + source + "\".");
 
 		if (password == null)
-			throw new IOException("No passwrod given for URL \"" + source + "\".");
+			throw new IOException("No password given for URL \"" + source + "\".");
 
 		host = target.getHost();
 		port = target.getPort();
@@ -115,5 +121,33 @@ public class ScpURIHandler extends AbstractURIHandler
 	public OutputStream openOutputStream(URI target, UsernamePasswordIdentity credential) throws IOException
 	{
 		throw new RuntimeException("openOutputStream should never be called on a ScpURIHandler.");
+	}
+
+	@Override
+	public boolean isDirectory(URI uri)
+	{
+		// hmmm: we should be able to copy directories also, but how can we tell if it is one?
+		return false;
+	}
+
+	@Override
+	public DataTransferStatistics copyDirectoryDown(URI source, File target, UsernamePasswordIdentity credential) throws IOException
+	{
+		// hmmm: figure out how to implement this on scp!
+		return null;
+	}
+
+	@Override
+	public DataTransferStatistics copyDirectoryUp(File source, URI target, UsernamePasswordIdentity credential) throws IOException
+	{
+		// hmmm: figure out how to implement this on scp!
+		return null;
+	}
+
+	@Override
+	public String getLocalPath(URI uri) throws IOException
+	{
+		//hmmm: is there any more accurate version of this?
+		return uri.getSchemeSpecificPart();
 	}
 }

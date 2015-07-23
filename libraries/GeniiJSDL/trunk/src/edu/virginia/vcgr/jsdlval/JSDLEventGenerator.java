@@ -499,7 +499,7 @@ public class JSDLEventGenerator
 			for (DataStaging stage : stages) {
 				path.push(path.formQNameFromPrevious("DataStaging"));
 				receiver.startDataStaging(path, stage.name(), stage.filename(), stage.filesystemName(), stage.creationFlag(),
-					stage.deleteOnTermionation());
+					stage.deleteOnTermionation(), stage.handleAsArchive());
 				handleAnys(path, stage.any(), stage.anyAttributes(), receiver);
 
 				generateSourceEvents(path, stage.source(), receiver);

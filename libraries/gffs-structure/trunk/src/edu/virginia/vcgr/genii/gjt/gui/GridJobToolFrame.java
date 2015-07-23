@@ -29,9 +29,10 @@ import edu.virginia.vcgr.genii.gjt.gui.fs.FilesystemMenu;
 import edu.virginia.vcgr.genii.gjt.gui.resource.ResourcesPanel;
 import edu.virginia.vcgr.genii.gjt.gui.stage.DataTab;
 import edu.virginia.vcgr.genii.gjt.gui.variables.VariablePanel;
+import edu.virginia.vcgr.genii.ui.BasicFrameWindow;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 
-public abstract class GridJobToolFrame extends JFrame
+public abstract class GridJobToolFrame extends BasicFrameWindow
 {
 	static final long serialVersionUID = 0L;
 

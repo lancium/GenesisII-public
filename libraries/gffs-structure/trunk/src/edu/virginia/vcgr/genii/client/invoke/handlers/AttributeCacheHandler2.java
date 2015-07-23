@@ -175,7 +175,7 @@ public class AttributeCacheHandler2
 
 		for (QName orig : getMultipleResourcePropertiesRequest) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Reqested parameter: " + orig);
+				_logger.debug("Requested parameter: " + orig);
 		}
 
 		List<QName> addedAttributeNames = reconfigureToPrefetchAdditionalAttributes(ctxt, getMultipleResourcePropertiesRequest);
@@ -196,7 +196,7 @@ public class AttributeCacheHandler2
 			return new GetResourcePropertyResponse(Elementals.toArray(result));
 		}
 		if (_logger.isTraceEnabled())
-			_logger.trace("Reqested resource property: " + getResourcePropertyRequest);
+			_logger.trace("Requested resource property: " + getResourcePropertyRequest);
 
 		GetResourcePropertyResponse response = (GetResourcePropertyResponse) ctxt.proceed();
 		storeAttributesInCache(target, response.get_any());

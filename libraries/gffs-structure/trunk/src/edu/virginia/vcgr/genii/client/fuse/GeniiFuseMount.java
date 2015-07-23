@@ -12,10 +12,12 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.fsii.DirectoryHandle;
 import edu.virginia.vcgr.fsii.FilesystemStatStructure;
+import edu.virginia.vcgr.fsii.exceptions.FSEntryNotFoundException;
 import edu.virginia.vcgr.fsii.file.OpenFlags;
 import edu.virginia.vcgr.fsii.file.OpenModes;
 import edu.virginia.vcgr.fsii.path.FilesystemPathRepresentation;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
+import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
 import edu.virginia.vcgr.genii.client.fuse.exceptions.FuseExceptions;
 import edu.virginia.vcgr.genii.client.fuse.exceptions.FuseFunctionNotImplementedException;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
@@ -98,6 +100,31 @@ public class GeniiFuseMount implements Filesystem
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("getattr(%s)", path));
 		FilesystemStatStructure statstruct = MetadataManager.retrieveStat(path);
+		// ASG changed July 15, 2015 to have getattr on non-existent files NOT go to the grid
+		if (statstruct==null) {
+			// The file or directory is not in the metadata cache, lets see if it is in the dir cache of the parent
+			String parentPath = DirectoryManager.getParentPath(path);
+			String entryName = MetadataManager.getNameFromPath(path);
+			FuseDirEnt[] dirEntries = DirectoryManager.getDir(parentPath);
+			boolean found=false;
+			if (dirEntries != null) {
+				for (FuseDirEnt ent : dirEntries) {
+					if (ent.name.equals(entryName)) {
+						// Found it. Hmm, what to do. Just let it fall through and have the stat call happen
+						found=true;
+						break;
+					}
+				}
+				if (!found) {
+					// Not there in the cache, the cache is up to date, the file does not exist.
+					throw FuseExceptions.translate(String.format("Unable to locate path %s.", path), new FSEntryNotFoundException(String.format("Unable to locate path %s.", path)));
+					
+					 //new FSEntryNotFoundException(String.format("Unable to locate path %s.", entryName));
+
+				}
+			}
+		}
+		// End of july 15 updates
 		try {
 			if (statstruct == null) {
 				statstruct = _fs.stat(PATHREP.parse(null, path));

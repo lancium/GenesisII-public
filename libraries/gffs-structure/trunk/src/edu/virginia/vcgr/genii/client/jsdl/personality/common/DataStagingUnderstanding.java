@@ -11,6 +11,7 @@ public class DataStagingUnderstanding
 {
 	private CreationFlagEnumeration _creationFlag = null;
 	private boolean _deleteOnTerminate = true;
+	private boolean _handleAsArchive = false;
 	private String _fileSystemName = null;
 	private String _filename = null;
 	private URI _sourceURI = null;
@@ -35,6 +36,16 @@ public class DataStagingUnderstanding
 	public void setDeleteOnTerminate(boolean onTerminate)
 	{
 		_deleteOnTerminate = onTerminate;
+	}
+
+	public boolean isHandleAsArchive()
+	{
+		return _handleAsArchive;
+	}
+
+	public void setHandleAsArchive(boolean handleAsArchive)
+	{
+		_handleAsArchive = handleAsArchive;
 	}
 
 	public void setFileSystemName(String fileSystemName)

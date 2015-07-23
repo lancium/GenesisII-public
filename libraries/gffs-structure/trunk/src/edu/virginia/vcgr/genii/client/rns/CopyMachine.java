@@ -43,14 +43,14 @@ public class CopyMachine
 	 * Constructs a copy machine for making a copy of the source to the target. If the sink is non-null, we will use it to record updates as
 	 * files and directories are seen.
 	 */
-	public CopyMachine(String sourceIn, String targetIn, TaskProgressListener updateSink, boolean forceIn, PrintWriter stderrIn,
+	public CopyMachine(String sourceIn, String targetIn, TaskProgressListener updateSink, boolean force, PrintWriter stderrIn,
 		RNSPath logLocation)
 	{
 		_source = sourceIn;
 		_target = targetIn;
 		_currentTarget = targetIn;
 		_updates = updateSink;
-		_force = forceIn;
+		_force = force;
 		_stderr = stderrIn;
 		_logLocation = logLocation;
 		if (_logger.isDebugEnabled())

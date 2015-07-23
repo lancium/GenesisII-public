@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.gjt.JobDefinitionListener;
-import edu.virginia.vcgr.genii.gjt.JobTool;
+import edu.virginia.vcgr.genii.gjt.JobToolManager;
 import edu.virginia.vcgr.genii.ui.plugins.AbstractCombinedUIMenusPlugin;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.MenuType;
@@ -58,7 +58,7 @@ public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		try {
 			Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
-			JobTool.launch(null, new JobDefinitionListenerImpl(context.uiContext().callingContext(), paths.iterator().next()), null);
+			JobToolManager.launch(null, new JobDefinitionListenerImpl(context.uiContext().callingContext(), paths.iterator().next()));
 		} catch (IOException ioe) {
 			throw new UIPluginException("Unable to run Grid Job Tool.", ioe);
 		}

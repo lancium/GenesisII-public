@@ -252,8 +252,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		try {
 			JobDefinition jaxbType = JSDLUtils.convert(jdt);
 			if (jaxbType.parameterSweeps().size() > 0) {
-				history.createErrorWriter("Parameter Sweep Unsupported.")
-					.format("This type of BES container does not " + "support Parameter Sweeps.").close();
+				history.createErrorWriter("Parameter Sweep Unsupported.").format(
+					"This type of BES container does not support Parameter Sweeps.").close();
 
 				throw new UnsupportedFeatureFaultType(new String[] { "This BES container does not support JSDL parameter sweeps." }, null);
 			}
@@ -295,10 +295,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		history.info("BES Creating Activity Instance");
 
 		EndpointReferenceType entryReference =
-			new BESActivityServiceImpl().CreateEPR(
-				BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
-					(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
-				Container.getServiceURL("BESActivityPortType"));
+			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
+				(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe), Container
+				.getServiceURL("BESActivityPortType"));
 
 		return new CreateActivityResponseType(entryReference, adt, historySink.eventMessages());
 
@@ -420,13 +419,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			any.addAll(BESAttributesHandler.getSupportedFilesystemsAttr());
 
 			return new GetFactoryAttributesDocumentResponseType(new FactoryResourceAttributesDocumentType(
-				new BasicResourceAttributesDocumentType(resourceName, BESAttributesHandler.getOperatingSystem(),
-					BESAttributesHandler.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()), new Double(
-						(double) BESAttributesHandler.getCPUSpeed()), new Double((double) BESAttributesHandler.getPhysicalMemory()),
-					new Double((double) BESAttributesHandler.getVirtualMemory()), Elementals.toArray(any)),
-				BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler.getName(), BESAttributesHandler.getDescription(),
-				BESAttributesHandler.getTotalNumberOfActivities(), BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles,
-				besExtensions, localResourceManagerType, Elementals.toArray(any)), null);
+				new BasicResourceAttributesDocumentType(resourceName, BESAttributesHandler.getOperatingSystem(), BESAttributesHandler
+					.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()), new Double((double) BESAttributesHandler
+					.getCPUSpeed()), new Double((double) BESAttributesHandler.getPhysicalMemory()), new Double((double) BESAttributesHandler
+					.getVirtualMemory()), Elementals.toArray(any)), BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler
+					.getName(), BESAttributesHandler.getDescription(), BESAttributesHandler.getTotalNumberOfActivities(),
+				BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles, besExtensions, localResourceManagerType, Elementals
+					.toArray(any)), null);
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unexpected BES exception.", sqe);
 		}

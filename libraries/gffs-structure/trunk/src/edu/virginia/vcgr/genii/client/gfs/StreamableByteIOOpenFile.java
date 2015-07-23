@@ -93,6 +93,9 @@ class StreamableByteIOOpenFile extends OperatorBasedOpenFile
 		{
 			_transferer.seekWrite(SeekOrigin.SEEK_BEGINNING, fileOffset, source);
 		}
+		
+		@Override
+		public void drain() {};
 	}
 
 	static private class AppendResolverImpl implements AppendResolver

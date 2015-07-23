@@ -35,6 +35,12 @@ public class CommonDataStagingFacet extends DefaultDataStagingFacet
 	}
 
 	@Override
+	public void consumeHandleAsArchiveFlag(Object currentUnderstanding, boolean handleAsArchive) throws JSDLException
+	{
+		((DataStagingUnderstanding) currentUnderstanding).setHandleAsArchive(handleAsArchive);
+	}
+
+	@Override
 	public void consumeFileSystemName(Object currentUnderstanding, String fileSystemName) throws JSDLException
 	{
 		((DataStagingUnderstanding) currentUnderstanding).setFileSystemName(fileSystemName);

@@ -265,7 +265,7 @@ public class ResourceConfigCache extends CommonCache
 			WSResourceConfig resourceConfig = cache.get(cacheKey);
 			if (resourceConfig != null) {
 				if (resourceConfig.isMatchingPath(pathToCompare)) {
-					matches.put(cacheKey, resourceConfig);
+					matches.put(resourceConfig.getMatchingPath(pathToCompare), resourceConfig);
 				}
 			}
 		}

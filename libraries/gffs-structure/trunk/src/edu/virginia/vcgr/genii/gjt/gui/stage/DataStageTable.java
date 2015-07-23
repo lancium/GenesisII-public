@@ -59,7 +59,8 @@ public class DataStageTable extends JTable
 		TableColumn stageURIColumn = cModel.getColumn(2);
 		TableColumn creationFlagColumn = cModel.getColumn(3);
 		TableColumn deleteOnTerminateColumn = cModel.getColumn(4);
-		TableColumn fsColumn = cModel.getColumn(5);
+		TableColumn unpackArchiveColumn = cModel.getColumn(5);
+		TableColumn fsColumn = cModel.getColumn(6);
 
 		filenameColumn.setHeaderValue("Filename");
 
@@ -76,6 +77,11 @@ public class DataStageTable extends JTable
 
 		deleteOnTerminateColumn.setHeaderValue("Delete on Terminate?");
 
+		if (isStageIn)
+			unpackArchiveColumn.setHeaderValue("Unpack Archive?");
+		else
+			unpackArchiveColumn.setHeaderValue("Pack to Archive?");
+		
 		fsColumn.setHeaderValue("Filesystem");
 		fsColumn.setCellRenderer(new FilesystemCellRenderer());
 		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(filesystemMap)));

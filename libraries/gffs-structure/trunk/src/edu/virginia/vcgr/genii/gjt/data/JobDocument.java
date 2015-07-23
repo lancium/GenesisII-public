@@ -662,7 +662,8 @@ public class JobDocument implements PostUnmarshallListener
 
 		builder.pop();
 
-		DataStaging staging = new DataStaging(results.first(), dataStage.creationFlag(), dataStage.deleteOnTerminate());
+		DataStaging staging = new DataStaging(results.first(), dataStage.creationFlag(), dataStage.deleteOnTerminate(),
+			dataStage.handleAsArchive());
 
 		FilesystemType fsType = dataStage.filesystemType();
 		if (JSDLGenerator.indicatesFilesystem(fsType)) {
@@ -993,11 +994,14 @@ public class JobDocument implements PostUnmarshallListener
 
 		JobIdentification jobIdent = generateJobIdentification(builder, variables);
 		Application application = generateApplication(builder, variables, filesystemSet);
+		
+		Collection<DataStaging> cds = generateDataStaging(builder, variables, filesystemSet);
+		
 		Resources resources = generateResources(builder, variables, filesystemSet);
 
 		JobDescription jobDesc = new JobDescription(jobIdent, application, resources);
 
-		jobDesc.staging().addAll(generateDataStaging(builder, variables, filesystemSet));
+		jobDesc.staging().addAll(cds);
 
 		builder.pop();
 

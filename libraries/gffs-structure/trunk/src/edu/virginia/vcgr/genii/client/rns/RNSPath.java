@@ -234,9 +234,7 @@ public class RNSPath implements Serializable, Cloneable
 
 	/**
 	 * Return the valid prefix of a path, as might be passed in lookup For example, if the path is /home/xsede.org/andrew/dir1/fred and dir1
-	 * did not exist prefix would return
-	 * 
-	 * @return /home/xsede.org/andrew
+	 * did not exist prefix would return /home/xsede.org/andrew
 	 */
 	public String getValidPrefix(String pathString)
 

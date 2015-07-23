@@ -4,8 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import edu.virginia.vcgr.genii.gjt.BlockingJobToolListener;
-import edu.virginia.vcgr.genii.gjt.JobTool;
+import edu.virginia.vcgr.genii.gjt.JobToolManager;
+import edu.virginia.vcgr.genii.gjt.gui.GridJobToolFrame;
+import edu.virginia.vcgr.genii.ui.BasicFrameWindow;
 
 public class GridJobToolApplication extends AbstractExternalApplication
 {
@@ -18,9 +19,25 @@ public class GridJobToolApplication extends AbstractExternalApplication
 	{
 		Collection<File> initialFiles = new ArrayList<File>(1);
 		initialFiles.add(content);
-		BlockingJobToolListener waiter = new BlockingJobToolListener();
-		JobTool.launch(initialFiles, null, waiter);
-		waiter.join();
+		JobToolManager.launch(initialFiles, null);
+		
+		//hmmm: do we ever actually hit this method at all?
+		
+		while (true) {
+			if (BasicFrameWindow.activeFrames(GridJobToolFrame.class) <= 0) {
+				/*
+				 * we have found that it's time to leave since there are no job tool frames left (although we really only think we'll see this as zero
+				 * and not negative).
+				 */
+				break;
+			}
+			try {
+				Thread.sleep(42);
+			} catch (InterruptedException e) {
+				// ignored.
+			}
+		}
+
 	}
 
 	@Override

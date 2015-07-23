@@ -12,11 +12,14 @@
  */
 package edu.virginia.vcgr.genii.client.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Properties;
+
+import org.morgan.util.io.DataTransferStatistics;
 
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
@@ -67,5 +70,31 @@ public class MailtoURIHandler extends AbstractURIHandler implements IURIHandler
 		}
 
 		return new MailOutputStream(address, headers);
+	}
+
+	@Override
+	public boolean isDirectory(URI uri)
+	{
+		// cannot mail directories at this time.
+		return false;
+	}
+
+	@Override
+	public DataTransferStatistics copyDirectoryDown(URI source, File target, UsernamePasswordIdentity credential) throws IOException
+	{
+		throw new IOException("inappropriate attempt to copy directory down using mailto: scheme");
+	}
+
+	@Override
+	public DataTransferStatistics copyDirectoryUp(File source, URI target, UsernamePasswordIdentity credential) throws IOException
+	{
+		throw new IOException("inappropriate attempt to copy directory up using mailto: scheme");
+	}
+
+	@Override
+	public String getLocalPath(URI uri) throws IOException
+	{
+		//hmmm: is there any more accurate version of this?  for email, do we care?
+		return uri.getSchemeSpecificPart();
 	}
 }

@@ -307,7 +307,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 					CredentialCache.getCachedCredential(tlsKey._certChain, IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain,
 						clientKeyAndCertificate._clientPrivateKey, restrictions, RWXCategory.FULL_ACCESS);
 				walletForResource.getRealCreds().addCredential(newTC);
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("made extra credential for connection: " + newTC);
 				foundAny = true;
 

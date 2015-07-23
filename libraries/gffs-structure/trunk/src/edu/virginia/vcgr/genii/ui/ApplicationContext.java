@@ -91,7 +91,7 @@ public class ApplicationContext
 		for (DisposeListener listener : listeners) {
 			_logger.debug("fireDispose calling dispose on " + listener);
 
-			listener.dispose();
+			listener.disposeInvoked();
 		}
 	}
 

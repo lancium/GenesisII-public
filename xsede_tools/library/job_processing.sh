@@ -9,6 +9,15 @@
 
 # this first section of functions is related to jobs that have been submitted to a queue.
 
+export STATOP=qstat  # original recipe
+#export STATOP=qlist  # newer usage.
+
+export SEEK_USER_PATTERN="$BASE_USER"
+if [ "$STATOP" == "qstat" ]; then
+  # drop the pattern down to looking for a space, since qstat doesn't show user name.
+  SEEK_USER_PATTERN=" "
+fi
+
 # echoes an integer for the count of jobs remaining in an unfinished state for the
 # current user.
 compute_remaining_jobs()
@@ -16,10 +25,10 @@ compute_remaining_jobs()
   local queue_path=$1
   local grid_app="$(pick_grid_app)"
   outfile="$(mktemp "$TEST_TEMP/job_stats.XXXXXX")"
-  raw_grid "$grid_app" qstat $queue_path | tail -n +2 | sed -e '/^$/d' >$outfile
+  raw_grid "$grid_app" $STATOP $queue_path | tail -n +2 | grep "$SEEK_USER_PATTERN" | sed -e '/^$/d' >$outfile
   local retval=${PIPESTATUS[0]}
   if [ $retval -ne 0 ]; then
-    # the qstat call failed, and we want to send back an error signal.
+    # the queue status call failed, and we want to send back an error signal.
     remaining="-1"
   else
     # compute how many jobs are in a finished state, and subtract from total.
@@ -35,7 +44,7 @@ compute_error_jobs()
 {
   local queue_path="$1"; shift
   local grid_app="$(pick_grid_app)"
-  echo $(raw_grid \"$grid_app\" qstat $queue_path | grep 'ERROR' | wc | gawk '{print $1 }')
+  echo $(raw_grid \"$grid_app\" $STATOP $queue_path | grep "$SEEK_USER_PATTERN" | grep 'ERROR' | wc | gawk '{print $1 }')
 }
 
 show_error_jobs()
@@ -44,7 +53,7 @@ show_error_jobs()
   if [ "$(compute_error_jobs $queue_path)" != "0" ]; then
     echo "FAILURE: These jobs had errors:"
     local grid_app="$(pick_grid_app)"
-    raw_grid \"$grid_app\" qstat $queue_path | grep 'ERROR'
+    raw_grid \"$grid_app\" $STATOP $queue_path | grep "$SEEK_USER_PATTERN" | grep 'ERROR'
     return 1
   else
     echo "SUCCESS: No jobs in an error state were seen."
@@ -64,7 +73,8 @@ function cancel_all_in_queue()
   # get a listing of all the stuff in the queue.
   holding="$GRID_OUTPUT_FILE"
   GRID_OUTPUT_FILE="$(mktemp $TEST_TEMP/job_processing/cancellation_list.XXXXXX)"
-  silent_grid qstat $queue_path
+#hmmm: this isn't specific for user yet when doing qlist!!!
+  silent_grid $STATOP $queue_path
   tickets=($(gawk '{ print $1 }' <$GRID_OUTPUT_FILE))
   # show what we're going to whack.
   echo "Cancelling $(expr ${#tickets[*]} - 1) queue jobs:"
@@ -81,7 +91,7 @@ function cancel_all_in_queue()
   done
 
   silent_grid qcomplete $queue_path --all
-  silent_grid qstat $queue_path
+  silent_grid $STATOP $queue_path
   
   # show any refugees if something managed to escape our queue crushing.
   if [ $(compute_remaining_jobs $queue_path) -ne 0 ]; then
@@ -131,12 +141,12 @@ function wait_for_all_pending_jobs()
     echo -n `date`
     echo ": There are $left jobs still queued or running."
     if [ "$left" == "-1" ]; then
-      echo "warning: saw a qstat failure while computing remaining jobs on '$queue_path'"
+      echo "warning: saw a $STATOP failure while computing remaining jobs on '$queue_path'"
     fi
     sleep $QUEUE_SLEEP_DURATION
     left=$(compute_remaining_jobs $queue_path)
     # we do not count the negative one values against the caller; that's almost always
-    # because the queue is so busy that we time out when doing qstat.
+    # because the queue is so busy that we time out when checking queue status.
     if [ "$left" == "$last_left" -a "$left" != "-1" ]; then
       ((tries_remaining--))
       if [ $tries_remaining -le 0 ]; then

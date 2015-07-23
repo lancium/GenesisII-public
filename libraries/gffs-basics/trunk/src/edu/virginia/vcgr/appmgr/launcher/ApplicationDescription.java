@@ -33,12 +33,6 @@ public class ApplicationDescription
 	static final private String APPLICATION_CLASS_PROPERTY = BASE_PROP_NAME + "application-class";
 	static final private String FAKE_UPDATER_CLASS_VALUE = "edu.virginia.vcgr.appmgr.update.UpdaterClass";
 
-	/*
-	 * the optional environment variable that points at the installation location. this becomes required if one is running the software under
-	 * eclipse.
-	 */
-	// static public final String INSTALLATION_DIR_ENVIRONMENT_VARIABLE = "GENII_INSTALL_DIR";
-
 	private VersionManager _versionManager;
 	private String _applicationName;
 	private File _applicationDirectory;
@@ -156,10 +150,9 @@ public class ApplicationDescription
 
 	/**
 	 * returns the location where the code is running, as best as can be determined.
-	 * 
-	 * old: this uses the GENII_INSTALL_DIR if set, but it also can
-	 * 
-	 * find the running location based on jar files. this cannot use the properties to look up the path, because this function needs to
+	 * finds the running location based on our jar files, or if that's not available, on the
+     * assumption of app path being within
+     * an appropriate installation (even if not at the top). this method cannot use standard genesis properties to look up the path, because this function needs to
 	 * operate before anything else is loaded (for OSGi usage).
 	 */
 	static public String getInstallationDirectory()
@@ -190,11 +183,65 @@ public class ApplicationDescription
 			if (_logger.isTraceEnabled())
 				_logger.trace("truncated path since inside jar: " + appPath);
 		}
-		appPath = appPath.concat("/..");
+		appPath = appPath.concat("/..");		
+
 		if (_logger.isTraceEnabled())
 			_logger.trace("jar-intuited startup bundle path: " + appPath);
 
+		File startupDir = new File(appPath);
+		if (!startupDir.exists() || !startupDir.isDirectory()) {
+			throw new RuntimeException("the location where we believe the installation is running from does not actually exist as a directory.");
+		}
+		
+		
+		/* make sure we can find our own bundles directory, which is a crucial thing for osgi.  if we can't find it,
+		 then we really don't know where home is.*/
+		File testingBundlesDir = new File(startupDir, "bundles");
+		File testingExtDir = new File(startupDir, "ext");
+		String lastStartupDirState = "not-equal";
+		
+		while (!testingBundlesDir.exists() || !testingExtDir.exists()) {			
+			if (_logger.isDebugEnabled()) {
+				try {
+					_logger.debug("failed to find bundles directory at '" + startupDir.getCanonicalPath() + "', popping up a level.");
+				} catch (IOException e) {
+					_logger.error("failed to get canonical path of our startup directory: " + startupDir, e);
+					throw new RuntimeException(e);
+				}
+			}
+
+			if (lastStartupDirState.equals(startupDir.getAbsolutePath())) {
+				throw new RuntimeException("caught the startup directory not changing, which means we have hit the root and failed to find our bundles and ext directories.");
+			}
+			// reset for next time.
+			lastStartupDirState = startupDir.getAbsolutePath();
+			
+			// pop up a level, since we didn't find our bundles directory.
+			startupDir = new File(startupDir, "..");
+			testingBundlesDir = new File(startupDir, "bundles");
+			testingExtDir = new File(startupDir, "ext");
+
+			if (startupDir.getParent() == null) {
+				throw new RuntimeException("failed to find the bundles and ext directories after hitting top of file system paths.");
+			}
+		}
+	
+		// we successfully found the bundles directory, even if we may have had to jump a few hoops.
+		if (_logger.isDebugEnabled())
+			_logger.debug("successfully found bundles directory under path: " + appPath);	
+		
+		// now resolve the path to an absolute location without relative components.
+		try {
+			appPath = startupDir.getCanonicalPath();
+		} catch (IOException e) {
+			_logger.error("could not open osgi directory: " + appPath);
+		}
+
 		appPath = appPath.replace('\\', '/');
+
+		if (_logger.isDebugEnabled())
+			_logger.debug("startup path after resolution with File: " + appPath);
+
 		return appPath;
 	}
 	

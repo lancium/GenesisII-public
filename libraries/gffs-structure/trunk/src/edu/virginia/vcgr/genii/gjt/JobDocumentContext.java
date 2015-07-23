@@ -1,7 +1,5 @@
 package edu.virginia.vcgr.genii.gjt;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -29,23 +27,6 @@ import edu.virginia.vcgr.jsdl.sweep.Sweep;
 public class JobDocumentContext
 {
 	static private Logger _logger = Logger.getLogger(JobDocumentContext.class);
-
-	static private class JobDocumentClosedWindowAdapter extends WindowAdapter
-	{
-		private JobToolListener _listener;
-
-		private JobDocumentClosedWindowAdapter(JobToolListener listener)
-		{
-			_listener = listener;
-		}
-
-		@Override
-		final public void windowClosed(WindowEvent e)
-		{
-			_listener.jobWindowClosed();
-		}
-	}
-
 	private JobApplicationContext _applicationContext;
 
 	private ParameterizableBroker _pBroker;
@@ -59,13 +40,7 @@ public class JobDocumentContext
 
 	private GridJobToolFrame _frame;
 
-	private void setFrameTitle()
-	{
-		String filename = (_file == null) ? "New Job Document" : _file.getAbsolutePath();
-		_frame.setTitle(String.format("Grid Job Tool - %s%s", filename, _modified ? "*" : ""));
-	}
-
-	JobDocumentContext(JobApplicationContext applicationContext, File initialFile, JobToolListener listener) throws IOException
+	JobDocumentContext(JobApplicationContext applicationContext, File initialFile) throws IOException
 	{
 		_applicationContext = applicationContext;
 		_variableManager = new VariableManager();
@@ -90,15 +65,26 @@ public class JobDocumentContext
 			_modified = true;
 
 		_frame = GridJobToolFrame.createNewFrame(this);
-		if (listener != null)
-			_frame.addWindowListener(new JobDocumentClosedWindowAdapter(listener));
+//		if (listener != null)
+//			_frame.addWindowListener(new JobDocumentClosedWindowAdapter(listener));
 
 		setFrameTitle();
 
 		mBroker.addModificationListener(new ModificationListenerImpl());
 	}
 
-	void setInitial()
+	public GridJobToolFrame getFrame()
+	{
+		return _frame;
+	}
+
+	private void setFrameTitle()
+	{
+		String filename = (_file == null) ? "New Job Document" : _file.getAbsolutePath();
+		_frame.setTitle(String.format("Grid Job Tool - %s%s", filename, _modified ? "*" : ""));
+	}
+
+void setInitial()
 	{
 		_initial = true;
 	}
@@ -322,4 +308,22 @@ public class JobDocumentContext
 			setFrameTitle();
 		}
 	}
+
+//	static private class JobDocumentClosedWindowAdapter extends WindowAdapter
+//	{
+//		private JobToolListener _listener;
+//
+//		private JobDocumentClosedWindowAdapter(JobToolListener listener)
+//		{
+//			_listener = listener;
+//		}
+//
+//		@Override
+//		final public void windowClosed(WindowEvent e)
+//		{
+//			_listener.jobWindowClosed();
+//		}
+//	}
+
+
 }

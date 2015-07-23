@@ -26,6 +26,12 @@ public class DefaultDataStagingFacet extends DefaultPersonalityFacet implements 
 	}
 
 	@Override
+	public void consumeHandleAsArchiveFlag(Object currentUnderstanding, boolean HandleAsArchive) throws JSDLException
+	{
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "HandleAsArchiveFlag"));
+	}
+
+	@Override
 	public void consumeFileName(Object currentUnderstanding, String fileName) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "FileName"));

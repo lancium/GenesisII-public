@@ -237,7 +237,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			return false;
 		} else if (trustList.contains(null)) {
 			// ACL contains null (the wildcard certificate)
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("passing ACL access check due to wildcard in trust list");
 			return true;
 		} else {
@@ -245,7 +245,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			for (AclEntry entry : trustList) {
 				try {
 					if (entry.isPermitted(identity)) {
-						if (_logger.isDebugEnabled())
+						if (_logger.isTraceEnabled())
 							_logger.debug("passing ACL access check due to permission (for " + entry.toString() + ") on identity: "
 								+ ((identity != null) ? identity.describe(VerbosityLevel.HIGH) : "null"));
 						return true;

@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -35,7 +36,7 @@ public class JobApplicationContext
 	private JobDefinitionListener _generationListener;
 	private Collection<JobDocumentContext> _openDocuments = new LinkedList<JobDocumentContext>();
 
-	JobApplicationContext(Collection<File> initialFiles, JobDefinitionListener generationListener, JobToolListener toolListener)
+	JobApplicationContext(Collection<File> initialFiles, JobDefinitionListener generationListener)
 		throws IOException
 	{
 		_preferences = new ToolPreferences();
@@ -58,9 +59,9 @@ public class JobApplicationContext
 
 		if (initialFiles != null && initialFiles.size() > 0) {
 			for (File initialFile : initialFiles)
-				_openDocuments.add(new JobDocumentContext(this, initialFile, toolListener));
+				_openDocuments.add(new JobDocumentContext(this, initialFile));
 		} else {
-			JobDocumentContext ctxt = new JobDocumentContext(this, null, toolListener);
+			JobDocumentContext ctxt = new JobDocumentContext(this, null);
 			ctxt.setInitial();
 			_openDocuments.add(ctxt);
 		}
@@ -111,7 +112,7 @@ public class JobApplicationContext
 	{
 		try {
 			JobDocumentContext ctxt;
-			_openDocuments.add(ctxt = new JobDocumentContext(this, null, null));
+			_openDocuments.add(ctxt = new JobDocumentContext(this, null));
 			ctxt.start();
 		} catch (IOException ioe) {
 			// Won't happen since we aren't reading anything.
@@ -121,15 +122,27 @@ public class JobApplicationContext
 
 	public void openDocument(File source)
 	{
+		ArrayList<JobDocumentContext> toWhack = new ArrayList<JobDocumentContext>();
+
 		try {
 			JobDocumentContext ctxt;
-			ctxt = new JobDocumentContext(this, source, null);
+			ctxt = new JobDocumentContext(this, source);
+
 			if (_openDocuments.size() == 1 && _openDocuments.iterator().next().isInitial()) {
-				_openDocuments.iterator().next().close();
-				_openDocuments.clear();
+				// drop this guy after we've added the new guy.
+				toWhack.add(_openDocuments.iterator().next());
 			}
 			_openDocuments.add(ctxt);
 			ctxt.start();
+
+			/*
+			 * now clean up the list of documents we decided to remove.
+			 */
+			for (JobDocumentContext jc : toWhack) {
+				_openDocuments.remove(toWhack);
+				jc.close();
+			}
+
 		} catch (IOException ioe) {
 			JOptionPane.showMessageDialog(null, "Error opening project file.", "Error Opening Project File", JOptionPane.ERROR_MESSAGE);
 			_logger.error("Unable to open project file.", ioe);
@@ -180,7 +193,7 @@ public class JobApplicationContext
 		{
 			try {
 				JobDocumentContext ctxt;
-				_openDocuments.add(ctxt = new JobDocumentContext(JobApplicationContext.this, new File(event.getFilename()), null));
+				_openDocuments.add(ctxt = new JobDocumentContext(JobApplicationContext.this, new File(event.getFilename())));
 				ctxt.start();
 			} catch (IOException ioe) {
 				JOptionPane.showMessageDialog(null, "Error opening project file.", "Error Opening Project File", JOptionPane.ERROR_MESSAGE);
