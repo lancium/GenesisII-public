@@ -227,8 +227,9 @@ public class ApplicationDescription
 		}
 	
 		// we successfully found the bundles directory, even if we may have had to jump a few hoops.
-		if (_logger.isDebugEnabled())
-			_logger.debug("successfully found bundles directory under path: " + appPath);	
+		if (_logger.isTraceEnabled()) {
+			_logger.debug("successfully found bundles directory under path: " + appPath);
+		}
 		
 		// now resolve the path to an absolute location without relative components.
 		try {
@@ -239,7 +240,7 @@ public class ApplicationDescription
 
 		appPath = appPath.replace('\\', '/');
 
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("startup path after resolution with File: " + appPath);
 
 		return appPath;
