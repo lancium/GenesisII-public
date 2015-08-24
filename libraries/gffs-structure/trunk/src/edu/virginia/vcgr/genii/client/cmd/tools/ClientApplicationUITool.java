@@ -67,8 +67,7 @@ public class ClientApplicationUITool extends BaseGridTool
 			ca.dispose();
 		}
 
-		
-		//hmmm: abstract this to a method on basic frame window!
+		// hmmm: abstract this to a method on basic frame window!
 		while (true) {
 			ArrayList<BasicFrameWindow> frames = UIFrame.getFrameList();
 			for (BasicFrameWindow fram : frames) {

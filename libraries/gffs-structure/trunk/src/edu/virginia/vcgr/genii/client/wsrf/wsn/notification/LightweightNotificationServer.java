@@ -27,7 +27,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.DefaultNotificationMultiplexer;
@@ -147,7 +147,7 @@ public class LightweightNotificationServer
 		if (!_httpServer.isStarted())
 			throw new IOException("Server not started!");
 
-		return new EndpointReferenceType(new AttributedURIType(String.format(URL_PATTERN, _protocol, Hostname.getMostGlobal()
+		return new EndpointReferenceType(new AttributedURIType(String.format(URL_PATTERN, _protocol, ConfiguredHostname.getMostGlobal()
 			.getCanonicalHostName(), _httpServer.getConnectors()[0].getLocalPort())), null, null, null);
 	}
 

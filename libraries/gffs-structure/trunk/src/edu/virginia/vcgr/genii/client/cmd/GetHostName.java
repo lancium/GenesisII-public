@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 
 public class GetHostName
 {
@@ -19,7 +19,7 @@ public class GetHostName
 	static private InetAddress getMostGlobal() throws SocketException
 	{
 		try {
-			InetAddress addr = Hostname.getMostGlobal();
+			InetAddress addr = ConfiguredHostname.getMostGlobal();
 			return addr;
 		} catch (Throwable t) {
 			return null;

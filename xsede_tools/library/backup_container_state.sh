@@ -70,7 +70,7 @@ fi
 rm -rf "$GENII_USER_DIR/breadcrumbs"
 mkdir "$GENII_USER_DIR/breadcrumbs"
 # we will ignore any missing files, since some may not exist.
-cp -R "$GENII_INSTALL_DIR/context.xml"* "$GENII_INSTALL_DIR/container.properties" "$GENII_INSTALL_DIR/xsede_tools"/*cfg "$GENII_INSTALL_DIR/deployments" "$GENII_INSTALL_DIR/xsede_tools/tools/deployment_generator" "$GENII_USER_DIR/breadcrumbs" 2>/dev/null
+cp -R "$GENII_INSTALL_DIR/context.xml"* "$GENII_INSTALL_DIR/lib/container.properties" "$GENII_INSTALL_DIR/lib/client.properties" "$GENII_INSTALL_DIR/xsede_tools"/*cfg "$GENII_INSTALL_DIR/deployments" "$GENII_INSTALL_DIR/xsede_tools/tools/deployment_generator" "$GENII_USER_DIR/breadcrumbs" 2>/dev/null
 
 ( pushd / ;
 tar -czf $backup_file "$GENII_USER_DIR" ;

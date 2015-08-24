@@ -25,7 +25,7 @@ public class SMBBuffer
 		this.buffer = init;
 		this.offset = offset;
 
-		// XXX: should this be here
+		// future: should this be here
 		this.buffer.order(ByteOrder.LITTLE_ENDIAN);
 	}
 
@@ -513,7 +513,7 @@ public class SMBBuffer
 		h.encode(slice(0));
 	}
 
-	// XXX: move this stuff out of here
+	// future: move this stuff out of here
 
 	int paramBlockStart = -1;
 

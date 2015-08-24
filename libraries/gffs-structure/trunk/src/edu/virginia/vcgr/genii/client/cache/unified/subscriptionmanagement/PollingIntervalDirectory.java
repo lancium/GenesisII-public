@@ -18,7 +18,7 @@ public class PollingIntervalDirectory
 
 	public static final long DEFAULT_POLLING_INTERVAL = 15 * 1000L; // 15 seconds
 	public static final long MINIMUM_POLLING_INTERVAL = 5 * 1000L; // 5 seconds
-	public static final long MAXIMUM_POLLING_INTERVAL = 30 * 1000L; // was four minutes, decreased to 30 seconds 
+	public static final long MAXIMUM_POLLING_INTERVAL = 30 * 1000L; // was four minutes, decreased to 30 seconds
 
 	// The poller should test and update its polling interval every now and then. Otherwise
 	// the system will throw exception to block polling requests.

@@ -23,7 +23,8 @@ source "$GENII_INSTALL_DIR/scripts/installation_helpers.sh"
 ##############
 
 replace_compiler_variables "$GENII_INSTALL_DIR/RELEASE"
-replace_compiler_variables "$GENII_INSTALL_DIR/container.properties"
+replace_compiler_variables "$GENII_INSTALL_DIR/lib/container.properties"
+replace_compiler_variables "$GENII_INSTALL_DIR/lib/client.properties"
 
 replace_installdir_variables "$GENII_INSTALL_DIR"
 
@@ -52,6 +53,13 @@ ln -s "$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer" "$GENII_
 find "$GENII_INSTALL_DIR" -type d -exec chmod -c a+rx "{}" ';' &>/dev/null
 find "$GENII_INSTALL_DIR" -type f -exec chmod -c a+r "{}" ';' &>/dev/null
 find "$GENII_INSTALL_DIR" -type f -iname "*.sh" -exec chmod -c a+rx "{}" ';' &>/dev/null
+find "$GENII_INSTALL_DIR/JavaServiceWrapper" -type f -iname "wrap*" -exec chmod -c a+rx "{}" ';' &>/dev/null
+
+# special case for linux 64 bit, to avoid the wrapper using 32 bit version.
+archfound=$(arch)
+if [ "x86_64" == "$archfound" -o "amd64" == "$archfound" ]; then
+  \rm -f "$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/wrapper-linux-x86-32"
+fi
 
 ##############
 

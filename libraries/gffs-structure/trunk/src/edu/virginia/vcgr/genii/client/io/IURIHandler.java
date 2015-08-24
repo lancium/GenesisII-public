@@ -45,8 +45,8 @@ public interface IURIHandler
 	public boolean canWrite(String uriScheme);
 
 	/**
-	 * returns true if we can determine that the URI represents a directory. this check is not supported on all schemes and will return false on those.
-	 * returning false here means that either the uri is not a directory or does not exist or the scheme cannot tell.
+	 * returns true if we can determine that the URI represents a directory. this check is not supported on all schemes and will return false
+	 * on those. returning false here means that either the uri is not a directory or does not exist or the scheme cannot tell.
 	 */
 	public boolean isDirectory(URI uri);
 

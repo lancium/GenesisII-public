@@ -18,9 +18,8 @@ public class ContainerDataStage implements Serializable
 	private String _targetURI;
 	private UsernamePasswordIdentity _credentials;
 
-	public ContainerDataStage(FilesystemRelative<String> name, Boolean deleteOnTerminate,
-		Boolean handleAsArchive, CreationFlagEnumeration creationFlag,
-		String sourceURI, String targetURI, UsernamePasswordIdentity credentials)
+	public ContainerDataStage(FilesystemRelative<String> name, Boolean deleteOnTerminate, Boolean handleAsArchive,
+		CreationFlagEnumeration creationFlag, String sourceURI, String targetURI, UsernamePasswordIdentity credentials)
 	{
 		if (name == null)
 			throw new IllegalArgumentException("Data stage name cannot be null.");
@@ -49,7 +48,7 @@ public class ContainerDataStage implements Serializable
 
 	final public boolean handleAsArchive(boolean defaultValue)
 	{
-		return (_handleAsArchive== null) ? defaultValue : _handleAsArchive.booleanValue();
+		return (_handleAsArchive == null) ? defaultValue : _handleAsArchive.booleanValue();
 	}
 
 	final public CreationFlagEnumeration getCreationFlag(CreationFlagEnumeration defaultValue)

@@ -171,7 +171,7 @@ public class ApplicationBase
 			return GridStates.CONNECTION_ALREADY_GOOD;
 		}
 
-		String connectCmd = ContainerProperties.getContainerProperties().getConnectionCommand();
+		String connectCmd = ClientProperties.getClientProperties().getConnectionCommand();
 		if (_logger.isDebugEnabled())
 			_logger.debug("grid connection command is: " + connectCmd);
 		if ((connectCmd == null) || connectCmd.isEmpty()) {

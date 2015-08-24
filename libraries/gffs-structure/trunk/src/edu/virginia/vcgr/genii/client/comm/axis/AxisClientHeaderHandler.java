@@ -270,7 +270,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 					// if no delegation step performed at some point above, do it here.
 					if (!handledThisAlready) {
-						if (_logger.isDebugEnabled())
+						if (_logger.isTraceEnabled())
 							_logger.debug("outcall, normal trust delegation by: "
 								+ clientKeyAndCertificate._clientCertChain[0].getSubjectDN());
 
@@ -299,8 +299,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 				_logger.error("failed to find a TLS certificate to delegate to for outcall");
 			} else {
 				/*
-				 * extra credential 1: the idea here is that we need assurance that the source resource trusts this tls
-				 * certificate and therefore the recipient should also.
+				 * extra credential 1: the idea here is that we need assurance that the source resource trusts this tls certificate and
+				 * therefore the recipient should also.
 				 */
 				// this credential says that the resource trusts the tls connection cert.
 				TrustCredential newTC =

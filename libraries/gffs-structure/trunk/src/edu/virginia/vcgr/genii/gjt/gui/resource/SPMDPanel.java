@@ -30,6 +30,8 @@ class SPMDPanel extends TitledPanel
 			new NullableNumberSpinner(new NullableNumberSpinnerModel(context.jobDocument().numberOfProcesses(), 1, Long.MAX_VALUE, 1));
 		JSpinner procesPerHost =
 			new NullableNumberSpinner(new NullableNumberSpinnerModel(context.jobDocument().processesPerHost(), 1, Long.MAX_VALUE, 1));
+		JSpinner threadsPerProcess =
+			new NullableNumberSpinner(new NullableNumberSpinnerModel(context.jobDocument().threadsPerProcess(), 1, Long.MAX_VALUE, 1));
 
 		add(new JLabel("Parallel Environment"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
@@ -43,6 +45,11 @@ class SPMDPanel extends TitledPanel
 			new Insets(5, 5, 5, 5), 5, 5));
 		add(procesPerHost, new GridBagConstraints(5, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
 			5, 5, 5, 5), 5, 5));
+
+		add(new JLabel("Threads per Process"), new GridBagConstraints(6, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		add(threadsPerProcess, new GridBagConstraints(7, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	private class SPMDValueListener implements ItemListener

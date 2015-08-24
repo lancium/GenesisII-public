@@ -68,7 +68,7 @@ public class BasicFileOperator implements Closeable
 			_appendBuffer.close();
 
 		// New code to drain all of the pending writes ASG 2015
-		if (_writeResolver!=null )
+		if (_writeResolver != null)
 			_writeResolver.drain();
 		_readBuffer = null;
 		_writeBuffer = null;
@@ -87,7 +87,7 @@ public class BasicFileOperator implements Closeable
 			_appendBuffer = null;
 		}
 		// New code to drain all of the pending writes ASG 2015
-		if (_writeResolver!=null )
+		if (_writeResolver != null)
 			_writeResolver.drain();
 		if (_readBuffer == null)
 			_readBuffer = new ReadableBuffer(_leaser, _readResolver);
@@ -179,10 +179,10 @@ public class BasicFileOperator implements Closeable
 		{
 			throw new IOException("File is not writable.");
 		}
-		
-		
-		public void drain()  {
-		
+
+		public void drain()
+		{
+
 		}
 	}
 

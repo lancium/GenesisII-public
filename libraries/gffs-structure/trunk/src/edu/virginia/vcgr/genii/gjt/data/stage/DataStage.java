@@ -110,7 +110,7 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 			fireJobDescriptionModified();
 		_handleAsArchive = handleAsArchive;
 	}
-	
+
 	public CreationFlag creationFlag()
 	{
 		return _creationFlag;

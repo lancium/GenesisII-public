@@ -52,8 +52,8 @@ public class JobTool extends BaseGridTool
 		while (true) {
 			if (BasicFrameWindow.activeFrames(GridJobToolFrame.class) <= 0) {
 				/*
-				 * we have found that it's time to leave since there are no job tool frames left (although we really only think we'll see this as zero
-				 * and not negative).
+				 * we have found that it's time to leave since there are no job tool frames left (although we really only think we'll see this
+				 * as zero and not negative).
 				 */
 				break;
 			}
@@ -65,11 +65,10 @@ public class JobTool extends BaseGridTool
 		}
 
 		_logger.info("all job tool windows have exited; closing application.");
-		
+
 		for (EditableFile file : files)
 			StreamUtils.close(file);
-			
-		
+
 		return 0;
 	}
 

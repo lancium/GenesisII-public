@@ -24,7 +24,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
@@ -402,11 +402,11 @@ public class CertGeneratorTool extends BaseGridTool
 
 	static private String determineLocalMachineName() throws SocketException
 	{
-		return Hostname.getMostGlobal().getCanonicalHostName();
+		return ConfiguredHostname.getMostGlobal().getCanonicalHostName();
 	}
 
 	static private String determineLocalMachineIP() throws SocketException
 	{
-		return Hostname.getMostGlobal().getHostAddress();
+		return ConfiguredHostname.getMostGlobal().getHostAddress();
 	}
 }

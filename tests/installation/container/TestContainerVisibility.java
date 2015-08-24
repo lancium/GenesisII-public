@@ -9,16 +9,16 @@ import org.junit.Assert;
 // import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 
 public class TestContainerVisibility
 {
-	static private Hostname _hostname;
+	static private ConfiguredHostname _hostname;
 
 	// @BeforeClass
 	static public void beforeClassSetup()
 	{
-		_hostname = Hostname.getLocalHostname();
+		_hostname = ConfiguredHostname.lookupHost(null);
 	}
 
 	@Test

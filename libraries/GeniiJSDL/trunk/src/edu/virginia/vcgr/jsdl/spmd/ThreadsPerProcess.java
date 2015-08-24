@@ -40,12 +40,12 @@ public class ThreadsPerProcess implements Serializable
 	@XmlValue
 	private Long _value = null;
 
-	private ThreadsPerProcess()
-	{
-		this(null, null);
-	}
+	// private ThreadsPerProcess()
+	// {
+	// this(null, null);
+	// }
 
-	private ThreadsPerProcess(Long value, Boolean actualIndividualCPUCount)
+	public ThreadsPerProcess(Long value, Boolean actualIndividualCPUCount)
 	{
 		_actualIndividualCPUCount = actualIndividualCPUCount;
 		_value = value;

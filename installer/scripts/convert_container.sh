@@ -294,8 +294,13 @@ user_path="$(retrieve_compiler_variable genii.user-path)"
 
 # find the old deployment name.
 var="edu.virginia.vcgr.genii.container.deployment-name"
-file="$OLD_INSTALL/container.properties"
+file="$OLD_INSTALL/lib/container.properties"
 old_dep="$(seek_variable "$var" "$file")"
+if [ -z "$old_dep" ]; then
+  # try again in old location for file.
+  file="$OLD_INSTALL/container.properties"
+  old_dep="$(seek_variable "$var" "$file")"
+fi
 if [ -z "$old_dep" ]; then complain_re_missing_deployment_variable; fi
 
 # find the hostname for the container.

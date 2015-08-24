@@ -32,8 +32,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
-public class RNSURIHandler extends AbstractURIHandler 
-//implements IURIHandler
+public class RNSURIHandler extends AbstractURIHandler
+// implements IURIHandler
 {
 	static private Log _logger = LogFactory.getLog(RNSURIHandler.class);
 
@@ -91,13 +91,13 @@ public class RNSURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	public boolean isDirectory(URI uri) 
+	public boolean isDirectory(URI uri)
 	{
 		RNSPath path = RNSPath.getCurrent();
 		try {
 			path = path.lookup(uri.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
 		} catch (RNSPathDoesNotExistException | RNSPathAlreadyExistsException e) {
-			// we return false, since we couldn't find the uri probably. 
+			// we return false, since we couldn't find the uri probably.
 			return false;
 		}
 		if (_logger.isDebugEnabled())
@@ -118,7 +118,6 @@ public class RNSURIHandler extends AbstractURIHandler
 		return path.pwd();
 	}
 
-
 	@Override
 	public DataTransferStatistics copyDirectoryDown(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
@@ -131,16 +130,15 @@ public class RNSURIHandler extends AbstractURIHandler
 		if (_logger.isDebugEnabled())
 			_logger.debug(String.format("copying directory down from \"%s\" to \"%s\".", path.pwd(), target.getAbsolutePath()));
 
-		CopyMachine cm = new CopyMachine(path.pwd(), "local:" + target.getAbsolutePath(), 
-			null, false, null, null);		
+		CopyMachine cm = new CopyMachine(path.pwd(), "local:" + target.getAbsolutePath(), null, false, null, null);
 		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
 
 		PathOutcome outcome = cm.copyTree();
 		if (outcome != PathOutcome.OUTCOME_SUCCESS) {
 			throw new IOException("failure in tree copy operation: " + PathOutcome.outcomeText(outcome));
-		}		
-		stats .finishTransfer();
-		
+		}
+		stats.finishTransfer();
+
 		return stats;
 	}
 
@@ -157,18 +155,17 @@ public class RNSURIHandler extends AbstractURIHandler
 			_logger.debug("unexpected already exists exception on: " + target.getSchemeSpecificPart());
 		}
 		if (_logger.isDebugEnabled())
-			_logger.debug(String.format("copying directory up from \"%s\" to \"%s\".", source.getAbsolutePath(), path.pwd() ));
+			_logger.debug(String.format("copying directory up from \"%s\" to \"%s\".", source.getAbsolutePath(), path.pwd()));
 
-		CopyMachine cm = new CopyMachine("local:" + source.getAbsolutePath(), path.pwd(),
-			null, false, null, null);
-		
+		CopyMachine cm = new CopyMachine("local:" + source.getAbsolutePath(), path.pwd(), null, false, null, null);
+
 		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
 
 		PathOutcome outcome = cm.copyTree();
 		if (outcome != PathOutcome.OUTCOME_SUCCESS) {
 			throw new IOException("failure in tree copy operation: " + PathOutcome.outcomeText(outcome));
 		}
-		stats .finishTransfer();		
+		stats.finishTransfer();
 		return stats;
 	}
 }

@@ -96,7 +96,7 @@ public class ReadRequest extends DefaultRequest
 			bytes_read = bis.read(contents, 0, contents.length);
 			if (bytes_read == -1) {
 				if (successResponse) {
-					// XXX: Server could 've sent a smaller response!
+					// future: Server could've sent a smaller response!
 					return new ReadResponse(0, read_buff);
 				} else {
 					return new ReadResponse(-1, Constants.SMALL_RESPONSE_ERROR);

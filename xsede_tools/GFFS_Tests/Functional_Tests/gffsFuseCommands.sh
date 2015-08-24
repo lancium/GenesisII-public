@@ -15,6 +15,13 @@ fi
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 1; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
+# how long should we snooze before checking that fuse has gotten the
+# notification that new files are available?
+FUSE_SNOOZE_TIME=34
+# how many times we should test that fuse sees a new file in the grid.
+#FUSE_COPY_COUNT=1
+FUSE_COPY_COUNT=20
+
 # where we hook in the fuse mount.
 MOUNT_POINT="$TEST_TEMP/mount-gffsFuseCommands"
 # the user's home directory from fuse perspective.
@@ -24,13 +31,6 @@ TESTING_DIR="$HOME_DIR/fuse-test"
 TESTING_DIR_ALTERNATE="$HOME_DIR/fuse-test-alt"
 # the main testing directory from grid's perspective.
 GRID_TEST_DIR=$RNSPATH/fuse-test
-
-# how long should we snooze before checking that fuse has gotten the
-# notification that new files are available?
-FUSE_SNOOZE_TIME=11
-# how many times we should test that fuse sees a new file in the grid.
-FUSE_COPY_COUNT=1
-#FUSE_COPY_COUNT=100
 
 oneTimeSetUp()
 {

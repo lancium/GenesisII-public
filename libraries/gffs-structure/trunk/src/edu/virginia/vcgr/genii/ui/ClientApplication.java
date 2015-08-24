@@ -108,10 +108,10 @@ public class ClientApplication extends UIFrame
 					((LazilyLoadedTab) jc).load();
 			}
 		});
-		
+
 		// We're opening a particular directory, not root
 		_browserTree = new RNSTree(getUIContext().applicationContext(), _uiContext, startPath, ShowWhichTypes.DIRECTORIES_AND_FILES);
-		
+
 		JScrollPane scroller = new JScrollPane(_browserTree);
 		scroller.setMinimumSize(RNSTree.DESIRED_BROWSER_SIZE);
 		scroller.setPreferredSize(RNSTree.DESIRED_BROWSER_SIZE);
@@ -183,7 +183,7 @@ public class ClientApplication extends UIFrame
 		for (String activity : pending) {
 			if (activity.equals(SELECT_FILEBROWSER_TOP)) {
 				// update to select the file list's first element.
-//not here yet:				_fileList.setSelectionPath(_fileList.getPathForRow(0));
+				// not here yet: _fileList.setSelectionPath(_fileList.getPathForRow(0));
 			}
 		}
 	}

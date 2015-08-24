@@ -59,8 +59,8 @@ public class SweepingJob extends ethread
 	 */
 	public SweepingJob(String ownTicket)
 	{
-		//future: this function is by no means complete if we want to actually resume a sweeping job.
-		
+		// future: this function is by no means complete if we want to actually resume a sweeping job.
+
 		_ownTicket = ownTicket;
 		_logger.warn("check if this is right ticket id, deserialized from db: " + _ownTicket);
 	}
@@ -202,11 +202,11 @@ public class SweepingJob extends ethread
 					 * future: sweeping job also needs to update its state regularly! maybe not for every single job, but certainly either
 					 * periodically or for each Nth job. anyway, here is a good place to update the state, since we are acting on the state!
 					 * unfortunately, the record we keep is in the calling context, so we'd be doing way too much work if we reloaded modified
-					 * and stored the context back every time.  instead, we should do it like every 10th job or something, and definitely at
+					 * and stored the context back every time. instead, we should do it like every 10th job or something, and definitely at
 					 * the completion of the sweep.
 					 */
 
-					_subJobCount++;  // we're hitting a new job.
+					_subJobCount++; // we're hitting a new job.
 					// we make an identifier using the guid of the sweeper with our sub-job counter attached.
 					String ticken = _ownTicket + String.format("%d", _subJobCount);
 					// drop the job into the queue using our pre-arranged ticket id.

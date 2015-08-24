@@ -78,8 +78,8 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 			} else {
 				stats = URIManager.get(_source, _target, _usernamePassword);
 			}
-			history.createTraceWriter("%s: %d Bytes Transferred", _target.getName(), stats.bytesTransferred()).format(
-				"%d bytes were transferred in %d ms.", stats.bytesTransferred(), stats.transferTime()).close();
+			history.createTraceWriter("%s: %d Bytes Transferred", _target.getName(), stats.bytesTransferred())
+				.format("%d bytes were transferred in %d ms.", stats.bytesTransferred(), stats.transferTime()).close();
 			/*
 			 * The file has been transfered. Now we check if it is a zip, tar, or gz. If so we need to extract the directory name to put it
 			 * in, and check if the directory already exists. If the unzip/untar/ungz target directory already exists DO NOT UNPACK IT
@@ -183,8 +183,8 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 			}
 
 		} catch (Throwable cause) {
-			history.createErrorWriter(cause, "Error staging in to %s", _target.getName()).format("Error staging in from %s to %s.", _source,
-				_target).close();
+			history.createErrorWriter(cause, "Error staging in to %s", _target.getName())
+				.format("Error staging in from %s to %s.", _source, _target).close();
 			throw cause;
 		}
 	}

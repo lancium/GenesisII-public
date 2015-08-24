@@ -154,12 +154,12 @@ public class JSDLFormer
 	{
 		HashMap<String, DataStaging_Type> stages = new HashMap<String, DataStaging_Type>();
 		// Here is Andrew's first "code"
-		
-		//hmmm: why are the stage constructors using default values for the delete on term and handle as archive below?
-		
+
+		// hmmm: why are the stage constructors using default values for the delete on term and handle as archive below?
+
 		for (String stage : _stageIn.keySet()) {
-			stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE, Boolean.TRUE, new SourceTarget_Type(
-				_stageIn.get(stage), null), null, null, null));
+			stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE, Boolean.TRUE,
+				new SourceTarget_Type(_stageIn.get(stage), null), null, null, null));
 		}
 
 		for (String stage : _stageOut.keySet()) {

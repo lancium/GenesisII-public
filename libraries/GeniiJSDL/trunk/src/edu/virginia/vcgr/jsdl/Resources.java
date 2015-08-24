@@ -62,6 +62,10 @@ public class Resources extends CommonJSDLElement implements Serializable
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "IndividualCPUCount")
 	private RangeValue _individualCPUCount = null;
 
+	// hmmm: no analog exists for this for threads as far as i can tell.
+	// @XmlElement(namespace = JSDLConstants.JSDL_NS, name = "IndividualThreadCount")
+	// private RangeValue _individualThreadCount = null;
+
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "IndividualNetworkBandwidth")
 	private RangeValue _individualNetworkBandwidth = null;
 

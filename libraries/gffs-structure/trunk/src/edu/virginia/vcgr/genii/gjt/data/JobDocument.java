@@ -70,6 +70,7 @@ import edu.virginia.vcgr.jsdl.spmd.NumberOfProcesses;
 import edu.virginia.vcgr.jsdl.spmd.ProcessesPerHost;
 import edu.virginia.vcgr.jsdl.spmd.SPMDApplication;
 import edu.virginia.vcgr.jsdl.spmd.SPMDConstants;
+import edu.virginia.vcgr.jsdl.spmd.ThreadsPerProcess;
 import edu.virginia.vcgr.jsdl.sweep.Sweep;
 import edu.virginia.vcgr.jsdl.sweep.SweepAssignment;
 import edu.virginia.vcgr.jsdl.sweep.SweepFunction;
@@ -144,6 +145,9 @@ public class JobDocument implements PostUnmarshallListener
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "processes-per-host")
 	private SettableLong _processesPerHost;
+
+	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "threads-per-process")
+	private SettableLong _threadsPerProcess;
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "stage-in")
 	private StageList _stageIns;
@@ -337,6 +341,22 @@ public class JobDocument implements PostUnmarshallListener
 			builder.pop();
 			builder.pop();
 		}
+
+		// hmmm: all made up, not sure if we need a similar section like this:
+		// if (_threadsPerProcess.value() != null) {
+		// if (resources == null)
+		// resources = new Resources();
+		// builder.push(new DefaultXPathNode("http://vcgr.cs.virginia.edu/jsdl/genii", "IndividualThreadsPerProcess"));
+		// builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
+		//
+		// RangeValue rv = new RangeValue();
+		//
+		// rv.upperBoundedRange(new Boundary(_threadsPerProcess.value()));
+		// resources.individualThreadsPerProcess(rv);
+		//
+		// builder.pop();
+		// builder.pop();
+		// }
 
 		if (_matchingParameters.size() > 0) {
 			if (resources == null)
@@ -613,8 +633,14 @@ public class JobDocument implements PostUnmarshallListener
 		 */
 		application.spmdVariation(_spmdVariation.variationURI());
 		application.numberOfProcesses(NumberOfProcesses.numberOfProccesses(_numberOfProcesses.value()));
+
 		if (_processesPerHost.value() != null)
 			application.processesPerHost(new ProcessesPerHost(_processesPerHost.value()));
+
+		// hmmm: where does this object get set? must do like the processes per host
+		if (_threadsPerProcess.value() != null)
+			application.threadsPerProcess(new ThreadsPerProcess(_threadsPerProcess.value(), null));
+
 		builder.pop();
 
 		if (modified)
@@ -662,8 +688,8 @@ public class JobDocument implements PostUnmarshallListener
 
 		builder.pop();
 
-		DataStaging staging = new DataStaging(results.first(), dataStage.creationFlag(), dataStage.deleteOnTerminate(),
-			dataStage.handleAsArchive());
+		DataStaging staging =
+			new DataStaging(results.first(), dataStage.creationFlag(), dataStage.deleteOnTerminate(), dataStage.handleAsArchive());
 
 		FilesystemType fsType = dataStage.filesystemType();
 		if (JSDLGenerator.indicatesFilesystem(fsType)) {
@@ -764,6 +790,9 @@ public class JobDocument implements PostUnmarshallListener
 
 		if (_processesPerHost == null)
 			_processesPerHost = new SettableLong(parameterBroker, modificationBroker);
+
+		if (_threadsPerProcess == null)
+			_threadsPerProcess = new SettableLong(parameterBroker, modificationBroker);
 
 		if (_stageIns == null)
 			_stageIns = new StageList(parameterBroker, modificationBroker, true);
@@ -902,6 +931,11 @@ public class JobDocument implements PostUnmarshallListener
 		return _processesPerHost;
 	}
 
+	public SettableLong threadsPerProcess()
+	{
+		return _threadsPerProcess;
+	}
+
 	public StageList stageIns()
 	{
 		return _stageIns;
@@ -994,9 +1028,9 @@ public class JobDocument implements PostUnmarshallListener
 
 		JobIdentification jobIdent = generateJobIdentification(builder, variables);
 		Application application = generateApplication(builder, variables, filesystemSet);
-		
+
 		Collection<DataStaging> cds = generateDataStaging(builder, variables, filesystemSet);
-		
+
 		Resources resources = generateResources(builder, variables, filesystemSet);
 
 		JobDescription jobDesc = new JobDescription(jobIdent, application, resources);

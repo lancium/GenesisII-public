@@ -35,7 +35,7 @@ import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -96,7 +96,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 
 	static public String getName()
 	{
-		return Hostname.getLocalHostname().toString();
+		return (new ConfiguredHostname()).getExternalName();
 	}
 
 	static public int getTotalNumberOfActivities() throws ResourceUnknownFaultType, ResourceException, RemoteException, SQLException

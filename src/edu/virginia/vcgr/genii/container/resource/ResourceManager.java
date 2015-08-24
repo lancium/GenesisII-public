@@ -1,10 +1,8 @@
 package edu.virginia.vcgr.genii.container.resource;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
@@ -16,7 +14,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
-import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.EmptyType;
 import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.IncludeTokenOpenType;
 import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.IncludeTokenType;
@@ -35,6 +32,7 @@ import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
+import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -42,7 +40,6 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.container.ContainerConstants;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
-import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -66,8 +63,9 @@ import edu.virginia.vcgr.genii.security.axis.WSSecurityUtils;
 public class ResourceManager
 {
 	static private Log _logger = LogFactory.getLog(ResourceManager.class);
-	private static Properties p = null;
-	static final String NO_X509_CLASS_LIST = "NO_X509_CLASS_LIST";
+
+	// used to limit the reporting of the EPR construction properties setting to one time.
+	static Boolean reportedAlready = false;
 
 	static public ResourceKey getTargetResource(String serviceName, String resourceKey) throws ResourceException, ResourceUnknownFaultType
 	{
@@ -177,29 +175,30 @@ public class ResourceManager
 	static private void MetaDataSecurityToken(ArrayList<MessageElement> metaDataAny, IResource resource) throws ResourceException
 	{
 		String serviceName = ((ResourceKey) resource.getParentResourceKey()).getServiceName();
+
 		// ASG 2014-01-11
 		// This is where the list of classes that do not get their own X.509 goes
 		Boolean matches = false;
-		// Let's first load the EPRConstruction properties file
-		if (p == null) {
-			p = new Properties();
-			InputStream in = HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/EPRConstruction.properties");
-			try {
-				p.load(in);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			} finally {
-				StreamUtils.close(in);
+
+		// Get the list of classes that should NOT have an X.509 in their EPR
+		String noX509List = ContainerProperties.getContainerProperties().getEPRConstructionProperties();
+		synchronized (reportedAlready) {
+			if (noX509List == null) {
+				noX509List = "LightWeightExportPortType";
+				if (!reportedAlready)
+					_logger.warn("Could not find EPRConstruction property: " + ContainerProperties.NO_X509_CLASS_LIST
+						+ "; so using default value: " + noX509List);
+			} else {
+				if (!reportedAlready)
+					_logger.info("EPRConstruction property says no X509 for these services: " + noX509List);
 			}
+			// don't bother saying anything about the properties again.
+			reportedAlready = true;
 		}
-		// Then get the list of classes that should NOT have an X.509 in their EPR
-		String r = p.getProperty(NO_X509_CLASS_LIST);
-		if (r == null) {
-			throw new RuntimeException("Could not find config/EPRConstructon.properties " + NO_X509_CLASS_LIST);
-		}
+
 		// ASG: 2014-01-21 Now check the serviceName against the list of classes in which we do put
 		// X.509 certs, e.g. LightWeightExportPortType
-		StringTokenizer tokenCollector = new StringTokenizer(r, ":");
+		StringTokenizer tokenCollector = new StringTokenizer(noX509List, ":");
 		while (tokenCollector.hasMoreTokens()) {
 			String className = tokenCollector.nextToken();
 			if (serviceName.equalsIgnoreCase(className))

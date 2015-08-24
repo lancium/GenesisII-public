@@ -133,6 +133,11 @@ if [ "$BES_TYPE" = "Genesis" ]; then
   # async test is currently enabled for multi-instance testing, and does not
   # clean up after itself.  the submission point test will clean up.
   EMS_TESTS+=(EMS_Tests/rnsEnabledBESTests/bes-test-submission-point.sh)
+
+  # this is a new test for staging of directories.  it does stage-in and
+  # stage-out in the same job.
+#not ready yet.
+#  EMS_TESTS+=(EMS_Tests/directoryStaging/testStagingDirectories.sh)
 else
   # Unicore specific tests...
   if [ ! -z "TEST_PARALLEL_JOBS" ]; then

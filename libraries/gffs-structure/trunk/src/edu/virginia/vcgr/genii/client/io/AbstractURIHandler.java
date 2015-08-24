@@ -30,7 +30,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 	public abstract InputStream openInputStream(URI source, UsernamePasswordIdentity credential) throws IOException;
 
 	public abstract OutputStream openOutputStream(URI target, UsernamePasswordIdentity credential) throws IOException;
-	
+
 	@Override
 	public abstract String getLocalPath(URI uri) throws IOException;
 
@@ -44,16 +44,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 	final public DataTransferStatistics get(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
 		IOException lastException = null;
-
-		// hmmm: support directories here also!!!!
-
-		// hmmm: right here does seem like the place to fork;
-		// the existing methods are all calling getinternal which goes directory to creating streams and expecting that to work.
-
-		// hmmm: we need new methods on uri handler for copying a directory!
-
 		int attempt = 0;
-
 		for (attempt = 0; attempt < NUM_RETRIES; attempt++) {
 			try {
 				return getInternal(source, target, credential);
@@ -99,8 +90,8 @@ public abstract class AbstractURIHandler implements IURIHandler
 	protected DataTransferStatistics getInternal(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
 		if (_logger.isDebugEnabled())
-			_logger.debug("getInternal: source='" +  source.getSchemeSpecificPart() + "' target='" + target.getAbsolutePath()+ "'");
-		
+			_logger.debug("getInternal: source='" + source.getSchemeSpecificPart() + "' target='" + target.getAbsolutePath() + "'");
+
 		if (isDirectory(source)) {
 			return copyDirectoryDown(source, target, credential);
 		} else {
@@ -122,7 +113,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 	protected DataTransferStatistics putInternal(File source, URI target, UsernamePasswordIdentity credential) throws IOException
 	{
 		if (_logger.isDebugEnabled())
-			_logger.debug("putInternal: source='" +  source.getAbsolutePath() + "' target='" + target.getSchemeSpecificPart()+ "'");
+			_logger.debug("putInternal: source='" + source.getAbsolutePath() + "' target='" + target.getSchemeSpecificPart() + "'");
 
 		if (source.isDirectory()) {
 			return copyDirectoryUp(source, target, credential);

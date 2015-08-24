@@ -46,9 +46,9 @@ public class NotificationMessageIndexProcessor
 		int messageIndexOfBroker = broker.getLastReceivedMessageIndex();
 		if (receivedMessageIndex > messageIndexOfBroker + 1) {
 			/*
-			 * TODO: Some messages are missing. Need to discard the cached resources of concerned container. However, we have to consider that
-			 * the missing notification messages may be delayed therefore can reach the client shortly. If the broker is in polling mode then
-			 * it may be polling notifications or immediately going to poll. Therefore, we need a careful technique for fault tolerance.
+			 * future: Some messages are missing. Need to discard the cached resources of concerned container. However, we have to consider
+			 * that the missing notification messages may be delayed therefore can reach the client shortly. If the broker is in polling mode
+			 * then it may be polling notifications or immediately going to poll. Therefore, we need a careful technique for fault tolerance.
 			 */
 		}
 

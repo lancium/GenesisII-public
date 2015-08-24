@@ -64,7 +64,7 @@ public class CILogonClient
 	private HttpClientContext _defaultContext = null;
 	private CookieStore _cookieJar = new BasicCookieStore();
 
-	// TODO probably needs to be moved out to a config file somewhere
+	// future: probably needs to be moved out to a config file somewhere.
 	// URL of the CILogon service
 	private final String CILogonURL = "https://ecp.cilogon.org/secure/getcert/";
 

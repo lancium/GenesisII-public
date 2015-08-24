@@ -478,8 +478,9 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				stc.checkTrust(delegation.getXMLBeanDoc());
 				_logger.debug("SUCCESS checking trust delegation just made.");
 			} catch (Exception e) {
-				_logger.error("exception checking signature just made for cred: " + toString() + " and last few frames are: "
-					+ ProgramTools.showLastFewOnStack(28), e);
+				_logger.error(
+					"exception checking signature just made for cred: " + toString() + " and last few frames are: "
+						+ ProgramTools.showLastFewOnStack(28), e);
 			}
 
 			AssertionDocument doc = delegation.getXMLBeanDoc();
@@ -882,14 +883,14 @@ public class TrustCredential implements NuCredential, RWXAccessible
 						+ ", orig=" + toCheck.getDelegationDepth());
 				}
 
-				if (!tc.getIssuer()[0].getSubjectX500Principal().toString().equals(
-					toCheck.getIssuer()[0].getSubjectX500Principal().toString())) {
+				if (!tc.getIssuer()[0].getSubjectX500Principal().toString()
+					.equals(toCheck.getIssuer()[0].getSubjectX500Principal().toString())) {
 					throw new IOException("issuer disagrees in reconstituted credential: original="
 						+ toCheck.getIssuer()[0].getSubjectX500Principal() + " recons=" + tc.getIssuer()[0].getSubjectX500Principal());
 				}
 
-				if (!tc.getDelegatee()[0].getSubjectX500Principal().toString().equals(
-					toCheck.getDelegatee()[0].getSubjectX500Principal().toString())) {
+				if (!tc.getDelegatee()[0].getSubjectX500Principal().toString()
+					.equals(toCheck.getDelegatee()[0].getSubjectX500Principal().toString())) {
 					throw new IOException("delegatee disagrees in reconstituted credential: original="
 						+ toCheck.getDelegatee()[0].getSubjectX500Principal() + " recons=" + tc.getDelegatee()[0].getSubjectX500Principal());
 				}

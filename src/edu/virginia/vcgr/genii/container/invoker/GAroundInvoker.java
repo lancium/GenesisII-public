@@ -22,7 +22,8 @@ public class GAroundInvoker extends RPCProvider
 	protected Object invokeMethod(MessageContext msgContext, Method method, Object obj, Object[] argValues) throws Exception
 	{
 		Method realMethod = obj.getClass().getMethod(method.getName(), method.getParameterTypes());
-		_logger.debug("invoking: " + realMethod.toString());
+		if (_logger.isTraceEnabled())
+			_logger.debug("invoking: " + realMethod.toString());
 		IAroundInvoker[] handlers;
 		synchronized (_cachedHandlers) {
 			handlers = _cachedHandlers.get(realMethod);
@@ -62,7 +63,7 @@ public class GAroundInvoker extends RPCProvider
 		if (annotation != null) {
 			Class<? extends IAroundInvoker>[] handlers = annotation.value();
 			for (Class<? extends IAroundInvoker> handler : handlers) {
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("adding case1 handler: " + handler.toString() + " for method: " + m.toString());
 				invokers.add(getInvoker(handler));
 			}
@@ -79,7 +80,7 @@ public class GAroundInvoker extends RPCProvider
 			if (annotation != null) {
 				Class<? extends IAroundInvoker>[] handlers = annotation.value();
 				for (Class<? extends IAroundInvoker> handler : handlers) {
-					if (_logger.isDebugEnabled())
+					if (_logger.isTraceEnabled())
 						_logger.debug("adding case2 handler: " + handler.toString() + " for method: " + m.toString());
 					invokers.add(getInvoker(handler));
 				}
@@ -91,7 +92,7 @@ public class GAroundInvoker extends RPCProvider
 		InstantiationException, InvocationTargetException
 	{
 		Constructor<? extends IAroundInvoker> cons = cl.getConstructor(new Class[0]);
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("creating invoker for: " + cl.toString());
 		return cons.newInstance(new Object[0]);
 	}

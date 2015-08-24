@@ -181,7 +181,7 @@ public class InCommonLoginTool extends BaseLoginTool
 				_logger.debug("preferred identity set in incommon login: " + newIdentity.toString());
 			}
 
-			// TODO Needs to be adjusted after permanent policy location is determined.
+			// future: Needs to be adjusted after permanent policy location is determined.
 			targetPath = STANDARD_PREFIX + _username;
 
 			// we're going to use the WS-TRUST token-issue operation to log in to a security tokens
@@ -273,8 +273,9 @@ public class InCommonLoginTool extends BaseLoginTool
 		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
 		if (_idpUrl == null) {
-			// TODO get these from server instead of hard code
-			// list hosted at: https://cilogon.org/include/ecpidps.txt
+			/*
+			 * future: get these from server instead of hard code; list hosted at: https://cilogon.org/include/ecpidps.txt
+			 */
 			try {
 				ComboBoxDialog idpDialog =
 					provider.createSingleListSelectionDialog("IDP Choice", "Please choose IDP", new SimpleMenuItem("ProtectNetwork",

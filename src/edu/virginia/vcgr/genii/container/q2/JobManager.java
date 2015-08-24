@@ -237,6 +237,8 @@ public class JobManager implements Closeable
 					identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 					String username = identities.iterator().next().toString();
+					if (_logger.isDebugEnabled())
+						_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
 					SortableJobKey jobKey = new SortableJobKey(job.getJobID(), job.getPriority(), job.getSubmitTime());
 
@@ -327,9 +329,11 @@ public class JobManager implements Closeable
 		/* Increment his attempt count if this counts against him. */
 		if (countAsAnAttempt) {
 			if (isPermanent) {
-				job.history(HistoryEventCategory.Terminating).createErrorWriter("Permanently Failing Job").format(
-					"We have determined that a job failure is permanent and "
-						+ "are boosting the attempt number up to the max to reflect this.").close();
+				job.history(HistoryEventCategory.Terminating)
+					.createErrorWriter("Permanently Failing Job")
+					.format(
+						"We have determined that a job failure is permanent and "
+							+ "are boosting the attempt number up to the max to reflect this.").close();
 
 				job.incrementRunAttempts(MAX_RUN_ATTEMPTS - job.getRunAttempts());
 			} else {
@@ -356,8 +360,8 @@ public class JobManager implements Closeable
 				_logger.debug(String.format("Moving job %s to ERROR state because we exceeded the maximum retry attempts.", job));
 			newState = QueueStates.ERROR;
 		} else {
-			job.history(HistoryEventCategory.ReQueing).createTraceWriter("Re-queuing Job").format(
-				"Re-queuing Job.  The job will " + "be removed from the runnable list until %tc.", job.getNextCanRun()).close();
+			job.history(HistoryEventCategory.ReQueing).createTraceWriter("Re-queuing Job")
+				.format("Re-queuing Job.  The job will " + "be removed from the runnable list until %tc.", job.getNextCanRun()).close();
 
 			/* Otherwise, we'll just requeue him */
 			if (_logger.isDebugEnabled())
@@ -443,10 +447,6 @@ public class JobManager implements Closeable
 			_database.incrementFinishCount(connection);
 
 			if (besName == null) {
-				
-				//hmmm: clean up.
-				_logger.debug("going to call modify job state for the non-bes job now!");
-				
 				/* handle a non-BES job by setting the state right now. this is because there is no job killer to deal with this later for us. */
 				_database
 					.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null, null);
@@ -666,6 +666,10 @@ public class JobManager implements Closeable
 			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
+
 			if (!_usersWithJobs.keySet().contains(username)) {
 				// This user has no jobs in the queue, add a set for him
 				TreeMap<SortableJobKey, JobData> jobs = new TreeMap<SortableJobKey, JobData>();
@@ -744,8 +748,8 @@ public class JobManager implements Closeable
 			if (MyProxyCertificate.isAvailable())
 				MyProxyCertificate.reset();
 
-			history.createInfoWriter("Queue Accepted Sweep Job").format("Queue accepted parameter sweep job with ticket %s (job-id = %d).",
-				tickynum, jobID).close();
+			history.createInfoWriter("Queue Accepted Sweep Job")
+				.format("Queue accepted parameter sweep job with ticket %s (job-id = %d).", tickynum, jobID).close();
 
 			/*
 			 * The data has been committed into the database so we can reload to this point from here on out.
@@ -773,6 +777,10 @@ public class JobManager implements Closeable
 			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
+
 			if (!_usersWithJobs.keySet().contains(username)) {
 				// This user has no jobs in the queue, add a set for him
 				TreeMap<SortableJobKey, JobData> jobs = new TreeMap<SortableJobKey, JobData>();
@@ -1167,10 +1175,11 @@ public class JobManager implements Closeable
 		try {
 
 			if (isAdmin || (QueueSecurity.isOwner(pji.getOwners(), callers))) {
-				return (new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()), JobStateEnumerationType
-					.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(), QueueUtils.convert(jobData.getSubmitTime()),
-					QueueUtils.convert(pji.getStartTime()), QueueUtils.convert(pji.getFinishTime()), new UnsignedShort(jobData
-						.getRunAttempts()), scheduledOn, jobData.getBESActivityStatus(), jobData.jobName()));
+				return (new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
+					JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
+					QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()), QueueUtils.convert(pji
+						.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn, jobData.getBESActivityStatus(),
+					jobData.jobName()));
 			}
 
 			else
@@ -1908,8 +1917,8 @@ public class JobManager implements Closeable
 
 			HistoryContext history = job.history(HistoryEventCategory.Checking);
 
-			history.createTraceWriter("Checking Running Job Status").format(
-				"Checking job status as the result of a received asynchronous notification.").close();
+			history.createTraceWriter("Checking Running Job Status")
+				.format("Checking job status as the result of a received asynchronous notification.").close();
 
 			/*
 			 * For convenience, we bundle together the id's of the job to check, and the bes container on which it is running.
@@ -2216,8 +2225,8 @@ public class JobManager implements Closeable
 			if (data == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-			data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested").format(
-				"Request to terminate job from outside the queue").close();
+			data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
+				.format("Request to terminate job from outside the queue").close();
 
 			jobsToKill.add(new Long(data.getJobID()));
 		}
@@ -2238,8 +2247,8 @@ public class JobManager implements Closeable
 			if (!QueueSecurity.isOwner(pji.getOwners())) {
 				GenesisIISecurityException t =
 					new GenesisIISecurityException("Don't have permission to kill job \"" + jobData.getJobTicket() + "\".");
-				jobData.history(HistoryEventCategory.Terminating).createWarnWriter("Termination Request Denied").format(
-					"Denying termination request.  Caller not authorized.").close();
+				jobData.history(HistoryEventCategory.Terminating).createWarnWriter("Termination Request Denied")
+					.format("Denying termination request.  Caller not authorized.").close();
 				throw t;
 			}
 
@@ -2459,8 +2468,8 @@ public class JobManager implements Closeable
 
 					SequenceNumber parentNumber = historyToken.retrieve();
 					historyToken =
-						InMemoryHistoryEventSink.wrapEvents(parentNumber, _besManager.getBESName(_besID), null, _database.historyKey(data
-							.getJobTicket()), resp == null ? null : resp.get_any());
+						InMemoryHistoryEventSink.wrapEvents(parentNumber, _besManager.getBESName(_besID), null,
+							_database.historyKey(data.getJobTicket()), resp == null ? null : resp.get_any());
 
 					data.historyToken(historyToken);
 					_database.historyToken(connection, _jobID, historyToken);
@@ -2521,18 +2530,21 @@ public class JobManager implements Closeable
 				}
 
 				if (countAgainstBES) {
-					_besManager.markBESAsUnavailable(_besID, String.format("Exception during job start %s(%s)", cause.getClass().getName(),
-						cause.getLocalizedMessage()));
+					_besManager.markBESAsUnavailable(_besID,
+						String.format("Exception during job start %s(%s)", cause.getClass().getName(), cause.getLocalizedMessage()));
 				}
 
 				if (data != null && countAgainstJob) {
 					data.setNextValidRunTime(new Date());
-					history.createInfoWriter("Job Being Re-queued").format(
-						"An attempt to run the job failed.  The job will " + "be removed from the runnable list until %ty.",
-						data.getNextCanRun()).close();
+					history
+						.createInfoWriter("Job Being Re-queued")
+						.format("An attempt to run the job failed.  The job will " + "be removed from the runnable list until %ty.",
+							data.getNextCanRun()).close();
 				} else {
-					history.createInfoWriter("Job Being Re-queued").format(
-						"The job failed, but it wasn't deemed the job's fault." + "The job will be availble for immediate re-scheduling.")
+					history
+						.createInfoWriter("Job Being Re-queued")
+						.format(
+							"The job failed, but it wasn't deemed the job's fault." + "The job will be availble for immediate re-scheduling.")
 						.close();
 				}
 
@@ -2736,6 +2748,8 @@ public class JobManager implements Closeable
 						identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 						String username = identities.iterator().next().toString();
+						if (_logger.isDebugEnabled())
+							_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
 						SortableJobKey jobKey = new SortableJobKey(_jobData);
 						_queuedJobs.put(jobKey, _jobData);

@@ -40,12 +40,11 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
 /*
- * Handler class for returning a response of RNS lookup call from the cache instead of making an 
- * RPC on the related container. Note that this should not be used unless we subscribe the EPR on 
- * which the lookup operation is invoked. This is because the resulting entries of the lookup 
- * call will be again inserted by the the caller in the cache, which will unwantedly update the 
- * cache lifetime of the entries. A subscription on the target EPR ensures that lookup entries 
- * are always valid so we can safely increase the cache lifetime of the component RNS entries.
+ * Handler class for returning a response of RNS lookup call from the cache instead of making an RPC on the related container. Note that this
+ * should not be used unless we subscribe the EPR on which the lookup operation is invoked. This is because the resulting entries of the
+ * lookup call will be again inserted by the the caller in the cache, which will unwantedly update the cache lifetime of the entries. A
+ * subscription on the target EPR ensures that lookup entries are always valid so we can safely increase the cache lifetime of the component
+ * RNS entries.
  */
 
 public class RNSCacheLookupHandler
@@ -62,12 +61,12 @@ public class RNSCacheLookupHandler
 			if (!wsName.isValidWSName())
 				return null;
 
-			// Opportunistically store root and current path's resource config in the cache to 
-			// improve the chance of cache hit for looked up contents. This is useful sometimes 
-			// as it can happen that the resources under a directory are already in the cache 
-			// but we fail to use them as the parent's resource configuration is not there 
-			// (either never saved or evicted). This opportunistic caching can only be applied 
-			// when the concerned parent is on the path to current working directory.For all 
+			// Opportunistically store root and current path's resource config in the cache to
+			// improve the chance of cache hit for looked up contents. This is useful sometimes
+			// as it can happen that the resources under a directory are already in the cache
+			// but we fail to use them as the parent's resource configuration is not there
+			// (either never saved or evicted). This opportunistic caching can only be applied
+			// when the concerned parent is on the path to current working directory.For all
 			// other directories, we don't have the path information saved anywhere beforehand.
 			storeRootAndCurrentPathsInTheCache();
 
@@ -117,9 +116,9 @@ public class RNSCacheLookupHandler
 			int elementCount = Integer.parseInt(element.getValue());
 			if (elementCount == 0)
 				return new LookupResponseType();
-			
+
 			// if the lookup request is for short form then we can construct a response even if there
-			// are not EPRs for the entries of the directory been looked upon 
+			// are not EPRs for the entries of the directory been looked upon
 			boolean shortForm = false;
 			try {
 				ICallingContext context = ContextManager.getCurrentContext();
@@ -131,7 +130,7 @@ public class RNSCacheLookupHandler
 				_logger.trace("could not get information about the short form");
 			}
 			_logger.debug("short form: " + shortForm + " for lookup on " + resourceConfig.getRnsPath());
-			
+
 			// for any call from FUSE we will need to ensure that some attributes are there for the
 			// entries of RNS-Lookup-Response list
 			boolean fuseCall = isCallMadeFromFuse();
@@ -167,26 +166,27 @@ public class RNSCacheLookupHandler
 			if (filteredNames == null || filteredNames.length == 0) {
 				if (entries.size() != elementCount) {
 					// There is a mismatch between cached element count and actual number of child
-					// entries in cache. This can happen during concurrent update in same RNS directory 
-					// and if no element listing has been done on target previously. Regardless of the 
-					// cause, if the target has been subscribed for notifications we should keep the 
+					// entries in cache. This can happen during concurrent update in same RNS directory
+					// and if no element listing has been done on target previously. Regardless of the
+					// cause, if the target has been subscribed for notifications we should keep the
 					// element count property up-to-date.
 					processHotspot(resourceConfig, target);
 
 					// In case there are stale entries in the cache that are not updated/removed
-					// because of some notification blockage, we are removing all entry EPRS from the 
+					// because of some notification blockage, we are removing all entry EPRS from the
 					// cache too.
 					removePossiblyStaleEntries(entryKeys);
 
 					if (_logger.isDebugEnabled())
-						_logger.debug("Lookup unsuccessful: count mismatch: " + resourceConfig.getRnsPath() + " entries " + entries.size() + " count " + elementCount);
+						_logger.debug("Lookup unsuccessful: count mismatch: " + resourceConfig.getRnsPath() + " entries " + entries.size()
+							+ " count " + elementCount);
 					return null;
 				}
 				// When the call is initiated from FUSE, most of the time it will be succeeded by a
-				// bunch o get-attributes call for the entries. If those attributes are not in cache 
-				// then an RPC will be issued for each entry missing attributes. As when looking up 
-				// entries from the container we can prefetch attributes for entries that are in the 
-				// same container as the target, sometimes it is better to let the lookup RPC to pass 
+				// bunch o get-attributes call for the entries. If those attributes are not in cache
+				// then an RPC will be issued for each entry missing attributes. As when looking up
+				// entries from the container we can prefetch attributes for entries that are in the
+				// same container as the target, sometimes it is better to let the lookup RPC to pass
 				// than satisfying request from the cache. The following IF condition does that
 				// assessment.
 				if (fuseCall && !shortForm && !isCacheContainsAllEntryAttributes(resourceConfig, entries))
@@ -194,20 +194,19 @@ public class RNSCacheLookupHandler
 			} else {
 				int totalCachedEntries = entries.size();
 				filterEntries(entries, filteredNames);
-				// This is not always right as the caller can pass an entry name that does not exists 
-				// in the RNS directory. We can't cover all the cases where such scenarios can spur. 
-				// However the checking of total-cached-entry counts will save us in cases where the 
-				// client has made a directory listing for all elements in the RNS directory before 
+				// This is not always right as the caller can pass an entry name that does not exists
+				// in the RNS directory. We can't cover all the cases where such scenarios can spur.
+				// However the checking of total-cached-entry counts will save us in cases where the
+				// client has made a directory listing for all elements in the RNS directory before
 				// making the vein lookup call.
 				if ((filteredNames.length != entries.size()) && (totalCachedEntries < elementCount)) {
-					if (_logger.isDebugEnabled())						
+					if (_logger.isDebugEnabled())
 						_logger.debug("Lookup unsuccessful: filtered search count mismatch: " + resourceConfig.getRnsPath());
 					return null;
 				}
 			}
 
-			LookupResponseType lookupResponseType = new LookupResponseType(
-					entries.toArray(new RNSEntryResponseType[entries.size()]), null);
+			LookupResponseType lookupResponseType = new LookupResponseType(entries.toArray(new RNSEntryResponseType[entries.size()]), null);
 			if (_logger.isDebugEnabled()) {
 				_logger.debug("satisfied lookup request from cache for: " + resourceConfig.getRnsPath());
 			}
@@ -256,21 +255,21 @@ public class RNSCacheLookupHandler
 			entries.add(response);
 		}
 	}
-	
+
 	private static boolean addMatchingShortEntriesInMap(List<RNSEntryResponseType> entries, boolean fuseCall,
-			Map<String, WSResourceConfig> matchingEntries)
+		Map<String, WSResourceConfig> matchingEntries)
 	{
 		boolean missingAttrInfo = false;
 		for (Map.Entry<String, WSResourceConfig> entry : matchingEntries.entrySet()) {
 			String entryRNSPath = entry.getKey();
-			
+
 			// for any call from FUSE we need to check if it is possible to construct a directory entry from the
 			// cached attributes
-			if (fuseCall) { 
+			if (fuseCall) {
 				FilesystemStatStructure entryConfig = MetadataManager.retrieveStat(entryRNSPath);
 				missingAttrInfo = missingAttrInfo || (entryConfig == null);
 			}
-			
+
 			// two attributes are needed by RNSPath class to operate properly on short RNS responses
 			List<MessageElement> attrList = new ArrayList<MessageElement>();
 			WSResourceConfig config = entry.getValue();
@@ -292,7 +291,7 @@ public class RNSCacheLookupHandler
 					return true;
 				}
 			}
-			
+
 			int indexOfLastSeperator = entryRNSPath.lastIndexOf('/');
 			String entryName = entryRNSPath.substring(indexOfLastSeperator + 1);
 			RNSMetadataType metadata = new RNSMetadataType();
@@ -320,9 +319,9 @@ public class RNSCacheLookupHandler
 	}
 
 	/*
-	 * Some RNS resource has been subscribed means the client is interested in its contents, that in 
-	 * turn of the time should be available in the client-cache, therefore we are fetching the element
-	 * -count property to later on to be able to satisfy lookup requests from the cache.
+	 * Some RNS resource has been subscribed means the client is interested in its contents, that in turn of the time should be available in
+	 * the client-cache, therefore we are fetching the element -count property to later on to be able to satisfy lookup requests from the
+	 * cache.
 	 */
 	private static void processHotspot(WSResourceConfig config, EndpointReferenceType target)
 	{
@@ -339,11 +338,10 @@ public class RNSCacheLookupHandler
 	}
 
 	/*
-	 * If a target RNS directory was blocked because of rapid updates by some other user, there is a 
-	 * chance that current user's cache has already removed entries. The existence of deleted entries 
-	 * in the cache will cause continuous cache failure as the element-count of the target will always 
-	 * have a smaller value than the number of entries in the cache. To avoid this problem, this method 
-	 * is used to remove the cached EPRs and resource configs of contents of the target RNS directory.
+	 * If a target RNS directory was blocked because of rapid updates by some other user, there is a chance that current user's cache has
+	 * already removed entries. The existence of deleted entries in the cache will cause continuous cache failure as the element-count of the
+	 * target will always have a smaller value than the number of entries in the cache. To avoid this problem, this method is used to remove
+	 * the cached EPRs and resource configs of contents of the target RNS directory.
 	 */
 	private static void removePossiblyStaleEntries(Set<String> matchedEntries)
 	{
@@ -358,8 +356,7 @@ public class RNSCacheLookupHandler
 	}
 
 	/*
-	 * This is the thread for asynchronously retrieving elementCount property from RNS directories that are 
-	 * hot-spots of lookup operation.
+	 * This is the thread for asynchronously retrieving elementCount property from RNS directories that are hot-spots of lookup operation.
 	 */
 	private static class ElementCountPropertyRetriever extends Thread
 	{
@@ -377,10 +374,9 @@ public class RNSCacheLookupHandler
 		public void run()
 		{
 			/*
-			 * Every cache management related thread that load or store information from the Cache should 
-			 * have unaccounted access to both CachedManager and RPCs to avoid getting mingled with Cache 
-			 * access and RPCs initiated by some user action. This is important to provide accurate statistics 
-			 * on per container resource usage.
+			 * Every cache management related thread that load or store information from the Cache should have unaccounted access to both
+			 * CachedManager and RPCs to avoid getting mingled with Cache access and RPCs initiated by some user action. This is important to
+			 * provide accurate statistics on per container resource usage.
 			 */
 			ResourceAccessMonitor.getUnaccountedAccessRight();
 
@@ -398,8 +394,8 @@ public class RNSCacheLookupHandler
 	}
 
 	/*
-	 * Determine whether or not a lookup request is initiated from FUSE by examining the call-stack. This 
-	 * information is subsequently used to assess the effectiveness returning a lookup result from client-cache.
+	 * Determine whether or not a lookup request is initiated from FUSE by examining the call-stack. This information is subsequently used to
+	 * assess the effectiveness returning a lookup result from client-cache.
 	 */
 	private static boolean isCallMadeFromFuse()
 	{

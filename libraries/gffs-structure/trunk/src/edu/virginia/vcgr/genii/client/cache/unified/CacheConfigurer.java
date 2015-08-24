@@ -6,13 +6,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subscriber;
-import edu.virginia.vcgr.genii.client.configuration.Deployment;
-import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
-import edu.virginia.vcgr.genii.client.configuration.Installation;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.virginia.vcgr.genii.client.ClientProperties;
+import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subscriber;
 
 /*
  * CacheConfigurer holds the configuration properties (e.g. timeout, size) of all elements of the entire client-side cache module. There is no
@@ -44,7 +42,7 @@ public class CacheConfigurer
 	public static long DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT = 30 * 1000L;
 	public static int DEFAULT_ATTRIBUTE_CACHE_SIZE = 1000;
 	public static int DEFAULT_EPR_CACHE_SIZE = 250;
-	// cak: caching disabled by default to avoid unicore code trying to cache.
+	// caching disabled by default, to avoid UNICORE code trying to cache.
 	private static boolean CACHING_ENABLED = false;
 	private static boolean SUBSCRIPTION_BASED_CACHING_ENABLED = false;
 
@@ -55,8 +53,7 @@ public class CacheConfigurer
 
 	public static void initializeCaches()
 	{
-		Deployment deployment = Installation.getDeployment(new DeploymentName());
-		Properties properties = deployment.clientCacheProperties();
+		Properties properties = ClientProperties.getClientProperties().getClientCacheProperties();
 
 		String cacheEnabled = properties.getProperty(CACHE_ENABLED);
 		if (cacheEnabled != null)

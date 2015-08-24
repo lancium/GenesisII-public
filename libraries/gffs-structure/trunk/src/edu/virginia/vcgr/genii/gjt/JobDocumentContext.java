@@ -65,8 +65,8 @@ public class JobDocumentContext
 			_modified = true;
 
 		_frame = GridJobToolFrame.createNewFrame(this);
-//		if (listener != null)
-//			_frame.addWindowListener(new JobDocumentClosedWindowAdapter(listener));
+		// if (listener != null)
+		// _frame.addWindowListener(new JobDocumentClosedWindowAdapter(listener));
 
 		setFrameTitle();
 
@@ -84,7 +84,7 @@ public class JobDocumentContext
 		_frame.setTitle(String.format("Grid Job Tool - %s%s", filename, _modified ? "*" : ""));
 	}
 
-void setInitial()
+	void setInitial()
 	{
 		_initial = true;
 	}
@@ -309,21 +309,20 @@ void setInitial()
 		}
 	}
 
-//	static private class JobDocumentClosedWindowAdapter extends WindowAdapter
-//	{
-//		private JobToolListener _listener;
-//
-//		private JobDocumentClosedWindowAdapter(JobToolListener listener)
-//		{
-//			_listener = listener;
-//		}
-//
-//		@Override
-//		final public void windowClosed(WindowEvent e)
-//		{
-//			_listener.jobWindowClosed();
-//		}
-//	}
-
+	// static private class JobDocumentClosedWindowAdapter extends WindowAdapter
+	// {
+	// private JobToolListener _listener;
+	//
+	// private JobDocumentClosedWindowAdapter(JobToolListener listener)
+	// {
+	// _listener = listener;
+	// }
+	//
+	// @Override
+	// final public void windowClosed(WindowEvent e)
+	// {
+	// _listener.jobWindowClosed();
+	// }
+	// }
 
 }

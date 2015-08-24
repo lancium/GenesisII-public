@@ -61,8 +61,8 @@ public class BasicFrameWindow extends JFrame
 	}
 
 	/**
-	 * returns the number of active frame windows of the specified type, which can be useful for deciding when a whole class of windows
-	 * are closed and the app running them no longer needs to continue.
+	 * returns the number of active frame windows of the specified type, which can be useful for deciding when a whole class of windows are
+	 * closed and the app running them no longer needs to continue.
 	 */
 	public static int activeFrames(Class<?> typeToFind)
 	{
@@ -70,7 +70,7 @@ public class BasicFrameWindow extends JFrame
 		synchronized (_frameList) {
 			for (BasicFrameWindow bfw : _frameList) {
 				if (typeToFind.isInstance(bfw)) {
-					count++;					
+					count++;
 				}
 			}
 			return count;

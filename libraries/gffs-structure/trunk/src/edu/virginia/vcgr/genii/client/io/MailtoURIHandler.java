@@ -94,7 +94,7 @@ public class MailtoURIHandler extends AbstractURIHandler implements IURIHandler
 	@Override
 	public String getLocalPath(URI uri) throws IOException
 	{
-		//hmmm: is there any more accurate version of this?  for email, do we care?
+		// hmmm: is there any more accurate version of this? for email, do we care?
 		return uri.getSchemeSpecificPart();
 	}
 }

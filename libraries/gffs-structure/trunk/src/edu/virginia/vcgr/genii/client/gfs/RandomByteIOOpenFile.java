@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.rbyteio.RandomByteIOPortType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.ClientProperties;
 import edu.virginia.vcgr.genii.client.byteio.buffer.AppendResolver;
 import edu.virginia.vcgr.genii.client.byteio.buffer.BasicFileOperator;
 import edu.virginia.vcgr.genii.client.byteio.buffer.ByteIOBufferLeaser;
@@ -26,43 +27,23 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 class RandomByteIOOpenFile extends OperatorBasedOpenFile
 {
 	static private Log _logger = LogFactory.getLog(RandomByteIOOpenFile.class);
-	private final static int BUF_SIZE = 1024 * 1024 * 32;
-	private final static int SHORT_BUF_SIZE = 1024 * 1024 * 8;
-	private static final int READ_RETRIES = 5;
-	private static final int WRITE_RETRIES = 5;
-	private static final int READ_BUFS = 4; // READ_BUFS MUST be at least 2;
-											// this is the max read ahead
-											// distance
-	// Note max readers/writers are STATIC - this is max number of concurrent
-	// readers or writers - these apply globally
-	private static final int MAX_WRITERS = 16; // Must be at least one.
-	private static final int MAX_READERS = 16; // MAX_READERS MUST be at least
-												// 2, and SHOULD be > READ_BUFS
 
-	private static final int TRANSFERERS = READ_BUFS + 0; // Transferers MUST be
-															// at least
-															// READ_BUFS
-	final static Semaphore WS = new Semaphore(MAX_WRITERS);
-	final static Semaphore RS = new Semaphore(MAX_READERS);
+	final static Semaphore WS = new Semaphore(getConfigs().max_writers);
+	final static Semaphore RS = new Semaphore(getConfigs().max_readers);
 
 	/**
 	 * does a deep copy of one byte buffer into another.
-	 * 
-	 * @param orig
-	 * @return
 	 */
 	private static ByteBuffer deepCopy(ByteBuffer orig)
 	{
 		int pos = orig.position(), lim = orig.limit();
 		try {
-			orig.position(0).limit(orig.capacity()); // set range to entire
-														// buffer
-			ByteBuffer toReturn = deepCopyVisible(orig); // deep copy range
-			toReturn.position(pos).limit(lim); // set range to original
+			orig.position(0).limit(orig.capacity()); // set range to entire buffer.
+			ByteBuffer toReturn = deepCopyVisible(orig); // deep copy range.
+			toReturn.position(pos).limit(lim); // set range to original.
 			return toReturn;
-		} finally // do in finally in case something goes wrong we don't bork
-					// the orig
-		{
+		} finally {
+			// do in finally in case something goes wrong; then we don't bork the original.
 			orig.position(pos).limit(lim); // restore original
 		}
 	}
@@ -130,7 +111,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 					return;
 				}
 				try {
-					while (tries < READ_RETRIES && !ready) {
+					while (tries < getConfigs().read_retries && !ready) {
 
 						tries += 1;
 						try {
@@ -149,7 +130,6 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 					try {
 						_tq.put(_RBT);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						_logger.error("Failed to put a transferer in RandomByteIOFile:read", e);
 					}
 				}
@@ -187,12 +167,12 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 
 		TypeInformation typeInfo = new TypeInformation(target);
 		long size = typeInfo.getByteIOSize();
-		// System.err.println("Creating a Random Byteio open file  of size " +
-		// size + "on host  " + target.getAddress().get_value().getHost());
+		if (_logger.isDebugEnabled())
+			_logger.debug("Creating random byteIO file of size " + size + " on host " + target.getAddress().get_value().getHost());
 
-		RandomByteIOTransferer rbit[] = new RandomByteIOTransferer[READ_BUFS];
-		ArrayBlockingQueue<RandomByteIOTransferer> tq = new ArrayBlockingQueue<RandomByteIOTransferer>(TRANSFERERS);
-		for (int i = 0; i < READ_BUFS; ++i) {
+		RandomByteIOTransferer rbit[] = new RandomByteIOTransferer[getConfigs().read_buffers];
+		ArrayBlockingQueue<RandomByteIOTransferer> tq = new ArrayBlockingQueue<RandomByteIOTransferer>(getConfigs().transferers);
+		for (int i = 0; i < getConfigs().read_buffers; ++i) {
 			rbit[i] = RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class, target));
 			tq.add(rbit[i]);
 		}
@@ -234,8 +214,8 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 			isSequential = true; // Assume until we know otherwise that they are
 									// doing sequential reads
 			_size = size;
-			bufs = new AsynchReadBuffer[READ_BUFS];
-			_bufSize = BUF_SIZE;
+			bufs = new AsynchReadBuffer[getConfigs().read_buffers];
+			_bufSize = getConfigs().long_buffer_size;
 			firstRead = true;
 		}
 
@@ -250,8 +230,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 			 * buffers, we make that buf buf[0], and restart re-ahead.
 			 */
 			while (bufs[0] != null && isSequential) {
-				// Note that we do NOT have to wait for the IO to complete to
-				// know if it will be in the buffer
+				// Note that we do NOT have to wait for the IO to complete to know if it will be in the buffer.
 				if (fileOffset >= bufs[0]._offset && fileOffset < bufs[0]._offset + bufs[0]._size) {
 					found = true;
 					break;
@@ -263,32 +242,32 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 				 */
 				count++;
 				bufs[0] = null;
-				for (int i = 0; i < READ_BUFS - 1; i++) {
-					bufs[i] = bufs[i + 1]; // Shift them down, thank god for
-											// garbage collection
+				for (int i = 0; i < getConfigs().read_buffers - 1; i++) {
+					bufs[i] = bufs[i + 1]; // Shift them down, thank god for garbage collection.
 				}
-				bufs[READ_BUFS - 1] = null;
+				bufs[getConfigs().read_buffers - 1] = null;
 			}
-			// Ok, at this point either all the bufs are 0, or we found it. If
-			// we did not find it we are going into nonSequential, non-read
-			// ahead
+			/*
+			 * Ok, at this point either all the bufs are 0, or we found it. If we did not find it we are going into nonSequential, non-read
+			 * ahead
+			 */
 			curP = fileOffset;
 			if (!found) {
 				isSequential = false;
 				// Only start reading if we are not at eof
-				_bufSize = SHORT_BUF_SIZE;
+				_bufSize = getConfigs().short_buffer_size;
 				if (fileOffset < _size)
 					startload(0, fileOffset);
 				return false;
 			}
-			// We found it, now we need to make sure the prefetch buffers are
-			// fine
-			// re-Start the pre-fetch pipeline if count > 0 . if count==0 then
-			// the data was in buf[0]
+			/*
+			 * We found it, now we need to make sure the prefetch buffers are fine re-Start the pre-fetch pipeline if count > 0 . if count==0
+			 * then the data was in buf[0]
+			 */
 
 			if (count > 0) {
 				// We were not in the first buffer, we need load
-				for (int i = READ_BUFS - count; i < READ_BUFS; i++) {
+				for (int i = getConfigs().read_buffers - count; i < getConfigs().read_buffers; i++) {
 					// Now we want to make sure the next read is less than file
 					// size
 					if (bufs[i - 1] != null && (fileOffset < bufs[i - 1]._offset + _bufSize)) {
@@ -338,7 +317,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 			if (firstRead) {
 				long offset = fileOffset;
 				int curBuf = 0;
-				while (offset < _size && curBuf < READ_BUFS) {
+				while (offset < _size && curBuf < getConfigs().read_buffers) {
 					startload(curBuf, offset);
 					curBuf++;
 					offset += _bufSize;
@@ -362,56 +341,40 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 			}
 			if (bufs[0] != null && !bufs[0].isReady())
 				bufs[0].waitfor();
-			// Now we have something in bufs[0]
-			// the buffer starts at bufs[0]._offset and has bufs[0].buf.length
+			// Now we have something in bufs[0]. the buffer starts at bufs[0]._offset and has bufs[0].buf.length.
 
-			// Let's check if this a "normal" sequential read. is
-			// (fileOffset>=curP or fileOffst>= b0.offset) and fileOffset <
-			// _size
-			// chkBuffers called above ensures that fileOffset is in the current
-			// buffer
+			/*
+			 * Let's check if this a "normal" sequential read. is (fileOffset>=curP or fileOffst>= b0.offset) and fileOffset < _size
+			 * chkBuffers called above ensures that fileOffset is in the current buffer
+			 */
 			if ((fileOffset >= curP || fileOffset >= bufs[0]._offset) && fileOffset < _size) {
 				boolean full = false; // Have we got all the bytes?
-				int remaining = length; // How many more bytes to get from the
-										// file
-				long workingOffset = fileOffset; // what is the current file
-													// offset we are reading
+				int remaining = length; // How many more bytes to get from the file.
+				long workingOffset = fileOffset; // what is the current file offset we are reading.
 				while (!full && bufs[0] != null && workingOffset < _size) {
 					if (bufs[0] != null && !bufs[0].isReady())
 						bufs[0].waitfor();
 					if (bufs[0].ioError() != 0) {
-						throw new IOException("Read failed after " + READ_RETRIES + " attempts");
+						throw new IOException("Read failed after " + getConfigs().read_retries + " attempts");
 					}
 					if (workingOffset >= bufs[0]._offset && workingOffset < bufs[0]._offset + bufs[0].buf.length) {
 						// The start is within the range
-						int buf_offset = (int) (workingOffset - bufs[0]._offset); // Where
-																					// are
-																					// we
-																					// copying
-																					// from
-																					// in
-																					// the
-																					// buffer
-						int copybytes = remaining; // How many bytes are we
-													// copying, we know the
-													// upper bound is
-													// "remaining"
-						// Make sure we only take what is available in the buf
+						int buf_offset = (int) (workingOffset - bufs[0]._offset);
+						// buf_offset -- Where are we copying from in the buffer?
+
+						int copybytes = remaining; // How many bytes are we copying, we know the upper bound is "remaining".
+						// Make sure we only take what is available in the buf.
 						if (copybytes > bufs[0].buf.length - buf_offset)
 							copybytes = bufs[0].buf.length - buf_offset;
-						// We now have the bytes to copy, the offset in the
-						// buffer
+						// We now have the bytes to copy, the offset in the buffer.
 						// System.err.println("copybytes is "+ copybytes);
 						System.arraycopy(bufs[0].buf, buf_offset, destination.array(), destOffset, copybytes);
-						// Need to update the position function of the byte
-						// buffer because arraycopy does not update it.
+						// Need to update the position function of the byte buffer because arraycopy does not update it.
 						destination.position(destOffset + copybytes);
-						// Note though that bufs[]._size may be greater than the
-						// data actually available, bufs[].buf.length if we
-						// passed end of file
-						// We want to put into destination
-						// update all of the counters and pointers by the number
-						// of bytes copied
+						/*
+						 * Note though that bufs[]._size may be greater than the data actually available, bufs[].buf.length if we passed end
+						 * of file We want to put into destination update all of the counters and pointers by the number of bytes copied.
+						 */
 						destOffset += copybytes;
 						remaining -= copybytes;
 						workingOffset += copybytes;
@@ -420,21 +383,15 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 						if (workingOffset >= _size)
 							return; // We've read all of the bytes, lets go
 						full = remaining == 0;
-						boolean consumed = buf_offset + copybytes == bufs[0].buf.length; // The
-																							// buffer
-																							// has
-																							// been
-																							// used
+						boolean consumed = buf_offset + copybytes == bufs[0].buf.length; // The buffer has been used.
 						if (consumed) {
 							// System.err.println("CONSUMED - NEED TO LOAD");
-							// Now start loading if there is more to read
+							// Now start loading if there is more to read.
 							chkBuffers(workingOffset);
 							// System.err.println("CONSUMED - on the way out");
 						}
 					} else {
-
-						// We will need to get more data, there are no bytes in
-						// bufs[0]
+						// We will need to get more data, there are no bytes in bufs[0].
 						_logger.error("Need to get more data, yet have no way to do so - LOGIC ERROR");
 					}
 				}
@@ -442,8 +399,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 				if (!full)
 					throw new IOException("Could not read all of the bytes");
 			} else {
-				// Not able to deal with this, it is out of bounds or too far
-				// backwards
+				// Not able to deal with this, it is out of bounds or too far backwards.
 				return;
 			}
 		}
@@ -484,7 +440,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 				}
 				try {
 
-					while (tries < WRITE_RETRIES && !done) {
+					while (tries < getConfigs().write_retries && !done) {
 						tries += 1;
 						try {
 							// System.err.println("Starting a write to offset " +
@@ -536,18 +492,20 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 				_transferer.truncAppend(offset, new byte[0]);
 				_tq.put(_transferer);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				_logger.error("interrupted exception caught in truncate", e);
 			}
 		}
 
 		@Override
 		public void write(long fileOffset, ByteBuffer source)
 		{
-			// System.err.println("Write to offset "+ fileOffset+", p " +
-			// source.limit());
+			if (_logger.isDebugEnabled())
+				_logger.debug("Write to offset " + fileOffset + ", p " + source.limit());
 			_synch.startWrite();
+
+			// hmmm: is this code not used?
 			// _transferer.write(fileOffset, source);
+
 			AsynchWriteBuffer B;
 			// Note the deepcopy of source.
 			B = new AsynchWriteBuffer(_tq, fileOffset, deepCopy(source), _synch);
@@ -562,11 +520,10 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 		@Override
 		public void drain()
 		{
-			// System.err.println("Draining to close the file  = "+
-			// _synch.numWriters);
-			_synch.waitForWritersToComplete(); // This has the effect of
-												// blocking the thread until all
-												// writes complete
+			if (_logger.isDebugEnabled())
+				_logger.debug("Draining to close the file, writers = " + _synch.numWriters);
+
+			_synch.waitForWritersToComplete(); // This has the effect of blocking the thread until all writes complete.
 
 		}
 	}
@@ -590,10 +547,32 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 				_transferer.append(source);
 				_tq.put(_transferer);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				_logger.warn("caught interrupted exception in append", e);
 			}
 
 		}
 	}
+
+	// do not use this member variable unless you are getConfigs() below.
+	private static ByteIOConfigurationPack _privateConfigPack = null;
+
+	/**
+	 * management of the configuration package for this class. only getConfigs() should ever be called to access the configuration, which will
+	 * ensure there is only one instance of the configuration package per process.
+	 */
+	public static ByteIOConfigurationPack getConfigs()
+	{
+		synchronized (RandomByteIOOpenFile.class) {
+			if (_privateConfigPack != null)
+				return _privateConfigPack;
+			try {
+				ClientProperties cp = ClientProperties.getClientProperties();
+				_privateConfigPack = new ByteIOConfigurationPack(cp);
+			} catch (Throwable t) {
+				_logger.error("failure to establish static byte io configuration pack", t);
+			}
+			return _privateConfigPack;
+		}
+	}
+
 }

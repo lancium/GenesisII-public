@@ -81,7 +81,7 @@ public class DataStageTable extends JTable
 			unpackArchiveColumn.setHeaderValue("Unpack Archive?");
 		else
 			unpackArchiveColumn.setHeaderValue("Pack to Archive?");
-		
+
 		fsColumn.setHeaderValue("Filesystem");
 		fsColumn.setCellRenderer(new FilesystemCellRenderer());
 		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(filesystemMap)));

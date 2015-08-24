@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.15" transformSequenceNumber="4">
-  <directoryPresets config="../scripts/proxyio.launcher.template" />
+  <directoryPresets config="../lib/web-service-client-config.wsdd" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -50,6 +50,7 @@
       <mountPoint id="7606" root="" location="ext" mode="755" />
       <mountPoint id="3944" root="" location="jre-addin" mode="755" />
       <mountPoint id="7211" root="" location="scripts" mode="755" />
+      <mountPoint id="11379" root="" location="lib" mode="755" />
       <mountPoint id="34" root="" location="" mode="755" />
       <mountPoint id="5994" root="5993" location="deployments" mode="755" />
       <mountPoint id="5995" root="5993" location="deployments/default" mode="755" />
@@ -76,6 +77,11 @@
       <fileEntry mountPoint="7211" file="./scripts/update_install_location.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="../scripts/gffschown.template" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="../scripts/proxyio.launcher.template" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="11379" file="./data_files/container.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="11379" file="./data_files/client.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="11379" file="../lib/cache.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="11379" file="../lib/socket.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="11379" file="../lib/web-service-client-config.wsdd" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="34" file=".." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp, *.fred" dirMode="755" overrideDirMode="true">
         <exclude>
           <entry location="current.deployment.lock" fileType="regular" />
@@ -84,7 +90,7 @@
           <entry location="cert-tool" fileType="regular" />
           <entry location="bin.ant" fileType="regular" />
           <entry location="set_gffs_vars" fileType="regular" />
-          <entry location="readme.txt" fileType="regular" />
+          <entry location="Readme.txt" fileType="regular" />
           <entry location="build.properties" fileType="regular" />
           <entry location=".project" fileType="regular" />
           <entry location="deployments" fileType="regular" />
@@ -106,7 +112,6 @@
           <entry location="scripts" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
           <entry location="proxyio.launcher" fileType="regular" />
-          <entry location="mappings.properties" fileType="regular" />
           <entry location=".svn" fileType="regular" />
           <entry location="installer" fileType="regular" />
           <entry location="context.xml" fileType="regular" />
@@ -115,16 +120,16 @@
           <entry location="src" fileType="regular" />
           <entry location="build.xml" fileType="regular" />
           <entry location=".classpath" fileType="regular" />
-          <entry location="container.properties" fileType="regular" />
+          <entry location="lib/container.properties" fileType="regular" />
+          <entry location="lib/client.properties" fileType="regular" />
           <entry location="BUILDME" fileType="regular" />
           <entry location="runContainer.sh" fileType="regular" />
           <entry location="libraries" fileType="regular" />
-          <entry location="change-port.sh" fileType="regular" />
+          <entry location="scripts/change-port.sh" fileType="regular" />
           <entry location="context.xml.lock" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="34" file="./data_files/container.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="34" file="../scripts/cert-tool" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="34" file="../scripts/set_gffs_vars" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="5995" file="../deployments/default" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
@@ -153,6 +158,12 @@
         <exclude>
           <entry location="export.properties" fileType="regular" />
           <entry location="gffs.exports" fileType="regular" />
+          <entry location="lib.build.xml" fileType="regular" />
+          <entry location="genesisII.container.log4j.properties" fileType="regular" />
+          <entry location="genesisII.client.log4j.properties" fileType="regular" />
+          <entry location="container.properties" fileType="regular" />
+          <entry location="genesisII.shared.log4j.properties" fileType="regular" />
+          <entry location="client.properties" fileType="regular" />
           <entry location="META-INF/mime.types" fileType="regular" />
         </exclude>
       </dirEntry>
@@ -169,7 +180,6 @@
           <entry location="jre-addin" fileType="regular" />
           <entry location="scripts" fileType="regular" />
           <entry location="webapps" fileType="regular" />
-          <entry location="container.properties.example" fileType="regular" />
           <entry location="dpages" fileType="regular" />
           <entry location="jni-libs" fileType="regular" />
           <entry location="current.version" fileType="regular" />
@@ -181,11 +191,12 @@
           <entry location="RELEASE" fileType="regular" />
           <entry location="docs" fileType="regular" />
           <entry location="License.txt" fileType="regular" />
+          <entry location="client.properties" fileType="regular" />
           <entry location="bundles" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
-          <entry location="container.properties" fileType="regular" />
           <entry location="cert-tool" fileType="regular" />
           <entry location="set_gffs_vars" fileType="regular" />
+          <entry location="lib" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="client-ui" fileType="launcher" />
           <entry location=".i4j_fileset_8166" fileType="regular" />
@@ -362,7 +373,7 @@
       </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="grid-win32" id="5619" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
+    <launcher name="grid32" id="5619" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -396,7 +407,7 @@
       </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="client-ui-win32" id="5622" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
+    <launcher name="client-ui32" id="5622" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
       <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
@@ -1675,7 +1686,31 @@ return true;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>container.properties</string>
+                                  <string>lib/container.properties</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch client.properties" id="7432" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="1">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>lib/client.properties</string>
                                 </object>
                               </void>
                             </array>
@@ -2150,8 +2185,9 @@ return true;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>File propFile = new File(context.getInstallationDirectory(), "container.properties");
-return propFile.exists();</condition>
+                    <condition>File propFile = new File(context.getInstallationDirectory(), "lib/container.properties");
+File propFile2 = new File(context.getInstallationDirectory(), "container.properties");
+return propFile.exists() || propFile2.exists();</condition>
                   </action>
                   <action name="" id="5121" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
@@ -4240,7 +4276,7 @@ return startService;</string>
                         <array class="java.io.File" length="1">
                           <void index="0">
                             <object class="java.io.File">
-                              <string>container.properties</string>
+                              <string>lib/container.properties</string>
                             </object>
                           </void>
                         </array>
@@ -4334,7 +4370,7 @@ return startService;</string>
     </applications>
   </installerGui>
   <mediaSets>
-    <macosFolder name="mac64_gui" id="2088" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-macosx-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
+    <macosFolder name="mac64_gui" id="2088" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-macosx-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4357,7 +4393,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </macosFolder>
-    <unixInstaller name="linux64_gui" id="3416" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux64_gui" id="3416" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4421,11 +4457,11 @@ return startService;</string>
         <content />
       </postUninstallScript>
     </linuxDeb>
-    <windows name="windows64_gui" id="8974" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows64_gui" id="8974" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="1450" />
-        <launcher id="39" />
-        <launcher id="1773" />
+        <launcher id="5619" />
+        <launcher id="5622" />
       </excludedLaunchers>
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
@@ -4448,7 +4484,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <unixInstaller name="linux32_gui" id="11295" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux32_gui" id="11295" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4477,7 +4513,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <windows name="windows32_gui" id="11297" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_60" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows32_gui" id="11297" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="39" />

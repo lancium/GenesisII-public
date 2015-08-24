@@ -193,7 +193,7 @@ public class FileHandler
 		long size = file.length();
 
 		if ((size - offset) < 0) {
-			// XXX: What to do for read attempt beyond EOF?
+			// future: What to do for read attempt beyond EOF?
 			// attempt to read beyond EOF!
 			// Simply return
 			try {

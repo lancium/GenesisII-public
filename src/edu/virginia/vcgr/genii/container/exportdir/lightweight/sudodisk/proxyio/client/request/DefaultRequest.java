@@ -84,7 +84,7 @@ public class DefaultRequest
 
 			bytes_read = bin.read(contents, 0, contents.length);
 			if (bytes_read == -1) {
-				// XXX: Server could 've sent a smaller response!
+				// future: Server could've sent a smaller response!
 				return new DefaultResponse(retVal, read_buff);
 			}
 

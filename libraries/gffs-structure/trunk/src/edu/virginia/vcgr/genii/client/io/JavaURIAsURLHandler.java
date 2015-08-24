@@ -119,31 +119,31 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 	}
 
 	@Override
-	public boolean isDirectory(URI uri) 
+	public boolean isDirectory(URI uri)
 	{
-		// hmmm: can we determine for any of the protocols (http, https, ftp) if it's file or directory?  
+		// future: can we determine for any of the protocols (http, https, ftp) if it's file or directory?
 		return false;
 	}
 
 	@Override
 	public DataTransferStatistics copyDirectoryDown(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
-		
-		// hmmm: implement this!  do we need to handle file: types here???
+
+		// future: implement this! do we need to handle file: types here???
 		return null;
 	}
 
 	@Override
 	public DataTransferStatistics copyDirectoryUp(File source, URI target, UsernamePasswordIdentity credential) throws IOException
 	{
-		// hmmm: implement this!  do we need to handle file: types here???
+		// future: implement this! do we need to handle file: types here???
 		return null;
 	}
 
 	@Override
 	public String getLocalPath(URI uri) throws IOException
 	{
-		//hmmm: is there any more accurate version of this?
+		// future: is there any more accurate version of this?
 		return uri.getSchemeSpecificPart();
 	}
 }

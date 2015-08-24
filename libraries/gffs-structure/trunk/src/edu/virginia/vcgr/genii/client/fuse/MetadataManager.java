@@ -152,7 +152,7 @@ public class MetadataManager
 	}
 
 	/*
-	 * TODO: We have to modify the implementation to support caching of resource configurations of EndPointReferences that do not have any
+	 * future: We have to modify the implementation to support caching of resource configurations of EndPointReferences that do not have any
 	 * EndPointIdentifier.
 	 */
 	public static int generateInodeNumber(EndpointReferenceType target)

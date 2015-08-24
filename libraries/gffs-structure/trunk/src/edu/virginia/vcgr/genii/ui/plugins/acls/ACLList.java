@@ -33,7 +33,7 @@ class ACLList extends JList
 		iMap.put(CommonKeyStrokes.COPY, copy.getValue(Action.NAME));
 		iMap.put(CommonKeyStrokes.PASTE, paste.getValue(Action.NAME));
 		iMap.put(CommonKeyStrokes.DELETE, _delete.getValue(Action.NAME));
-		// TODO: remap to "go up a level" --> iMap.put(CommonKeyStrokes.BACKSPACE,
+		// hmmm: remap to "go up a level" --> iMap.put(CommonKeyStrokes.BACKSPACE,
 		// _delete.getValue(Action.NAME));
 	}
 

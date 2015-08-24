@@ -13,16 +13,12 @@
 
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
-import java.util.Properties;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -32,8 +28,8 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.ClientProperties;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -42,8 +38,6 @@ import edu.virginia.vcgr.genii.client.comm.socket.SocketConfigurer;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
 import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
-import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
-import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.client.security.TrustStoreLinkage;
@@ -66,31 +60,27 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 {
 	static private Log _logger = LogFactory.getLog(VcgrSslSocketFactory.class);
 
-	static final private String CACHE_SIZE_PROPERTY_NAME =
-		"edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory.max-cache-size";
-
-	static final private int DEFAULT_MAX_CACHE_ELEMENTS = 64; // cak: reduced from 1024.
-
-	static final private int SESSION_CACHE_SIZE_MAX = 256; // cak: reduced from 1000.
-
 	static {
-		// initializations to restrict types of TLS we will use.
-		// this one is for https-client:
+		/*
+		 * initializations to restrict types of TLS we will use. this one is for https-client: evidence says this does not help for our case
+		 * of the gffs client, but this does at least protect our normal web browsing from using SSLv3.
+		 */
 		java.lang.System.setProperty("https.protocols", "TLSv1");
-		// evidence says this does not help for our case of the gffs client, but
-		// this does at least protect our normal web browsing from using SSLv3.
+
 	}
 
-	// holds the maximum elements for the socket cache, rather than reading it from file every time.
-	static private Integer _maxCacheElements = -1;
+	// hmmm: should this maximum have any relation to the configured max value that we got from properties???
+	final private int SESSION_CACHE_SIZE_MAX = 2048;
 
 	static public InheritableThreadLocal<ICallingContext> threadCallingContext = new InheritableThreadLocal<ICallingContext>();
 
 	static private LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory> _sslSessionCache =
-		new LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory>(getMaxCacheElements());
+		new LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory>(ClientProperties.getClientProperties().getMaxSocketCacheElements());
 
 	protected TrustManager[] _trustManagers;
-	protected SocketConfigurer _clientSocketConfigurer = Installation.getDeployment(new DeploymentName()).clientSocketConfigurer();
+	protected SocketConfigurer _clientSocketConfigurer = ClientProperties.getClientProperties().getClientSocketProperties();
+
+	// Installation.getDeployment(new DeploymentName()).clientSocketConfigurer();
 
 	public VcgrSslSocketFactory()
 	{
@@ -121,35 +111,6 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		} catch (Exception ex) {
 			_logger.info("exception occurred in loadTrustManager", ex);
 		}
-	}
-
-	static public int getMaxCacheElements()
-	{
-		InputStream in = null;
-		synchronized (_maxCacheElements) {
-			if (_maxCacheElements > -1)
-				return _maxCacheElements;
-			_maxCacheElements = DEFAULT_MAX_CACHE_ELEMENTS;
-			try {
-				File sslCachePropertiesFile =
-					Installation.getDeployment(new DeploymentName()).getConfigurationDirectory().lookupFile("ssl-cache.properties");
-				in = new FileInputStream(sslCachePropertiesFile);
-				Properties props = new Properties();
-				props.load(in);
-				String value = props.getProperty(CACHE_SIZE_PROPERTY_NAME);
-				if (value != null) {
-					_maxCacheElements = Integer.parseInt(value);
-					if (_maxCacheElements < 0)
-						_maxCacheElements = 0;
-				}
-			} catch (Throwable cause) {
-				_logger.warn("Unable to lookup ssl-cache.properties configuration file.  Using default values.", cause);
-			} finally {
-				StreamUtils.close(in);
-			}
-		}
-
-		return _maxCacheElements;
 	}
 
 	protected SSLSocketFactory getSSLSocketFactory() throws IOException

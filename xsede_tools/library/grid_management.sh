@@ -221,6 +221,23 @@ function isMirrorEnabled()
 
 # grid-wide operations.
 
+# sets up configuration files needed before the container is started.
+function prepare_container_configuration()
+{
+  pushd "$GENII_INSTALL_DIR" &>/dev/null
+
+  # clear out any container properties that could interfere with our new grid.
+  \rm -f "$GENII_INSTALL_DIR/lib/container.properties" "$GENII_INSTALL_DIR/lib/client.properties"
+
+  # also put a simple generated container and client properties files into place.
+  cp "$GENII_INSTALL_DIR/lib/container.properties.template" "$GENII_INSTALL_DIR/lib/container.properties"
+  check_if_failed "generating a container.properties file"
+  cp "$GENII_INSTALL_DIR/lib/client.properties.template" "$GENII_INSTALL_DIR/lib/client.properties"
+  check_if_failed "generating a client.properties file"
+
+  popd &>/dev/null
+}
+
 # runs the bootstrap XML script to establish our basic grid configuration.
 function bootstrap_grid()
 {
@@ -229,9 +246,6 @@ function bootstrap_grid()
 
   # perform the basic setup of the grid, already canned for us.
   echo "Bootstrapping default grid configuration..."
-
-  # clear out any container properties that could interfere with our new grid.
-  \rm -f "$GENII_INSTALL_DIR/container.properties"
 
   bootstrap_file="$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/bootstrap.xml"
   cp "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/configuration/template-bootstrap.xml" "$bootstrap_file"
@@ -253,13 +267,9 @@ function bootstrap_grid()
   cp "$GENII_INSTALL_DIR/context.xml" "$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/context.xml"
   check_if_failed "copying context file into deployment '$DEPLOYMENT_NAME'"
 
-  # also put a simple generated container.properties file into place.
-  cp "$GENII_INSTALL_DIR/container.properties.example" "$GENII_INSTALL_DIR/container.properties"
-  check_if_failed "generating a container.properties file"
-
   # drop in the reconnection line so our mini grid canhaz simple reconnect.
-  echo "edu.virginia.vcgr.genii.gridInitCommand=\"local:$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/context.xml\" \"$DEPLOYMENT_NAME\"" >>"$GENII_INSTALL_DIR/container.properties"
-  check_if_failed "adding grid connection information to container.properties"
+  echo "edu.virginia.vcgr.genii.gridInitCommand=\"local:$DEPLOYMENTS_ROOT/$DEPLOYMENT_NAME/context.xml\" \"$DEPLOYMENT_NAME\"" >>"$GENII_INSTALL_DIR/lib/client.properties"
+  check_if_failed "adding grid connection information to client.properties"
 
   # copy up a bogus deployment information file to have a placeholder that makes sense.
   cp "$GENII_INSTALL_DIR/installer/bootstrap-build.config" "$GENII_INSTALL_DIR/current.deployment"

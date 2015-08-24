@@ -52,6 +52,7 @@ import com.sun.mail.iap.ConnectionException;
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
+import edu.virginia.vcgr.genii.client.ClientProperties;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
@@ -98,30 +99,15 @@ import edu.virginia.vcgr.genii.security.x509.CertTool;
 public class AxisClientInvocationHandler implements InvocationHandler, IFinalInvoker
 {
 	static private Log _logger = LogFactory.getLog(AxisClientInvocationHandler.class);
+
 	private static final String STUB_CONFIGURED = "edu.virginia.vcgr.genii.client.security.stub-configured";
-
-	// future: this really needs to be stored in a config file so users can change it!!!
-	/*
-	 * the amount of time that any particular client request is allowed to take before time expires. default was raised from 2 minutes to 6.
-	 */
-	static private int _DEFAULT_CLIENT_REQUEST_TIMEOUT = 1000 * 60 * 3;
-	// Was 1000 * 60 * 6
-
-	/**
-	 * We'll wait 16 seconds for a connection failure before it's considered TOO long for the exponential back-off retry.
-	 */
-	static private final long MAX_FAILURE_TIME_RETRY = 1000L * 16;
 
 	static private MessageLevelSecurityRequirements __minClientMessageSec = null;
 
-	/*
-	 * this is the maximum time that an operation can take before it is possible to consider adding it from the dead hosts pool. if it takes
-	 * longer than this fairly short duration, then we consider that it is really down.
-	 */
-	final long MAXIMUM_ALLOWABLE_CONNECTION_PAUSE = 5000L;
+	static public String WSDD_CLIENT_CONFIGURATION_FILE = "web-service-client-config.wsdd";
 
 	/**
-	 * Class to wipe our loaded config stuff in the event the config manager reloads.
+	 * add linkage to wipe our loaded config stuff in the event the config manager reloads.
 	 */
 	static {
 		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
@@ -184,11 +170,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		return retval;
 	}
 
-	public static int getDefaultClientTimeout()
-	{
-		// future: this really needs to be stored in a config file so users can change it!!!
-		return _DEFAULT_CLIENT_REQUEST_TIMEOUT;
-	}
+	// public static int getDefaultClientTimeout()
+	// {
+	// // future: this really needs to be stored in a config file so users can change it!!!
+	// return _DEFAULT_CLIENT_REQUEST_TIMEOUT;
+	// }
 
 	/**
 	 * Retrieves the client's minimum allowable level of message security
@@ -353,7 +339,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	{
 		try {
 			Constructor<?> cons = loc.getConstructor(org.apache.axis.EngineConfiguration.class);
-			_providerConfig = new FileProvider("client-config.wsdd");
+			_providerConfig = new FileProvider(WSDD_CLIENT_CONFIGURATION_FILE);
 			Object retval = cons.newInstance(_providerConfig);
 
 			return retval;
@@ -418,8 +404,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	{
 		if (_manager == null) {
 			_manager =
-				(InvocationInterceptorManager) ConfigurationManager.getCurrentConfiguration().getClientConfiguration().retrieveSection(
-					new QName("http://vcgr.cs.virginia.edu/Genesis-II", "client-pipeline"));
+				(InvocationInterceptorManager) ConfigurationManager.getCurrentConfiguration().getClientConfiguration()
+					.retrieveSection(new QName("http://vcgr.cs.virginia.edu/Genesis-II", "client-pipeline"));
 		}
 
 		if (_manager == null) {
@@ -498,7 +484,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		int baseTwitter = 25;
 		int attempt = 0;
 		long startAttempt = 0L;
-		int timeout = (_timeout != null) ? _timeout.intValue() : _DEFAULT_CLIENT_REQUEST_TIMEOUT;
+		int timeout = (_timeout != null) ? _timeout.intValue() : ClientProperties.getClientProperties().getClientTimeout();
 		TypeInformation type = null;
 
 		ResourceAccessMonitor.reportResourceUsage(origEPR);
@@ -516,9 +502,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						_logger.debug("Unable to communicate with endpoint (not a retryable-exception).");
 					throw cause;
 				} else {
-					// Presumably, here I need to invalidate the cache for all entries that
-					// belongs to that particular container.
-					// ASG July 2015, this is done in resolveandinvoke
+					/*
+					 * Presumably, here I need to invalidate the cache for all entries that belongs to that particular container.
+					 * 
+					 * ASG July 2015, this is done in resolveandinvoke
+					 */
 				}
 				if (type == null)
 					type = new TypeInformation(_epr);
@@ -528,11 +516,12 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						_logger.debug("Unable to communicate with endpoint after " + attempt + " attempts.");
 					throw cause;
 				}
-				// deltaCommunicate is the total amount of time spent on the attempt,
-				// including time spent talking to the resolver and each instance.
-				// If this single attempt took too long, then don't make another attempt.
+				/*
+				 * deltaCommunicate is the total amount of time spent on the attempt, including time spent talking to the resolver and each
+				 * instance. If this single attempt took too long, then don't make another attempt.
+				 */
 				long deltaCommunicate = System.currentTimeMillis() - startAttempt;
-				if (deltaCommunicate > MAX_FAILURE_TIME_RETRY) {
+				if (deltaCommunicate > ClientProperties.getClientProperties().getMaximumRetryTime()) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Unable to communicate with endpoint after " + deltaCommunicate + " millis");
 					throw cause;
@@ -607,7 +596,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						throwable = throwable.getCause();
 				}
 				if (_logger.isDebugEnabled())
-					_logger.debug("doInvoke fault on " + calledMethod.getName() + "due to: " + throwable.getMessage());
+					_logger.debug("doInvoke fault on " + calledMethod.getName() + " due to: " + throwable.getMessage());
 				if ((throwable instanceof TryAgainFaultType) && (!tryAgain)) {
 					tryAgain = true;
 				} else {
@@ -626,16 +615,17 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					String throwmsg = throwable.getMessage() == null ? "Null message" : throwable.getMessage();
 					Boolean securityException = throwmsg.contains("Access denied");
 					Boolean connectionProblem = throwmsg.contains("ConnectException");
-//					Boolean SSLProblem = throwmsg.contains("SSLHandshakeException");
+					// Boolean SSLProblem = throwmsg.contains("SSLHandshakeException");
 
-					// Added July 14, 2015 by ASG to deal with dead hosts and not bother trying to talk to them. The timeouts kill us.
 					/*
-					 * CAK: added a skip if the connection failure was super fast, since then we hope we can retry that type of failure just as swiftly.
-					 * usually the connection failure mode stays consistent, i.e. a firewall is always keeping us the whole timeout period,
-					 * whereas an unreachable host or down container can fail very fast.
+					 * ASG: Added July 14, 2015 to deal with dead hosts and not bother trying to talk to them. The timeouts kill us.
+					 * 
+					 * CAK: added a skip if the connection failure was super fast, since then we hope we can retry that type of failure just
+					 * as swiftly. usually the connection failure mode stays consistent, i.e. a firewall is always keeping us the whole
+					 * timeout period, whereas an unreachable host or down container can fail very fast.
 					 */
-					if ( (throwable instanceof ConnectionException || throwable instanceof UnknownHostException || connectionProblem)
-						&& (duration > MAXIMUM_ALLOWABLE_CONNECTION_PAUSE)) {
+					if ((throwable instanceof ConnectionException || throwable instanceof UnknownHostException || connectionProblem)
+						&& (duration > ClientProperties.getClientProperties().getMaximumAllowableConnectionPause())) {
 						DeadHostChecker.addHostToDeadPool(handler);
 						String msg = "Communication failure for " + key;
 						_logger.error(msg);

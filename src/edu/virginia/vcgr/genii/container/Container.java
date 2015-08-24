@@ -59,7 +59,7 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
 import edu.virginia.vcgr.genii.client.configuration.Security;
@@ -204,11 +204,12 @@ public class Container extends ApplicationBase
 
 			socketConnector.setPort(_containerConfiguration.getListenPort());
 			_containerConfiguration.getSslInformation().configure(getConfigurationManager(), (SslSocketConnector) socketConnector);
-			_containerURL = Hostname.normalizeURL("https://127.0.0.1:" + _containerConfiguration.getListenPort());
+			_containerURL =
+				edu.virginia.vcgr.appmgr.net.Hostname.normalizeURL("https://127.0.0.1:" + _containerConfiguration.getListenPort());
 		} else {
 			socketConnector = new SocketConnector();
 			socketConnector.setPort(_containerConfiguration.getListenPort());
-			_containerURL = Hostname.normalizeURL("http://127.0.0.1:" + _containerConfiguration.getListenPort());
+			_containerURL = edu.virginia.vcgr.appmgr.net.Hostname.normalizeURL("http://127.0.0.1:" + _containerConfiguration.getListenPort());
 		}
 
 		_logger.info(String.format("Setting max acceptor threads to %d\n", _containerConfiguration.getMaxAcceptorThreads()));
@@ -497,7 +498,7 @@ public class Container extends ApplicationBase
 	{
 		try {
 			URL url = new URL(ctxt.getProperty(MessageContext.TRANS_URL).toString());
-			URL result = new URL(url.getProtocol(), Hostname.getLocalHostname().toString(), url.getPort(), url.getFile());
+			URL result = new URL(url.getProtocol(), ConfiguredHostname.lookupHost(null).toString(), url.getPort(), url.getFile());
 			return result.toString();
 		} catch (MalformedURLException mue) {
 			// Can't happen

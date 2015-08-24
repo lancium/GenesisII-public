@@ -77,7 +77,8 @@ public class SMBNegotiate implements SMBCommand
 			acc.put((byte) 0);
 			// Max Mpx Count; number of simultaneous requests
 			acc.putShort((short) 0xffff);
-			// Max VCs; number of setups per individual connection; XXX: maybe force 1
+			// Max VCs; number of setups per individual connection.
+			// future: maybe force 1
 			acc.putShort((short) 0xffff);
 			// Max buffer size
 			acc.putInt(0x20000);
@@ -123,7 +124,8 @@ public class SMBNegotiate implements SMBCommand
 			acc.putShort((short) 0xffff);
 			// Max Mpx Count; number of simultaneous requests
 			acc.putShort((short) 0xffff);
-			// Max VCs; number of setups per individual connection; XXX: maybe force 1
+			// Max VCs; number of setups per individual connection
+			// future: maybe force 1
 			acc.putShort((short) 0xffff);
 			// Support for write raw and read raw
 			acc.putShort((short) 0);

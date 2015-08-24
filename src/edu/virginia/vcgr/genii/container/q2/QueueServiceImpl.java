@@ -598,8 +598,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			new QueueAsBESFactoryAttributesUtilities(_queueMgr.getBESManager().allBESInformation(), (QueueConstructionParameters) baseCP);
 		boolean isAcceptingNewActivities = _resource.isAcceptingNewActivites();
 		long totalNumberOfActivities = _queueMgr.getJobCount();
-		return new GetFactoryAttributesDocumentResponseType(utils
-			.factoryResourceAttributes(isAcceptingNewActivities, totalNumberOfActivities), null);
+		return new GetFactoryAttributesDocumentResponseType(
+			utils.factoryResourceAttributes(isAcceptingNewActivities, totalNumberOfActivities), null);
 	}
 
 	@Override

@@ -31,8 +31,8 @@ public interface WriteResolver
 	 * @throws IOException
 	 */
 	public void truncate(long offset) throws IOException;
-	
+
 	/* Wait for pending writes to complete */
 	public void drain();
-	
+
 }

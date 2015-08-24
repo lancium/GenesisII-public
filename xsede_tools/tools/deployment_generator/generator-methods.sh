@@ -276,10 +276,14 @@ function populate_deployment()
   find "$DEP_DIR" -depth -type d -iname "\.svn" -exec rm -rf {} ';'
 
   # get the container properties right.
-  cp "$GENII_INSTALL_DIR/container.properties.example" "$GENII_INSTALL_DIR/container.properties"
-  check_if_failed "copying container properties example"
-  replace_phrase_in_file "$GENII_INSTALL_DIR/container.properties" "^.*edu.virginia.vcgr.genii.container.deployment-name=.*" "edu.virginia.vcgr.genii.container.deployment-name=$DEP_NAME"
-  check_if_failed "fixing container properties for deployment"
+  cp "$GENII_INSTALL_DIR/lib/container.properties.template" "$GENII_INSTALL_DIR/lib/container.properties"
+  check_if_failed "copying container properties template"
+
+  # set up a client properties file.
+  cp "$GENII_INSTALL_DIR/lib/client.properties.template" "$GENII_INSTALL_DIR/lib/client.properties"
+  check_if_failed "copying client properties template"
+  replace_phrase_in_file "$GENII_INSTALL_DIR/lib/client.properties" "^.*edu.virginia.vcgr.genii.container.deployment-name=.*" "edu.virginia.vcgr.genii.container.deployment-name=$DEP_NAME"
+  check_if_failed "fixing client properties for deployment"
 
   # remove any old context.xml, since we are making a new one now.
   rm -f context.xml

@@ -21,8 +21,9 @@ public class UnpackTar
 	/**
 	 * takes a tar.gz file as the "tarFile" parameter, then decompresses and unpacks the file into the "dest" location.
 	 */
-	
-	public static void uncompressArchive(ArchiveInputStream tarIn, File dest) throws IOException {
+
+	public static void uncompressArchive(ArchiveInputStream tarIn, File dest) throws IOException
+	{
 
 		if (dest.exists()) {
 			// Don't unpack into an existing directory
@@ -60,22 +61,23 @@ public class UnpackTar
 			tarEntry = tarIn.getNextEntry();
 		}
 		tarIn.close();
-		
+
 	}
+
 	public synchronized static void uncompressTarGZ(File tarFile, File dest) throws IOException
 	{
 		TarArchiveInputStream tarIn = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(tarFile)));
 
 		uncompressArchive(tarIn, dest);
 	}
-	
+
 	public synchronized static void uncompressTar(File tarFile, File dest) throws IOException
 	{
 		TarArchiveInputStream tarIn = new TarArchiveInputStream(new FileInputStream(tarFile));
 
 		uncompressArchive(tarIn, dest);
 	}
-	
+
 	public synchronized static void uncompressZip(File zipFile, File dest) throws IOException
 	{
 		ZipArchiveInputStream tarIn = new ZipArchiveInputStream(new FileInputStream(zipFile));

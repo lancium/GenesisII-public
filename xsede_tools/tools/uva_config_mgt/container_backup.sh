@@ -28,7 +28,7 @@ if [ -f "$GENII_INSTALL_DIR/context.xml" ]; then
 fi
 
 # backup the container state.
-tar -czf "$backup_file" "$GENII_USER_DIR" "$GENII_INSTALL_DIR/deployments" "$GENII_INSTALL_DIR/container.properties" "${additional_pax[@]}"
+tar -czf "$backup_file" "$GENII_USER_DIR" "$GENII_INSTALL_DIR/deployments" "$GENII_INSTALL_DIR"/*.properties "${additional_pax[@]}"
 
 if [ ! -z "$BACKUP_INTO_GRID" ]; then
   #copy the backup state to grid-namespace

@@ -198,7 +198,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		// End logging
 		try {
 			/*
-			 * TODO - rather than building a list of all the files in the directory and seeing if this one is there - just check if is there.
+			 * hmmm: rather than building a list of all the files in the directory and seeing if this one is there - just check if is there.
 			 */
 			_resourceLock.lock();
 			Collection<String> entries = _resource.listEntries(filename);
@@ -561,7 +561,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		topic.publish(new RNSOperationContents(RNSOperations.Remove, name, null, vvr));
 	}
 
-	// TODO: setResourceProperties() does not send "policy" update.
+	// future: setResourceProperties() does not send "policy" update.
 
 	/**
 	 * Given a new resource which was just created and which is about to be added to this directory - if this directory has a policy that new

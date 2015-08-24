@@ -168,7 +168,7 @@ public class SMBConnection implements Runnable
 	 */
 	public int allocateTID(SMBTree tree) throws SMBException
 	{
-		/* TODO: improve */
+		/* future: improve */
 		for (int i = 0; i < 0xffff; i++) {
 			if (trees.get(i) == null) {
 				trees.put(i, tree);
@@ -356,7 +356,7 @@ public class SMBConnection implements Runnable
 		} catch (BufferOverflowException e) {
 			acc.position(fix);
 			_logger.debug("Buffer overflow", e);
-			// XXX: this might be BUFFER_TOO_SMALL actually
+			// future: this might be BUFFER_TOO_SMALL actually
 			sendError(h, acc, NTStatus.BUFFER_OVERFLOW);
 		}
 	}
@@ -408,7 +408,7 @@ public class SMBConnection implements Runnable
 		} catch (BufferOverflowException e) {
 			acc.position(fix);
 			_logger.debug("Buffer overflow", e);
-			// XXX: this might be BUFFER_TOO_SMALL actually
+			// future: this might be BUFFER_TOO_SMALL actually
 			sendError(h, acc, NTStatus.BUFFER_OVERFLOW);
 		}
 	}

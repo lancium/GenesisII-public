@@ -122,9 +122,6 @@ public class SocketConfigurer
 
 	final public void configureSocket(Socket socket)
 	{
-		if (_logger.isDebugEnabled())
-			_logger.debug("Configuring socket.");
-
 		try {
 			if (_keepAlive != null) {
 				if (_logger.isDebugEnabled())
@@ -144,9 +141,6 @@ public class SocketConfigurer
 				socket.setSendBufferSize(_sendBufferSize);
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Set send buffer size to %d (now it's %d).", _sendBufferSize, socket.getSendBufferSize()));
-			} else {
-				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Left send buffer size at %d.", socket.getSendBufferSize()));
 			}
 
 			if (_receiveBufferSize != null) {
@@ -154,9 +148,6 @@ public class SocketConfigurer
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Set receive buffer size to %d (now it's %d).", _receiveBufferSize,
 						socket.getReceiveBufferSize()));
-			} else {
-				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Left receive buffer size at %d.", socket.getReceiveBufferSize()));
 			}
 
 			if (_reuseAddress != null) {
@@ -190,8 +181,9 @@ public class SocketConfigurer
 			}
 
 			if (socket instanceof SSLSocket) {
-				// this change does fix the POODLE issue for our clients; clients
-				// will no longer negotiate down to SSLv3 afterwards.
+				/*
+				 * this change *DOES* fix the POODLE issue for our clients; clients will no longer negotiate down to SSLv3 afterwards.
+				 */
 				((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1" });
 			}
 

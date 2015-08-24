@@ -322,33 +322,31 @@ public class QueueDatabase
 					// recreate the sweeping job for this state.
 					SweepingJob sweep = new SweepingJob(jobTicket);
 
-					
 					QueueStates state = QueueStates.valueOf(rs.getString(4));
 
-					//hmmm: remove this again
-					_logger.info("queue state of sweeping job on reload is: "  + state);
-					
+					// _logger.info("queue state of sweeping job on reload is: " + state);
+
 					/*
 					 * if the state wasn't finished yet, then we set it to an error state, since we currently do not resume from a stopped
 					 * sweep.
 					 */
-					if (!state.isFinalState() ) {						
+					if (!state.isFinalState()) {
 						state = QueueStates.ERROR;
 					}
-					
 
 					data =
-						new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket, rs
-							.getShort(3), state, new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), HistoryContextFactory.createContext(
-							HistoryEventCategory.Default, callContext, historyKey(jobTicket)), new LoggingContext(rs.getString(11)));
+						new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket,
+							rs.getShort(3), state, new Date(rs.getTimestamp(5).getTime()), rs.getShort(6),
+							HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)),
+							new LoggingContext(rs.getString(11)));
 
 				} else {
 
 					data =
 						new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
-							new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7), HistoryContextFactory
-								.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)), new LoggingContext(rs
-								.getString(11)));
+							new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
+							HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)),
+							new LoggingContext(rs.getString(11)));
 				}
 
 				Blob blob = rs.getBlob(8);
@@ -635,8 +633,8 @@ public class QueueDatabase
 					break;
 				}
 
-				ret.put(jobID, new PartialJobInfo((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1)), rs.getTimestamp(2), rs
-					.getTimestamp(3)));
+				ret.put(jobID,
+					new PartialJobInfo((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1)), rs.getTimestamp(2), rs.getTimestamp(3)));
 
 				rs.close();
 				rs = null;

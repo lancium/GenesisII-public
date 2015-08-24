@@ -14,7 +14,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 
-// TODO: not finished?
+// future: not finished?
 public class SMBTree
 {
 	static private Log _logger = LogFactory.getLog(SMBTree.class);
@@ -35,7 +35,7 @@ public class SMBTree
 
 	public int allocateFID(SMBFile file) throws SMBException
 	{
-		/* TODO: improve */
+		/* future: improve */
 		for (int i = 0; i < 0x10000; i++) {
 			if (files.get(i) == null) {
 				files.put(i, file);
@@ -58,7 +58,7 @@ public class SMBTree
 
 	public int allocateSID(SMBSearchState search) throws SMBException
 	{
-		/* TODO: improve */
+		/* future: improve */
 		for (int i = 0; i < 0x10000; i++) {
 			if (searches.get(i) == null) {
 				searches.put(i, search);
@@ -67,7 +67,8 @@ public class SMBTree
 			}
 		}
 
-		throw new SMBException(NTStatus.INSUFF_SERVER_RESOURCES);// XXX: maybe OS2_NO_MORE_SIDS
+		throw new SMBException(NTStatus.INSUFF_SERVER_RESOURCES);
+		// future: maybe OS2_NO_MORE_SIDS
 	}
 
 	public SMBSearchState verifySID(int SID) throws SMBException
@@ -91,7 +92,7 @@ public class SMBTree
 
 	public static String pathNormalize(String path)
 	{
-		// TODO: improve this
+		// future: improve this
 		path = path.replace('\\', '/');
 		while (path.length() > 0 && path.charAt(0) == '/')
 			path = path.substring(1);
@@ -145,7 +146,7 @@ public class SMBTree
 		if (path.isEmpty())
 			return root;
 
-		// TODO: improve this
+		// future: improve this
 		path = path.replace('\\', '/');
 		while (path.length() > 0 && path.charAt(0) == '/')
 			path = path.substring(1);
@@ -238,7 +239,7 @@ public class SMBTree
 	public static void rm(RNSPath dir) throws SMBException
 	{
 		try {
-			// XXX: is this correct
+			// future: is this correct
 			dir.delete();
 		} catch (RNSPathDoesNotExistException e) {
 			throw new SMBException(NTStatus.NO_SUCH_FILE);

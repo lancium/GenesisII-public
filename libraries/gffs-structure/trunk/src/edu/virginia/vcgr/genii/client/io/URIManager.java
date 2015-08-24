@@ -27,20 +27,15 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.DataTransferStatistics;
 
+import edu.virginia.vcgr.genii.client.ClientProperties;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
-import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
-import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 @SuppressWarnings("unchecked")
 public class URIManager
 {
 	static private Log _logger = LogFactory.getLog(URIManager.class);
-
-	static private final String DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS = "128";
-	static private final String MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY =
-		"edu.virginia.vcgr.genii.client.io.uri-manager.max-simultaneous-connections";
 
 	static private final QName _URI_HANDLER_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "uri-handlers");
 
@@ -59,9 +54,7 @@ public class URIManager
 			}
 		}
 
-		int count =
-			Integer.parseInt(Installation.getDeployment(new DeploymentName()).uriManagerProperties()
-				.getProperty(MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY, DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS));
+		int count = ClientProperties.getClientProperties().getMaximumURIManagerConnections();
 		_logger.info(String.format("URIManager configured to allow up to %d simultaneous connections.", count));
 		_connectionSemaphore = new Semaphore(count, true);
 	}
@@ -90,10 +83,6 @@ public class URIManager
 
 	static public DataTransferStatistics get(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
-		
-		//hmmm: support directories here also!!!!
-
-		
 		_logger.info(String.format("Attempting to copy from '%s' to '%s'.", source, target));
 		String scheme = source.getScheme();
 		if (scheme == null)

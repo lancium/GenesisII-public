@@ -583,7 +583,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 				if (flags.status != null)
 					return flags.status;
 
-				// TODO - resolve add/add conflicts and add/delete conflicts.
+				// future: resolve add/add conflicts and add/delete conflicts.
 
 				if (targetEPR == null) {
 					if (_logger.isDebugEnabled())
@@ -602,7 +602,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 				_resourceLock.unlock();
 			}
 
-			// TODO - replay one message after an add/add conflict?
+			// future: replay one message after an add/add conflict?
 
 			if (resource.getEntryCount() == 0) {
 				// Destroy this resolver resource.

@@ -36,7 +36,7 @@ import com.sun.mail.smtp.SMTPMessage;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 
 class MailOutputStream extends OutputStream
 {
@@ -66,7 +66,7 @@ class MailOutputStream extends OutputStream
 			_mailProps = new Properties();
 			_mailProps.put("mail.smtp.host", "localhost");
 			_mailProps.put("mail.smtp.auth", "false");
-			_mailProps.put("mail.smtp.from", "vcgr-grid@" + Hostname.getLocalHostname());
+			_mailProps.put("mail.smtp.from", "vcgr-grid@" + ConfiguredHostname.lookupHost(null));
 		}
 
 		_session = Session.getInstance(_mailProps);

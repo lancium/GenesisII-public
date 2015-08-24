@@ -22,7 +22,7 @@ import edu.virginia.vcgr.genii.client.bes.ResourceManagerType;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.queue.QueueConstructionParameters;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeed;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeedUnits;
@@ -236,7 +236,7 @@ class QueueAsBESFactoryAttributesUtilities
 
 		besExtensions = new URI[0];
 
-		String machineName = Hostname.getLocalHostname().toString();
+		String machineName = ConfiguredHostname.lookupHost(null).toString();
 
 		Collection<MessageElement> any = new LinkedList<MessageElement>();
 		any.addAll(supportedFilesystems());

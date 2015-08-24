@@ -95,7 +95,7 @@ public class SMBOpenAndX implements SMBCommand
 			acc.putShort((short) SMBFileAttributes.fromTypeInfo(type));
 			UTime.fromMillis(write.getTime()).encode(acc);
 			acc.putInt((int) fileSize);
-			// XXX: maybe base off of ACCESS_MODE
+			// future: maybe base off of ACCESS_MODE
 			if (type.isRByteIO())
 				acc.putShort((short) (2 | SHARE_DENY_NONE));
 			else

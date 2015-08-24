@@ -285,7 +285,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 		if (segmentList.size() == 0) {
 			return;
 		}
-		// TODO: incrementVersionLockCount(_resource);
+		// future: why wasn't this done? incrementVersionLockCount(_resource);
 		_resourceLock.unlock();
 		try {
 			EndpointReferenceType primaryEPR = EPRUtils.fromBytes((byte[]) _resource.getProperty(SyncProperty.PRIMARY_EPR_PROP_NAME));
@@ -297,7 +297,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			}
 		} finally {
 			_resourceLock.lock();
-			// TODO: decrementVersionLockCount(_resource);
+			// future: why wasn't this here? decrementVersionLockCount(_resource);
 		}
 		RandomAccessFile raf = null;
 		bitmapFile = null;
@@ -563,8 +563,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 				if (flags.status != null)
 					return flags.status;
 				if (operation.equals(ByteIOOperations.Unlink)) {
-					// TODO - Destroy subscription from sender.
-					// Also, remove outcalls to sender from persistent queue?
+					// future: Destroy subscription from sender.
+					// future: Also, remove outcalls to sender from persistent queue?
 					return NotificationConstants.OK;
 				}
 				File bitmapFile = resource.getBitmapFile();

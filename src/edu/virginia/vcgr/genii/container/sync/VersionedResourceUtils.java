@@ -275,7 +275,7 @@ public class VersionedResourceUtils
 	 */
 	public static void destroySubscription(IResource publisher, EndpointReferenceType consumerEPR)
 	{
-		// TODO - implement destroySubscription()
+		// future: implement destroySubscription()
 	}
 
 	/**

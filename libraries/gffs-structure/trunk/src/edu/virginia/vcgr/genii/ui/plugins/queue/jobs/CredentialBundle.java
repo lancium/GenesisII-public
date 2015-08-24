@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
@@ -20,6 +22,8 @@ import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 class CredentialBundle implements Comparable<CredentialBundle>
 {
+	static private Log _logger = LogFactory.getLog(CredentialBundle.class);
+
 	private String _value;
 	private String _tooltip;
 
@@ -96,8 +100,12 @@ class CredentialBundle implements Comparable<CredentialBundle>
 			SecurityUtilities.filterCredentials(identities, SecurityUtilities.GROUP_TOKEN_PATTERN, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 		Set<String> ownerSet = new HashSet<String>();
 
-		for (Identity owner : owners)
+		for (Identity owner : owners) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("adding owner via CLIENT_IDENTITY_PATTERN: " + owner);
+
 			ownerSet.add(toOwnerString(owner));
+		}
 
 		String[] ownerStrings = ownerSet.toArray(new String[ownerSet.size()]);
 

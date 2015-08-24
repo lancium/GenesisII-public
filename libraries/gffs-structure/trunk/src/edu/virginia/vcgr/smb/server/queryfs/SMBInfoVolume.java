@@ -12,7 +12,7 @@ public class SMBInfoVolume
 	{
 		output.putInt(SMBQueryFs.SERIAL_NUMBER);
 
-		// TODO: this is very broken
+		// future: this is very broken
 
 		// output.put((byte)output.strlen(SMBQueryFs.VOLUME_LABEL, unicode));
 		// output.putString(SMBQueryFs.VOLUME_LABEL, unicode);

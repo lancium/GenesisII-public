@@ -17,7 +17,8 @@ public class SMBQueryFsAttributeInfo
 		int length = SMBQueryFs.FILESYSTEM_NAME.length();
 
 		output.putInt(FILE_CASE_SENSITIVE_SEARCH | FILE_CASE_PRESERVED_NAMES | FILE_UNICODE_ON_DISK);
-		// Maximum size of filename; XXX: maybe choose a better value
+		// Maximum size of filename.
+		// future: maybe choose a better value
 		output.putInt(0x100);// output.putInt(0xffff);
 		output.putInt(length * 2);
 		for (int i = 0; i < length; i++)

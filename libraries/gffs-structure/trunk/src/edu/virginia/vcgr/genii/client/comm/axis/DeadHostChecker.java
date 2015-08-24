@@ -6,6 +6,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.ClientProperties;
+
 /**
  * Manages a list of hosts that have proven to be down recently. Has support to not immediately fail the host, as this can lead to too quick
  * an assumption that the host is down, but after N tries, the host is out. It will then be tested again periodically so we know when it comes
@@ -14,6 +16,15 @@ import org.apache.commons.logging.LogFactory;
 public class DeadHostChecker
 {
 	static private Log _logger = LogFactory.getLog(DeadHostChecker.class);
+
+	// this value specifies how many attempts can fail before the host is considered down.
+	static private int HOW_MANY_DOWNS_ALLOWED = 1;
+
+	/*
+	 * this is the longest amount of time between checking of dead hosts that we'll ever pause. exponential backoff will occur up until this
+	 * delay time, and then stay at this delay time afterwards.
+	 */
+	static private int MAXIMUM_ALLOWABLE_CHECKING_DELAY = 60 * 1000 * 5; // current is 5 minutes max for exponential backoff on retries.
 
 	public static class HostKey
 	{
@@ -52,15 +63,6 @@ public class DeadHostChecker
 
 	static final HashMap<HostKey, RetryInfo> deadHosts = new HashMap<HostKey, RetryInfo>();
 
-	// this value specifies how many attempts can fail before the host is considered down.
-	static private int HOW_MANY_DOWNS_ALLOWED = 1;
-
-	/*
-	 * this is the longest amount of time between checking of dead hosts that we'll ever pause. exponential backoff will occur up until this
-	 * delay time, and then stay at this delay time afterwards.
-	 */
-	static private int MAXIMUM_ALLOWABLE_CHECKING_DELAY = 60 * 1000 * 5;  // current is 5 seconds max.
-
 	public static class RetryInfo
 	{
 		public long nextTime;
@@ -76,7 +78,7 @@ public class DeadHostChecker
 
 		int initialDelay()
 		{
-			return AxisClientInvocationHandler.getDefaultClientTimeout() / 2;
+			return ClientProperties.getClientProperties().getClientTimeout() / 2;
 		}
 
 		boolean isThisHostDead()
@@ -156,13 +158,13 @@ public class DeadHostChecker
 
 			// we definitely saw this host as down at least once, so record that now.
 			inf.recordDown();
-			
+
 			if (!inf.isThisHostDead()) {
 				// still up, although we needed to record that failure.
 				if (_logger.isDebugEnabled())
 					_logger.debug("host " + key + " is not dead yet but suffered a connection problem.");
 			} else {
-				// this is dead now.  say something about it if we didn't already.
+				// this is dead now. say something about it if we didn't already.
 				if (!alreadyDead && _logger.isDebugEnabled())
 					_logger.warn("host " + key + " is newly considered dead due to communication problems.");
 			}

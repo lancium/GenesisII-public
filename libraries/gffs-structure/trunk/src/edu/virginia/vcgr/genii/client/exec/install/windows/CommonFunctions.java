@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 
 public class CommonFunctions
@@ -48,7 +48,7 @@ public class CommonFunctions
 			accountOverride = String.format("%s\\%s", getLocalUserDomain(), System.getProperty("user.name"));
 		else {
 			if (accountOverride.contains(MACHINE_NAME_TOKEN)) {
-				accountOverride = accountOverride.replace(MACHINE_NAME_TOKEN, Hostname.getLocalHostname().toShortString());
+				accountOverride = accountOverride.replace(MACHINE_NAME_TOKEN, ConfiguredHostname.lookupHost(null).getShortExternalName());
 			}
 		}
 

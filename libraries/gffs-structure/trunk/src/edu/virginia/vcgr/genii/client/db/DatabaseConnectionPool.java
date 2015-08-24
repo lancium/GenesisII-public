@@ -12,40 +12,40 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
-import edu.virginia.vcgr.genii.client.locking.GReadWriteLock;
-import edu.virginia.vcgr.genii.client.locking.UnfairReadWriteLock;
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
 public class DatabaseConnectionPool
 {
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
 
-	static protected final String _DB_POOL_SIZE_DEFAULT = "16";
-	/*
-	 * future: is 16 too large? we get these horrid messages at times: ERROR 40XL1: A lock could not be obtained within the time requested
-	 * tried 8 to see if alleviated the problem, but was still seeing the complaints.
-	 */
+	// hmmm: wacky largeness right now to test new mechanism. norm 16.
+	static protected final int _DB_POOL_SIZE_DEFAULT = 64;
 
-	private GReadWriteLock _lock = new UnfairReadWriteLock();
-	private LinkedList<Connection> _connPool;
-	private int _poolSize;
+	// hmmm: ridiculously large delay allowed now; was 4 seconds originally!
+	static public final int MAX_SNOOZE_AWAITING_POOL = 24 * 1000; // in milliseconds.
+
+	// number of milliseconds to snooze between lock attempts.
+	static public final int TIME_TAKEN_PER_SNOOZE = 240;
+
+	private LinkedList<Connection> _connPool; // all of our pooled db connections.
+	private int _poolSize; // how big the pool may grow.
 	private String _connectString;
 	private String _user;
 	private String _password;
 
 	protected DatabaseConnectionPool(DBPropertyNames names, Properties connectionProperties, String specialString)
 	{
-		set_connPool(new LinkedList<Connection>());
-		set_poolSize(Integer.parseInt(connectionProperties.getProperty(names._DB_POOL_SIZE_PROPERTY, _DB_POOL_SIZE_DEFAULT)));
-		set_user(connectionProperties.getProperty(names._DB_USER_PROPERTY));
-		set_password(connectionProperties.getProperty(names._DB_PASSWORD_PROPERTY));
+		setConnPool(new LinkedList<Connection>());
+		setPoolSize(Integer.parseInt(connectionProperties.getProperty(names._DB_POOL_SIZE_PROPERTY, "" + _DB_POOL_SIZE_DEFAULT)));
+		setUser(connectionProperties.getProperty(names._DB_USER_PROPERTY));
+		setPassword(connectionProperties.getProperty(names._DB_PASSWORD_PROPERTY));
 
 		// this is dangerous since it prints db account name and password.
 		if (_logger.isTraceEnabled())
 			_logger.trace("DB Conn Pool for: " + connectionProperties);
 
-		set_connectString(replaceMacros(connectionProperties.getProperty(names._DB_CONNECT_STRING_PROPERTY), specialString));
-		if (get_connectString() == null)
+		setConnectString(replaceMacros(connectionProperties.getProperty(names._DB_CONNECT_STRING_PROPERTY), specialString));
+		if (getConnectString() == null)
 			throw new IllegalArgumentException("Connect string cannot be null for database connection.");
 	}
 
@@ -92,64 +92,54 @@ public class DatabaseConnectionPool
 		return str.substring(0, start) + dir.getAbsolutePath() + str.substring(start + specialString.length());
 	}
 
-	protected LinkedList<Connection> get_connPool()
+	protected LinkedList<Connection> getConnPool()
 	{
 		return _connPool;
 	}
 
-	protected void set_connPool(LinkedList<Connection> _connPool)
+	protected void setConnPool(LinkedList<Connection> connPool)
 	{
-		this._connPool = _connPool;
+		this._connPool = connPool;
 	}
 
-	protected int get_poolSize()
+	protected int getPoolSize()
 	{
 		return _poolSize;
 	}
 
-	protected void set_poolSize(int _poolSize)
+	protected void setPoolSize(int poolSize)
 	{
-		this._poolSize = _poolSize;
+		this._poolSize = poolSize;
 	}
 
-	protected String get_connectString()
+	protected String getConnectString()
 	{
 		return _connectString;
 	}
 
-	protected void set_connectString(String _connectString)
+	protected void setConnectString(String connectString)
 	{
-		this._connectString = _connectString;
+		this._connectString = connectString;
 	}
 
-	protected String get_user()
+	protected String getUser()
 	{
 		return _user;
 	}
 
-	protected void set_user(String _user)
+	protected void setUser(String _user)
 	{
 		this._user = _user;
 	}
 
-	protected String get_password()
+	protected String getPassword()
 	{
 		return _password;
 	}
 
-	protected void set_password(String _password)
+	protected void setPassword(String _password)
 	{
 		this._password = _password;
-	}
-
-	protected GReadWriteLock get_lock()
-	{
-		return _lock;
-	}
-
-	protected void set_lock(GReadWriteLock _lock)
-	{
-		this._lock = _lock;
 	}
 
 	protected Connection acquire() throws SQLException
@@ -157,44 +147,38 @@ public class DatabaseConnectionPool
 		SQLException lastException = null;
 		Connection connection = null;
 		if (_logger.isTraceEnabled())
-			_logger.trace("Acquiring DB connection[" + get_connPool().size() + "]");
-		boolean succeeded = false;
+			_logger.debug("Acquiring DB connection with " + getConnPool().size() + " active in pool.");
 
-		int maxSnooze = 4 * 1000; // in milliseconds.
-		int eachSleep = 500; // number of milliseconds to snooze between lock attempts.
-		int attempts = (int) ((double) maxSnooze / (double) eachSleep + 1);
-
+		int attempts = (int) ((double) MAX_SNOOZE_AWAITING_POOL / (double) TIME_TAKEN_PER_SNOOZE + 1);
 		for (int lcv = 0; lcv < attempts; lcv++) {
 			try {
-				get_lock().readLock().lock();
-				synchronized (get_connPool()) {
-					if (!get_connPool().isEmpty()) {
-						connection = get_connPool().removeFirst();
+				synchronized (getConnPool()) {
+					if (!getConnPool().isEmpty()) {
+						connection = getConnPool().removeFirst();
 					}
 				}
-
-				if (connection == null)
+				if (connection == null) {
 					connection = createConnection();
-
+				}
 				((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(connection)).setAcquired();
-
-				succeeded = true;
+				if (_logger.isTraceEnabled())
+					_logger.trace((lcv + 1) + " tries needed to get lock on db.");
 				return connection;
 			} catch (SQLException sqe) {
 				_logger.error(String.format("Unable to acquire/create connection to database on attempt %d.", lcv), sqe);
 				lastException = sqe;
-			} finally {
-				if (!succeeded)
-					get_lock().readLock().unlock();
 			}
 
+			// we failed to get a connection, so snooze a bit and try again.
 			try {
-				Thread.sleep(eachSleep);
+				Thread.sleep(TIME_TAKEN_PER_SNOOZE);
 			} catch (Throwable cause) {
+				// ignore any interruptions. may want to revise if we see us getting stuck on shutdown.
 			}
 		}
 
-		_logger.error("Unable to acquire/create connections in " + maxSnooze / 1000 + " seconds.  Giving up.", lastException);
+		_logger.error("Unable to acquire/create db connection in " + MAX_SNOOZE_AWAITING_POOL / 1000
+			+ " seconds, or an unexpected error occurred.  Giving up.", lastException);
 		throw lastException;
 	}
 
@@ -208,17 +192,18 @@ public class DatabaseConnectionPool
 	public void release(Connection conn)
 	{
 		if (_logger.isTraceEnabled())
-			_logger.trace("Releasing a database connection [" + get_connPool().size() + "].");
+			_logger.debug("Releasing DB connection with " + getConnPool().size() + " active in pool.");
 
-		if (conn == null)
+		if (conn == null) {
 			return;
+		}
 
-		synchronized (get_connPool()) {
+		synchronized (getConnPool()) {
 			try {
 				try {
 					conn.rollback();
-					if (get_connPool().size() < get_poolSize()) {
-						get_connPool().addLast(conn);
+					if (getConnPool().size() < getPoolSize()) {
+						getConnPool().addLast(conn);
 						return;
 					}
 				} catch (SQLException sqe) {
@@ -231,8 +216,6 @@ public class DatabaseConnectionPool
 					_logger.error("Error closing the connection.", t);
 				}
 			} finally {
-				get_lock().readLock().unlock();
-
 				((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(conn)).setReleased();
 			}
 		}
@@ -243,7 +226,7 @@ public class DatabaseConnectionPool
 		if (_logger.isTraceEnabled())
 			_logger.trace("Creating a new database connection.");
 
-		Connection conn = DriverManager.getConnection(get_connectString(), get_user(), get_password());
+		Connection conn = DriverManager.getConnection(getConnectString(), getUser(), getPassword());
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 		return (Connection) Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new Class[] { Connection.class },
 			new DatabaseConnectionInterceptor(conn));

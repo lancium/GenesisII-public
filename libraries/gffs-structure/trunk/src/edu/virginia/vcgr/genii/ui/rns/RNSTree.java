@@ -521,7 +521,7 @@ public class RNSTree extends JTree implements EndpointRetriever
 	{
 		iMap.put(CommonKeyStrokes.REFRESH, _refreshAction.getValue(Action.NAME));
 
-		// TODO: should be converted to 'go up one level'. ==> iMap.put(CommonKeyStrokes.BACKSPACE,
+		// future: should be converted to 'go up one level'. ==> iMap.put(CommonKeyStrokes.BACKSPACE,
 		// no! do not delete for backspace: _deleteAction.getValue(Action.NAME));
 
 		iMap.put(CommonKeyStrokes.DELETE, _deleteAction.getValue(Action.NAME));

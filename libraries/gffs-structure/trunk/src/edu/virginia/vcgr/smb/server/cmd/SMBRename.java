@@ -26,7 +26,7 @@ public class SMBRename implements SMBCommand
 		// handle
 
 		SMBTree tree = c.verifyTID(h.tid);
-		// TODO: this is wrong, the names are actually patterns, although there's no documentation on how it works
+		// future: this is wrong, the names are actually patterns, although there's no documentation on how it works
 		RNSPath oldPath = tree.lookup(oldName, h.isCaseSensitive());
 		RNSPath newPath = tree.lookup(newName, h.isCaseSensitive());
 

@@ -73,7 +73,7 @@ public class SMBOpen implements SMBCommand
 		acc.startParameterBlock();
 		acc.putShort((short) FID);
 		acc.putShort((short) SMBFileAttributes.fromTypeInfo(info));
-		// TODO: wrong timezone
+		// future: fix wrong timezone
 		acc.putInt((int) (write.getTime() / 1000));
 		acc.putInt((int) fileSize);
 		acc.putShort((short) accessMode);

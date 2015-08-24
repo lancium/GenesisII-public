@@ -111,9 +111,6 @@ public class DownloadManagerContainerService extends AbstractContainerService
 
 	public DataTransferStatistics download(URI source, File target, UsernamePasswordIdentity credential) throws IOException
 	{
-		
-		//hmmm: support directories here also!!!!
-		
 		target = target.getAbsoluteFile();
 		InProgressLock lock;
 		boolean iAmResponsible = false;

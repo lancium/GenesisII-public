@@ -36,8 +36,7 @@ public class JobApplicationContext
 	private JobDefinitionListener _generationListener;
 	private Collection<JobDocumentContext> _openDocuments = new LinkedList<JobDocumentContext>();
 
-	JobApplicationContext(Collection<File> initialFiles, JobDefinitionListener generationListener)
-		throws IOException
+	JobApplicationContext(Collection<File> initialFiles, JobDefinitionListener generationListener) throws IOException
 	{
 		_preferences = new ToolPreferences();
 

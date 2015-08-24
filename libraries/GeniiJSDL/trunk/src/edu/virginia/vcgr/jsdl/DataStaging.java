@@ -27,7 +27,8 @@ import edu.virginia.vcgr.jsdl.hpcfse.HPCFSEConstants;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_filename", "_filesystemName", "_creationFlag", "_deleteOnTermination", "_handleAsArchive", "_source", "_target", "_credentials" })
+@XmlType(propOrder = { "_filename", "_filesystemName", "_creationFlag", "_deleteOnTermination", "_handleAsArchive", "_source", "_target",
+	"_credentials" })
 public class DataStaging extends CommonJSDLElement
 {
 	static final long serialVersionUID = 0L;
@@ -88,13 +89,14 @@ public class DataStaging extends CommonJSDLElement
 		_target = target;
 	}
 
-	public DataStaging(String filename, String filesystemName, CreationFlag creationFlag, boolean deleteOnTermination, boolean handleAsArchive, SourceTarget source,
-		SourceTarget target)
+	public DataStaging(String filename, String filesystemName, CreationFlag creationFlag, boolean deleteOnTermination,
+		boolean handleAsArchive, SourceTarget source, SourceTarget target)
 	{
 		this(null, filename, filesystemName, creationFlag, deleteOnTermination, handleAsArchive, source, target);
 	}
 
-	public DataStaging(String filename, CreationFlag creationFlag, boolean deleteOnTermination, boolean handleAsArchive, SourceTarget source, SourceTarget target)
+	public DataStaging(String filename, CreationFlag creationFlag, boolean deleteOnTermination, boolean handleAsArchive, SourceTarget source,
+		SourceTarget target)
 	{
 		this(filename, null, creationFlag, deleteOnTermination, handleAsArchive, source, target);
 	}
@@ -162,7 +164,7 @@ public class DataStaging extends CommonJSDLElement
 	{
 		_handleAsArchive = handleAsArchive;
 	}
-	
+
 	final public Boolean handleAsArchive()
 	{
 		return _handleAsArchive;

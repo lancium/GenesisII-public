@@ -1,0 +1,105 @@
+
+# This file supplies properties for GFFS clients.
+#
+# Note on search order for configuration items listed in this file:
+# These configuration items will first be sought in 'installation.properties'
+# in the state directory (GENII_USER_DIR).  Any settings found in the
+# 'installation.properties' file will override those found in 'this' file.
+# Note that 'this' file has a flexible definition, in that the file named
+# client.properties can be found in either the state directory 
+# ($GENII_USER_DIR) or the installation directory's lib folder
+# ($GENII_INSTALL_DIR/lib).
+# If client.properties is found in the state directory, then it takes
+# precedence; if neither an installation.properties nor a client.properties
+# is found in the state directory, then the file client.properties will be
+# sought in the install directory's lib folder as a last resort.
+
+#######
+
+# help topic associations to web addresses.
+main.help=http://genesis2.virginia.edu/wiki/Main/GUIHelpMain
+general.export.help=http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm#anchor_e_3_2
+export.creation.help=http://genesis2.virginia.edu/wiki/Main/GUIHelpMain#CreateExport
+general.directory.help=http://genesis2.virginia.edu/wiki/Main/GUIHelpMain#DirOps
+create.directory.help=http://genesis2.virginia.edu/wiki/Main/GUIHelpMain#HelpWhere
+general.file.help=http://genesis2.virginia.edu/wiki/Main/GUIHelpMain#FileOps
+general.security.help=http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm#anchor_e_2_3
+general.storage.help=http://genesis2.virginia.edu/wiki/Main/GUIHelpMain#HelpWhere
+job.create.help=http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm#anchor_e_5
+
+# UI error reporting.
+edu.virginia.vcgr.genii.ui.error.report-target=http://vcgr.cs.virginia.edu/ui/report/reporter.php
+#hmmm: may not be used any more.
+
+#######
+
+# This can be changed to the actual deployment name in use.  The deployment
+# name is held in the state directory's active records for the grid
+# connection otherwise.
+#gffs.deployment-name=example
+#gffs.deployment-name=${compiler:genii.new-deployment}
+
+# Absolute path of the deployments folder for this installation.  Default is
+# the $GENII_INSTALL_DIR/deployments folder.
+#gffs.deployment-directory=
+
+#######
+
+# parameters for byte I/O file read/write operations.
+
+# buffer size for standard large reads during sequential access.  default is 32 megabytes.
+gffs.byteio.long_buffer_size=33554432
+
+# buffer size for smaller reads, once we've decided the client is not using a sequential access pattern.  default is 8 megabytes.
+gffs.byteio.short_buffer_size=8388608
+
+# max times to retry a failed read.
+gffs.byteio.read_retries=5
+
+# max times to retry a failed write.
+gffs.byteio.write_retries=5
+
+# read buffer count MUST be >= 2; this is the max read ahead distance.
+gffs.byteio.read_buffers=4
+
+# max writers MUST be >= 1.
+gffs.byteio.max_writers=16
+
+# max readers MUST be >= 2, and SHOULD be > read buffers.
+gffs.byteio.max_readers=16
+
+# transferers MUST be >= read buffers.
+gffs.byteio.transferers=4
+
+#######
+
+# this is the longest that the client will wait for a request to be answered
+# by a container.  the default timeout is one minute, which may not be
+# sufficient for some very long-running operations.
+gffs.client_timeout=60000
+
+# we'll wait this long for a connection failure before it's considered TOO
+# long for the exponential back-off retry.  this should be larger than the
+# gffs.client_timeout, since it is expecting to cross some number of those
+# rpc operations.
+gffs.max_failure_retry_time=120000
+
+# this is the maximum time that an operation can take before we consider
+# adding it from the dead hosts pool. if it takes longer than this fairly
+# short duration, then we consider that the host:port combo is really down.
+gffs.max_connection_pause=5000
+
+# the cache size for ssl socket factories, to avoid paying costs to reconstruct.
+gffs.socket_cache_size=1024
+
+# maximum number of connections allowed by URI manager at a time.
+edu.virginia.vcgr.genii.client.io.uri-manager.max-simultaneous-connections=4
+
+#######
+
+# Connection command for clients to find the installed grid deployment.
+# Example below is what might be used for XSEDE production grid.
+#edu.virginia.vcgr.genii.gridInitCommand="local:/home/fred/GenesisII/deployments/current_grid/context.xml" "current_grid"
+# install4j version that gets replaced by interactive installer.
+#edu.virginia.vcgr.genii.gridInitCommand="local:${installer:sys.installationDir}/deployments/${compiler:genii.new-deployment}/${compiler:genii.deployment-context}" "${compiler:genii.new-deployment}"
+

@@ -83,7 +83,7 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 	public void completeFacet(Object parentUnderstanding, Object currentUnderstanding)
 	{
 		JobRequest jr = (JobRequest) parentUnderstanding;
-		jr.addDataStage(new ContainerDataStage(new FilesystemRelative<String>(_filesystemName, _fileName), _deleteOnTerminate, _handleAsArchive, _creationFlag,
-			_sourceURI, _targetURI, _credential));
+		jr.addDataStage(new ContainerDataStage(new FilesystemRelative<String>(_filesystemName, _fileName), _deleteOnTerminate,
+			_handleAsArchive, _creationFlag, _sourceURI, _targetURI, _credential));
 	}
 }

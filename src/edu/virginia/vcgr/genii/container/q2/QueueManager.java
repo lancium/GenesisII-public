@@ -453,8 +453,6 @@ public class QueueManager implements Closeable
 		}
 	}
 
-
-	
 	public Collection<ReducedJobInformationType> listJobs(String ticket) throws SQLException, ResourceException
 	{
 		Connection connection = null;
@@ -662,8 +660,8 @@ public class QueueManager implements Closeable
 			for (Long besID : hostSlotSummary.keySet()) {
 				BESInformation info = _besManager.getBESInformation(besID);
 				if (info != null) {
-					summary.add(new HostDescription(info.getProcessorArchitecture(), info.getOperatingSystemType()), hostSlotSummary
-						.get(besID));
+					summary.add(new HostDescription(info.getProcessorArchitecture(), info.getOperatingSystemType()),
+						hostSlotSummary.get(besID));
 				}
 			}
 		}

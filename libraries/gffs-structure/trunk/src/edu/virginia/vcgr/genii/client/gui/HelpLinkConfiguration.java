@@ -1,10 +1,6 @@
 package edu.virginia.vcgr.genii.client.gui;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.morgan.util.io.StreamUtils;
+import edu.virginia.vcgr.genii.client.ClientProperties;
 
 public class HelpLinkConfiguration
 {
@@ -18,24 +14,11 @@ public class HelpLinkConfiguration
 	public static final String GENERAL_STORAGE_HELP = "general.storage.help";
 	public static final String JOB_CREATE_HELP = "job.create.help";
 
-	private static Properties p = null;
-
-	public static String get_help_url(String help_ptr)
+	public static String get_help_url(String helpPointer)
 	{
-		if (p == null) {
-			p = new Properties();
-			InputStream in = HelpLinkConfiguration.class.getClassLoader().getResourceAsStream("config/help-links.properties");
-			try {
-				p.load(in);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			} finally {
-				StreamUtils.close(in);
-			}
-		}
-		String r = p.getProperty(help_ptr);
+		String r = ClientProperties.getClientProperties().getHelpFileProperty(helpPointer);
 		if (r == null) {
-			throw new RuntimeException("Could not find help link " + help_ptr);
+			throw new RuntimeException("Could not find help link for: " + helpPointer);
 		}
 		return r;
 	}

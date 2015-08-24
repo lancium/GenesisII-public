@@ -11,8 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.comm.socket.SocketConfigurer;
-
 public class Deployment
 {
 	static private Log _logger = LogFactory.getLog(Deployment.class);
@@ -20,11 +18,7 @@ public class Deployment
 	static private final String CONFIGURATION_DIRECTORY_NAME = "configuration";
 	static private final String SERVICES_DIRECTORY_NAME = "services";
 	static private final String DYNAMIC_PAGES_DIRECTORY_NAME = "dynamic-pages";
-	static private final String URI_PROPERTIES_FILENAME = "uri-manager.properties";
 	static private final String WEB_CONTAINER_PROPERTIES_FILENAME = "web-container.properties";
-	static private final String REJUVENATION_PROPERTYIES_FILENAME = "rejuvenation.properties";
-	static private final String CLIENT_SOCKET_PROPERTIES_FILENAME = "client-socket.properties";
-	static private final String CLIENT_CACHE_PROPERTIES_FILENAME = "client-cache.properties";
 
 	static private Map<String, Deployment> _knownDeployments = new HashMap<String, Deployment>(4);
 
@@ -34,10 +28,6 @@ public class Deployment
 	private HierarchicalDirectory _servicesDirectory;
 	private HierarchicalDirectory _dynamicPagesDirectory;
 	private Properties _webContainerProperties;
-	private Properties _uriManagerProperties;
-	private Properties _rejuvenationProperties;
-	private Properties _clientCacheProperties;
-	private SocketConfigurer _clientSocketConfigurer;
 	private NamespaceDefinitions _namespace;
 
 	private Deployment(File deploymentDirectory)
@@ -63,50 +53,6 @@ public class Deployment
 		_dynamicPagesDirectory = _deploymentDirectory.lookupDirectory(DYNAMIC_PAGES_DIRECTORY_NAME);
 
 		_webContainerProperties = loadWebContainerProperties(_deploymentDirectory.getName(), _configurationDirectory);
-		_uriManagerProperties = loadURIManagerProperties(_deploymentDirectory.getName(), _configurationDirectory);
-		_clientSocketConfigurer = loadClientSocketConfigurer();
-		_rejuvenationProperties = loadRejuvenationProperties(_deploymentDirectory.getName(), _configurationDirectory);
-		_clientCacheProperties = loadClientCacheProperties(_deploymentDirectory.getName(), _configurationDirectory);
-	}
-
-	private SocketConfigurer loadClientSocketConfigurer()
-	{
-		Properties properties = new Properties();
-
-		File confFile = getConfigurationFile(CLIENT_SOCKET_PROPERTIES_FILENAME);
-		if (confFile.exists()) {
-			FileInputStream fin = null;
-
-			try {
-				fin = new FileInputStream(confFile);
-				properties.load(fin);
-			} catch (IOException ioe) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Unable to load client-socket properties.", ioe);
-			} finally {
-				StreamUtils.close(fin);
-			}
-		}
-
-		return new SocketConfigurer(properties);
-	}
-
-	static private Properties loadURIManagerProperties(String deploymentName, HierarchicalDirectory configurationDirectory)
-	{
-		FileInputStream fin = null;
-		Properties ret = new Properties();
-
-		try {
-			fin = new FileInputStream(configurationDirectory.lookupFile(URI_PROPERTIES_FILENAME));
-			ret.load(fin);
-			return ret;
-		} catch (IOException ioe) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("Unable to load uri manager properties from deployment.", ioe);
-			return new Properties();
-		} finally {
-			StreamUtils.close(fin);
-		}
 	}
 
 	static private Properties loadWebContainerProperties(String deploymentName, HierarchicalDirectory configurationDirectory)
@@ -121,41 +67,6 @@ public class Deployment
 		} catch (IOException ioe) {
 			_logger.fatal("Unable to load web container properties from deployment.", ioe);
 			throw new InvalidDeploymentException(deploymentName, "Unable to load web container properties from deployment.");
-		} finally {
-			StreamUtils.close(fin);
-		}
-	}
-
-	static private Properties loadRejuvenationProperties(String deploymentName, HierarchicalDirectory configurationDirectory)
-	{
-		FileInputStream fin = null;
-		Properties ret = new Properties();
-
-		try {
-			fin = new FileInputStream(configurationDirectory.lookupFile(REJUVENATION_PROPERTYIES_FILENAME));
-			ret.load(fin);
-			return ret;
-		} catch (IOException ioe) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("Unable to load software rejuvenation information.  " + "Assuming there isn't any.", ioe);
-			return new Properties();
-		} finally {
-			StreamUtils.close(fin);
-		}
-	}
-
-	static private Properties loadClientCacheProperties(String deploymentName, HierarchicalDirectory configurationDirectory)
-	{
-		FileInputStream fin = null;
-		Properties ret = new Properties();
-
-		try {
-			fin = new FileInputStream(configurationDirectory.lookupFile(CLIENT_CACHE_PROPERTIES_FILENAME));
-			ret.load(fin);
-			return ret;
-		} catch (IOException ioe) {
-			_logger.error("Unable to load cache configuration properties. Caching will be disabled.", ioe);
-			return new Properties();
 		} finally {
 			StreamUtils.close(fin);
 		}
@@ -196,29 +107,9 @@ public class Deployment
 		return _dynamicPagesDirectory;
 	}
 
-	public Properties uriManagerProperties()
-	{
-		return _uriManagerProperties;
-	}
-
 	public Properties webContainerProperties()
 	{
 		return _webContainerProperties;
-	}
-
-	public SocketConfigurer clientSocketConfigurer()
-	{
-		return _clientSocketConfigurer;
-	}
-
-	public Properties softwareRejuvenationProperties()
-	{
-		return _rejuvenationProperties;
-	}
-
-	public Properties clientCacheProperties()
-	{
-		return _clientCacheProperties;
 	}
 
 	public DeploymentName getName()

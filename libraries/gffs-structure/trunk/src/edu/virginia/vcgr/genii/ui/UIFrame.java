@@ -55,13 +55,13 @@ public class UIFrame extends BasicFrameWindow
 	}
 
 	protected void initializeUIFrame(ApplicationContext context, UIContext uiContext)
-	{		
+	{
 		_logger.debug("creating UI frame");
-		
+
 		_uiContext = uiContext;
 		_uiContext.setApplicationContext(context);
 		_uiContext.applicationContext().addDisposeListener(_disposeListener);
-		
+
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);

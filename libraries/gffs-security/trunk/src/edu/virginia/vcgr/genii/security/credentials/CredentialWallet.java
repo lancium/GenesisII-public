@@ -102,10 +102,11 @@ public class CredentialWallet implements Externalizable, Describable
 		try {
 			if (priorDelegation.getDelegatee().equals(delegatee)) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("skipping extension of trust since prior delegation already delegated to delegatee: delegatee=" + delegatee[0].getSubjectDN() + " prior delegatee=" + priorDelegation.getDelegatee()[0].getSubjectDN());
+					_logger.debug("skipping extension of trust since prior delegation already delegated to delegatee: delegatee="
+						+ delegatee[0].getSubjectDN() + " prior delegatee=" + priorDelegation.getDelegatee()[0].getSubjectDN());
 				return priorDelegation;
 			}
-			
+
 			TrustCredential assertion =
 				CredentialCache.getCachedDelegationChain(delegatee, delegateeType, issuer, issuerPrivateKey, restrictions, accessCategories,
 					priorDelegation);

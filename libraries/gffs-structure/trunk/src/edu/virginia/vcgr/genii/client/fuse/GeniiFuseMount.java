@@ -101,25 +101,26 @@ public class GeniiFuseMount implements Filesystem
 			_logger.trace(String.format("getattr(%s)", path));
 		FilesystemStatStructure statstruct = MetadataManager.retrieveStat(path);
 		// ASG changed July 15, 2015 to have getattr on non-existent files NOT go to the grid
-		if (statstruct==null) {
+		if (statstruct == null) {
 			// The file or directory is not in the metadata cache, lets see if it is in the dir cache of the parent
 			String parentPath = DirectoryManager.getParentPath(path);
 			String entryName = MetadataManager.getNameFromPath(path);
 			FuseDirEnt[] dirEntries = DirectoryManager.getDir(parentPath);
-			boolean found=false;
+			boolean found = false;
 			if (dirEntries != null) {
 				for (FuseDirEnt ent : dirEntries) {
 					if (ent.name.equals(entryName)) {
 						// Found it. Hmm, what to do. Just let it fall through and have the stat call happen
-						found=true;
+						found = true;
 						break;
 					}
 				}
 				if (!found) {
 					// Not there in the cache, the cache is up to date, the file does not exist.
-					throw FuseExceptions.translate(String.format("Unable to locate path %s.", path), new FSEntryNotFoundException(String.format("Unable to locate path %s.", path)));
-					
-					 //new FSEntryNotFoundException(String.format("Unable to locate path %s.", entryName));
+					throw FuseExceptions.translate(String.format("Unable to locate path %s.", path),
+						new FSEntryNotFoundException(String.format("Unable to locate path %s.", path)));
+
+					// new FSEntryNotFoundException(String.format("Unable to locate path %s.", entryName));
 
 				}
 			}
@@ -263,8 +264,8 @@ public class GeniiFuseMount implements Filesystem
 	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("read(%s, %d, %s, %d)", path, fileHandle, buffer, offset));
-//		if ((path != null) && (buffer != null))
-//			System.out.printf("read(%s, %d, %s, %d)\n", path, fileHandle, buffer, offset);
+		// if ((path != null) && (buffer != null))
+		// System.out.printf("read(%s, %d, %s, %d)\n", path, fileHandle, buffer, offset);
 		try {
 			_fs.read(fileHandle, offset, buffer);
 		} catch (Throwable cause) {

@@ -18,8 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.AttributedURIType;
 
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
-
 public class AttributedURITypeSmart extends AttributedURIType
 {
 	static private Log _logger = LogFactory.getLog(AttributedURITypeSmart.class);
@@ -34,7 +32,7 @@ public class AttributedURITypeSmart extends AttributedURIType
 	static private String smartifyURL(String url)
 	{
 		try {
-			return Hostname.normalizeURL(url);
+			return edu.virginia.vcgr.appmgr.net.Hostname.normalizeURL(url);
 		} catch (UnknownHostException uhe) {
 			_logger.warn(uhe);
 			return url;

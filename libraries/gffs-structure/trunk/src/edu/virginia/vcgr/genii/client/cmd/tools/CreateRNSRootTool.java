@@ -10,7 +10,6 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.context.ContextFileSystem;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -69,7 +68,7 @@ public class CreateRNSRootTool extends BaseGridTool
 	{
 		String filename = getArgument(0);
 
-		String baseURL = Hostname.normalizeURL(_protocol + "://" + _host + ":" + _port + "/" + _baseURLPath);
+		String baseURL = edu.virginia.vcgr.appmgr.net.Hostname.normalizeURL(_protocol + "://" + _host + ":" + _port + "/" + _baseURLPath);
 		createRNSRoot(filename, baseURL);
 		return 0;
 	}

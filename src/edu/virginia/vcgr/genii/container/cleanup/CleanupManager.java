@@ -1,7 +1,5 @@
 package edu.virginia.vcgr.genii.container.cleanup;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,32 +10,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
-import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.ContainerProperties;
 
 public class CleanupManager
 {
 	static private Log _logger = LogFactory.getLog(CleanupManager.class);
 
-	static final private String CLEANUP_PROPERTIES_FILENAME = "cleanup.properties";
 	static final private String PROPERTY_SUFFIX = "enact-cleanup";
 
 	static private Properties loadProperties()
 	{
-		File cleanupProperties = Installation.getDeployment(new DeploymentName()).getConfigurationFile(CLEANUP_PROPERTIES_FILENAME);
-
-		FileInputStream fin = null;
-		try {
-			fin = new FileInputStream(cleanupProperties);
-			Properties ret = new Properties();
-			ret.load(fin);
-			return ret;
-		} catch (Throwable cause) {
-			_logger.warn("Unable to read the cleanup properties.  " + "We're not going to enact anything.", cause);
-			return new Properties();
-		} finally {
-			StreamUtils.close(fin);
-		}
+		return ContainerProperties.getContainerProperties();
 	}
 
 	static private boolean enactCleanup(String value)

@@ -67,7 +67,7 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
@@ -171,9 +171,56 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		return super.startup();
 	}
 
+	/*
+	 * how long should the BES postpone starting up once it is told it's started? this gives the container that owns the BES a chance to fully
+	 * start.
+	 */
+	// public final long BES_SNOOZE_PERIOD_AFTER_STARTUP = 1000L * 60L;
+	//
+	// private class ActivityDelayingThread extends ethread
+	// {
+	// private int _activationCount = 0;
+	//
+	// ActivityDelayingThread()
+	// {
+	// super(BES_SNOOZE_PERIOD_AFTER_STARTUP);
+	//
+	// }
+	//
+	// @Override
+	// public boolean performActivity()
+	// {
+	// if (_activationCount++ < 1) {
+	// // first activation is too soon; we want the timer period to elapse once.
+	// return true;
+	// }
+	//
+	// startupBESServices();
+	//
+	// // although this is a timed thread, we only want one shot of activity, so return false.
+	// return false;
+	// }
+	//
+	// }
+
+	// ActivityDelayingThread _postponer = null;
+
 	@Override
 	public void postStartup()
 	{
+		// _logger.debug("postponing BES services startup, allowing container to finish restarting.");
+		// _postponer = new ActivityDelayingThread();
+		// _postponer.start();
+		// }
+		//
+		//
+		//
+		// public void startupBESServices()
+		// {
+		// _postponer = null; // done with the thread, so it can be trashed whenever.
+		//
+		// _logger.debug("now initiating BES services startup.");
+
 		try {
 			/*
 			 * In order to make out calls, we have to have a working context so we go ahead and create an empty one.
@@ -252,8 +299,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		try {
 			JobDefinition jaxbType = JSDLUtils.convert(jdt);
 			if (jaxbType.parameterSweeps().size() > 0) {
-				history.createErrorWriter("Parameter Sweep Unsupported.").format(
-					"This type of BES container does not support Parameter Sweeps.").close();
+				history.createErrorWriter("Parameter Sweep Unsupported.")
+					.format("This type of BES container does not support Parameter Sweeps.").close();
 
 				throw new UnsupportedFeatureFaultType(new String[] { "This BES container does not support JSDL parameter sweeps." }, null);
 			}
@@ -295,9 +342,10 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		history.info("BES Creating Activity Instance");
 
 		EndpointReferenceType entryReference =
-			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
-				(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe), Container
-				.getServiceURL("BESActivityPortType"));
+			new BESActivityServiceImpl().CreateEPR(
+				BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
+					(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
+				Container.getServiceURL("BESActivityPortType"));
 
 		return new CreateActivityResponseType(entryReference, adt, historySink.eventMessages());
 
@@ -381,7 +429,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		throws RemoteException
 	{
 		Collection<MessageElement> any = new ArrayList<MessageElement>(4);
-		String resourceName = Hostname.getLocalHostname().toString();
+		String resourceName = ConfiguredHostname.lookupHost(null).toString();
 
 		URI[] namingProfiles = null;
 		URI[] besExtensions = null;
@@ -419,13 +467,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			any.addAll(BESAttributesHandler.getSupportedFilesystemsAttr());
 
 			return new GetFactoryAttributesDocumentResponseType(new FactoryResourceAttributesDocumentType(
-				new BasicResourceAttributesDocumentType(resourceName, BESAttributesHandler.getOperatingSystem(), BESAttributesHandler
-					.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()), new Double((double) BESAttributesHandler
-					.getCPUSpeed()), new Double((double) BESAttributesHandler.getPhysicalMemory()), new Double((double) BESAttributesHandler
-					.getVirtualMemory()), Elementals.toArray(any)), BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler
-					.getName(), BESAttributesHandler.getDescription(), BESAttributesHandler.getTotalNumberOfActivities(),
-				BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles, besExtensions, localResourceManagerType, Elementals
-					.toArray(any)), null);
+				new BasicResourceAttributesDocumentType(resourceName, BESAttributesHandler.getOperatingSystem(),
+					BESAttributesHandler.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()), new Double(
+						(double) BESAttributesHandler.getCPUSpeed()), new Double((double) BESAttributesHandler.getPhysicalMemory()),
+					new Double((double) BESAttributesHandler.getVirtualMemory()), Elementals.toArray(any)),
+				BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler.getName(), BESAttributesHandler.getDescription(),
+				BESAttributesHandler.getTotalNumberOfActivities(), BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles,
+				besExtensions, localResourceManagerType, Elementals.toArray(any)), null);
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unexpected BES exception.", sqe);
 		}

@@ -90,6 +90,8 @@ if [ -z "$REUSE_GRID_CERTIFICATES" ]; then
   check_if_failed "creating certificates for test grid"
 fi
 
+prepare_container_configuration
+
 launch_container_if_not_running "$DEPLOYMENT_NAME"
 
 echo Startup log state...

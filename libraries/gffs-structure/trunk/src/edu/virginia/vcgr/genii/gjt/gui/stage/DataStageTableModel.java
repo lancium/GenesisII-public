@@ -64,7 +64,7 @@ class DataStageTableModel extends AbstractTableModel
 
 			case 5:
 				return stage.handleAsArchive();
-				
+
 			case 6:
 				return stage.filesystemType();
 		}
@@ -102,7 +102,7 @@ class DataStageTableModel extends AbstractTableModel
 			case 4:
 				stage.deleteOnTerminate(((Boolean) aValue).booleanValue());
 				break;
-				
+
 			case 5:
 				stage.handleAsArchive(((Boolean) aValue).booleanValue());
 				break;

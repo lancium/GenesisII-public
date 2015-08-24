@@ -75,7 +75,7 @@ public class TestingDBConnectionPool
 		props.setProperty("edu.virginia.vcgr.genii.client.db.db-password", "");
 		props.setProperty("edu.virginia.vcgr.genii.client.db.pool-size", "8");
 
-		// TODO: parameters not right; need to copy server db conn pool?
+		// future: parameters not right; need to copy server db conn pool?
 		_pool = new DatabaseConnectionPool(null, props, null);
 	}
 

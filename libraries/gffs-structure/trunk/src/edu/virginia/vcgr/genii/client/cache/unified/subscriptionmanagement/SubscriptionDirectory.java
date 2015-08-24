@@ -26,7 +26,7 @@ import edu.virginia.vcgr.genii.notification.broker.IndirectSubscriptionEntryType
  */
 public class SubscriptionDirectory
 {
-	// TODO: This should come from some properties file.
+	// hmmm: This should come from some properties file.
 	public static final long SUBSCRIPTION_TIMEOUT_INTERVAL = 30 * 60 * 1000L; // thirty minutes
 
 	static final Map<String, Date> SUBSCRIBED_RESOURCE_TO_SUBSCRIPTION_END_TIME_MAP = new ConcurrentHashMap<String, Date>();
