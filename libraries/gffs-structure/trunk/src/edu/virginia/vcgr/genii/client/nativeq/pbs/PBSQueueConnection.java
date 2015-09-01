@@ -195,6 +195,23 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 			// add directive for specifying multiple processors
 			Integer numProcs = application.getNumProcesses();
 			Integer numProcsPerHost = application.getNumProcessesPerHost();
+			Integer threadsPerProcess = application.getThreadsPerProcess();
+			
+			//hmmm: use threadsPerProcess here!  although PBS doesn't seem to have a notion of threads separate from processes...
+
+			_logger.info("pbs spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc=" + threadsPerProcess);
+
+			//hmmm: danger--hardcoded strings from our spmd mode, which might change.
+			// new section for checking whether they've asked for exclusivity or are okay with sharing the node for sequential jobs.
+			if (application.getSPMDVariation().toString().contains("NodeExclusiveThreaded")) {
+				script.format("#PBS -l place=excl");
+				if (_logger.isDebugEnabled())
+					_logger.debug("pbs using exclusive flag for NodeExclusiveThreaded spmd");
+			} else {
+				script.format("#PBS shared");
+				if (_logger.isDebugEnabled())
+					_logger.debug("pbs using shared flag for SharedThreaded spmd");
+			}
 
 			if (numProcs != null) {
 				if (numProcsPerHost != null) {

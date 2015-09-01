@@ -55,6 +55,10 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 		_handleAsArchive = handleAsArchive;
 	}
 
+	// hmmm: move this elsewhere.
+	/**
+	 * the types of compressed files that we know how to handle.
+	 */
 	public enum CompressedFileTypes {
 		UNKNOWN,
 		TAR_FILE,
@@ -62,6 +66,134 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 		TGZ_FILE,
 		ZIP_FILE,
 	};
+
+	/**
+	 * packages up the work done by isRecognizedArchiveType, which provides the type that was recognized and the suffix length for the
+	 * extension of that type.
+	 */
+	static public class ArchiveDetails
+	{
+		public CompressedFileTypes _type = CompressedFileTypes.UNKNOWN; // from constructor.
+		public Integer _suffixLength = -1; // from constructor.
+		public String _baseName;// calculated in isRecognizedArchiveType.
+		File _folder; // calculated in isRecognizedArchiveType.
+
+		ArchiveDetails(CompressedFileTypes type, Integer suffixLength)
+		{
+			_type = type;
+			_suffixLength = suffixLength;
+		}
+
+		@Override
+		public String toString()
+		{
+			return "type=" + _type + " suffix length=" + _suffixLength + " basename='" + _baseName + "' folder='" + _folder + "'";
+		}
+
+		/**
+		 * returns a non-null archive details object if the "testFile" ends in a known archive extension (zip, tar, tgz, tar.gz).
+		 */
+		public static ArchiveDetails isRecognizedArchiveType(File testFile)
+		{
+			ArchiveDetails toReturn = null;
+			
+			if (testFile.getPath().endsWith(".zip")) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling zip file: " + testFile);
+				toReturn = new ArchiveDetails(CompressedFileTypes.ZIP_FILE, 4);
+			} else if (testFile.getPath().endsWith(".tar")) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling tar file: " + testFile);
+				toReturn = new ArchiveDetails(CompressedFileTypes.TAR_FILE, 4);
+			} else if (testFile.getPath().endsWith(".tgz")) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling tgz file: " + testFile);
+				toReturn = new ArchiveDetails(CompressedFileTypes.TGZ_FILE, 4);
+			} else if (testFile.getPath().endsWith(".tar.gz")) {
+				toReturn = new ArchiveDetails(CompressedFileTypes.TAR_GZ_FILE, 7);
+			}
+
+			if (toReturn == null) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("could not recognize file type as archive: " + testFile);
+				return toReturn;
+			}
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("Handling file type " + toReturn._type);
+
+			/*
+			 * now we know some characteristics of the file involved, so let's break up the name and figure out what directory to create from
+			 * the archive.
+			 */
+			if (_logger.isDebugEnabled())
+				_logger.debug("before calculation, target path is '" + testFile.getPath());
+			String justFilename = new File(testFile.getPath()).getName();
+			if (_logger.isDebugEnabled())
+				_logger.debug("just the filename of target path is '" + justFilename + "'");
+			toReturn._baseName = justFilename.substring(0, justFilename.length() - toReturn._suffixLength);
+			if (_logger.isDebugEnabled())
+				_logger.debug("basename of archive file calculated as '" + toReturn._baseName + "'");
+			File tempTarg = new File(testFile.getPath());
+			toReturn._folder = new File(tempTarg.getParent() + "/" + toReturn._baseName);
+			if (_logger.isDebugEnabled())
+				_logger.debug("folder of archive would be '" + toReturn._folder + "'");
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("intuited that '" + testFile + "' had: " + toReturn.toString());
+
+			return toReturn;
+		}
+
+	}
+
+	/**
+	 * attempts to treat the _target as an archive file and uncompress it.
+	 */
+	public void uncompressArchive(HistoryContext history) throws JSDLException, IOException
+	{
+		/*
+		 * The target path is, for example, xxx/yyy/fred.zip. I want to create a directory xxx/yyy/fred. First I extract fred.zip, then create
+		 * the dir fred.
+		 * 
+		 * Initially, we need to determine what the file type is (based on extension), and then we can construct the proper directory name.
+		 */
+		// String baseName = "Unknown";
+		if (_logger.isDebugEnabled()) {
+			File parent = _target.getParentFile();
+			_logger.debug("Parent dir of target is '" + parent + "'");
+		}
+
+		ArchiveDetails detail = ArchiveDetails.isRecognizedArchiveType(_target);
+		if (detail == null) {
+			// this is a failure; we know we needed to figure out the structure of the name before here.
+			throw new JSDLException("failure to determine type of archive (due to HandleAsArchive flag) for file '"
+				+ _target.getAbsolutePath() + "'");
+		}
+
+		File compressedFile = new File(_target.getPath());
+
+		/*
+		 * An abiding concern here is that we don't uncompress the archive twice in scratch directories. Thus all of these will blow out an
+		 * IOException if the expected target directory is already present and somewhat in the way.
+		 */
+		switch (detail._type) {
+			case TAR_FILE:
+				UnpackTar.uncompressTar(compressedFile, detail._folder);
+				break;
+			case ZIP_FILE:
+				UnpackTar.uncompressZip(compressedFile, detail._folder);
+				break;
+			case TAR_GZ_FILE: // intentional fall-through to TGZ.
+			case TGZ_FILE:
+				UnpackTar.uncompressTarGZ(compressedFile, detail._folder);
+				break;
+			default:
+				throw new JSDLException("unanticipated file type when uncompressing for HandleAsArchive");
+		}
+
+		history.createTraceWriter(detail._baseName + " archive decompressed to " + detail._folder);
+	}
 
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
@@ -80,106 +212,23 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 			}
 			history.createTraceWriter("%s: %d Bytes Transferred", _target.getName(), stats.bytesTransferred())
 				.format("%d bytes were transferred in %d ms.", stats.bytesTransferred(), stats.transferTime()).close();
-			/*
-			 * The file has been transfered. Now we check if it is a zip, tar, or gz. If so we need to extract the directory name to put it
-			 * in, and check if the directory already exists. If the unzip/untar/ungz target directory already exists DO NOT UNPACK IT
-			 * AGAIN!!!!
-			 */
+			// The file has been transfered. Now we check if it needs to be handled as an archive.
 			try {
-				String baseName = "Unknown";
-				File parent = _target.getParentFile();
-				File folder;
-				int suffixLength = 0;
-				CompressedFileTypes type = CompressedFileTypes.UNKNOWN;
-
-				if (_logger.isDebugEnabled())
-					_logger.debug("Parent is '" + parent + "'");
-
-				/*
-				 * if stage-in says handle as archive
-				 */
 				if (_handleAsArchive) {
 					/*
-					 * The target path is, for example, xxx/yyy/fred.zip. I want to create a directory xxx/yyy/fred. First I extract fred.zip,
-					 * then create the dir fred.
-					 * 
-					 * Initially, we need to determine what the file type is (based on extension), and then we can construct the proper
-					 * directory name.
+					 * they told us to handle this file as an archive. it will be decompressed now. this should not be done twice, if the
+					 * folder already exists.
 					 */
-					if (_target.getPath().endsWith(".zip")) {
-						if (_logger.isDebugEnabled())
-							_logger.debug("Handling zip file: " + _target);
-						type = CompressedFileTypes.ZIP_FILE;
-						suffixLength = 4;
-					} else if (_target.getPath().endsWith(".tar")) {
-						if (_logger.isDebugEnabled())
-							_logger.debug("Handling tar file: " + _target);
-						type = CompressedFileTypes.TAR_FILE;
-						suffixLength = 4;
-					} else if (_target.getPath().endsWith(".tgz")) {
-						if (_logger.isDebugEnabled())
-							_logger.debug("Handling tgz file: " + _target);
-						type = CompressedFileTypes.TGZ_FILE;
-						suffixLength = 4;
-					} else if (_target.getPath().endsWith(".tar.gz")) {
-						if (_logger.isDebugEnabled())
-							_logger.debug("Handling tar.gz file: " + _target);
-						type = CompressedFileTypes.TAR_GZ_FILE;
-						suffixLength = 7;
-					}
-
-					if (suffixLength <= 0) {
-						// this is a failure; we know we needed to figure out the structure of the name before here.
-						throw new JSDLException("failure to determine type of archive for HandleAsArchive flag");
-					}
-
-					/*
-					 * now we know some characteristics of the file involved, so let's break up the name and figure out what directory to
-					 * create from the archive.
-					 */
-					if (_logger.isDebugEnabled())
-						_logger.debug("before calculation, target path is '" + _target.getPath());
-					String justFilename = new File(_target.getPath()).getName();
-					if (_logger.isDebugEnabled())
-						_logger.debug("just the filename of target path is '" + justFilename + "'");
-					baseName = justFilename.substring(0, justFilename.length() - suffixLength);
-					if (_logger.isDebugEnabled())
-						_logger.debug("basename of archive file calculated as '" + baseName + "'");
-					File tempTarg = new File(_target.getPath());
-					folder = new File(tempTarg.getParent() + "/" + baseName);
-					if (_logger.isDebugEnabled())
-						_logger.debug("will stage archive to path '" + folder + "'");
-
-					File compressedFile = new File(_target.getPath());
-
-					/*
-					 * An abiding concern here is that we don't uncompress the archive twice in scratch directories. Thus all of these will
-					 * blow out an IOException if the expected target directory is already present and somewhat in the way.
-					 */
-					switch (type) {
-						case TAR_FILE:
-							UnpackTar.uncompressTar(compressedFile, folder);
-							break;
-						case ZIP_FILE:
-							UnpackTar.uncompressZip(compressedFile, folder);
-							break;
-						case TAR_GZ_FILE: // intentional fall-through to TGZ.
-						case TGZ_FILE:
-							UnpackTar.uncompressTarGZ(compressedFile, folder);
-							break;
-						default:
-							throw new JSDLException("unanticipated switch for HandleAsArchive; unknown file type");
-					}
-
-					history.createTraceWriter(baseName + " archive decompressed");
+					uncompressArchive(history);
 				}
 			} catch (IOException ie) {
-				// This is caught when it either was already unzipped or
-				if (ie.getMessage().indexOf("already exists") < 0) {
+				// This is caught when it was already unzipped.
+				if ((ie.getMessage() != null) && (ie.getMessage().indexOf("already exists") < 0)) {
 					throw ie;
 				}
-				history.createTraceWriter("Stage input already extracted");
-				System.err.println("Stage input already extracted");
+				String msg = "Stage input already extracted";
+				history.createTraceWriter(msg);
+				System.err.println(msg);
 			}
 
 		} catch (Throwable cause) {

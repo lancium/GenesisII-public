@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 
 import org.morgan.util.io.StreamUtils;
 import org.morgan.utils.gui.GUIUtils;
@@ -171,18 +170,18 @@ class QueueManipulation
 		@Override
 		public void taskCancelled(Task<Integer> task)
 		{
-			JOptionPane.showMessageDialog(_ownerComponent,
-				"This task runs asynchronously and results from executing it may not appear immediately.", "Delayed Results Warning",
-				JOptionPane.WARNING_MESSAGE);
+//			JOptionPane.showMessageDialog(_ownerComponent,
+//				"This task runs asynchronously and results from executing it may not appear immediately.", "Delayed Results Warning",
+//				JOptionPane.WARNING_MESSAGE);
 			_model.refresh(_ownerComponent);
 		}
 
 		@Override
 		public void taskCompleted(Task<Integer> task, Integer result)
 		{
-			JOptionPane.showMessageDialog(_ownerComponent,
-				"This task runs asynchronously and results from executing it may not appear immediately.", "Delayed Results Warning",
-				JOptionPane.WARNING_MESSAGE);
+//			JOptionPane.showMessageDialog(_ownerComponent,
+//				"This task runs asynchronously and results from executing it may not appear immediately.", "Delayed Results Warning",
+//				JOptionPane.WARNING_MESSAGE);
 			_model.refresh(_ownerComponent);
 		}
 	}

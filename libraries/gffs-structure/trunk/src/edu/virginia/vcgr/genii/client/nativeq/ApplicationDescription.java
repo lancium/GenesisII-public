@@ -15,6 +15,7 @@ public class ApplicationDescription
 	private URI _spmdVariation;
 	private Integer _numProcesses;
 	private Integer _numProcessesPerHost;
+	private Integer _threadsPerProcess;
 	private String _executableName;
 	private Collection<String> _arguments;
 	private Map<String, String> _environment;
@@ -25,6 +26,7 @@ public class ApplicationDescription
 	private File _resourceUsagePath;
 
 	public ApplicationDescription(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
+		Integer threadsPerProcess,
 		String executableName, Collection<String> arguments, Map<String, String> environment, String stdinRedirect, String stdoutRedirect,
 		String stderrRedirect, ResourceConstraints resourceConstraints, File resourceUsagePath)
 	{
@@ -32,6 +34,7 @@ public class ApplicationDescription
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
+		_threadsPerProcess = threadsPerProcess;
 
 		if (executableName == null)
 			throw new IllegalArgumentException("Executable name cannot be null.");
@@ -65,6 +68,11 @@ public class ApplicationDescription
 	public Integer getNumProcessesPerHost()
 	{
 		return _numProcessesPerHost;
+	}
+	
+	public Integer getThreadsPerProcess()
+	{
+		return _threadsPerProcess;
 	}
 
 	public String getExecutableName()

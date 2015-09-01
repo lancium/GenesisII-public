@@ -62,7 +62,7 @@ public class Hostname
 	public Hostname(String givenAddress)
 	{
 		if ((givenAddress == null) || (givenAddress.length() == 0)) {
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("into localhost case because given address is: " + givenAddress);
 
 			// set the address to a known good name, in case we have to fall through.
@@ -84,7 +84,7 @@ public class Hostname
 		}
 
 		if (_logger.isDebugEnabled())
-			_logger.debug("post localhost case: now the given address is: " + givenAddress);
+			_logger.debug("going to look up address: " + givenAddress);
 
 		InetAddress addr = null;
 		try {
@@ -108,7 +108,6 @@ public class Hostname
 				_externalName = formString(address);
 			} else {
 				_externalName = givenAddress;
-				// _externalName = formString(addr);
 			}
 
 		} catch (UnknownHostException e) {

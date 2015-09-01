@@ -55,7 +55,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		String submitScriptName = providerConfiguration().submitScriptName();
 
 		if (submitScriptName != null && submitScriptName.contains("/"))
-			throw new IllegalArgumentException("SubmitScriptName must not contain any " + "path characters (such as '/').");
+			throw new IllegalArgumentException("SubmitScriptName must not contain any path characters (such as '/').");
 
 		File bashBinary = providerConfiguration().bashBinary(new File("/bin/bash"));
 		checkBinary(bashBinary);
@@ -194,7 +194,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				workingDirectory, application.getStdinRedirect(workingDirectory), stdoutRedirect, stderrRedirect,
 				application.getResourceUsagePath(), wrapper.getPathToWrapper());
 			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, application.getSPMDVariation(), application.getNumProcesses(),
-				application.getNumProcessesPerHost());
+				application.getNumProcessesPerHost(), application.getThreadsPerProcess());
 
 			if (_logger.isDebugEnabled())
 				_logger.debug("Trying to call cmdLine manipulators.");

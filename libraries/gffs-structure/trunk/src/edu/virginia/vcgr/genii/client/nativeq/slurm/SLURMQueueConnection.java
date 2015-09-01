@@ -195,8 +195,27 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			// add directive for specifying multiple processors
 			Integer numProcs = application.getNumProcesses();
 			Integer numProcsPerHost = application.getNumProcessesPerHost();
+			Integer threadsPerProcess = application.getThreadsPerProcess();
+			
+			//hmmm: use threadsPerProcess here!
 
+			if (_logger.isDebugEnabled())
+				_logger.debug("slurm spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc=" + threadsPerProcess);
+			
+			//hmmm: danger--hardcoded strings from our spmd mode, which might change.
+			// new section for checking whether they've asked for exclusivity or are okay with sharing the node for sequential jobs.
+			if (application.getSPMDVariation().toString().contains("NodeExclusiveThreaded")) {
+				script.format("#SBATCH --exclusive");
+				if (_logger.isDebugEnabled())
+					_logger.debug("slurm using exclusive flag for NodeExclusiveThreaded spmd");
+			} else if (application.getSPMDVariation().toString().contains("SharedThreaded")) {
+				script.format("#SBATCH --share");				
+				if (_logger.isDebugEnabled())
+					_logger.debug("slurm using shared flag for SharedThreaded spmd");
+			}
+			
 			if (numProcs != null) {
+				script.format("#SBATCH --tasks %d\n", numProcs.intValue());
 				if (numProcsPerHost != null) {
 					Integer hosts = numProcs / numProcsPerHost;
 					script.format("#SBATCH --nodes %d\n", hosts.intValue());
@@ -204,6 +223,10 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 				} else {
 					script.format("#SBATCH -n %d\n", numProcs.intValue());
 				}
+			}
+			
+			if (threadsPerProcess != null) {
+				script.format("#SBATCH --cpus-per-task%d\n", threadsPerProcess.intValue());				
 			}
 
 		}

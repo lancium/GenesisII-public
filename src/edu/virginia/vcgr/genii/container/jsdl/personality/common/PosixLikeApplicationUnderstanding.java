@@ -19,6 +19,7 @@ public abstract class PosixLikeApplicationUnderstanding extends CommonApplicatio
 {
 	private Integer _numProcesses = null;
 	private Integer _numProcessesPerHost = null;
+	private Integer _threadsPerProcess = null;
 	private URI _spmdVariation = null;
 
 	private FilesystemRelativePath _executable = null;
@@ -61,6 +62,16 @@ public abstract class PosixLikeApplicationUnderstanding extends CommonApplicatio
 	public Integer getNumProcessesPerHost()
 	{
 		return _numProcessesPerHost;
+	}
+
+	public void setThreadsPerProcess(int threadsPerProcess)
+	{
+		_threadsPerProcess = new Integer(threadsPerProcess);
+	}
+
+	public Integer getThreadsPerProcess()
+	{
+		return _threadsPerProcess;
 	}
 
 	public void setExecutable(FilesystemRelativePath executable)

@@ -34,6 +34,16 @@ public class CommonPosixLikeSPMDApplicationFacet extends DefaultSPMDApplicationF
 	}
 
 	@Override
+	public void consumeThreadsPerProcess(Object currentUnderstanding, Integer threadsPerProcess, boolean useActualIndividualCPUCount)
+		throws JSDLException
+	{
+		if (useActualIndividualCPUCount)
+			throw new UnsupportedJSDLElement(new QName(SPMDConstants.JSDL_SPMD_NS, "useActualIndividualCPUCount"));
+		
+		((PosixLikeApplicationUnderstanding) currentUnderstanding).setThreadsPerProcess(threadsPerProcess.intValue());		
+	}
+	
+	@Override
 	public void consumeSPMDVariation(Object currentUnderstanding, URI spmdVariation) throws JSDLException
 	{
 		((PosixLikeApplicationUnderstanding) currentUnderstanding).setSPMDVariation(spmdVariation);

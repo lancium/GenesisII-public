@@ -7,7 +7,7 @@
 ##############
 
 # the number of lines we scan for the container startup phrase.
-export LINE_COUNT_FOR_START_CHECK=200
+export LINE_COUNT_FOR_START_CHECK=400
 
 ##############
 

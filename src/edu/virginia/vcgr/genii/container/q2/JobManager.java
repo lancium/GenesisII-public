@@ -237,7 +237,7 @@ public class JobManager implements Closeable
 					identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 					String username = identities.iterator().next().toString();
-					if (_logger.isDebugEnabled())
+					if (_logger.isTraceEnabled())
 						_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
 					SortableJobKey jobKey = new SortableJobKey(job.getJobID(), job.getPriority(), job.getSubmitTime());
@@ -661,13 +661,13 @@ public class JobManager implements Closeable
 			_jobsByTicket.put(ticket, job);
 			_queuedJobs.put(jobKey, job);
 
-			// As jobs are added to the primary list, they are also added to the
-			// appropriate user list (newly created, if needed)
+			/* As jobs are added to the primary list, they are also added to the
+			 appropriate user list (newly created, if needed) */
 			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();
 
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
 			if (!_usersWithJobs.keySet().contains(username)) {
@@ -772,13 +772,13 @@ public class JobManager implements Closeable
 			_jobsByTicket.put(tickynum, job);
 			_queuedJobs.put(jobKey, job);
 
-			// As jobs are added to the primary list, they are also added to the
-			// appropriate user list (newly created, if needed)
+			/* As jobs are added to the primary list, they are also added to the
+			 appropriate user list (newly created, if needed) */
 			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();
 
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
 			if (!_usersWithJobs.keySet().contains(username)) {
@@ -2748,7 +2748,7 @@ public class JobManager implements Closeable
 						identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 						String username = identities.iterator().next().toString();
-						if (_logger.isDebugEnabled())
+						if (_logger.isTraceEnabled())
 							_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
 						SortableJobKey jobKey = new SortableJobKey(_jobData);

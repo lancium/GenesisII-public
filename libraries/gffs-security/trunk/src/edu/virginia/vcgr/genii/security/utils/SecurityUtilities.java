@@ -317,13 +317,18 @@ public class SecurityUtilities implements CertificateValidator
 		return ret;
 	}
 
-	// broken from gaml days: static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$",
-	// Pattern.CASE_INSENSITIVE);
-
-	// correct pattern for current credential printing as of 2015-07-09.
+	/*
+	 * this pattern is used to match and then *remove* any group credentials from consideration for ownership of jobs being added.
+	 * 
+	 * (verified as a correct pattern for current credential printing as of 2015-07-09.)
+	 */
 	static final public Pattern GROUP_TOKEN_PATTERN = Pattern.compile("^\\(group\\).*$", Pattern.CASE_INSENSITIVE);
 
-	// hmmm: below may be broken also.
+	/*
+	 * this pattern is used to weed out undesirable identities from being considered the real owner of a job. anything matching this is
+	 * considered automatically *not* to be the real owner. the main purpose here seems to be removing any self-signed client certificates
+	 * from accidentally being considered the job owner, when true STS identities should instead be used.
+	 */
 	static final public Pattern CLIENT_IDENTITY_PATTERN = Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$", Pattern.CASE_INSENSITIVE);
 
 	static private boolean matches(Identity identity, Pattern[] patterns)
@@ -346,10 +351,13 @@ public class SecurityUtilities implements CertificateValidator
 
 		for (Identity test : in) {
 			if (!matches(test, patterns)) {
-				_logger.debug("pattern did not match so adding: " + test);
+				// hmmm: move this and one below down to trace, or remove.
+				if (_logger.isDebugEnabled())
+					_logger.debug("pattern did not match so adding: " + test);
 				ret.add(test);
 			} else {
-				_logger.debug("pattern matched so NOT adding: " + test);
+				if (_logger.isDebugEnabled())
+					_logger.debug("pattern matched so NOT adding: " + test);
 			}
 		}
 

@@ -637,7 +637,6 @@ public class JobDocument implements PostUnmarshallListener
 		if (_processesPerHost.value() != null)
 			application.processesPerHost(new ProcessesPerHost(_processesPerHost.value()));
 
-		// hmmm: where does this object get set? must do like the processes per host
 		if (_threadsPerProcess.value() != null)
 			application.threadsPerProcess(new ThreadsPerProcess(_threadsPerProcess.value(), null));
 

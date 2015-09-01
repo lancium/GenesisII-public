@@ -16,6 +16,7 @@ public interface CmdLineManipulatorConstants
 	static public final String SPMD_VARIATION = "spmd-variation";
 	static public final String NUMBER_OF_PROCESSES = "number-of-processes";
 	static public final String NUMBER_OF_PROCESSES_PER_HOST = "number-of-processes-per-host";
+	static public final String THREADS_PER_PROCESS = "threads-per-process";
 
 	// environment job properties
 	static public final String ENVIRONMENT = "environment";

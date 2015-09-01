@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="../../../ext/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="../../../ext/ivy-2.3.0.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-compress-1.8.1.jar"/>
+	<classpathentry kind="lib" path="/home/fred/gffs/code/fred-trunk/ext/commons-io-2.4.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>
