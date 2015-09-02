@@ -123,6 +123,8 @@ public class RNSNotificationHandler
 		// Although this is a loop, in typical cases we will find only one RNSPath for the
 		// publisher.
 		for (String rnsPathOfPublisher : publisherConfig.getRnsPaths()) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("saw addition update notification on: " + rnsPathOfPublisher);
 
 			// Store the new entry in the RNS Lookup cache.
 			String pathForEntry = DirectoryManager.getPathForDirectoryEntry(rnsPathOfPublisher, entryName);
@@ -176,6 +178,8 @@ public class RNSNotificationHandler
 		// Although this is a loop, in typical cases we will find only one RNSPath for the
 		// publisher.
 		for (String rnsPathOfPublisher : publisherConfig.getRnsPaths()) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("saw removal update notification on: " + rnsPathOfPublisher);
 
 			// update the cached directory to reflect the removal of entries
 			UnixDirectory publisherDirectory = (UnixDirectory) CacheManager.getItemFromCache(rnsPathOfPublisher, UnixDirectory.class);

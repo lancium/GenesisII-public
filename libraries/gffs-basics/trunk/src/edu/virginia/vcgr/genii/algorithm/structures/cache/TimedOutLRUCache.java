@@ -94,6 +94,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 
 	public DataType get(KeyType key)
 	{
+		Date now = new Date();
 		synchronized (_map) {
 			RoleBasedCacheNode<KeyType, DataType> node = _map.get(key);
 			if (node == null)
@@ -101,10 +102,14 @@ public class TimedOutLRUCache<KeyType, DataType>
 
 			_lruList.remove(node);
 
-			// reset the node's lifespan, since it's just been hit.
-			node.setInvalidationDate(_defaultTimeoutMS);
-			// future: perhaps add a notion of max lifespan to enforce some rollover.
+			if (node.getInvalidationDate().before(now)) {
+				// this entry has become stale.
+				_map.remove(key);
+				_timeoutList.remove(node);
+				return null;
+			}
 
+			// move the node to the end of the LRU list, since we just accessed it.
 			_lruList.insert(node);
 
 			return node.getData();

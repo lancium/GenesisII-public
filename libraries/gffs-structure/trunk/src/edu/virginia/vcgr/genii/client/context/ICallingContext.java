@@ -59,6 +59,8 @@ public interface ICallingContext
 
 	public KeyAndCertMaterial getActiveKeyAndCertMaterial() throws AuthZSecurityException;
 
+	public ICallingContext getParent();
+
 	public Serializable getTransientProperty(String name);
 
 	public void setTransientProperty(String name, Serializable value);

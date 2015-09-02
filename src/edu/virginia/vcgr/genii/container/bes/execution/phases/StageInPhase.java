@@ -96,7 +96,7 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 		public static ArchiveDetails isRecognizedArchiveType(File testFile)
 		{
 			ArchiveDetails toReturn = null;
-			
+
 			if (testFile.getPath().endsWith(".zip")) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("Handling zip file: " + testFile);

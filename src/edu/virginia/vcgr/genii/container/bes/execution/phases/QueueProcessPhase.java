@@ -74,9 +74,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	transient private Boolean _terminate = null;
 
 	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
-		Integer threadsPerProcess, File executable,
-		Collection<String> arguments, Map<String, String> environment, File stdin, File stdout, File stderr,
-		BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
+		Integer threadsPerProcess, File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout,
+		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
 
@@ -168,9 +167,9 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				hWriter.close();
 
 				_jobToken =
-					queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost, _threadsPerProcess, _executable
-						.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null), fileToPath(_stdout, null), stderrPath,
-						_resourceConstraints, resourceUsageFile));
+					queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
+						_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null), fileToPath(
+							_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
 
 				_logger.info(String.format("Queue submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()));
 				history.createTraceWriter("Job Queued into Batch System")

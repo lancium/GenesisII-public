@@ -32,9 +32,8 @@ public class CmdLineManipulatorUtils
 		return;
 	}
 
-	static public void
-		addSPMDJobProperties(Map<String, Object> jobProperties, URI variation, Integer numProcesses, Integer numProcessesPeHost,
-			Integer threadsPerProcess)
+	static public void addSPMDJobProperties(Map<String, Object> jobProperties, URI variation, Integer numProcesses,
+		Integer numProcessesPeHost, Integer threadsPerProcess)
 	{
 		if (variation != null) {
 			jobProperties.put(CmdLineManipulatorConstants.SPMD_VARIATION, variation);

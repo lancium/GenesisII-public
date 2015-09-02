@@ -62,10 +62,9 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		process.cancel();
 	}
 
-	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost, Integer threadsPerProcess,
-		File commonDirectory,
-		File executable, String[] arguments, Map<String, String> environment, PassiveStreamRedirectionDescription redirects,
-		BESConstructionParameters constructionParameters)
+	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
+		Integer threadsPerProcess, File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
+		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
 
@@ -153,7 +152,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, _executable.getAbsolutePath(), args);
 			CmdLineManipulatorUtils.addEnvProperties(jobProperties, _fuseMountPoint, _environment, workingDirectory,
 				_redirects.stdinSource(), _redirects.stdoutSink(), stderrFile, resourceUsageFile, wrapper.getPathToWrapper());
-			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, _spmdVariation, _numProcesses, _numProcessesPerHost, _threadsPerProcess);
+			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, _spmdVariation, _numProcesses, _numProcessesPerHost,
+				_threadsPerProcess);
 
 			newCmdLine = new Vector<String>();
 			if (_logger.isDebugEnabled())

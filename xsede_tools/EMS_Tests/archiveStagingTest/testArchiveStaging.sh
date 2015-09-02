@@ -25,21 +25,53 @@ oneTimeSetUp()
     echo "JSDL file generation failure.  unassigned random id perhaps?"
     exit 1
   fi
-
-  # invoke our own cleanup function.
-  oneTimeTearDown
 }
 
-testUploadStagingContents()
+testUploadStagingContentsForBES()
 {
-  echo "Copying necessary files to Grid namespace"
-  grid cp local:gorp.zip grid:$RNSPATH
-  assertEquals "Copying archive file up to sandbox" 0 $?
-  grid cp local:snarfle-from-gorp.sh grid:$RNSPATH
-  assertEquals "Copying script file up to sandbox" 0 $?
+  # invoke our own cleanup function before copying files up.
+  oneTimeTearDown
+  # copy the staging files up.
+  uploadStagingContents
 }
 
-testSubmitJobWithStagedArchives()
+testFindBESName()
+{
+  available_resources="$(get_BES_resources)"
+  assertEquals "Listing $QUEUE_PATH/resources" 0 $?
+}
+
+testRunJobWithStagedArchivesToBES()
+{
+  echo "starting submit... $(date)"
+
+  # we just use the first BES for this test.
+  BES_NAME=${available_resources[0]}
+
+  echo "will run job on BES called: $BES_NAME"
+
+  grid run --jsdl=local:$GENERATED_JSDL_FOLDER/gorp-returns.jsdl $BES_NAME
+  assertEquals "Submitting single 'cat' job to cat a file on $BES_NAME" 0 $?
+
+  echo "ending submit... $(date)"
+
+  # there is no waiting needed for synchronous BES job.  we can move to next test.
+}
+
+testResultingStageOutFromBES()
+{
+  verifyResultingStageOut
+}
+
+testUploadStagingContentsForBES()
+{
+  # invoke our own cleanup function before copying files up.
+  oneTimeTearDown
+  # copy the staging files up.
+  uploadStagingContents
+}
+
+testSubmitJobWithStagedArchivesToQueue()
 {
   echo "starting submit... $(date)"
 
@@ -55,7 +87,41 @@ testWaitForDirectoryStagingJob()
   assertEquals "No archive staging jobs should be left" 0 $?
 }
 
-testResultingStageOut()
+testResultingStageOutFromQueue()
+{
+  verifyResultingStageOut
+}
+
+oneTimeTearDown()
+{
+  echo "cleaning up any test data files."
+
+  cleanLocalTestFiles
+
+  # clean-up any prior run's grid files.
+  silent_grid rm $RNSPATH/gorp.zip $RNSPATH/snarfle.zip $RNSPATH/snarfle-from-gorp.sh &>/dev/null
+}
+
+##############
+
+# helpful methods used above.
+
+uploadStagingContents()
+{
+  echo "Copying necessary files to Grid namespace"
+  grid cp local:gorp.zip grid:$RNSPATH
+  assertEquals "Copying archive file up to sandbox" 0 $?
+  grid cp local:snarfle-from-gorp.sh grid:$RNSPATH
+  assertEquals "Copying script file up to sandbox" 0 $?
+}
+
+cleanLocalTestFiles()
+{
+  # clean up any local files and dirs we may have created.
+  rm -rf snarfle.zip gorp_guts snarfle_guts
+}
+
+verifyResultingStageOut()
 {
   grid cp $RNSPATH/snarfle.zip local:snarfle.zip
   assertEquals "Copying staged out archive file locally" 0 $?
@@ -70,16 +136,8 @@ testResultingStageOut()
   assertEquals "Unzipping original stage-in archive file locally" 0 $?
   diff -r gorp_guts snarfle_guts
   assertEquals "Testing archive for identical contents to original" 0 $?
-}
-
-oneTimeTearDown()
-{
-  # clean up any local files and dirs we may have created.
-  rm -rf snarfle.zip gorp_guts snarfle_guts
-
-  # clean-up any prior run's grid files.
-#  silent_grid rm $RNSPATH/gorp.zip $RNSPATH/snarfle.zip $RNSPATH/snarfle-from-gorp.sh 
-#&>/dev/null
+  # toss out the testing junk.
+  cleanLocalTestFiles
 }
 
 # load and run shUnit2

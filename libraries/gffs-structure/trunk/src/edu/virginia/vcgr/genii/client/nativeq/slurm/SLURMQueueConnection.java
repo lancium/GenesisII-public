@@ -196,37 +196,38 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			Integer numProcs = application.getNumProcesses();
 			Integer numProcsPerHost = application.getNumProcessesPerHost();
 			Integer threadsPerProcess = application.getThreadsPerProcess();
-			
-			//hmmm: use threadsPerProcess here!
 
 			if (_logger.isDebugEnabled())
-				_logger.debug("slurm spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc=" + threadsPerProcess);
-			
-			//hmmm: danger--hardcoded strings from our spmd mode, which might change.
+				_logger.debug("slurm spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc="
+					+ threadsPerProcess);
+
+			// hmmm: danger--hardcoded strings from our spmd mode, which might change.
 			// new section for checking whether they've asked for exclusivity or are okay with sharing the node for sequential jobs.
 			if (application.getSPMDVariation().toString().contains("NodeExclusiveThreaded")) {
 				script.format("#SBATCH --exclusive");
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using exclusive flag for NodeExclusiveThreaded spmd");
 			} else if (application.getSPMDVariation().toString().contains("SharedThreaded")) {
-				script.format("#SBATCH --share");				
+				script.format("#SBATCH --share");
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using shared flag for SharedThreaded spmd");
 			}
-			
+
+			// in slurm, processes are tasks. so we only worry about tasks/processes and processes per host here.
 			if (numProcs != null) {
-				script.format("#SBATCH --tasks %d\n", numProcs.intValue());
+				// always specify number of tasks if they told us.
+				script.format("#SBATCH --ntasks=%d\n", numProcs.intValue());
+				// if we also know processes per host, add in the node and tasks per node counts.
 				if (numProcsPerHost != null) {
 					Integer hosts = numProcs / numProcsPerHost;
-					script.format("#SBATCH --nodes %d\n", hosts.intValue());
-					script.format("#SBATCH --ntasks-per-node %d\n", numProcsPerHost.intValue());
-				} else {
-					script.format("#SBATCH -n %d\n", numProcs.intValue());
+					script.format("#SBATCH --nodes=%d\n", hosts.intValue());
+					script.format("#SBATCH --ntasks-per-node=%d\n", numProcsPerHost.intValue());
 				}
 			}
-			
+
+			// if they provided the number of threads per process, then we also specify that. this is separate from task counting.
 			if (threadsPerProcess != null) {
-				script.format("#SBATCH --cpus-per-task%d\n", threadsPerProcess.intValue());				
+				script.format("#SBATCH --cpus-per-task=%d\n", threadsPerProcess.intValue());
 			}
 
 		}

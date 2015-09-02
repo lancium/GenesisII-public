@@ -22,6 +22,9 @@ public class PermissionDeniedException extends AuthZSecurityException
 
 	static public String extractMethodName(String message)
 	{
+		// Added 8/14/2015 by ASG
+		if (message == null)
+			return null;
 		Matcher matcher = METHOD_EXTRACTOR_PATTERN.matcher(message);
 		if (matcher.matches())
 			return matcher.group(1);
@@ -30,6 +33,9 @@ public class PermissionDeniedException extends AuthZSecurityException
 
 	static public String extractAssetDenied(String message)
 	{
+		// Added 8/14/2015 by ASG
+		if (message == null)
+			return null;
 		Matcher matcher = ASSET_EXTRACTOR_PATTERN.matcher(message);
 		if (matcher.matches())
 			return matcher.group(1);

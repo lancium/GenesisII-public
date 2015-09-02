@@ -41,10 +41,14 @@ public class Hostname
 	static private String _cachedHostname = null;
 	static private String _cachedIPAddress = null;
 
-	// private InetAddress _address = null;
-	private String _externalName;
+	private String _externalName; // our hostname as it appears to the world, given EPR addressing scheme.
+	private boolean _foundHostOkay = false; // tracks if the lookup succeeded.
 
-	private boolean _foundHostOkay = false;
+	/*
+	 * used only for local host to avoid repeated lookups. this differs from the _cachedHostName in that this string is formatted according to
+	 * formString's requirements.
+	 */
+	private static String _staticVettedLocalHost = null;
 
 	/**
 	 * constructs a hostname based on our best guess for what this host is named. the valid() method reports whether this was successful or
@@ -67,6 +71,14 @@ public class Hostname
 
 			// set the address to a known good name, in case we have to fall through.
 			givenAddress = "localhost";
+
+			// see if we already looked up the local host info.
+			if (_staticVettedLocalHost != null) {
+				_externalName = _staticVettedLocalHost;
+				_foundHostOkay = true;
+				return;
+			}
+
 			/*
 			 * handle the null or blank hostname case, which indicates using the local host. this is a best-guess operation, where we may not
 			 * always be able to answer with a hostname that the caller actually wants.
@@ -74,17 +86,22 @@ public class Hostname
 			_externalName = getHostnameOverride();
 			if (_externalName != null) {
 				_foundHostOkay = true;
-				return;
 			} else {
 				InetAddress address = getMostGlobal();
 				_externalName = formString(address);
 				_foundHostOkay = true;
-				return;
 			}
+			// set our persistent record for the localhost.
+			_staticVettedLocalHost = _externalName;
+			// done with localhost case, hopefully successfully.
+			return;
 		}
 
 		if (_logger.isDebugEnabled())
 			_logger.debug("going to look up address: " + givenAddress);
+
+		// hmmm: here is a good place to have a DNS cache. just before looking up for real, is it in the cache? cache should maybe be lru
+		// timeout.
 
 		InetAddress addr = null;
 		try {

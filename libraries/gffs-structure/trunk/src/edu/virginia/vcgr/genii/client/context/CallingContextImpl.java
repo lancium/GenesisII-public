@@ -67,6 +67,13 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	public CallingContextImpl(CallingContextImpl parent)
 	{
 		_parent = parent;
+
+	}
+
+	@Override
+	public ICallingContext getParent()
+	{
+		return _parent;
 	}
 
 	public CallingContextImpl(ContextType ct) throws IOException
@@ -303,6 +310,11 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	{
 
 		out.writeObject(_transientProperties);
+		if (_parent == this) {
+			String msg = "parent is set to this - about to do infinite recurrsion";
+			_logger.error(msg);
+			throw new IOException(msg);
+		}
 
 		if (_parent != null) {
 			out.writeBoolean(true);

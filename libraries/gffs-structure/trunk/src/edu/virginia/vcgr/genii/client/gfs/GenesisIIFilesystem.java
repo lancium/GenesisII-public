@@ -283,24 +283,15 @@ public class GenesisIIFilesystem implements FSFilesystem
 			DirectoryHandle directoryHandle;
 			if (info.isEnhancedRNS()) {
 				_logger.trace("Using Short form for Enhanced-RNS handle.");
-				ICallingContext context = ContextManager.getCurrentContext();
+				ICallingContext context = ContextManager.getCurrentContext().getParent();
 
 				context.setSingleValueProperty("RNSShortForm", true);
-				/*
-				 * Due to a problem the the context resolver, we have explicitly store the context to make property update visible in the rest
-				 * of the code.
-				 */
-				ContextManager.storeCurrentContext(context);
 
 				EnhancedRNSPortType pt = ClientUtils.createProxy(EnhancedRNSPortType.class, target.getEndpoint());
 				RNSIterable entries = new RNSIterable(fullPath, pt.lookup(null), context, RNSConstants.PREFERRED_BATCH_SIZE);
 				directoryHandle = new EnhancedRNSHandle(this, entries, fullPath);
 
 				context.removeProperty("RNSShortForm");
-				/*
-				 * For the similar problem, we have to do another store after removing the property to have the proper effect.
-				 */
-				ContextManager.storeCurrentContext(context);
 			} else if (info.isRNS()) {
 				directoryHandle = new DefaultRNSHandle(this, target.listContents(true));
 			} else {

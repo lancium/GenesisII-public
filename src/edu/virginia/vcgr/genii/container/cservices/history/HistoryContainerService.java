@@ -29,13 +29,15 @@ public class HistoryContainerService extends AbstractContainerService
 {
 	static private Log _logger = LogFactory.getLog(HistoryContainerService.class);
 
-	static final private long CLEANUP_INTERVAL = 1000L; // 1000L * 60 * 60; // 1 hour.
+	static final private long CLEANUP_INTERVAL = 5000L; // 1000L * 60 * 60; // 1 hour.
 
 	static final public String SERVICE_NAME = "History Service";
 
 	static final private Queue<String> queue = new LinkedList<String>();
 
 	static final private Object lock = new Object();
+
+	static final int HISTORY_RECORDS_CLEANING_COUNT = 10;
 
 	private class CleanupAlarmHandler implements AlarmHandler
 	{
@@ -48,15 +50,18 @@ public class HistoryContainerService extends AbstractContainerService
 				connection = getConnectionPool().acquire(false);
 				HistoryDatabase.cleanupDeadEvents(connection);
 				String resourceId = new String();
+				int count = 0;
+				while (count < HISTORY_RECORDS_CLEANING_COUNT && resourceId != null) {
+					synchronized (lock) {
+						resourceId = queue.poll();
+					}
 
-				synchronized (lock) {
-					resourceId = queue.poll();
-				}
-
-				if (resourceId != null) {
-					deleteRecords(connection, resourceId);
-					HistoryDatabase.removeStaleRecord(resourceId, connection);
-					_logger.info(String.format("Deleting history for resource %s", resourceId));
+					if (resourceId != null) {
+						deleteRecords(connection, resourceId);
+						HistoryDatabase.removeStaleRecord(resourceId, connection);
+						_logger.info(String.format("Deleting history for resource %s", resourceId));
+					}
+					count++;
 				}
 
 				connection.commit(); // commits combined to 1 for performance

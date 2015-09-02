@@ -17,7 +17,7 @@ source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
 # how long should we snooze before checking that fuse has gotten the
 # notification that new files are available?
-FUSE_SNOOZE_TIME=34
+FUSE_SNOOZE_TIME=4
 # how many times we should test that fuse sees a new file in the grid.
 #FUSE_COPY_COUNT=1
 FUSE_COPY_COUNT=20

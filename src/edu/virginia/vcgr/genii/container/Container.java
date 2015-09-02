@@ -265,7 +265,11 @@ public class Container extends ApplicationBase
 			}
 		}
 
-		CacheConfigurer.disableSubscriptionBasedCaching();
+		// hmmm: trying a few things out. totally disabling the cache for container fixed the bug for the archive staging test.
+		// want to try having cache *and* subscriptions enabled.
+
+		// CacheConfigurer.disableSubscriptionBasedCaching();
+		// CacheConfigurer.disableCaching();
 
 		for (IServiceWithCleanupHook service : containerServiceObjects) {
 			try {

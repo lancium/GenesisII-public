@@ -661,8 +661,9 @@ public class JobManager implements Closeable
 			_jobsByTicket.put(ticket, job);
 			_queuedJobs.put(jobKey, job);
 
-			/* As jobs are added to the primary list, they are also added to the
-			 appropriate user list (newly created, if needed) */
+			/*
+			 * As jobs are added to the primary list, they are also added to the appropriate user list (newly created, if needed)
+			 */
 			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();
@@ -772,8 +773,9 @@ public class JobManager implements Closeable
 			_jobsByTicket.put(tickynum, job);
 			_queuedJobs.put(jobKey, job);
 
-			/* As jobs are added to the primary list, they are also added to the
-			 appropriate user list (newly created, if needed) */
+			/*
+			 * As jobs are added to the primary list, they are also added to the appropriate user list (newly created, if needed)
+			 */
 			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();

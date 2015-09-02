@@ -40,6 +40,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -130,8 +131,11 @@ public class RNSPath implements Serializable, Cloneable
 			storeResourceConfigInCache();
 		}
 
-		if (_logger.isTraceEnabled())
-			_logger.debug("++ creating RNSPath for path: " + pwd());
+		// currently just logging for container side.
+		if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("++ RNSPath created on container for path: " + pwd());
+		}
 	}
 
 	/**
