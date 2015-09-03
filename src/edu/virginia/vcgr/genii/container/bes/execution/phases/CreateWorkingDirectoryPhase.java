@@ -42,10 +42,9 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 		try {
 			File cwd = new GuaranteedDirectory(_workingDirectory);
 
-			if (OperatingSystemType.isWindows())
+			if (OperatingSystemType.isWindows()) {
 				cwd.setWritable(true, false);
-
-			else {
+			} else {
 				FileSystemUtils.chmod(cwd.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
 					| FileSystemUtils.MODE_USER_EXECUTE | FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE
 					| FileSystemUtils.MODE_GROUP_EXECUTE);

@@ -40,10 +40,13 @@ public class ThreadsPerProcess implements Serializable
 	@XmlValue
 	private Long _value = null;
 
-	// private ThreadsPerProcess()
-	// {
-	// this(null, null);
-	// }
+	/**
+	 * default constructor is only used by jsdl low-level stuff, but it is needed. 
+	 */
+	public ThreadsPerProcess()
+	{
+		this(null, null);
+	}
 
 	public ThreadsPerProcess(Long value, Boolean actualIndividualCPUCount)
 	{

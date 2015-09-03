@@ -615,6 +615,8 @@ try {
     File finalSourceDir = null;
     
     if (Util.isLinux()) {
+//System.out.println("found linux system");
+    
         // this is linux...  is it 32 or 64 bits?        
         Runtime runt = Runtime.getRuntime();
         String[] cmds = {"arch"};
@@ -640,14 +642,18 @@ try {
             // install the linux64 jni.
             finalSourceDir = new File(baseJni + "lin64");
             context.setVariable("genii.platform", "linux64");
+
+//System.out.println("found 64 bit linux system");
         } else {
             // install the linux32 jni.
             finalSourceDir = new File(baseJni + "lin32");
             context.setVariable("genii.platform", "linux32");
+//System.out.println("found 32 bit linux system");
         }
         
     } else if (Util.isAtLeastWindowsXP()) {
         // windows xp or later...
+//System.out.println("found windows system");
         
         if (Util.is64BitWindows()) {
             // 64 bit windows.
@@ -660,11 +666,15 @@ try {
         }
         
     } else if (Util.isMacOS()) {
+//System.out.println("found mac system");
+
         // mac os x....
         // we only support 64 bit mac os x currently...
         finalSourceDir = new File(baseJni + "osx64");
         context.setVariable("genii.platform", "macosx64");
     } else {
+System.out.println("found unknown type of operating system!");
+
         Util.logInfo(null, "unknown OS platform so cannot copy JNI libraries appropriately");
         context.setVariable("genii.platform", "unknown");
     }

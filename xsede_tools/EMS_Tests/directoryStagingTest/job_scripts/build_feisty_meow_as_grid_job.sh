@@ -31,14 +31,14 @@ rm -rf "./feisty_meow"
 
 
 ####
-echo "bailing out of normal process here, just making simple copy"
-mkdir $target_directory
-echo >"$target_directory/binaries/nechung" <<eof
-echo this is not really nechung.
-echo nechung variable is \$NECHUNG.
-eof
-echo end of gunk temp
-exit 0
+#echo "bailing out of normal process here, just making simple copy"
+#mkdir $target_directory
+#echo >"$target_directory/binaries/nechung" <<eof
+#echo this is not really nechung.
+#echo nechung variable is \$NECHUNG.
+#eof
+#echo end of gunk temp
+#exit 0
 ####
 
 # get the feisty meow codebase now.

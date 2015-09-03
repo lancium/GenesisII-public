@@ -104,7 +104,7 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements CmdLineM
 				}
 
 				// extract configuration
-				return variation.variationConfigurtaion();
+				return variation.variationConfiguration();
 			}
 		}
 

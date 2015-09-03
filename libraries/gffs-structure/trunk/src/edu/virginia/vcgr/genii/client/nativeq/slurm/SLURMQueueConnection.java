@@ -29,6 +29,7 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
+import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorConstants;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.ResourceConstraints;
 
@@ -186,12 +187,14 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		throws NativeQueueException, IOException
 	{
 		super.generateQueueHeaders(script, workingDirectory, application);
+		
+		_logger.debug("entered into slurm queue conn generate q headers");
+		
+		// add directives for specifying stdout and stderr redirects
+		script.format("#SBATCH -o %s\n", application.getStdoutRedirect(workingDirectory));
+		script.format("#SBATCH -e %s\n", application.getStderrRedirect(workingDirectory));
 
 		if (application.getSPMDVariation() != null) {
-			// add directives for specifying stdout and stderr redirects
-			script.format("#SBATCH -o %s\n", application.getStdoutRedirect(workingDirectory));
-			script.format("#SBATCH -e %s\n", application.getStderrRedirect(workingDirectory));
-
 			// add directive for specifying multiple processors
 			Integer numProcs = application.getNumProcesses();
 			Integer numProcsPerHost = application.getNumProcessesPerHost();
@@ -201,14 +204,13 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 				_logger.debug("slurm spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc="
 					+ threadsPerProcess);
 
-			// hmmm: danger--hardcoded strings from our spmd mode, which might change.
 			// new section for checking whether they've asked for exclusivity or are okay with sharing the node for sequential jobs.
-			if (application.getSPMDVariation().toString().contains("NodeExclusiveThreaded")) {
-				script.format("#SBATCH --exclusive");
+			if (application.getSPMDVariation().toString().contains(CmdLineManipulatorConstants.NODE_EXCLUSIVE_THREADED_PHRASE)) {
+				script.format("#SBATCH --exclusive\n");
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using exclusive flag for NodeExclusiveThreaded spmd");
-			} else if (application.getSPMDVariation().toString().contains("SharedThreaded")) {
-				script.format("#SBATCH --share");
+			} else if (application.getSPMDVariation().toString().contains(CmdLineManipulatorConstants.SHARED_THREADED_PHRASE)) {
+				script.format("#SBATCH --share\n");
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using shared flag for SharedThreaded spmd");
 			}

@@ -3,8 +3,11 @@ package edu.virginia.vcgr.genii.client.nativeq;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.URI;
@@ -81,9 +84,10 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	{
 		PrintStream ps = null;
 		List<String> finalCmdLine;
-		try {
-			File submitScript = getSubmitScript(workingDirectory);
+		File submitScript = null;
 
+		try {
+			submitScript = getSubmitScript(workingDirectory);
 			ps = new PrintStream(submitScript);
 			generateScriptHeader(ps, workingDirectory, application);
 			generateQueueHeaders(ps, workingDirectory, application);
@@ -93,11 +97,34 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			generateScriptFooter(ps, workingDirectory, application);
 
 			submitScript.setExecutable(true, true);
+
 			return new Pair<File, List<String>>(submitScript, finalCmdLine);
 		} catch (IOException ioe) {
 			throw new NativeQueueException("Unable to generate submit script.", ioe);
 		} finally {
 			StreamUtils.close(ps);
+			
+			//hmmm: move this to gffs-basics as filesystem helper, but support passing a stream for the output to go to.
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("full script about to be sent is:");
+				int line = 0;
+				BufferedReader br = null;
+				try {
+					FileInputStream fi = new FileInputStream(submitScript);
+					br = new BufferedReader(new InputStreamReader(fi));
+					String text;
+					while ((text = br.readLine()) != null) {
+						line++;
+						_logger.debug(line + ": " + text);
+					}
+				} catch (FileNotFoundException e) {
+					_logger.error("failed to show the contents of the submit script: " + submitScript, e);
+				} catch (IOException e) {
+					_logger.error("IOException while showing contents of the submit script: " + submitScript, e);
+				} finally {
+					StreamUtils.close(br);
+				}
+			}
 		}
 	}
 

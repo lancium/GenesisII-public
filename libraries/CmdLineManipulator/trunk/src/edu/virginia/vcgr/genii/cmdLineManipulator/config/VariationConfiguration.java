@@ -126,12 +126,12 @@ public class VariationConfiguration implements Serializable
 		_variationType = newType;
 	}
 
-	final public Object variationConfigurtaion()
+	final public Object variationConfiguration()
 	{
 		return _variationConfiguration;
 	}
 
-	final public void variationConfigurtaion(Object conf)
+	final public void variationConfiguration(Object conf)
 	{
 		_variationConfiguration = conf;
 	}
