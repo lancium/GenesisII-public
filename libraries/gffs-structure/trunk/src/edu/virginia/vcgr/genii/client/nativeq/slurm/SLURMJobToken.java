@@ -84,6 +84,5 @@ public class SLURMJobToken extends AbstractJobToken
 		justNum = stripOutNumericalToken(fud);
 		System.out.println("input string was: " + fud);
 		System.out.println("got just a batch identifier of '" + justNum + "'; is that right?");
-
 	}
 }

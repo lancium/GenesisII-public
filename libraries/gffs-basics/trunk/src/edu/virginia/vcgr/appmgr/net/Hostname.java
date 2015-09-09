@@ -105,12 +105,6 @@ public class Hostname
 			return;
 		}
 
-		if (_logger.isDebugEnabled())
-			_logger.debug("going to look up address: " + givenAddress);
-
-		// hmmm: here is a good place to have a DNS cache. just before looking up for real, is it in the cache? cache should maybe be lru
-		// timeout.
-
 		synchronized (_dnsCache) {
 			// see if the name has already been looked up.
 			String alreadyKnown = _dnsCache.get(givenAddress);

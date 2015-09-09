@@ -149,8 +149,9 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			script.println("{");
 			script.println("\techo \"Caught a signal -- killing process group.\" >&2");
 			script.println("\tQUEUE_SCRIPT_RESULT=257");
-			script.format("\techo $QUEUE_SCRIPT_RESULT > %s\n", QUEUE_SCRIPT_RESULT_FILENAME);
-			script.println("sync");
+			// we write the script result to a temp file then move it to ensure presence of result file is atomic.
+			script.format("\techo $QUEUE_SCRIPT_RESULT > %s.tmp\n", QUEUE_SCRIPT_RESULT_FILENAME);
+			script.format("\tmv %1$s.tmp %1$s\n", QUEUE_SCRIPT_RESULT_FILENAME);
 			script.println("\tkill -9 0");
 			script.println("}");
 			script.println();
@@ -261,10 +262,9 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	protected void generateScriptFooter(PrintStream script, File workingDirectory, ApplicationDescription application)
 		throws NativeQueueException, IOException
 	{
-		// write the script result directly to our expected file.
-		script.format("echo $QUEUE_SCRIPT_RESULT > %s\n", QUEUE_SCRIPT_RESULT_FILENAME);
-		// force an fs update to hopefully ensure we see the resulting file.
-		script.println("sync");
+		// we write the script result to a temp file then move it to ensure presence of result file is atomic.
+		script.format("echo $QUEUE_SCRIPT_RESULT > %s.tmp\n", QUEUE_SCRIPT_RESULT_FILENAME);
+		script.format("mv %1$s.tmp %1$s\n", QUEUE_SCRIPT_RESULT_FILENAME);
 		script.println("exit $QUEUE_SCRIPT_RESULT");
 	}
 
