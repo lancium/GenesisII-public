@@ -94,45 +94,63 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		List<String> commandLine = new LinkedList<String>();
 		commandLine.addAll(_qdelStart);
 
+		// make sure they pay attention to us.
+		commandLine.add("--signal=KILL");
+
 		String arg = token.toString();
 		if (_destination != null)
 			arg = arg + "@" + _destination;
 		commandLine.add(arg);
 		ProcessBuilder builder = new ProcessBuilder(commandLine);
+
+		if (_logger.isDebugEnabled())
+			_logger.debug("attempting to cancel slurm job: " + token);
+
 		execute(builder);
 	}
 
 	static private class JobStatusParser implements ScriptLineParser
 	{
-		static private Pattern JOB_TOKEN_PATTERN = Pattern.compile("^\\s*Job Id:\\s*(\\S+)\\s*$");
-		static private Pattern JOB_STATE_PATTERN = Pattern.compile("^\\s*job_state\\s*=\\s*(\\S+)\\s*$");
+		static private Pattern JOB_TOKEN_AND_STATE_PATTERN = Pattern
+			.compile("^\\s*id\\s*=\\s*(\\S+)\\s+state\\s*=\\s*(\\S+)\\s+user\\s*=\\s*(\\S+)\\s*$");
 
 		private Map<String, String> _matchedPairs = new HashMap<String, String>();
 
-		private String _lastToken = null;
-		private String _lastState = null;
+		private String _lastJobID = null;
+		private String _lastJobState = null;
 
 		@Override
 		public Pattern[] getHandledPatterns()
 		{
-			return new Pattern[] { JOB_TOKEN_PATTERN, JOB_STATE_PATTERN };
+			return new Pattern[] { JOB_TOKEN_AND_STATE_PATTERN };
 		}
 
 		@Override
 		public void parseLine(Matcher matcher) throws NativeQueueException
 		{
-			if (matcher.pattern() == JOB_TOKEN_PATTERN)
-				_lastToken = matcher.group(1);
-			else if (matcher.pattern() == JOB_STATE_PATTERN) {
-				_lastState = matcher.group(1);
-				if (_lastToken == null)
-					throw new NativeQueueException("Unable to parse status output.");
+			_lastJobID = matcher.group(1);
+			_lastJobState = matcher.group(2);
+			String user = matcher.group(3);
 
-				_matchedPairs.put(_lastToken, _lastState);
-				_lastToken = null;
-				_lastState = null;
-			} else
-				throw new NativeQueueException("Unable to parse status output.");
+			// future: is it useful to know the user? we do know it for slurm.
+
+			/*
+			 * hmmm: this overall approach seems to be kind of crazy. we are always asking the native queue for absolutely all jobs. why are
+			 * we not restricting that to the jobs submitted as the user that we submit jobs as???
+			 */
+
+			if ((_lastJobID == null) || (_lastJobState == null)) {
+				String msg = "Unable to parse status output.";
+				_logger.error(msg);
+				throw new NativeQueueException(msg);
+			}
+			_matchedPairs.put(_lastJobID, _lastJobState);
+
+			if (_logger.isTraceEnabled()) {
+				_logger.debug("added a token: " + _lastJobID + ", " + _lastJobState + " (with unused user name of " + user + ")");
+			}
+			_lastJobID = null;
+			_lastJobState = null;
 		}
 
 		public Map<String, String> getStateMap() throws NativeQueueException
@@ -148,23 +166,29 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		{
 			Map<JobToken, NativeQueueState> ret = new HashMap<JobToken, NativeQueueState>();
 
+			// command line is configured to make squeue spit out the id, state and owner on one line.
 			List<String> commandLine = new LinkedList<String>();
 			commandLine.addAll(_qstatStart);
+			commandLine.add("-h");
 			commandLine.add("-l");
+			commandLine.add("-o");
+			commandLine.add("id=%A state=%t user=%u");
 
 			if (_destination != null)
 				commandLine.add(String.format("@%s", _destination));
 
 			ProcessBuilder builder = new ProcessBuilder(commandLine);
+
 			String result = execute(builder);
 			JobStatusParser parser = new JobStatusParser();
 			parseResult(result, parser);
 			Map<String, String> stateMap = parser.getStateMap();
+
 			for (String tokenString : stateMap.keySet()) {
 				SLURMJobToken token = new SLURMJobToken(tokenString);
 				SLURMQueueState state = SLURMQueueState.fromStateSymbol(stateMap.get(tokenString));
-				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Putting %s[%s]\n", token, state));
+				if (_logger.isTraceEnabled())
+					_logger.debug(String.format("slurm status: token %s state %s\n", token, state));
 				ret.put(token, state);
 			}
 
@@ -176,9 +200,12 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 	public NativeQueueState getStatus(JobToken token) throws NativeQueueException
 	{
 		NativeQueueState state = _statusCache.get(token, new BulkSLURMStatusFetcher(), DEFAULT_CACHE_WINDOW);
-		if (state == null)
-			state = SLURMQueueState.fromStateSymbol("C");
-
+		if (_logger.isTraceEnabled())
+			_logger.debug("received a parsed queue state of: " + state);
+		if (state == null) {
+			state = SLURMQueueState.fromStateSymbol("CD");
+			_logger.warn("job state received was missing (probably exited), so setting state to: " + state);
+		}
 		return state;
 	}
 
@@ -187,9 +214,7 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		throws NativeQueueException, IOException
 	{
 		super.generateQueueHeaders(script, workingDirectory, application);
-		
-		_logger.debug("entered into slurm queue conn generate q headers");
-		
+
 		// add directives for specifying stdout and stderr redirects
 		script.format("#SBATCH -o %s\n", application.getStdoutRedirect(workingDirectory));
 		script.format("#SBATCH -e %s\n", application.getStderrRedirect(workingDirectory));
@@ -315,5 +340,31 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		} catch (IOException ioe) {
 			throw new NativeQueueException("Unable to determine application exit status.", ioe);
 		}
+	}
+
+	public static void main(String[] args)
+	{
+		JobStatusParser parser = new JobStatusParser();
+		String[] lines =
+			{ "id=36697 state=CG user=ak3ka", "id=36799 state=R user=ak3ka", "id=36808 state=R user=ak3ka", "id=36809 state=R user=ak3ka",
+				"id=36810 state=R user=ak3ka", "id=36901 state=PD user=cak0l", "id=36902 state=PD user=cak0l", "id=36903 state=PD user=cak0l" };
+
+		for (String line : lines) {
+			for (Pattern pattern : parser.getHandledPatterns()) {
+				Matcher matcher = pattern.matcher(line);
+				if (matcher.matches()) {
+					try {
+						parser.parseLine(matcher);
+						_logger.info("success parsing, got: id=" + parser._lastJobID + " state=" + parser._lastJobState);
+					} catch (NativeQueueException e) {
+						_logger.error("failed to parse line with exception", e);
+					}
+					break;
+				} else {
+					_logger.debug("FAILED TO MATCH THE PATTERN, PATTERN IS WRONG");
+				}
+			}
+		}
+
 	}
 }

@@ -67,7 +67,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	public CallingContextImpl(CallingContextImpl parent)
 	{
 		_parent = parent;
-
 	}
 
 	@Override
@@ -84,14 +83,16 @@ public class CallingContextImpl implements ICallingContext, Serializable
 			if (pairs != null) {
 				for (ContextNameValuePairType pair : ct.getProperty()) {
 					String name = pair.getName();
-					if (_logger.isTraceEnabled())
+					if (_logger.isTraceEnabled()) {
 						_logger.trace("adding context entry for: " + name);
+					}
 					Collection<Serializable> multiValue = _properties.get(name);
 					if (multiValue == null) {
 						multiValue = new ArrayList<Serializable>();
 						_properties.put(name, multiValue);
-						if (_logger.isTraceEnabled())
+						if (_logger.isTraceEnabled()) {
 							_logger.trace("adding empty multivalue for null property called: " + name);
+						}
 					}
 					multiValue.add(retrieveBase64Decoded(pair.getValue()));
 				}
@@ -136,8 +137,9 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	@Override
 	public synchronized void setSingleValueProperty(String name, Serializable value)
 	{
-		if (value == null)
+		if (value == null) {
 			_logger.error("attempting to store a null Serializable object.");
+		}
 		ArrayList<Serializable> multiValue = new ArrayList<Serializable>();
 		multiValue.add(value);
 		setProperty(name, multiValue);
@@ -241,7 +243,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	@Override
 	public synchronized void setCurrentPath(RNSPath newPath)
 	{
-		_logger.debug("current path being set to: " + (newPath == null ? "null" : newPath.toString()));
+		if (_logger.isDebugEnabled())
+			_logger.debug("current path being set to: " + (newPath == null ? "null" : newPath.toString()));
 		setSingleValueProperty(CURRENT_PATH_KEY, newPath);
 	}
 

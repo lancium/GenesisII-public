@@ -41,7 +41,7 @@ public class ThreadsPerProcess implements Serializable
 	private Long _value = null;
 
 	/**
-	 * default constructor is only used by jsdl low-level stuff, but it is needed. 
+	 * default constructor is only used by jsdl low-level stuff, but it is needed.
 	 */
 	public ThreadsPerProcess()
 	{

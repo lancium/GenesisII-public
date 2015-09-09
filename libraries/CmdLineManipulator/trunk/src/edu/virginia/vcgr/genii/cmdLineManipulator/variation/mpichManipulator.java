@@ -115,17 +115,17 @@ public class mpichManipulator extends AbstractCmdLineManipulator<MpichVariationC
 
 		if (mpichConfiguration != null) {
 			// short circuit inquiries for our sequential modes, which the BES should still be able to do.
-			
+
 			// confirm requested spmd variation supported by BES
 			boolean matchingSupport = false;
-			
+
 			// we allow our two sequential modes to pass through, since the queue should still be able to run these.
 			if (jobSPMDVariation(jobProps).toString().contains(CmdLineManipulatorConstants.NODE_EXCLUSIVE_THREADED_PHRASE)) {
 				matchingSupport = true;
 			} else if (jobSPMDVariation(jobProps).toString().contains(CmdLineManipulatorConstants.SHARED_THREADED_PHRASE)) {
-				matchingSupport = true;			
+				matchingSupport = true;
 			}
-			
+
 			for (String supportedVariation : mpichConfiguration.spmdVariations()) {
 				if (jobSPMDVariation(jobProps).toString().equals(supportedVariation)) {
 					matchingSupport = true;

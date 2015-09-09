@@ -131,9 +131,9 @@ public class RNSPath implements Serializable, Cloneable
 			storeResourceConfigInCache();
 		}
 
-		// currently just logging for container side.
+		// currently just logging for container side; client creates these all the time, but container use is more interesting.
 		if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("++ RNSPath created on container for path: " + pwd());
 		}
 	}

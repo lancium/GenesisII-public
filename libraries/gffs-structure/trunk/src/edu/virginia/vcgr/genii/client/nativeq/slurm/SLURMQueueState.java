@@ -34,21 +34,19 @@ public class SLURMQueueState implements NativeQueueState
 
 	static public SLURMQueueState fromStateSymbol(String symbol)
 	{
-		for (int lcv = 0; lcv < symbol.length(); lcv++) {
-			switch (symbol.charAt(lcv)) {
-				case 'R':
-				case 'E':
-					return new SLURMQueueState("Executing", false, false);
-				case 'X':
-				case 'C':
-					return new SLURMQueueState("Exiting", true, false);
-				case 'Q':
-					return new SLURMQueueState("Queued", false, false);
-				case 'H':
-					return new SLURMQueueState("Held", false, false);
-			}
+		/*
+		 * from slurm docs: Job state, compact form: PD (pending), R (running), CA (cancelled), CF(configuring), CG (completing), CD
+		 * (completed), F (failed), TO (timeout), and NF (node failure). See the JOB STATE CODES section below for more information. (Valid
+		 * for jobs only)
+		 */
+		if (symbol.equalsIgnoreCase("PD") || symbol.equalsIgnoreCase("CF") || symbol.equalsIgnoreCase("CG")) {
+			return new SLURMQueueState("Queued", false, false);
+		} else if (symbol.equalsIgnoreCase("R")) {
+			return new SLURMQueueState("Executing", false, false);
+		} else if (symbol.equalsIgnoreCase("CA") || symbol.equalsIgnoreCase("CD") || symbol.equalsIgnoreCase("F")
+			|| symbol.equalsIgnoreCase("NF") || symbol.equalsIgnoreCase("TO")) {
+			return new SLURMQueueState("Exiting", true, false);
 		}
-
 		return new SLURMQueueState("Unknown", true, true);
 	}
 }

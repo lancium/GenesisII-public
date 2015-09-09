@@ -171,7 +171,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null), fileToPath(
 							_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
 
-				_logger.info(String.format("Queue submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()));
+				_logger.info(String.format("Queue submitted job '%s' using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()));
 				history.createTraceWriter("Job Queued into Batch System")
 					.format("BES submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()).close();
 
@@ -183,12 +183,17 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				_state = queue.getStatus(_jobToken);
 				context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
 				if (lastState == null || !lastState.equals(_state.toString())) {
+					if (_logger.isDebugEnabled())
+						_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
 					history.trace("Batch System State:  %s", _state);
 					lastState = _state.toString();
 				}
 
-				if (_state.isFinalState())
+				if (_state.isFinalState()) {
+					if (_logger.isDebugEnabled())
+						_logger.debug("queue job '" + _jobToken.toString() + "' is now in a final state: " + _state);
 					break;
+				}
 
 				_phaseShiftLock.wait(DEFAULT_LOOP_CYCLE);
 			}

@@ -117,7 +117,7 @@ public class CredentialWallet implements Externalizable, Describable
 			assertionChains.put(assertion.getId(), assertion);
 			return assertion;
 		} catch (Throwable e) {
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("* dropping inappropriate extension for delegatee:\n" + delegatee[0].getSubjectDN() + "\n...on chain of...\n"
 					+ priorDelegation.toString() + "\nexception message: " + e.getMessage());
 

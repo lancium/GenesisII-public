@@ -103,8 +103,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			throw new NativeQueueException("Unable to generate submit script.", ioe);
 		} finally {
 			StreamUtils.close(ps);
-			
-			//hmmm: move this to gffs-basics as filesystem helper, but support passing a stream for the output to go to.
+
+			// hmmm: move this to gffs-basics as filesystem helper, but support passing a stream for the output to go to.
 			if (_logger.isDebugEnabled()) {
 				_logger.debug("full script about to be sent is:");
 				int line = 0;
@@ -149,8 +149,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			script.println("{");
 			script.println("\techo \"Caught a signal -- killing process group.\" >&2");
 			script.println("\tQUEUE_SCRIPT_RESULT=257");
-			script.format("echo $QUEUE_SCRIPT_RESULT > %s.tmp\n", QUEUE_SCRIPT_RESULT_FILENAME);
-			script.format("mv %1$s.tmp %1$s\n", QUEUE_SCRIPT_RESULT_FILENAME);
+			script.format("\techo $QUEUE_SCRIPT_RESULT > %s\n", QUEUE_SCRIPT_RESULT_FILENAME);
+			script.println("sync");
 			script.println("\tkill -9 0");
 			script.println("}");
 			script.println();
@@ -170,8 +170,9 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			script.println("QUEUE_JOB_ID=%%");
 			script.println("wait %$QUEUE_JOB_ID");
 			script.println("export QUEUE_SCRIPT_RESULT=$?");
-		} else
+		} else {
 			script.format("\nexport QUEUE_SCRIPT_RESULT=$?\n");
+		}
 	}
 
 	protected List<String> generateApplicationBody(PrintStream script, File workingDirectory, ApplicationDescription application)
@@ -231,13 +232,13 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				throw new NativeQueueException(String.format("CmdLine Manipulators failed: %s", execption.getMessage()));
 			}
 
-			// for testing only - default cmdLine format to compare to transform
-			Vector<String> testCmdLine =
-				wrapper.formCommandLine(application.getFuseMountPoint(), application.getEnvironment(), workingDirectory,
-					application.getStdinRedirect(workingDirectory), stdoutRedirect, stderrRedirect, application.getResourceUsagePath(),
-					execName, application.getArguments().toArray(new String[application.getArguments().size()]));
-			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Pervious cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
+			// // for testing only - default cmdLine format to compare to transform
+			// Vector<String> testCmdLine =
+			// wrapper.formCommandLine(application.getFuseMountPoint(), application.getEnvironment(), workingDirectory,
+			// application.getStdinRedirect(workingDirectory), stdoutRedirect, stderrRedirect, application.getResourceUsagePath(),
+			// execName, application.getArguments().toArray(new String[application.getArguments().size()]));
+			// if (_logger.isDebugEnabled())
+			// _logger.debug(String.format("Previous cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
 
 			boolean first = true;
 			for (String element : newCmdLine) {
@@ -260,8 +261,10 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	protected void generateScriptFooter(PrintStream script, File workingDirectory, ApplicationDescription application)
 		throws NativeQueueException, IOException
 	{
-		script.format("echo $QUEUE_SCRIPT_RESULT > %s.tmp\n", QUEUE_SCRIPT_RESULT_FILENAME);
-		script.format("mv %1$s.tmp %1$s\n", QUEUE_SCRIPT_RESULT_FILENAME);
+		// write the script result directly to our expected file.
+		script.format("echo $QUEUE_SCRIPT_RESULT > %s\n", QUEUE_SCRIPT_RESULT_FILENAME);
+		// force an fs update to hopefully ensure we see the resulting file.
+		script.println("sync");
 		script.println("exit $QUEUE_SCRIPT_RESULT");
 	}
 
@@ -278,8 +281,9 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 			logProcessResult(result, stdoutCopy, stderrCopy);
 
-			if (result == 0)
+			if (result == 0) {
 				return stdoutCopy.getResult();
+			}
 			throw new ScriptExecutionException(commandLine, result, stderrCopy.getResult());
 		} catch (InterruptedException ie) {
 			throw new NativeQueueException("Unable to execute command.", ie);
@@ -348,9 +352,13 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				}
 			}
 		} catch (IOException ioe) {
-			// This won't happen.
+			_logger.error("caught exception in parseResult", ioe);
 		}
 	}
+
+	/*
+	 * we only log the results below if debugging level is enabled, since always enabling this gets way too noisy.
+	 */
 
 	static private void logProcess(Collection<String> commandLine)
 	{

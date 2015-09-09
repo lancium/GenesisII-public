@@ -11,6 +11,9 @@ fi
 
 echo "going to build in '$source_directory' and copy results to '$target_directory'"
 
+# make sure we don't carry anyone else's config in here.
+unset FEISTY_MEOW_DIR
+
 # make sure the source directory exists.
 if [ ! -d "$source_directory" ]; then
   mkdir "$source_directory"

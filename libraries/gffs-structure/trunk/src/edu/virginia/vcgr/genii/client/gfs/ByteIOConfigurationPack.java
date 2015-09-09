@@ -67,8 +67,6 @@ public class ByteIOConfigurationPack
 	ByteIOConfigurationPack(Properties loadFrom)
 	{
 		try {
-			_logger.debug("*** yo into the byte io config pack");
-
 			// for each member of this class, load from properties or use the default value.
 			long_buffer_size = Integer.parseInt(loadFrom.getProperty(BUF_SIZE_PROPERTY, "" + BUF_SIZE_DEFAULT));
 			short_buffer_size = Integer.parseInt(loadFrom.getProperty(SHORT_BUF_SIZE_PROPERTY, "" + SHORT_BUF_SIZE_DEFAULT));
@@ -81,7 +79,7 @@ public class ByteIOConfigurationPack
 
 			verify();
 
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("loaded byteio configs from properties, got this: " + toString());
 		} catch (Throwable t) {
 			_logger.error("failed to construct a byte io config pack from properties", t);

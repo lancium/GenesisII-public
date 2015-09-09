@@ -251,9 +251,11 @@ public class AxisClientHeaderHandler extends BasicHandler
 									clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
 									accessCategories, trustDelegation);
 							if (newCred == null) {
-								_logger
-									.debug("failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
-										+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+								if (_logger.isTraceEnabled()) {
+									_logger
+										.debug("failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
+											+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+								}
 								continue;
 							}
 

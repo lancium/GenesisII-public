@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
+
 public class Hostname
 {
 	static private Log _logger = LogFactory.getLog(Hostname.class);
@@ -43,6 +45,12 @@ public class Hostname
 
 	private String _externalName; // our hostname as it appears to the world, given EPR addressing scheme.
 	private boolean _foundHostOkay = false; // tracks if the lookup succeeded.
+
+	// how long should dns entries be remembered, in milliseconds?
+	private static final int DNS_NAME_TIMEOUT_MS = 30 * 60 * 1000; // current timeout is 30 minutes.
+
+	// cache quite a few names for the timeout period so we can cross over twitchy DNS responses / failures.
+	private static TimedOutLRUCache<String, String> _dnsCache = new TimedOutLRUCache<String, String>(256, DNS_NAME_TIMEOUT_MS);
 
 	/*
 	 * used only for local host to avoid repeated lookups. this differs from the _cachedHostName in that this string is formatted according to
@@ -103,6 +111,22 @@ public class Hostname
 		// hmmm: here is a good place to have a DNS cache. just before looking up for real, is it in the cache? cache should maybe be lru
 		// timeout.
 
+		synchronized (_dnsCache) {
+			// see if the name has already been looked up.
+			String alreadyKnown = _dnsCache.get(givenAddress);
+			if (alreadyKnown != null) {
+				// yep, we know this one, so return it.
+				_externalName = alreadyKnown;
+				_foundHostOkay = true;
+				if (_logger.isTraceEnabled())
+					_logger.debug("DNSCACHE: found address '" + givenAddress + "' in cache as '" + _externalName + "'");
+				return;
+			} else {
+				if (_logger.isTraceEnabled())
+					_logger.debug("DNSCACHE: did not find address '" + givenAddress + "' in cache");
+			}
+		}
+
 		InetAddress addr = null;
 		try {
 			InetAddress[] addrs = InetAddress.getAllByName(givenAddress);
@@ -113,17 +137,19 @@ public class Hostname
 				return;
 			}
 
+			// all of the successful alternatives below should just keep going; only a failure should return or throw an exception.
 			if (addr.isLoopbackAddress()) {
 				_externalName = getHostnameOverride();
 				if (_externalName != null) {
-					// this is a success, it seems.
+					// this is a success, since we're using the assigned override.
 					_foundHostOkay = true;
-					return;
+				} else {
+					// we need to figure out the best way of representing our localhost address.
+					InetAddress address = getMostGlobal();
+					_externalName = formString(address);
 				}
-
-				InetAddress address = getMostGlobal();
-				_externalName = formString(address);
 			} else {
+				// since it's not localhost, we can go with the answer we received from dns lookup.
 				_externalName = givenAddress;
 			}
 
@@ -135,6 +161,10 @@ public class Hostname
 
 		// if we are allowed to get here, it is assumed that things worked.
 		_foundHostOkay = true;
+		synchronized (_dnsCache) {
+			// add the newly looked up name so we don't have to check again for a while.
+			_dnsCache.put(givenAddress, _externalName);
+		}
 	}
 
 	/**

@@ -33,10 +33,10 @@ public interface CmdLineManipulatorConstants
 	static public final String MANIP_ARGS = "manipulator-additional-arguments";
 
 	/*
-	 * these phrases are a substring that should always be found in our SPMD variations that we've defined for sequential apps.
-	 * if the strings change in the spmd_variations.xml, then they must be updated here also.
+	 * these phrases are a substring that should always be found in our SPMD variations that we've defined for sequential apps. if the strings
+	 * change in the spmd_variations.xml, then they must be updated here also.
 	 */
 	static final public String NODE_EXCLUSIVE_THREADED_PHRASE = "NodeExclusiveThreaded";
 	static final public String SHARED_THREADED_PHRASE = "SharedThreaded";
-	
+
 }
