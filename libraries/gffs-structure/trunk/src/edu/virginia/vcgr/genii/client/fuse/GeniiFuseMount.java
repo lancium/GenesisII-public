@@ -17,7 +17,6 @@ import edu.virginia.vcgr.fsii.file.OpenFlags;
 import edu.virginia.vcgr.fsii.file.OpenModes;
 import edu.virginia.vcgr.fsii.path.FilesystemPathRepresentation;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
-import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
 import edu.virginia.vcgr.genii.client.fuse.exceptions.FuseExceptions;
 import edu.virginia.vcgr.genii.client.fuse.exceptions.FuseFunctionNotImplementedException;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
@@ -99,6 +98,7 @@ public class GeniiFuseMount implements Filesystem
 	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("getattr(%s)", path));
+
 		FilesystemStatStructure statstruct = MetadataManager.retrieveStat(path);
 		// ASG changed July 15, 2015 to have getattr on non-existent files NOT go to the grid
 		if (statstruct == null) {
@@ -155,6 +155,7 @@ public class GeniiFuseMount implements Filesystem
 	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("getdir(%s)", path));
+
 		FuseDirEnt[] dirEntries = DirectoryManager.getDir(path);
 		if (dirEntries != null)
 			return dirEntries;
@@ -264,8 +265,7 @@ public class GeniiFuseMount implements Filesystem
 	{
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("read(%s, %d, %s, %d)", path, fileHandle, buffer, offset));
-		// if ((path != null) && (buffer != null))
-		// System.out.printf("read(%s, %d, %s, %d)\n", path, fileHandle, buffer, offset);
+
 		try {
 			_fs.read(fileHandle, offset, buffer);
 		} catch (Throwable cause) {

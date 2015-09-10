@@ -18,7 +18,7 @@ import edu.virginia.vcgr.genii.osgi.OSGiSupport;
  * 
  * hmmm: probably should get similar implementation to ThreadAndProcessSynchronizer.
  * 
- * hmmm: can use the T&PSync class directly if we add notion of max attempts and polling interval to that class.
+ * hmmm: !!! can use the T&PSync class directly if we add notion of max attempts and polling interval to that class.
  */
 public class FileLock implements Closeable
 {

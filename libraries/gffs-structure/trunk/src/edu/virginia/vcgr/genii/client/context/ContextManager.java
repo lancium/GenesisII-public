@@ -61,6 +61,11 @@ public class ContextManager
 		return ctxt;
 	}
 
+	/*
+	 * hmmm: !!! context loading functions could be smarter! they could cache the context in memory, and if there is a change in the file,
+	 * only then reload it.
+	 */
+
 	// this function locates the current calling context, which could actually be null.
 	static public ICallingContext getCurrentContext() throws FileNotFoundException, IOException
 	{

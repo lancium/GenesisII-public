@@ -15,13 +15,6 @@ fi
 if [ -z "$XSEDE_TEST_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 1; fi
 source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
 
-# how long should we snooze before checking that fuse has gotten the
-# notification that new files are available?
-FUSE_SNOOZE_TIME=4
-# how many times we should test that fuse sees a new file in the grid.
-#FUSE_COPY_COUNT=1
-FUSE_COPY_COUNT=20
-
 # where we hook in the fuse mount.
 MOUNT_POINT="$TEST_TEMP/mount-gffsFuseCommands"
 # the user's home directory from fuse perspective.
@@ -239,27 +232,6 @@ testRemovingDirectory()
   assertEquals "Testing 'rmdir $TESTING_DIR_ALTERNATE' on mounted dir" 0 $?
   ls -l "$HOME_DIR"
   assertEquals "Testing ls on outer folder" 0 $?
-}
-
-testNewFileInGridShowsUp()
-{
-  if ! fuse_supported; then return 0; fi
-  local newfile=new-file-testing-fuse-yo
-  for ((i=0; i < $FUSE_COPY_COUNT; i++)); do
-    local currfile=$newfile-$i
-    grid echo this is a new file in the grid. \\\> $RNSPATH/$currfile
-    assertEquals "Writing a new file in the grid" 0 $?
-    # pause needed since fuse must see notification over network before it updates cache.
-    sleep $FUSE_SNOOZE_TIME
-    ls -1 "$HOME_DIR" | grep $currfile
-    assertEquals "Testing that newly created file shows up in fuse directory listing" 0 $?
-    grid rm $RNSPATH/$currfile
-    assertEquals "Cleaning up newly created file" 0 $?
-    # pause needed since fuse must see notification over network before it updates cache.
-    sleep $FUSE_SNOOZE_TIME
-    ls -1 "$HOME_DIR" | grep $currfile
-    assertNotEquals "Testing that newly deleted file is missing in fuse directory listing" 0 $?
-  done
 }
 
 testUnmountingFuseMount()

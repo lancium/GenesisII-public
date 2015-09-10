@@ -86,6 +86,7 @@ fi
 GFFS_TESTS=( \
   GFFS_Tests/Functional_Tests/gffsFileOpsTest.sh \
   GFFS_Tests/Functional_Tests/gffsFuseCommands.sh \
+  GFFS_Tests/Functional_Tests/testFuseFilePresence.sh \
   GFFS_Tests/Functional_Tests/gffsGridCommands.sh \
   GFFS_Tests/Functional_Tests/gffsReplCommands.sh \
   GFFS_Tests/Functional_Tests/rnsBearTrap.sh \

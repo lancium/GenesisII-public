@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.xml.namespace.QName;
 
@@ -34,7 +35,9 @@ import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
+import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
@@ -51,7 +54,9 @@ import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.identity.Identity;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 public class GenesisIIFilesystem implements FSFilesystem
 {
@@ -61,6 +66,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	private RNSPath _root;
 	private RNSPath _lastPath;
 	private Collection<Identity> _callerIdentities;
+
+	public static String CREDENTIAL_ERROR_MESSAGE = "There are no credentials or they have expired.  Cannot operate on: ";
 
 	private FileHandleTable<GeniiOpenFile> _fileTable = new FileHandleTable<GeniiOpenFile>(FILE_TABLE_SIZE);
 
@@ -85,10 +92,73 @@ public class GenesisIIFilesystem implements FSFilesystem
 		return c;
 	}
 
+	/**
+	 * succeeds if there are "additional credentials" in the wallet. this means that the fuse system is at least logged into *something*. if
+	 * there are no additional credentials at all, then this throws an exception. the parameters are in two different forms since methods here
+	 * use either a flat file name or an array of strings. we will display whichever one is not null.
+	 */
+	public static void checkCredentialsAreGood(String name, String[] names) throws FSException
+	{
+		boolean toReturn = false;
+		ICallingContext callingContext;
+		try {
+			callingContext = ContextManager.getCurrentContext();
+			if (callingContext != null) {
+				// no context at all means no creds either, so to even think we have credentials we must have a context.
+				KeyAndCertMaterial clientKeyMaterial =
+					ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+				if (clientKeyMaterial == null) {
+					throw new RuntimeException("failed to retrieve a valid TLS certificate for the client");
+				}
+				TransientCredentials tranCreds = TransientCredentials.getTransientCredentials(callingContext);
+				toReturn = (tranCreds != null) && !tranCreds.isEmpty();
+			}
+		} catch (Throwable e) {
+			_logger.warn("exception thrown while checking credentials", e);
+		}
+		if (_logger.isTraceEnabled()) {
+			_logger.debug("cred check says that creds are: " + (toReturn ? "good" : "bad"));
+		}
+		/*
+		 * a note about failures here: if the credentials should become good again at some future point, then we will automatically reload
+		 * them above in the check and renew call. thus we don't need any special code to reload the credentials and patch the context; it
+		 * just happens as a matter of course.
+		 */
+		if (toReturn != true) {
+			// the credentials are not good; blow out an appropriate type of exception.
+			String relevantFile = name;
+			if (relevantFile == null) {
+				relevantFile = flattenPath(names);
+			}
+			throw new FSIllegalAccessException(CREDENTIAL_ERROR_MESSAGE + relevantFile);
+		}
+	}
+
+	/**
+	 * returns a list of path components in descending hierarchical order into the corresponding rooted directory path.
+	 */
+	public static String flattenPath(String[] toFlatten)
+	{
+		if ((toFlatten == null) || (toFlatten.length == 0)) {
+			return null;
+		}
+		StringBuilder toReturn = new StringBuilder();
+		for (String f : toFlatten) {
+			toReturn.append("/");
+			toReturn.append(f);
+		}
+		return toReturn.toString();
+	}
+
 	FilesystemStatStructure stat(String name, EndpointReferenceType target) throws FSException
 	{
+		checkCredentialsAreGood(name, null);
+
 		TypeInformation typeInfo = new TypeInformation(target);
 		FilesystemEntryType type;
+
+		if (_logger.isTraceEnabled())
+			_logger.debug("hitting stat() on name='" + name + "'");
 
 		if (typeInfo.isRNS())
 			type = FilesystemEntryType.DIRECTORY;
@@ -212,6 +282,11 @@ public class GenesisIIFilesystem implements FSFilesystem
 
 	public RNSPath lookup(String[] pathComponents) throws FSException
 	{
+		checkCredentialsAreGood(null, pathComponents);
+
+		if (_logger.isTraceEnabled())
+			_logger.debug("hitting lookup() on name='" + flattenPath(pathComponents) + "'");
+
 		String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(pathComponents);
 
 		RNSPath entry;
@@ -226,6 +301,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public void chmod(String[] path, Permissions permissions) throws FSException
 	{
+		checkCredentialsAreGood(null, path);
+
 		RNSPath target = lookup(path);
 		if (!target.exists())
 			throw new FSEntryNotFoundException(String.format("Couldn't find target path %s.", target.pwd()));
@@ -254,6 +331,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public void link(String[] sourcePath, String[] targetPath) throws FSException
 	{
+		checkCredentialsAreGood(null, sourcePath);
+
 		RNSPath source = lookup(sourcePath);
 		RNSPath target = lookup(targetPath);
 
@@ -273,6 +352,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public DirectoryHandle listDirectory(String[] path) throws FSException
 	{
+		checkCredentialsAreGood(null, path);
+
 		String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(path);
 		RNSPath target = lookup(path);
 		if (!target.exists())
@@ -307,6 +388,11 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public void mkdir(String[] path, Permissions initialPermissions) throws FSException
 	{
+		checkCredentialsAreGood(null, path);
+
+		if (_logger.isTraceEnabled())
+			_logger.debug("hitting mkdir() on name='" + flattenPath(path) + "'");
+
 		RNSPath target = lookup(path);
 		if (target.exists())
 			throw new FSEntryAlreadyExistsException(String.format("Directory %s already exists.", target.pwd()));
@@ -326,6 +412,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	private long open(String[] path, boolean wasCreated, RNSPath target, EndpointReferenceType epr, OpenFlags flags, OpenModes mode)
 		throws FSException, ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
+		checkCredentialsAreGood(null, path);
+
 		GeniiOpenFile gof;
 
 		TypeInformation tInfo = new TypeInformation(epr);
@@ -347,6 +435,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public long open(String[] path, OpenFlags flags, OpenModes mode, Permissions initialPermissions) throws FSException
 	{
+		checkCredentialsAreGood(null, path);
+
 		RNSPath target = lookup(path);
 		EndpointReferenceType epr;
 
@@ -394,6 +484,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public FilesystemStatStructure stat(String[] path) throws FSException
 	{
+		checkCredentialsAreGood(null, path);
+
 		RNSPath target = lookup(path);
 		if (!target.exists())
 			throw new FSEntryNotFoundException(String.format("Unable to locate path %s.", target.pwd()));
@@ -408,6 +500,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public void truncate(String[] path, long newSize) throws FSException
 	{
+		checkCredentialsAreGood(null, path);
+
 		RNSPath target = lookup(path);
 		if (!target.exists())
 			throw new FSEntryNotFoundException(String.format("Couldn't find path %s.", target.pwd()));
@@ -436,6 +530,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public void unlink(String[] path) throws FSException
 	{
+		checkCredentialsAreGood(null, path);
+
 		RNSPath target = lookup(path);
 		if (!target.exists())
 			throw new FSEntryNotFoundException(String.format("Couldn't locate path %s.", target.pwd()));
@@ -452,6 +548,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public void updateTimes(String[] path, long accessTime, long modificationTime) throws FSException
 	{
+		checkCredentialsAreGood(null, path);
+
 		RNSPath target = lookup(path);
 		if (!target.exists())
 			throw new FSEntryNotFoundException(String.format("Unable to find path %s.", target.pwd()));
@@ -476,6 +574,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public void rename(String[] fromPath, String[] toPath) throws FSException
 	{
+		checkCredentialsAreGood(null, fromPath);
+
 		RNSPath from = lookup(fromPath);
 		RNSPath to = lookup(toPath);
 
@@ -490,5 +590,23 @@ public class GenesisIIFilesystem implements FSFilesystem
 		} catch (Throwable cause) {
 			throw FSExceptions.translate(String.format("Unable to rename %s to %s.", from.pwd(), to.pwd()), cause);
 		}
+	}
+
+	public static void testCredentialCheckingCost(String name, String[] names)
+	{
+		Date now = new Date();
+		_logger.debug("starting timing test of cred checker at: " + now.toString());
+		double REPEAT_COUNT = 10000;
+		for (int i = 0; i < REPEAT_COUNT; i++) {
+			try {
+				checkCredentialsAreGood(name, names);
+			} catch (FSException e) {
+				_logger.error("failed during credential timing test with exception", e);
+			}
+		}
+		Date newNow = new Date();
+		_logger.debug("ended timing test of cred checker at: " + newNow.toString());
+		double msSpent = newNow.getTime() - now.getTime();
+		_logger.debug("total time taken = " + msSpent + "ms, which per operation is " + (double) (msSpent / REPEAT_COUNT));
 	}
 }

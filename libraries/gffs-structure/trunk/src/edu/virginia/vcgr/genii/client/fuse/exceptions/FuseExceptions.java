@@ -21,6 +21,11 @@ public class FuseExceptions
 {
 	static public FuseException translate(String message, Throwable cause)
 	{
+		if (cause.getMessage() != null) {
+			// append the lower level message because that is often still useful.
+			message = message + "(" + cause.getMessage() + ")";
+		}
+
 		if (cause instanceof FuseException)
 			return (FuseException) cause;
 		else if (cause instanceof RNSPathAlreadyExistsException)
@@ -37,8 +42,6 @@ public class FuseExceptions
 			return new FuseEntryAlreadyExistsException(message, cause);
 		else if (cause instanceof FSEntryNotFoundException)
 			return new FuseNoSuchEntryException(message, cause);
-		else if (cause instanceof FSException)
-			return new FuseException(message, cause);
 		else if (cause instanceof FSFileHandleBadStateException)
 			return new FuseFileHandleBadStateException(message, cause);
 		else if (cause instanceof FSIllegalAccessException)
@@ -53,6 +56,8 @@ public class FuseExceptions
 			return translate(message, cause.getCause());
 		else if (cause instanceof FSSecurityException)
 			return new FusePermissionDeniedException(message, cause);
+		else if (cause instanceof FSException)
+			return new FuseException(message, cause);
 		else
 			return new FuseUnknownException(message, cause);
 	}

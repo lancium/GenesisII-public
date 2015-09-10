@@ -335,7 +335,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		try {
 			_transientProperties.putAll((HashMap<String, Serializable>) in.readObject());
 			if (in.readBoolean()) {
-				// read in another set from the parent
+				// read in another set from the parent.
 				deserializeTransientProperties(in);
 			}
 		} catch (InvalidClassException e) {
@@ -354,8 +354,9 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 	private void collapseTransient(HashMap<String, Serializable> target)
 	{
-		if (_parent != null)
+		if (_parent != null) {
 			_parent.collapseTransient(target);
+		}
 
 		for (String key : _transientProperties.keySet()) {
 			target.put(key, _transientProperties.get(key));

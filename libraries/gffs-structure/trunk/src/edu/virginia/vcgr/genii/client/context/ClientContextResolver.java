@@ -57,7 +57,7 @@ public class ClientContextResolver implements IContextResolver
 		try {
 			fl = FileLock.lockFile(contextFile);
 
-			// if we don't have split context files, we will try to load a combined on.
+			// if we don't have split context files, we will try to load a combined one.
 			if (contextFile == null || !contextFile.exists() || contextFile.length() == 0) {
 				File combinedFile = getCombinedFile();
 				// make sure we could actually try loading the combined one.
