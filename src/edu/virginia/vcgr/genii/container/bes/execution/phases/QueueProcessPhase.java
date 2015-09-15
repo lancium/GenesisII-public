@@ -180,20 +180,29 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 			String lastState = null;
 			while (true) {
-				_state = queue.getStatus(_jobToken);
-				context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
-				if (lastState == null || !lastState.equals(_state.toString())) {
-					if (_logger.isDebugEnabled())
-						_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
-					history.trace("Batch System State:  %s", _state);
-					lastState = _state.toString();
+				boolean stateIsUsable = false;
+				try {
+					_state = queue.getStatus(_jobToken);
+					stateIsUsable = true;
+				} catch (Exception e) {
+					_logger.error("caught exception while asking for queue state; ignoring result", e);
 				}
-
+				if (stateIsUsable) {
+					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
+					if (lastState == null || !lastState.equals(_state.toString())) {
+						if (_logger.isDebugEnabled())
+							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
+						history.trace("Batch System State:  %s", _state);
+						lastState = _state.toString();
+					}
+				}
+	
+				// the state may have been updated elsewhere, so we still examine if we're in final state here.
 				if (_state.isFinalState()) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("queue job '" + _jobToken.toString() + "' is now in a final state: " + _state);
 					break;
-				}
+				}	
 
 				_phaseShiftLock.wait(DEFAULT_LOOP_CYCLE);
 			}
