@@ -599,7 +599,7 @@ return true;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="Decide on platform details" id="11092" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Decide on platform" id="11610" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
@@ -608,12 +608,6 @@ return true;</string>
                           <void property="value">
                             <string>
 try {
-    String targetDir = context.getInstallationDirectory() +  "/jni-lib";
-    String baseJni = context.getInstallationDirectory() +  "/jni-libs/";
-
-    // where we will get the jni binaries from.    
-    File finalSourceDir = null;
-    
     if (Util.isLinux()) {
 //System.out.println("found linux system");
     
@@ -639,56 +633,35 @@ try {
         output.close();
         
         if (is64bits) {
-            // install the linux64 jni.
-            finalSourceDir = new File(baseJni + "lin64");
             context.setVariable("genii.platform", "linux64");
-
 //System.out.println("found 64 bit linux system");
         } else {
-            // install the linux32 jni.
-            finalSourceDir = new File(baseJni + "lin32");
             context.setVariable("genii.platform", "linux32");
 //System.out.println("found 32 bit linux system");
         }
         
     } else if (Util.isAtLeastWindowsXP()) {
         // windows xp or later...
-//System.out.println("found windows system");
-        
+//System.out.println("found windows system");        
         if (Util.is64BitWindows()) {
-            // 64 bit windows.
-            finalSourceDir = new File(baseJni + "win64");
             context.setVariable("genii.platform", "windows64");
         } else {
-            // 32 bit windows.
-            finalSourceDir = new File(baseJni + "win32");
             context.setVariable("genii.platform", "windows32");
         }
         
     } else if (Util.isMacOS()) {
 //System.out.println("found mac system");
-
         // mac os x....
         // we only support 64 bit mac os x currently...
-        finalSourceDir = new File(baseJni + "osx64");
         context.setVariable("genii.platform", "macosx64");
     } else {
 System.out.println("found unknown type of operating system!");
-
-        Util.logInfo(null, "unknown OS platform so cannot copy JNI libraries appropriately");
+        Util.logInfo(null, "unknown OS platform; there will be problems in the rest of the installation.");
         context.setVariable("genii.platform", "unknown");
     }
-    
-    if (finalSourceDir != null) {
-        // we can do the copy now.  but don't know how to get it done in install4j.
-        // we save the location to a variable and use that.
-        context.setVariable("genii.jnipath", finalSourceDir.getAbsolutePath());        
-        Util.logInfo(null, "found platform is " + context.getVariable("genii.platform") + " and the jni dir is " +  context.getVariable("genii.jnipath"));
-    }
-    
-    
+        
 } catch(Exception e) {
-    Util.logInfo(null, "exception occurred while copying JNI libraries for the OS platform");
+    Util.logInfo(null, "exception occurred while determining OS platform");
 }
 
 return true;
@@ -885,6 +858,71 @@ return true;</string>
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.SetProgressAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Decide on jni directory" id="11092" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>
+try {
+    // get earlier calculated platform.
+    String platypus =  (String) context.getVariable("genii.platform"); 
+    
+    String targetDir = context.getInstallationDirectory() +  "/jni-lib";
+    String baseJni = context.getInstallationDirectory() +  "/jni-libs/";
+
+    // where we will get the jni binaries from.    
+    File finalSourceDir = null;
+    
+    if (platypus.equals("linux64")) {
+        // install the linux64 jni.
+        finalSourceDir = new File(baseJni + "lin64");
+//System.out.println("setting up jni for 64 bit linux system");
+    } else if (platypus.equals("linux32")) {
+        // install the linux32 jni.
+        finalSourceDir = new File(baseJni + "lin32");
+//System.out.println("setting up jni for 32 bit linux system");
+    } else if (platypus.equals("win64")) {
+        // 64 bit windows.
+        finalSourceDir = new File(baseJni + "win64");
+//System.out.println("setting up jni for 64 bit windows system");
+    } else if (platypus.equals("win32")) {
+        // 32 bit windows.
+       finalSourceDir = new File(baseJni + "win32");
+//System.out.println("setting up jni for 32 bit windows system");
+    } else if (platypus.equals("macosx64")) {
+        // we only support 64 bit mac os x currently...
+        finalSourceDir = new File(baseJni + "osx64");
+//System.out.println("setting up jni for 64 bit mac os x system");
+    } else {
+System.out.println("found unknown type of operating system!  cannot set up JNI properly.");
+        Util.logInfo(null, "unknown OS platform so cannot copy JNI libraries appropriately");
+    }
+    
+    if (finalSourceDir != null) {
+        // we can do the copy now.  but don't know how to get it done in install4j.
+        // we save the location to a variable and use that.
+        context.setVariable("genii.jnipath", finalSourceDir.getAbsolutePath());        
+        Util.logInfo(null, "found platform is " + context.getVariable("genii.platform") + " and the jni dir is " +  context.getVariable("genii.jnipath"));
+    }
+    
+    
+} catch(Exception e) {
+    Util.logInfo(null, "exception occurred while copying JNI libraries for the OS platform");
+}
+
+return true;
+</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
                   </java>
                 </serializedBean>
                 <condition />
@@ -1183,7 +1221,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Copy the chosen jni directory to final place" id="10899" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Copy the chosen jni directory to final place" id="10899" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="4" errorMessage="failed to copy jni lib dir to path ${installer:genii.jnipath}">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -1200,6 +1238,9 @@ return true;</string>
                                 </object>
                               </void>
                             </array>
+                          </void>
+                          <void property="overwriteMode">
+                            <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
                           </void>
                         </object>
                       </java>
