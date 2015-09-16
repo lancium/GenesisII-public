@@ -23,10 +23,8 @@ APP_NAME="GFFS"
 APP_LONG_NAME="GFFS Container Service"
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-# try to pick the right installation directory if it's not set.
-if [ -z "$GENII_INSTALL_DIR" ]; then
-  export GENII_INSTALL_DIR="$WORKDIR"
-fi
+# pick the right installation directory.
+export GENII_INSTALL_DIR="$WORKDIR"
 
 #echo "saying that workdir is $WORKDIR"
 
