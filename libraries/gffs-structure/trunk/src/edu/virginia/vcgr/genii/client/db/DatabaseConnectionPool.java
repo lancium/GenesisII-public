@@ -19,7 +19,7 @@ public class DatabaseConnectionPool
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
 
 	// hmmm: wacky largeness right now to test new mechanism. norm 16.
-	static protected final int _DB_POOL_SIZE_DEFAULT = 64;
+	static protected final int _DB_POOL_SIZE_DEFAULT = 16;
 
 	// hmmm: ridiculously large delay allowed now; was 4 seconds originally!
 	static public final int MAX_SNOOZE_AWAITING_POOL = 2 * 60 * 1000; // in milliseconds.
