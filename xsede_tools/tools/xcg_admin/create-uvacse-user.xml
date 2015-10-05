@@ -15,30 +15,30 @@ parameters for this script are:
 				<param>--kerbRealm=UVACSE</param>
 				<param>--kerbKdc=uvacse-002.cs.virginia.edu</param>
 				<param>--validDuration=10years</param>
-				<param>/containers/BootstrapContainer/Services/KerbAuthnPortType</param>
+				<param>/resources/xcg.virginia.edu/containers/BootstrapContainer/Services/KerbAuthnPortType</param>
 				<param>${ARGV[1]}</param>
 			</geniix:idp>
 
 			<geniix:ln>
-				<param>/containers/BootstrapContainer/Services/KerbAuthnPortType/${ARGV[1]}</param>
-				<param>/users/${ARGV[1]}</param>
+				<param>/resources/xcg.virinia.edu/containers/BootstrapContainer/Services/KerbAuthnPortType/${ARGV[1]}</param>
+				<param>/users/xcg.virginia.edu/${ARGV[1]}</param>
 			</geniix:ln>
 
 			<geniix:mkdir>
 				<param>--parents</param>
-				<param>/home/${ARGV[1]}</param>
+				<param>/home/xcg.virginia.edu/${ARGV[1]}</param>
 			</geniix:mkdir>
 
 			<geniix:chmod>
-				<param>/users/${ARGV[1]}</param>
+				<param>/users/xcg.virginia.edu/${ARGV[1]}</param>
 				<param>5</param>
-				<param>/users/${ARGV[1]}</param>
+				<param>/users/xcg.virginia.edu/${ARGV[1]}</param>
 			</geniix:chmod>
 			
 			<geniix:chmod>
-				<param>/home/${ARGV[1]}</param>
+				<param>/home/xcg.virginia.edu/${ARGV[1]}</param>
 				<param>7</param>
-				<param>/users/${ARGV[1]}</param>
+				<param>/users/xcg.virginia.edu/${ARGV[1]}</param>
 			</geniix:chmod>
 
 </gsh:script>

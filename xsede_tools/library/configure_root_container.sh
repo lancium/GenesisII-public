@@ -136,9 +136,9 @@ check_if_failed Logging in as $new_admin_name
 # copy up the flag that shows this is *not* a useful, real, secure grid
 # and also let everyone read that file.
 multi_grid <<eof
-  cp "local:$WORKDIR/a_bogus_grid.txt" /
+  cp "local:$WORKDIR/a_bogus_grid.txt" "/a_bogus_grid_on_${HOSTNAME}_owned_by_${USER}.txt"
   onerror Failed copy bogus grid file up to root directory.
-  chmod /a_bogus_grid.txt +r --everyone
+  chmod /a_bogus_grid* +r --everyone
   onerror Failed to change permissions on bogus grid file.
 eof
 check_if_failed Setting up bogus grid marker file.

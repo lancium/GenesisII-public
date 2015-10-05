@@ -27,15 +27,15 @@ oneTimeSetUp()
   fi
 
   # clean-up any prior run.
-  grid rm -rf $RNSPATH/job_scripts $RNSPATH/feisty_meow $RNSPATH/murphy
-#?  rm -rf $WORKDIR/murphy
+  grid rm -rf $RNSPATH/job_scripts $RNSPATH/vi-source $RNSPATH/murphy
+  rm -rf $WORKDIR/murphy
 }
 
 testUploadStagingContents()
 {
   echo "Copying necessary files to Grid namespace"
-  grid cp -r local:./job_scripts grid:$RNSPATH
-  assertEquals "Copying job_scripts directory up" 0 $?
+  grid cp -r local:./job_scripts local:./vi-source grid:$RNSPATH
+  assertEquals "Copying job_scripts and source directory up" 0 $?
 }
 
 testSubmitJobWithDirectoryStaging()
@@ -56,17 +56,30 @@ testWaitForDirectoryStagingJob()
 
 testResultingDirectoryStageOut()
 {
+  # get the output side version.
+  grid cp -r "$RNSPATH/murphy" local:./murphy
 
-#is this looking in the right place?  like in grid?
+  out1=$(mktemp $TEST_TEMP/infiles.XXXXXX)
+  out2=$(mktemp $TEST_TEMP/outfiles.XXXXXX)
 
-  echo listing out the build products of note...
-  ls murphy/binaries/nechung*
-  assertEquals "nechung binary did not get built as expected" 0 $?
-  chmod 755 ./murphy/binaries/nechung
-  # set the nechung database environment variable so the app can find the fortunes.
-  export NECHUNG=/home/fred/feisty_meow/nucleus/applications/nechung/example.txt
-  echo running the produced binary...
-  ./murphy/binaries/nechung
+  pushd ./vi-source
+  assertEquals "Changing to source directory for compare" 0 $?
+  find . -type f >"$out1"
+  assertEquals "Running find on input directory to get file names" 0 $?
+  popd
+
+  pushd ./murphy
+  assertEquals "Changing to source directory for compare" 0 $?
+  find . -type f >"$out2"
+  assertEquals "Running find on output directory to get file names" 0 $?
+  popd
+
+  outpoof=$(comm -23 "$out1" "$out2")
+  assertEquals "Comparing the files listed in both dirs with comm" 0 $?
+
+  fsize=${#outpoof}
+  assertEquals "Output file should be empty from running comm tool" 0 $fsize
+
 }
 
 # load and run shUnit2

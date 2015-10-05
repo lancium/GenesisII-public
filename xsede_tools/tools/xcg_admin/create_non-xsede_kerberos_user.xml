@@ -47,7 +47,7 @@ Script arguments:
           	<block>
 			<geniix:ln>
 				<param>${ARGV[1]}/Services/KerbAuthnPortType/${ARGV[4]}</param>
-				<param>/users/${ARGV[4]}</param>
+				<param>/users/xcg.virginia.edu/${ARGV[4]}</param>
 			</geniix:ln>
 		</block>
           	<catch class="java.lang.Exception">
@@ -60,7 +60,7 @@ Script arguments:
           	<block>
 			<geniix:mkdir>
 				<param>-p</param>
-				<param>/home/${ARGV[4]}</param>
+				<param>/home/xcg.virginia.edu/${ARGV[4]}</param>
 			</geniix:mkdir>
 		</block>
           	<catch class="java.lang.Exception">
@@ -69,18 +69,18 @@ Script arguments:
         	</try>
 
 		<geniix:chmod>
-			<param>/users/${ARGV[4]}</param>
+			<param>/users/xcg.virginia.edu/${ARGV[4]}</param>
 			<param>5</param>
-			<param>/users/${ARGV[4]}</param>
+			<param>/users/xcg.virginia.edu/${ARGV[4]}</param>
 		</geniix:chmod>
 
 		<echo message="Granting permissions to new user to new home directory"/>
         	<try>
           	<block>
 			<geniix:chmod>
-				<param>/home/${ARGV[4]}</param>
+				<param>/home/xcg.virginia.edu/${ARGV[4]}</param>
 				<param>7</param>
-				<param>/users/${ARGV[4]}</param>
+				<param>/users/xcg.virginia.edu/${ARGV[4]}</param>
 			</geniix:chmod>
 		</block>
           	<catch class="java.lang.Exception">

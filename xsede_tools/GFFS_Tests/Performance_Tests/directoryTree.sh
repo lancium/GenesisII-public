@@ -51,6 +51,11 @@ oneTimeSetUp()
       echo "is a bootstrapped test!  A real export test against a remote container could"
       echo "still work if the path exists locally there."
     fi
+  else
+    # test area already existed, so make sure nothing was left behind.
+    if [ -d "$TEST_AREA/EMS_Tests" ]; then
+      rm -rf "$TEST_AREA/EMS_Tests"
+    fi
   fi
 }
 
