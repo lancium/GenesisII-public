@@ -132,7 +132,8 @@ public abstract class ethread implements Runnable
 			while (true) {
 				boolean keepGoing = performActivity();
 				if (!keepGoing) {
-					c_logger.debug("thread returned false for single shot thread.  just saying.");
+					c_logger.debug("thread returned false, signifying it wants to exit.  now dropping it.");
+					break;
 				}
 				if (c_period == 0) {
 					// not a periodic thread, so we're done now.
@@ -153,5 +154,8 @@ public abstract class ethread implements Runnable
 		} catch (Throwable t) {
 			c_logger.info("exception thrown from performActivity: " + t.getLocalizedMessage(), t);
 		}
+		// reset the thread held since we're leaving right now.
+		c_stopThread = true;
+		c_RealThread = null;
 	}
 }
