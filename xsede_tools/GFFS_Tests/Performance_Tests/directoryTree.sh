@@ -19,7 +19,10 @@ export FULL_EXPORT_PATH="$RNSPATH/export-local"
 oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.
+}
 
+testCleanupPriorTestRuns()
+{
   # remove any previous mount point.
   fusermount -u "$MOUNT_POINT" &>/dev/null
   if [ -e "$MOUNT_POINT" ]; then rmdir "$MOUNT_POINT"; fi
@@ -39,6 +42,8 @@ oneTimeSetUp()
   grid rm -rf ${RNSPATH}/testDir &>/dev/null
   # create a new mount point.
   mkdir "$MOUNT_POINT"
+  assertEquals "Making mount point directory at $MOUNT_POINT" 0 $?
+
   # create the export path, if we can.  this should be a pre-existing directory,
   # and this creation attempt will only work if we're doing a simple bootstrap test.
   if [ ! -d "$TEST_AREA" ]; then
@@ -55,6 +60,11 @@ oneTimeSetUp()
     # test area already existed, so make sure nothing was left behind.
     if [ -d "$TEST_AREA/EMS_Tests" ]; then
       rm -rf "$TEST_AREA/EMS_Tests"
+      assertEquals "Cleaning EMS_Tests from export area" 0 $?
+    fi
+    if [ -d "$TEST_AREA/testDir" ]; then
+      rm -rf "$TEST_AREA/testDir"
+      assertEquals "Cleaning testDir from export area" 0 $?
     fi
   fi
 }
@@ -65,6 +75,31 @@ testCreateExport() {
   grid export --create $CONTAINERPATH/Services/LightWeightExportPortType local:$TEST_AREA grid:$FULL_EXPORT_PATH
   assertEquals "Creating export on $CONTAINERPATH, local path $TEST_AREA, at $FULL_EXPORT_PATH" 0 $?
   cat $GRID_OUTPUT_FILE
+}
+
+# moved to just after export creation to expedite this test.
+testRecursiveCopyAndDeleteOnExport()
+{
+  if ! fuse_supported; then return 0; fi
+  grid cp -r local:"$XSEDE_TEST_ROOT/EMS_Tests" $FULL_EXPORT_PATH
+  assertEquals "copy directory recursively to export path" 0 $?
+  grid ls $FULL_EXPORT_PATH/EMS_Tests/besFunctionality &>/dev/null
+  assertEquals "directory is present on export path afterwards" 0 $?
+  if [ -d $TEST_AREA/EMS_Tests/besFunctionality -a -d $TEST_AREA/EMS_Tests/faultJobsTests ]; then
+    true
+  else
+    false
+  fi
+  assertEquals "certain directories are present on real filesystem of export" 0 $?
+
+#echo bailing
+#exit 1
+
+
+  grid rm -r $FULL_EXPORT_PATH/EMS_Tests
+  assertEquals "remove copied directory from export path" 0 $?
+  grid ls $FULL_EXPORT_PATH/EMS_Tests &>/dev/null
+  assertNotEquals "directory really should be gone after removal" 0 $?
 }
 
 testFuseMount () {
@@ -106,10 +141,10 @@ testListingExportViaFuse()
 testFuseRecursiveCp() {
   if ! fuse_supported; then return 0; fi
   # Recursively copy files from $1 into the $2
-  # Then ls -lR the directory and count the number of lines
-  time cp -rv $TEST_TEMP/testDir "$MOUNT_POINT/$RNSPATH"
+  time cp -r $TEST_TEMP/testDir "$MOUNT_POINT/$RNSPATH" 
   assertEquals "Recursively copying from testDir to $MOUNT_POINT/$RNSPATH" 0 $?
-  time ls -lR "$MOUNT_POINT/$RNSPATH"
+  # Then ls -lR the directory (not yet: and count the number of lines)
+  time ls -lR "$MOUNT_POINT/$RNSPATH" &>/dev/null
   assertEquals "Recursively listing the copied files in testDir to $MOUNT_POINT/$RNSPATh" 0 $?
 }
 
@@ -117,30 +152,11 @@ testFuseRecursiveCpOntoExport()
 {
   if ! fuse_supported; then return 0; fi
   # Recursively copy files from $1 into the $2
-  time cp -rv $TEST_TEMP/testDir "$MOUNT_POINT/$FULL_EXPORT_PATH"
+  time cp -r $TEST_TEMP/testDir "$MOUNT_POINT/$FULL_EXPORT_PATH" 
   assertEquals "Recursively copying from testDir to $MOUNT_POINT/$FULL_EXPORT_PATH" 0 $?
   echo "Recursively listing the copied files in $MOUNT_POINT/$FULL_EXPORT_PATH"
-  time ls -lR "$MOUNT_POINT/$FULL_EXPORT_PATH"
+  time ls -lR "$MOUNT_POINT/$FULL_EXPORT_PATH" &>/dev/null
   assertEquals "directory copied to export was listable" 0 $?
-}
-
-testRecursiveCopyAndDeleteOnExport()
-{
-  if ! fuse_supported; then return 0; fi
-  grid cp -r local:"$XSEDE_TEST_ROOT/EMS_Tests" $FULL_EXPORT_PATH
-  assertEquals "copy directory recursively to export path" 0 $?
-  grid ls $FULL_EXPORT_PATH/EMS_Tests/besFunctionality &>/dev/null
-  assertEquals "directory is present on export path afterwards" 0 $?
-  if [ -d $TEST_AREA/EMS_Tests/besFunctionality -a -d $TEST_AREA/EMS_Tests/besFunctionality ]; then
-    true
-  else
-    false
-  fi
-  assertEquals "directories are present on real filesystem of export" 0 $?
-  grid rm -r $FULL_EXPORT_PATH/EMS_Tests
-  assertEquals "remove copied directory from export path" 0 $?
-  grid ls $FULL_EXPORT_PATH/EMS_Tests &>/dev/null
-  assertNotEquals "directory really should be gone after removal" 0 $?
 }
 
 testRemovingTestDir()
@@ -148,6 +164,7 @@ testRemovingTestDir()
   if ! fuse_supported; then return 0; fi
   grid rm -r ${RNSPATH}/testDir
   assertEquals "cleaning up test directory in RNS" 0 $?
+
 #turn these on once we identify issues in this test on 126 test vms.
 #  rm -rf "$MOUNT_POINT/$FULL_EXPORT_PATH"
 #  assertEquals "cleaning up test directory in exported path" 0 $?
