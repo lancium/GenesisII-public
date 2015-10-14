@@ -194,13 +194,14 @@ public class TimedOutLRUCache<KeyType, DataType>
 					try {
 						clearStale();
 						RoleBasedCacheNode<KeyType, DataType> firstNode = _timeoutList.peekFirst();
-						if (firstNode == null)
+						if (firstNode == null) {
 							_map.wait();
-						else {
+						} else {
 							Date nextStale = firstNode.getInvalidationDate();
 							long timeout = nextStale.getTime() - System.currentTimeMillis();
-							if (timeout > 0)
+							if (timeout > 0) {
 								_map.wait(timeout);
+							}
 						}
 					} catch (InterruptedException ie) {
 					}

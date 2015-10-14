@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.LookupResponseType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
@@ -22,6 +24,8 @@ import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
 final public class RNSLegacyProxy
 {
+	private static Log _logger = LogFactory.getLog(RNSLegacyProxy.class);
+
 	private EnhancedRNSPortType _newClient;
 	private ICallingContext _callContext;
 
@@ -89,6 +93,16 @@ final public class RNSLegacyProxy
 
 	final public Set<String> remove(String... names) throws WriteNotPermittedFaultType, RemoteException
 	{
+		Set<String> ret = new HashSet<String>();
+		if (_logger.isDebugEnabled()) {
+			StringBuilder sb = new StringBuilder();
+			for (String name : names) {
+				sb.append(name);
+				sb.append(" ");
+			}
+			_logger.debug("calling remove on: " + sb);
+		}
+
 		RNSEntryResponseType[] rpt;
 
 		if (names == null || names.length == 0)
@@ -96,7 +110,6 @@ final public class RNSLegacyProxy
 		else
 			rpt = _newClient.remove(names);
 
-		Set<String> ret = new HashSet<String>();
 		for (RNSEntryResponseType resp : rpt) {
 			if (resp.getFault() != null)
 				throw new RemoteException(String.format("Unable to remove entry %s!", resp.getEntryName()), resp.getFault());

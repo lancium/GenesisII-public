@@ -759,14 +759,18 @@ public class RNSPath implements Serializable, Cloneable
 		/*
 		 * Note that calling context property for RNS-Short-Form in this case is set before creating the proxy. This is because when a call is
 		 * coming from FUSE, we get a context resolver that cannot propagate property updates accurately across all the references of the
-		 * calling context. --old:For the same reason an explicit store is invoked after setting the property.old:-- As a general rule, doing
-		 * context update before proxy creation is advisable to avoid similar unwanted problems.
+		 * calling context.
+		 * 
+		 * --old:For the same reason an explicit store is invoked after setting the property.old:-- As a general rule, doing context update
+		 * before proxy creation is advisable to avoid similar unwanted problems.
 		 */
 		ICallingContext context = null;
 		try {
 			context = ContextManager.getCurrentContext();
-			context.setSingleValueProperty("RNSShortForm", shortForm);
-			_logger.trace("RNS Short form set to true for listContents");
+			if (shortForm) {
+				context.setSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN, shortForm);
+				_logger.trace("RNS Short form set to true for listContents");
+			}
 		} catch (Exception e) {
 		}
 
@@ -796,10 +800,10 @@ public class RNSPath implements Serializable, Cloneable
 			} catch (Exception e) {
 				_logger.warn("exception during attempt to close stream", e);
 			}
-			// remove the calling context property for short form
+			// remove the calling context property for short form.
 			if (shortForm) {
 				try {
-					context.removeProperty("RNSShortForm");
+					context.removeProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
 				} catch (Exception e) {
 					_logger.error("Could not remove the short form request from the calling context", e);
 				}
@@ -864,7 +868,7 @@ public class RNSPath implements Serializable, Cloneable
 				// setting the calling context property for short form
 				try {
 					context = ContextManager.getCurrentContext();
-					context.setSingleValueProperty("RNSShortForm", true);
+					context.setSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN, true);
 					_logger.trace("Short RNS form requested from Grid Client.");
 				} catch (Exception e) {
 					_logger.trace("could not set the short form");
@@ -899,7 +903,7 @@ public class RNSPath implements Serializable, Cloneable
 
 			if (getShortForm) {
 				try {
-					context.removeProperty("RNSShortForm");
+					context.removeProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
 				} catch (Exception e) {
 					_logger.error("Could not remove the short form request from the calling context", e);
 				}

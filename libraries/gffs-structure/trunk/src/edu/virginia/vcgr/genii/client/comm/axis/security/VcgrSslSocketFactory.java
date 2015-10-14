@@ -62,11 +62,11 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 	static {
 		/*
-		 * initializations to restrict types of TLS we will use. this one is for https-client: evidence says this does not help for our case
-		 * of the gffs client, but this does at least protect our normal web browsing from using SSLv3.
+		 * initializations to restrict types of TLS we will use (to disallow SSLv3 and thus avoid the POODLE exploit). this one is for
+		 * https-client: evidence says this does not help for our case of the gffs client, but this does at least protect our normal web
+		 * browsing from using SSLv3.
 		 */
 		java.lang.System.setProperty("https.protocols", "TLSv1");
-
 	}
 
 	// hmmm: should this maximum have any relation to the configured max value that we got from properties???
@@ -79,8 +79,6 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 	protected TrustManager[] _trustManagers;
 	protected SocketConfigurer _clientSocketConfigurer = ClientProperties.getClientProperties().getClientSocketProperties();
-
-	// Installation.getDeployment(new DeploymentName()).clientSocketConfigurer();
 
 	public VcgrSslSocketFactory()
 	{
@@ -175,9 +173,10 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			}
 			sslcontext.init(kms, mgrs, null);
 
-			// show which trust managers we have loaded. we want at least one of these to be our crl
-			// handling replacement.
-			if (_logger.isDebugEnabled()) {
+			/*
+			 * show which trust managers we have loaded. we want at least one of these to be our crl handling replacement.
+			 */
+			if (_logger.isTraceEnabled()) {
 				for (TrustManager m : mgrs) {
 					_logger.debug("trust manager: " + m.toString() + " type: " + m.getClass().getCanonicalName());
 				}
@@ -213,9 +212,9 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	}
 
 	@Override
-	public Socket createSocket(Socket socket, String s, int i, boolean flag) throws IOException
+	public Socket createSocket(Socket socket, String s, int i, boolean autoClose) throws IOException
 	{
-		return configureSocket(getSSLSocketFactory().createSocket(socket, s, i, flag));
+		return configureSocket(getSSLSocketFactory().createSocket(socket, s, i, autoClose));
 	}
 
 	@Override
@@ -237,9 +236,9 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	}
 
 	@Override
-	public Socket createSocket(String s, int i) throws IOException
+	public Socket createSocket(String address, int port) throws IOException
 	{
-		return configureSocket(getSSLSocketFactory().createSocket(s, i));
+		return configureSocket(getSSLSocketFactory().createSocket(address, port));
 	}
 
 	public String[] getDefaultCipherSuites()

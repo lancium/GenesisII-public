@@ -22,8 +22,9 @@ public class Subscriber
 {
 	private static Log _logger = LogFactory.getLog(Subscriber.class);
 
-	private static Subscriber subscriber;
-	private SubscriptionOutcallHandler handler = null;
+	private static Subscriber _singleInstanceSubscriber;
+	
+	private SubscriptionOutcallHandler _handler = null;
 
 	/*
 	 * This is producer-consumer type queue for managing subscription requests. The subscriber acts as a producer while the
@@ -33,7 +34,6 @@ public class Subscriber
 
 	private Subscriber()
 	{
-
 		/*
 		 * We need to create an SSL server to get the notifications in a secure way. Current HTTPServer is a makeshift implementation as I
 		 * don't know the standard way of accessing and creating SSL certificates.
@@ -58,21 +58,28 @@ public class Subscriber
 		 */
 		if (serverStartedSuccessfully) {
 			queue = new LinkedBlockingQueue<PendingSubscription>();
-			handler = new SubscriptionOutcallHandler(queue, notificationServer, true);
-			handler.start();
+			_handler = new SubscriptionOutcallHandler(queue, notificationServer, true);
+			_handler.start();
 			new PollingFrequencyAdjuster().start();
 		}
 	}
 
+	// this synchronizes on the class level since it sets up a static instance of this class.
 	public static synchronized Subscriber getInstance()
 	{
-		if (subscriber == null) {
-			subscriber = new Subscriber();
+		if (_singleInstanceSubscriber == null) {
+			_singleInstanceSubscriber = new Subscriber();
 		}
-		return subscriber;
+		return _singleInstanceSubscriber;
 	}
 
-	public void requestForSubscription(PendingSubscription request)
+	public void resetPendingSubscriptions()
+	{
+		queue.clear();
+	}
+
+	// synchronizes on the single subscriber instance (which must be == this) to avoid thread collisions during subscription.
+	synchronized public void requestForSubscription(PendingSubscription request)
 	{
 		if (!CacheConfigurer.isSubscriptionEnabled())
 			return;
@@ -93,8 +100,10 @@ public class Subscriber
 
 	public static void resetCallingContext()
 	{
-		if (subscriber != null) {
-			subscriber.handler.updateCallingContext();
+		if (_singleInstanceSubscriber != null) {
+			synchronized (_singleInstanceSubscriber) {
+				_singleInstanceSubscriber._handler.updateCallingContext();
+			}
 		}
 	}
 

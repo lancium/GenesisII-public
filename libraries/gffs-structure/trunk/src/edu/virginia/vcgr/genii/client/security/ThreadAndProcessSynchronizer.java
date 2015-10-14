@@ -52,7 +52,8 @@ public class ThreadAndProcessSynchronizer
 			synchronized (_lockRecords) {
 				SynchPackage found = _lockRecords.get(lockFile);
 				if (found == null) {
-					_logger.debug("acquireLock: creating new synch package for lock file: " + lockFile);
+					if (_logger.isTraceEnabled())
+						_logger.debug("acquireLock: creating new synch package for lock file: " + lockFile);
 					found = new SynchPackage(lockFile);
 					_lockRecords.put(lockFile, found);
 				}

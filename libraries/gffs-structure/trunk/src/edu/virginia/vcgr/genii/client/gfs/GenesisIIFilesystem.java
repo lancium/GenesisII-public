@@ -366,13 +366,13 @@ public class GenesisIIFilesystem implements FSFilesystem
 				_logger.trace("Using Short form for Enhanced-RNS handle.");
 				ICallingContext context = ContextManager.getCurrentContext().getParent();
 
-				context.setSingleValueProperty("RNSShortForm", true);
+				context.setSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN, true);
 
 				EnhancedRNSPortType pt = ClientUtils.createProxy(EnhancedRNSPortType.class, target.getEndpoint());
 				RNSIterable entries = new RNSIterable(fullPath, pt.lookup(null), context, RNSConstants.PREFERRED_BATCH_SIZE);
 				directoryHandle = new EnhancedRNSHandle(this, entries, fullPath);
 
-				context.removeProperty("RNSShortForm");
+				context.removeProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
 			} else if (info.isRNS()) {
 				directoryHandle = new DefaultRNSHandle(this, target.listContents(true));
 			} else {
@@ -538,10 +538,24 @@ public class GenesisIIFilesystem implements FSFilesystem
 
 		try {
 			MetadataManager.removeCachedAttributes(target);
-			target.delete();
+			try {
+				target.delete();
+			}
+			catch (RNSPathDoesNotExistException ne) {
+				/* 
+				 * Do not need to do anything, we are trying to delete it, and it is not there. ASG 2015-08-24			
+				 */
+			}
+			catch (Throwable cause){
+				if (cause instanceof FSNotADirectoryException) {
+					// Swallow it
+				}
+				throw FSExceptions.translate("Unable to delete entry: " + target.pwd(), cause);
+			}
 			DirectoryManager.removeDirEntry(target);
-		} catch (Throwable cause) {
-			throw FSExceptions.translate("Unable to delete entry.", cause);
+		} 
+		catch (Throwable cause) {
+			throw FSExceptions.translate("Unable to delete entry: "  + target.pwd(), cause);
 		}
 	}
 

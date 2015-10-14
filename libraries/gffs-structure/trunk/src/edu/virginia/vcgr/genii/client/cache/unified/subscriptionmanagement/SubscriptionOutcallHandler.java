@@ -86,13 +86,11 @@ class SubscriptionOutcallHandler extends Thread
 	{
 		LoggingContext.assumeNewLoggingContext();
 
-		// Every cache management related thread that load or store information from the Cache
-		// should have
-		// unaccounted access to both CachedManager and RPCs to avoid getting mingled with Cache
-		// access and
-		// RPCs initiated by some user action. This is important to provide accurate statistics on
-		// per container
-		// resource usage.
+		/*
+		 * Every cache management related thread that load or store information from the Cache should have unaccounted access to both
+		 * CachedManager and RPCs to avoid getting mingled with Cache access and RPCs initiated by some user action. This is important to
+		 * provide accurate statistics on per container resource usage.
+		 */
 		ResourceAccessMonitor.getUnaccountedAccessRight();
 
 		new SubscriptionRequestSampler().start();
@@ -146,7 +144,7 @@ class SubscriptionOutcallHandler extends Thread
 			SubscriptionDirectory.notifySubscriptionFailure(subscriptionRequest.getNewsSource());
 		} catch (Exception e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("indirect subscription request was denied.");
+				_logger.debug("indirect subscription request was denied.", e);
 		} finally {
 			StreamUtils.close(assumedContextToken);
 		}
@@ -193,10 +191,11 @@ class SubscriptionOutcallHandler extends Thread
 			URI wsEndpointIdentifier = new WSName(EPR).getEndpointIdentifier();
 			WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsEndpointIdentifier, WSResourceConfig.class);
 			if (resourceConfig != null) {
-				// although a single resource can be mapped to multiple RNS paths, we are
-				// assuming only one of them while calculating number of branches within
-				// the list of subscription requests. This is done to reduce the chance of
-				// accidental denial of subscriptions on a normal use case.
+				/*
+				 * although a single resource can be mapped to multiple RNS paths, we are assuming only one of them while calculating number
+				 * of branches within the list of subscription requests. This is done to reduce the chance of accidental denial of
+				 * subscriptions on a normal use case.
+				 */
 				String rnsPath = resourceConfig.getRnsPath();
 				if (rnsPath != null) {
 					pathStrings.add(rnsPath);
@@ -210,7 +209,7 @@ class SubscriptionOutcallHandler extends Thread
 	 * This is a predictive operation. We cannot ensure that the resource we are trying to subscribe hasn't been deleted by other user.
 	 * However, when the deletion has been done locally, we expect there wouldn't be any resource configuration instance in the cache for the
 	 * concerned news source. Based on that assumption we are filtering the subscription request. Note that, to remove a directory we have to
-	 * look check the its contents first, which result in a lookup call, and naturally creates pending subscriptions.
+	 * look check its contents first, which result in a lookup call, and naturally creates pending subscriptions.
 	 */
 	private void filterRequestsCorrespondingDeletedResources(List<PendingSubscription> requests)
 	{
@@ -257,13 +256,11 @@ class SubscriptionOutcallHandler extends Thread
 		public void run()
 		{
 
-			// Every cache management related thread that load or store information from the Cache
-			// should have
-			// unaccounted access to both CachedManager and RPCs to avoid getting mingled with Cache
-			// access and
-			// RPCs initiated by some user action. This is important to provide accurate statistics
-			// on per container
-			// resource usage.
+			/*
+			 * Every cache management related thread that load or store information from the Cache should have unaccounted access to both
+			 * CachedManager and RPCs to avoid getting mingled with Cache access and RPCs initiated by some user action. This is important to
+			 * provide accurate statistics on per container resource usage.
+			 */
 			ResourceAccessMonitor.getUnaccountedAccessRight();
 
 			if (controlledRateMode) {

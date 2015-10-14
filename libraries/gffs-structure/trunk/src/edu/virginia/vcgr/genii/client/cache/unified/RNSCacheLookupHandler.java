@@ -39,14 +39,13 @@ import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 
-/*
+/**
  * Handler class for returning a response of RNS lookup call from the cache instead of making an RPC on the related container. Note that this
  * should not be used unless we subscribe the EPR on which the lookup operation is invoked. This is because the resulting entries of the
  * lookup call will be again inserted by the the caller in the cache, which will unwantedly update the cache lifetime of the entries. A
  * subscription on the target EPR ensures that lookup entries are always valid so we can safely increase the cache lifetime of the component
  * RNS entries.
  */
-
 public class RNSCacheLookupHandler
 {
 
@@ -61,13 +60,13 @@ public class RNSCacheLookupHandler
 			if (!wsName.isValidWSName())
 				return null;
 
-			// Opportunistically store root and current path's resource config in the cache to
-			// improve the chance of cache hit for looked up contents. This is useful sometimes
-			// as it can happen that the resources under a directory are already in the cache
-			// but we fail to use them as the parent's resource configuration is not there
-			// (either never saved or evicted). This opportunistic caching can only be applied
-			// when the concerned parent is on the path to current working directory.For all
-			// other directories, we don't have the path information saved anywhere beforehand.
+			/*
+			 * Opportunistically store root and current path's resource config in the cache to improve the chance of cache hit for looked up
+			 * contents. This is useful sometimes as it can happen that the resources under a directory are already in the cache but we fail
+			 * to use them as the parent's resource configuration is not there (either never saved or evicted). This opportunistic caching can
+			 * only be applied when the concerned parent is on the path to current working directory.For all other directories, we don't have
+			 * the path information saved anywhere beforehand.
+			 */
 			storeRootAndCurrentPathsInTheCache();
 
 			WSResourceConfig resourceConfig =
@@ -122,7 +121,7 @@ public class RNSCacheLookupHandler
 			boolean shortForm = false;
 			try {
 				ICallingContext context = ContextManager.getCurrentContext();
-				Object form = context.getSingleValueProperty("RNSShortForm");
+				Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
 				if (form != null && Boolean.TRUE.equals(form)) {
 					shortForm = true;
 				}
@@ -198,7 +197,7 @@ public class RNSCacheLookupHandler
 				// in the RNS directory. We can't cover all the cases where such scenarios can spur.
 				// However the checking of total-cached-entry counts will save us in cases where the
 				// client has made a directory listing for all elements in the RNS directory before
-				// making the vein lookup call.
+				// making the vain lookup call.
 				if ((filteredNames.length != entries.size()) && (totalCachedEntries < elementCount)) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Lookup unsuccessful: filtered search count mismatch: " + resourceConfig.getRnsPath());

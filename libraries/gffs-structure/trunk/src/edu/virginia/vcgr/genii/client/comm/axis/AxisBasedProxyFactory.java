@@ -44,6 +44,7 @@ public class AxisBasedProxyFactory implements IProxyFactory
 	static public QName LOCATOR_REGISTRY_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "locator-registry");
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
 		throws ResourceException, GenesisIISecurityException
 	{
@@ -69,11 +70,10 @@ public class AxisBasedProxyFactory implements IProxyFactory
 	{
 		Class<?>[] portTypes = ClientUtils.getLocatorPortTypes(locatorClasses);
 		AxisClientInvocationHandler handler = new AxisClientInvocationHandler(locatorClasses, targetEPR, callContext);
-
 		return Proxy.newProxyInstance(loader, portTypes, handler);
 	}
 
-	private AxisClientInvocationHandler getInvocationHandler(Object clientProxy) throws ResourceException
+	static private AxisClientInvocationHandler getInvocationHandler(Object clientProxy) throws ResourceException
 	{
 		InvocationHandler handler = Proxy.getInvocationHandler(clientProxy);
 		if (handler == null)
@@ -83,24 +83,28 @@ public class AxisBasedProxyFactory implements IProxyFactory
 		return (AxisClientInvocationHandler) handler;
 	}
 
+	@Override
 	public EndpointReferenceType extractTargetEPR(Object proxy) throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(proxy);
 		return handler.getTargetEPR();
 	}
-
+	
+	@Override
 	public Collection<GeniiAttachment> getAttachments(Object clientProxy) throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
 		return handler.getInAttachments();
 	}
 
+	@Override
 	public GenesisIIEndpointInformation getLastEndpointInformation(Object clientProxy) throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
 		return handler.getLastEndpointInformation();
 	}
 
+	@Override
 	public void setAttachments(Object clientProxy, Collection<GeniiAttachment> attachments, AttachmentType attachmentType)
 		throws ResourceException
 	{
@@ -108,6 +112,7 @@ public class AxisBasedProxyFactory implements IProxyFactory
 		handler.setOutAttachments(attachments, attachmentType);
 	}
 
+	@Override
 	public void setTimeout(Object clientProxy, int timeoutMillis) throws ResourceException
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);

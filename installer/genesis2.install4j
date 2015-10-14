@@ -162,7 +162,7 @@
           <entry location="genesisII.container.log4j.properties" fileType="regular" />
           <entry location="genesisII.client.log4j.properties" fileType="regular" />
           <entry location="container.properties" fileType="regular" />
-          <entry location="genesisII.shared.log4j.properties" fileType="regular" />
+          <entry location="shared.log4j.properties" fileType="regular" />
           <entry location="client.properties" fileType="regular" />
           <entry location="META-INF/mime.types" fileType="regular" />
         </exclude>

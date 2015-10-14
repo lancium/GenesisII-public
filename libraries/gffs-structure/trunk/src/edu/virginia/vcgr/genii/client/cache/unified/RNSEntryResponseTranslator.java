@@ -20,7 +20,7 @@ import edu.virginia.vcgr.genii.client.rp.DefaultSingleResourcePropertyTranslator
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.rp.SingleResourcePropertyTranslator;
 
-/*
+/**
  * This class gets an RNSEntryResponse and extracts from it all cache-able attributes.
  */
 public class RNSEntryResponseTranslator implements CacheableItemsGenerator

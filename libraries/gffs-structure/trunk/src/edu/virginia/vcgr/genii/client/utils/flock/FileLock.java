@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.utils.flock;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.logging.Log;
@@ -11,21 +10,21 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
+import edu.virginia.vcgr.genii.client.security.ThreadAndProcessSynchronizer;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 
 /**
- * warning: this class only supports process synchronization and does not handle thread locking in same application.
- * 
- * hmmm: probably should get similar implementation to ThreadAndProcessSynchronizer.
- * 
- * hmmm: !!! can use the T&PSync class directly if we add notion of max attempts and polling interval to that class.
+ * A file locking class that supports both thread and process locking (where the nio support only handles process locking in general).
  */
 public class FileLock implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(FileLock.class);
 
-	private FileOutputStream _internalFile = null;
-	private java.nio.channels.FileLock _internalLock = null;
+	// private FileOutputStream _internalFile = null;
+	// private java.nio.channels.FileLock _internalLock = null;
+
+	private File _lockFile; // the actual file being locked.
+	private boolean _locked = false; // did we acquire a lock that should be released?
 
 	/**
 	 * Creates a file lock that can be used for both reading and writing (by creating a new file based on the real file's name but ending in
@@ -42,34 +41,39 @@ public class FileLock implements Closeable
 	 */
 	public FileLock(File fileToLock, int maxAttempts, long pollInterval) throws FileLockException, InterruptedException
 	{
-		File lockFile = determineLockfileName(fileToLock);
+		_lockFile = determineLockfileName(fileToLock);
 
-		try {
-			_internalFile = new FileOutputStream(lockFile);
+		// hmmm: not using the attempts or poll interval yet!
 
-			while (maxAttempts > 0) {
-				try {
-					if (pollInterval > 0)
-						_internalLock = _internalFile.getChannel().tryLock();
-					else
-						_internalLock = _internalFile.getChannel().lock();
+		ThreadAndProcessSynchronizer.acquireLock(_lockFile.getAbsolutePath());
+		_locked = true;
 
-					if (_internalLock != null)
-						return;
-				} catch (IOException ioe) {
-					// Error locking the file. Sleep and try again.
-					Thread.sleep(pollInterval);
-				}
-			}
-
-			try {
-				_internalFile.close();
-			} catch (Throwable cause) {
-			}
-			throw new FileLockException("Unable to create lock for file '" + fileToLock + "' using lock file '" + lockFile + "'.");
-		} catch (IOException ioe) {
-			throw new FileLockException("Unable to create lock for '" + fileToLock + "' using lock file '" + lockFile + "'.", ioe);
-		}
+		// try {
+		// _internalFile = new FileOutputStream(lockFile);
+		//
+		// while (maxAttempts > 0) {
+		// try {
+		// if (pollInterval > 0)
+		// _internalLock = _internalFile.getChannel().tryLock();
+		// else
+		// _internalLock = _internalFile.getChannel().lock();
+		//
+		// if (_internalLock != null)
+		// return;
+		// } catch (IOException ioe) {
+		// // Error locking the file. Sleep and try again.
+		// Thread.sleep(pollInterval);
+		// }
+		// }
+		//
+		// try {
+		// _internalFile.close();
+		// } catch (Throwable cause) {
+		// }
+		// throw new FileLockException("Unable to create lock for file '" + fileToLock + "' using lock file '" + lockFile + "'.");
+		// } catch (IOException ioe) {
+		// throw new FileLockException("Unable to create lock for '" + fileToLock + "' using lock file '" + lockFile + "'.", ioe);
+		// }
 	}
 
 	protected void finalize() throws IOException
@@ -105,17 +109,22 @@ public class FileLock implements Closeable
 	@Override
 	synchronized public void close() throws IOException
 	{
-		if (_internalLock != null) {
-			try {
-				_internalLock.release();
-			} catch (Throwable cause) {
-			}
-			try {
-				_internalFile.close();
-			} catch (Throwable cause) {
-			}
-			_internalLock = null;
+		if (_locked) {
+			ThreadAndProcessSynchronizer.releaseLock(_lockFile.getAbsolutePath());
+			_locked = false;
 		}
+
+		// if (_internalLock != null) {
+		// try {
+		// _internalLock.release();
+		// } catch (Throwable cause) {
+		// }
+		// try {
+		// _internalFile.close();
+		// } catch (Throwable cause) {
+		// }
+		// _internalLock = null;
+		// }
 	}
 
 	static private final int DEFAULT_MAX_LOCK_ATTEMPTS = 10;

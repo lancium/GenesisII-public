@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -185,7 +186,7 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 			boolean ShortForm = false;
 			try {
 				ICallingContext context = ContextManager.getCurrentContext();
-				Object form = context.getSingleValueProperty("RNSShortForm");
+				Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
 				if (form != null && Boolean.TRUE.equals(form)) {
 					ShortForm = true;
 					_logger.info("Short form attribute found to be set to true in the calling context");

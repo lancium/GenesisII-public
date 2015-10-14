@@ -37,6 +37,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -438,7 +439,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		boolean requestedShortForm = false;
 		try {
 			ICallingContext context = ContextManager.getCurrentContext();
-			Object form = context.getSingleValueProperty("RNSShortForm");
+			Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
 			if (form != null && Boolean.TRUE.equals(form) && batchRequest) {
 				requestedShortForm = true;
 				_logger.info("Short form attribute found to be set to true in the calling context");

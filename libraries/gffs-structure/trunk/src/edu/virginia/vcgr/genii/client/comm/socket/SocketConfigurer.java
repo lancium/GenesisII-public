@@ -184,7 +184,7 @@ public class SocketConfigurer
 				/*
 				 * this change *DOES* fix the POODLE issue for our clients; clients will no longer negotiate down to SSLv3 afterwards.
 				 */
-				((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1" });
+				((SSLSocket) socket).setEnabledProtocols(new String[] { "TLSv1", "TLSv1.1" });
 			}
 
 		} catch (SocketException se) {

@@ -364,8 +364,20 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		ArrayList<X509Certificate[]> authenticatedCertChains, X509Certificate[] callerTLSCert, ICallingContext callContext)
 		throws AuthZSecurityException, GeneralSecurityException
 	{
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled()) {
 			_logger.debug("entered authBearCred with caller: " + callerTLSCert[0].getSubjectDN());
+
+			String dumpedCreds = "";
+			for (X509Certificate[] x509 : authenticatedCertChains) {
+				dumpedCreds = dumpedCreds.concat(x509[0].getSubjectDN() + "\n");
+			}
+			_logger.debug("auth chains initially are:\n" + dumpedCreds);
+
+			for (NuCredential cred : bearerCredentials) {
+				dumpedCreds = dumpedCreds.concat(cred.describe(VerbosityLevel.HIGH) + "\n");
+			}
+			_logger.debug("initial untested credential set is:\n" + dumpedCreds);
+		}
 
 		HashSet<NuCredential> retval = new HashSet<NuCredential>();
 
@@ -391,15 +403,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					continue; // no longer anything to check on that one; we don't want it.
 				}
 
-				// Verify that the request message signer is the same as the
-				// one of the holder-of-key certificates.
+				// Verify that the request message signer is the same as one of the holder-of-key certificates.
 				boolean match = false;
 				if (_logger.isTraceEnabled())
-					_logger.trace("credential to test has first delegatee: " + assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN()
+					_logger.debug("credential to test has first delegatee: " + assertion.getRootOfTrust().getDelegatee()[0].getSubjectDN()
 						+ "\n...and original issuer: " + assertion.getOriginalAsserter()[0].getSubjectDN());
 				for (X509Certificate[] callerCertChain : authenticatedCertChains) {
 					if (_logger.isTraceEnabled())
-						_logger.trace("...comparing with " + callerCertChain[0].getSubjectDN());
+						_logger.debug("...comparing with " + callerCertChain[0].getSubjectDN());
 					try {
 						int position = assertion.findDelegateeInChain(callerCertChain[0]);
 						if (position >= 0) {
@@ -411,7 +422,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							break;
 						} else {
 							if (_logger.isTraceEnabled())
-								_logger.trace("...found them to be different.");
+								_logger.debug("...found them to be different.");
 						}
 					} catch (Throwable e) {
 						_logger.error("failure: exception thrown during holder of key checks", e);
@@ -419,10 +430,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				}
 
 				if (!match) {
-					String msg =
-						"WARN: dropping credential which did not match incoming message sender: '" + assertion.describe(VerbosityLevel.HIGH)
-							+ "'";
-					_logger.debug(msg);
+					if (_logger.isDebugEnabled()) {
+						String msg =
+							"WARN: dropping credential which did not match incoming message sender: '"
+								+ assertion.describe(VerbosityLevel.HIGH) + "'";
+						_logger.debug(msg);
+					}
 					// skip adding it.
 					continue;
 				}
@@ -431,12 +444,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				 * discover when the sender trusts a credential, and include it if there's a matching pass through identity.
 				 */
 				if (callerTLSCert[0].equals(assertion.getOriginalAsserter()[0])) {
-					if (_logger.isDebugEnabled())
+					if (_logger.isTraceEnabled())
 						_logger.debug("found an assertion matching the target TLS cert chain: " + assertion.toString());
 					X509Certificate passThrough =
 						(X509Certificate) callContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 					if (passThrough != null) {
-						if (_logger.isDebugEnabled())
+						if (_logger.isTraceEnabled())
 							_logger.debug("got a pass through cert, checking delegatee: " + passThrough.getSubjectDN().toString());
 						if (assertion.getDelegatee()[0].equals(passThrough)) {
 							X509Certificate[] pt = new X509Certificate[1];
@@ -444,17 +457,19 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							// found a matching pass-through identity, so allow the caller to act as
 							// this.
 							X509Identity x509 = new X509Identity(pt, IdentityType.CONNECTION);
-							_logger.debug("adding matching pass-through identity for: " + x509.toString());
+							if (_logger.isTraceEnabled())
+								_logger.debug("adding matching pass-through identity for: " + x509.toString());
 							retval.add(x509);
 						} else {
-							_logger.debug("saying pass-through (1) not matching delegatee (2): '" + passThrough + "' vs. '"
-								+ assertion.getDelegatee()[0] + "'");
+							if (_logger.isTraceEnabled())
+								_logger.debug("saying pass-through (1) not matching delegatee (2): '" + passThrough + "' vs. '"
+									+ assertion.getDelegatee()[0] + "'");
 						}
 					} else {
-						_logger.trace("did not get a pass through credential.");
+						if (_logger.isTraceEnabled())
+							_logger.trace("did not get a pass through credential.");
 					}
 				}
-
 			}
 
 			retval.add(cred);
@@ -463,7 +478,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		if (_logger.isTraceEnabled()) {
 			String dumpedCreds = "";
 			for (NuCredential cred : retval) {
-				dumpedCreds.concat(cred.describe(VerbosityLevel.HIGH) + "\n");
+				dumpedCreds = dumpedCreds.concat(cred.describe(VerbosityLevel.HIGH) + "\n");
 			}
 			_logger.debug("before leaving authbearcred credential set is:\n" + dumpedCreds);
 		}

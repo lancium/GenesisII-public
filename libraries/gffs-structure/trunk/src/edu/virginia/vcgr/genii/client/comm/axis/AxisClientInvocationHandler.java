@@ -47,8 +47,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
-import com.sun.mail.iap.ConnectionException;
-
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
@@ -106,6 +104,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	static public String WSDD_CLIENT_CONFIGURATION_FILE = "web-service-client-config.wsdd";
 
+	// records how many rpcs are ongoing right now.
+	static private volatile Integer _activeClients = 0;
+
 	/**
 	 * add linkage to wipe our loaded config stuff in the event the config manager reloads.
 	 */
@@ -117,7 +118,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	{
 		public void notifyUnloaded()
 		{
-			synchronized (ConfigurationManager.class) {
+			synchronized (AxisClientInvocationHandler.class) {
 				__minClientMessageSec = null;
 			}
 		}
@@ -125,6 +126,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	private EndpointReferenceType _epr;
 
+	// future: this would be a good place to use a shorter timeout on containers...
 	private Integer _timeout = null;
 
 	private ICallingContext _callContext;
@@ -139,18 +141,41 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	private Class<?>[] _locators = null;
 	private AxisClientInvocationHandler _parentHandler = null;
-	private FileProvider _providerConfig = null;
+	static private FileProvider _providerConfig = new FileProvider(WSDD_CLIENT_CONFIGURATION_FILE);
 
 	// cache of signed, serialized delegation assertions
 	static private int VALIDATED_CERT_CACHE_SIZE = 32;
 	static private LRUCache<X509Certificate, Boolean> validatedCerts = new LRUCache<X509Certificate, Boolean>(VALIDATED_CERT_CACHE_SIZE);
 
-	static Object _lock = new Object();
-
 	public AxisClientInvocationHandler(Class<?> locator, EndpointReferenceType epr, ICallingContext callContext) throws ResourceException,
 		GenesisIISecurityException
 	{
 		this(new Class[] { locator }, epr, callContext);
+	}
+
+	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext) throws ResourceException,
+		GenesisIISecurityException
+	{
+		try {
+
+			_epr = epr;
+
+			if (callContext == null) {
+				callContext = new CallingContextImpl(new ContextType());
+			}
+			_callContext = callContext.deriveNewContext();
+			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");
+			_locators = locators;
+
+			// create the locator and add the methods to our list.
+			for (Class<?> locator : locators) {
+				Object locatorInstance = createLocatorInstance(locator);
+				addMethods(locatorInstance, epr);
+			}
+		} catch (IOException ioe) {
+			throw new ResourceException("Error creating secure client stub: " + ioe.getMessage(), ioe);
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -169,12 +194,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 		return retval;
 	}
-
-	// public static int getDefaultClientTimeout()
-	// {
-	// // future: this really needs to be stored in a config file so users can change it!!!
-	// return _DEFAULT_CLIENT_REQUEST_TIMEOUT;
-	// }
 
 	/**
 	 * Retrieves the client's minimum allowable level of message security
@@ -216,9 +235,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		MessageLevelSecurityRequirements minClientMessageSec = getMinClientMessageSec();
 		MessageLevelSecurityRequirements minResourceSec = null;
 
-		synchronized (_lock) {
-			minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
-		}
+		minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
 
 		MessageLevelSecurityRequirements neededMsgSec = minClientMessageSec.computeUnion(minResourceSec);
 
@@ -294,35 +311,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 
 		} catch (Exception e) {
-			throw new ResourceException("Unable to create locator instance: " + e.getMessage(), e);
+			throw new ResourceException("Unable to configure security: " + e.getMessage(), e);
 		}
-	}
-
-	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext) throws ResourceException,
-		GenesisIISecurityException
-	{
-		// future: this would be a good place to use a shorter timeout on containers.
-
-		try {
-
-			_epr = epr;
-
-			if (callContext == null) {
-				callContext = new CallingContextImpl(new ContextType());
-			}
-			_callContext = callContext.deriveNewContext();
-			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");
-			_locators = locators;
-
-			// create the locator and add the methods
-			for (Class<?> locator : locators) {
-				Object locatorInstance = createLocatorInstance(locator);
-				addMethods(locatorInstance, epr);
-			}
-		} catch (IOException ioe) {
-			throw new ResourceException("Error creating secure client stub: " + ioe.getMessage(), ioe);
-		}
-
 	}
 
 	private AxisClientInvocationHandler cloneHandlerForNewEPR(EndpointReferenceType epr) throws ResourceException, GenesisIISecurityException
@@ -420,6 +410,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	public Object invoke(Object target, Method m, Object[] params) throws Throwable
 	{
 		Object toReturn = null;
+		synchronized (_activeClients) {
+			_activeClients++;
+		}
 		try {
 			InvocationInterceptorManager mgr = getManager();
 			toReturn = mgr.invoke(getTargetEPR(), _callContext, this, m, params);
@@ -431,7 +424,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			throw e;
 		} catch (Throwable t) {
 			String msg = "exception occurred during invoke";
-
+			// we don't care below if t.getMessage() is null, since the extraction methods check for that.
 			String asset = edu.virginia.vcgr.genii.client.security.PermissionDeniedException.extractAssetDenied(t.getMessage());
 			String method = edu.virginia.vcgr.genii.client.security.PermissionDeniedException.extractMethodName(t.getMessage());
 			if ((method != null) && (asset != null)) {
@@ -454,8 +447,21 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 
 			throw t;
+		} finally {
+			synchronized (_activeClients) {
+				_activeClients--;
+			}
 		}
 		return toReturn;
+	}
+
+	static public boolean isActive()
+	{
+		int curr;
+		synchronized (_activeClients) {
+			curr = _activeClients;
+		}
+		return curr > 0;
 	}
 
 	static private boolean isConnectionException(Throwable cause)
@@ -578,7 +584,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				// So let's give up in advance
 				String msg = "Host " + key + " is known to be down, skipping";
 				_logger.error(msg);
-				throw new ConnectionException(msg);
+				throw new ConnectException(msg);
 			}
 
 			long startTime = System.currentTimeMillis();
@@ -596,7 +602,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						throwable = throwable.getCause();
 				}
 				if (_logger.isDebugEnabled())
-					_logger.debug("doInvoke fault on " + calledMethod.getName() + " due to: " + throwable.getMessage());
+					_logger.debug("doInvoke faulted on " + calledMethod.getName(), throwable);
 				if ((throwable instanceof TryAgainFaultType) && (!tryAgain)) {
 					tryAgain = true;
 				} else {
@@ -624,12 +630,12 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					 * as swiftly. usually the connection failure mode stays consistent, i.e. a firewall is always keeping us the whole
 					 * timeout period, whereas an unreachable host or down container can fail very fast.
 					 */
-					if ((throwable instanceof ConnectionException || throwable instanceof UnknownHostException || connectionProblem)
+					if ((throwable instanceof ConnectException || throwable instanceof UnknownHostException || connectionProblem)
 						&& (duration > ClientProperties.getClientProperties().getMaximumAllowableConnectionPause())) {
 						DeadHostChecker.addHostToDeadPool(handler);
 						String msg = "Communication failure for " + key;
 						_logger.error(msg);
-						throw new ConnectionException(msg);
+						throw new ConnectException(msg);
 					} else {
 						/*
 						 * hmmm: why are we automatically considering the host is okay here? have we definitely enumerated all connection

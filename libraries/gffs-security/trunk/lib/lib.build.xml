@@ -6,28 +6,28 @@
 		<concat destfile="${lib.dir}/genesisII.container.log4j.properties">
   			<filelist dir="${lib.dir}">
 				<file name="genesisII.container.log4j.properties.template" />
-				<file name="genesisII.shared.log4j.properties" />
+				<file name="shared.log4j.properties" />
 			</filelist>
 		</concat>
 
 		<concat destfile="${lib.dir}/genesisII.client.log4j.properties">
   			<filelist dir="${lib.dir}">
 				<file name="genesisII.client.log4j.properties.template" />
-				<file name="genesisII.shared.log4j.properties" />
+				<file name="shared.log4j.properties" />
 			</filelist>
 		</concat>
 
 		<concat destfile="${lib.dir}/production.container.log4j.properties">
   			<filelist dir="${lib.dir}">
 				<file name="production.container.log4j.properties.template" />
-				<file name="genesisII.shared.log4j.properties" />
+				<file name="shared.log4j.properties" />
 			</filelist>
 		</concat>
 
 		<concat destfile="${lib.dir}/production.client.log4j.properties">
   			<filelist dir="${lib.dir}">
 				<file name="production.client.log4j.properties.template" />
-				<file name="genesisII.shared.log4j.properties" />
+				<file name="shared.log4j.properties" />
 			</filelist>
 		</concat>
 

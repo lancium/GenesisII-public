@@ -94,7 +94,7 @@ public class Container extends ApplicationBase
 
 	static private CrlInvigoratorThread _crlInvigorator = null;
 
-	// Default to 1 year
+	// Default to 1 year certificate lifespan.
 	static private long _defaultCertificateLifetime = 1000L * 60L * 60L * 24L * 365L;
 
 	static public void usage()
@@ -116,7 +116,7 @@ public class Container extends ApplicationBase
 		try {
 			prepareServerApplication();
 
-			// Set Trust Store Provider
+			// Set Trust Store Providers.
 			java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
 
 			LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
@@ -264,9 +264,10 @@ public class Container extends ApplicationBase
 			}
 		}
 
-		// hmmm: trying a few things out. totally disabling the cache for container fixed the bug for the archive staging test.
-		// want to try having cache *and* subscriptions enabled.
-
+		/*
+		 * if caching is to be disabled for containers, this is where it's done. we've had some good success with allowing full caching for
+		 * the container though.
+		 */
 		// CacheConfigurer.disableSubscriptionBasedCaching();
 		// CacheConfigurer.disableCaching();
 

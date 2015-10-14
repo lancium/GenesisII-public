@@ -120,7 +120,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 						}
 
 						catch (RemoteException re) {
-							_logger.error("Timed out during a read on host " + re.getCause().getMessage(), re);
+							_logger.error("Failed during a read on host " , re);
 							ioerror = 110; // Unix timeout error
 							continue;
 						}

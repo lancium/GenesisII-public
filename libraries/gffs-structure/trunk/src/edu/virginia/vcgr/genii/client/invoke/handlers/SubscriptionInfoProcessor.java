@@ -41,7 +41,6 @@ public class SubscriptionInfoProcessor
 	@PipelineProcessor(portType = EnhancedRNSPortType.class)
 	public LookupResponseType lookup(InvocationContext ctxt, String[] names) throws Throwable
 	{
-
 		if (!CacheConfigurer.isSubscriptionEnabled()) {
 			return (LookupResponseType) ctxt.proceed();
 		}

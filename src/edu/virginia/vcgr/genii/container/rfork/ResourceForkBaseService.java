@@ -629,7 +629,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			boolean requestedShortForm = false;
 			try {
 				ICallingContext context = ContextManager.getCurrentContext();
-				Object form = context.getSingleValueProperty("RNSShortForm");
+				Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
 				if (form != null && Boolean.TRUE.equals(form)) {
 					requestedShortForm = true;
 					_logger.info("Short form attribute found to be set to true in the calling context");

@@ -200,7 +200,7 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
 					NotificationBrokerConstants.RESOURCE_AUTHORIZATION_CHANGE_SUBSCRIPTION) }, subscriptionReference);
 		} catch (Exception ex) {
-			_logger.info("Subscription request did not succeed: " + ex.getMessage());
+			_logger.info("Subscription request did not succeed", ex);
 			final SubscriptionFailedFaultType subscriptionFault =
 				new SubscriptionFailedFaultType(null, Calendar.getInstance(), publisher, null,
 					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to create subscriptions.") }, null);

@@ -261,7 +261,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 		boolean doDebug = log.isDebugEnabled();
 
 		if (doDebug) {
-			log.debug("WSDoAllReceiver: enter invoke() with msg type: " + msgContext.getCurrentMessage().getMessageType());
+			log.debug("ClientMessageSecurityReceiver: enter invoke() with msg type: " + msgContext.getCurrentMessage().getMessageType());
 		}
 
 		RequestData reqData = new RequestData();
@@ -277,7 +277,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 				action = (String) msgContext.getProperty(WSHandlerConstants.ACTION);
 			}
 			if (action == null) {
-				throw new AxisFault("WSDoAllReceiver: No action defined");
+				throw new AxisFault("ClientMessageSecurityReceiver: No action defined");
 			}
 			int doAction = WSSecurityUtil.decodeAction(action, actions);
 
@@ -300,7 +300,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 					log.debug(org.apache.axis.utils.XMLUtils.PrettyDocumentToString(doc));
 				}
 			} catch (Exception ex) {
-				throw new AxisFault("WSDoAllReceiver: cannot convert into document", ex);
+				throw new AxisFault("ClientMessageSecurityReceiver: cannot convert into document", ex);
 			}
 
 			/*
@@ -329,14 +329,14 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 				wsResult = secEngine.processSecurityHeader(doc, actor, cbHandler, reqData.getSigCrypto(), reqData.getDecCrypto());
 			} catch (WSSecurityException ex) {
 				_logger.info("exception occurred in superinvoke", ex);
-				throw new AxisFault("WSDoAllReceiver: security processing failed", ex);
+				throw new AxisFault("ClientMessageSecurityReceiver: security processing failed", ex);
 			}
 
 			if (wsResult == null) { // no security header found
 				if (doAction == WSConstants.NO_SECURITY) {
 					return;
 				} else {
-					throw new AxisFault("WSDoAllReceiver: Request does not contain required Security header");
+					throw new AxisFault("ClientMessageSecurityReceiver: Request does not contain required Security header");
 				}
 			}
 
@@ -396,7 +396,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			try {
 				sHeader = sm.getSOAPEnvelope().getHeader();
 			} catch (Exception ex) {
-				throw new AxisFault("WSDoAllReceiver: cannot get SOAP header after security processing", ex);
+				throw new AxisFault("ClientMessageSecurityReceiver: cannot get SOAP header after security processing", ex);
 			}
 
 			Iterator<?> headers = sHeader.examineHeaderElements(actor);
@@ -427,7 +427,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 
 				if (returnCert != null) {
 					if (!verifyTrust(returnCert, reqData)) {
-						throw new AxisFault("WSDoAllReceiver: The certificate used for the signature is not trusted");
+						throw new AxisFault("ClientMessageSecurityReceiver: The certificate used for the signature is not trusted");
 					}
 				}
 			}
@@ -448,7 +448,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 
 				if (timestamp != null) {
 					if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-						throw new AxisFault("WSDoAllReceiver: The timestamp could not be validated");
+						throw new AxisFault("ClientMessageSecurityReceiver: The timestamp could not be validated");
 					}
 				}
 			}
@@ -457,7 +457,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			 * now check the security actions: do they match, in right order?
 			 */
 			if (!checkReceiverResults(wsResult, actions)) {
-				throw new AxisFault("WSDoAllReceiver: security processing failed (actions mismatch)");
+				throw new AxisFault("ClientMessageSecurityReceiver: security processing failed (actions mismatch)");
 
 			}
 			/*
@@ -472,7 +472,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			results.add(0, rResult);
 
 			if (doDebug) {
-				log.debug("WSDoAllReceiver: exit invoke()");
+				log.debug("ClientMessageSecurityReceiver: exit invoke()");
 			}
 		} catch (WSSecurityException e) {
 			throw new AxisFault(e.getMessage(), e);

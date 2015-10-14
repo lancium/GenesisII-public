@@ -11,7 +11,9 @@ deployment-name
 under the deployments-dir.
 
 active-deployment-dir
-    The folder where all deployment information 
+    The folder where all deployment information for the current grid is
+stored.  This will generally be a folder under the 'deployments-dir' that has
+the name 'deployment-name'.
 
 security-dir
     The currently configured directory for security assets, such as the

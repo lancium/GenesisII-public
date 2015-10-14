@@ -1895,8 +1895,9 @@ public class JobManager implements Closeable
 		/*
 		 * Iterate through all running jobs and enqueue a worker to check the status of that job.
 		 */
-		if (_logger.isDebugEnabled())
-			_logger.debug("going to check on " + _runningJobs.size() + " supposedly running jobs.");
+		if (_logger.isDebugEnabled() && (_runningJobs.size() > 0)) {
+			_logger.debug("checking on " + _runningJobs.size() + " running jobs.");
+		}
 
 		for (JobData job : _runningJobs.values()) {
 			if (_logger.isDebugEnabled())

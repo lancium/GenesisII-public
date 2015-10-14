@@ -204,7 +204,8 @@ public class ApplicationDescription
 		while (!testingBundlesDir.exists() || !testingExtDir.exists()) {
 			if (_logger.isDebugEnabled()) {
 				try {
-					_logger.debug("failed to find bundles directory at '" + startupDir.getCanonicalPath() + "', popping up a level.");
+					if (_logger.isTraceEnabled())
+						_logger.debug("failed to find bundles directory at '" + startupDir.getCanonicalPath() + "', popping up a level.");
 				} catch (IOException e) {
 					_logger.error("failed to get canonical path of our startup directory: " + startupDir, e);
 					throw new RuntimeException(e);
