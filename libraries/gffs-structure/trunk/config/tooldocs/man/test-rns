@@ -1,0 +1,13 @@
+Description:
+
+This test launches multiple threads which attempt to build a shared view of the grid file system by starting at the root and gradually descending to all reachable directories for the current user.
+
+The following options are available:
+
+--threads=N
+
+Set the number of concurrent testing threads to N.
+
+--runtime=S
+
+Run the test for S seconds and then clean up all the threads.
