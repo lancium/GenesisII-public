@@ -141,7 +141,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	private Class<?>[] _locators = null;
 	private AxisClientInvocationHandler _parentHandler = null;
-	static private FileProvider _providerConfig = new FileProvider(WSDD_CLIENT_CONFIGURATION_FILE);
+	private FileProvider _providerConfig = null;
 
 	// cache of signed, serialized delegation assertions
 	static private int VALIDATED_CERT_CACHE_SIZE = 32;
