@@ -23,7 +23,7 @@ public class Subscriber
 	private static Log _logger = LogFactory.getLog(Subscriber.class);
 
 	private static Subscriber _singleInstanceSubscriber;
-	
+
 	private SubscriptionOutcallHandler _handler = null;
 
 	/*

@@ -540,22 +540,19 @@ public class GenesisIIFilesystem implements FSFilesystem
 			MetadataManager.removeCachedAttributes(target);
 			try {
 				target.delete();
-			}
-			catch (RNSPathDoesNotExistException ne) {
-				/* 
-				 * Do not need to do anything, we are trying to delete it, and it is not there. ASG 2015-08-24			
+			} catch (RNSPathDoesNotExistException ne) {
+				/*
+				 * Do not need to do anything, we are trying to delete it, and it is not there. ASG 2015-08-24
 				 */
-			}
-			catch (Throwable cause){
+			} catch (Throwable cause) {
 				if (cause instanceof FSNotADirectoryException) {
 					// Swallow it
 				}
 				throw FSExceptions.translate("Unable to delete entry: " + target.pwd(), cause);
 			}
 			DirectoryManager.removeDirEntry(target);
-		} 
-		catch (Throwable cause) {
-			throw FSExceptions.translate("Unable to delete entry: "  + target.pwd(), cause);
+		} catch (Throwable cause) {
+			throw FSExceptions.translate("Unable to delete entry: " + target.pwd(), cause);
 		}
 	}
 

@@ -38,7 +38,7 @@ public class MultithreadedRNSTester extends BaseGridTool
 	 * there are more threads than connections, some threads will need to wait.
 	 */
 	int _numberOfThreads = 8;
-	
+
 	public static volatile boolean _threadsShouldStop = false;
 
 	enum DirectoryStatus {
@@ -104,15 +104,15 @@ public class MultithreadedRNSTester extends BaseGridTool
 			// }
 			// }
 		}
-		
+
 		// we're opting here for a cooperative stop instead of forcing the threads to quit.
 		_threadsShouldStop = true;
-		
-		//we don't want to stop the threads since that could interrupt our stuck call.  we're opting for cooperative stop instead.
-//		for (int i = 0; i < NUMBER_OF_TESTER_THREADS; i++) {
-//			testers[i].stop();
-//		}
-		
+
+		// we don't want to stop the threads since that could interrupt our stuck call. we're opting for cooperative stop instead.
+		// for (int i = 0; i < NUMBER_OF_TESTER_THREADS; i++) {
+		// testers[i].stop();
+		// }
+
 		// this bit isn't necessary but i wanted to know the threads weren't locked up on exit.
 		boolean allExited = false;
 		while (!allExited) {
@@ -140,7 +140,7 @@ public class MultithreadedRNSTester extends BaseGridTool
 	{
 		_runtime = Long.parseLong(seconds);
 	}
-	
+
 	@Option({ "threads" })
 	public void setThreads(String threads)
 	{
@@ -166,7 +166,7 @@ public class MultithreadedRNSTester extends BaseGridTool
 				// our soft sentinel said it's time to go.
 				return false;
 			}
-			
+
 			String chosenName = null;
 			// pick a directory to do a lookup on.
 			synchronized (_storedDirectories) {
@@ -224,7 +224,8 @@ public class MultithreadedRNSTester extends BaseGridTool
 					}
 				}
 			} catch (Throwable e) {
-				_logger.info("could not successfully lookup contents of: " + rpath.pwd() + ", exception was: " + e.getClass().getCanonicalName());
+				_logger.info("could not successfully lookup contents of: " + rpath.pwd() + ", exception was: "
+					+ e.getClass().getCanonicalName());
 				synchronized (_storedDirectories) {
 					// we only want to mark it as bad if this is an access problem! temporary screwup problems should be tried again.
 					if (e instanceof PermissionDeniedException || e instanceof RNSPathDoesNotExistException) {

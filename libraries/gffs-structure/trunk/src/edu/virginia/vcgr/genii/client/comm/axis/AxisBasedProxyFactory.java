@@ -89,7 +89,7 @@ public class AxisBasedProxyFactory implements IProxyFactory
 		AxisClientInvocationHandler handler = getInvocationHandler(proxy);
 		return handler.getTargetEPR();
 	}
-	
+
 	@Override
 	public Collection<GeniiAttachment> getAttachments(Object clientProxy) throws ResourceException
 	{

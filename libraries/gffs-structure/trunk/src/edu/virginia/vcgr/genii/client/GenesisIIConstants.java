@@ -114,7 +114,7 @@ public class GenesisIIConstants
 	 * a string encoding of the sweep job's state. this is only valid for serialized job definitions of "sweeping jobs".
 	 */
 	static public final String SWEEP_JOB_STATE = "edu.virginia.vcgr.genii.container.q2.sweep_state";
-	
+
 	// if found in the calling context, then lookup should be done with short form results.
 	static public final String RNS_SHORT_FORM_TOKEN = "RNSShortForm";
 }

@@ -222,7 +222,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				trustList = acl.executeAcl;
 				break;
 			case OPEN:
-///hmmm: could measure this with grant check if changed wording.
+				// /hmmm: could measure this with grant check if changed wording.
 				if (_logger.isDebugEnabled())
 					_logger.debug("giving access to identity due to OPEN permission: "
 						+ ((identity != null) ? identity.describe(VerbosityLevel.HIGH) : "null"));

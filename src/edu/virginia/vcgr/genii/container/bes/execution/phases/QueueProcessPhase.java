@@ -196,13 +196,13 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						lastState = _state.toString();
 					}
 				}
-	
+
 				// the state may have been updated elsewhere, so we still examine if we're in final state here.
 				if (_state.isFinalState()) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("queue job '" + _jobToken.toString() + "' is now in a final state: " + _state);
 					break;
-				}	
+				}
 
 				_phaseShiftLock.wait(DEFAULT_LOOP_CYCLE);
 			}
