@@ -681,7 +681,7 @@ public class QueueDatabase
 			return new JobStatusInformation(EPRUtils.fromBlob(rs.getBlob(2)), EPRUtils.fromBlob(rs.getBlob(3)),
 				(ICallingContext) DBSerializer.fromBlob(rs.getBlob(1)));
 		} catch (IOException ioe) {
-			throw new ResourceException("Unable to deserialize calling context form database.", ioe);
+			throw new ResourceException("Unable to deserialize calling context from database.", ioe);
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);

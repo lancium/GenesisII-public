@@ -1,0 +1,133 @@
+#!/bin/bash
+# October 1, 2015 by Andrew Grimshaw
+# This script connects via a unix domain socket to a genesis II client running as a "server"
+# The "server" is connected wrapped by nc (netcat), and is listening for connections on the socket.
+# The server accepts command and executes them, writting the result back to nc, and this to this script
+# The first time it is started it takes a few seconds to fire up the grid command.
+# Subsequent invocations are much faster.
+
+#set -x
+
+# Start by definging some variables. We might have many different "servers" running, on different machines
+# for different users. We differentiate them by username and hostname. In the future we might support
+# multiple servers for each user. For now we limit it to one.
+USERNAME=`whoami`
+HOSTNAME=`hostname`
+
+# The netcat command we will use to connect to the "server". Note that -q -1 indicates that nc should wait
+# forever after it has accepted all of its input. THIS IS CRITICAL, do not change. If it becomes some constant
+# there may be more output than can be generated in that constant time, and nc will terminate. If -q 0, the default,
+# then nc may terminate before any server output has been generated.
+LOCKFILE="/tmp/grid.server.$USERNAME.$HOSTNAME"
+SOCKFILE="/tmp/grid.sockfile.$USERNAME.$HOSTNAME"
+REDIRECTFILE="/tmp/grid.redirectfile.$USERNAME.$HOSTNAME"
+NC_COMMAND="nc -Ukl $SOCKFILE"
+CL_NC_COMMAND="nc -q -1 -U $SOCKFILE"
+
+# A temp file for the input, remove when done.
+INPFILE="/tmp/grid.server.$USERNAME.$HOSTNAME.input.$$"
+
+# Now we begin.
+# trap ctrl-c and call ctrl_c()
+trap ctrl_c INT
+
+function ctrl_c() {
+# So we want to stop everything. Trying to clean up what state the 
+# grid command was in will be difficult. So we will destroy it and all
+# of the pipes and files. On the next invocation they will all
+# be restarted.
+        echo "** Trapped CTRL-C - Exiting and cleaning up all processes"
+	GRIDCMD=`which grid`
+	GRIDPID=`pgrep -f "/bin/sh $GRIDCMD"`
+	pkill --signal 9 -P $GRIDPID
+	pkill --signal 9 -f "/bin/sh $GRIDCMD"
+	pkill -f "$NC_COMMAND"
+	pkill -f "$CL_NC_COMMAND"
+	pkill -f "cat $REDIRECTFILE"
+	rm -f $SOCKFILE $REDIRECTFILE
+	rm -f $INPFILE
+	rm -f $LOCKFILE
+}
+
+# Get exclusive access to eliminate race conditions on access to the "server"
+lockfile $LOCKFILE
+
+# if there is no SOCKFILE, create one mkfifo $SOCKFILE;chmod go-rwx $SOCKFILE;
+if [ -e "$SOCKFILE" ] ;
+then
+	# let's make sure it is ours, and rw only by me .. don't want anybody taking over
+	# the channnel and impersonating
+	PERM=`stat -c%A $SOCKFILE`
+	if [ "$PERM" != "srwx------" ] ;
+	then
+		echo "WARNING - PERMISSIONS HAVE BEEN MODIFIED ON $SOCKFILE"
+		chmod go-rwx $SOCKFILE
+	fi
+else
+	mkfifo $SOCKFILE
+	# Set permissions so only i can see it.
+	chmod go-rwx $SOCKFILE
+fi
+# Now, lets check if there is a server running. If there is not this will not work well :-)
+# Perhaps we could check if there is a process owned by us "nc -Ukl $SOCKFILE", "id -u"
+# ps l | grep "nc -Ukl $SOCKFILE" | grep `id -u` | awk '{ print $3 }'`
+SERVER_PID=`pgrep -f "$NC_COMMAND"`
+#echo $SERVER_PID
+# We are also going to want to check to make sure it is MY process
+# that is sitting on the other end of this pipe.
+if [[ -z "$SERVER_PID" ]] ;
+then
+# If there is not server running we need to start one.
+
+# 	Check if there is a grid command
+#	Assuming there is for now
+
+#	if there is no REDIRECTFILE create one, mkfifo $REDIRECTFILE;chmod go-rwx $REDIRECTFILE
+#	Now fire up the server client. cat $REDIRECTFILE | nc -Ukl $SOCKFILE | grid 2&> $REDIRECTFILE &
+#	$$$ Somehow figure out how to save that we have started it and how to check for it.
+
+#	Sleep a few sconds to let it catch up; sleep 5
+
+	# Nothing here, need to clean up and start
+	rm -f $REDIRECTFILE
+	mkfifo $REDIRECTFILE
+	chmod go-rwx $REDIRECTFILE
+	cat $REDIRECTFILE | grid 2>&1 | $NC_COMMAND  > $REDIRECTFILE &
+	sleep 5
+fi
+
+
+# Now there server is up, or there is trouble in river city. 
+# Generate the input script to the server. The "echo" commands bracket the command, and are used to 
+# make sure we only read output for us, not an old partially finished command. The "stop" tells us
+# when we have reached the end.
+cat <<inp > "$INPFILE"
+echo [1234start$$4567]
+$*
+echo [1234stop.$$4567]
+inp
+
+# now start it up
+cat $INPFILE | $CL_NC_COMMAND | {
+	line= 
+	# First scan through output consuming old unused output if any, we read it and throw it away
+	# until we see our start token.
+	read  line
+	until [[ $line == *"[1234start$$4567]"* ]]; do
+		read line
+	done
+	# Now we read through our data until we see the stop token.
+	# We should also consume the initial "[grid]". Later.
+	read line
+	until [[ $line == *"[1234stop.$$4567]"* ]]; do
+		echo $line
+		line=
+		read  line
+		#echo $line
+	done
+	# This is the ugliest of hacks. The shell will not terminate until nc terminates. So we kill it.
+	kill `ps l | grep "$CL_NC_COMMAND" | grep $$ | awk '{ print $3 }'`
+}
+# now clean up
+rm -f $INPFILE
+rm -f $LOCKFILE

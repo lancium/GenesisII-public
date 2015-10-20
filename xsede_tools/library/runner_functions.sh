@@ -19,8 +19,10 @@ function pick_grid_app()
       echo "cmd /c $dos_genii\\grid.bat"
     fi
   else
-    # linux and others don't need a special version.	   
+    # linux and mac don't need to grope for the file as badly.
     echo "$GENII_INSTALL_DIR/grid"
+    # and they can now take advantage of the fastgrid script.
+#not quite yet:    echo "$XSEDE_TEST_ROOT/library/fastgrid"
   fi
 }
 

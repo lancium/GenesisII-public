@@ -88,14 +88,14 @@ public class RNSCacheLookupHandler
 				}
 			}
 
-			// if there is no RNSPath mapping for the resource then it is not possible to construct
-			// a lookup response from cached contents.
+			// if there is no RNSPath mapping for the resource then it is not possible to construct a lookup response from cached contents.
 			if (!resourceConfig.isMappedToRNSPaths())
 				return null;
 
-			// this is a safety checking as cache access may be blocked and we got the original null
-			// return for the resource configuration object because of that, instead of absence of
-			// the object in the cache.
+			/*
+			 * this is a safety checking as cache access may be blocked and we got the original null return for the resource configuration
+			 * object because of that, instead of absence of the object in the cache.
+			 */
 			resourceConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
 			if (resourceConfig == null)
 				return null;
@@ -164,16 +164,17 @@ public class RNSCacheLookupHandler
 
 			if (filteredNames == null || filteredNames.length == 0) {
 				if (entries.size() != elementCount) {
-					// There is a mismatch between cached element count and actual number of child
-					// entries in cache. This can happen during concurrent update in same RNS directory
-					// and if no element listing has been done on target previously. Regardless of the
-					// cause, if the target has been subscribed for notifications we should keep the
-					// element count property up-to-date.
+					/*
+					 * There is a mismatch between cached element count and actual number of child entries in cache. This can happen during
+					 * concurrent update in same RNS directory and if no element listing has been done on target previously. Regardless of the
+					 * cause, if the target has been subscribed for notifications we should keep the element count property up-to-date.
+					 */
 					processHotspot(resourceConfig, target);
 
-					// In case there are stale entries in the cache that are not updated/removed
-					// because of some notification blockage, we are removing all entry EPRS from the
-					// cache too.
+					/*
+					 * In case there are stale entries in the cache that are not updated/removed because of some notification blockage, we are
+					 * removing all entry EPRS from the cache too.
+					 */
 					removePossiblyStaleEntries(entryKeys);
 
 					if (_logger.isDebugEnabled())
@@ -181,23 +182,23 @@ public class RNSCacheLookupHandler
 							+ " count " + elementCount);
 					return null;
 				}
-				// When the call is initiated from FUSE, most of the time it will be succeeded by a
-				// bunch o get-attributes call for the entries. If those attributes are not in cache
-				// then an RPC will be issued for each entry missing attributes. As when looking up
-				// entries from the container we can prefetch attributes for entries that are in the
-				// same container as the target, sometimes it is better to let the lookup RPC to pass
-				// than satisfying request from the cache. The following IF condition does that
-				// assessment.
+				/*
+				 * When the call is initiated from FUSE, most of the time it will be succeeded by a bunch o get-attributes call for the
+				 * entries. If those attributes are not in cache then an RPC will be issued for each entry missing attributes. As when looking
+				 * up entries from the container we can prefetch attributes for entries that are in the same container as the target,
+				 * sometimes it is better to let the lookup RPC to pass than satisfying request from the cache. The following IF condition
+				 * does that assessment.
+				 */
 				if (fuseCall && !shortForm && !isCacheContainsAllEntryAttributes(resourceConfig, entries))
 					return null;
 			} else {
 				int totalCachedEntries = entries.size();
 				filterEntries(entries, filteredNames);
-				// This is not always right as the caller can pass an entry name that does not exists
-				// in the RNS directory. We can't cover all the cases where such scenarios can spur.
-				// However the checking of total-cached-entry counts will save us in cases where the
-				// client has made a directory listing for all elements in the RNS directory before
-				// making the vain lookup call.
+				/*
+				 * This is not always right as the caller can pass an entry name that does not exists in the RNS directory. We can't cover all
+				 * the cases where such scenarios can spur. However the checking of total-cached-entry counts will save us in cases where the
+				 * client has made a directory listing for all elements in the RNS directory before making the vain lookup call.
+				 */
 				if ((filteredNames.length != entries.size()) && (totalCachedEntries < elementCount)) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Lookup unsuccessful: filtered search count mismatch: " + resourceConfig.getRnsPath());

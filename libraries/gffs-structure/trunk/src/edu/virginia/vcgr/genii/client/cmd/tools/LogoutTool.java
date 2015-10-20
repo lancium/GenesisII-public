@@ -126,8 +126,6 @@ public class LogoutTool extends BaseGridTool
 				throw new IOException("No credentials matched the pattern \"" + _pattern + "\".");
 			}
 			ContextManager.storeCurrentContext(callContext);
-			// drop any notification brokers or other cached info after credential change.
-			CacheManager.resetCachingSystem();
 		} else {
 			while (true) {
 				ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
@@ -159,15 +157,14 @@ public class LogoutTool extends BaseGridTool
 						_logger.debug("Removing credential from current calling context credentials.");
 
 					ContextManager.storeCurrentContext(callContext);
-
-					// drop any notification brokers or other cached info after credential change.
-					CacheManager.resetCachingSystem();
-
 				} catch (Throwable t) {
 					stderr.println("Error getting login selection:  " + t.getLocalizedMessage());
 					break;
 				}
 			}
+
+			// drop any notification brokers or other cached info after credential change.
+			CacheManager.resetCachingSystem();
 		}
 
 		return 0;

@@ -231,7 +231,9 @@ public class KeystoreManager
 					// also.
 
 					String gridCertificatesDirectory = getGridCertsDir();
-					_logger.debug("found the grid-certificates dir at: " + gridCertificatesDirectory);
+					if (_logger.isTraceEnabled()) {
+						_logger.debug("found the grid-certificates dir at: " + gridCertificatesDirectory);
+					}
 					if (gridCertificatesDirectory != null) {
 						// need filelock here to ensure we don't get a partial directory.
 						ThreadAndProcessSynchronizer.acquireLock(CertUpdateHelpers.CONSISTENCY_LOCK_FILE);
@@ -246,7 +248,7 @@ public class KeystoreManager
 				}
 
 			} catch (Exception ex) {
-				_logger.info("exception occurred in KeystoreManager notifyUnloaded while loading trust store", ex);
+				_logger.error("exception occurred in KeystoreManager notifyUnloaded while loading trust store", ex);
 			}
 
 			if (trustStore == null) {
@@ -336,7 +338,9 @@ public class KeystoreManager
 		}
 
 		try {
-			_logger.debug("found " + prefix + " certs folder in: " + certDirectory);
+			if (_logger.isTraceEnabled()) {
+				_logger.debug("found " + prefix + " certs folder in: " + certDirectory);
+			}
 			List<Certificate> certificateList = SecurityUtilities.loadCertificatesFromDirectory(certDirectory);
 			if (certificateList != null && !certificateList.isEmpty()) {
 				if (ks == null) {

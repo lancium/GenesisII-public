@@ -91,7 +91,6 @@ public class RandomByteIOInputStream extends InputStream
 				factory[lcv] = new RandomByteIOTransfererFactory(clientStub[lcv]);
 				transferer[lcv] = factory[lcv].createRandomByteIOTransferer(desiredTransferProtocol);
 			}
-
 		}
 	}
 

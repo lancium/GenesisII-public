@@ -53,7 +53,7 @@ public class OSGiSupport
 			}
 		}
 		File newPath = new File(newParent, justChewedPath);
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("new fully chopped path: '" + newPath.getAbsolutePath() + "'");
 		return newPath;
 	}

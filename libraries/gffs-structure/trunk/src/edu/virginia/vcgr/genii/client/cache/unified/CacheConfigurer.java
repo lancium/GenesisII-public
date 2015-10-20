@@ -70,10 +70,9 @@ public class CacheConfigurer
 
 		if (!advertisedConfig) {
 			advertisedConfig = true;
-			_logger.debug("Caching enabled: " + Boolean.toString(CACHING_ENABLED));
-			_logger.debug("Subscription enabled: " + Boolean.toString(SUBSCRIPTION_BASED_CACHING_ENABLED));
-			_logger.debug("Cache timeout: " + DEFAULT_CACHE_TIMOUT_TIME + "ms");
-			_logger.debug("Max polling delay: " + DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT + "ms");
+			_logger.debug("Caching enabled: " + Boolean.toString(CACHING_ENABLED) + ", Subscriptions enabled: "
+				+ Boolean.toString(SUBSCRIPTION_BASED_CACHING_ENABLED) + ", Cache timeout: " + DEFAULT_CACHE_TIMOUT_TIME + "ms"
+				+ ", Max polling delay: " + DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT + "ms ");
 		}
 
 		if (CACHING_ENABLED) {

@@ -189,8 +189,9 @@ public class ResourceManager
 					_logger.warn("Could not find EPRConstruction property: " + ContainerProperties.NO_X509_CLASS_LIST
 						+ "; so using default value: " + noX509List);
 			} else {
-				if (!reportedAlready)
+				if (!reportedAlready) {
 					_logger.info("EPRConstruction property says no X509 for these services: " + noX509List);
+				}
 			}
 			// don't bother saying anything about the properties again.
 			reportedAlready = true;
@@ -221,8 +222,9 @@ public class ResourceManager
 				throw new ResourceException(e.getMessage(), e);
 			}
 		} else {
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled()) {
 				_logger.debug("not putting an x509 into EPR for class: " + serviceName);
+			}
 		}
 	}
 
@@ -411,9 +413,16 @@ public class ResourceManager
 			}
 			IResource resource = resourceKey.dereference();
 
+			Object prop = resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME);
+			// hmmm: this could have been where we were getting a null exception
+			if (prop == null) {
+				String msg = "received empty property for EPI name";
+				_logger.error(msg);
+				throw new ResourceException(msg);
+			}
+
 			// add epi
-			any.add(new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME)
-				.toString()));
+			any.add(new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, prop.toString()));
 
 			// add security metadata (Use OGSA Secure Addressing depending on
 			// config setting)

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This cache attempt to efficiently handle cached items that may time out after a certain period of time. It does this by maintaining 3
  * separate data structures. The first is a HashMap which allows for quick access to the cached data based off of the key. The second is a
@@ -20,6 +23,8 @@ import java.util.Set;
  */
 public class TimedOutLRUCache<KeyType, DataType>
 {
+	static Log _logger = LogFactory.getLog(TimedOutLRUCache.class);
+
 	private HashMap<KeyType, RoleBasedCacheNode<KeyType, DataType>> _map;
 	private LRUList<KeyType, DataType> _lruList;
 	private TimeoutList<KeyType, DataType> _timeoutList;
@@ -92,6 +97,24 @@ public class TimedOutLRUCache<KeyType, DataType>
 		return _maxElements;
 	}
 
+	/**
+	 * tickles the object so that it won't expire for another default expiration period. true is returned if the object was there and got
+	 * updated.
+	 */
+	public boolean refresh(KeyType key)
+	{
+		synchronized (_map) {
+			RoleBasedCacheNode<KeyType, DataType> node = _map.get(key);
+			if (node == null)
+				return false;
+			_lruList.remove(node);
+			node.setInvalidationDate(_defaultTimeoutMS);
+			// move the node to the end of the LRU list, since we just accessed it.
+			_lruList.insert(node);
+			return true;
+		}
+	}
+
 	public DataType get(KeyType key)
 	{
 		Date now = new Date();
@@ -99,19 +122,15 @@ public class TimedOutLRUCache<KeyType, DataType>
 			RoleBasedCacheNode<KeyType, DataType> node = _map.get(key);
 			if (node == null)
 				return null;
-
 			_lruList.remove(node);
-
 			if (node.getInvalidationDate().before(now)) {
 				// this entry has become stale.
 				_map.remove(key);
 				_timeoutList.remove(node);
 				return null;
 			}
-
 			// move the node to the end of the LRU list, since we just accessed it.
 			_lruList.insert(node);
-
 			return node.getData();
 		}
 	}
@@ -127,6 +146,8 @@ public class TimedOutLRUCache<KeyType, DataType>
 					break;
 
 				if (node.getInvalidationDate().compareTo(now) <= 0) {
+					if (_logger.isDebugEnabled())
+						_logger.debug("removing timed-out node: " + node.getKey());
 					_map.remove(node.getKey());
 					_timeoutList.removeFirst();
 					_lruList.remove(node);

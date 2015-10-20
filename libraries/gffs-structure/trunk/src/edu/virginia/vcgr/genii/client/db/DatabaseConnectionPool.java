@@ -24,7 +24,9 @@ public class DatabaseConnectionPool
 	static public final int MAX_SNOOZE_AWAITING_POOL = 2 * 60 * 1000; // in milliseconds.
 	// currently set to 2 minutes before the db attempt will fail.
 
-	// number of milliseconds to snooze between lock attempts.
+	/*
+	 * number of milliseconds to snooze between lock attempts. it doesn't seem to help to try super frequently, almost seems worse.
+	 */
 	static public final int TIME_TAKEN_PER_SNOOZE = 240;
 
 	private LinkedList<Connection> _connPool; // all of our pooled db connections.

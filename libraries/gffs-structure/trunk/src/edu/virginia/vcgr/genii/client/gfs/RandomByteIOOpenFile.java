@@ -120,7 +120,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 						}
 
 						catch (RemoteException re) {
-							_logger.error("Failed during a read on host ", re);
+							_logger.error("Failed during a read on host", re);
 							ioerror = 110; // Unix timeout error
 							continue;
 						}
@@ -499,7 +499,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 		@Override
 		public void write(long fileOffset, ByteBuffer source)
 		{
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("Write to offset " + fileOffset + ", p " + source.limit());
 			_synch.startWrite();
 
@@ -520,7 +520,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 		@Override
 		public void drain()
 		{
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("Draining to close the file, writers = " + _synch.numWriters);
 
 			_synch.waitForWritersToComplete(); // This has the effect of blocking the thread until all writes complete.

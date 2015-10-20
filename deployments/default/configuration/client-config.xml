@@ -335,6 +335,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.HungryVoidTool</mconf:class>
 		<mconf:class name="rem"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.HungryVoidTool</mconf:class>
+		<mconf:class name="test-rns"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MultithreadedRNSTester</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

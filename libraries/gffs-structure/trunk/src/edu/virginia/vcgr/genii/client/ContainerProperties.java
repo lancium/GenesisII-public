@@ -86,7 +86,7 @@ public class ContainerProperties extends Properties
 		// well, nothing worked, so use a default based on the installation directory.
 		if (toReturn == null)
 			toReturn = new File(Installation.getInstallDirectory(), ClientProperties.DEPLOYMENTS_DIRECTORY_NAME).getAbsolutePath();
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("deployments folder calculated as: '" + toReturn + "'");
 		return toReturn;
 	}

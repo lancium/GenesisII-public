@@ -33,6 +33,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -193,17 +194,36 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		}
 
 		/*
+		 * October 15, 2015. ASG and CAK Added code to allow invokers to pass in rwx mask for access control.
+		 */
+		ICallingContext context;
+		String mask = null;
+		try {
+			context = ContextManager.getCurrentContext();
+			mask = (String) context.getSingleValueProperty(GenesisIIConstants.CREATION_MASK);
+		} catch (Exception e) {
+			_logger.debug("Could not acquire calling context to retrieve creation mask");
+		}
+		if (mask == null)
+			mask = "rwx";
+
+		Acl acl = new Acl();
+		if (mask.contains("r"))
+			acl.readAcl.addAll(defaultOwners);
+		if (mask.contains("w"))
+			acl.writeAcl.addAll(defaultOwners);
+		if (mask.contains("x"))
+			acl.executeAcl.addAll(defaultOwners);
+		/*
 		 * dgm4d: this is a security issue // Add the resoure's static creating service if (serviceCertChain != null) { defaultOwners.add(new
 		 * X509Identity(serviceCertChain)); }
 		 */
 
 		// Add the resource itself
-		defaultOwners.add(new X509Identity((X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME)));
-
-		Acl acl = new Acl();
-		acl.readAcl.addAll(defaultOwners);
-		acl.writeAcl.addAll(defaultOwners);
-		acl.executeAcl.addAll(defaultOwners);
+		X509Identity res = new X509Identity((X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME));
+		acl.readAcl.add(res);
+		acl.writeAcl.add(res);
+		acl.executeAcl.add(res);
 
 		resource.setProperty(GENII_ACL_PROPERTY_NAME, acl);
 	}

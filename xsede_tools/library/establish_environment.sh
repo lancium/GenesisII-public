@@ -21,6 +21,7 @@ function create_work_area()
   if [ $(grep -ic "additional credentials" <$GRID_OUTPUT_FILE) -gt 0 ]; then
     # set up the RNSPATH folder, in case it doesn't already exist.
     echo Checking work area in $RNSPATH
+#hmmm: list parent to see if it's there, rather than blindly creating it; we don't want any extra error messages in the logs from this.
     silent_grid mkdir --parents grid:$RNSPATH &>/dev/null
     silent_grid chmod grid:$RNSPATH +rwx $USERPATH
     check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
@@ -41,12 +42,6 @@ function sanity_test_and_init()
   fi
   # establish this for shunit so tests do not have to run in current directory.
   export SHUNIT_PARENT="$WORKDIR/$(basename "$0")"
-
-  # show who we're logged in as.
-#  echo -e "\nCurrently logged in to the grid as:"
-#  grid whoami
-#  cat $GRID_OUTPUT_FILE
-#  echo
 
   create_work_area
 

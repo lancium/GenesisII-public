@@ -215,6 +215,18 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			RandomByteIOServiceImpl service = new RandomByteIOServiceImpl();
 			// System.err.println("created the file");
 			String serviceURL = Container.getServiceURL("RandomByteIOPortType");
+
+			/*
+			 * October 15, 2015 ASG and CAK. Push creation mask into calling context - default to rw
+			 */
+			ICallingContext context;
+			try {
+				context = ContextManager.getCurrentContext();
+				context.setSingleValueProperty(GenesisIIConstants.CREATION_MASK, "rw");
+			} catch (Exception e) {
+				_logger.debug("Could not acquire calling context to set creation mask within.");
+			}
+
 			EndpointReferenceType entryReference = service.CreateEPR(null, serviceURL);
 
 			entryReference = prepareEPRToStore(entryReference);

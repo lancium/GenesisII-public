@@ -92,10 +92,6 @@ testRecursiveCopyAndDeleteOnExport()
   fi
   assertEquals "certain directories are present on real filesystem of export" 0 $?
 
-#echo bailing
-#exit 1
-
-
   grid rm -r $FULL_EXPORT_PATH/EMS_Tests
   assertEquals "remove copied directory from export path" 0 $?
   grid ls $FULL_EXPORT_PATH/EMS_Tests &>/dev/null

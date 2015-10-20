@@ -79,7 +79,8 @@ public class RNSUtilities
 				result = current.lookup(pathToDefaultContainer + "/Services/" + userHints);
 				if (!result.exists()) {
 					// that was their last chance for this to work.
-					String msg = "Couldn't find an IDP service using the supplied information \"" + userHints + "\".";
+					String msg =
+						"Couldn't find an IDP service named '" + defaultServiceName + "' using the supplied information '" + userHints + "'.";
 					_logger.warn(msg);
 					throw new RNSException(msg);
 				}
@@ -118,14 +119,16 @@ public class RNSUtilities
 				typeInfo = new TypeInformation(result.getEndpoint());
 				for (PortType requiredPortType : requiredPortTypes) {
 					if (!typeInfo.hasPortType(requiredPortType)) {
-						throw new RNSException("Couldn't find an IDP service using the supplied information \"" + userHints + "\".");
+						throw new RNSException("Couldn't find an IDP service named '" + defaultServiceName
+							+ "' using the supplied information '" + userHints + "'.");
 					}
 				}
 			} else {
 				/*
 				 * It isn't the service, and it isn't a container, so we basically have to give up.
 				 */
-				throw new RNSException("Couldn't find an IDP service using the supplied information \"" + userHints + "\".");
+				throw new RNSException("Couldn't find an IDP service named '" + defaultServiceName + "' using the supplied information '"
+					+ userHints + "'.");
 			}
 		}
 

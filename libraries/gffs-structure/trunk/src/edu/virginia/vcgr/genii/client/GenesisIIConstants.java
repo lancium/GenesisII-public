@@ -117,4 +117,7 @@ public class GenesisIIConstants
 
 	// if found in the calling context, then lookup should be done with short form results.
 	static public final String RNS_SHORT_FORM_TOKEN = "RNSShortForm";
+
+	// This property will hold values such as r, rw, rwx. It is used at resource creation time.
+	static public final String CREATION_MASK = "Creation_Mask";
 }

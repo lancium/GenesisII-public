@@ -104,7 +104,7 @@ public class ContextFileSystem
 			if (myResponsibility) {
 				FileLock fl = null;
 				try {
-					if (_logger.isDebugEnabled())
+					if (_logger.isTraceEnabled())
 						_logger.debug("Actively loading current calling context credentials to session state from files \"" + filename
 							+ "\", \"" + transientFilename + "\"");
 					fl = FileLock.lockFile(filename);
@@ -155,9 +155,11 @@ public class ContextFileSystem
 				_cache[hashValue] = pair;
 
 				if (transientFilename == null) {
-					if (_logger.isDebugEnabled())
-						_logger.debug("This process is now unable to store current calling context credentials for the session statefile \""
-							+ contextFilename + "\".");
+					if (_logger.isTraceEnabled()) {
+						_logger
+							.debug("This process is now *unable* to store current calling context credentials for the session statefile \""
+								+ contextFilename + "\".");
+					}
 				}
 
 			}
@@ -264,8 +266,9 @@ public class ContextFileSystem
 			ObjectInputStream in = new ObjectInputStream(new RAFInputStream(raf));
 			context.deserializeTransientProperties(in);
 			if ((TransientCredentials.getTransientCredentials(context).isEmpty())) {
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled()) {
 					_logger.debug("Loaded empty calling context credentials from session statefile " + filename);
+				}
 			}
 		} finally {
 			StreamUtils.close(raf);
@@ -282,7 +285,7 @@ public class ContextFileSystem
 		}
 		RandomAccessFile raf = null;
 		try {
-			if (_logger.isDebugEnabled()) {
+			if (_logger.isTraceEnabled()) {
 				_logger.debug("Storing credentials to session state in file '" + filename + "'");
 			}
 			raf = new RandomAccessFile(filename, "rw");

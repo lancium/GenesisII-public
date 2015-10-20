@@ -41,7 +41,7 @@ public class FileHandleTable<FileObjectType>
 		else
 			_nextFree = Integer.class.cast(entry);
 
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug(String.format("FileHandleTable[%x] -- Allocating slot %d, next free is %d.", this.hashCode(), ret, _nextFree));
 
 		_table[ret] = file;
@@ -66,21 +66,21 @@ public class FileHandleTable<FileObjectType>
 
 		if (entry != null && (entry instanceof Closeable)) {
 			try {
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug(String.format("Closing instance of %s.", entry.getClass().getName()));
 				((Closeable) entry).close();
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug(String.format("Instance of %s closed.", entry.getClass().getName()));
 			} catch (Throwable cause) {
 				_logger.warn(String.format("Unable to close instance of %s.", entry.getClass().getName()), cause);
 			}
 		} else {
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug(String.format("Releasing instance of %s without closing.", entry == null ? "<null>" : entry.getClass()
 					.getName()));
 		}
 
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug(String.format("FileHandleTable[%x] -- Released handle %d and pointing that slot to %d.", this.hashCode(), handle,
 				_nextFree));
 		_table[handle] = new Integer(_nextFree);

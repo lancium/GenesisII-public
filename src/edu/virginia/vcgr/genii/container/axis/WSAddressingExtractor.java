@@ -77,7 +77,7 @@ public class WSAddressingExtractor extends BasicHandler
 				epr.setMetadata((MetadataType) ObjectDeserializer.toObject(he, MetadataType.class));
 			} else if (heName.equals(_WSA_TO_QNAME)) {
 				epr.setAddress(new AttributedURIType(he.getFirstChild().getNodeValue()));
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("WSAddressingExtractor found target: \"" + epr.getAddress().get_value() + "\".");
 			} else if (heName.equals(GenesisIIConstants.MYPROXY_QNAME)) {
 				MyProxyCertificate.setPEMFormattedCertificate(he.getFirstChild().getNodeValue());

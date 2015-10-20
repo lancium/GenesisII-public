@@ -1894,7 +1894,7 @@ return true;
                   <void property="conditionExpression">
                     <object class="com.install4j.api.beans.ScriptProperty">
                       <void property="value">
-                        <string>context.getVariable("genii.isContainer").equals("true") </string>
+                        <string>context.getVariable("genii.isContainer").equals("true") &amp;&amp; !context.getBooleanVariable("sys.confirmedUpdateInstallation")</string>
                       </void>
                     </object>
                   </void>

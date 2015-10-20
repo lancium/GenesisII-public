@@ -40,9 +40,11 @@ public class ResourceConfigCache extends CommonCache
 		int fileLookupCacheCapacity = capacity - directoryLookupCacheCapacity;
 		fileConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(fileLookupCacheCapacity, cacheLifeTime);
 
-		_logger.debug("ResourceConfig cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "
-			+ Boolean.toString(monitoringEnabled));
-		_logger.debug("Capacity is divided as 1:9 for storing directory and file resource configs");
+		if (_logger.isTraceEnabled()) {
+			_logger.debug("ResourceConfig cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "
+				+ Boolean.toString(monitoringEnabled));
+			_logger.debug("Capacity is divided as 1:9 for storing directory and file resource configs");
+		}
 	}
 
 	@Override
@@ -91,9 +93,10 @@ public class ResourceConfigCache extends CommonCache
 		if (cacheKey instanceof URI) {
 			String primaryIdentifer = cacheKey.toString();
 
-			// only try to put if it is not already in the cache. Otherwise,
-			// there is a chance that we will missed some identifier mappings
-			// by inserting a replacement resource configuration.
+			/*
+			 * only try to put if it is not already in the cache. Otherwise, there is a chance that we will missed some identifier mappings by
+			 * inserting a replacement resource configuration.
+			 */
 			WSResourceConfig wsResourceConfig = cache.get(primaryIdentifer);
 			if (wsResourceConfig == null) {
 				cache.put(primaryIdentifer, newResourceConfig, lifetime);

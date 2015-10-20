@@ -109,7 +109,7 @@ public class SoapHeaderHandler implements IAroundInvoker
 			}
 		}
 
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("Calling Operation with MessageID = " + messageID + ", ReplyTo = " + replyTo.getAddress().get_value()
 				+ ", Action = " + action);
 

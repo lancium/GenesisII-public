@@ -58,8 +58,10 @@ public class ByteIORPCache extends CommonAttributeCache
 
 		translator = new DefaultSingleResourcePropertyTranslator();
 
-		_logger.debug("ByteIO cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "
-			+ Boolean.toString(monitoringEnabled));
+		if (_logger.isTraceEnabled()) {
+			_logger.debug("ByteIO cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "
+				+ Boolean.toString(monitoringEnabled));
+		}
 	}
 
 	@Override

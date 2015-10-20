@@ -265,6 +265,10 @@
 		</antcall>
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="fastgrid"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
 			<param name="script-base-name" value="cert-tool"/>
 		</antcall>
 		<antcall target="build-script-win">

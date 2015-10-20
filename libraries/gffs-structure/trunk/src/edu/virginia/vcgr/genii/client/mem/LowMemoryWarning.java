@@ -17,6 +17,8 @@ import javax.management.NotificationListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+// hmmm: rename this class and move to lower hierarchy.
+
 public class LowMemoryWarning
 {
 	static private Log _logger = LogFactory.getLog(LowMemoryWarning.class);
@@ -65,12 +67,20 @@ public class LowMemoryWarning
 		}
 	}
 
+	/**
+	 * invokes java's garbage collection.
+	 */
+	public static void performGarbageCollection()
+	{
+		ManagementFactory.getMemoryMXBean().gc();
+	}
+
 	private class NotificationListenerImpl implements NotificationListener
 	{
 		@Override
 		public void handleNotification(Notification n, Object hb)
 		{
-			ManagementFactory.getMemoryMXBean().gc();
+			performGarbageCollection();
 			MemoryUsage usage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
 			long threshold = (long) (usage.getMax() * DEADLY_PERCENTAGE_THRESHOLD);
 			if (usage.getUsed() >= threshold) {

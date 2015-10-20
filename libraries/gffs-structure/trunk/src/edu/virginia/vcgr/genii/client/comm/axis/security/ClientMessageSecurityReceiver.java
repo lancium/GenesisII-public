@@ -117,6 +117,8 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 			String actor = (String) getOption(WSHandlerConstants.ACTOR);
 			SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
 			if (WSSecurityUtil.getSecurityHeader(doc, actor, sc) == null) {
+				// _logger.debug("CMSR: not continuing since there's no security header");
+
 				return;
 			}
 
@@ -257,6 +259,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
 	@SuppressWarnings("unchecked")
 	public void superinvoke(MessageContext msgContext) throws AxisFault
 	{
+		// _logger.debug("CMSR: into superInvoke to handle security headers");
 
 		boolean doDebug = log.isDebugEnabled();
 

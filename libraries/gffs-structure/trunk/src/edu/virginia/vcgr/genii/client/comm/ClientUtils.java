@@ -414,7 +414,7 @@ public class ClientUtils
 	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
 		throws ResourceException, GenesisIISecurityException
 	{
-		// this seems to be the root createProxy which the others depend on.
+		// this is the root createProxy (within this class) which all the others depend on.
 		IProxyFactory factory = getProxyFactory();
 		IFace face = factory.createProxy(loader, iface, epr, callContext);
 		Long timeout = _TIMEOUTS.get();

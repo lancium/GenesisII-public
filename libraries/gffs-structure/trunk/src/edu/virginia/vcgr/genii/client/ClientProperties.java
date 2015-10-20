@@ -121,9 +121,11 @@ public class ClientProperties extends Properties
 			try {
 				in = new FileInputStream(file);
 				load(in);
-				_logger.debug("successfully loaded installation properties.");
+				if (_logger.isTraceEnabled()) {
+					_logger.debug("successfully loaded installation properties.");
+				}
 			} catch (IOException e) {
-				_logger.debug("failed to load installation properties.");
+				_logger.error("failed to load installation properties", e);
 				return;
 			} finally {
 				StreamUtils.close(in);

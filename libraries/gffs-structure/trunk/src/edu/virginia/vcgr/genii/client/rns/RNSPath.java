@@ -212,8 +212,9 @@ public class RNSPath implements Serializable, Cloneable
 				}
 			}
 		} catch (RemoteException re) {
-			if (_logger.isDebugEnabled())
+			if (_logger.isDebugEnabled()) {
 				_logger.debug("Error looking up path component.", re);
+			}
 		}
 
 		return _cachedEPR;

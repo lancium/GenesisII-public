@@ -18,13 +18,13 @@ public class DeadHostChecker
 	static private Log _logger = LogFactory.getLog(DeadHostChecker.class);
 
 	// this value specifies how many attempts can fail before the host is considered down.
-	static private int HOW_MANY_DOWNS_ALLOWED = 1;
+	static private final int HOW_MANY_DOWNS_ALLOWED = 1;
 
 	/*
 	 * this is the longest amount of time between checking of dead hosts that we'll ever pause. exponential backoff will occur up until this
 	 * delay time, and then stay at this delay time afterwards.
 	 */
-	static private int MAXIMUM_ALLOWABLE_CHECKING_DELAY = 60 * 1000 * 5; // current is 5 minutes max for exponential backoff on retries.
+	static private final int MAXIMUM_ALLOWABLE_CHECKING_DELAY = 60 * 1000 * 5; // current is 5 minutes max for exponential backoff on retries.
 
 	public static class HostKey
 	{

@@ -1,18 +1,13 @@
 package edu.virginia.vcgr.genii.system.classloader;
 
-/**
- * A class loader that builds a repository of all the known class loaders, so we can hopefully find stuff across all our jar files.
- */
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+/**
+ * A class loader that builds a repository of all the known class loaders, so we can hopefully find stuff across all our jar files.
+ */
 public class GenesisClassLoader extends ClassLoader
 {
-	static private Log _logger = LogFactory.getLog(GenesisClassLoader.class);
-
 	private static GenesisClassLoader _theRealLoaderList = null;
 
 	private HashSet<ClassLoader> _loaders = new HashSet<ClassLoader>();
@@ -36,17 +31,11 @@ public class GenesisClassLoader extends ClassLoader
 	synchronized public boolean addLoader(ClassLoader newLoader)
 	{
 		if (!_loaders.contains(newLoader)) {
-
-			/*
-			 * nope //temp design truncation to see if we are causing osgi problems. if (_loaders.size() > 0) { if (_logger.isDebugEnabled())
-			 * _logger.debug("skipping classloader add; single instance mode: " + newLoader.toString()); return false; }
-			 */
-
 			_loaders.add(newLoader);
 			return true;
 		} else {
-			if (_logger.isTraceEnabled())
-				_logger.trace("classloader was already loaded: " + newLoader.toString());
+			// below is just debugging noise and is not a real error condition.
+			// System.err.println("classloader was already loaded: " + newLoader.toString());
 			return false;
 		}
 	}
@@ -57,6 +46,10 @@ public class GenesisClassLoader extends ClassLoader
 	@Override
 	synchronized protected Class<?> findClass(String name) throws ClassNotFoundException
 	{
+		/*
+		 * !! important-- this function must not use log4j since loading the log4j classes is sometimes its responsibility. that's why here,
+		 * of very few places indeed, we allow the code to log to standard error.
+		 */
 		Class<?> toReturn = null;
 		Iterator<ClassLoader> itty = _loaders.iterator();
 		while (itty.hasNext()) {
@@ -65,12 +58,12 @@ public class GenesisClassLoader extends ClassLoader
 				toReturn = curr.loadClass(name);
 				if (toReturn != null)
 					return toReturn;
-				_logger.debug("um, class loader gave us null rather than an exception.  that's not normal.  fail.");
+				System.err.println("um, class loader gave us null rather than an exception.  that's not normal.  fail.");
 			} catch (Throwable cause) {
-				_logger.debug("did not find class " + name + " in loader: " + curr.toString());
+				System.err.println("did not find class " + name + " in loader: " + curr.toString());
 			}
 		}
-		_logger.error("failure to find class '" + name + "' in any extant class loader.");
+		System.err.println("failure to find class '" + name + "' in any extant class loader.");
 		throw new ClassNotFoundException(name);
 	}
 }

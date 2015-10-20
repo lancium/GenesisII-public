@@ -77,7 +77,8 @@ public class RevocationAwareTrustManager implements ConfigurationUnloadedListene
 	@Override
 	public void checkClientTrusted(X509Certificate chain[], String authType) throws CertificateException
 	{
-		_logger.debug("seeing client: " + chain[0].getSubjectDN());
+		if (_logger.isTraceEnabled())
+			_logger.debug("seeing client: " + chain[0].getSubjectDN());
 		synchronized (_trustLock) {
 			if (_trustManagers != null) {
 				if (_trustManagers.length > 0) {
@@ -99,7 +100,8 @@ public class RevocationAwareTrustManager implements ConfigurationUnloadedListene
 	@Override
 	public void checkServerTrusted(X509Certificate chain[], String authType) throws CertificateException
 	{
-		_logger.debug("seeing server: " + chain[0].getSubjectDN());
+		if (_logger.isTraceEnabled())
+			_logger.debug("seeing server: " + chain[0].getSubjectDN());
 		synchronized (_trustLock) {
 			if (_trustManagers != null) {
 				if (_trustManagers.length > 0) {

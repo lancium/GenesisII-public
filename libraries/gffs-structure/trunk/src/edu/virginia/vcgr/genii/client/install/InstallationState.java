@@ -34,7 +34,8 @@ public class InstallationState implements Serializable
 
 	static private InstallationState readState(File installFile)
 	{
-		_logger.debug("reading install state from " + installFile);
+		if (_logger.isTraceEnabled())
+			_logger.debug("reading install state from " + installFile);
 
 		FileInputStream fin = null;
 
@@ -60,7 +61,8 @@ public class InstallationState implements Serializable
 
 	static private void writeState(File installFile, InstallationState state) throws IOException
 	{
-		_logger.debug("writing install state to " + installFile);
+		if (_logger.isTraceEnabled())
+			_logger.debug("writing install state to " + installFile);
 
 		FileOutputStream fout = null;
 

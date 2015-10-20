@@ -29,6 +29,7 @@ import edu.virginia.vcgr.fsii.exceptions.FSNotAFileException;
 import edu.virginia.vcgr.fsii.file.OpenFlags;
 import edu.virginia.vcgr.fsii.file.OpenModes;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
+import edu.virginia.vcgr.fsii.security.PermissionBits;
 import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
@@ -399,10 +400,10 @@ public class GenesisIIFilesystem implements FSFilesystem
 
 		try {
 			target.mkdir();
-			if (initialPermissions != null) {
-				GenesisIIACLManager mgr = new GenesisIIACLManager(target.getEndpoint(), _callerIdentities);
-				mgr.setCreatePermissions(initialPermissions);
-			}
+			// if (initialPermissions != null) {
+			// GenesisIIACLManager mgr = new GenesisIIACLManager(target.getEndpoint(), _callerIdentities);
+			// mgr.setCreatePermissions(initialPermissions);
+			// }
 			DirectoryManager.addNewDirEntry(target, this, true);
 		} catch (Throwable cause) {
 			throw FSExceptions.translate("Unable to create directory.", cause);
@@ -456,8 +457,12 @@ public class GenesisIIFilesystem implements FSFilesystem
 					throw new FSEntryNotFoundException(String.format("Couldn't find path %s.", target.pwd()));
 
 				epr = target.createNewFile();
-				if (initialPermissions != null)
-					(new GenesisIIACLManager(epr, _callerIdentities)).setCreatePermissions(initialPermissions);
+				if (initialPermissions != null) {
+					// If the permissions are not the default for byteio (rw-), then set them the way the caller wanted.
+					if (initialPermissions.isSet(PermissionBits.OWNER_EXECUTE) || !initialPermissions.isSet(PermissionBits.OWNER_READ)
+						|| !initialPermissions.isSet(PermissionBits.OWNER_WRITE))
+						(new GenesisIIACLManager(epr, _callerIdentities)).setCreatePermissions(initialPermissions);
+				}
 
 				DirectoryManager.addNewDirEntry(target, this, true);
 				return open(path, true, target, epr, flags, mode);
