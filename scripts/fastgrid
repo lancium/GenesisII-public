@@ -5,6 +5,8 @@
 # The server accepts command and executes them, writting the result back to nc, and this to this script
 # The first time it is started it takes a few seconds to fire up the grid command.
 # Subsequent invocations are much faster.
+# October 28, 2015 ASG. 
+# Fixed startup to kill nc if there is no grid command assoicated with it.
 
 #set -x
 
@@ -27,30 +29,72 @@ CL_NC_COMMAND="nc -q -1 -U $SOCKFILE"
 # A temp file for the input, remove when done.
 INPFILE="/tmp/grid.server.$USERNAME.$HOSTNAME.input.$$"
 
+function processOutput()
+{
+	line= 
+	# First scan through output consuming old unused output if any, we read it and throw it away
+	# until we see our start token.
+	read  line
+	until [[ $line == *"[1234start$$4567]"* ]]; do
+		read line
+	done
+	# Now we read through our data until we see the stop token.
+	# We should also consume the initial "[grid]". Later.
+	read line
+	until [[ $line == *"[1234stop.$$4567]"* ]]; do
+		# Now check if there was a fault. The use of onfault will generate a line similar to the below
+		# if there was a fault.
+		# OnFault--a fault occurred [1]:
+		# So first check if there is such a line, if so grab the [value] and return
+		if [[ $line == *"OnFault--a fault occurred"*"$$"* ]]
+		then
+			#number=$(echo $line | tr -cd '[:digit:]')
+			exitCode=$(echo $line | sed -e 's/.*\[\([0-9][0-9]*\)\].*/\1/')
+		else 
+			echo $line
+		fi
+		line=
+		read  line
+	done
+	# This is the ugliest of hacks. The shell will not terminate until nc terminates. So we kill it.
+	kill `ps l | grep "$CL_NC_COMMAND" | grep $$ | awk '{ print $3 }'`
+	return $exitCode
+}
+
 # Now we begin.
 # trap ctrl-c and call ctrl_c()
 trap ctrl_c INT
 
-function ctrl_c() {
+function nukem() {
 # So we want to stop everything. Trying to clean up what state the 
 # grid command was in will be difficult. So we will destroy it and all
 # of the pipes and files. On the next invocation they will all
 # be restarted.
-        echo "** Trapped CTRL-C - Exiting and cleaning up all processes"
+
 	GRIDCMD=`which grid`
 	GRIDPID=`pgrep -f "/bin/sh $GRIDCMD"`
-	pkill --signal 9 -P $GRIDPID
+	if [ ! -z "$GRIDPID" ] ;
+	then
+		pkill --signal 9 -P $GRIDPID
+	fi
 	pkill --signal 9 -f "/bin/sh $GRIDCMD"
 	pkill -f "$NC_COMMAND"
 	pkill -f "$CL_NC_COMMAND"
 	pkill -f "cat $REDIRECTFILE"
 	rm -f $SOCKFILE $REDIRECTFILE
+}
+
+function ctrl_c() {
+# Caught ctrl-c, echo that fact and nukem
+        echo "** Trapped CTRL-C - Exiting and cleaning up all processes"
+	nukem
 	rm -f $INPFILE
 	rm -f $LOCKFILE
 }
 
 # Get exclusive access to eliminate race conditions on access to the "server"
 lockfile $LOCKFILE
+
 
 # if there is no SOCKFILE, create one mkfifo $SOCKFILE;chmod go-rwx $SOCKFILE;
 if [ -e "$SOCKFILE" ] ;
@@ -71,11 +115,14 @@ fi
 # Now, lets check if there is a server running. If there is not this will not work well :-)
 # Perhaps we could check if there is a process owned by us "nc -Ukl $SOCKFILE", "id -u"
 # ps l | grep "nc -Ukl $SOCKFILE" | grep `id -u` | awk '{ print $3 }'`
-SERVER_PID=`pgrep -f "$NC_COMMAND"`
-#echo $SERVER_PID
+SOCKPID=`pgrep -f "$NC_COMMAND"`
+#echo $SOCKPID
+GRIDCMD=`which grid`
+GRIDPID=`pgrep -f "/bin/sh $GRIDCMD"`
+#echo $GRIDPID
 # We are also going to want to check to make sure it is MY process
 # that is sitting on the other end of this pipe.
-if [[ -z "$SERVER_PID" ]] ;
+if [ -z "$SOCKPID" -o  -z "$GRIDPID" ] ;
 then
 # If there is not server running we need to start one.
 
@@ -89,6 +136,8 @@ then
 #	Sleep a few sconds to let it catch up; sleep 5
 
 	# Nothing here, need to clean up and start
+	# First clean up nc if it was there
+	nukem
 	rm -f $REDIRECTFILE
 	mkfifo $REDIRECTFILE
 	chmod go-rwx $REDIRECTFILE
@@ -104,30 +153,17 @@ fi
 cat <<inp > "$INPFILE"
 echo [1234start$$4567]
 $*
+onfault Error in subshell $$
 echo [1234stop.$$4567]
 inp
 
+exitCode=0
 # now start it up
-cat $INPFILE | $CL_NC_COMMAND | {
-	line= 
-	# First scan through output consuming old unused output if any, we read it and throw it away
-	# until we see our start token.
-	read  line
-	until [[ $line == *"[1234start$$4567]"* ]]; do
-		read line
-	done
-	# Now we read through our data until we see the stop token.
-	# We should also consume the initial "[grid]". Later.
-	read line
-	until [[ $line == *"[1234stop.$$4567]"* ]]; do
-		echo $line
-		line=
-		read  line
-		#echo $line
-	done
-	# This is the ugliest of hacks. The shell will not terminate until nc terminates. So we kill it.
-	kill `ps l | grep "$CL_NC_COMMAND" | grep $$ | awk '{ print $3 }'`
-}
+cat $INPFILE | $CL_NC_COMMAND | processOutput
+exitval=$?
+
 # now clean up
 rm -f $INPFILE
 rm -f $LOCKFILE
+
+exit $exitval

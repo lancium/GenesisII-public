@@ -73,7 +73,7 @@
 			url="${wsdl.source.prefix}${stub.gen.source-wsdl}"
 			serverside="true"
 			quiet="true"
-			namespacemappingfile="${project.dir}/lib/mappings.properties"/>
+			namespacemappingfile="${wsdl.dir}/mappings.properties"/>
 		<copy todir="${generated.source.dir}">
 			<fileset dir="${stub.gen.target-dir}">
 				<include name="**/*.java"/>

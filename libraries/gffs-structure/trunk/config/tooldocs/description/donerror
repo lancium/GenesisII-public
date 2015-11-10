@@ -1,1 +1,1 @@
-Prints a failure message if the previous command exited with a failure.
+Prints a failure message if the previous command exited with a failure.  The grid shell is then terminated.

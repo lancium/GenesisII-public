@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.CallingContextUtilities;
@@ -109,7 +110,7 @@ public class AxisBasedContextResolver implements IContextResolver
 						// debugging code that writes the context to a file.
 						boolean debuggingMode = false;
 						if (debuggingMode == true) {
-							storeToFile(em, System.getProperty("user.home"));
+							storeToFile(em, FileSystemHelper.sanitizeFilename(System.getProperty("user.home")));
 						}
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						PrintStream ps = new PrintStream(baos);

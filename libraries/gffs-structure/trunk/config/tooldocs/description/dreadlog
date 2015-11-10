@@ -1,2 +1,0 @@
-This is a basic CLI tool for retrieving log entries from a DLog service. It can be used retrieving all logs from a service, querying for one or many specific rpcids, and recursively requesting log hierarchies.
-This is a basic CLI tool for retrieving log entries from a DLog service. It can be used retrieving all logs from a service, querying for one or many specific rpcids, and recursively requesting log hierarchies.

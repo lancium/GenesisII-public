@@ -26,9 +26,7 @@ oneTimeSetUp()
     exit 1
   fi
 
-  # clean-up any prior run.
-  grid rm -rf $RNSPATH/job_scripts $RNSPATH/vi-source $RNSPATH/murphy
-  rm -rf $WORKDIR/murphy
+  oneTimeTearDown
 }
 
 testUploadStagingContents()
@@ -80,6 +78,14 @@ testResultingDirectoryStageOut()
   fsize=${#outpoof}
   assertEquals "Output file should be empty from running comm tool" 0 $fsize
 
+}
+
+oneTimeTearDown()
+{
+  echo cleaning up test area...
+  # clean-up any prior run.
+  silent_grid rm -r $RNSPATH/job_scripts $RNSPATH/vi-source $RNSPATH/murphy &>/dev/null
+  rm -rf $WORKDIR/murphy
 }
 
 # load and run shUnit2

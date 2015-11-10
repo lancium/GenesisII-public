@@ -50,9 +50,9 @@ public class DeleteDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 					JOptionPane.showConfirmDialog(context.ownerComponent(), "Are you sure you want to recursively delete " + path.getName()
 						+ "?", "Yes - DELETE WITHOUT UNDO " + path.getName(), JOptionPane.YES_NO_OPTION);
 				if (reply == JOptionPane.YES_OPTION) {
-					RmTool rmtool = new RmTool();
 					PathOutcome ret;
-					ret = rmtool.rm(path, true, false);
+					//hmmm: can we find a stderr to pass in instead of null?
+					ret = RmTool.rm(path, true, false, null);
 					if (PathOutcome.OUTCOME_SUCCESS.differs(ret)) {
 						String msg = "failed to delete the chosen path: " + path.getName() + " because " + PathOutcome.outcomeText(ret);
 						LoggingTarget.logInfo(msg, null);

@@ -315,14 +315,14 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOTool</mconf:class>
 		<mconf:class name="onerror"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.OnErrorTool</mconf:class>
+		<mconf:class name="onfault"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.OnFaultTool</mconf:class>
 		<mconf:class name="version"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.VersionTool</mconf:class>
 		<mconf:class name="tell-config"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TellConfigTool</mconf:class>
 		<mconf:class name="iclogin"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.InCommonLoginTool</mconf:class>
-		<mconf:class name="readlog"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LogReaderTool</mconf:class>
 		<mconf:class name="identity"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IdentityTool</mconf:class>
 		<mconf:class name="mst"
@@ -337,6 +337,10 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.HungryVoidTool</mconf:class>
 		<mconf:class name="test-rns"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MultithreadedRNSTester</mconf:class>
+		<mconf:class name="date"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.DateTool</mconf:class>
+		<mconf:class name="rmdir"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RmdirTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

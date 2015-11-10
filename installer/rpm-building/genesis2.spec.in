@@ -70,6 +70,10 @@ cp -rf $GEN2_SOURCE_LOC/INSTALL \
   $GEN2_SOURCE_LOC/xsede_tools \
   $GEN2_BUILDOUT
 
+# copy in the generated jar files.
+cp -rf $GEN2_SOURCE_LOC/generated/* \
+  $GEN2_BUILDOUT/ext/
+
 # set up the application property files.
 cp -Rf $GEN2_SOURCE_LOC/scripts/genii-* $GEN2_BUILDOUT/ext
 
@@ -172,10 +176,6 @@ bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 /opt/genesis2-%GRID%/jar-desc.xml
 /opt/genesis2-%GRID%/set_gffs_vars
 /opt/genesis2-%GRID%/proxyio.launcher
-
-#old, now under lib.
-#/opt/genesis2-%GRID%/container.properties
-#/opt/genesis2-%GRID%/client.properties
 
 %changelog
 * Wed Jul 23 2014 Chris Koeritz <koeritz@virginia.edu> 

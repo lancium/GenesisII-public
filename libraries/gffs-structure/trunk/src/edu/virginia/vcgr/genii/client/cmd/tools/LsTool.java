@@ -305,16 +305,26 @@ public class LsTool extends BaseGridTool
 			name = prefix + "/" + name;
 		out.println(name + ":");
 
-		ArrayList<String> subdirs = new ArrayList<String>();
-		DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR, isMultiline, isCertChain);
-		path.applyToContents(dl);
-
-		out.println();
-		if (isRecursive) {
-			for (String entry : subdirs) {
-				RNSPath sub = new RNSPath(path, entry, null, false);
-				listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+		try {
+			ArrayList<String> subdirs = new ArrayList<String>();
+			DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR, isMultiline, isCertChain);
+			path.applyToContents(dl);
+	
+			out.println();
+			if (isRecursive) {
+				for (String entry : subdirs) {
+					RNSPath sub = new RNSPath(path, entry, null, false);
+					listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+				}
 			}
+		} catch (Throwable t) {
+			String excepMsg = t.getMessage();
+			// if there's no message, we'll speak about the exception type instead.
+			if (excepMsg == null)
+				excepMsg = t.getClass().getCanonicalName();
+			String msg ="failed during listDirectory: " + excepMsg; 
+			out.println(msg);
+			_logger.error(msg, t);
 		}
 	}
 }

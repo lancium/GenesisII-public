@@ -21,14 +21,14 @@ function save_and_switch_userdir()
   local new_dir="$1"; shift
   HOLD_USERDIR="$GENII_USER_DIR"
   # new kludge; save the logging config for this user dir.
-  cp "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" "$HOLD_USERDIR"
+  cp "$GENII_INSTALL_DIR/lib/build.container.log4j.properties" "$HOLD_USERDIR"
   export GENII_USER_DIR="$new_dir"
   if [ ! -d "$GENII_USER_DIR" ]; then
     # it's handy for this directory to exist before we copy things into it.
     mkdir "$GENII_USER_DIR"
   fi
-  if [ -f "$GENII_USER_DIR/genesisII.container.log4j.properties" ]; then
-    cp "$GENII_USER_DIR/genesisII.container.log4j.properties" "$GENII_INSTALL_DIR/lib"
+  if [ -f "$GENII_USER_DIR/build.container.log4j.properties" ]; then
+    cp "$GENII_USER_DIR/build.container.log4j.properties" "$GENII_INSTALL_DIR/lib"
   fi
 }
 
@@ -36,10 +36,10 @@ function save_and_switch_userdir()
 function restore_userdir()
 {
   # new kludge; save the logging config for the current user dir.
-  cp "$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties" "$GENII_USER_DIR"
+  cp "$GENII_INSTALL_DIR/lib/build.container.log4j.properties" "$GENII_USER_DIR"
   export GENII_USER_DIR="$HOLD_USERDIR"
-  if [ -f "$GENII_USER_DIR/genesisII.container.log4j.properties" ]; then
-    cp "$GENII_USER_DIR/genesisII.container.log4j.properties" "$GENII_INSTALL_DIR/lib"
+  if [ -f "$GENII_USER_DIR/build.container.log4j.properties" ]; then
+    cp "$GENII_USER_DIR/build.container.log4j.properties" "$GENII_INSTALL_DIR/lib"
   fi
 }
 
@@ -77,11 +77,11 @@ function get_container_logfile()
     extra="_${DEP_NAME}"
   fi
   # log file for normal deployments.
-  local logfile="$GENII_INSTALL_DIR/lib/genesisII.container.log4j.properties"
+  local logfile="$GENII_INSTALL_DIR/lib/build.container.log4j.properties"
   if [ "$DEP_NAME" == "$BACKUP_DEPLOYMENT_NAME" ]; then
     # trying to be somewhat clever and use the state directory if it has log4j properties.
-    if [ -f "$BACKUP_USER_DIR/genesisII.container.log4j.properties" ]; then
-      logfile="$BACKUP_USER_DIR/genesisII.container.log4j.properties"
+    if [ -f "$BACKUP_USER_DIR/build.container.log4j.properties" ]; then
+      logfile="$BACKUP_USER_DIR/build.container.log4j.properties"
     else
       # if we cannot find the actual log4j props, don't return a name that would be
       # the same as the main container log.
@@ -89,8 +89,8 @@ function get_container_logfile()
       return
     fi
   elif [ "$DEP_NAME" == "default" ]; then
-    if [ -f "$GENII_USER_DIR/genesisII.container.log4j.properties" ]; then
-      logfile="$GENII_USER_DIR/genesisII.container.log4j.properties"
+    if [ -f "$GENII_USER_DIR/build.container.log4j.properties" ]; then
+      logfile="$GENII_USER_DIR/build.container.log4j.properties"
     fi
   fi
   to_return="$(grep log4j.appender.LOGFILE.File "$logfile" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
@@ -100,7 +100,7 @@ function get_container_logfile()
 # returns the standard location for the client log file.
 function get_client_logfile()
 {
-  to_return="$(grep log4j.appender.LOGFILE.File "$GENII_INSTALL_DIR/lib/genesisII.client.log4j.properties" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
+  to_return="$(grep log4j.appender.LOGFILE.File "$GENII_INSTALL_DIR/lib/build.client.log4j.properties" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
   echo "$to_return"
 }
 

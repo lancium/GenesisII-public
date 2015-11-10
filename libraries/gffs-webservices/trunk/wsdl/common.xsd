@@ -152,25 +152,4 @@
 	<xsd:element name="RemoveMatchingParameterResponseType"
 		type="genii-common:RemoveMatchingParameterResponseType"/>
 
-	<xsd:complexType name="LogRetrieveRequestType">
-		<xsd:sequence>
-			<xsd:element name="rpcID" type="xsd:string"
-				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
-		</xsd:sequence>
-	</xsd:complexType>
-	<xsd:element name="GetChildLogIDsRequestType" type="genii-common:LogRetrieveRequestType"/>
-	<xsd:element name="GetAllLogsRequestType"     type="genii-common:LogRetrieveRequestType"/>
-	<xsd:element name="GetLogsByIDRequestType"    type="genii-common:LogRetrieveRequestType"/>
-	
-	<xsd:complexType name="LogRetrieveResponseType">
-		<xsd:sequence>
-			<xsd:element name="logEntries" type="LogEntryType"
-				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
-			<xsd:element name="childRPCs" type="LogHierarchyEntryType"
-				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
-		</xsd:sequence>
-	</xsd:complexType>
-	<xsd:element name="LogRetrieveResponseType"
-		type="genii-common:LogRetrieveResponseType"/>
-
 </xsd:schema>

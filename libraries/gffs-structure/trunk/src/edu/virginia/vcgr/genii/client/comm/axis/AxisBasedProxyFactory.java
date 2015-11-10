@@ -38,7 +38,6 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 public class AxisBasedProxyFactory implements IProxyFactory
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(AxisBasedProxyFactory.class);
 
 	static public QName LOCATOR_REGISTRY_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "locator-registry");
@@ -62,15 +61,19 @@ public class AxisBasedProxyFactory implements IProxyFactory
 			throw new ConfigurationException("Unable to find a locator for \"" + iface.getName() + "\".");
 		}
 
-		return (IFace) createClientProxy(loader, locators, epr, callContext);
-	}
+		IFace toReturn = null;
 
-	private Object createClientProxy(ClassLoader loader, Class<?>[] locatorClasses, EndpointReferenceType targetEPR,
-		ICallingContext callContext) throws ResourceException, GenesisIISecurityException
-	{
-		Class<?>[] portTypes = ClientUtils.getLocatorPortTypes(locatorClasses);
-		AxisClientInvocationHandler handler = new AxisClientInvocationHandler(locatorClasses, targetEPR, callContext);
-		return Proxy.newProxyInstance(loader, portTypes, handler);
+		/*
+		 * CAK: synchronization related to AXIS-2498 bug. we lock on service locator to avoid stumbling into thread-unsafe type mapping code.
+		 */
+		synchronized (locators[0]) {
+			Class<?>[] portTypes = ClientUtils.getLocatorPortTypes(locators);
+			AxisClientInvocationHandler handler = new AxisClientInvocationHandler(locators, epr, callContext);
+			toReturn = (IFace) Proxy.newProxyInstance(loader, portTypes, handler);
+			if (_logger.isTraceEnabled())
+				_logger.debug("used class " + iface.getName() + " to create proxy of type " + toReturn.getClass().getCanonicalName());
+		}
+		return toReturn;
 	}
 
 	static private AxisClientInvocationHandler getInvocationHandler(Object clientProxy) throws ResourceException

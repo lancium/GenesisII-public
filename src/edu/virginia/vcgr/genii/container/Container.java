@@ -52,6 +52,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.algorithm.structures.queue.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHook;
 import edu.virginia.vcgr.genii.client.ApplicationBase;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
@@ -121,7 +122,7 @@ public class Container extends ApplicationBase
 
 			LowMemoryWarning.INSTANCE.addLowMemoryListener(new LowMemoryExitHandler(7));
 
-			_logger.info(String.format("Deployment name is '%s'.\n", new DeploymentName()));
+			_logger.info(String.format("Deployment name is '%s'", new DeploymentName()));
 
 			WSDDProvider.registerProvider(GAroundInvokerFactory.PROVIDER_QNAME, new GAroundInvokerFactory());
 
@@ -268,8 +269,12 @@ public class Container extends ApplicationBase
 		 * if caching is to be disabled for containers, this is where it's done. we've had some good success with allowing full caching for
 		 * the container though.
 		 */
-		// CacheConfigurer.disableSubscriptionBasedCaching();
-		// CacheConfigurer.disableCaching();
+		boolean allowContainersToCache = false;
+		boolean allowContainersToSubscribe = false;
+		if (!allowContainersToSubscribe)
+			CacheConfigurer.disableSubscriptionBasedCaching();
+		if (!allowContainersToCache)
+			CacheConfigurer.disableCaching();
 
 		for (IServiceWithCleanupHook service : containerServiceObjects) {
 			try {

@@ -41,6 +41,7 @@ public class ResourceFileHandler extends AbstractHandler
 		}
 	}
 
+	@Override
 	public void handle(String target, HttpServletRequest arg2, HttpServletResponse arg3, int dispatch) throws HttpException, IOException,
 		ServletException
 	{

@@ -1,0 +1,1 @@
+Prints a message if the previous command exited with a fault.  Does not exit grid command.

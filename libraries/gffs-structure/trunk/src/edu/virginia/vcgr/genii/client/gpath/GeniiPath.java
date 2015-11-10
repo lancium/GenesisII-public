@@ -17,6 +17,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -51,7 +52,7 @@ public class GeniiPath implements Serializable
 			path = "";
 
 		// drop any backslashes in the path in favor of forward slashes.
-		path = path.replace("\\", "/");
+		path = FileSystemHelper.sanitizeFilename(path);
 
 		int index = path.indexOf(':');
 		if (index > 0) {
@@ -321,7 +322,7 @@ public class GeniiPath implements Serializable
 			path = "";
 
 		// drop any backslashes in the path in favor of forward slashes.
-		path = path.replace("\\", "/");
+		path = FileSystemHelper.sanitizeFilename(path);
 
 		Collection<PathMixIn> toReturn = null;
 

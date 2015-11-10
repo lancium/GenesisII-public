@@ -24,11 +24,10 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
-import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -43,7 +42,6 @@ import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionExcep
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
-import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -637,18 +635,12 @@ public class BESActivity implements Closeable
 
 		private Object _phaseLock;
 		private ExecutionPhase _currentPhase = null;
-		private LoggingContext context;
 
 		public ActivityRunner(boolean suspendRequested, boolean terminateRequested)
 		{
 			_phaseLock = BESActivity.this;
 			_terminateRequested = terminateRequested;
 			_suspendRequested = suspendRequested;
-			try {
-				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
-			} catch (ContextException e) {
-				context = new LoggingContext();
-			}
 		}
 
 		final public boolean isSuspended()
@@ -714,7 +706,6 @@ public class BESActivity implements Closeable
 
 		public void run()
 		{
-			LoggingContext.assumeLoggingContext(context);
 			while (true) {
 				try {
 					synchronized (_phaseLock) {

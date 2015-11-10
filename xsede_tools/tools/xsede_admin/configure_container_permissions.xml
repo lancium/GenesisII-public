@@ -35,12 +35,12 @@
         <gsh:foreach param-name="SERVICE"
                 source-rns="${CONTAINER}/Services">
                 <geniix:chmod>
-                        <gsh:param>${CONTAINER}/${SERVICES}</gsh:param>
+                        <gsh:param>${CONTAINER}/${SERVICE}</gsh:param>
                         <gsh:param>+rwx</gsh:param>
                         <gsh:param>${IDENTITY}</gsh:param>
                 </geniix:chmod>
                 <geniix:chmod>
-                        <gsh:param>${CONTAINER}/${SERVICES}</gsh:param>
+                        <gsh:param>${CONTAINER}/${SERVICE}</gsh:param>
                         <gsh:param>+r</gsh:param>
                         <gsh:param>/groups/xsede.org/gffs-users</gsh:param>
                 </geniix:chmod>

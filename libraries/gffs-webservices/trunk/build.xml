@@ -10,6 +10,19 @@
 		<matches string="${java.specification.version}" pattern="^1\.5$"/>
 	</condition>
 
+	<!-- loads the version to attach to the jars. -->
+	<loadfile property="app.version" srcFile="${top.level.dir}/current.version">
+		<filterchain>
+			<expandproperties/>
+			<headfilter lines="-1" skip="1"/>
+			<tailfilter lines="-1" skip="3"/>
+			<tokenfilter>
+				<replaceregex pattern="genii.app-version=" replace="" flags="gi"/>
+			</tokenfilter>
+			<StripLineBreaks/>
+		</filterchain>
+	</loadfile>
+
 	<!-- Static Class paths -->
 
 	<path id="axis.classpath">
@@ -30,6 +43,7 @@
 
 	<path id="ext.classpath">
 		<fileset dir="${ext.dir}" includes="*.jar"/>
+		<fileset dir="${generated.jar.dir}" includes="**/*.jar"/>
 	</path>
 
 	<path id="project.classpath">
@@ -44,32 +58,20 @@
 	<import file="${basedir}/init.build.xml"/>
 
 	<!-- Build Targets -->
-	<target name="build" depends="announce,jars"/>
-
-	<target name="announce" >
-		<exec executable="java">
-			<arg value="-version"/>
-		</exec>
-	</target>
+	<target name="build" depends="jars"/>
 
 	<target name="jars" depends="gffs-webservices.jar"/>
 
-	<target name="nutty-ant-requirement">
-		<!-- the syntax for fileset is annoying and generally skips the
-		top level directory, which we want.  this forces it to pack the
-		files into the jar with "services/..." form. -->
-		<mkdir dir="${basedir}/subdir"/>
-                <copy todir="${basedir}/subdir/services">
-                        <fileset dir="${basedir}/services" includes="**/*.wsdd"/>
-                </copy>
-        </target>
-
 	<target name="genii.ws" depends="gffs-webservices.jar"/>
 
-	<target name="gffs-webservices.jar" depends="genii.ws.compile,genii.wsdl.tools.compile,nutty-ant-requirement">
-		<jar destfile="${lib.dir}/gffs-webservices.jar">
+	<target name="gffs-webservices.jar" depends="genii.ws.compile,genii.wsdl.tools.compile">
+                <delete>
+                        <fileset dir="${generated.jar.dir}" includes="gffs-webservices*.jar" />
+                </delete>
+
+		<jar destfile="${generated.jar.dir}/gffs-webservices-${app.version}.jar">
 			<fileset dir="${generated.obj.dir}"/>
-			<fileset dir="${basedir}/subdir"/>
+			<fileset dir="." includes="services/**"/>
 			<fileset dir="${obj.dir}">
 				<include name="edu/virginia/**/*"/>
 			</fileset>
@@ -139,17 +141,6 @@
 				<include name="config/tooldocs/usage/*"/>
 			</fileset>
 		</copy>
-<!-- turned off since maybe not needed again.
-		<copy todir="${bundles.home}/endorsed">
-			<fileset dir="${ext.dir}">
-				<include name="xmlsec*jar" />
-			</fileset>
-			<fileset dir="${bundles.home}">
-				<include name="*log4j*jar" />
-				<include name="*commons*loggi*jar" />
-			</fileset>
-		</copy>
--->
 	</target>
 
 	<target name="genii.ws.compile" depends="generate.ws.source">
@@ -174,39 +165,18 @@
 	</target>
 
 	<target name="clean" depends="init">
-                <delete failonerror="false">
-                        <fileset dir="${temporary.codegen.dir}" includes="**/*"/>
-                </delete>
+                <delete dir="${basedir}/lib"/>
+                <delete dir="${basedir}/subdir"/>
+                <delete failonerror="false" dir="${temporary.codegen.dir}" />
 		<delete dir="${wsdd.dir}"/>
 		<delete dir="${dpages.dir}"/>
 		<delete dir="${generated.source.dir}"/>
-		<delete dir="${basedir}/subdir"/>
-                <delete failonerror="false">
-                        <fileset dir="${generated.obj.dir}" includes="**/*"/>
-                </delete>
+                <delete failonerror="false" dir="${generated.obj.dir}" />
                 <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
-		<delete quiet="true">
-			<fileset dir="${lib.dir}" includes="**/*.jar"/>
-		</delete>
 		<delete dir="${services.dir}" quiet="true"/>
-		<delete file="${basedir}/jserver.sh"/>
-		<delete file="${basedir}/runContainer.sh"/>
-		<delete file="${basedir}/runContainer.bat"/>
-		<delete file="${basedir}/grid"/>
-		<delete file="${basedir}/grid.bat"/>
-		<delete file="${basedir}/cert-tool"/>
-		<delete file="${basedir}/cert-tool.bat"/>
-		<delete file="${basedir}/jar-desc.xml"/>
-		<delete file="${basedir}/jserver-jar-desc.xml"/>
 		<delete>
-			<fileset dir="${basedir}"
-				includes="**/*.log"/>
-			<fileset dir="${basedir}"
-				includes="**/*.log.*" />
-			<fileset dir="${bundles.home}"
-				includes="endorsed/**/*" />
 			<fileset dir="${basedir}"
 				includes="unit-test-reports/**/*" />
 		</delete>

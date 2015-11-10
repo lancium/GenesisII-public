@@ -15,12 +15,10 @@ import org.feistymeow.process.ethread;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
-import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.jsdl.JobDefinition;
@@ -163,7 +161,6 @@ public class SweepingJob extends ethread
 		private QueueManager _queueManager;
 		private Collection<String> _tickets;
 		private short _priority;
-		private LoggingContext _context;
 
 		private SweepListenerImpl(QueueManager queueManager, short priority) throws FileNotFoundException, IOException
 		{
@@ -172,11 +169,6 @@ public class SweepingJob extends ethread
 			_priority = priority;
 			_callingContext = ContextManager.getExistingContext();
 			_workingContext = (WorkingContext) WorkingContext.getCurrentWorkingContext().clone();
-			try {
-				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
-			} catch (ContextException e) {
-				_context = new LoggingContext();
-			}
 		}
 
 		/**
@@ -193,7 +185,6 @@ public class SweepingJob extends ethread
 			Closeable assumedContextToken = null;
 
 			try {
-				LoggingContext.assumeLoggingContext(_context);
 				WorkingContext.setCurrentWorkingContext(_workingContext);
 				assumedContextToken = ContextManager.temporarilyAssumeContext(_callingContext);
 				synchronized (_tickets) {

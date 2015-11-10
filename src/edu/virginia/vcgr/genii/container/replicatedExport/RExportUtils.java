@@ -103,8 +103,8 @@ public class RExportUtils
 
 	static protected String createReplicaLinkName(String localPath)
 	{
-		// back or forward slashes?
-		int index = localPath.lastIndexOf("\\");
+		localPath.replace('\\', '/');
+		int index = localPath.lastIndexOf("/");
 
 		if (index == -1)
 			return localPath;

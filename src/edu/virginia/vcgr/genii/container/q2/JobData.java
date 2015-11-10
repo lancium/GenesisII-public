@@ -14,7 +14,6 @@ import org.ggf.jsdl.JobDefinition_Type;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -38,7 +37,6 @@ public class JobData
 	private HistoryEventToken _historyToken = null;
 
 	private String _jobName = null;
-	private LoggingContext _loggingContext = null;
 
 	/**
 	 * This variable is used internally by the queue to maintain the current "active" state of a job. Is it in the process of being created or
@@ -105,7 +103,7 @@ public class JobData
 	private String _sweepState = null;
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		Long besID, HistoryContext history, LoggingContext loggingContext)
+		Long besID, HistoryContext history)
 	{
 		_jobName = jobName;
 		_killed = false;
@@ -117,19 +115,18 @@ public class JobData
 		_besID = besID;
 		_runAttempts = runAttempts;
 		_history = history;
-		_loggingContext = loggingContext;
 	}
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		HistoryContext history, LoggingContext loggingContext)
+		HistoryContext history)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, loggingContext);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history);
 	}
 
 	public JobData(SweepingJob sweep, long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, HistoryContext history, LoggingContext loggingContext)
+		short runAttempts, HistoryContext history)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, loggingContext);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history);
 		if (sweep == null) {
 			_logger.error("not adding sweep job since sweep object is null!");
 			/* important to keep the state non-null, since this is supposedly a sweep even if broken. we don't want this sent to a BES. */
@@ -199,16 +196,6 @@ public class JobData
 	public void setJobState(QueueStates jobState)
 	{
 		_jobState = jobState;
-	}
-
-	public LoggingContext getLoggingContext()
-	{
-		return _loggingContext;
-	}
-
-	public void setLoggingContext(LoggingContext loggingContext)
-	{
-		_loggingContext = loggingContext;
 	}
 
 	public Date getSubmitTime()

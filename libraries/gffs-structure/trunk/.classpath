@@ -3,32 +3,27 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="tests"/>
-	<classpathentry kind="lib" path="../../../ext/axis/axis.jar" sourcepath="/home/fred/xsede/code/axis1.4.gen2/src"/>
-	<classpathentry kind="lib" path="../../../bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
-	<classpathentry kind="lib" path="../../../ext/commons-codec-1.4.jar"/>
-	<classpathentry kind="lib" path="../../../ext/axis/jaxrpc.jar"/>
-	<classpathentry kind="lib" path="../../../ext/wss4j-1.5.6.jar"/>
-	<classpathentry kind="lib" path="../../../ext/fuse-j.jar"/>
-	<classpathentry kind="lib" path="../../../ext/MorganUtilities.jar"/>
-	<classpathentry kind="lib" path="../../../bundles/org.eclipse.osgi_3.8.0.v20120529-1548.jar" sourcepath="/home/fred/.m2/repository/org/eclipse/tycho/org.eclipse.osgi/3.8.0.v20120529-1548/org.eclipse.osgi-3.8.0.v20120529-1548-sources.jar"/>
-	<classpathentry kind="lib" path="../../../ext/jetty/servlet-api-2.5-20081211.jar"/>
-	<classpathentry kind="lib" path="../../../ext/axis/mail.jar"/>
-	<classpathentry kind="lib" path="../../../ext/jetty/jetty-6.1.26.jar"/>
-	<classpathentry kind="lib" path="../../../ext/jetty/jetty-util-6.1.26.jar"/>
-	<classpathentry kind="lib" path="../../../ext/fsview.jar"/>
-	<classpathentry kind="lib" path="../../../bundles/com.jcraft.jsch_0.1.46.v201205102330.jar"/>
-	<classpathentry kind="lib" path="../../../ext/ant/ant-jsch.jar"/>
-	<classpathentry kind="lib" path="../../../ext/ant/ant.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/axis/axis.jar" sourcepath="/home/fred/gffs/code/library_source/axis1.4/src"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/axis/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/fuse-j.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/MorganUtilities.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.eclipse.osgi_3.8.0.v20120529-1548.jar" sourcepath="/home/fred/.m2/repository/org/eclipse/tycho/org.eclipse.osgi/3.8.0.v20120529-1548/org.eclipse.osgi-3.8.0.v20120529-1548-sources.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/axis/mail.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/com.jcraft.jsch_0.1.46.v201205102330.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ant/ant-jsch.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ant/ant.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-basics"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-security"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-webservices"/>
-	<classpathentry kind="lib" path="../../../bundles/org.apache.commons.lang_2.6.0.v201205030909.jar"/>
-	<classpathentry kind="lib" path="../../../ext/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="../../../ext/commons-io-2.4.jar"/>
-	<classpathentry kind="lib" path="../../../ext/bcpkix-jdk15on-149.jar"/>
-	<classpathentry kind="lib" path="../../../ext/bcprov-jdk15on-149.jar"/>
-	<classpathentry kind="lib" path="../../../ext/httpclient-4.3.1.jar"/>
-	<classpathentry kind="lib" path="../../../ext/httpcore-4.3.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.apache.commons.lang_2.6.0.v201205030909.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/bcpkix-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/bcprov-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/httpclient-4.3.1.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/httpcore-4.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MacOSXSwing"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/myproxy-logon-1.8.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ncsa-security-core-1.2.jar"/>
@@ -39,5 +34,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/CmdLineManipulator"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GeniiJSDL"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GeniiProcessMgmt"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/com.springsource.org.apache.ws.security-1.5.8.jar" sourcepath="/home/fred/gffs/code/library_source/com.springsource.org.apache.ws.security-sources-1.5.8.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/FSViewII"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.apache.commons.httpclient_3.1.0.v201012070820.jar" sourcepath="/home/fred/gffs/code/library_source/commons-httpclient-3.1/src"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/jetty/jetty-6.1.26.jar" sourcepath="/home/fred/.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-sources.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/jetty/jetty-util-6.1.26.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/jetty/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

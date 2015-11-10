@@ -38,11 +38,9 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Pair;
 import org.morgan.utils.gui.tearoff.TearoffHandler;
 
-import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
 import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.ui.ApplicationContext;
@@ -295,21 +293,13 @@ public class RNSTree extends JTree implements EndpointRetriever
 
 	private class TreeWillExpandListenerImpl implements TreeWillExpandListener
 	{
-		private LoggingContext context;
-
 		public TreeWillExpandListenerImpl()
 		{
-			try {
-				context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
-			} catch (ContextException e) {
-				context = new LoggingContext();
-			}
 		}
 
 		@Override
 		public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
 		{
-			LoggingContext.assumeLoggingContext(context);
 			TreePath path = event.getPath();
 			RNSTreeNode node = (RNSTreeNode) path.getLastPathComponent();
 			RNSTreeObject obj = (RNSTreeObject) node.getUserObject();
@@ -321,7 +311,6 @@ public class RNSTree extends JTree implements EndpointRetriever
 		@Override
 		public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException
 		{
-			LoggingContext.assumeLoggingContext(context);
 			TreePath path = event.getPath();
 			RNSTreeNode node = (RNSTreeNode) path.getLastPathComponent();
 			RNSTreeObject obj = (RNSTreeObject) node.getUserObject();

@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.security.ThreadAndProcessSynchronizer;
@@ -19,9 +20,6 @@ import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 public class FileLock implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(FileLock.class);
-
-	// private FileOutputStream _internalFile = null;
-	// private java.nio.channels.FileLock _internalLock = null;
 
 	private File _lockFile; // the actual file being locked.
 	private boolean _locked = false; // did we acquire a lock that should be released?
@@ -47,33 +45,6 @@ public class FileLock implements Closeable
 
 		ThreadAndProcessSynchronizer.acquireLock(_lockFile.getAbsolutePath());
 		_locked = true;
-
-		// try {
-		// _internalFile = new FileOutputStream(lockFile);
-		//
-		// while (maxAttempts > 0) {
-		// try {
-		// if (pollInterval > 0)
-		// _internalLock = _internalFile.getChannel().tryLock();
-		// else
-		// _internalLock = _internalFile.getChannel().lock();
-		//
-		// if (_internalLock != null)
-		// return;
-		// } catch (IOException ioe) {
-		// // Error locking the file. Sleep and try again.
-		// Thread.sleep(pollInterval);
-		// }
-		// }
-		//
-		// try {
-		// _internalFile.close();
-		// } catch (Throwable cause) {
-		// }
-		// throw new FileLockException("Unable to create lock for file '" + fileToLock + "' using lock file '" + lockFile + "'.");
-		// } catch (IOException ioe) {
-		// throw new FileLockException("Unable to create lock for '" + fileToLock + "' using lock file '" + lockFile + "'.", ioe);
-		// }
 	}
 
 	protected void finalize() throws IOException
@@ -85,13 +56,14 @@ public class FileLock implements Closeable
 	{
 		File toReturn = null;
 
-		String path = file.getAbsolutePath();
-		if (path.startsWith(System.getProperty("user.home"))) {
+		String path = FileSystemHelper.sanitizeFilename(file.getAbsolutePath());
+		if (path.startsWith(FileSystemHelper.sanitizeFilename(System.getProperty("user.home")))) {
 			/*
 			 * special case for files in known home folder; we will make the lock right there, since that should work. assumption is that the
 			 * file really should be fixed in that location, which means file locking could be cross-container, so the state dir is not an
 			 * appropriate place to store the lock file.
 			 */
+//			_logger.debug("saw user.home in this path: " + path);
 			toReturn = new File(path + ".lock");
 		} else {
 			/*
@@ -99,6 +71,7 @@ public class FileLock implements Closeable
 			 * different container. it's just too bad if we do need to share the lock file with a different container for most arbitrary
 			 * paths, since we cannot guarantee we can create the lock file in read-only locations such as the system-wide install directory.
 			 */
+//			_logger.debug("this path was someplace else in fs, so we will make a name under userdir: " + path);
 			toReturn = OSGiSupport.chopUpPath(InstallationProperties.getUserDir(), new File(file.getAbsolutePath() + ".lock"), "flock");
 		}
 		if (_logger.isTraceEnabled())

@@ -6,6 +6,9 @@
 	<property file="${basedir}/build.properties"/>
 	<property name="project.dir" value="${basedir}"/>
 
+	<!-- not used really -->
+	<buildnumber file="${user.home}/.ant-build-version"/>
+
 	<!-- Static Class paths -->
 	<path id="ant.classpath">
 		<fileset dir="${ant.home.override}" includes="**/*.jar"/>
@@ -17,11 +20,6 @@
 
 	<path id="jetty.classpath">
 		<fileset dir="${jetty.home}" includes="**/*.jar"/>
-	</path> 
-
-	<path id="gffs-security.classpath">
-		<fileset dir="${ext.dir}" includes="gffs-security*.jar"/>
-		<fileset dir="${ext.dir}" includes="gffs-basics*.jar"/>
 	</path> 
 
 	<path id="axis.classpath">
@@ -43,6 +41,7 @@
 
 	<path id="ext.classpath">
 		<fileset dir="${ext.dir}" includes="*.jar"/>
+		<fileset dir="${generated.jar.dir}" includes="*.jar"/>
 	</path>
 
 	<path id="project.classpath">
@@ -56,7 +55,6 @@
 	</path>
 			
 	<!-- Imports -->	
-	<import file="${basedir}/build-initial.xml"/>
 	<import file="${scripts.dir}/scripts.build.xml"/>
 	<import file="${lib.dir}/lib.build.xml"/>
 	<import file="${src.dir}/jni/genii_jni_32/vcgrJniLibs.build.xml"/>
@@ -65,10 +63,34 @@
 	<!-- Build Targets -->
 	<target name="build" depends="announce,libraries,jars,lib-setup,scripts,run.unit.tests,conclude"/>
 
-	<target name="announce" >
+	<target name="init">
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${dpages.dir}"/>
+		<mkdir dir="${generated.jar.dir}"/>
+		<copy file="${basedir}/installer/current.version"
+                   tofile="${basedir}/current.version"/>
+	</target>
+	
+	<target name="announce" depends="init" >
+		<!-- loads the version to attach to the jars.  postponed until after build initial steps. -->
+		<loadfile property="app.version" srcFile="${top.level.dir}/current.version">
+			<filterchain>
+				<expandproperties/>
+				<headfilter lines="-1" skip="1"/>
+				<tailfilter lines="-1" skip="3"/>
+				<tokenfilter>
+					<replaceregex pattern="genii.app-version=" replace="" flags="gi"/>
+				</tokenfilter>
+				<StripLineBreaks/>
+			</filterchain>
+		</loadfile>
+
+		<echo message="Current GFFS application version is: ${app.version}"/>
+
 		<exec executable="java">
 		<arg value="-version"/>
 		</exec>
+
 	</target>
 
 	<target name="conclude" >
@@ -88,7 +110,10 @@
 	<target name="jars" depends="genii.container.jar,genii.dpages.jars"/>
 
 	<target name="genii.container.jar" depends="genii.compile">
-		<jar destfile="${ext.dir}/gffs-container.jar">
+		<delete>
+			<fileset dir="${generated.jar.dir}" includes="gffs-container*.jar" />
+		</delete>
+		<jar destfile="${generated.jar.dir}/gffs-container-${app.version}.jar">
 			<fileset dir="${obj.dir}">
 				<include name="edu/virginia/**/*"/>
 			</fileset>
@@ -172,7 +197,6 @@
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>
-		<delete dir="${services.dir}"/>
 
 		<delete dir="${basedir}/unit-test-reports"/>
 
@@ -183,40 +207,27 @@
 		<delete file="${basedir}/cert-tool.bat"/>
 		<delete file="${basedir}/context.xml.lock"/>
 		<delete file="${basedir}/grid"/>
+		<delete file="${basedir}/fastgrid"/>
 		<delete file="${basedir}/grid.bat"/>
 		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/runContainer.sh"/>
 		<delete file="${basedir}/runContainer.bat"/>
 
 		<!-- clean out current jars that are generated. -->
-		<delete file="${ext.dir}/CmdLineManipulator.jar"/>
-		<delete file="${ext.dir}/GeniiJSDL.jar"/>
-		<delete file="${ext.dir}/GeniiProcMgmt.jar"/>
-		<delete file="${ext.dir}/GridJobTool.jar"/>
-		<delete file="${ext.dir}/MNaming.jar"/>
-		<delete file="${ext.dir}/MacOSXSwing.jar"/>
-		<delete file="${ext.dir}/dpage.jar"/>
-		<delete file="${ext.dir}/fsview.jar"/>
-		<delete file="${ext.dir}/gffs-basics.jar"/>
-		<delete file="${ext.dir}/gffs-container.jar"/>
-		<delete file="${ext.dir}/gffs-security.jar"/>
-		<delete file="${ext.dir}/gffs-structure.jar"/>
-		<delete file="${ext.dir}/gffs-webservices.jar"/>
-
-		<!-- clean some older jars and directories that could interfere with building. -->
-		<delete file="${ext.dir}/app-manager.jar"/>
-		<delete file="${ext.dir}/patch-builder.jar"/>
-		<delete file="${lib.dir}/gffs-container.jar"/>
+		<delete dir="${generated.jar.dir}" />
 
 		<!-- clean up some deeper files that are generated. -->
-		<delete file="${lib.dir}/genesisII.client.log4j.properties"/>
-		<delete file="${lib.dir}/genesisII.container.log4j.properties"/>
+		<delete file="${lib.dir}/build.client.log4j.properties"/>
+		<delete file="${lib.dir}/build.container.log4j.properties"/>
 		<delete file="${lib.dir}/production.client.log4j.properties"/>
 		<delete file="${lib.dir}/production.container.log4j.properties"/>
+
 		<!-- clean out some generated config files. -->
+		<delete file="${basedir}/current.version"/>
+		<delete file="${lib.dir}/client.properties"/>
+		<delete file="${lib.dir}/container.properties"/>
 		<delete file="${lib.dir}/export.properties"/>
 		<delete file="${lib.dir}/gffs.exports"/>
-
 		<delete>
 			<fileset dir="${basedir}/ext"
 				includes="**/*.properties"/>
@@ -233,6 +244,26 @@
 			<fileset dir="${bundles.home}"
 				includes="endorsed/**/*" />
 		</delete>
+
+		<!-- clean out legacy versions of some jar files to avoid having them break us. -->
+                <delete>
+			<fileset dir="${ext.dir}" includes="CmdLineManipulator*.jar"/>
+			<fileset dir="${ext.dir}" includes="GeniiJSDL*.jar"/>
+			<fileset dir="${ext.dir}" includes="GeniiProcMgmt*.jar"/>
+			<fileset dir="${ext.dir}" includes="GridJobTool*.jar"/>
+			<fileset dir="${ext.dir}" includes="MNaming*.jar"/>
+			<fileset dir="${ext.dir}" includes="MacOSXSwing*.jar"/>
+			<fileset dir="${ext.dir}" includes="dpage*.jar"/>
+			<fileset dir="${ext.dir}" includes="fsview*.jar"/>
+			<fileset dir="${ext.dir}" includes="gffs-basics*.jar"/>
+			<fileset dir="${ext.dir}" includes="gffs-security*.jar"/>
+			<fileset dir="${ext.dir}" includes="gffs-webservices*.jar"/>
+			<fileset dir="${ext.dir}" includes="gffs-structure*.jar"/>
+			<fileset dir="${ext.dir}" includes="gffs-container*.jar"/>
+			<fileset dir="${ext.dir}" includes="app-manager*.jar"/>
+			<fileset dir="${ext.dir}" includes="patch-builder*.jar"/>
+		</delete>
+
 		<antcall target="clean-all-scripts" />
 	</target>
 	

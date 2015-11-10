@@ -522,7 +522,7 @@ public class RNSPath implements Serializable, Cloneable
 	{
 		try {
 			if (_logger.isDebugEnabled())
-				_logger.debug("looking up path: " + path);
+				_logger.debug("looking up path: '" + path + "'");
 			return lookup(path, RNSPathQueryFlags.DONT_CARE);
 		} catch (RNSPathDoesNotExistException e) {
 			_logger.error("unexpected exception: " + e.getLocalizedMessage(), e);
@@ -797,7 +797,9 @@ public class RNSPath implements Serializable, Cloneable
 
 		finally {
 			try {
-				StreamUtils.close(entries.getIterable());
+				if ((entries != null) && (entries.getIterable() != null)) {
+					StreamUtils.close(entries.getIterable());
+				}
 			} catch (Exception e) {
 				_logger.warn("exception during attempt to close stream", e);
 			}

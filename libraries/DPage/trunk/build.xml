@@ -11,7 +11,21 @@
 
         <path id="ext.classpath">
                 <fileset dir="${ext.dir}" includes="**/*.jar"/>
+		<fileset dir="${generated.jar.dir}" includes="**/*.jar"/>
         </path>
+
+	<!-- loads the version to attach to the jars. -->
+	<loadfile property="app.version" srcFile="${top.level.dir}/current.version">
+		<filterchain>
+			<expandproperties/>
+			<headfilter lines="-1" skip="1"/>
+			<tailfilter lines="-1" skip="3"/>
+			<tokenfilter>
+				<replaceregex pattern="genii.app-version=" replace="" flags="gi"/>
+			</tokenfilter>
+			<StripLineBreaks/>
+		</filterchain>
+	</loadfile>
 
 	<path id="project.classpath">
 		<pathelement location="${obj-dir}"/>
@@ -21,7 +35,6 @@
 			
 	<!-- Build Targets -->
 	<target name="init">
-		<mkdir dir="${lib.dir}"/>
 		<mkdir dir="${obj.dir}"/>
 	</target>
 
@@ -30,7 +43,10 @@
 	<target name="jars" depends="dpage.jar"/>
 
 	<target name="dpage.jar" depends="dpage.compile">
-		<jar destfile="${lib.dir}/dpage.jar">
+		<delete>
+			<fileset dir="${generated.jar.dir}" includes="dpage*.jar" />
+		</delete>
+		<jar destfile="${generated.jar.dir}/dpage-${app.version}.jar">
 			<fileset dir="${obj.dir}">
 				<include name="org/morgan/dpage/**/*"/>
 			</fileset>
@@ -53,8 +69,6 @@
                 <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
-		<delete quiet="true">
-			<fileset dir="${lib.dir}" includes="**/*.jar"/>
-		</delete>
+                <delete dir="${basedir}/lib"/>
 	</target>
 </project>

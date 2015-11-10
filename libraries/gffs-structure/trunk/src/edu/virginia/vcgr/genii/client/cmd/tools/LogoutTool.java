@@ -162,10 +162,10 @@ public class LogoutTool extends BaseGridTool
 					break;
 				}
 			}
-
-			// drop any notification brokers or other cached info after credential change.
-			CacheManager.resetCachingSystem();
 		}
+
+		// drop any notification brokers or other cached info after credential change.
+		CacheManager.resetCachingSystem();
 
 		return 0;
 	}

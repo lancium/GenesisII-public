@@ -78,6 +78,13 @@ check_if_failed "logging in as $USERPATH"
 bash "$XSEDE_TEST_ROOT/library/configure_mirror_container.sh" $NORMAL_ACCOUNT_PASSWD
 check_if_failed "deploying mirror container"
 
+#maybe remove
+echo after configuring mirror container...
+check_logs_for_errors
+if [ ! -z "$BACKUP_DEPLOYMENT_NAME" ]; then
+  check_logs_for_errors "$BACKUP_DEPLOYMENT_NAME"
+fi
+
 # stop the container again so we can snapshot the config.
 echo "Stopping the container and making a snapshot of the user directory..."
 bash "$XSEDE_TEST_ROOT/library/zap_genesis_javas.sh"

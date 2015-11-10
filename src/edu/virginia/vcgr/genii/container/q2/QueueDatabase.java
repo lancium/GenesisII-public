@@ -26,7 +26,6 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.IResource;
@@ -337,16 +336,14 @@ public class QueueDatabase
 					data =
 						new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket,
 							rs.getShort(3), state, new Date(rs.getTimestamp(5).getTime()), rs.getShort(6),
-							HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)),
-							new LoggingContext(rs.getString(11)));
+							HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)));
 
 				} else {
 
 					data =
 						new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
 							new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
-							HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)),
-							new LoggingContext(rs.getString(11)));
+							HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)));
 				}
 
 				Blob blob = rs.getBlob(8);
@@ -491,7 +488,7 @@ public class QueueDatabase
 	 * @throws IOException
 	 */
 	public long submitJob(Connection connection, String ticket, short priority, JobDefinition_Type jsdl, ICallingContext callingContext,
-		Collection<Identity> identities, QueueStates state, Date submitTime, String rpcid) throws SQLException, IOException
+		Collection<Identity> identities, QueueStates state, Date submitTime) throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -508,7 +505,7 @@ public class QueueDatabase
 			stmt.setShort(6, priority);
 			stmt.setString(7, state.name());
 			stmt.setTimestamp(8, new Timestamp(submitTime.getTime()));
-			stmt.setString(9, rpcid);
+			stmt.setString(9, "n");
 
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to add job to the queue database.");
@@ -539,7 +536,7 @@ public class QueueDatabase
 	}
 
 	public long submitJob(SweepingJob sweep, Connection connection, String ticket, short priority, JobDefinition_Type jsdl,
-		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime, String rpcid)
+		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime)
 		throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
@@ -565,7 +562,7 @@ public class QueueDatabase
 			stmt.setShort(6, priority);
 			stmt.setString(7, state.name());
 			stmt.setTimestamp(8, new Timestamp(submitTime.getTime()));
-			stmt.setString(9, rpcid);
+			stmt.setString(9, "n");
 
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to add job to the queue database.");

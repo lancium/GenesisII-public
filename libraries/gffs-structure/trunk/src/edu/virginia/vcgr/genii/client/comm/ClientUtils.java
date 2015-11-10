@@ -162,8 +162,7 @@ public class ClientUtils
 			if (retval != null) {
 				// check the time validity of our client identity
 				for (X509Certificate cert : retval._clientCertChain) {
-					// (Check 10 seconds into the future so as to avoid the credential
-					// expiring in-flight)
+					// Check 10 seconds into the future so as to avoid the credential expiring in-flight.
 					cert.checkValidity(new Date(System.currentTimeMillis() + 10000));
 				}
 			} else if (ConfigurationManager.getCurrentConfiguration().isClientRole()) {
@@ -173,8 +172,7 @@ public class ClientUtils
 			throw new AuthZSecurityException("certificate is not yet valid: " + e.getLocalizedMessage(), e);
 		} catch (CertificateExpiredException e) {
 			if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
-				// We're a resource operating inside this container with
-				// a specific identity that has now expired.
+				// We're a resource operating inside this container with a specific identity that has now expired.
 				throw new AuthZSecurityException("certificate is no longer valid: " + e.getLocalizedMessage(), e);
 			} else {
 				// We're in the client role, meaning we can generate our own new client identity.
@@ -227,8 +225,11 @@ public class ClientUtils
 			while (itr.hasNext()) {
 				NuCredential cred = itr.next();
 				try {
-					// (Check 10 seconds into the future so as to avoid the credential expiring
-					// in-flight).
+					/*
+					 * Check 10 seconds into the future so as to avoid the credential expiring in-flight. Here we are only checking that the
+					 * credentials date is still good; we should have checked the credentials more thoroughly when they were first added to
+					 * the context.
+					 */
 					cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
 				} catch (Exception e) {
 					updated = true;

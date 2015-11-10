@@ -10,6 +10,7 @@ import org.ggf.jsdl.FileSystem_Type;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 
 public class ConfigurationManager
@@ -125,12 +126,12 @@ public class ConfigurationManager
 			return _manager;
 		}
 	}
-
+	
 	protected ConfigurationManager(String userDir)
-	{
+	{		
 		_userDir = new File(userDir);
 
-		System.setProperty(_USER_DIR_PROPERTY, _userDir.getAbsolutePath());
+		System.setProperty(_USER_DIR_PROPERTY, FileSystemHelper.sanitizeFilename(_userDir.getAbsolutePath()));
 
 		try {
 			Deployment deployment = Installation.getDeployment(new DeploymentName());

@@ -1,0 +1,20 @@
+Definitions:
+
+arg1 arg2 .. argn
+	String of characters to be printed to the terminal if failure occurred.
+
+Description:
+
+Tests the result of the command executed just prior to the fault check.  If that prior command failed, then onfault will print arg1 through argn to standard error.  This is useful in running batches of commands, since results can be checked and an explicit error message can be sent when a fault occurs.  This differs from onerror in that it does not stop the grid shell.
+
+Example:
+
+grid <<eof
+ls /home/fred
+onfault fred folder is missing or inaccessible.
+cp local:bigfile.dat /home/fred/bigfile-0031.dat
+...more commands...
+<<eof
+
+If the 'ls' command fails, then the message 'fred folder is missing or inaccessible' is printed to stderr, and then the batch of commands continues executing.
+

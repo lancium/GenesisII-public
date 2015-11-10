@@ -8,6 +8,8 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -73,18 +75,30 @@ public class Subscriber
 		return _singleInstanceSubscriber;
 	}
 
-	public void resetPendingSubscriptions()
+	synchronized public void flushPendingSubscriptions()
 	{
 		queue.clear();
+		_handler.flushPendingSubscriptions();
 	}
 
-	// synchronizes on the single subscriber instance (which must be == this) to avoid thread collisions during subscription.
 	synchronized public void requestForSubscription(PendingSubscription request)
 	{
 		if (!CacheConfigurer.isSubscriptionEnabled())
 			return;
 		if (queue == null)
 			return;
+		ICallingContext callingContext = null;
+		try {
+			callingContext = ContextManager.getExistingContext();
+		} catch (Throwable t) {
+			_logger.error("failed to retrieve calling context", t);
+			return;
+		}
+
+		if (!SubscriptionOutcallHandler.areCredentialsOkay(callingContext)) {
+			_logger.debug("dropping requested subscription since we have no credentials: req=" + request);
+			return;
+		}
 
 		EndpointReferenceType newsSource = request.getNewsSource();
 		if (SubscriptionDirectory.isResourceAlreadySubscribed(newsSource) || !SubscriptionDirectory.isResourceSubscribable(newsSource)
@@ -98,7 +112,7 @@ public class Subscriber
 		}
 	}
 
-	public static void resetCallingContext()
+	synchronized public static void resetCallingContext()
 	{
 		if (_singleInstanceSubscriber != null) {
 			synchronized (_singleInstanceSubscriber) {
@@ -107,7 +121,7 @@ public class Subscriber
 		}
 	}
 
-	private boolean isSubscribableTarget(EndpointReferenceType target)
+	static public boolean isSubscribableTarget(EndpointReferenceType target)
 	{
 		// The target does not represent an implied GenesisII resource; subscription is pointless.
 		WSName wsName = new WSName(target);

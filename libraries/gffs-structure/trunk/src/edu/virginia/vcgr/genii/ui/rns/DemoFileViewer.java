@@ -1,14 +1,21 @@
 package edu.virginia.vcgr.genii.ui.rns;
 
-import java.awt.*;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.Border;
-import javax.swing.filechooser.FileSystemView;
-
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileFilter;
+
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * demo code: to be tossed out eventually.
@@ -86,7 +93,6 @@ class DemoFileViewer
 				DemoFileViewer fl = new DemoFileViewer();
 				Component c1 = fl.getGui(f.listFiles(new TextFileFilter()), true);
 
-				// f = new File(System.getProperty("user.home"));
 				Component c2 = fl.getGui(f.listFiles(new TextFileFilter()), false);
 
 				JFrame frame = new JFrame("File List");

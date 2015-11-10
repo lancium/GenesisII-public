@@ -549,6 +549,15 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		}
 		RNSOperation operation = new RNSOperation(RNSOperation.OperationType.ENTRY_REMOVE, removeRequest);
 		notifyChangeInContent(operation, null, null);
+
+		if (_logger.isDebugEnabled()) {
+			StringBuilder sb = new StringBuilder();
+			for (RNSEntryResponseType ent : ret) {
+				sb.append(ent.getEntryName());
+				sb.append(" ");
+			}
+			_logger.debug("providing a response with " + ret.length + " elements, containing: " + sb);
+		}
 		return ret;
 	}
 

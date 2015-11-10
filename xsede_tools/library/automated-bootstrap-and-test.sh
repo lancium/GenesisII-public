@@ -166,7 +166,7 @@ echo "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
 # fix the logging level so we don't get noisy BS in our command output.
 # also point the logging directory at our local logs folder instead of at default
 # location of ${user.home}/.GenesisII.
-for i in $GENII_INSTALL_DIR/lib/genesisII*log4j.properties; do
+for i in $GENII_INSTALL_DIR/lib/build*log4j.properties; do
   sed -i \
     -e "s/log4j.rootCategory=.*LOGFILE/log4j.rootCategory=DEBUG, LOGFILE/" \
     -e "s%\${user.home}\/.GenesisII%$GRITTY_TESTING_TOP_LEVEL\/logs%" \

@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.GuaranteedDirectory;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -19,7 +20,6 @@ import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.TrustStoreLinkage;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
@@ -58,13 +58,14 @@ public class ApplicationBase
 	static public void setupUserDir(File userdir)
 	{
 		if (!userdir.exists()) {
+			String userDirName = FileSystemHelper.sanitizeFilename(userdir.getAbsolutePath());
 			try {
-				File userDirFile = new GuaranteedDirectory(userdir.getAbsolutePath(), true);
+				File userDirFile = new GuaranteedDirectory(userDirName, true);
 				if (!userDirFile.isDirectory()) {
-					throw new RuntimeException("Path \"" + userdir.getAbsolutePath() + "\" is not a directory.");
+					throw new RuntimeException("Path \"" + userDirName + "\" is not a directory.");
 				}
 			} catch (Throwable e) {
-				throw new RuntimeException("Unable to create directory \"" + userdir.getAbsolutePath() + "\".");
+				throw new RuntimeException("Unable to create directory \"" + userDirName + "\".");
 			}
 		}
 	}
@@ -74,8 +75,6 @@ public class ApplicationBase
 	 */
 	static protected void prepareServerApplication() throws AuthZSecurityException
 	{
-		LoggingContext.assumeNewLoggingContext();
-
 		if (!OSGiSupport.setUpFramework()) {
 			System.err.println("Exiting due to OSGi startup failure.");
 			System.exit(1);
@@ -222,7 +221,7 @@ public class ApplicationBase
 	// a default for the state directory, if one cannot be found elsewhere.
 	static String getDefaultUserDir()
 	{
-		return String.format("%s/%s", System.getProperty("user.home"), GenesisIIConstants.GENESISII_STATE_DIR_NAME);
+		return String.format("%s/%s", FileSystemHelper.sanitizeFilename(System.getProperty("user.home")), GenesisIIConstants.GENESISII_STATE_DIR_NAME);
 	}
 
 	/**

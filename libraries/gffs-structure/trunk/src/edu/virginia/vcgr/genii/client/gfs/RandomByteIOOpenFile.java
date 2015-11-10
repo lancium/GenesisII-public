@@ -167,7 +167,7 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 
 		TypeInformation typeInfo = new TypeInformation(target);
 		long size = typeInfo.getByteIOSize();
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("Creating random byteIO file of size " + size + " on host " + target.getAddress().get_value().getHost());
 
 		RandomByteIOTransferer rbit[] = new RandomByteIOTransferer[getConfigs().read_buffers];

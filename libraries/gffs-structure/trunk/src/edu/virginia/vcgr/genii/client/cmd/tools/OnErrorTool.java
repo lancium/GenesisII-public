@@ -36,7 +36,7 @@ public class OnErrorTool extends BaseGridTool
 			return 0;
 
 		StringBuilder errorMsg = new StringBuilder();
-		errorMsg.append("OnError--exiting due to failure: ");
+		errorMsg.append("OnError--exiting due to failure [" + getLastExit() + "]: ");
 		for (String argument : getArguments()) {
 			errorMsg.append(argument);
 			errorMsg.append(' ');

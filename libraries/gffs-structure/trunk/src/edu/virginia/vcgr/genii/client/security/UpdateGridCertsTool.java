@@ -30,7 +30,7 @@ public class UpdateGridCertsTool
 	 * given the name of a certificate package, this will download it and install it into the state directory in grid-certificates. this
 	 * manages the file locking necessary to keep the certs dir in synch with other users.
 	 */
-	static private int getCertPackAndInstall(RNSPath certPackFile) throws IOException
+	static private int getCertPackAndInstall(RNSPath certPackFile, PrintWriter stderr) throws IOException
 	{
 		File downloadLocation = File.createTempFile("tempCertFile", "tgz");
 
@@ -66,8 +66,7 @@ public class UpdateGridCertsTool
 			// clean up any old certs dir.
 			File oldCertsDir = new File(InstallationProperties.getUserDir() + "/grid-certificates.old");
 			if (oldCertsDir.exists()) {
-				RmTool cleaner = new RmTool();
-				outc = cleaner.rm(oldCertsDir, true, true);
+				outc = RmTool.rm(oldCertsDir, true, true, stderr);
 				if (outc.differs(PathOutcome.OUTCOME_SUCCESS)) {
 					_logger.error("failed to remove the existing old certificates directory");
 					return 1;
@@ -265,7 +264,8 @@ public class UpdateGridCertsTool
 
 		try {
 			// if we decide to call this, then we expect to actually update the trust store.
-			if (getCertPackAndInstall(certPack) != 0) {
+			//hmmm: can we find a stderr to pass here instead of null?
+			if (getCertPackAndInstall(certPack, null) != 0) {
 				return 1;
 			}
 		} catch (Exception e) {

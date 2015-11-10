@@ -83,7 +83,7 @@ public class RNSCacheLookupHandler
 					resourceConfig = currentPathConfig;
 				} else {
 					if (_logger.isTraceEnabled())
-						_logger.trace("Lookup unsuccessful: no resource configuration in the cache.");
+						_logger.trace("cache miss: no resource configuration in the cache.");
 					return null;
 				}
 			}
@@ -108,7 +108,7 @@ public class RNSCacheLookupHandler
 			if (element == null) {
 				processHotspot(resourceConfig, target);
 				if (_logger.isTraceEnabled())
-					_logger.trace("Lookup unsuccessful: element count property missing: " + resourceConfig.getRnsPath());
+					_logger.trace("cache miss: element count property missing: " + resourceConfig.getRnsPath());
 				return null;
 			}
 
@@ -178,7 +178,7 @@ public class RNSCacheLookupHandler
 					removePossiblyStaleEntries(entryKeys);
 
 					if (_logger.isDebugEnabled())
-						_logger.debug("Lookup unsuccessful: count mismatch: " + resourceConfig.getRnsPath() + " entries " + entries.size()
+						_logger.debug("cache miss: count mismatch: " + resourceConfig.getRnsPath() + " entries " + entries.size()
 							+ " count " + elementCount);
 					return null;
 				}
@@ -201,14 +201,14 @@ public class RNSCacheLookupHandler
 				 */
 				if ((filteredNames.length != entries.size()) && (totalCachedEntries < elementCount)) {
 					if (_logger.isDebugEnabled())
-						_logger.debug("Lookup unsuccessful: filtered search count mismatch: " + resourceConfig.getRnsPath());
+						_logger.debug("cache miss: filtered search count mismatch: " + resourceConfig.getRnsPath());
 					return null;
 				}
 			}
 
 			LookupResponseType lookupResponseType = new LookupResponseType(entries.toArray(new RNSEntryResponseType[entries.size()]), null);
 			if (_logger.isDebugEnabled()) {
-				_logger.debug("satisfied lookup request from cache for: " + resourceConfig.getRnsPath());
+				_logger.debug("cache hit: for " + resourceConfig.getRnsPath());
 			}
 			return lookupResponseType;
 
@@ -221,7 +221,6 @@ public class RNSCacheLookupHandler
 
 	private static void storeRootAndCurrentPathsInTheCache() throws FileNotFoundException, IOException
 	{
-
 		RNSPath currentPath = ContextManager.getExistingContext().getCurrentPath();
 		RNSPath rootPath = currentPath.getRoot();
 

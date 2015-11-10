@@ -69,7 +69,7 @@ if [ ! -z "$BACKUP_DEPLOYMENT_NAME" -a ! -z "$BACKUP_USER_DIR" ]; then
   bash "$XSEDE_TEST_ROOT/library/restore_container_state.sh" "$TMP/mirror_save.tar.gz" 
   if [ $? -ne 0 ]; then echo "===> script failure restoring mirror container state, exiting."; exit 1;  fi
 
-  cp "$BACKUP_USER_DIR"/genesisII.container.log4j.properties "$GENII_INSTALL_DIR/lib"
+  cp "$BACKUP_USER_DIR"/build.container.log4j.properties "$GENII_INSTALL_DIR/lib"
 
   launch_container_if_not_running "$BACKUP_DEPLOYMENT_NAME"
   restore_userdir

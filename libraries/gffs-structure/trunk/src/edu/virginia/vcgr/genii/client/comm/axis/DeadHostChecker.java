@@ -103,10 +103,8 @@ public class DeadHostChecker
 	/**
 	 * checks the host in our records and returns true if it is considered alive and false if it is considered dead.
 	 */
-	public static boolean evaluateHostAlive(AxisClientInvocationHandler handler)
+	public static boolean evaluateHostAlive(String host, int port)
 	{
-		String host = handler.getTargetEPR().getAddress().get_value().getHost();
-		int port = handler.getTargetEPR().getAddress().get_value().getPort();
 		HostKey key = new HostKey(host, port);
 
 		// Added July 14, 2015 by ASG to deal with dead hosts and not bother trying to talk to them. The timeouts kill us.
@@ -127,10 +125,8 @@ public class DeadHostChecker
 		}
 	}
 
-	public static void addHostToDeadPool(AxisClientInvocationHandler handler)
+	public static void addHostToDeadPool(String host, int port)
 	{
-		String host = handler.getTargetEPR().getAddress().get_value().getHost();
-		int port = handler.getTargetEPR().getAddress().get_value().getPort();
 		HostKey key = new HostKey(host, port);
 
 		synchronized (deadHosts) {
@@ -171,10 +167,8 @@ public class DeadHostChecker
 		}
 	}
 
-	public static void removeHostFromDeadPool(AxisClientInvocationHandler handler)
+	public static void removeHostFromDeadPool(String host, int port)
 	{
-		String host = handler.getTargetEPR().getAddress().get_value().getHost();
-		int port = handler.getTargetEPR().getAddress().get_value().getPort();
 		HostKey key = new HostKey(host, port);
 
 		// Well, the host was reported alive again, so remove if it is in deadHosts.

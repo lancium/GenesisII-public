@@ -7,10 +7,10 @@
 		<replace file="${basedir}/${win-script-base-name}.bat"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/${win-script-base-name}.bat"
-			token="$LOG4JCONFIG" value="genesisII.container.log4j.properties"
+			token="$LOG4JCONFIG" value="build.container.log4j.properties"
 			summary="no"/>
 		<replace file="${basedir}/${win-script-base-name}.bat"
-			token="$CLIENT_LOG4JCONFIG" value="genesisII.client.log4j.properties"
+			token="$CLIENT_LOG4JCONFIG" value="build.client.log4j.properties"
 			summary="no"/>
 		<antcall target="set-jni">
 			<param name="build-target-file" value="${basedir}/${win-script-base-name}.bat"/>
@@ -23,10 +23,10 @@
 		<replace file="${basedir}/${unix-script-base-name}"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/${unix-script-base-name}"
-			token="%{LOG4JCONFIG}" value="genesisII.container.log4j.properties"
+			token="%{LOG4JCONFIG}" value="build.container.log4j.properties"
 			summary="no"/>
 		<replace file="${basedir}/${unix-script-base-name}"
-			token="%{CLIENT_LOG4JCONFIG}" value="genesisII.client.log4j.properties"
+			token="%{CLIENT_LOG4JCONFIG}" value="build.client.log4j.properties"
 			summary="no"/>
 		<antcall target="set-jni">
 			<param name="build-target-file" value="${basedir}/${unix-script-base-name}"/>

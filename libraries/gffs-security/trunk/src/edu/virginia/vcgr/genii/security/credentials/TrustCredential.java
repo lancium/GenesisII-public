@@ -725,7 +725,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * tests that the credential is valid.
+	 * tests that the credential is valid.  this method is used by unicore gffs interop.
 	 */
 	@Override
 	public void checkValidity(Date date) throws AttributeInvalidException

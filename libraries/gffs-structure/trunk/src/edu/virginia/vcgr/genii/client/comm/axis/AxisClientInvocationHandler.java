@@ -579,7 +579,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			// the key is used for debugging output below.
 			DeadHostChecker.HostKey key = new DeadHostChecker.HostKey(host, port);
 
-			boolean alive = DeadHostChecker.evaluateHostAlive(handler);
+			boolean alive = DeadHostChecker.evaluateHostAlive(host, port);
 			if (!alive) {
 				// So let's give up in advance
 				String msg = "Host " + key + " is known to be down, skipping";
@@ -591,7 +591,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			try {
 				Object toReturn = handler.doInvoke(calledMethod, arguments, timeout);
 				// if we got to here, the host is looking pretty healthy.
-				DeadHostChecker.removeHostFromDeadPool(handler);
+				DeadHostChecker.removeHostFromDeadPool(host, port);
 				return toReturn;
 			} catch (Throwable throwable) {
 				long duration = System.currentTimeMillis() - startTime;
@@ -632,7 +632,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					 */
 					if ((throwable instanceof ConnectException || throwable instanceof UnknownHostException || connectionProblem)
 						&& (duration > ClientProperties.getClientProperties().getMaximumAllowableConnectionPause())) {
-						DeadHostChecker.addHostToDeadPool(handler);
+						DeadHostChecker.addHostToDeadPool(host, port);
 						String msg = "Communication failure for " + key;
 						_logger.error(msg);
 						throw new ConnectException(msg);
@@ -642,7 +642,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						 * related exceptions above?
 						 */
 
-						DeadHostChecker.removeHostFromDeadPool(handler);
+						DeadHostChecker.removeHostFromDeadPool(host, port);
 					}
 					// End of ASG deadHosts updates
 					if (!(securityException || "destroy".equalsIgnoreCase(methodName)

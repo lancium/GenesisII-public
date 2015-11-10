@@ -5,19 +5,23 @@
 	<property file="${basedir}/build.properties"/>
 
 	<!-- Static Classpath -->
-<!--	<path id="log4j.classpath">
-		<fileset dir="${ext.dir}"
-			includes="**/log4j*.jar"/>
-	</path>
-	<path id="commonslogging.classpath">
-		<fileset dir="${ext.dir}"
-			includes="**/commons-logging*.jar"/>
-	</path>
--->
-
         <path id="ext.classpath">
                 <fileset dir="${ext.dir}" includes="**/*.jar"/>
+		<fileset dir="${generated.jar.dir}" includes="**/*.jar"/>
         </path>
+
+	<!-- loads the version to attach to the jars. -->
+	<loadfile property="app.version" srcFile="${top.level.dir}/current.version">
+		<filterchain>
+			<expandproperties/>
+			<headfilter lines="-1" skip="1"/>
+			<tailfilter lines="-1" skip="3"/>
+			<tokenfilter>
+				<replaceregex pattern="genii.app-version=" replace="" flags="gi"/>
+			</tokenfilter>
+			<StripLineBreaks/>
+		</filterchain>
+	</loadfile>
 
 	<path id="project.classpath">
 		<pathelement location="${obj-dir}"/>
@@ -31,7 +35,11 @@
 	<target name="jars" depends="GeniiJSDL.jar"/>
 
 	<target name="GeniiJSDL.jar" depends="GeniiJSDL.compile">
-		<jar destfile="${lib.dir}/GeniiJSDL.jar">
+                <delete>
+                        <fileset dir="${generated.jar.dir}" includes="GeniiJSDL*.jar" />
+                </delete>
+
+		<jar destfile="${generated.jar.dir}/GeniiJSDL-${app.version}.jar">
 			<manifest>
 				<attribute name="Main-Class"
 					value="edu.virginia.vcgr.jsdl.ParameterSweeper"/>
@@ -58,13 +66,12 @@
                 <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
-		<delete dir="${lib.dir}"/>
 		<delete dir="${api.doc.dir}"/>
+                <delete dir="${basedir}/lib"/>
 	</target>
 
 	<target name="init">
 		<mkdir dir="${obj.dir}"/>
-		<mkdir dir="${lib.dir}"/>
 		<mkdir dir="${api.doc.dir}"/>
 	</target>
 

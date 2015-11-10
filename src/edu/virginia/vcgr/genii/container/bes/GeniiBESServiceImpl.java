@@ -71,7 +71,6 @@ import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -266,7 +265,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
 	}
 
-	static private EndpointReferenceType _localActivityServiceEPR = null;
+//	static private EndpointReferenceType _localActivityServiceEPR = null;
 
 	public GeniiBESServiceImpl() throws RemoteException
 	{
@@ -330,11 +329,11 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			throw new NotAcceptingNewActivitiesFaultType(null);
 		}
 
-		if (_localActivityServiceEPR == null) {
-			// only need to make this epr from scratch once (which involves
-			// a get-attr rpc to the service to get its full epr)
-			_localActivityServiceEPR = EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
-		}
+//		if (_localActivityServiceEPR == null) {
+//			// only need to make this epr from scratch once (which involves
+//			// a get-attr rpc to the service to get its full epr)
+//			_localActivityServiceEPR = EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
+//		}
 
 		_logger.info(String.format("BES with resource key \"%s\" is creating an activity.", _resource.getKey()));
 

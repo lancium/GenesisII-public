@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,10 +69,10 @@ public class RmTool extends BaseGridTool
 			GeniiPath gPath = new GeniiPath(getArgument(lcv));
 			PathOutcome ret = PathOutcome.OUTCOME_ERROR;
 			if (gPath.pathType() == GeniiPathType.Grid) {
-				ret = rm(path, gPath.path(), recursive, force);
+				ret = rm(path, gPath.path(), recursive, force, stderr);
 			} else {
 				File fPath = new File(gPath.path());
-				ret = rm(fPath, recursive, force);
+				ret = rm(fPath, recursive, force, stderr);
 			}
 			if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
 				String msg = "Failed to remove " + gPath.toString() + " because " + PathOutcome.outcomeText(ret) + ".";
@@ -97,7 +98,7 @@ public class RmTool extends BaseGridTool
 	/**
 	 * removes a path pointed at by a java File object.
 	 */
-	public PathOutcome rm(File path, boolean recursive, boolean force)
+	public static PathOutcome rm(File path, boolean recursive, boolean force, PrintWriter stderr)
 	{
 		if (path == null)
 			return PathOutcome.OUTCOME_NOTHING;
@@ -106,7 +107,7 @@ public class RmTool extends BaseGridTool
 		if (!path.exists()) {
 			if (force)
 				return PathOutcome.OUTCOME_SUCCESS; // no error for this case with force enabled.
-			stderr.println(path.getName() + " does not exist.");
+			if (stderr!=null) stderr.println(path.getName() + " does not exist.");
 			return PathOutcome.OUTCOME_NOTHING;
 		}
 		if (recursive)
@@ -120,7 +121,7 @@ public class RmTool extends BaseGridTool
 	/**
 	 * removes a "filePath" in RNS space using the "currentPath" as an entre.
 	 */
-	public PathOutcome rm(RNSPath currentPath, String filePath, boolean recursive, boolean force)
+	public static PathOutcome rm(RNSPath currentPath, String filePath, boolean recursive, boolean force, PrintWriter stderr)
 	{
 		if ((currentPath == null) || (filePath == null))
 			return PathOutcome.OUTCOME_NOTHING;
@@ -128,7 +129,7 @@ public class RmTool extends BaseGridTool
 			_logger.debug("entered into rm on RNSPath + String: currpath=" + currentPath.toString() + " filepath=" + filePath.toString()
 				+ " recurs=" + recursive + " force=" + force);
 		for (RNSPath file : currentPath.expand(filePath)) {
-			PathOutcome ret = rm(file, recursive, force);
+			PathOutcome ret = rm(file, recursive, force, stderr);
 			if (ret.differs(PathOutcome.OUTCOME_SUCCESS))
 				return ret;
 		}
@@ -138,7 +139,7 @@ public class RmTool extends BaseGridTool
 	/**
 	 * removes an RNS "path" from RNS space.
 	 */
-	public PathOutcome rm(RNSPath path, boolean recursive, boolean force)
+	public static PathOutcome rm(RNSPath path, boolean recursive, boolean force, PrintWriter stderr)
 	{
 		if (path == null)
 			return PathOutcome.OUTCOME_NOTHING;
@@ -156,7 +157,7 @@ public class RmTool extends BaseGridTool
 			return ret;
 		if (force) {
 			String msg = "Forcing removal via unlink after exception.";
-			stderr.println(msg);
+			if (stderr!=null) stderr.println(msg);
 			_logger.warn(msg);
 			try {
 				path.unlink();

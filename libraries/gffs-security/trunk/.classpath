@@ -3,12 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="tests"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="../../../bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
-	<classpathentry kind="lib" path="../../../ext/junit-4.11.jar"/>
-	<classpathentry kind="lib" path="../../../bundles/org.apache.commons.lang_2.6.0.v201205030909.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.apache.commons.lang_2.6.0.v201205030909.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-basics"/>
-	<classpathentry kind="lib" path="../../../ext/bcpkix-jdk15on-149.jar"/>
-	<classpathentry kind="lib" path="../../../ext/bcprov-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/bcpkix-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/bcprov-jdk15on-149.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/bundle-u6security_1.0.74.jar" sourcepath="/home/fred/xsede/code/unicore_goods/new_unicore_148/samly2-2.1.0"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

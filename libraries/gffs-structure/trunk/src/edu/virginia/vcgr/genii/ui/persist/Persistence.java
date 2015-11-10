@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
+
 public class Persistence
 {
 	static private final String PERSISTENCE_DIRECTORY_NAME = ".genii-ui-persistence";
@@ -31,7 +33,7 @@ public class Persistence
 
 	private Persistence() throws IOException
 	{
-		String home = System.getProperty("user.home");
+		String home = FileSystemHelper.sanitizeFilename(System.getProperty("user.home"));
 		if (home == null)
 			home = ".";
 		_superDirectory = new File(home);

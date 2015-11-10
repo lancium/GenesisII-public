@@ -10,12 +10,29 @@
 
 	<path id="build.classpath">
 		<fileset dir="${ext.dir}" includes="**/*.jar"/>
+		<fileset dir="${generated.jar.dir}" includes="**/*.jar"/>
 	</path>
+
+	<!-- loads the version to attach to the jars. -->
+	<loadfile property="app.version" srcFile="${top.level.dir}/current.version">
+		<filterchain>
+			<expandproperties/>
+			<headfilter lines="-1" skip="1"/>
+			<tailfilter lines="-1" skip="3"/>
+			<tokenfilter>
+				<replaceregex pattern="genii.app-version=" replace="" flags="gi"/>
+			</tokenfilter>
+			<StripLineBreaks/>
+		</filterchain>
+	</loadfile>
 
 	<target name="build" depends="jar"/>
 
 	<target name="jar" depends="compile">
-		<jar destfile="${lib.dir}/CmdLineManipulator.jar">
+		<delete>
+			<fileset dir="${generated.jar.dir}" includes="CmdLineManipulator*.jar" />
+		</delete>
+		<jar destfile="${generated.jar.dir}/CmdLineManipulator-${app.version}.jar">
 			<manifest>
 				<attribute name="Main-Class"
 					value="edu.virginia.vcgr.genii.CmdLineManipulator.CmdLineManipulator"/>
@@ -44,13 +61,12 @@
 
 	<target name="init">
 		<mkdir dir="${obj.dir}"/>
-		<mkdir dir="${lib.dir}"/>
 	</target>
 
 	<target name="clean">
                 <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
-		<delete dir="${lib.dir}"/>
+                <delete dir="${basedir}/lib"/>
 	</target>
 </project>	

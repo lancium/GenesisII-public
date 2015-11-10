@@ -98,7 +98,12 @@ public class MkdirTool extends BaseGridTool
 			GeniiPath gPath = new GeniiPath(rnsService);
 			if (gPath.pathType() != GeniiPathType.Grid)
 				throw new InvalidToolUsageException("RNSService must be a grid path. ");
-			service = lookupPath(rnsService);
+			// October 1, 2015 by ASG, check if rnsServce has a Services/EnhancedRNSPortType sub-path
+			// If it does, over-ride their path with the sub-dir
+			if (new GeniiPath(rnsService + "/Services/EnhancedRNSPortType").exists()) {
+				service = lookupPath(rnsService + "/Services/EnhancedRNSPortType");
+			} else
+				service = lookupPath(rnsService);
 		}
 
 		ICallingContext ctxt = ContextManager.getExistingContext();

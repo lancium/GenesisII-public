@@ -2,14 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="../../../bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
-	<classpathentry kind="lib" path="../../../bundles/org.slf4j.api_1.6.4.v20120130-2120.jar"/>
-	<classpathentry kind="lib" path="../../../ext/slf4j-log4j12-1.6.6.jar"/>
-	<classpathentry kind="lib" path="../../../ext/MorganUtilities.jar"/>
-	<classpathentry kind="lib" path="../../../ext/junit-4.11.jar"/>
-	<classpathentry kind="lib" path="../../../ext/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="../../../ext/ivy-2.3.0.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.slf4j.api_1.6.4.v20120130-2120.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/slf4j-log4j12-1.6.6.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/MorganUtilities.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ivy-2.3.0.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-compress-1.8.1.jar"/>
-	<classpathentry kind="lib" path="/home/fred/gffs/code/fred-trunk/ext/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-io-2.4.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

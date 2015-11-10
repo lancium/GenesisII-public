@@ -127,6 +127,10 @@ public class AxisCredentialWallet
 		}
 	}
 
+	//hmmm: !!!! important place here; we need to not verify the whole chains we're getting back.
+	// instead of returning a fully assembled credential wallet, we just need to give back everything we found in the
+	// soap WITHOUT verifying it!....
+	
 	private void constructFromSOAPHeaderElement(MessageElement encodedCredentials)
 	{
 		/*
@@ -149,7 +153,7 @@ public class AxisCredentialWallet
 			throw new SecurityException(msg);
 		}
 
-		// retrieve all trust delegations from the SOAPHeader and store them in a map
+		// retrieve all trust delegations from the SOAPHeader and store them in a map.
 		Map<String, TrustCredential> detachedDelegations = new HashMap<String, TrustCredential>();
 
 		/*

@@ -41,33 +41,38 @@ public class SubscriptionInfoProcessor
 	@PipelineProcessor(portType = EnhancedRNSPortType.class)
 	public LookupResponseType lookup(InvocationContext ctxt, String[] names) throws Throwable
 	{
-		if (!CacheConfigurer.isSubscriptionEnabled()) {
-			return (LookupResponseType) ctxt.proceed();
-		}
+		try {
+			if (!CacheConfigurer.isSubscriptionEnabled()) {
+				return (LookupResponseType) ctxt.proceed();
+			}
 
-		LookupResponseType resp = RNSCacheLookupHandler.getCachedLookupResponse(ctxt.getTarget(), names);
-		if (resp == null) {
-			resp = (LookupResponseType) ctxt.proceed();
-			RNSEntryResponseType[] initMembers = resp.getEntryResponse();
-			if (initMembers != null) {
-				for (RNSEntryResponseType member : initMembers) {
-					searchAndStoreNotificationBrokerFactoryAddress(member);
+			LookupResponseType resp = RNSCacheLookupHandler.getCachedLookupResponse(ctxt.getTarget(), names);
+			if (resp == null) {
+				resp = (LookupResponseType) ctxt.proceed();
+				RNSEntryResponseType[] initMembers = resp.getEntryResponse();
+				if (initMembers != null) {
+					for (RNSEntryResponseType member : initMembers) {
+						searchAndStoreNotificationBrokerFactoryAddress(member);
+					}
+				}
+				EndpointReferenceType target = ctxt.getTarget();
+				WSName wsName = new WSName(target);
+				WSResourceConfig targetConfig = null;
+				if (wsName.isValidWSName()) {
+					targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
+					if (targetConfig != null) {
+						_logger.debug("Did a lookup call for: " + targetConfig.getRnsPath());
+					}
 				}
 			}
+
 			EndpointReferenceType target = ctxt.getTarget();
-			WSName wsName = new WSName(target);
-			WSResourceConfig targetConfig = null;
-			if (wsName.isValidWSName()) {
-				targetConfig = (WSResourceConfig) CacheManager.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
-				if (targetConfig != null) {
-					_logger.debug("Did a lookup call for: " + targetConfig.getRnsPath());
-				}
-			}
+			Subscriber.getInstance().requestForSubscription(new PendingRNSSubscription(target));
+			return resp;
+		} catch (Throwable t) {
+			_logger.error("blowup in subscription info processor", t);
+			throw t;
 		}
-
-		EndpointReferenceType target = ctxt.getTarget();
-		Subscriber.getInstance().requestForSubscription(new PendingRNSSubscription(target));
-		return resp;
 	}
 
 	private void searchAndStoreNotificationBrokerFactoryAddress(RNSEntryResponseType member)

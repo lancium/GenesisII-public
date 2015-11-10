@@ -7,6 +7,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
+
 /**
  * encapsulates one restriction (or enabling) of a path for exports for a user or the class of all users.
  */
@@ -132,7 +134,7 @@ public class ExportControl
 
 	public ExportControl(String path, String user, Set<ModeAllowance> modes)
 	{
-		_path = path.replace("\\", "/");
+		_path = FileSystemHelper.sanitizeFilename(path);
 		_user = user;
 		if (modes != null)
 			_allowedModes = new HashSet<ModeAllowance>(modes);
@@ -228,7 +230,7 @@ public class ExportControl
 	 */
 	public int isPathAppropriate(String pathToCheck)
 	{
-		pathToCheck = pathToCheck.replace("\\", "/");
+		pathToCheck = FileSystemHelper.sanitizeFilename(pathToCheck);
 
 		boolean windowsPath = false;
 		int matchCount = 0;

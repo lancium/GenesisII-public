@@ -11,6 +11,7 @@ import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
+import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 import edu.virginia.vcgr.genii.security.credentials.X509Identity;
@@ -61,6 +62,21 @@ public class TransientCredentials implements Serializable
 		if (_logger.isTraceEnabled())
 			_logger.debug("storing cred into transient set: " + cred.toString() + " via " + ProgramTools.showLastFewOnStack(6));
 		_credentials.add(cred);
+	}
+
+	/**
+	 * returns a credential wallet object with all of the trust credentials from this object in it. note that this strips out any X509Identity
+	 * and other non-trust-credentials, so there will be no connection credential left either.
+	 */
+	public CredentialWallet generateWallet()
+	{
+		CredentialWallet toReturn = new CredentialWallet();
+		for (NuCredential cred : _credentials) {
+			if (cred instanceof TrustCredential) {
+				toReturn.addCredential((TrustCredential) cred);
+			}
+		}
+		return toReturn;
 	}
 
 	public void addAll(Collection<NuCredential> newCreds)

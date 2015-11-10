@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.morgan.util.io.StreamUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 
 public class GridEnvironment
 {
@@ -22,7 +23,7 @@ public class GridEnvironment
 
 	static private File getGridEnvFile()
 	{
-		String homedirPath = System.getProperty("user.home");
+		String homedirPath = FileSystemHelper.sanitizeFilename(System.getProperty("user.home"));
 		if (homedirPath == null) {
 			_logger.warn("Unable to find user's home directory property.");
 			return null;

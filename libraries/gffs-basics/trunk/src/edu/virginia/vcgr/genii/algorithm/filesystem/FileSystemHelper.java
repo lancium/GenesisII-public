@@ -55,4 +55,37 @@ public class FileSystemHelper
 		return Files.isSymbolicLink(nioPath);
 	}
 
+	// hmmm: don't we have this already? that's hard to believe....
+	/**
+	 * makes the string a more friendly filesystem path for java. this includes turning backslashes into forward slashes.
+	 */
+	public static String sanitizeFilename(String toClean)
+	{
+		if (toClean == null)
+			return toClean; // can't fix nothing.		
+		//_logger.debug("before='" + toClean + "'");
+		
+		//String toReturn = toClean.replaceAll("[\\\\]", "/");
+		String toReturn = toClean.replace('\\', '/');
+		
+		//future: any other cleanings we should do on the path?
+		
+		//_logger.debug("after='" + toReturn + "'");		
+		return toReturn;
+	}
+
+	static public void main(String [] args)
+	{
+		String uglyPath = "C:\\Program Files\\GenesisII\\";
+		String fixedPath = sanitizeFilename(uglyPath);
+		String expectedPath ="C:/Program Files/GenesisII/"; 
+		if (!fixedPath.equals(expectedPath)) {
+			System.err.println("FAILURE IN PARSING!  result is not right: '" + fixedPath + "' when it should be '" + expectedPath);
+			System.exit(1);
+		} else {
+			System.err.println("parsing occurred as expected.");
+		}
+		System.exit(0);
+	}
+	
 }

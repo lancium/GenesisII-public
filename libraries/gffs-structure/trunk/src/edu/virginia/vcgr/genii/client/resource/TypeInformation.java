@@ -264,6 +264,7 @@ public class TypeInformation
 
 	public long getByteIOSize()
 	{
+		if (!isByteIO()) return 0;  // not supported.
 		try {
 			Long value = null;
 
@@ -290,6 +291,7 @@ public class TypeInformation
 
 	private Date getTimeAttribute(String attrName) throws RemoteException
 	{
+		if (!isByteIO()) return new Date();  // not supported.
 		QName attrQName = new QName((isRByteIO() ? ByteIOConstants.RANDOM_BYTEIO_NS : ByteIOConstants.STREAMABLE_BYTEIO_NS), attrName);
 		GeniiCommon proxy = ClientUtils.createProxy(GeniiCommon.class, _epr);
 		GetResourcePropertyResponse resp = proxy.getResourceProperty(attrQName);
@@ -331,6 +333,8 @@ public class TypeInformation
 
 	public String describeByteIO()
 	{
+		if (!isByteIO()) return "[not byteio]";  // not supported.
+		
 		long size = getByteIOSize();
 		if (size < 0)
 			return "[file(non-rsp.)]";

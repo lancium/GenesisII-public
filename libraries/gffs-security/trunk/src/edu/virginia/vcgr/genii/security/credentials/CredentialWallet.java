@@ -133,7 +133,7 @@ public class CredentialWallet implements Externalizable, Describable
 	public void addCredential(TrustCredential assertion)
 	{
 		if (assertionChains.containsKey(assertion.getId())) {
-			_logger.error("attempt to add identical assertion to the wallet; ignoring.");
+			_logger.debug("attempt to add identical assertion to the wallet; ignoring.");
 			return;
 		}
 		if (assertion.getPriorDelegationId() != null) {
@@ -242,8 +242,8 @@ public class CredentialWallet implements Externalizable, Describable
 	}
 
 	/*
-	 * old name preserved for unicore usage; does not remove invalid delegations, so reassembly works as expected even with expired
-	 * credentials.
+	 * important: this old method name is preserved for unicore usage; does not remove invalid delegations, so reassembly works as expected
+	 * even with expired credentials.
 	 */
 	public void reattachDelegations()
 	{
@@ -253,7 +253,7 @@ public class CredentialWallet implements Externalizable, Describable
 	/**
 	 * if credentials have been added willy nilly, possibly without their being linked together, this will find and relink all of them
 	 * properly. the only thing remaining in the wallet will be isolated assertions or an assertion chain's most recent element. if
-	 * removeInvalid is true, then any expired or invalid delegations will be trashed. it is important not to clear those out during
+	 * "removeInvalid" is true, then any expired or invalid delegations will be trashed. it is important not to clear those out during
 	 * deserialization though or one will not get back any credential, which leads to unanticipated exceptions.
 	 */
 	public void flexReattachDelegations(boolean removeInvalid)
@@ -294,8 +294,7 @@ public class CredentialWallet implements Externalizable, Describable
 					break;
 				} else {
 					String priorDelegationId = delegation.getPriorDelegationId();
-					// make sure we're not operating on a wallet that's already been fully
-					// reattached.
+					// make sure we're not operating on a wallet that's already been fully re-attached.
 					if ((priorDelegationId != null) && (delegation.getPriorDelegation() != null) && chainsAreIntact(delegation)) {
 						// this one looks okay already, so we'll just add it.
 						if (_logger.isTraceEnabled()) {

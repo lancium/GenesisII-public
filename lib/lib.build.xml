@@ -3,16 +3,16 @@
 
 	<target name="log4j-properties">
 
-		<concat destfile="${lib.dir}/genesisII.container.log4j.properties">
+		<concat destfile="${lib.dir}/build.container.log4j.properties">
   			<filelist dir="${lib.dir}">
-				<file name="genesisII.container.log4j.properties.template" />
+				<file name="build.container.log4j.properties.template" />
 				<file name="shared.log4j.properties" />
 			</filelist>
 		</concat>
 
-		<concat destfile="${lib.dir}/genesisII.client.log4j.properties">
+		<concat destfile="${lib.dir}/build.client.log4j.properties">
   			<filelist dir="${lib.dir}">
-				<file name="genesisII.client.log4j.properties.template" />
+				<file name="build.client.log4j.properties.template" />
 				<file name="shared.log4j.properties" />
 			</filelist>
 		</concat>

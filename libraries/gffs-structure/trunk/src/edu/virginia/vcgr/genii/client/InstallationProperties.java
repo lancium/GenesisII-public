@@ -16,6 +16,7 @@ import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.appmgr.launcher.ApplicationDescription;
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -250,7 +251,7 @@ public class InstallationProperties extends Properties
 		try {
 			// load the state directory so we can get an absolute path and also verify its health.
 			File userDirFile = new GuaranteedDirectory(userDir, true);
-			return userDirFile.getCanonicalPath();
+			return FileSystemHelper.sanitizeFilename(userDirFile.getCanonicalPath());
 		} catch (Throwable cause) {
 			throw new RuntimeException("Unable to access or create state directory.", cause);
 		}
@@ -263,8 +264,8 @@ public class InstallationProperties extends Properties
 	public static String getSimpleGridName()
 	{
 		UserConfigurationFile depProps =
-			new UserConfigurationFile(new File(ApplicationDescription.getInstallationDirectory(),
-				InstallationConstants.DEPLOYMENT_PROPERTIES_FILE).getAbsolutePath());
+			new UserConfigurationFile(FileSystemHelper.sanitizeFilename(new File(ApplicationDescription.getInstallationDirectory(),
+				InstallationConstants.DEPLOYMENT_PROPERTIES_FILE).getAbsolutePath()));
 		String gridName = depProps.getProperty(InstallationConstants.GRID_NAME_SETTING);
 		return gridName;
 	}

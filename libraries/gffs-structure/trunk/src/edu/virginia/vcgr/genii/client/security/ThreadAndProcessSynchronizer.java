@@ -13,6 +13,7 @@ import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 
 /**
@@ -97,13 +98,18 @@ public class ThreadAndProcessSynchronizer
 		}
 	}
 
+	//hmmm: these should move to a more certificatey area.
 	/**
 	 * returns the file name of the consistency lock file that is used for upgrading certificates.
 	 */
 	private static File getConsistencyLockFile(String lockFile)
 	{
+		lockFile = FileSystemHelper.sanitizeFilename(lockFile);
 		if (lockFile.startsWith("/")) {
 			// this looks like an absolute path, so we use it directly.
+			return new File(lockFile);
+		} else if (lockFile.substring(1, 2).equals(":")) {
+			// looks like a windows path, so we'll use that directly also.
 			return new File(lockFile);
 		}
 		String stateDir = InstallationProperties.getUserDir();
@@ -117,7 +123,8 @@ public class ThreadAndProcessSynchronizer
 	private static FileChannel lockConsistencyFile(SynchPackage lockPack)
 	{
 		File lockFile = getConsistencyLockFile(lockPack._lockFile);
-		_logger.trace("consistency file is: " + lockFile);
+		if (_logger.isTraceEnabled())
+			_logger.debug("consistency file is: " + lockFile);
 		FileSystem fs = FileSystems.getDefault();
 		Path fp = fs.getPath(lockFile.getAbsolutePath());
 		FileChannel fc = null;

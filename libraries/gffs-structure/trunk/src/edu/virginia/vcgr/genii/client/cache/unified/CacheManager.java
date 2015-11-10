@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.NotificationBrokerDirectory;
+import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subscriber;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.SubscriptionDirectory;
 
 /*
@@ -317,6 +318,17 @@ public class CacheManager
 			CacheConfigurer.resetCaches();
 			NotificationBrokerDirectory.clearDirectory();
 			SubscriptionDirectory.clearDirectory();
+			// flush any subscriptions that are still pending.
+			Subscriber.getInstance().flushPendingSubscriptions();
+			
+			try {
+				// drop any connections that are established to avoid keeping session alive with wrong creds.
+				//HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+				//connMgr.closeIdleConnections(0);
+			} catch (Throwable t) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("screwup from closing idle connections", t);
+			}
 		} catch (Exception ex) {
 			_logger.error("Alarm: couldn't reset the caching system after a failure. " + "To avoid seeing, possibly, stale contents, "
 				+ "restart the grid client: " + ex.getMessage());

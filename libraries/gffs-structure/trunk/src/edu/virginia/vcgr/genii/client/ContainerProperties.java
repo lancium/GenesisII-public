@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 
 public class ContainerProperties extends Properties
@@ -81,11 +82,13 @@ public class ContainerProperties extends Properties
 				toReturn = checkLocalDir.getAbsolutePath();
 			}
 		}
-		if (toReturn == null)
-			toReturn = getProperty(ClientProperties.GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME);
+		if (toReturn == null) {
+			toReturn = FileSystemHelper.sanitizeFilename(getProperty(ClientProperties.GENII_DEPLOYMENT_DIRECTORY_PROPERTY_NAME));
+		}
 		// well, nothing worked, so use a default based on the installation directory.
-		if (toReturn == null)
+		if (toReturn == null) {
 			toReturn = new File(Installation.getInstallDirectory(), ClientProperties.DEPLOYMENTS_DIRECTORY_NAME).getAbsolutePath();
+		}
 		if (_logger.isTraceEnabled())
 			_logger.debug("deployments folder calculated as: '" + toReturn + "'");
 		return toReturn;

@@ -50,13 +50,11 @@ import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
-import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.history.SequenceNumber;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -319,8 +317,6 @@ public class JobManager implements Closeable
 			return true;
 		}
 
-		LoggingContext.adoptExistingContext(job.getLoggingContext());
-
 		if (_logger.isDebugEnabled())
 			_logger.debug(String.format("Failing job %s(%s, %s, %s)", job, countAsAnAttempt ? "This failure counts against the job"
 				: "This failure does NOT count against the job", isPermanent ? "Failure is permanent" : "Failure is NOT permanent",
@@ -403,7 +399,6 @@ public class JobManager implements Closeable
 
 		job.history(HistoryEventCategory.Terminating).debug("Finishing Job with JobKiller");
 		_outcallThreadPool.enqueue(new JobKiller(job, newState, false, attemptKill, besName, null));
-		LoggingContext.releaseCurrentLoggingContext();
 		return ret;
 	}
 
@@ -428,8 +423,6 @@ public class JobManager implements Closeable
 				_logger.debug(String.format("Couldn't find job for id %d, so I can't finish it.", jobID));
 			return;
 		}
-
-		LoggingContext.adoptExistingContext(job.getLoggingContext());
 
 		if (_logger.isDebugEnabled())
 			_logger.debug("Finished job " + job);
@@ -489,8 +482,6 @@ public class JobManager implements Closeable
 			job.setJobState(QueueStates.FINISHED);
 			job.history(HistoryEventCategory.Terminating).debug("Finishing non-BES Job without JobKiller");
 		}
-
-		LoggingContext.releaseCurrentLoggingContext();
 	}
 
 	synchronized public void killJob(Connection connection, long jobID) throws SQLException, ResourceException
@@ -503,8 +494,6 @@ public class JobManager implements Closeable
 				_logger.debug(String.format("Couldn't find job for id %d, so I can't kill it.", jobID));
 			return;
 		}
-
-		LoggingContext.adoptExistingContext(job.getLoggingContext());
 
 		if (_logger.isDebugEnabled())
 			_logger.debug("Killing a running job:" + jobID);
@@ -547,9 +536,6 @@ public class JobManager implements Closeable
 			besName = _besManager.getBESName(besID);
 
 		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true, true, besName, besID));
-
-		LoggingContext.releaseCurrentLoggingContext();
-
 		_schedulingEvent.notifySchedulingEvent();
 	}
 
@@ -625,12 +611,11 @@ public class JobManager implements Closeable
 			Date submitTime = new Date();
 
 			HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Default, _database.historyKey(ticket));
-			String rpcid = LoggingContext.getCurrentLoggingContext().getCurrentID();
-
+			
 			/*
 			 * Submit the job information into the queue (and get a new jobID from the database for it).
 			 */
-			long jobID = _database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime, rpcid);
+			long jobID = _database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime);
 			if (MyProxyCertificate.isAvailable())
 				_database.setSecurityHeader(connection, jobID, MyProxyCertificate.getPEMString());
 
@@ -648,12 +633,11 @@ public class JobManager implements Closeable
 			if (_logger.isDebugEnabled())
 				_logger.debug("Submitted job \"" + ticket + "\" as job number " + jobID);
 
-			LoggingContext loggingContext = LoggingContext.getCurrentLoggingContext();
 			/*
 			 * Create a new data structure for the job's in memory information and put it into the in-memory lists.
 			 */
 			JobData job =
-				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history, loggingContext);
+				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -729,7 +713,6 @@ public class JobManager implements Closeable
 			Date submitTime = new Date();
 
 			HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Default, _database.historyKey(tickynum));
-			String rpcid = LoggingContext.getCurrentLoggingContext().getCurrentID();
 
 			// hook in the history context for the special sweep job.
 			sweep.setHistory(history);
@@ -738,7 +721,7 @@ public class JobManager implements Closeable
 			 * Submit the job information into the queue (and get a new jobID from the database for it).
 			 */
 			long jobID =
-				_database.submitJob(sweep, connection, tickynum, priority, jsdl, callingContext, identities, state, submitTime, rpcid);
+				_database.submitJob(sweep, connection, tickynum, priority, jsdl, callingContext, identities, state, submitTime);
 			sweep.setJobId(jobID);
 
 			if (MyProxyCertificate.isAvailable())
@@ -759,13 +742,12 @@ public class JobManager implements Closeable
 			if (_logger.isDebugEnabled())
 				_logger.debug("Submitted sweeping job \"" + tickynum + "\" as job number " + jobID);
 
-			LoggingContext loggingContext = LoggingContext.getCurrentLoggingContext();
 			/*
 			 * Create a new data structure for the job's in memory information and put it into the in-memory lists.
 			 */
 			JobData job =
 				new JobData(sweep, jobID, PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), tickynum, priority, state, submitTime,
-					(short) 0, history, loggingContext);
+					(short) 0, history);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -1795,12 +1777,6 @@ public class JobManager implements Closeable
 		if (job == null || job.getBESID() == null)
 			return;
 
-		try {
-			LoggingContext.adoptExistingContext(job.getLoggingContext());
-		} catch (ContextException e) {
-			// not really worried about it
-		}
-
 		JobCommunicationInfo info = null;
 		try {
 			/*
@@ -1827,8 +1803,6 @@ public class JobManager implements Closeable
 		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
 			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
 		}
-
-		LoggingContext.releaseCurrentLoggingContext();
 	}
 
 	synchronized public Map<String, Long> summarizeToMap()
@@ -2107,7 +2081,6 @@ public class JobManager implements Closeable
 				continue;
 			}
 
-			LoggingContext.adoptExistingContext(data.getLoggingContext());
 			/*
 			 * Get the job off of the queued list and instead put him on the running list. Also, note which bes the jobs is assigned to.
 			 */
@@ -2125,7 +2098,6 @@ public class JobManager implements Closeable
 			 * container will cause this attempt at starting a job to fail.
 			 */
 			_outcallThreadPool.enqueue(new JobLauncher(this, match.getJobID(), match.getBESID()));
-			LoggingContext.releaseCurrentLoggingContext();
 		}
 
 		/*
@@ -2303,15 +2275,9 @@ public class JobManager implements Closeable
 		private long _jobID;
 		private long _besID;
 		private JobManager _manager;
-		private LoggingContext _context;
 
 		public JobLauncher(JobManager manager, long jobID, long besID)
 		{
-			try {
-				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
-			} catch (ContextException e) {
-				_context = new LoggingContext();
-			}
 			_manager = manager;
 			_jobID = jobID;
 			_besID = besID;
@@ -2342,8 +2308,6 @@ public class JobManager implements Closeable
 
 		public void run()
 		{
-			LoggingContext.assumeLoggingContext(_context);
-
 			boolean isPermanent = false;
 			ICallingContext startCtxt = null;
 			Connection connection = null;
@@ -2578,7 +2542,6 @@ public class JobManager implements Closeable
 		private QueueStates _newState;
 		private String _besName;
 		private Long _besID;
-		private LoggingContext _context;
 
 		public JobKiller(JobData jobData, QueueStates newState, boolean outcallOnly, boolean attemptKill, String besName, Long besID)
 		{
@@ -2588,11 +2551,6 @@ public class JobManager implements Closeable
 			_attemptKill = attemptKill;
 			_besName = besName;
 			_besID = besID;
-			try {
-				_context = (LoggingContext) LoggingContext.getCurrentLoggingContext().clone();
-			} catch (ContextException e) {
-				_context = new LoggingContext();
-			}
 		}
 
 		public boolean equals(JobKiller other)
@@ -2680,8 +2638,6 @@ public class JobManager implements Closeable
 
 		public void run()
 		{
-			LoggingContext.assumeLoggingContext(_context);
-
 			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
 
 			if (_logger.isDebugEnabled())

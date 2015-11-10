@@ -106,9 +106,9 @@ for subproject in \
     # re-enact the retval...
     if [ $retval -ne 0 ]; then false; else true; fi
     check_result "ant build for $subproject"
-    # publish the newly crafted jars into the main build's ext folder.
-    cp -v -f lib/*.jar "$TOPDIR/ext"
-    check_result "publishing jar file produced by $subproject"
+#    # publish the newly crafted jars into the main build's ext folder.
+#nope, done automatically now.    cp -v -f lib/*.jar "$TOPDIR/ext"
+#nope2    check_result "publishing jar file produced by $subproject"
   fi
 
   popd
@@ -123,7 +123,7 @@ if [ ! -z "$TRUNK_BUILD" -a -z "$CLEAN_UP" ]; then
   check_result "entering default deployment"
   \rm -rf services
   check_result "cleaning any existing services"
-  unzip ../../$CHECKOUT_DIR/gffs-webservices/trunk/lib/gffs-webservices.jar services/*
+  unzip $GENII_INSTALL_DIR/generated/gffs-webservices*.jar services/*
   check_result "unpacking services directory from gffs-webservices.jar"
   popd
 fi

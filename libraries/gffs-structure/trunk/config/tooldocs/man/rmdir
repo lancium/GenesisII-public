@@ -1,0 +1,4 @@
+Description:
+
+Similar to the rmdir tool in UNIX, the grid rmdir tool removes empty directories from the grid filesystem.  To indicate a local path, make sure to begin the pathname with 'local:'.
+

@@ -8,15 +8,33 @@
 	<path id="project.classpath">
 		<fileset dir="${ext.dir}" includes="**/*.jar"/>
 		<pathelement location="${obj.dir}"/>
+		<fileset dir="${generated.jar.dir}" includes="**/*.jar"/>
 	</path>
 			
+	<!-- loads the version to attach to the jars. -->
+	<loadfile property="app.version" srcFile="${top.level.dir}/current.version">
+		<filterchain>
+			<expandproperties/>
+			<headfilter lines="-1" skip="1"/>
+			<tailfilter lines="-1" skip="3"/>
+			<tokenfilter>
+				<replaceregex pattern="genii.app-version=" replace="" flags="gi"/>
+			</tokenfilter>
+			<StripLineBreaks/>
+		</filterchain>
+	</loadfile>
+
 	<!-- Build Targets -->
 	<target name="build" depends="jars"/>
 
 	<target name="jars" depends="fsview.jar"/>
 
 	<target name="fsview.jar" depends="fsview.compile">
-		<jar destfile="${lib.dir}/fsview.jar">
+                <delete>
+                        <fileset dir="${generated.jar.dir}" includes="fsview*.jar" />
+                </delete>
+
+		<jar destfile="${generated.jar.dir}/fsview-${app.version}.jar">
 			<fileset dir="${obj.dir}">
 				<include name="edu/virginia/g3/**/*"/>
 			</fileset>
@@ -38,16 +56,13 @@
 
 	<target name="init">
 		<mkdir dir="${obj.dir}"/>
-		<mkdir dir="${lib.dir}"/>
 	</target>
 
 	<target name="clean">
                 <delete failonerror="false">
                         <fileset dir="${obj.dir}" includes="**/*"/>
                 </delete>
-		<delete quiet="true">
-			<fileset dir="${lib.dir}" includes="**/*.jar"/>
-		</delete>
+                <delete dir="${basedir}/lib"/>
 	</target>
 	
 </project>

@@ -28,8 +28,7 @@ public class SimpleExceptionHandler implements IExceptionHandler
 		int toReturn = 0; // assume we can recover by default.
 
 		// before we do anything else, add the whole thing to the detailed log.
-		DetailedLogger.detailed().info(
-			"simple handler processing exception: " + cause.getLocalizedMessage() + "\n" + ExceptionUtils.getStackTrace(cause));
+		DetailedLogger.detailed().info("processing exception: " + cause.getLocalizedMessage() + "\n" + ExceptionUtils.getStackTrace(cause));
 
 		/*
 		 * remembers the last message we printed so we don't echo duplicates (which can happen when exceptions are wrapped repeatedly at

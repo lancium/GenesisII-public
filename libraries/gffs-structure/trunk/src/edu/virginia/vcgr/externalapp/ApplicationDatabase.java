@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -85,7 +86,7 @@ public class ApplicationDatabase
 
 	protected ApplicationRegistry loadLocalOverrideRegistry()
 	{
-		String localHome = System.getProperty("user.home");
+		String localHome = FileSystemHelper.sanitizeFilename(System.getProperty("user.home"));
 		if (localHome != null) {
 			File path = new File(localHome);
 			path = new File(path, ".grid-applications.xml");

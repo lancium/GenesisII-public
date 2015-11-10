@@ -17,6 +17,7 @@ import edu.virginia.vcgr.appmgr.io.IOUtils;
 import edu.virginia.vcgr.appmgr.util.HierarchicalProperties;
 import edu.virginia.vcgr.appmgr.util.PropertyUtilities;
 import edu.virginia.vcgr.appmgr.version.VersionManager;
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 
 public class ApplicationDescription
 {
@@ -160,7 +161,8 @@ public class ApplicationDescription
 		// see if we can intuit our location from living in a jar.
 		URL url = ApplicationDescription.class.getProtectionDomain().getCodeSource().getLocation();
 		try {
-			appPath = new File(url.toURI().getSchemeSpecificPart()).toString();
+			// get the app path but switch back slashes to forward ones.
+			appPath = new File(url.toURI().getSchemeSpecificPart()).toString().replace('\\', '/');
 		} catch (URISyntaxException e) {
 			String msg = "failed to convert code source url to app path: " + url;
 			_logger.error(msg);
@@ -171,8 +173,8 @@ public class ApplicationDescription
 		if (appPath.endsWith(".jar")) {
 			// we need to chop off the jar file part of the name.
 			int lastSlash = appPath.lastIndexOf("/");
-			if (lastSlash < 0)
-				lastSlash = appPath.lastIndexOf("\\");
+//			if (lastSlash < 0)
+//				lastSlash = appPath.lastIndexOf("\\");
 			if (lastSlash < 0) {
 				String msg = "could not find a slash character in the path: " + appPath;
 				_logger.error(msg);
@@ -199,25 +201,20 @@ public class ApplicationDescription
 		 */
 		File testingBundlesDir = new File(startupDir, "bundles");
 		File testingExtDir = new File(startupDir, "ext");
-		String lastStartupDirState = "not-equal";
+		String lastStartupDirState = "not-equal"; // a string we should never see as a full path.
 
 		while (!testingBundlesDir.exists() || !testingExtDir.exists()) {
 			if (_logger.isDebugEnabled()) {
-				try {
-					if (_logger.isTraceEnabled())
-						_logger.debug("failed to find bundles directory at '" + startupDir.getCanonicalPath() + "', popping up a level.");
-				} catch (IOException e) {
-					_logger.error("failed to get canonical path of our startup directory: " + startupDir, e);
-					throw new RuntimeException(e);
-				}
+				if (_logger.isTraceEnabled())
+					_logger.debug("failed to find bundles directory at '" + startupDir.getAbsolutePath() + "', popping up a level.");
 			}
 
-			if (lastStartupDirState.equals(startupDir.getAbsolutePath())) {
+			if (lastStartupDirState.equals(FileSystemHelper.sanitizeFilename(startupDir.getAbsolutePath()))) {
 				throw new RuntimeException(
 					"caught the startup directory not changing, which means we have hit the root and failed to find our bundles and ext directories.");
 			}
 			// reset for next time.
-			lastStartupDirState = startupDir.getAbsolutePath();
+			lastStartupDirState = FileSystemHelper.sanitizeFilename(startupDir.getAbsolutePath());
 
 			// pop up a level, since we didn't find our bundles directory.
 			startupDir = new File(startupDir, "..");
@@ -236,16 +233,12 @@ public class ApplicationDescription
 
 		// now resolve the path to an absolute location without relative components.
 		try {
-			appPath = startupDir.getCanonicalPath();
+			appPath = FileSystemHelper.sanitizeFilename(startupDir.getCanonicalPath());
 		} catch (IOException e) {
 			_logger.error("could not open osgi directory: " + appPath);
 		}
-
-		appPath = appPath.replace('\\', '/');
-
 		if (_logger.isTraceEnabled())
 			_logger.debug("startup path after resolution with File: " + appPath);
-
 		return appPath;
 	}
 

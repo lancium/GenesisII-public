@@ -19,22 +19,27 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig;
+import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.logging.LoggingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.LightweightNotificationServer;
 import edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPortType;
 import edu.virginia.vcgr.genii.notification.broker.IndirectSubscriptionEntryType;
 import edu.virginia.vcgr.genii.notification.broker.IndirectSubscriptionType;
 import edu.virginia.vcgr.genii.notification.broker.SubscriptionFailedFaultType;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 /*
  * This is the class for creating subscriptions for cache management. This works by running two cooperating threads. The first is responsible
  * for sampling the subscription requests and accepting or filtering them on the basis of rate of subscription requests. The second is
  * responsible for making subscribe out-calls to the resource containers.
  */
-class SubscriptionOutcallHandler extends Thread
+public class SubscriptionOutcallHandler extends Thread
 {
 	private static Log _logger = LogFactory.getLog(SubscriptionOutcallHandler.class);
 
@@ -53,6 +58,10 @@ class SubscriptionOutcallHandler extends Thread
 	private LinkedBlockingQueue<PendingSubscription> scheduledSubscriptionQueue;
 	private ICallingContext callingContext;
 	private EndpointReferenceType localEndpoint;
+
+	static final int RPC_ACTIVE_SNOOZE_FOR_SUBSCRIPTIONS = 1000;
+
+	// if we see an active rpc occurring, then we will snooze this long.
 
 	public void updateCallingContext()
 	{
@@ -81,11 +90,26 @@ class SubscriptionOutcallHandler extends Thread
 		}
 	}
 
+	public void flushPendingSubscriptions()
+	{
+		scheduledSubscriptionQueue.clear();
+	}
+
+	// records if the subscription thread should snooze before more subscriptions.
+	static volatile int _snoozeTimeBeforeMoreSubscriptions = 100;
+
+	/*
+	 * this is used to tell the subscription thread to take a break before doing more subscriptions. it is useful when we are changing
+	 * authorization contexts and will perhaps not have any credentials for a while.
+	 */
+	public static void setSnoozeBeforeNextSubscription(int snoozeTime)
+	{
+		_snoozeTimeBeforeMoreSubscriptions = snoozeTime;
+	}
+
 	@Override
 	public void run()
 	{
-		LoggingContext.assumeNewLoggingContext();
-
 		/*
 		 * Every cache management related thread that load or store information from the Cache should have unaccounted access to both
 		 * CachedManager and RPCs to avoid getting mingled with Cache access and RPCs initiated by some user action. This is important to
@@ -96,13 +120,55 @@ class SubscriptionOutcallHandler extends Thread
 		new SubscriptionRequestSampler().start();
 		while (true) {
 			try {
+				// minimal sleep just to not get too hot here when there are lots of requests.
+//				int snoozicle = _snoozeTimeBeforeMoreSubscriptions;
+				// don't snooze next time unless someone outside intervenes.
+				_snoozeTimeBeforeMoreSubscriptions = 0;
+				
+				//hmmm: feature disabled for snoozes right now.
+//				Thread.sleep(snoozicle);
+				
+				/*
+				 * let's see if the rpc mechanism is active. if it is, we would prefer not to interleave rpc calls unnecessarily. we also
+				 * prefer to give the main thread priority over the subscription process.
+				 */
+				//hmmm: client counting snooze is disabled right now.
+//				int clientCount = AxisClientInvocationHandler.getActiveClients();
+//				if (clientCount >= 1) {
+//					_snoozeTimeBeforeMoreSubscriptions = RPC_ACTIVE_SNOOZE_FOR_SUBSCRIPTIONS;
+//					if (_logger.isDebugEnabled())
+//						_logger.debug("will snooze subscription outcall due to other active rpc clients");
+//					// jump back to top of loop and snooze, since we know there is other stuff going on.
+//					continue;
+//				}
+				
 				PendingSubscription subscriptionRequest = scheduledSubscriptionQueue.take();
 				createSubscription(subscriptionRequest);
 			} catch (InterruptedException e) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("interrupted while creating subscriptions");
+					_logger.debug("interrupted while creating subscriptions.");
+			} catch (Exception e) {
+				_logger.info("caught exception while creating subscriptions", e);
 			}
 		}
+	}
+
+	// hmmm: !!! move this to a nice location lower than here!
+	public static boolean areCredentialsOkay(ICallingContext callingContext)
+	{
+		KeyAndCertMaterial clientKeyMaterial;
+		try {
+			clientKeyMaterial =
+				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+		} catch (AuthZSecurityException e) {
+			_logger.error("got an exception when trying to load calling context", e);
+			return false;
+		}
+		if (clientKeyMaterial == null) {
+			throw new RuntimeException("failed to retrieve a valid TLS certificate for the client");
+		}
+		TransientCredentials tranCreds = TransientCredentials.getTransientCredentials(callingContext);
+		return (tranCreds != null) && !tranCreds.isEmpty();
 	}
 
 	private void createSubscription(PendingSubscription subscriptionRequest)
@@ -114,6 +180,11 @@ class SubscriptionOutcallHandler extends Thread
 			if (!SubscriptionDirectory.isResourceAlreadySubscribed(newsSource)) {
 
 				assumedContextToken = ContextManager.temporarilyAssumeContext(callingContext);
+
+				if (!areCredentialsOkay(callingContext)) {
+					_logger.debug("bailing out of subscription creation since we have no credentials: req=" + subscriptionRequest);
+					return;
+				}
 
 				NotificationBrokerWrapper brokerWrapper =
 					NotificationBrokerDirectory.getNotificationBrokerForEndpoint(newsSource, localEndpoint);
@@ -142,9 +213,13 @@ class SubscriptionOutcallHandler extends Thread
 				name = subscriptionRequest.toString();
 			_logger.info("resource not subscribable: '" + name + "'");
 			SubscriptionDirectory.notifySubscriptionFailure(subscriptionRequest.getNewsSource());
-		} catch (Exception e) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("indirect subscription request was denied.", e);
+		} catch (Throwable e) {
+			if (_logger.isDebugEnabled()) {
+				String msg = "no message";
+				if (e.getMessage() != null)
+					msg = e.getMessage();
+				_logger.debug("indirect subscription request was denied: " + msg);
+			}
 		} finally {
 			StreamUtils.close(assumedContextToken);
 		}
