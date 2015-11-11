@@ -71,6 +71,9 @@ public class Driver extends ApplicationBase
 			System.exit(1);
 		}
 
+		// configure the connection pooling to our whims.
+		VcgrSslSocketFactory.setupConnectionPool();
+		
 		GridEnvironment.loadGridEnvironment();
 
 		String deploymentName = DeploymentName.figureOutDefaultDeploymentName();

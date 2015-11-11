@@ -18,10 +18,15 @@ public class DatabaseConnectionPool
 {
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
 
+	// set this to true if you want more diagnostics for timing printed at debug level.
+	public static boolean ENABLE_DB_TIMING_LOGS = false;	
+
+	// how many connections to the database should be pooled?
 	static protected final int _DB_POOL_SIZE_DEFAULT = 16;
 
-	// hmmm: ridiculously large delay allowed now; was 4 seconds originally!
+	// how long should the database user wait for a connection from the pool?
 	static public final int MAX_SNOOZE_AWAITING_POOL = 2 * 60 * 1000; // in milliseconds.
+	// hmmm: ridiculously large delay allowed now; was 4 seconds originally!
 	// currently set to 2 minutes before the db attempt will fail.
 
 	/*

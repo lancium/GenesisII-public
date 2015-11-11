@@ -21,9 +21,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.morgan.util.io.StreamUtils;
-import org.mortbay.jetty.HttpException;
-import org.mortbay.jetty.handler.AbstractHandler;
 
 import edu.virginia.vcgr.genii.system.classloader.GenesisClassLoader;
 
@@ -42,8 +42,7 @@ public class ResourceFileHandler extends AbstractHandler
 	}
 
 	@Override
-	public void handle(String target, HttpServletRequest arg2, HttpServletResponse arg3, int dispatch) throws HttpException, IOException,
-		ServletException
+	public void handle(String target, Request arg1, HttpServletRequest arg2, HttpServletResponse arg3) throws IOException, ServletException
 	{
 		InputStream in = null;
 		OutputStream out = null;

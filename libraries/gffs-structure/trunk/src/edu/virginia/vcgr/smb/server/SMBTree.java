@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -89,88 +90,127 @@ public class SMBTree
 	{
 		searches.remove(SID);
 	}
-
-	public static String pathNormalize(String path)
-	{
-		// future: improve this
-		path = path.replace('\\', '/');
-		while (path.length() > 0 && path.charAt(0) == '/')
-			path = path.substring(1);
-
-		return path;
-	}
+	
+	//hmmm: case-insensitive matching should be turned off since it is awfully slow.
+	//hmmm: but we have also found it cannot be turned off because windows whips out these all upper case versions of our file names sometimes.
+	// the protection we did by ignoring all those bogus file names may make this usable again?
 
 	private static RNSPath lookupInsensitive(RNSPath dir, String file)
 	{
-		SMBWildcard pattern = new SMBWildcard(file);
-
 		RNSPath trivial = dir.lookup(file);
-		if (trivial.exists())
+		if (trivial.exists()) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("insense: success looking up trivial path: " + file);
 			return trivial;
+		}
 
+		SMBWildcard pattern = new SMBWildcard(file);
 		try {
 			Collection<RNSPath> list = dir.listContents(pattern);
-			if (list.isEmpty())
+			if (list.isEmpty()) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("insense: failure looking up path with pattern: " + file);
 				return trivial;
+			}
 
 			return list.iterator().next();
 		} catch (RNSPathDoesNotExistException e) {
-			if (dir.isRoot())
+			if (dir.isRoot()) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("insense: failure looking up path (non-existent): " + file);
 				return trivial;
+			}
 
 			// Maybe this directory needs to be resolved
 			dir = lookupInsensitive(dir.getParent(), dir.getName());
+			if (_logger.isDebugEnabled())
+				_logger.debug("insense: after looking up parent, dir now: " + dir.pwd());
+
 		} catch (RNSException e) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("insense: failure finding dir: " + file);
 			return trivial;
 		}
 
 		trivial = dir.lookup(file);
-		if (trivial.exists())
+		if (trivial.exists()) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("insense: success looking up file (post dir find): " + dir.pwd());
 			return trivial;
+		}
 
 		try {
 			Collection<RNSPath> list = dir.listContents(pattern);
-			if (list.isEmpty())
+			if (list.isEmpty()) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("insense: failure looking up path with pattern (place 2): " + file);
 				return trivial;
+			}
 
+			if (_logger.isDebugEnabled())
+				_logger.debug("insense: success looking up via pattern (place 2): " + file);
 			return list.iterator().next();
 		} catch (RNSPathDoesNotExistException e) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("insense: failure looking up path (non-existent place 2): " + file);
 			return trivial;
 		} catch (RNSException e) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("insense: failure looking up path (rns exception): " + file, e);
 			return trivial;
 		}
 	}
 
-	private static RNSPath lookup(RNSPath root, String path)
-	{
-		if (path.isEmpty())
-			return root;
-
-		// future: improve this
-		path = path.replace('\\', '/');
-		while (path.length() > 0 && path.charAt(0) == '/')
-			path = path.substring(1);
-
-		if (_logger.isDebugEnabled())
-			_logger.debug("SMBTree looking up path(2): " + path);
-		return root.lookup(path);
-	}
-
-	public static RNSPath lookup(RNSPath root, String path, boolean caseSensitive)
+	public static RNSPath lookup(RNSPath root, String path, boolean caseSensitive) throws SMBException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("SMBTree looking up path(3): " + path);
 
-		RNSPath file = lookup(root, path);
+		if (path.isEmpty())
+			return root;
 
-		// File exists no case-insensitive search needed
-		if (caseSensitive || file.exists())
+		path = FileSystemHelper.sanitizeFilename(path);
+
+		/*
+		 * hmmm: !!!! ham-handed kludge for the names windows keeps asking us about and which cause us to endlessly look for things in the grid.
+		 */
+		if (path.endsWith("folder.gif") ||
+			path.endsWith("folder.jpg") ||
+			path.endsWith("Thumbs.db") ||
+			path.endsWith("desktop.ini") ) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("ignoring windows specific file name: " + path);
+			throw new SMBException(NTStatus.NO_SUCH_FILE);
+		}
+		
+		if (path.endsWith("srvsvc")) {
+			// attempting to shut it up fast on srvsvc, although this is more problematic than these others.
+			// it indicates a whole slew of expected services.
+			
+			if (_logger.isDebugEnabled())
+				_logger.debug("special path seen; pretending it's root: " + path);
+			
+			///throw new SMBException(NTStatus.NOT_IMPLEMENTED);
+			
+			// pretend they're asking about the root.
+			return root;
+		}			
+
+		
+		RNSPath file = root.lookup(path);
+		
+		//hmmm: disabling case insensitive searches here.
+//		return file; //added to disable case insensitivity.
+		// File exists or no case-insensitive search needed?
+		if (caseSensitive || file.exists()) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("success looking up path: " + path);
 			return file;
-
+		}
 		return lookupInsensitive(file.getParent(), file.getName());
 	}
 
-	public RNSPath lookup(String path, boolean caseSensitive)
+	public RNSPath lookup(String path, boolean caseSensitive) throws SMBException
 	{
 		return SMBTree.lookup(root, path, caseSensitive);
 	}
@@ -180,6 +220,7 @@ public class SMBTree
 		try {
 			return new TypeInformation(file.getEndpoint());
 		} catch (RNSPathDoesNotExistException e) {
+			_logger.error("failed to find path: " + file.pwd(), e);
 			throw new SMBException(NTStatus.OBJECT_PATH_NOT_FOUND);
 		}
 	}
@@ -262,7 +303,8 @@ public class SMBTree
 
 	public Collection<RNSPath> listContents(String path, boolean caseSensitive) throws SMBException
 	{
-		int sep = path.lastIndexOf('\\');
+		path = FileSystemHelper.sanitizeFilename(path);
+		int sep = path.lastIndexOf('/');
 		if (sep == -1) {
 			// Only filename
 			return SMBTree.listContents(root, new SMBWildcard(path));
@@ -274,7 +316,8 @@ public class SMBTree
 
 	public Collection<RNSPath> listContents(String path, RNSFilter filter, boolean caseSensitive) throws SMBException
 	{
-		int sep = path.lastIndexOf('\\');
+		path = FileSystemHelper.sanitizeFilename(path);
+		int sep = path.lastIndexOf('/');
 		if (sep == -1) {
 			// Only filename
 			return SMBTree.listContents(root, new SMBSearchFilter(new SMBWildcard(path), filter));
@@ -314,7 +357,8 @@ public class SMBTree
 
 	public SMBSearchState search(String path, boolean caseSensitive) throws SMBException
 	{
-		int sep = path.lastIndexOf('\\');
+		path = FileSystemHelper.sanitizeFilename(path);
+		int sep = path.lastIndexOf('/');
 		if (sep == -1) {
 			// Only filename
 			return SMBTree.search(root, new SMBWildcard(path));
@@ -326,7 +370,8 @@ public class SMBTree
 
 	public SMBSearchState search(String path, RNSFilter filter, boolean caseSensitive) throws SMBException
 	{
-		int sep = path.lastIndexOf('\\');
+		path = FileSystemHelper.sanitizeFilename(path);
+		int sep = path.lastIndexOf('/');
 		if (sep == -1) {
 			// Only filename
 			return SMBTree.search(root, new SMBWildcard(path), filter);

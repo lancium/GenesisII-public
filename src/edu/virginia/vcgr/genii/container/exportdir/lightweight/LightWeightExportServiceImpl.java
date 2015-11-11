@@ -27,7 +27,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
-import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
+import edu.virginia.vcgr.genii.container.axis.ServerAuthorizationManagement;
 import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.SudoExportUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -56,7 +56,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 			if (_logger.isDebugEnabled())
 				_logger.debug("pre-checking for admin access on: " + resource.getClass().getCanonicalName());
-			return ServerWSDoAllReceiver.checkAccess(resource, RWXCategory.WRITE);
+			return ServerAuthorizationManagement.checkAccess(resource, RWXCategory.WRITE);
 		} catch (Exception e) {
 			if (_logger.isDebugEnabled()) {
 				String msg = "exception caught while testing for admin rights on export port type.";

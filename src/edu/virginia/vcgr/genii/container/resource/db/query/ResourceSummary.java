@@ -10,15 +10,20 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ResourceSummary
 {
+	static private Log _logger = LogFactory.getLog(ResourceSummary.class);
+
 	/**
 	 * Retrieves a list of all known resources in the container, grouped by the fully qualified name of the implementing class.
 	 * 
@@ -35,7 +40,11 @@ public class ResourceSummary
 
 		try {
 			ps = connection.prepareStatement("SELECT resourceid, humanname, epi, implementingclass " + "FROM resources2");
+			long startTime = System.currentTimeMillis();
 			rs = ps.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("get resources time is " + (System.currentTimeMillis()-startTime));
+			
 
 			while (rs.next()) {
 				String implClassString = rs.getString(4);
@@ -68,7 +77,11 @@ public class ResourceSummary
 		try {
 			stmt = connection.prepareStatement("SELECT resourceid, humanname, epi FROM resources2 " + "WHERE implementingClass = ?");
 			stmt.setString(1, implementingClassName);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("resourcesforclass time is " + (System.currentTimeMillis()-startTime));
+			
 
 			while (rs.next()) {
 				ret.add(new ResourceSummaryInformation(rs.getString(1), rs.getString(2), rs.getString(3), implementingClassName));
@@ -89,7 +102,11 @@ public class ResourceSummary
 		try {
 			stmt = connection.prepareStatement("SELECT epr FROM resources2 WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("getEPR time is " + (System.currentTimeMillis()-startTime));
+		
 			if (rs.next())
 				return EPRUtils.fromBlob(rs.getBlob(1));
 
@@ -108,7 +125,11 @@ public class ResourceSummary
 		try {
 			stmt = connection.prepareStatement("SELECT epr FROM resources2 WHERE epi = ?");
 			stmt.setString(1, epi);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("getEPR from EPI time is " + (System.currentTimeMillis()-startTime));
+			
 			if (rs.next())
 				return EPRUtils.fromBlob(rs.getBlob(1));
 

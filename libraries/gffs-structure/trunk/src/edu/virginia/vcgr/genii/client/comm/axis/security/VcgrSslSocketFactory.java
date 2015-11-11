@@ -26,6 +26,8 @@ import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
+import org.apache.axis.AxisProperties;
+import org.apache.axis.components.net.DefaultCommonsHTTPClientProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,10 +57,14 @@ import edu.virginia.vcgr.genii.security.x509.SingleSSLX509KeyManager;
  * Allows us to re-read trust-stores when we detect changes in the client/server configuration.
  * 
  * @author dgm4d
+ * @author cak0l
  */
 public class VcgrSslSocketFactory extends SSLSocketFactory implements ConfigurationUnloadedListener
 {
 	static private Log _logger = LogFactory.getLog(VcgrSslSocketFactory.class);
+
+	// this is the maximum number of sessions we should try to cache.
+	public final static int DEFAULT_SESSION_CACHE_SIZE = 256;
 
 	static {
 		/*
@@ -69,11 +75,9 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		java.lang.System.setProperty("https.protocols", "TLSv1");
 	}
 
-	// hmmm: should this maximum have any relation to the configured max value that we got from properties???
-	final private int SESSION_CACHE_SIZE_MAX = 2048;
-
 	static public InheritableThreadLocal<ICallingContext> threadCallingContext = new InheritableThreadLocal<ICallingContext>();
 
+	// hmmm: fix this naming; this is a factory cache, not a session cache.
 	static private LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory> _sslSessionCache =
 		new LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory>(ClientProperties.getClientProperties().getMaxSocketCacheElements());
 
@@ -154,16 +158,26 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			SSLContext sslcontext = SSLContext.getInstance("TLS");
 			_logger.debug("ssl context claims protocol is: " + sslcontext.getProtocol() + " protocol.");
 
-			SSLSessionContext sessionContext = sslcontext.getServerSessionContext();
-			if (sessionContext == null) {
+			// we set the client and server session cache sizes to allow session reuse (hopefully).
+
+			SSLSessionContext serverSessionContext = sslcontext.getServerSessionContext();
+			if (serverSessionContext == null) {
 				if (_logger.isDebugEnabled())
-					_logger.debug("Couldn't get a session context on which to set the cache size.");
+					_logger.debug("Couldn't get a server session context on which to set the cache size.");
 			} else {
-				if (sessionContext.getSessionCacheSize() > SESSION_CACHE_SIZE_MAX) {
-					if (_logger.isDebugEnabled())
-						_logger.debug("Setting server ssl session context cache size to max.");
-					sessionContext.setSessionCacheSize(SESSION_CACHE_SIZE_MAX);
-				}
+				serverSessionContext.setSessionCacheSize(DEFAULT_SESSION_CACHE_SIZE);
+				if (_logger.isDebugEnabled())
+					_logger.debug("Set server ssl session context cache size to: " + serverSessionContext.getSessionCacheSize());
+			}
+
+			SSLSessionContext clientSessionContext = sslcontext.getClientSessionContext();
+			if (clientSessionContext == null) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("Couldn't get a client session context on which to set the cache size.");
+			} else {
+				clientSessionContext.setSessionCacheSize(DEFAULT_SESSION_CACHE_SIZE);
+				if (_logger.isDebugEnabled())
+					_logger.debug("Set client ssl session context cache size to: " + clientSessionContext.getSessionCacheSize());
 			}
 
 			TrustManager[] mgrs = null;
@@ -182,18 +196,6 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 				}
 			}
 
-			sessionContext = sslcontext.getServerSessionContext();
-			if (sessionContext == null) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Couldn't get a session context on which to set the cache size.");
-			} else {
-				if (sessionContext.getSessionCacheSize() > SESSION_CACHE_SIZE_MAX) {
-					if (_logger.isDebugEnabled())
-						_logger.debug("Setting server ssl session context cache size to max.");
-					sessionContext.setSessionCacheSize(SESSION_CACHE_SIZE_MAX);
-				}
-			}
-
 			factory = (SSLSocketFactory) sslcontext.getSocketFactory();
 			synchronized (_sslSessionCache) {
 				_sslSessionCache.put(cacheKey, factory);
@@ -209,6 +211,12 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	{
 		_clientSocketConfigurer.configureSocket(socket);
 		return socket;
+	}
+
+	// had to add this to make CommonsHttpSender in axis happy. after this method existed, connections started working again.
+	public Socket createSocket() throws IOException
+	{
+		return configureSocket(getSSLSocketFactory().createSocket());
 	}
 
 	@Override
@@ -259,6 +267,28 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			_logger.info("exception occurred in getSupportedCipherSuites", e);
 			return null;
 		}
+	}
+
+	static public void setupConnectionPool()
+	{
+		// hmmm: make these into symbolic constants not hardcoded numbers!
+
+		// "Total Connections" Pool size
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.MAXIMUM_TOTAL_CONNECTIONS_PROPERTY_KEY, "500");
+		// huge! was set to like 150.
+
+		// "Connections per host" pool size
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.MAXIMUM_CONNECTIONS_PER_HOST_PROPERTY_KEY, "20");
+
+		// max duration to wait for a connection from the pool.
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_POOL_TIMEOUT_KEY, "30000");
+
+		// Timeout to establish connection in milliseconds.
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_CONNECTION_TIMEOUT_KEY, ""
+			+ ClientProperties.getClientProperties().getClientTimeout());
+
+		// Timeout "waiting for data" (read timeout)
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_SO_TIMEOUT_KEY, "180000");
 	}
 
 	static public class KeyAndCertMaterialCacheKey

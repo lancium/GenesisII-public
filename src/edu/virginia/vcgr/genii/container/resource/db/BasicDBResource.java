@@ -28,6 +28,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
+import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.Rollbackable;
@@ -148,7 +149,11 @@ public class BasicDBResource implements IResource
 				_logger.trace("looking up resource: " + _resourceKey);
 			stmt = _connection.prepareStatement(_VERIFY_STMT);
 			stmt.setString(1, _resourceKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("load time is " + (System.currentTimeMillis()-startTime));
+			
 			if (!rs.next()) {
 				// the special key is not always found as a database resource.
 				if (_logger.isDebugEnabled() && !_resourceKey.contains(_SPECIAL_SERVICE_KEY_TEMPLATE)) {
@@ -221,7 +226,11 @@ public class BasicDBResource implements IResource
 			stmt = connection.prepareStatement(_GET_PROPERTY_STMT);
 			stmt.setString(1, resourceKey);
 			stmt.setString(2, propertyName);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("getProperty time is " + (System.currentTimeMillis()-startTime));
+			
 			if (!rs.next())
 				return null;
 
@@ -388,7 +397,11 @@ public class BasicDBResource implements IResource
 		try {
 			stmt = _connection.prepareStatement("SELECT paramname, paramvalue FROM matchingparams " + "WHERE resourceid = ?");
 			stmt.setString(1, _resourceKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("getMatchingParameters time is " + (System.currentTimeMillis()-startTime));
+			
 			while (rs.next()) {
 				ret.add(new MatchingParameter(rs.getString(1), rs.getString(2)));
 			}
@@ -458,7 +471,10 @@ public class BasicDBResource implements IResource
 		try {
 			stmt = connection.prepareStatement("SELECT epi FROM resources2 WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("getEPI time is " + (System.currentTimeMillis()-startTime));
 			if (rs.next())
 				return rs.getString(1);
 
@@ -498,7 +514,11 @@ public class BasicDBResource implements IResource
 		try {
 			stmt = connection.prepareStatement("SELECT resourceid FROM resources2 WHERE epi = ?");
 			stmt.setString(1, epi);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("getResourceIDtime is " + (System.currentTimeMillis()-startTime));
+		
 			if (rs.next())
 				return rs.getString(1);
 		} finally {
@@ -517,7 +537,11 @@ public class BasicDBResource implements IResource
 		try {
 			stmt = _connection.prepareStatement("SELECT createtime FROM resources WHERE resourceid = ?");
 			stmt.setString(1, _resourceKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("createTime time is " + (System.currentTimeMillis()-startTime));
+			
 			if (!rs.next())
 				return null;
 			Timestamp ts = rs.getTimestamp(1);
@@ -578,7 +602,11 @@ public class BasicDBResource implements IResource
 		try {
 			stmt = _connection.prepareStatement("SELECT attrvalues FROM unknownattrs WHERE resourceid = ?");
 			stmt.setString(1, getKey());
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("get unkownattributes time is " + (System.currentTimeMillis()-startTime));
+			
 			while (rs.next()) {
 				Blob blob = rs.getBlob(1);
 				long blobLength = blob.length();

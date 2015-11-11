@@ -33,19 +33,23 @@ import org.apache.axis.transport.http.AxisServletBase;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.bio.SocketConnector;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.feistymeow.process.ethread;
 import org.morgan.dpage.DynamicPageLoader;
 import org.morgan.dpage.ScratchSpaceManager;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.GuaranteedDirectory;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.handler.ContextHandler;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.security.SslSocketConnector;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.webapp.WebAppContext;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -54,7 +58,7 @@ import edu.virginia.vcgr.genii.algorithm.structures.queue.IServiceWithCleanupHoo
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
-import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
+import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslContextFactory;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
@@ -63,6 +67,7 @@ import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
 import edu.virginia.vcgr.genii.client.configuration.Security;
+import edu.virginia.vcgr.genii.client.configuration.SslInformation;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
@@ -116,6 +121,8 @@ public class Container extends ApplicationBase
 
 		try {
 			prepareServerApplication();
+
+			VcgrSslSocketFactory.setupConnectionPool();
 
 			// Set Trust Store Providers.
 			java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
@@ -181,7 +188,8 @@ public class Container extends ApplicationBase
 	{
 		WebAppContext webAppCtxt;
 		Server server;
-		SocketConnector socketConnector;
+
+		SelectChannelConnector connector;
 
 		initializeIdentitySecurity(getConfigurationManager().getContainerConfiguration());
 
@@ -197,37 +205,60 @@ public class Container extends ApplicationBase
 		if (_containerConfiguration.isSSL()) {
 			// Determine if we should accept self signed certificates
 			if (_containerConfiguration.trustSelfSigned()) {
-				socketConnector = new TrustAllSslSocketConnector();
+				SslInformation sslinfo = _containerConfiguration.getSslInformation();
+				SslContextFactory fac =
+					new TrustAllSslContextFactory(sslinfo.getKeystoreFilename(), sslinfo.getKeyPassword(), sslinfo.getKeystorePassword(),
+						sslinfo.getKeystoreType());
+				connector = new SslSelectChannelConnector(fac);
 				_logger.info("Note: accepting connections from self signed certificates");
-			} else
-				socketConnector = new SslSocketConnector();
 
-			socketConnector.setPort(_containerConfiguration.getListenPort());
-			_containerConfiguration.getSslInformation().configure(getConfigurationManager(), (SslSocketConnector) socketConnector);
+			} else {
+				connector = new SslSelectChannelConnector();
+			}
+			connector.setPort(_containerConfiguration.getListenPort());
 			_containerURL =
 				edu.virginia.vcgr.appmgr.net.Hostname.normalizeURL("https://127.0.0.1:" + _containerConfiguration.getListenPort());
 		} else {
-			socketConnector = new SocketConnector();
-			socketConnector.setPort(_containerConfiguration.getListenPort());
+			connector = new SelectChannelConnector();
+			connector.setPort(_containerConfiguration.getListenPort());
 			_containerURL = edu.virginia.vcgr.appmgr.net.Hostname.normalizeURL("http://127.0.0.1:" + _containerConfiguration.getListenPort());
 		}
 
-		_logger.info(String.format("Setting max acceptor threads to %d\n", _containerConfiguration.getMaxAcceptorThreads()));
-		socketConnector.setAcceptors(_containerConfiguration.getMaxAcceptorThreads());
-		server.addConnector(socketConnector);
+		int maxAcceptors = _containerConfiguration.getMaxAcceptorThreads();
+		if (maxAcceptors > 2 * Runtime.getRuntime().availableProcessors()) {
+			// limit the number of acceptors as expected by jetty.
+			maxAcceptors = 2 * Runtime.getRuntime().availableProcessors();
+			if (_logger.isDebugEnabled())
+				_logger.debug("reducing number of acceptors from " + _containerConfiguration.getMaxAcceptorThreads() + " to " + maxAcceptors
+					+ " to meet jetty requirements (<=2*cpus)");
+		}
+		if (_logger.isDebugEnabled())
+			_logger.debug(String.format("Setting max acceptor threads to %d\n", maxAcceptors));
+		connector.setAcceptors(maxAcceptors);
 
-		ContextHandler context1 = new ContextHandler("/axis");
+		server.setConnectors(new Connector[] { connector });
+
+		ContextHandler context1 = new ContextHandler();
+		context1.setContextPath("/axis");
 		webAppCtxt = new WebAppContext(Installation.axisWebApplicationPath().getAbsolutePath(), "/");
 		context1.setHandler(webAppCtxt);
 
 		Server dServer = loadDynamicPages(_containerConfiguration.getDPagesPort());
 
-		ContextHandler context2 = new ContextHandler("/");
+		// hmmm: TOP-LEVEL HTTP SETUP IS probably NOT RIGHT YET.
+		ContextHandler context2 = new ContextHandler();
+		context2.setContextPath("/");
+		// doesn't work either yet: context2.addServlet(new ServletHolder(new ResourceFileHandler("edu/virginia/vcgr/genii/container")),
+		// "/*");
 		context2.setHandler(new ResourceFileHandler("edu/virginia/vcgr/genii/container"));
 
-		ContextHandlerCollection contexts = new ContextHandlerCollection();
-		contexts.setHandlers(new ContextHandler[] { context1, context2 });
-		server.setHandler(contexts);
+		HandlerCollection handlers = new HandlerCollection();
+		handlers.setHandlers(new ContextHandler[] { context1, context2 });
+		server.setHandler(handlers);
+
+		// ContextHandlerCollection contexts = new ContextHandlerCollection();
+		// contexts.setHandlers(new ContextHandler[] { context1, context2 });
+		// server.setHandler(contexts);
 
 		try {
 			recordInstallationState(System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default"), new URL(_containerURL));
@@ -298,7 +329,8 @@ public class Container extends ApplicationBase
 		Collection<Class<? extends IServiceWithCleanupHook>> managedServiceClasses =
 			new LinkedList<Class<? extends IServiceWithCleanupHook>>();
 
-		ServletHolder[] holders = ctxt.getServletHandler().getServlets();
+		ServletHandler han = ctxt.getServletHandler();
+		ServletHolder[] holders = han.getServlets();
 		for (ServletHolder holder : holders) {
 			if (holder.getName().equals("AxisServlet")) {
 				_axisServer = ((AxisServletBase) holder.getServlet()).getEngine();

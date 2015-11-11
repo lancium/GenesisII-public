@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.URI;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,18 +21,22 @@ import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperToken;
 import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
+import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
+import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 
 public class RunProcessPhase extends AbstractRunProcessPhase implements TerminateableExecutionPhase, Serializable
 {
@@ -106,6 +111,18 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		ProcessWrapperToken token;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
+		
+		// ASG 2015-11-05. Updated to get a nice log message 
+		ICallingContext callContext = context.getCallingContext();
+
+		String prefId = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
+		X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(callContext, prefId);
+		String userName = CredentialWallet.extractUsername(owner);
+		if (userName==null) userName="UnKnown";
+
+		
+		// End of updates
+		
 		synchronized (_processLock) {
 			command = new Vector<String>();
 			command.add(_executable.getAbsolutePath());
@@ -180,7 +197,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			for (String arg : newCmdLine)
 				hWriter.format(" %s", arg);
 			hWriter.close();
-
+			_logger.info(String.format("Executing job for userID '%s' using command line:\n\t%s", userName,testCmdLine.toString()));
+			
 			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, newCmdLine);
 		}
 

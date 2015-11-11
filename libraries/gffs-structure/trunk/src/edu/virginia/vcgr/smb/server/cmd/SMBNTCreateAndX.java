@@ -93,13 +93,22 @@ public class SMBNTCreateAndX implements SMBCommand
 
 		int FID = tree.allocateFID(fd);
 
-		Date createTime = info.getByteIOCreateTime();
-		Date accessTime = info.getByteIOAccessTime();
-		Date writeTime = info.getByteIOModificationTime();
+		Date createTime = new Date();
+		Date accessTime = new Date();
+		Date writeTime = new Date();
+		if (info.isByteIO()) {
+			// hmmm: we don't have timestamp info for rns?  at least, if we call these methods on rns dirs, there are huge exceptions.
+			createTime = info.getByteIOCreateTime();
+			accessTime = info.getByteIOAccessTime();
+			writeTime = info.getByteIOModificationTime();
+		}
+		
 		Date changeTime = writeTime;
+		
 		long fileSize = 0;
-		if (info.isByteIO())
+		if (info.isByteIO()) {
 			fileSize = info.getByteIOSize();
+		}
 		long allocSize = fileSize;
 
 		acc.startParameterBlock();
@@ -120,10 +129,11 @@ public class SMBNTCreateAndX implements SMBCommand
 		acc.putShort((short) 0);
 		// Not a pipe
 		acc.putShort((short) 0);
-		if (info.isRNS())
+		if (info.isRNS()) {
 			acc.put((byte) 1);
-		else
+		} else {
 			acc.put((byte) 0);
+		}
 		acc.finishParameterBlock();
 
 		acc.emptyDataBlock();

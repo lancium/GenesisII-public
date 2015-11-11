@@ -13,12 +13,14 @@ import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.morgan.util.io.StreamUtils;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.ContextHandler;
-import org.mortbay.jetty.security.SslSocketConnector;
 import org.oasis_open.wsn.base.Notify;
 import org.oasis_open.wsn.base.SubscribeResponse;
 import org.w3c.dom.Element;
@@ -54,28 +56,32 @@ public class LightweightNotificationServer
 
 	static final private String URL_PATTERN = "%1$s://%2$s:%3$d/";
 
-	static private SocketConnector createSocketConnector(Integer port)
+	static private SelectChannelConnector createSocketConnector(Integer port)
 	{
-		SocketConnector listener = new SocketConnector();
-
+		SelectChannelConnector listener = new SelectChannelConnector();
 		if (port != null)
 			listener.setPort(port);
+
+		// temp to see if conn refused goes away.
+		// did not help: listener.setAcceptors(16);
 
 		return listener;
 	}
 
-	static private SocketConnector createSslSocketConnector(Integer port, String keystore, String keystoreType, String password,
+	static private SelectChannelConnector createSslSocketConnector(Integer port, String keystore, String keystoreType, String password,
 		String keyPassword)
 	{
-		SslSocketConnector listener = new SslSocketConnector();
+		SslContextFactory factory = new SslContextFactory();
+		factory.setKeyStorePath(keystore);
+		factory.setKeyStoreType(keystoreType);
+		factory.setKeyStorePassword(keyPassword);
+		factory.setKeyManagerPassword(password);
 
-		if (port != null)
+		SelectChannelConnector listener = new SslSelectChannelConnector(factory);
+
+		if (port != null) {
 			listener.setPort(port);
-
-		listener.setKeystore(keystore);
-		listener.setKeystoreType(keystoreType);
-		listener.setKeyPassword(keyPassword);
-		listener.setPassword(password);
+		}
 
 		return listener;
 	}
@@ -83,7 +89,7 @@ public class LightweightNotificationServer
 	private class NotificationJettyHandler extends AbstractHandler
 	{
 		@Override
-		public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) throws IOException,
+		public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException,
 			ServletException
 		{
 			InputStream in = null;
@@ -91,6 +97,8 @@ public class LightweightNotificationServer
 			try {
 				in = request.getInputStream();
 				SOAPMessage msg = MessageFactory.newInstance().createMessage(null, in);
+				// drop the stream as soon as we can.
+				StreamUtils.close(in);
 				SOAPBody body = msg.getSOAPBody();
 				Element notifyElement = (Element) body.getFirstChild();
 				Notify notify = (Notify) ObjectDeserializer.toObject(notifyElement, Notify.class);
@@ -159,9 +167,9 @@ public class LightweightNotificationServer
 		return handler;
 	}
 
-	private LightweightNotificationServer(SocketConnector listener)
+	private LightweightNotificationServer(SelectChannelConnector listener)
 	{
-		_protocol = (listener instanceof SslSocketConnector) ? Protocols.https : Protocols.http;
+		_protocol = (listener instanceof SslSelectChannelConnector) ? Protocols.https : Protocols.http;
 
 		_httpServer = new Server();
 

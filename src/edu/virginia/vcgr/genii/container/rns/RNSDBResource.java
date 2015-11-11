@@ -10,11 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -29,6 +32,8 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class RNSDBResource extends BasicDBResource implements IRNSResource
 {
+	static private Log _logger = LogFactory.getLog(RNSDBResource.class);
+
 	static private final String _ADD_ENTRY_STATEMENT = "INSERT INTO entries (resourceid, name, endpoint, id, attrs, endpoint_id) "
 		+ "VALUES(?, ?, ?, ?, ?, ?)";
 	static private final String _SELECT_ENTRIES_STMT = "SELECT name FROM entries WHERE resourceid = ?";
@@ -99,7 +104,11 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 				stmt.setString(2, name);
 			}
 			stmt.setString(1, _resourceKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("listentries time is " + (System.currentTimeMillis()-startTime));
+		
 
 			while (rs.next()) {
 				ret.add(rs.getString(1));
@@ -155,7 +164,11 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			}
 
 			stmt1.setString(1, _resourceKey);
+			long startTime = System.currentTimeMillis();
 			rs1 = stmt1.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("retrievebyentrieds time is " + (System.currentTimeMillis()-startTime));
+			
 
 			Map<String, EndpointReferenceType> entriesWithMissingResourceKeys = new HashMap<String, EndpointReferenceType>();
 
@@ -231,7 +244,11 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		try {
 			stmt = _connection.prepareStatement(_RETRIEVE_COUNT_STMT);
 			stmt.setString(1, _resourceKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("retrieve count time is " + (System.currentTimeMillis()-startTime));
+			
 
 			if (rs.next())
 				count = rs.getInt(1);
@@ -270,7 +287,11 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			}
 
 			stmt.setString(1, _resourceKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("retrieve id time is " + (System.currentTimeMillis()-startTime));
+			
 
 			if (isBatch) {
 				while (rs.next()) {
@@ -323,7 +344,11 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			stmt = connection.prepareStatement(_RETRIEVE_ENTRY_FROM_ID);
 			// stmt.setString(1, _resourceKey);
 			stmt.setString(1, id);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("retrieve by index time is " + (System.currentTimeMillis()-startTime));
+			
 
 			if (rs.next()) {
 

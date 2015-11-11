@@ -1057,14 +1057,20 @@ public class RNSPath implements Serializable, Cloneable
 
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 		try {
+			String currdir = pwd();
 			if (EPRUtils.isCommunicable(_cachedEPR)) {
 				GeniiCommon common = createProxy(_cachedEPR, GeniiCommon.class);
+				if (_logger.isDebugEnabled())
+					_logger.debug("about to call destroy on " + currdir);
 				common.destroy(new Destroy());
 			}
 
 			EnhancedRNSPortType rpt = createProxy(parentEPR, EnhancedRNSPortType.class);
 			RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
+			if (_logger.isDebugEnabled())
+				_logger.debug("about to call remove on " + currdir);
 			proxy.remove(getName());
+
 			_cachedEPR = null;
 			_attemptedResolve = true;
 		} catch (RemoteException re) {

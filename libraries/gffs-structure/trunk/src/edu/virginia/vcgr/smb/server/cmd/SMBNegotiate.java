@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.smb.server.FileTime;
 import edu.virginia.vcgr.smb.server.SMBBuffer;
 import edu.virginia.vcgr.smb.server.SMBCommand;
@@ -14,6 +17,8 @@ import edu.virginia.vcgr.smb.server.SMBHeader;
 
 public class SMBNegotiate implements SMBCommand
 {
+	static private Log _logger = LogFactory.getLog(SMBNegotiate.class);
+
 	public static final int CAP_RAW_MODE = 0x1;
 	public static final int CAP_MPX_MODE = 0x2;
 	public static final int CAP_UNICODE = 0x4;
@@ -43,13 +48,20 @@ public class SMBNegotiate implements SMBCommand
 
 		for (int idx = 0; data.remaining() > 0; idx++) {
 			String dialect = data.getOEMString();
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("dialect[" + idx + "]=" + dialect);
+
 			if (dialect.equalsIgnoreCase("PCLAN1.0") || dialect.equalsIgnoreCase("PC NETWORK PROGRAM 1.0")) {
 				core = idx;
-			} else if (dialect.equalsIgnoreCase("LANMAN1.0")) {
+			} else if (dialect.equalsIgnoreCase("LANMAN1.0") || dialect.equalsIgnoreCase("NT LANMAN1.0")) {
 				LM10 = idx;
-			} else if (dialect.equalsIgnoreCase("LANMAN1.2")) {
+			} else if (dialect.equalsIgnoreCase("LANMAN1.2") || dialect.equalsIgnoreCase("LANMAN1.2X002")) {
 				LM12 = idx;
-			} else if (dialect.equalsIgnoreCase("LM1.2X002")) {
+			} else if (dialect.equalsIgnoreCase("LANMAN2.1") || dialect.equalsIgnoreCase("DOS LANMAN2.1")) {
+				LM21 = idx;
+			} else if (dialect.equalsIgnoreCase("LM1.2X002") || dialect.equalsIgnoreCase("SMB 2.002")
+				|| dialect.equalsIgnoreCase("SMB 2.???")) {
 				LM20 = idx;
 			} else if (dialect.equalsIgnoreCase("LANMAN2.1")) {
 				LM21 = idx;
@@ -66,20 +78,78 @@ public class SMBNegotiate implements SMBCommand
 		// LM12 = -1;
 		// LM10 = -1;
 
-		if (NTLM != -1) {
+		if (LM10 != -1 || LM12 != -1 || LM20 != -1 || LM21 != -1) {
+			int select;
+			if (LM21 != -1) {
+				_logger.debug("smb choosing NTLM version 2.1 dialect");
+				select = LM21;
+				c.setDialect(SMBDialect.LM21);
+			} else if (LM20 != -1) {
+				_logger.debug("smb choosing NTLM version 2.0 dialect");
+				select = LM20;
+				c.setDialect(SMBDialect.LM20);
+			} else if (LM12 != -1) {
+				_logger.debug("smb choosing NTLM version 1.2 dialect");
+				select = LM12;
+				c.setDialect(SMBDialect.LM12);
+			} else {
+				_logger.debug("smb choosing NTLM version 1.0 dialect");
+				select = LM10;
+				c.setDialect(SMBDialect.LM10);
+			}
+
+			acc.startParameterBlock();
+			acc.putShort((short) select);
+			acc.putShort((short) 0);
+
+			// Max buffer size
+			acc.putShort((short) 0xffff);
+
+			// Max Mpx Count; number of simultaneous requests
+			acc.putShort((short) 0xffff);
+			// hmmm: adjusted to 50 to see if makes a difference. not helping.
+
+			// Max VCs; number of setups per individual connection
+			// future: maybe force 1
+			acc.putShort((short) 0xffff);
+			// hmmm: upped this also to see if helps with windows hoseups. did not help
+
+			// Support for write raw and read raw
+			acc.putShort((short) 0);
+			acc.putShort((short) 0);
+			acc.putShort((short) 0);
+			acc.putShort((short) 0);
+			acc.putShort((short) 0);
+			acc.putShort((short) 0);
+			acc.putShort((short) 0);
+			acc.putShort((short) 0);
+			acc.finishParameterBlock();
+
+			acc.emptyDataBlock();
+
+			c.sendSuccess(h, acc);
+		} else if (NTLM != -1) {
+			_logger.debug("smb choosing NTLM dialect");
+
 			long millis = new Date().getTime();
 
 			c.setDialect(SMBDialect.NTLM);
 
 			acc.startParameterBlock();
 			acc.putShort((short) NTLM);
+
 			// Share-level; no authentication
 			acc.put((byte) 0);
+
 			// Max Mpx Count; number of simultaneous requests
 			acc.putShort((short) 0xffff);
+			// hmmm: upgraded to 50 to see it that helps. nope.
+
 			// Max VCs; number of setups per individual connection.
 			// future: maybe force 1
 			acc.putShort((short) 0xffff);
+			// hmmm: upped this also to see if helps with windows hoseups. did not help.
+
 			// Max buffer size
 			acc.putInt(0x20000);
 			// Max raw size
@@ -101,47 +171,9 @@ public class SMBNegotiate implements SMBCommand
 			acc.finishDataBlock();
 
 			c.sendSuccess(h, acc);
-		} else if (LM10 != -1 || LM12 != -1 || LM20 != -1 || LM21 != -1) {
-			int select;
-			if (LM21 != -1) {
-				select = LM21;
-				c.setDialect(SMBDialect.LM21);
-			} else if (LM20 != -1) {
-				select = LM20;
-				c.setDialect(SMBDialect.LM20);
-			} else if (LM12 != -1) {
-				select = LM12;
-				c.setDialect(SMBDialect.LM12);
-			} else {
-				select = LM10;
-				c.setDialect(SMBDialect.LM10);
-			}
-
-			acc.startParameterBlock();
-			acc.putShort((short) select);
-			acc.putShort((short) 0);
-			// Max buffer size
-			acc.putShort((short) 0xffff);
-			// Max Mpx Count; number of simultaneous requests
-			acc.putShort((short) 0xffff);
-			// Max VCs; number of setups per individual connection
-			// future: maybe force 1
-			acc.putShort((short) 0xffff);
-			// Support for write raw and read raw
-			acc.putShort((short) 0);
-			acc.putShort((short) 0);
-			acc.putShort((short) 0);
-			acc.putShort((short) 0);
-			acc.putShort((short) 0);
-			acc.putShort((short) 0);
-			acc.putShort((short) 0);
-			acc.putShort((short) 0);
-			acc.finishParameterBlock();
-
-			acc.emptyDataBlock();
-
-			c.sendSuccess(h, acc);
 		} else if (core != -1) {
+			_logger.debug("smb choosing 'core' dialect");
+
 			c.setDialect(SMBDialect.CORE);
 
 			acc.startParameterBlock();
@@ -152,6 +184,8 @@ public class SMBNegotiate implements SMBCommand
 
 			c.sendSuccess(h, acc);
 		} else {
+			_logger.debug("smb failed to choose any offered dialect");
+
 			acc.startParameterBlock();
 			acc.putShort((short) -1);
 			acc.finishParameterBlock();

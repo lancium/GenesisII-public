@@ -34,7 +34,7 @@ public class SMBSetInformation implements SMBCommand
 		RNSPath path = tree.lookup(fileName, h.isCaseSensitive());
 		SMBFile fd = SMBTree.open(path, 0, false, false, false);
 		fd.setAttr(fileAttr);
-		if (!writeTime.isZero())
+		if (!writeTime.isZero() && !writeTime.isMax())
 			fd.setWriteTime(writeTime.toMillis());
 
 		acc.emptyParamBlock();

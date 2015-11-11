@@ -129,6 +129,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 		out.writeObject(_historyToken);
 		out.writeObject(_besName);
 		out.writeObject(_historyKey);
+		// we still have to add and remove the context, even though it's unused.
 		out.writeObject(new LoggingContext());
 	}
 
@@ -138,6 +139,8 @@ public class BESActivityTerminatorActor implements OutcallActor
 		_historyToken = (HistoryEventToken) in.readObject();
 		_besName = (String) in.readObject();
 		_historyKey = (String) in.readObject();
+		// we still have to add and remove the context, even though it's unused.
+		@SuppressWarnings("unused")
 		LoggingContext context = (LoggingContext) in.readObject();
 	}
 

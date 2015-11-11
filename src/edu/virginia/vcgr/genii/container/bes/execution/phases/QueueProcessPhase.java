@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,10 @@ import edu.virginia.vcgr.genii.client.bes.ExitCondition;
 import edu.virginia.vcgr.genii.client.bes.NormalExit;
 import edu.virginia.vcgr.genii.client.bes.SignaledExit;
 import edu.virginia.vcgr.genii.client.bes.Signals;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.ResourceConstraints;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
@@ -31,14 +35,15 @@ import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
-import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
-import edu.virginia.vcgr.genii.client.jsdl.personality.common.ResourceConstraints;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
+import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
+import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
@@ -134,6 +139,17 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 		setExportedEnvironment(_environment);
 		history.createDebugWriter("Activity Environment Set").format("Activity environment set to %s", _environment).close();
+		
+		// ASG 2015-11-05. Updated to get a nice log message 
+		ICallingContext callContext = context.getCallingContext();
+
+		String prefId = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
+		X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(callContext, prefId);
+		String userName = CredentialWallet.extractUsername(owner);
+		if (userName==null) userName="UnKnown";
+
+		
+		// End of updates
 
 		synchronized (_phaseShiftLock) {
 			if (_terminate != null && _terminate.booleanValue()) {
@@ -171,7 +187,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null), fileToPath(
 							_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
 
-				_logger.info(String.format("Queue submitted job '%s' using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()));
+				_logger.info(String.format("Queue submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,_jobToken.getCmdLine()));
 				history.createTraceWriter("Job Queued into Batch System")
 					.format("BES submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()).close();
 

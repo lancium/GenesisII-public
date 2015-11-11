@@ -18,6 +18,7 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements IRes
 		+ "CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
 
 	static private String _CREATE_ENTRY_INDEX_STMT = "CREATE INDEX idx ON entries (id)";
+	static private String _CREATE_ENTRY_INDEX2_STMT = "CREATE INDEX idx2 ON entries (endpoint_id)";
 
 	// the endpoint_id was not in the original RNS entries table. We have added this to facilitate
 	// subscription based client-side metadata caching. To support online migration this column has
@@ -50,6 +51,7 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements IRes
 			DatabaseTableUtils.createTables(conn, false, _CREATE_ENTRY_TABLE_STMT);
 			DatabaseTableUtils.addColumns(conn, false, _ADD_ENDPOINT_ID_COLUMN_STMT);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_ENTRY_INDEX_STMT);
+			DatabaseTableUtils.createTables(conn, false, _CREATE_ENTRY_INDEX2_STMT);
 			conn.commit();
 		} finally {
 			_pool.release(conn);

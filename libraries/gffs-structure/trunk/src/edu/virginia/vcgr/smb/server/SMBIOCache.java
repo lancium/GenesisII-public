@@ -3,10 +3,15 @@ package edu.virginia.vcgr.smb.server;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 
 public class SMBIOCache
 {
+	static private Log _logger = LogFactory.getLog(SMBIOCache.class);
+
 	// 16 MB
 	private static final int XFER_LOG_SIZE = 24;
 	private static final int XFER_SIZE = (1 << XFER_LOG_SIZE);
@@ -16,6 +21,12 @@ public class SMBIOCache
 
 	private class Waiter extends Thread
 	{
+		Waiter()
+		{
+			if (_logger.isDebugEnabled())
+				_logger.debug("creating a new waiter thread");
+		}
+		
 		public void run()
 		{
 			try {
@@ -67,13 +78,20 @@ public class SMBIOCache
 
 	private ByteBuffer slice(int pos, int len)
 	{
-		ByteBuffer ret = cached.slice();
-		ret.position(pos);
-		if (pos + len > readAvail)
-			ret.limit(readAvail);
-		else
-			ret.limit(len + pos);
-		return ret;
+		if (_logger.isDebugEnabled())
+			_logger.debug("slice: pos=" + pos + " len=" + len);
+		try {
+			ByteBuffer ret = cached.slice();
+			ret.position(pos);
+			if (pos + len > readAvail)
+				ret.limit(readAvail);
+			else
+				ret.limit(len + pos);
+			return ret;
+		} catch (Throwable t) {
+			_logger.error("failed in slice with exception", t);
+			return null;
+		}
 	}
 
 	public SMBIOCache(RandomByteIOTransferer transferer)
@@ -126,6 +144,9 @@ public class SMBIOCache
 
 	private void doLoadBlock(long block) throws SMBException
 	{
+		if (_logger.isDebugEnabled())
+			_logger.debug("doLoadBlock loading block=" + block);
+		
 		synchronized (cached) {
 			// data must be flushed now
 			doFlushAsync();
@@ -225,14 +246,27 @@ public class SMBIOCache
 		long startOff = off - (startBlock << XFER_LOG_SIZE);
 		long endOff = off + size - (endBlock << XFER_LOG_SIZE);
 
+		if (_logger.isDebugEnabled())
+			_logger.debug("smb data remaining in buff=" + size + " endOffset=" + endOff);
+		
+		if (size <= 0) {
+			// no data is left to read.
+			if (_logger.isDebugEnabled())
+				_logger.debug("bailing out of smb cache read since no data left");
+			return 0;
+		}
+		
 		while (true) {
 			if (startBlock == curBlock && endBlock == curBlock) {
 				// Fits completely
 				synchronized (cached) {
 					ByteBuffer place = slice((int) startOff, size);
+					if (place == null) {
+						_logger.error("failed to call slice and get byte buffer A");
+						break;
+					}
 					data.put(place);
 				}
-
 				break;
 			} else if (startBlock == curBlock) {
 				// Spans forward boundary
@@ -241,6 +275,10 @@ public class SMBIOCache
 
 				synchronized (cached) {
 					ByteBuffer first = slice((int) startOff, (int) firstSize);
+					if (first == null) {
+						_logger.error("failed to call slice and get byte buffer B");
+						break;
+					}
 					data.put(first);
 				}
 
@@ -257,6 +295,10 @@ public class SMBIOCache
 				tmp.position((int) secondSize);
 				synchronized (cached) {
 					ByteBuffer first = slice((int) startOff, (int) firstSize);
+					if (first == null) {
+						_logger.error("failed to call slice and get byte buffer C");
+						break;
+					}
 					tmp.put(first);
 				}
 
@@ -276,6 +318,8 @@ public class SMBIOCache
 	{
 		try {
 			transferer.truncAppend(size, new byte[0]);
+			// hmmm: this was jumping to curBlock, but that could be past end of the file after truncate, so we jump back to just after the write.
+			curBlock = size >> XFER_LOG_SIZE;
 			doLoadBlock(curBlock);
 		} catch (RemoteException e) {
 			throw new SMBException(NTStatus.ACCESS_DENIED);

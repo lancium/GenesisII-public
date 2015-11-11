@@ -28,17 +28,24 @@ public class Config
 		return _client;
 	}
 
-	static private MessageContext _cached = null;
+	// static private MessageContext _cached = null;
 
 	static public MessageContext getContext()
 	{
-		synchronized (Config.class) {
-			if (_cached == null) {
-				_cached = new MessageContext(getClientEngine());
-				_cached.setEncodingStyle("");
-				_cached.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE);
-			}
+
+		// hmmm: super speculative but who thinks that it's okay to stash a static context once and then reuse it a bunch? not this guy.
+		MessageContext toReturn = MessageContext.getCurrentContext();
+		if (toReturn == null) {
+			toReturn = new MessageContext(getClientEngine());
+			toReturn.setEncodingStyle("");
+			toReturn.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE);
 		}
-		return _cached;
+
+		return toReturn;
+
+		/*
+		 * synchronized (Config.class) { if (_cached == null) { _cached = new MessageContext(getClientEngine()); _cached.setEncodingStyle("");
+		 * _cached.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE); } } return _cached;
+		 */
 	}
 }

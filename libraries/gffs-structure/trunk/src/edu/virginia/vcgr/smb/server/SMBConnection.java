@@ -87,6 +87,10 @@ public class SMBConnection implements Runnable
 		// LM10 (0x22 - 0x2F)
 		commands[0x22] = new SMBSetInformation2();
 		commands[0x23] = new SMBQueryInformation2();
+		
+		//commands [0x25] = ...?  this is asked for a lot and we do not implement.
+		//it wants SMB_COM_TRANSACTION 
+			
 		commands[0x2B] = new SMBEcho();
 		commands[0x2D] = new SMBOpenAndX();
 		commands[0x2E] = new SMBReadAndX();
@@ -326,10 +330,13 @@ public class SMBConnection implements Runnable
 
 		/* Locate the command handler */
 		SMBCommand handler = commands[command];
-		_logger.trace("Handling command " + command);
 		if (handler == null) {
+			_logger.warn("failed to find handler for command!  cmd=0x" + Integer.toHexString(command));
 			sendError(h, acc, NTStatus.NOT_IMPLEMENTED);
 			return;
+		}
+		if (_logger.isDebugEnabled()) {
+			_logger.debug("Handling command 0x" + Integer.toHexString(command) + " with handler " + handler.getClass().getName());
 		}
 
 		try {
@@ -343,6 +350,8 @@ public class SMBConnection implements Runnable
 			handler.execute(this, h, params, data, message, acc);
 		} catch (SMBException e) {
 			acc.position(fix);
+			if (_logger.isDebugEnabled())
+				_logger.debug("returning error condition: " + e.getMessage());
 			sendError(h, acc, e.getStatus());
 			return;
 		} catch (IndexOutOfBoundsException e) {
@@ -374,10 +383,15 @@ public class SMBConnection implements Runnable
 
 		/* Locate the command handler */
 		SMBCommand handler = commands[command];
-		_logger.trace("Handling command " + command);
+		
 		if (handler == null) {
+			_logger.warn("failed to find handler for command!  cmd=0x" + Integer.toHexString(command));
 			sendError(h, acc, NTStatus.NOT_IMPLEMENTED);
 			return;
+		}
+		
+		if (_logger.isDebugEnabled()) {
+			_logger.debug("Handling command (AndX) 0x" + Integer.toHexString(command) + " with handler " + handler.getClass().getName());
 		}
 
 		// Remember the position so we can undo any changes if an exception occurs
@@ -396,6 +410,8 @@ public class SMBConnection implements Runnable
 			handler.execute(this, h, params, data, message, acc);
 		} catch (SMBException e) {
 			acc.position(fix);
+			if (_logger.isDebugEnabled())
+				_logger.debug("returning error condition: " + e.getMessage());
 			sendError(h, acc, e.getStatus());
 		} catch (IndexOutOfBoundsException e) {
 			acc.position(fix);
@@ -433,7 +449,8 @@ public class SMBConnection implements Runnable
 			return false;
 		}
 
-		_logger.trace("Receiving packet of size " + length);
+		if (_logger.isTraceEnabled())
+			_logger.trace("Receiving packet of size " + length);
 
 		/* Now the actual SMB packet */
 		ByteBuffer packet = ByteBuffer.allocate(length);
@@ -451,7 +468,8 @@ public class SMBConnection implements Runnable
 			return false;
 		}
 
-		if (_logger.isDebugEnabled())
+		// far too noisy for normal debugging sessions.
+		if (_logger.isTraceEnabled())
 			_logger.debug("got smb request with header: " + header);
 
 		doCommand(header, header.command, buffer);

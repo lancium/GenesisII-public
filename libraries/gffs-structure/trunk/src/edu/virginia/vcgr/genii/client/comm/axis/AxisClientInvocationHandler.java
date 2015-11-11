@@ -13,20 +13,20 @@
 package edu.virginia.vcgr.genii.client.comm.axis;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -35,14 +35,13 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.SimpleChain;
 import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Stub;
-import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.types.URI;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
@@ -52,7 +51,6 @@ import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.ClientProperties;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.NotificationMessageIndexProcessor;
@@ -64,6 +62,9 @@ import edu.virginia.vcgr.genii.client.comm.MethodDescription;
 import edu.virginia.vcgr.genii.client.comm.ResolutionContext;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.comm.axis.AxisServiceAndStubTracking.AcquiredStubRecord;
+import edu.virginia.vcgr.genii.client.comm.axis.AxisServiceAndStubTracking.AcquiredStubsList;
+import edu.virginia.vcgr.genii.client.comm.axis.AxisServiceAndStubTracking.ServiceRecord;
 import edu.virginia.vcgr.genii.client.comm.axis.security.ISecurityRecvHandler;
 import edu.virginia.vcgr.genii.client.comm.axis.security.ISecuritySendHandler;
 import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurity;
@@ -87,30 +88,26 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.utils.DetailedLogger;
 import edu.virginia.vcgr.genii.context.ContextType;
-import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
-import edu.virginia.vcgr.genii.security.x509.CertTool;
 
+/**
+ * manages RPC calls using our defined axis services. handles resolution and replication issues also.
+ */
 public class AxisClientInvocationHandler implements InvocationHandler, IFinalInvoker
 {
-	static private Log _logger = LogFactory.getLog(AxisClientInvocationHandler.class);
-
-	private static final String STUB_CONFIGURED = "edu.virginia.vcgr.genii.client.security.stub-configured";
+	static Log _logger = LogFactory.getLog(AxisClientInvocationHandler.class);
 
 	static private MessageLevelSecurityRequirements __minClientMessageSec = null;
 
-	static public String WSDD_CLIENT_CONFIGURATION_FILE = "web-service-client-config.wsdd";
-
-	// records how many rpcs are ongoing right now.
+	// records how many rpcs are going on right now.
 	static private volatile Integer _activeClients = 0;
 
-	/**
-	 * add linkage to wipe our loaded config stuff in the event the config manager reloads.
-	 */
 	static {
+		/*
+		 * add linkage to wipe our loaded config stuff in the event the config manager reloads.
+		 */
 		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
 	}
 
@@ -130,7 +127,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	private Integer _timeout = null;
 
 	private ICallingContext _callContext;
-	private X509Certificate _resourceCert;
 
 	private AttachmentType _attachmentType = AttachmentType.DIME;
 	private Collection<GeniiAttachment> _outAttachments = null;
@@ -139,25 +135,28 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	private HashMap<MethodDescription, Object> _portMethods = new HashMap<MethodDescription, Object>();
 
+	// locators are the "types" of classes that we can instantiate services for.
 	private Class<?>[] _locators = null;
 	private AxisClientInvocationHandler _parentHandler = null;
-	private FileProvider _providerConfig = null;
 
-	// cache of signed, serialized delegation assertions
-	static private int VALIDATED_CERT_CACHE_SIZE = 32;
-	static private LRUCache<X509Certificate, Boolean> validatedCerts = new LRUCache<X509Certificate, Boolean>(VALIDATED_CERT_CACHE_SIZE);
+	private URL _serviceURL = null;
 
-	public AxisClientInvocationHandler(Class<?> locator, EndpointReferenceType epr, ICallingContext callContext) throws ResourceException,
-		GenesisIISecurityException
-	{
-		this(new Class[] { locator }, epr, callContext);
-	}
+	/*
+	 * these are the stubs we need to release when done with our call. note that this list is not synchronized because it is not static and is
+	 * a member of the axis client invocation object, which is always created anew for each rpc.
+	 */
+	private AcquiredStubsList _acquiredStubs = new AcquiredStubsList();
 
+	/**
+	 * constructs a handler for rpc calls using the "locators" list of classes to create axis services connecting to the "epr" (host, port,
+	 * container id).
+	 */
 	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext) throws ResourceException,
 		GenesisIISecurityException
 	{
-		try {
+		AxisServiceAndStubTracking.recordHandlerCreationAndTakeOutTrashIfAppropriate();
 
+		try {
 			_epr = epr;
 
 			if (callContext == null) {
@@ -169,8 +168,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 			// create the locator and add the methods to our list.
 			for (Class<?> locator : locators) {
-				Object locatorInstance = createLocatorInstance(locator);
-				addMethods(locatorInstance, epr);
+				ServiceRecord reco = AxisServiceAndStubTracking.createServiceInstance(locator);
+				addMethods(reco);
 			}
 		} catch (IOException ioe) {
 			throw new ResourceException("Error creating secure client stub: " + ioe.getMessage(), ioe);
@@ -214,22 +213,17 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	public synchronized void configureSecurity(Stub stubInstance) throws GenesisIISecurityException, GeneralSecurityException,
 		ResourceException
 	{
-		if (stubInstance._getProperty(STUB_CONFIGURED) != null) {
+		Object confProp = stubInstance._getProperty(AxisServiceAndStubTracking.STUB_CONFIGURED);
+		if ((confProp != null) && (confProp.toString() != "")) {
+			// this one is already configured.
 			return;
 		}
-		stubInstance._setProperty(STUB_CONFIGURED, STUB_CONFIGURED);
+		stubInstance._setProperty(AxisServiceAndStubTracking.STUB_CONFIGURED, AxisServiceAndStubTracking.STUB_CONFIGURED);
+
+		// new call to turn on session tracking, and hopefully provide better performance.
+		stubInstance.setMaintainSession(true);
+
 		stubInstance._setProperty("attachments.implementation", "org.apache.axis.attachments.AttachmentsImpl");
-
-		X509Certificate[] chain = EPRUtils.extractCertChain(_epr);
-		if ((chain != null) && _logger.isTraceEnabled()) {
-			int which = 0;
-			for (X509Certificate cert : chain) {
-				if (_logger.isTraceEnabled())
-					_logger.trace("got chain[" + which++ + "] for epr as: " + cert.getSubjectDN());
-			}
-		}
-
-		URI epi = EPRUtils.extractEndpointIdentifier(_epr);
 
 		// determine the level of message security we need
 		MessageLevelSecurityRequirements minClientMessageSec = getMinClientMessageSec();
@@ -241,34 +235,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		// perform resource-AuthN as specified in the client config file
 		try {
-			if (chain == null) {
-				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " does not contain a certificate chain.");
-			}
-			_resourceCert = chain[0];
-
-			synchronized (validatedCerts) {
-				if (!validatedCerts.containsKey(_resourceCert)) {
-					// make sure the epi's match
-					String certEpi = CertTool.getSN(chain[0]);
-					if (!certEpi.equals(epi.toString())) {
-						throw new GenesisIISecurityException("EPI for " + _epr.getAddress().toString() + " (" + epi.toString()
-							+ ") does not match that in the certificate (" + certEpi + ")");
-					}
-
-					// run it through the trust manager
-					boolean okay = CertificateValidatorFactory.getValidator().validateIsTrustedResource(chain);
-					if (!okay) {
-						/*
-						 * we throw an exception so that we can either bail out, or just warn about it.
-						 */
-						// but we warn very quietly these days.
-						throw new AuthZSecurityException("failed to validate cert chain: " + chain[0].getSubjectDN());
-					}
-
-					// insert into valid certs cache
-					validatedCerts.put(_resourceCert, Boolean.TRUE);
-				}
-			}
+			AxisServiceAndStubTracking.validateCertificateChain(_epr);
 		} catch (Exception e) {
 			if (minClientMessageSec.isWarn()) {
 				/*
@@ -282,18 +249,26 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		}
 
-		/* prepare a message security datastructure for the message context if needed. */
-		MessageSecurity msgSecData = new MessageSecurity(neededMsgSec, chain, epi);
-		if (msgSecData != null) {
-			stubInstance._setProperty(CommConstants.MESSAGE_SEC_CALL_DATA, msgSecData);
-		}
+		/*
+		 * prepare a message security data structure for the message context.
+		 */
+		MessageSecurity msgSecData = null;
+		X509Certificate[] chain = EPRUtils.extractCertChain(_epr);
+		URI epi = EPRUtils.extractEndpointIdentifier(_epr);
+		msgSecData = new MessageSecurity(neededMsgSec, chain, epi);
+		stubInstance._setProperty(CommConstants.MESSAGE_SEC_CALL_DATA, msgSecData);
 
 		try {
+			ServiceRecord reco = _acquiredStubs.getServiceRecordForStub(stubInstance);
+			if (reco == null) {
+				throw new AuthZSecurityException("failed to load service record for stub!  stub is: " + stubInstance);
+			}
+
 			/*
 			 * configure the send handler(s), working backwards so as to set the last one that actually does work to serialize the message.
 			 */
 			ArrayList<ISecuritySendHandler> sendHandlers =
-				getHandler((SimpleChain) _providerConfig.getGlobalRequest(), ISecuritySendHandler.class);
+				getHandler((SimpleChain) reco._providerConfig.getGlobalRequest(), ISecuritySendHandler.class);
 			boolean serializerFound = false;
 			for (int i = sendHandlers.size() - 1; i >= 0; i--) {
 				ISecuritySendHandler h = sendHandlers.get(i);
@@ -305,11 +280,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 			// configure the recv handler(s)
 			ArrayList<ISecurityRecvHandler> recvHandlers =
-				getHandler((SimpleChain) _providerConfig.getGlobalResponse(), ISecurityRecvHandler.class);
+				getHandler((SimpleChain) reco._providerConfig.getGlobalResponse(), ISecurityRecvHandler.class);
 			for (ISecurityRecvHandler h : recvHandlers) {
 				h.configure(_callContext);
 			}
-
 		} catch (Exception e) {
 			throw new ResourceException("Unable to configure security: " + e.getMessage(), e);
 		}
@@ -317,50 +291,88 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	private AxisClientInvocationHandler cloneHandlerForNewEPR(EndpointReferenceType epr) throws ResourceException, GenesisIISecurityException
 	{
-		AxisClientInvocationHandler newHandler = new AxisClientInvocationHandler(_locators, epr, _callContext);
-		if (_outAttachments != null)
-			newHandler._outAttachments = new LinkedList<GeniiAttachment>(_outAttachments);
-		newHandler._attachmentType = _attachmentType;
-		newHandler._parentHandler = this;
-		return newHandler;
-	}
-
-	private Object createLocatorInstance(Class<?> loc) throws ResourceException
-	{
 		try {
-			Constructor<?> cons = loc.getConstructor(org.apache.axis.EngineConfiguration.class);
-			_providerConfig = new FileProvider(WSDD_CLIENT_CONFIGURATION_FILE);
-			Object retval = cons.newInstance(_providerConfig);
-
-			return retval;
-		} catch (NoSuchMethodException nsme) {
-			throw new ResourceException("Class " + loc.getName() + " does not refer to a known locator class type.", nsme);
-		} catch (Exception e) {
-			throw new ResourceException("Unable to create locator instance: " + e.getMessage(), e);
+			AxisClientInvocationHandler newHandler = new AxisClientInvocationHandler(_locators, epr, _callContext);
+			if (_outAttachments != null)
+				newHandler._outAttachments = new LinkedList<GeniiAttachment>(_outAttachments);
+			newHandler._attachmentType = _attachmentType;
+			newHandler._parentHandler = this;
+			return newHandler;
+		} catch (Throwable t) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Attempt to create new AxisClientInvocationHandle failed.", t);
+			return null;
 		}
 	}
 
-	private void addMethods(Object locatorInstance, EndpointReferenceType epr) throws MalformedURLException, ResourceException
+	@Override
+	public void finalize() throws Throwable
 	{
-		Method locatorPortTypeMethod;
-		URL url = null;
 		try {
-			if (epr.getAddress().get_value().toString().equals(WSName.UNBOUND_ADDRESS))
+			releaseStubs();
+		} finally {
+			super.finalize();
+		}
+	}
+
+	/**
+	 * return all the acquired stubs to the pool. this should at least be called by the finalizer for the class. it may also be called once
+	 * the caller/owner *knows* that the axis RPC call is done and will never be re-attempted or reused.
+	 */
+	private void releaseStubs()
+	{
+		try {
+			_portMethods.clear();
+			_acquiredStubs.releaseAllStubs();
+		} catch (Throwable t) {
+			_logger.error("crashed while releasing stubs!?", t);
+		}
+	}
+
+	private void addMethods(ServiceRecord reco) throws MalformedURLException, ResourceException
+	{
+		try {
+			if (_epr.getAddress().get_value().toString().equals(WSName.UNBOUND_ADDRESS))
 				if (_logger.isDebugEnabled())
 					_logger.debug("Processing unbound address in AxisClientInvocationHandler");
-			url = new URL(epr.getAddress().get_value().toString());
+			_serviceURL = new URL(_epr.getAddress().get_value().toString());
 		} catch (java.net.MalformedURLException mue) {
-			if (epr.getAddress().get_value().toString().equals(WSName.UNBOUND_ADDRESS))
-				url = null;
+			if (_epr.getAddress().get_value().toString().equals(WSName.UNBOUND_ADDRESS))
+				_serviceURL = null;
 			else
 				throw mue;
 		}
-		try {
-			locatorPortTypeMethod = ClientUtils.getLocatorPortTypeMethod(locatorInstance.getClass());
-			Stub stubInstance = (Stub) locatorPortTypeMethod.invoke(locatorInstance, new Object[] { url });
 
-			if (epr != null) {
-				stubInstance._setProperty(CommConstants.TARGET_EPR_PROPERTY_NAME, epr);
+		if (_serviceURL == null) {
+			// this is not a normal thing, so let's bail if there's no url.
+			throw new ResourceException("failed to determine service URL from EPR member!  _epr=" + _epr);
+		}
+
+		try {
+			Stub stubInstance = null;
+
+			Date startStubbing = new Date();
+			stubInstance = AxisServiceAndStubTracking.getStubCache().getStub(reco._service, _serviceURL);
+
+			if (stubInstance != null) {
+				long duration = (new Date()).getTime() - startStubbing.getTime();
+				_acquiredStubs.add(new AcquiredStubRecord(stubInstance, _serviceURL, reco));
+				if (AxisServiceAndStubTracking.enableExtraLogging && _logger.isDebugEnabled())
+					_logger.debug("reusing stub instance " + stubInstance + " for url " + _serviceURL + " took " + duration + " ms");
+			}
+
+			Method locatorPortTypeMethod = ClientUtils.getLocatorPortTypeMethod(reco._service.getClass());
+			if (stubInstance == null) {
+				stubInstance = (Stub) locatorPortTypeMethod.invoke(reco._service, new Object[] { _serviceURL });
+				long duration = (new Date()).getTime() - startStubbing.getTime();
+				if (AxisServiceAndStubTracking.enableExtraLogging && _logger.isDebugEnabled())
+					_logger.debug("creating new stub instance " + stubInstance + " for url " + _serviceURL + " took " + duration + " ms");
+				// add this new stub so it will be released when this object is disposed.
+				_acquiredStubs.add(new AcquiredStubRecord(stubInstance, _serviceURL, reco));
+			}
+
+			if (_epr != null) {
+				stubInstance._setProperty(CommConstants.TARGET_EPR_PROPERTY_NAME, _epr);
 			}
 			if (_callContext != null) {
 				stubInstance._setProperty(CommConstants.CALLING_CONTEXT_PROPERTY_NAME, _callContext);
@@ -373,7 +385,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		} catch (InvocationTargetException ite) {
 			Throwable t = ite;
-			DetailedLogger.detailed().info("addMethods partial handling for exception:" + ExceptionUtils.getStackTrace(t));
+			_logger.error("addMethods saw exception", ite);
 			if (ite.getCause() != null)
 				t = ite.getCause();
 			if (t != null) {
@@ -413,6 +425,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		synchronized (_activeClients) {
 			_activeClients++;
 		}
+
 		try {
 			InvocationInterceptorManager mgr = getManager();
 			toReturn = mgr.invoke(getTargetEPR(), _callContext, this, m, params);
@@ -437,9 +450,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			if (_logger.isDebugEnabled()) {
 				ICallingContext context;
 				try {
-					context = ContextManager.getCurrentContext();
-					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
-					_logger.debug("invocation that was denied has these creds in call context: " + tc.toString());
+					if (_logger.isTraceEnabled()) {
+						context = ContextManager.getCurrentContext();
+						TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
+						_logger.debug("invocation that was denied has these creds in call context: " + tc.toString());
+					}
 				} catch (Exception e2) {
 					String msg2 = "could not load calling context to inspect credentials for failed IDP.";
 					_logger.error(msg2, e2);
@@ -452,6 +467,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				_activeClients--;
 			}
 		}
+
 		return toReturn;
 	}
 
@@ -462,6 +478,15 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			curr = _activeClients;
 		}
 		return curr > 0;
+	}
+
+	static public int getActiveClients()
+	{
+		int curr;
+		synchronized (_activeClients) {
+			curr = _activeClients;
+		}
+		return curr;
 	}
 
 	static private boolean isConnectionException(Throwable cause)
@@ -562,15 +587,35 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	private Object resolveAndInvoke(ResolutionContext context, Method calledMethod, Object[] arguments, int timeout) throws Throwable
 	{
 		AxisClientInvocationHandler handler = null;
-		boolean tryAgain = false;
-		Throwable firstException = null;
+
+		boolean tryAgain = false; // if this flag is true, then at least one failure happened and we will retry with same handler.
+		Throwable firstException = null; // the first exception that occurred during invocation.
+
+		// keep looping until something good happens or something very bad happens.
 		while (true) {
 			try {
-				if (!tryAgain)
+				/*
+				 * if try again flag is true, it means we're giving the current handler another chance. if try again is false, then either
+				 * we're here for the first time or we gave up on the last handler, but we will create a new handler.
+				 */
+				if (!tryAgain) {
+					// come up with a client invocation handler for this context using the resolver.
 					handler = resolve(context);
+				} else {
+					if (handler == null) {
+						String msg = "serious logic error: there was no handler already created for the try again case";
+						_logger.error(msg);
+						throw new AxisFault(msg);
+					}
+				}
 			} catch (Throwable throwable) {
-				if (firstException == null)
+				if (firstException == null) {
 					firstException = throwable;
+				}
+				/*
+				 * it seems that if there's a failure during the resolution process, we blast it out right away. there is no trying again in
+				 * this error case.
+				 */
 				throw firstException;
 			}
 
@@ -581,28 +626,27 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 			boolean alive = DeadHostChecker.evaluateHostAlive(host, port);
 			if (!alive) {
-				// So let's give up in advance
+				// this host is recorded as unhealthy, so let's give up in advance
 				String msg = "Host " + key + " is known to be down, skipping";
 				_logger.error(msg);
 				throw new ConnectException(msg);
 			}
 
-			long startTime = System.currentTimeMillis();
+			long startTime = System.currentTimeMillis(); // invocation start time.
 			try {
-				Object toReturn = handler.doInvoke(calledMethod, arguments, timeout);
+				Object toReturn = null;
+				toReturn = handler.doInvoke(calledMethod, arguments, timeout);
 				// if we got to here, the host is looking pretty healthy.
 				DeadHostChecker.removeHostFromDeadPool(host, port);
 				return toReturn;
 			} catch (Throwable throwable) {
 				long duration = System.currentTimeMillis() - startTime;
 
-				DetailedLogger.detailed().info("resolveAndInvoke partial handling for exception:" + ExceptionUtils.getStackTrace(throwable));
+				_logger.error("resolveAndInvoke saw exception on method " + calledMethod.getName(), throwable);
 				if (throwable instanceof InvocationTargetException) {
 					if (throwable.getCause() != null)
 						throwable = throwable.getCause();
 				}
-				if (_logger.isDebugEnabled())
-					_logger.debug("doInvoke faulted on " + calledMethod.getName(), throwable);
 				if ((throwable instanceof TryAgainFaultType) && (!tryAgain)) {
 					tryAgain = true;
 				} else {
@@ -641,7 +685,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						 * hmmm: why are we automatically considering the host is okay here? have we definitely enumerated all connection
 						 * related exceptions above?
 						 */
-
 						DeadHostChecker.removeHostFromDeadPool(host, port);
 					}
 					// End of ASG deadHosts updates
@@ -656,7 +699,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						 * itself use WS-resources that are destroyed with a cache refresh and invocation of destroy on those resources can
 						 * fail too. Meanwhile, notification management methods are ignored to avoid redundant cache refreshes.
 						 */
-
 						CacheManager.resetCachingForContainer(handler.getTargetEPR());
 					}
 				}
@@ -713,6 +755,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			setInAttachments(inAttachments);
 
 		boolean isGeniiEndpoint = false;
+		boolean supportsShorthand = false;
 		Version endpointVersion = null;
 
 		for (SOAPHeaderElement elem : stubInstance.getResponseHeaders()) {
@@ -736,6 +779,27 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						}
 					}
 				}
+			} else if (name.equals(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_NAME)) {
+				//hmmm: TURNED OFF FOR NOW since this feature is not actually implemented yet.
+				
+//				// found our credential shorthand sentinel header. we will pedanticly check that it's set to true.
+//				org.w3c.dom.Node n = elem.getFirstChild();
+//				if (n != null) {
+//					String text = n.getNodeValue();
+//					if (text != null && text.equalsIgnoreCase("true")) {
+//						supportsShorthand = true;
+//					}
+//					// hmmm: lower this logging.
+//					if (_logger.isDebugEnabled()) {
+//						if (supportsShorthand)
+//							_logger.debug("saw that endpoint supports credential shorthand");
+//						else if (text == null)
+//							_logger
+//								.debug("endpoint says it does not support credential shorthand, although it is generating that soap header!?");
+//						else
+//							_logger.debug("endpoint does not support credential shorthand; it is from the before time.");
+//					}
+//				}
 			} else if (name.equals(NotificationBrokerConstants.MESSAGE_INDEX_QNAME)) {
 				EndpointReferenceType target = getTargetEPR();
 				int messageIndex = Integer.parseInt(elem.getValue());
@@ -743,7 +807,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		}
 
-		_lastEndpointInfo = new GenesisIIEndpointInformation(isGeniiEndpoint, endpointVersion);
+		_lastEndpointInfo = new GenesisIIEndpointInformation(isGeniiEndpoint, endpointVersion, supportsShorthand);
 		return ret;
 	}
 
@@ -789,7 +853,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		try {
 			EndpointReferenceType resolvedEPR = context.resolve();
 			if (resolvedEPR != null) {
-				AxisClientInvocationHandler newHandler = makeNewHandler(resolvedEPR);
+				AxisClientInvocationHandler newHandler = cloneHandlerForNewEPR(resolvedEPR);
 				if (newHandler != null) {
 					return newHandler;
 				}
@@ -798,17 +862,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			throw new NameResolutionFailedException(exception);
 		}
 		throw new NameResolutionFailedException();
-	}
-
-	protected AxisClientInvocationHandler makeNewHandler(EndpointReferenceType resolvedEPR)
-	{
-		try {
-			return cloneHandlerForNewEPR(resolvedEPR);
-		} catch (Throwable t) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("Attempt to create new AxisClientInvocationHandle failed.", t);
-			return null;
-		}
 	}
 
 	public EndpointReferenceType getTargetEPR()

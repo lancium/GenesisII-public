@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.client.configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
-import org.mortbay.jetty.security.SslSocketConnector;
 
 public class SslInformation
 {
@@ -40,16 +39,16 @@ public class SslInformation
 		_keyPassword = properties.getProperty(KeystoreSecurityConstants.Container.SSL_KEY_PASSWORD_PROP);
 	}
 
-	public void configure(ConfigurationManager manager, SslSocketConnector connector)
-	{
-		connector.setKeystore(_keystoreFilename);
-		connector.setKeystoreType(_keystoreType);
-		connector.setPassword(_keystorePassword);
-		connector.setKeyPassword(_keyPassword);
-
-		// request clients to authn with a cert
-		connector.setWantClientAuth(true);
-	}
+	// public void configure(ConfigurationManager manager, SslSocketConnector connector)
+	// {
+	// connector.setKeystore(_keystoreFilename);
+	// connector.setKeystoreType(_keystoreType);
+	// connector.setPassword(_keystorePassword);
+	// connector.setKeyPassword(_keyPassword);
+	//
+	// // request clients to authn with a cert
+	// connector.setWantClientAuth(true);
+	// }
 
 	// simple wrapper for the two strings needed to authorize against kerberos realm.
 	public class KerberosKeytabAndPrincipal

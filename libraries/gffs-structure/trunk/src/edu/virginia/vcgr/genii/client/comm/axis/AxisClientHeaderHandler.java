@@ -96,10 +96,23 @@ public class AxisClientHeaderHandler extends BasicHandler
 				}
 			}
 
+			// add our endpoint qname header, which is also used to signify that this is a genesis 2 endpoint.
 			SOAPHeaderElement isGenesisII = new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME, Boolean.TRUE);
 			isGenesisII.setActor(null);
 			isGenesisII.setMustUnderstand(false);
 			header.addChildElement(isGenesisII);
+
+			//hmmm: NOT ADDING CRED SHORTHAND HEADER YET
+//			/*
+//			 * add in the new header for credential shorthand notation, signifying that the server knows how to reassemble partial credentials
+//			 * from a client when the client has previously presented the whole credential chains.
+//			 */
+//			SOAPHeaderElement supportsShorthand =
+//				new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_QNAME, Boolean.TRUE);
+//			supportsShorthand.setActor(null);
+//			supportsShorthand.setMustUnderstand(false);
+//			header.addChildElement(supportsShorthand);
+
 		} catch (SOAPException se) {
 			throw new AxisFault(se.getLocalizedMessage());
 		}

@@ -2,14 +2,19 @@ package edu.virginia.vcgr.smb.server;
 
 import java.nio.ByteBuffer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
 public abstract class SMBFile
 {
+	static private Log _logger = LogFactory.getLog(SMBFile.class);
+
 	private RNSPath path;
 	private EndpointReferenceType fileEPR;
 	private boolean deletePending;
@@ -34,6 +39,25 @@ public abstract class SMBFile
 
 	public int read(SMBBuffer acc, long off, int len) throws SMBException
 	{
+		if (_logger.isDebugEnabled())
+			_logger.debug("smb read: acc=" + acc + " offset=" + off + " len=" + len);
+		
+		// check that we won't go past end of file.
+		TypeInformation typo = SMBTree.stat(path);
+		long fileSize = typo.getByteIOSize();
+		if (off >= fileSize) {
+			_logger.debug("smb shortcutting read that's past eof (offset).");
+			return 0;
+		}
+		if (off + len > fileSize) {
+			// trim the length a bit.
+			len = (int)(fileSize - off);
+			if (len <= 0) {
+				_logger.debug("smb shortcutting read that's past eof (offset+len).");
+				return 0;
+			}
+		}
+		
 		IO io = getIO();
 
 		ByteBuffer read = acc.slice().prepareBuffer();
@@ -47,6 +71,8 @@ public abstract class SMBFile
 
 	public void write(SMBBuffer out, long off) throws SMBException
 	{
+		if (_logger.isDebugEnabled())
+			_logger.debug("smb write: out=" + out + " offset=" + off);
 		IO io = getIO();
 
 		ByteBuffer write = out.prepareBuffer();

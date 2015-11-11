@@ -73,7 +73,7 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOAttributesUpdateNotification;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOContentsChangedContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
-import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
+import edu.virginia.vcgr.genii.container.axis.ServerAuthorizationManagement;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -533,7 +533,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			// The notification contains the identity of the user who modified the resource.
 			// The identity is delegated to the resource that sent the notification.
 			// The notification is signed by the resource.
-			if (!ServerWSDoAllReceiver.checkAccess(resource, RWXCategory.WRITE)) {
+			if (!ServerAuthorizationManagement.checkAccess(resource, RWXCategory.WRITE)) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("RandomByteIOServiceImpl.notify: permission denied");
 				return NotificationConstants.FAIL;

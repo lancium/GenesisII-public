@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -139,7 +140,11 @@ public class NotificationBrokerDatabase
 		try {
 			stmt = connection.prepareStatement(LOAD_BROKER_STMT);
 			stmt.setString(1, resourceId);
+			long startTime = System.currentTimeMillis();
 			resultSet = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("loadBrokertime is " + (System.currentTimeMillis()-startTime));
+			
 			while (resultSet.next()) {
 				uninitializedInstance.setMode(resultSet.getBoolean("mode"));
 				uninitializedInstance.setMessageIndex(resultSet.getInt("message_index"));
@@ -268,7 +273,11 @@ public class NotificationBrokerDatabase
 			stmt1 = connection.prepareStatement(activeBrokerQuery);
 			stmt1.setLong(1, currentTime);
 			stmt1.setString(2, clientId);
-			resultSet1 = stmt1.executeQuery();
+			long startTime = System.currentTimeMillis();
+			resultSet1= stmt1.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("get brokers time is " + (System.currentTimeMillis()-startTime));
+
 			while (resultSet1.next()) {
 				NotificationBrokerDBResource resource = new NotificationBrokerDBResource(resultSet1.getString("resource_id"), null);
 				resource.setMessageIndex(resultSet1.getInt("message_index"));
@@ -280,7 +289,11 @@ public class NotificationBrokerDatabase
 			stmt2 = connection.prepareStatement(passiveBrokerQuery);
 			stmt2.setLong(1, currentTime);
 			stmt2.setString(2, clientId);
+			startTime = System.currentTimeMillis();
 			resultSet2 = stmt2.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("dgetBrokers2 time is " + (System.currentTimeMillis()-startTime));
+		
 			while (resultSet2.next()) {
 				NotificationBrokerDBResource resource = new NotificationBrokerDBResource(resultSet2.getString("resource_id"), null);
 				resource.setMessageIndex(resultSet2.getInt("message_index"));
@@ -309,7 +322,11 @@ public class NotificationBrokerDatabase
 		try {
 			stmt = connection.prepareStatement(sql);
 			stmt.setString(1, resourceOrClientId);
+			long startTime = System.currentTimeMillis();
 			resultSet = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("get messageindex time is " + (System.currentTimeMillis()-startTime));
+			
 			while (resultSet.next()) {
 				return resultSet.getInt("message_index");
 			}

@@ -23,4 +23,54 @@ public class NTStatus
 	public static final int EAS_NOT_SUPPORTED = 0xC000004F;
 	public static final int OS2_INVALID_LEVEL = 0x007C0001;
 	public static final int FILE_IS_A_DIRECTORY = 0xC00000BA;
+
+	/**
+	 * turns the numerical error status into the corresponding string.
+	 */
+	public static String messageForStatus(int status)
+	{
+		if (status == SUCCESS)
+			return "SUCCESS";
+		if (status == NOT_IMPLEMENTED)
+			return "NOT_IMPLEMENTED";
+		if (status == INVALID_SMB)
+			return "INVALID_SMB";
+		if (status == NO_MORE_FILES)
+			return "NO_MORE_FILES";
+		if (status == INSUFF_SERVER_RESOURCES)
+			return "INSUFF_SERVER_RESOURCES";
+		if (status == SMB_BAD_TID)
+			return "SMB_BAD_TID";
+		if (status == OBJECT_PATH_NOT_FOUND)
+			return "OBJECT_PATH_NOT_FOUND";
+		if (status == ACCESS_DENIED)
+			return "ACCESS_DENIED";
+		if (status == SMB_BAD_FID)
+			return "SMB_BAD_FID";
+		if (status == INTERNAL_ERROR)
+			return "INTERNAL_ERROR";
+		if (status == BUFFER_OVERFLOW)
+			return "BUFFER_OVERFLOW";
+		if (status == OBJECT_NAME_COLLISION)
+			return "OBJECT_NAME_COLLISION";
+		if (status == NO_SUCH_FILE)
+			return "NO_SUCH_FILE";
+		if (status == DATA_ERROR)
+			return "DATA_ERROR";
+		if (status == DIRECTORY_NOT_EMPTY)
+			return "DIRECTORY_NOT_EMPTY";
+		if (status == OS2_NEGATIVE_SEEK)
+			return "OS2_NEGATIVE_SEEK";
+		if (status == END_OF_FILE)
+			return "END_OF_FILE";
+		if (status == INVALID_PARAMETER)
+			return "INVALID_PARAMETER";
+		if (status == EAS_NOT_SUPPORTED)
+			return "EAS_NOT_SUPPORTED";
+		if (status == OS2_INVALID_LEVEL)
+			return "OS2_INVALID_LEVEL";
+		if (status == FILE_IS_A_DIRECTORY)
+			return "FILE_IS_A_DIRECTORY";
+		return "UNKNOWN_ERROR_CODE";
+	}
 }

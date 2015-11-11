@@ -8,6 +8,8 @@ public class SMBException extends Exception
 
 	public SMBException(int ntstatus)
 	{
+		// set the message for later use from our status strings.
+		super(NTStatus.messageForStatus(ntstatus));
 		this.ntstatus = ntstatus;
 	}
 

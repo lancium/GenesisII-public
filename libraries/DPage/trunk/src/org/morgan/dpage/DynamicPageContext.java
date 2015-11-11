@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
 class DynamicPageContext extends AbstractHandler
 {
@@ -27,9 +28,10 @@ class DynamicPageContext extends AbstractHandler
 		_injectionHandlerFactory = injectionHandlerFactory;
 	}
 
+	// hmmm: !!!! not doing anything with the Request object here yet.
 	@Override
-	public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) throws IOException,
-		ServletException
+	public void handle(String target, Request newRequestObjectToHandle, HttpServletRequest request, HttpServletResponse response)
+		throws IOException, ServletException
 	{
 		OutputStream out = null;
 		String targetDirectory;
@@ -71,4 +73,5 @@ class DynamicPageContext extends AbstractHandler
 			StreamUtils.close(out);
 		}
 	}
+
 }

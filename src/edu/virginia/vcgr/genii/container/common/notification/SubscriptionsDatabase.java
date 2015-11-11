@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -119,8 +120,10 @@ public class SubscriptionsDatabase
 		try {
 			stmt = connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions " + "WHERE publisherresourcekey = ?");
 			stmt.setString(1, publisherKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
-
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("destroy subscriptions time is " + (System.currentTimeMillis()-startTime));
 			while (rs.next()) {
 				String subKey = null;
 
@@ -150,7 +153,11 @@ public class SubscriptionsDatabase
 				connection.prepareStatement("SELECT subscriptionreference, consumerreference, topicquery, "
 					+ "policies, additionaluserdata FROM wsnsubscriptions " + "WHERE publisherresourcekey = ? AND paused = 0");
 			stmt.setString(1, publisherKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("set subsubscriptions time is " + (System.currentTimeMillis()-startTime));
+	
 
 			while (rs.next()) {
 				addSubscriptionFromResults(topic, subscriptions, rs);
@@ -181,7 +188,10 @@ public class SubscriptionsDatabase
 					+ "WHERE paused = 0 and publisherresourcekey in (" + joinStringsForInClause(publishers) + ")";
 
 			stmt = connection.prepareStatement(sql);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("get sub subscriptions time is " + (System.currentTimeMillis()-startTime));
 
 			while (rs.next()) {
 				addSubscriptionFromResults(topic, subscriptions, rs);
@@ -218,7 +228,12 @@ public class SubscriptionsDatabase
 		try {
 			stmt = connection.prepareStatement(query);
 			stmt.setString(1, originalPublisher);
+			long startTime = System.currentTimeMillis();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("Subscription query is " + query);
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("getindirect subscriptions time is " + (System.currentTimeMillis()-startTime));
 			while (rs.next()) {
 				indirectPublishers.add(rs.getString(1));
 			}

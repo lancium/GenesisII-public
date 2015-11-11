@@ -22,7 +22,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
+import edu.virginia.vcgr.genii.container.axis.ServerAuthorizationManagement;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.GeniiDirAttributeHandlers;
@@ -138,7 +138,7 @@ public class CommonSTSAttributesHandler extends GeniiDirAttributeHandlers
 	{
 		ResourceKey resourceKey = ResourceManager.getCurrentResource();
 		IResource resource = resourceKey.dereference();
-		if (!ServerWSDoAllReceiver.checkAccess(resource, RWXCategory.WRITE)) {
+		if (!ServerAuthorizationManagement.checkAccess(resource, RWXCategory.WRITE)) {
 			String message = "Unauthorized access to the sensitive IDP attribute: " + attributeName;
 			throw new SecurityException(message);
 		}

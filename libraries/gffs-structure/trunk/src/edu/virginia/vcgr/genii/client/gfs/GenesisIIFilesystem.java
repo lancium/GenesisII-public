@@ -9,6 +9,7 @@ import java.util.Date;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rbyteio.RandomByteIOPortType;
@@ -32,13 +33,16 @@ import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
 import edu.virginia.vcgr.fsii.security.PermissionBits;
 import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
+import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
@@ -71,6 +75,12 @@ public class GenesisIIFilesystem implements FSFilesystem
 	public static String CREDENTIAL_ERROR_MESSAGE = "There are no credentials or they have expired.  Cannot operate on: ";
 
 	private FileHandleTable<GeniiOpenFile> _fileTable = new FileHandleTable<GeniiOpenFile>(FILE_TABLE_SIZE);
+	
+	static QName MODTIME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
+	static QName CREATTIME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
+	static QName ACCESSTIME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static QName SIZE = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
+
 
 	final static private long toNonNull(Long l)
 	{
@@ -465,6 +475,26 @@ public class GenesisIIFilesystem implements FSFilesystem
 				}
 
 				DirectoryManager.addNewDirEntry(target, this, true);
+				
+				CacheManager.putItemInCache(epr, ByteIOConstants.rsize, new  MessageElement(ByteIOConstants.rsize, 0));
+				CacheManager.putItemInCache(epr, ByteIOConstants.rxferMechs, new MessageElement(ByteIOConstants.rxferMechs, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+				
+				Calendar c = Calendar.getInstance();
+				c.setTimeInMillis(System.currentTimeMillis());
+				
+				MessageElement modtime = new MessageElement(MODTIME, c);
+				CacheManager.putItemInCache(epr, ByteIOConstants.rmodTime, modtime);
+			
+
+				MessageElement createtime = new MessageElement(CREATTIME, c);
+				CacheManager.putItemInCache(epr, ByteIOConstants.rcreatTime, createtime);
+
+				MessageElement accesstime = new MessageElement(ACCESSTIME, c);
+				CacheManager.putItemInCache(epr, ByteIOConstants.raccessTime, accesstime);
+				
+				MessageElement perms = new MessageElement(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, "rw----"); 
+				CacheManager.putItemInCache(epr, GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, perms);
+				
 				return open(path, true, target, epr, flags, mode);
 			}
 		} catch (Throwable cause) {

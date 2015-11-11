@@ -71,7 +71,7 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
-import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
+import edu.virginia.vcgr.genii.container.axis.ServerAuthorizationManagement;
 import edu.virginia.vcgr.genii.container.byteio.DefaultRandomByteIOAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
@@ -413,8 +413,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			}
 
 			if (isIndexedIterate) {
-				for (String request : lookupRequest)
+				for (String request : lookupRequest) {
 					indices.addAll(_resource.retrieveIdOfEntry(request));
+				}
 
 				for (int lcv = 0; lcv < batchLimit; ++lcv) {
 					InMemoryIteratorEntry imie = indices.remove(0);
@@ -512,6 +513,28 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	{
 		throw new UnsupportedOperationException("Rename not supported in Resource forks!");
 	}
+/*	
+	private boolean destroyEntry(String entry) {
+		
+		EndpointRefere
+		String serviceName = EPRUtils.extractServiceName(entryReference);
+		EndpointReferenceType resolverEPR = EPRUtils.fromBytes(data);
+		UpdateResponseType response = ResolverUtils.updateResolver(resolverEPR, entryReference);
+		entryReference = response.getNew_EPR();
+		if ((serviceName != null) && serviceName.equals(_serviceName)) {
+			AddressingParameters aParams = new AddressingParameters(entryReference.getReferenceParameters());
+			String resourceKey = aParams.getResourceKey();
+			ResourceKey rkKey = ResourceManager.getTargetResource(serviceName, resourceKey);
+			IResource childResource = rkKey.dereference();
+			childResource.setProperty(GeniiDirPolicy.RESOLVER_POLICY_PROP_NAME, data);
+			String value = (String) _resource.getProperty(GeniiDirPolicy.REPLICATION_POLICY_PROP_NAME);
+			if (value != null) {
+				childResource.setProperty(GeniiDirPolicy.REPLICATION_POLICY_PROP_NAME, value);
+			}
+			childResource.commit();
+		
+		return true;
+	}*/
 
 	@RWXMapping(RWXCategory.WRITE)
 	public RNSEntryResponseType[] remove(String[] removeRequest) throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
@@ -718,7 +741,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			// The notification contains the identity of the user who modified the resource.
 			// The identity is delegated to the resource that sent the notification.
 			// The notification is signed by the resource.
-			if (!ServerWSDoAllReceiver.checkAccess(resource, RWXCategory.WRITE)) {
+			if (!ServerAuthorizationManagement.checkAccess(resource, RWXCategory.WRITE)) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("GeniiDirServiceImpl.notify: permission denied");
 				return NotificationConstants.FAIL;

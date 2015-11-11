@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.axis.transport.http.CommonsHTTPSender;
 import org.apache.axis.types.URI;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
@@ -323,8 +325,8 @@ public class CacheManager
 			
 			try {
 				// drop any connections that are established to avoid keeping session alive with wrong creds.
-				//HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
-				//connMgr.closeIdleConnections(0);
+				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+				connMgr.closeIdleConnections(0);
 			} catch (Throwable t) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("screwup from closing idle connections", t);

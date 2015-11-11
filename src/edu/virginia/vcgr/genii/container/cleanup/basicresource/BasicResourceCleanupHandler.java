@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Triple;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.cleanup.AbstractCleanupHandler;
 import edu.virginia.vcgr.genii.container.cleanup.CleanupContext;
@@ -20,9 +21,8 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerServi
 
 public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(BasicResourceCleanupHandler.class);
-
+	
 	static private void cleanupSubscriptions(Connection connection, String publisherKey) throws Throwable
 	{
 		ResultSet rs = null;
@@ -31,7 +31,11 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		try {
 			stmt = connection.prepareStatement("SELECT subscriptionresourcekey FROM wsnsubscriptions " + "WHERE publisherresourcekey = ?");
 			stmt.setString(1, publisherKey);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("clean up subscriptions time is " + (System.currentTimeMillis()-startTime));
+			
 
 			while (rs.next()) {
 				WSNSubscriptionCleanupHandler handler = new WSNSubscriptionCleanupHandler();
@@ -126,7 +130,11 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		try {
 			stmt = connection.prepareStatement("SELECT propvalue FROM properties WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("evaluate properties time is " + (System.currentTimeMillis()-startTime));
+			
 
 			while (rs.next()) {
 				Blob blob = rs.getBlob(1);
@@ -147,8 +155,11 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		try {
 			stmt = connection.prepareStatement("SELECT resourceid FROM resources WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
-
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("evaluate resources table time is " + (System.currentTimeMillis()-startTime));
+			
 
 			boolean wasItThere = rs.next();
 
@@ -169,8 +180,11 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		try {
 			stmt = connection.prepareStatement("SELECT epr FROM resources2 WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
-
+			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("evaluate resource2 table time is " + (System.currentTimeMillis()-startTime));
+			
 
 			boolean wasItThere = rs.next();
 

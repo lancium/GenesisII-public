@@ -4,20 +4,45 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
 
 public class DynamicPageLoader
 {
-	/*
-	 * for newer jetty. static public void addHandler(Server jettyServer, AbstractHandler newHandler) { ArrayList<Handler> handlerList = new
-	 * ArrayList<Handler>(); handlerList.addAll(Arrays.asList(jettyServer.getHandlers())); handlerList.add(0, newHandler); HandlerList
-	 * newHandlers = new HandlerList(); newHandlers.setHandlers((Handler[])handlerList.toArray()); jettyServer.setHandler(newHandlers); }
-	 * 
-	 * static public void addHandler(ContextHandler contexty, AbstractHandler newHandler) { ArrayList<Handler> handlerList = new
-	 * ArrayList<Handler>(); handlerList.addAll(Arrays.asList(contexty.getHandlers())); handlerList.add(0, newHandler); HandlerList
-	 * newHandlers = new HandlerList(); newHandlers.setHandlers((Handler[])handlerList.toArray()); contexty.setHandler(newHandlers); }
-	 */
+
+	// hmmm: this code is remembered as non-working...
+	// hmmm: !!! it has been re-done more rationally now, but still is a good thing to look at if things fail to run properly.
+
+	static public void addHandler(Server jettyServer, AbstractHandler newHandler)
+	{
+		HandlerList newList = new HandlerList();
+
+		// hmmm: do we want new handler to go in first? probably?
+		newList.addHandler(newHandler);
+
+		Handler[] handlers = jettyServer.getHandlers();
+		for (Handler h : handlers) {
+			newList.addHandler(h);
+		}
+		jettyServer.setHandler(newList);
+	}
+
+	static public void addHandler(ContextHandler contexty, AbstractHandler newHandler)
+	{
+		HandlerList newList = new HandlerList();
+
+		// hmmm: do we want new handler to go in first? probably?
+		newList.addHandler(newHandler);
+
+		Handler[] handlers = contexty.getHandlers();
+		for (Handler h : handlers) {
+			newList.addHandler(h);
+		}
+		contexty.setHandler(newList);
+	}
 
 	static public void addDynamicPages(Server jettyServer, ScratchSpaceManager scratchManager, File sourceDPagePackage) throws IOException
 	{
@@ -28,9 +53,9 @@ public class DynamicPageLoader
 			PageContextDescription pageDescription = pageDescriptions.get(context);
 
 			ContextHandler cHandler = new ContextHandler(context);
-			cHandler.addHandler(new DynamicPageContext(dpagePackage.classLoader(), pageDescription.resourceBase(), pageDescription
-				.injectionHandlerFactory()));
-			jettyServer.addHandler(cHandler);
+			addHandler(cHandler,
+				new DynamicPageContext(dpagePackage.classLoader(), pageDescription.resourceBase(), pageDescription.injectionHandlerFactory()));
+			addHandler(jettyServer, cHandler);
 		}
 		dpagePackage.close();
 	}

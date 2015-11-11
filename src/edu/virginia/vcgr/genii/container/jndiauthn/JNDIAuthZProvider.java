@@ -29,7 +29,7 @@ import javax.naming.directory.InitialDirContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mortbay.jetty.security.UnixCrypt;
+import org.eclipse.jetty.util.security.UnixCrypt;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
