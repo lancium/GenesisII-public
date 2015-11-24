@@ -15,7 +15,7 @@ if [ -z "$GENII_INSTALL_DIR" ]; then
   export GENII_INSTALL_DIR="$TOPDIR"
 fi
 # set up some important variables for the success of the build.
-export ANT_OPTS='-Xms512m -Xmx768m -XX:MaxPermSize=768m'
+export ANT_OPTS='-Xms512m -Xmx768m'
 
 # prints an error message (from parameters) and exits if the previous command failed.
 function check_result()
