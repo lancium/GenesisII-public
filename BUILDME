@@ -21,7 +21,7 @@ This will take the source rpm and produce a new RPM binary package:
 Building from tar bundle:
 
   Preparation (same for both 32-bit and 64-bit versions):
-    export ANT_OPTS=-Xms512m -Xmx768m
+    export ANT_OPTS=-Xms512m -Xmx768m -XX:MaxPermSize=768m
     tar -xf genesis2-{grid}-{version}.tar.gz
     cd genesis2-{grid}-{version}
     ant clean
