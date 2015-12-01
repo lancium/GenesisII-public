@@ -188,12 +188,12 @@ public class SMBTree
 			// it indicates a whole slew of expected services.
 			
 			if (_logger.isDebugEnabled())
-				_logger.debug("special path seen; pretending it's root: " + path);
+				_logger.debug("special path seen; saying not implemented: " + path);
 			
-			///throw new SMBException(NTStatus.NOT_IMPLEMENTED);
+			throw new SMBException(NTStatus.NOT_IMPLEMENTED);
 			
 			// pretend they're asking about the root.
-			return root;
+			//return root;
 		}			
 
 		

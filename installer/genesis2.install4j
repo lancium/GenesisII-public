@@ -66,8 +66,8 @@
       <fileEntry mountPoint="7606" file="../scripts/genii-container-application.properties" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="7606" file="../ext/ntrights.exe" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="7606" file="../scripts/genii-certtool-application.properties" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="3944" file="unlimited_jce_java7/US_export_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="3944" file="unlimited_jce_java7/local_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="3944" file="unlimited_jce_java8/US_export_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="3944" file="unlimited_jce_java8/local_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="7211" file="./scripts/main_installation_script.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="7211" file="./scripts/configure_container.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="./scripts/convert_container.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
@@ -4418,7 +4418,7 @@ return startService;</string>
     </applications>
   </installerGui>
   <mediaSets>
-    <macosFolder name="mac64_gui" id="2088" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-macosx-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
+    <macosFolder name="mac64_gui" id="2088" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-macosx-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.8.0_66_unpacked" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4441,7 +4441,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </macosFolder>
-    <unixInstaller name="linux64_gui" id="3416" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux64_gui" id="3416" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4505,7 +4505,7 @@ return startService;</string>
         <content />
       </postUninstallScript>
     </linuxDeb>
-    <windows name="windows64_gui" id="8974" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows64_gui" id="8974" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4532,7 +4532,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <unixInstaller name="linux32_gui" id="11295" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="linux32_gui" id="11295" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4561,7 +4561,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <windows name="windows32_gui" id="11297" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_80" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows32_gui" id="11297" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="39" />
@@ -4589,7 +4589,7 @@ return startService;</string>
       <includedDownloadableComponents />
     </windows>
   </mediaSets>
-  <buildIds buildAll="false">
+  <buildIds buildAll="true">
     <mediaSet refId="3416" />
   </buildIds>
   <buildOptions verbose="true" faster="false" disableSigning="false" debug="false" />

@@ -351,12 +351,11 @@ public class SecurityUtilities implements CertificateValidator
 
 		for (Identity test : in) {
 			if (!matches(test, patterns)) {
-				// hmmm: move this and one below down to trace, or remove.
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("pattern did not match so adding: " + test);
 				ret.add(test);
 			} else {
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("pattern matched so NOT adding: " + test);
 			}
 		}

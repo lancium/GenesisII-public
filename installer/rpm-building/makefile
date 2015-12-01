@@ -37,8 +37,8 @@ build-rpms: package-code
 		-e "s/%DEPLOYMENT_CONTEXT%/$(DEPLOYMENT_CONTEXT)/g" \
 		genesis2.spec.in >$(RPMBUILD_TOPDIR)/SPECS/genesis2.spec
 	$(RPMBUILD) --sign --define '_topdir $(RPMBUILD_TOPDIR)' --buildroot $(RPMBUILD_TOPDIR)/BUILDROOT -ba $(RPMBUILD_TOPDIR)/SPECS/genesis2.spec
-	cp $(RPMBUILD_TOPDIR)/RPMS/*/* $(RPMBUILD_TOPDIR)/SRPMS/* $(HOME)/installer_products
-	bash md5sum_generator.sh
+	cp $(RPMBUILD_TOPDIR)/RPMS/*/* $(RPMBUILD_TOPDIR)/SRPMS/* $(HOME)/installer_products-$(GRID)
+	bash md5sum_generator.sh $(HOME)/installer_products-$(GRID)
 	rm -rf $(RPMBUILD_TOPDIR)
 
 # some ugly extra steps since the packager doesn't make a sub-dir inside tar file.
@@ -49,6 +49,6 @@ package-code:
 	bash ../../scripts/produce_build_package.sh $(shell pwd)/../../ $(TMP) "" $(BUNDLE_NAME)-temp
 	(cd $(BUNDLE_NAME); tar -xf $(TMP)/$(BUNDLE_NAME)-temp.tar.gz)
 	tar -czf $(BUNDLE_NAME).tar.gz $(BUNDLE_NAME)
-	cp $(BUNDLE_NAME).tar.gz $(HOME)/installer_products/$(BUNDLE_NAME)-source.tar.gz 
+	cp $(BUNDLE_NAME).tar.gz $(HOME)/installer_products-$(GRID)/$(BUNDLE_NAME)-source.tar.gz 
 	rm -rf $(BUNDLE_NAME) $(TMP)/$(BUNDLE_NAME)-temp.tar.gz 
 

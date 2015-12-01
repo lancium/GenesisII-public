@@ -29,8 +29,19 @@ fi
 
 CONFIGFILE="$INSTALLER_DIR/$installer_config"
 
+# find the grid name that should be added to the installer binaries.
+simple_name=$(sed -n -e 's/genii.simple-name=\(.*\)/\1/p' "$INSTALLER_DIR/$installer_config")
+if [ -z "$simple_name" ]; then
+  echo
+  echo "Failed to find the grid's simple name in the config file."
+  echo "There should be an entry called genii.simple-name that defines this."
+  echo
+  exit 1
+fi
+echo "Building installers for grid named: $simple_name"
+
 # make sure our output folder is there.
-OUTPUT_DIRECTORY="$HOME/installer_products"
+OUTPUT_DIRECTORY="$HOME/installer_products-${simple_name}"
 if [ ! -d "$OUTPUT_DIRECTORY" ]; then
   mkdir "$OUTPUT_DIRECTORY"
 fi

@@ -5,6 +5,8 @@
 # eliminate stripping of binaries.
 %global __os_install_post %{nil}
 
+%define debug_package %{nil}
+
 Summary: Genesis II is an open source, standards based grid platform designed to support both high-throughput computing and secure data sharing
 Name: genesis2-%GRID%
 Version: %VER%

@@ -13,9 +13,11 @@ function replace_phrase_in_file()
   local file="$1"; shift
   local phrase="$1"; shift
   local replacement="$1"; shift
+
   if [ -z "$file" -o ! -f "$file" -o -z "$phrase" -o -z "$replacement" ]; then
     echo "replace_phrase_in_file: needs a filename, a phrase to replace, and the"
     echo "text to replace that phrase with."
+    echo "was passed file='$file' phrase='$phrase' replacement='$replacement'"
     return 1
   fi
   sed -i -e "s%$phrase%$replacement%g" "$file"
@@ -160,6 +162,10 @@ function replace_compiler_variables()
     # split the line into the variable name and value.
     IFS='=' read -a assignment <<< "$line"
     local var="${assignment[0]}"
+    if [[ $var =~ ^"#" ]]; then
+      # skip comments.
+      continue;
+    fi
     local value="${assignment[1]}"
     if [ "${value:0:1}" == '"' ]; then
       # assume the entry was in quotes and remove them.

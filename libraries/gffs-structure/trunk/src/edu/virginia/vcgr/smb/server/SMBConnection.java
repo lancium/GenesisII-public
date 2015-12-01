@@ -10,6 +10,7 @@ import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.text.TextHelper;
 import edu.virginia.vcgr.ogrsh.server.comm.CommUtils;
 import edu.virginia.vcgr.smb.server.cmd.SMBCheckDirectory;
 import edu.virginia.vcgr.smb.server.cmd.SMBClose;
@@ -53,11 +54,17 @@ import edu.virginia.vcgr.smb.server.trans2.SMBTrans2SetPathInformation;
 
 public class SMBConnection implements Runnable
 {
-	private SocketChannel client;
-	private int maxBufferSize = 0x20000;
-	private SMBDialect dialect = SMBDialect.CORE;
-
 	static private Log _logger = LogFactory.getLog(SMBConnection.class);
+
+	private SocketChannel client;
+//	private int maxBufferSize = 0x20000;
+	//subtracting 4 bytes for netbios header.
+	private int maxBufferSize = 0x10000 - 4;
+//	private int maxBufferSize = 16644 - 4;
+	//hmmm: theorizing that we were using too big a buffer before...  
+	//this new value was causing problems in getting the buffers!
+	
+	private SMBDialect dialect = SMBDialect.CORE;
 
 	public static SMBCommand[] commands = new SMBCommand[256];
 	static {
@@ -286,6 +293,10 @@ public class SMBConnection implements Runnable
 
 	public void send(SMBBuffer buffer) throws IOException
 	{
+		// way too noisy for normal debug.
+		//hmmm: reads will be way too noisy when they are chunks of file updates too.
+		if (_logger.isTraceEnabled())
+			_logger.debug("sending buffer:\n" + TextHelper.dumpByteArray(buffer.preparePacket().array()));
 		CommUtils.writeFully(client, buffer.preparePacket());
 	}
 
@@ -336,7 +347,7 @@ public class SMBConnection implements Runnable
 			return;
 		}
 		if (_logger.isDebugEnabled()) {
-			_logger.debug("Handling command 0x" + Integer.toHexString(command) + " with handler " + handler.getClass().getName());
+			_logger.debug("Handling command: 0x" + Integer.toHexString(command) + " with handler " + handler.getClass().getSimpleName());
 		}
 
 		try {
@@ -356,15 +367,15 @@ public class SMBConnection implements Runnable
 			return;
 		} catch (IndexOutOfBoundsException e) {
 			acc.position(fix);
-			_logger.debug("Buffer out of bounds", e);
+			_logger.error("Buffer out of bounds", e);
 			sendError(h, acc, NTStatus.INVALID_SMB);
 		} catch (BufferUnderflowException e) {
 			acc.position(fix);
-			_logger.debug("Buffer underflow", e);
+			_logger.error("Buffer underflow", e);
 			sendError(h, acc, NTStatus.INVALID_SMB);
 		} catch (BufferOverflowException e) {
 			acc.position(fix);
-			_logger.debug("Buffer overflow", e);
+			_logger.error("Buffer overflow", e);
 			// future: this might be BUFFER_TOO_SMALL actually
 			sendError(h, acc, NTStatus.BUFFER_OVERFLOW);
 		}
@@ -391,7 +402,7 @@ public class SMBConnection implements Runnable
 		}
 		
 		if (_logger.isDebugEnabled()) {
-			_logger.debug("Handling command (AndX) 0x" + Integer.toHexString(command) + " with handler " + handler.getClass().getName());
+			_logger.debug("Handling command (AND_X): 0x" + Integer.toHexString(command) + " with handler " + handler.getClass().getSimpleName());
 		}
 
 		// Remember the position so we can undo any changes if an exception occurs
@@ -415,20 +426,20 @@ public class SMBConnection implements Runnable
 			sendError(h, acc, e.getStatus());
 		} catch (IndexOutOfBoundsException e) {
 			acc.position(fix);
-			_logger.debug("Buffer out of bounds", e);
+			_logger.error("Buffer out of bounds", e);
 			sendError(h, acc, NTStatus.INVALID_SMB);
 		} catch (BufferUnderflowException e) {
 			acc.position(fix);
-			_logger.debug("Buffer underflow", e);
+			_logger.error("Buffer underflow", e);
 			sendError(h, acc, NTStatus.INVALID_SMB);
 		} catch (BufferOverflowException e) {
 			acc.position(fix);
-			_logger.debug("Buffer overflow", e);
+			_logger.error("Buffer overflow", e);
 			// future: this might be BUFFER_TOO_SMALL actually
 			sendError(h, acc, NTStatus.BUFFER_OVERFLOW);
 		}
 	}
-
+	
 	public boolean doPacket() throws IOException
 	{
 		/* First the packet length */
@@ -455,6 +466,11 @@ public class SMBConnection implements Runnable
 		/* Now the actual SMB packet */
 		ByteBuffer packet = ByteBuffer.allocate(length);
 		CommUtils.readFully(client, packet);
+		
+		//hmmm: reduce the logging level here!
+		if (_logger.isDebugEnabled())
+			_logger.debug("received buffer:\n" + TextHelper.dumpByteArray(packet.array()));
+		
 		packet.flip();
 
 		/* Convert into an easy to parse form */
@@ -469,7 +485,7 @@ public class SMBConnection implements Runnable
 		}
 
 		// far too noisy for normal debugging sessions.
-		if (_logger.isTraceEnabled())
+		if (_logger.isDebugEnabled())
 			_logger.debug("got smb request with header: " + header);
 
 		doCommand(header, header.command, buffer);

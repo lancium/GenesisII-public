@@ -2,6 +2,9 @@ package edu.virginia.vcgr.smb.server.cmd;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.smb.server.SMBAndX;
 import edu.virginia.vcgr.smb.server.SMBBuffer;
 import edu.virginia.vcgr.smb.server.SMBCommand;
@@ -12,6 +15,7 @@ import edu.virginia.vcgr.smb.server.SMBHeader;
 
 public class SMBSessionSetupAndX implements SMBCommand
 {
+	static private Log _logger = LogFactory.getLog(SMBSessionSetupAndX.class);
 
 	@Override
 	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
@@ -21,6 +25,10 @@ public class SMBSessionSetupAndX implements SMBCommand
 
 		SMBAndX chain = SMBAndX.decode(params);
 		int maxBufferSize = params.getUShort();
+		
+		if (_logger.isDebugEnabled())
+			_logger.debug("seeing max buffer size in session setup of " + maxBufferSize);
+		
 		// The number of simultaneous requests
 		/* int maxMpxCount = */params.getUShort();
 		// The connection number; zero means reset ?

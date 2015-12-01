@@ -169,8 +169,7 @@ public class CredentialWallet implements Externalizable, Describable
 		while (iterator.hasNext()) {
 			TrustCredential curr = iterator.next();
 			if (!curr.isValid()) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("actually found an invalid credential to remove: " + curr.toString());
+				_logger.warn("actually found an invalid credential to remove: " + curr.toString());
 				iterator.remove();
 			}
 		}

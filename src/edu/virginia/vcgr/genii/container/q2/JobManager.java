@@ -1185,7 +1185,7 @@ public class JobManager implements Closeable
 			throw new ResourceException("Unable to query job status");
 
 		if (jobs == null || jobs.length == 0) {
-			return (getIterableJobStatus(connection));
+			return getIterableJobStatus(connection);
 		}
 
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
@@ -1341,7 +1341,6 @@ public class JobManager implements Closeable
 	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection) throws GenesisIISecurityException,
 		ResourceException, SQLException
 	{
-
 		HashMap<Long, PartialJobInfo> ownerMap;
 		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
 		Collection<String> toIterate = new LinkedList<String>();

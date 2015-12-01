@@ -81,10 +81,10 @@ public class QStatTool extends BaseGridTool
 
 	private void printHeader()
 	{
-		stdout.println(String.format("%1$-36s   %2$-21s   %3$-4s   %4$-8s", "Ticket", "Submit Time", "Tries", "State"));
+		stdout.println(String.format("%1$-40s   %2$-21s   %3$-4s   %4$-8s", "Ticket", "Submit Time", "Tries", "State"));
 	}
 
-	static private final String _FORMAT = "%1$-36s   %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY   %3$-4d   %4$s";
+	static private final String _FORMAT = "%1$-40s   %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY   %3$-4d   %4$s";
 
 	private void printJobInformation(JobInformation jobInfo)
 	{
@@ -112,6 +112,5 @@ public class QStatTool extends BaseGridTool
 				}
 			}
 		}
-		stdout.println();
 	}
 }

@@ -4,6 +4,9 @@
 	<!-- Properties -->
 	<property file="${basedir}/build.properties"/>
 
+        <property name="ant.build.javac.source" value="1.7"/>
+        <property name="ant.build.javac.target" value="1.7"/>
+
 	<!-- Static Classpath -->
         <path id="ext.classpath">
                 <fileset dir="${ext.dir}" includes="**/*.jar"/>

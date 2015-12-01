@@ -9,7 +9,7 @@ where X.config is the name of a GenesisII installer configuration file.  If
 you leave off 'X.config', then the script will list out all of the available
 configuration files.
 
-Creates the interactive install4j installers in $HOME/installer_products.
+Creates the interactive install4j installers in $HOME/installer_products-{grid name}.
 
 ####
 
@@ -24,7 +24,7 @@ configuration for this file:
 %_gpg_name  Chris Koeritz (XSEDE Key) <koeritz@virginia.edu>
 
 Creates the source tarball, source RPM and installer RPM packages in
-$HOME/installer_products.
+$HOME/installer_products-{grid name}.
 
 ####
 

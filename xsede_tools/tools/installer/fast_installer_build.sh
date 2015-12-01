@@ -69,7 +69,7 @@ fi
 
 ##############
 
-OUTPUT_DIRECTORY=$HOME/installer_products
+OUTPUT_DIRECTORY="$HOME/installer_products-${simple_name}"
 if [ ! -d "$OUTPUT_DIRECTORY" ]; then
   mkdir "$OUTPUT_DIRECTORY"
 fi

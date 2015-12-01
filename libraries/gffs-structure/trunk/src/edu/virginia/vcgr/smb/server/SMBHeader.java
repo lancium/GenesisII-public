@@ -25,14 +25,14 @@ public class SMBHeader
 	public String toString()
 	{
 		StringBuilder b = new StringBuilder();
-		b.append("command=");
-		b.append(command);
-		b.append(" status=");
-		b.append(status);
-		b.append(" flags=");
-		b.append(flags);
-		b.append(" flags2=");
-		b.append(flags2);
+		b.append("command=0x");
+		b.append(Integer.toHexString(command));
+		b.append(" status=0x");
+		b.append(Integer.toHexString(status));
+		b.append(" flags=0x");
+		b.append(Integer.toHexString(flags));
+		b.append(" flags2=0x");
+		b.append(Integer.toHexString(flags2));
 		b.append(" pid=");
 		b.append(pid);
 		b.append(" security=");

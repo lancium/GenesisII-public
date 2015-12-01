@@ -105,9 +105,9 @@ public class MyProxyLoginTool extends BaseLoginTool
 	/**
 	 * assumes that the username and password have already been set.
 	 */
-	public int doMyproxyLogin(ICallingContext callContext) throws ReloadShellException, ToolException, UserCancelException, RNSException,
-		AuthZSecurityException, IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException,
-		DialogException
+	public int doMyproxyLogin(ICallingContext callContext)
+		throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException, IOException,
+		ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		String pass = new String(_password);
 
@@ -127,14 +127,19 @@ public class MyProxyLoginTool extends BaseLoginTool
 		if ((_host != null) && (_port != 0)) {
 			mp.setPort(_port);
 			mp.setHost(_host);
-			_logger.debug("plugging in chosen parameters for host and port: host=" + _host + " port=" + _port);
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("plugging in parameters specified on command line for host and port: host=" + _host + " port=" + _port);
 		} else {
 			// Load values from properties file
-			int port = Integer.parseInt(myProxyProperties.getProperty(MYPROXY_PORT_PROP));
-			String host = myProxyProperties.getProperty(MYPROXY_HOST_PROP);
+			_port = Integer.parseInt(myProxyProperties.getProperty(MYPROXY_PORT_PROP));
+			_host = myProxyProperties.getProperty(MYPROXY_HOST_PROP);
 
-			mp.setPort(port);
-			mp.setHost(host);
+			mp.setPort(_port);
+			mp.setHost(_host);
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("plugging in parameters configured in myproxy properties for host and port: host=" + _host + " port=" + _port);
 		}
 
 		mp.setLifetime(lifetime);

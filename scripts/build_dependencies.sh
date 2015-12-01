@@ -99,7 +99,7 @@ for subproject in \
       echo "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
       echo
       echo "Often the command that will correct this build problem is:"
-      echo "sudo cp $GENII_INSTALL_DIR/installer/unlimited_jce_java7/*jar /usr/lib/jvm/java-7-oracle/jre/lib/security/"
+      echo "sudo cp $GENII_INSTALL_DIR/installer/unlimited_jce_java8/*jar /usr/lib/jvm/java-8-oracle/jre/lib/security/"
       echo
       echo -e "=======\n"
     fi

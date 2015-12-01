@@ -122,8 +122,16 @@ public class SMBIOCache
 		}
 	}
 
-	private void doFlushAsync()
+	private void doFlushAsync() throws SMBException
 	{
+		_logger.info("mapping async flush to sync one as debugging test" );
+		boolean doAsynch = false;
+		if (!doAsynch) {
+			 doFlushSync();
+			 return;
+		}
+		
+		
 		byte[] data;
 		long off;
 
@@ -229,13 +237,16 @@ public class SMBIOCache
 			}
 		}
 
-		synchronized (cached) {
-			if (!waiting) {
-				waiting = true;
-				Waiter w = new Waiter();
-				w.start();
-			}
-		}
+		SMBIOCache.this.doFlushSync();
+
+		//hmmm: turning off use of the waiter object.
+//		synchronized (cached) {
+//			if (!waiting) {
+//				waiting = true;
+//				Waiter w = new Waiter();
+//				w.start();
+//			}
+//		}
 	}
 
 	public int read(ByteBuffer data, long off) throws SMBException

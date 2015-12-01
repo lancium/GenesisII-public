@@ -280,6 +280,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		try {
 			checkValidity(new Date());
 		} catch (AttributeInvalidException cause) {
+			_logger.error("caught invalid attribute in TrustCredential isValid check", cause);			
 			return false;
 		}
 		return true;
@@ -685,13 +686,22 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		} else {
 			if (priorDelegationId != null) {
 				String msg = "there is an id for the prior delegation but it is null!: " + priorDelegationId;
-				if (performLogging)
+				if (performLogging) {
 					_logger.error(msg);
+				}
 				throw new AttributeInvalidException(msg);
 			}
 		}
-		// test our constraints.
-		getConstraints().checkValidity(getDelegationDepth(), date);
+		
+		try {
+			// test our constraints.
+			getConstraints().checkValidity(getDelegationDepth(), date);
+		} catch (AttributeInvalidException t) {
+			if (performLogging) {
+				_logger.error("failed to validate basic date validity or delegation depth", t);				
+			}
+			throw t;
+		}
 
 		if (properlySigned) {
 			// we have already checked this particular delegation.

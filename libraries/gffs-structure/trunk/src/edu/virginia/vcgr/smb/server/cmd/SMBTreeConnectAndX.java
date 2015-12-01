@@ -50,8 +50,12 @@ public class SMBTreeConnectAndX implements SMBCommand
 			_logger.debug("** seeing IPC$ path");
 			// hmmm: for now leave internal there at root.
 			
-			//hmmm: trying different approach: tell it we can't handle this.
+			//hmmm: trying different approach: tell it we can't handle this.  doesn't make it any better, maybe even worse.
 			//throw new SMBException(NTStatus.NOT_IMPLEMENTED);
+			//hmmm: trying not found instead.
+			throw new SMBException(NTStatus.OBJECT_PATH_NOT_FOUND);
+
+			
 
 		} else {			
 			// We only listen to \\stuff\grid[\path]

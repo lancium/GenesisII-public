@@ -22,12 +22,7 @@
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/bcpkix-jdk15on-149.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/bcprov-jdk15on-149.jar"/>
-	<classpathentry kind="lib" path="/GenesisII-trunk/ext/httpclient-4.3.1.jar"/>
-	<classpathentry kind="lib" path="/GenesisII-trunk/ext/httpcore-4.3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MacOSXSwing"/>
-	<classpathentry kind="lib" path="/GenesisII-trunk/ext/myproxy-logon-1.8.jar"/>
-	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ncsa-security-core-1.2.jar"/>
-	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ncsa-security-util-1.2.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/xmlsec-1.4.6.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/bundle-u6security_1.0.74.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
@@ -45,5 +40,10 @@
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/jetty7/servlet-api-2.5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/FSViewII"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/bundles/org.apache.commons.httpclient_3.1.0.v201012070820.jar" sourcepath="/home/fred/gffs/code/library_source/commons-httpclient-3.1/src"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/httpclient-4.3.2.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/httpcore-4.3.1.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/myproxy-logon-3.1.1.jar" sourcepath="/home/fred/gffs/code/library_source/myproxy-logon-3.1.1-sources"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ncsa-security-core-3.1.1.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ncsa-security-util-3.1.1.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

@@ -368,7 +368,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 	static private void logProcessResult(int result, StreamCopier stdout, StreamCopier stderr)
 	{
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug(new LazyEvaluatorResult(result, stdout, stderr));
 	}
 

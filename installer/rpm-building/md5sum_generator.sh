@@ -22,19 +22,17 @@ source $WORKDIR/../../xsede_tools/tools/installer/installer_helper.sh
 
 ##############
 
-export INSTALLER_DIR="$GENII_INSTALL_DIR/installer"
+# grab installer directory off of command line.
+export OUTPUT_DIR="$1"; shift
 
-##############
-
-OUTPUT_DIRECTORY=$HOME/installer_products
-if [ ! -d "$OUTPUT_DIRECTORY" ]; then
-  mkdir "$OUTPUT_DIRECTORY"
+if [ -z "$OUTPUT_DIR" ]; then
+  echo "$(basename $0): This script needs a directory where the installers exist that it can generate md5 sum files into."
+  exit 1
 fi
 
-
 ##############
 
-pushd "$OUTPUT_DIRECTORY" &>/dev/null
+pushd "$OUTPUT_DIR" &>/dev/null
 generate_md5sums
 popd &>/dev/null
 

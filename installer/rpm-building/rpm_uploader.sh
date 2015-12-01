@@ -6,6 +6,8 @@
 
 HERE="$( \cd "$(\dirname "$0")" && \pwd )"
 
+echo NEED SIMPLE_NAME for RPM LOCATION IN HERE
+
 RPM_LOCATION="$HOME/installer_products"
 
 TEMP_STORAGE="$HOME/rpms_to_transfer"
