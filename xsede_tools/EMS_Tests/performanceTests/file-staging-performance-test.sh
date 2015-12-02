@@ -98,7 +98,14 @@ testFileConsistency()
 
   grid cp $RNSPATH/randomhalfgig.transferred local:$TEST_TEMP/randomhalfgig.transferred
   diff $HUGE_TEST_FILE $TEST_TEMP/randomhalfgig.transferred
-  assertEquals "Checking File consistency, local copy vs copy on grid namespace" 0 $?
+  retval=$?
+  assertEquals "Checking File consistency, local copy vs copy on grid namespace" 0 $retval
+  if [ $retval -ne 0 ]; then
+    echo here is list of the two files that differ:
+    ls -al $HUGE_TEST_FILE $TEST_TEMP/randomhalfgig.transferred
+    echo here are md5sums of failed files:
+    md5sum $HUGE_TEST_FILE $TEST_TEMP/randomhalfgig.transferred
+  fi
   echo `date`": test ended"
 
   # now clean out all the jobs.
