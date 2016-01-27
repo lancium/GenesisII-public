@@ -6,7 +6,9 @@
 
 ##############
 
-# echoes the right grid application to run for this platform.
+# echoes the right grid application to run for this platform.  this will use
+# the fastgrid tool if possible.
+#hmmm: currently not possible since kills fuse?  need to try...
 function pick_grid_app()
 {
   if [ "$OS" == "Windows_NT" ]; then
@@ -19,10 +21,29 @@ function pick_grid_app()
       echo "cmd /c $dos_genii\\bin\\grid.bat"
     fi
   else
-    # linux and mac don't need to grope for the file as badly.
+    # linux and mac don't need to grope about for the file quite as badly.
     echo "$GENII_INSTALL_DIR/grid"
     # and they can now take advantage of the fastgrid script.
-#not quite yet:    echo "$GFFS_TOOLKIT_ROOT/library/fastgrid"
+#    echo "$GENII_INSTALL_DIR/fastgrid"
+  fi
+}
+
+# echoes the proper "normal" grid application to run for this platform.
+#hmmm: could eliminate one version if fast grid supported streaming or we build a work around.
+function pick_unaccelerated_grid_app()
+{
+  if [ "$OS" == "Windows_NT" ]; then
+    dos_genii="$(echo "$GENII_INSTALL_DIR" | sed -e 's/\//\\/g')"
+    if [ -f "$GENII_INSTALL_DIR/bin/grid.exe" ]; then
+      echo "$GENII_INSTALL_DIR/bin/grid.exe"
+    elif [ ! -z "$(uname -a | grep "^MING" )" ]; then
+      echo "cmd //c $dos_genii\\bin\\grid.bat"
+    else
+      echo "cmd /c $dos_genii\\bin\\grid.bat"
+    fi
+  else
+    # linux and mac don't need to grope for the file as badly.
+    echo "$GENII_INSTALL_DIR/grid"
   fi
 }
 
@@ -41,7 +62,7 @@ function silent_grid()
 function fuse()
 {
   local fuse_out="$(mktemp "$TEST_TEMP/grid_logs/out_fuse_$(date_string).XXXXXX")"
-  logged_grid "$fuse_out" "$(pick_grid_app)" fuse $* &
+  logged_grid "$fuse_out" "$(pick_unaccelerated_grid_app)" fuse $* &
 }
 
 # a function that behaves like the normal grid command, except that it times the
@@ -79,7 +100,7 @@ function grid()
 # into the grid command.  this allows using a here document as input to the command.
 function multi_grid()
 {
-  grid_base \"$(pick_grid_app)\"
+  grid_base \"$(pick_unaccelerated_grid_app)\"
   local retval=$?
   if [ $retval -ne 0 ]; then
     # we have to exit here since the command is operating as a sub-shell with the new

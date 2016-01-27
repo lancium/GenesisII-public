@@ -79,7 +79,10 @@ eof
 #new code to add to the number of groups the user starts with.
 #want to leave in, but needs to be able to be turned off for grant count comparisons;
 #this will definitely change the number of grants.
-  additional_group_list=(bogonic cthonic fredonic luponic ozonic)
+  additional_group_list=(bogonic cthonic fredonic luponic ozonic \
+gurp1 gurp2 gurp3 gurp4 gurp5 gurp6 \
+)
+#remove the gurps later!
   local groupname
   for groupname in ${additional_group_list[*]}; do
     local fullgroup="/groups/$FOLDERSPACE/$groupname"
@@ -88,6 +91,8 @@ eof
     check_if_failed Could not create group $fullgroup
     give_create_perms $fullgroup $USERPATH
     check_if_failed Could not give user $USERPATH permissions on $fullgroup
+    silent_grid ln $fullgroup $USERPATH/$groupname
+    check_if_failed Could not link group $fullgroup under user STS at $USERPATH
   done
 }
 

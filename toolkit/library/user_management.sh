@@ -192,7 +192,7 @@ function give_create_perms()
   local resrc="$1"; shift
   local grp="$1"; shift
   echo "Granting create permissions to '$resrc' for '$grp'."
-  grid_chk chmod "$resrc" +rx "$grp"
+  silent_grid chmod "$resrc" +rx "$grp"
 }
 
 # gets the groups found under a user path.  this is handy for later removing
