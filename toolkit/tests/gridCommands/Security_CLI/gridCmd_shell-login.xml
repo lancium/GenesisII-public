@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-19-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="localMountPoint" source="${ARGV[2]}"/>
+<gsh:define name="containerPath" source="${ARGV[3]}"/>
+<gsh:define name="geniiInstallPath" source="${ARGV[4]}"/>
+
+<gsh:echo message="Copying local:./glogin.xml file to ${rnsPath}/.glogin.xml"/>
+<geniix:cp>
+	<gsh:param>local:./glogin.xml</gsh:param>
+	<gsh:param>${rnsPath}/.glogin.xml</gsh:param>
+</geniix:cp>
+
+<gsh:echo message="Executing 'whoami' BEFORE 'shell-login' command"/>
+<geniix:whoami/>
+
+<gsh:echo message="Testing 'shell-login ${rnsPath}' command"/>
+<geniix:shell-login>
+	<gsh:param>${rnsPath}/</gsh:param>
+</geniix:shell-login>
+
+<gsh:echo message="Executing 'whoami' AFTER 'shell-login' command"/>
+<geniix:whoami/>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/.glogin.xml</gsh:param>
+</geniix:rm>
+
+</gsh:script>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- This script creates a kerberos user within the XSEDE namespace. -->
+
+<!-- Author Vanamala Venkataswamy -->
+
+<!--
+
+Script arguments:
+  1=container path (ex. /containers/BootstrapContainer )
+  2=kerbRealm
+  3=kerbKdc
+  4=Username
+
+-->
+
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+	xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+	
+	<condition property="correct_number_of_arguments">
+    		<compare numeric="true" arg1="5" arg2="${ARGV}" comparison="eq"/>
+  	</condition>
+
+	<if test="correct_number_of_arguments">
+    	<then>
+
+		<echo message="Creating user ${ARGV[4]}"/>
+        	<try>
+          	<block>
+			<geniix:idp>
+				<param>--kerbRealm=${ARGV[2]}</param>
+				<param>--kerbKdc=${ARGV[3]}</param>
+				<param>--validDuration=10years</param>
+				<param>${ARGV[1]}/Services/KerbAuthnPortType</param>
+				<param>${ARGV[4]}</param>
+			</geniix:idp>
+		</block>
+          	<catch class="java.lang.Exception">
+          		<echo message="Could not create user identity, accepting that it may exist."/>
+          	</catch>
+        	</try>
+
+		<echo message="Linking new user to /users/xsede.org directory"/>
+        	<try>
+          	<block>
+			<geniix:ln>
+				<param>${ARGV[1]}/Services/KerbAuthnPortType/${ARGV[4]}</param>
+				<param>/users/xsede.org/${ARGV[4]}</param>
+			</geniix:ln>
+		</block>
+          	<catch class="java.lang.Exception">
+            		<echo message="Could not link user identity, accepting that it may exist."/>
+          	</catch>
+        	</try>
+
+		<echo message="Creating new home directory"/>
+        	<try>
+          	<block>
+			<geniix:mkdir>
+				<param>-p</param>
+				<param>/home/xsede.org/${ARGV[4]}</param>
+			</geniix:mkdir>
+		</block>
+          	<catch class="java.lang.Exception">
+            		<echo message="Could not create home directory, accepting that it may exist."/>
+          	</catch>
+        	</try>
+
+		<geniix:chmod>
+			<param>/users/xsede.org/${ARGV[4]}</param>
+			<param>5</param>
+			<param>/users/xsede.org/${ARGV[4]}</param>
+		</geniix:chmod>
+
+		<echo message="Granting permissions to new user to new home directory"/>
+        	<try>
+          	<block>
+			<geniix:chmod>
+				<param>/home/xsede.org/${ARGV[4]}</param>
+				<param>7</param>
+				<param>/users/xsede.org/${ARGV[4]}</param>
+			</geniix:chmod>
+		</block>
+          	<catch class="java.lang.Exception">
+            		<echo message="Could not grant permissions to new home direcotry."/>
+          	</catch>
+        	</try>
+
+
+	</then>
+	</if>
+
+</gsh:script>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-13-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<geniix:mkdir>
+        <gsh:param>${rnsPath}/cdDir</gsh:param>
+</geniix:mkdir>
+
+<gsh:echo message="Testing 'cd' command"/>
+<geniix:cd>
+        <gsh:param>${rnsPath}/cdDir</gsh:param>
+</geniix:cd>
+
+<gsh:echo message="Testing recursive 'cd cdDir' command"/>
+<gsh:for param-name="i" initial-value="0" inclusive-limit="3">
+        <geniix:mkdir>
+                <gsh:param>cdDir</gsh:param>
+        </geniix:mkdir>
+        <geniix:cd>
+                <gsh:param>cdDir</gsh:param>
+        </geniix:cd>
+</gsh:for>
+
+<gsh:echo message="Testing 'cd ../' command"/>
+
+<gsh:echo message="Before cd ../"/>
+<geniix:pwd/>
+
+<geniix:cd>
+        <gsh:param>../</gsh:param>
+</geniix:cd>
+
+<gsh:echo message="After cd ../"/>
+<geniix:pwd/>
+
+
+<geniix:cd>
+        <gsh:param>${rnsPath}</gsh:param>
+</geniix:cd>
+
+<geniix:rm>
+	<gsh:param>cdDir</gsh:param>
+</geniix:rm>
+
+</gsh:script>

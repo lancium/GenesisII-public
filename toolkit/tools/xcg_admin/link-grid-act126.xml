@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Author: Shava Smallen -->
+<!-- This script is used to link the XCG grid into xsede namespace -->
+
+<gsh:script
+    xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+    xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+  <gsh:default name="EPR_FILE" value="${ARGV[1]}"/>
+  <gsh:default name="EXT_GRID" value="act126.virginia.edu"/>
+
+  <gsh:echo message="Creating /mount/${EXT_GRID}"/>
+  <geniix:ln>
+    <gsh:param>--epr-file=local:${EPR_FILE}</gsh:param>
+    <gsh:param>/mount/${EXT_GRID}</gsh:param>
+  </geniix:ln>
+
+  <gsh:echo message="Linking /users/${EXT_GRID}"/>
+  <geniix:ln>
+    <gsh:param>/mount/${EXT_GRID}/users</gsh:param>
+    <gsh:param>/users/${EXT_GRID}</gsh:param>
+  </geniix:ln>
+
+  <gsh:echo message="Linking /groups/${EXT_GRID}"/>
+  <geniix:ln>
+    <gsh:param>/mount/${EXT_GRID}/groups</gsh:param>
+    <gsh:param>/groups/${EXT_GRID}</gsh:param>
+  </geniix:ln>
+
+  <gsh:echo message="Linking /home/${EXT_GRID}"/>
+  <geniix:ln>
+    <gsh:param>/mount/${EXT_GRID}/home</gsh:param>
+    <gsh:param>/home/${EXT_GRID}</gsh:param>
+  </geniix:ln>
+
+  <gsh:echo message="Creating /resources/${EXT_GRID}"/>
+  <geniix:mkdir>
+    <gsh:param>-p</gsh:param>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+  </geniix:mkdir>
+
+  <gsh:echo message="Adding rwx for grimshaw on /resources/${EXT_GRID}"/>
+  <geniix:chmod>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+    <gsh:param>+rwx</gsh:param>
+    <gsh:param>/users/grimshaw</gsh:param>
+  </geniix:chmod>
+
+  <gsh:echo message="Adding rwx for andrew on /resources/${EXT_GRID}"/>
+  <geniix:chmod>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+    <gsh:param>+rwx</gsh:param>
+    <gsh:param>/users/andrew</gsh:param>
+  </geniix:chmod>
+
+  <gsh:echo message="Adding rwx for fred on /resources/${EXT_GRID}"/>
+  <geniix:chmod>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+    <gsh:param>+rwx</gsh:param>
+    <gsh:param>/users/fred</gsh:param>
+  </geniix:chmod>
+
+  <gsh:echo message="Adding rwx for koeritz on /resources/${EXT_GRID}"/>
+  <geniix:chmod>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+    <gsh:param>+rwx</gsh:param>
+    <gsh:param>/users/koeritz</gsh:param>
+  </geniix:chmod>
+
+  <gsh:echo message="Adding rwx for vana on /resources/${EXT_GRID}"/>
+  <geniix:chmod>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+    <gsh:param>+rwx</gsh:param>
+    <gsh:param>/users/vana</gsh:param>
+  </geniix:chmod>
+
+<!--  <gsh:echo message="Adding rwx for gffs-admins on /resources/${EXT_GRID}"/>
+  <geniix:chmod>
+    <gsh:param>/resources/${EXT_GRID}</gsh:param>
+    <gsh:param>+rwx</gsh:param>
+    <gsh:param>/groups/xsede.org/gffs-admins</gsh:param>
+  </geniix:chmod>
+  -->
+
+  <gsh:echo message="Linking /containers/${EXT_GRID}"/>
+  <geniix:ln>
+      <gsh:param>/mount/${EXT_GRID}/resources/xsede.org/containers</gsh:param>
+      <gsh:param>/containers/${EXT_GRID}</gsh:param>
+  </geniix:ln>
+
+<!-- doesn't exist.
+  <gsh:echo message="Linking /bes-containers/${EXT_GRID}"/>
+  <geniix:ln>
+      <gsh:param>/mount/${EXT_GRID}/resources/xsede.org/bes-containers</gsh:param>
+      <gsh:param>/bes-containers/${EXT_GRID}</gsh:param>
+  </geniix:ln>
+  -->
+
+  <gsh:echo message="Linking /queues/${EXT_GRID}"/>
+  <geniix:ln>
+      <gsh:param>/mount/${EXT_GRID}/resources/xsede.org/queues</gsh:param>
+      <gsh:param>/queues/${EXT_GRID}</gsh:param>
+  </geniix:ln>
+
+</gsh:script>
+

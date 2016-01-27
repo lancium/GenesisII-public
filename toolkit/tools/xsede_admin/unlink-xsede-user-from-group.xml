@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- links a given user to a given group -->
+
+<gsh:script
+        xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+        xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+        xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script">
+
+<!--
+Inputs for the script:
+
+1.  user name (ex. johndoe)
+2.  group name (ex. gffs-users)
+
+-->
+       <gsh:default name="USER" value="${ARGV[1]}"/>
+       <gsh:default name="USER_DIR" value="/users/xsede.org"/>
+       <gsh:default name="USER_PATH" value="${USER_DIR}/${USER}"/>
+       <gsh:default name="GROUP" value="${ARGV[2]}"/>
+       <gsh:default name="GROUP_DIR" value="/groups/xsede.org"/>
+       <gsh:default name="GROUP_PATH" value="${GROUP_DIR}/${GROUP}"/>
+
+       <echo message=" Checking if ${USER_PATH} exists"/>
+        <try>
+          <block>
+            <geniix:ls>
+              <param>${USER_PATH}</param>
+            </geniix:ls>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not find ${USER_PATH}."/>
+          </catch>
+        </try>
+       <echo message=" Checking if ${GROUP_PATH} exists."/>
+        <try>
+          <block>
+            <geniix:ls>
+              <param>${GROUP_PATH}</param>
+            </geniix:ls>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not find ${GROUP_PATH}."/>
+          </catch>
+        </try>
+       <echo message=" Checking if ${USER_PATH}/${GROUP} exists (user is in group)."/>
+        <try>
+          <block>
+            <geniix:ls>
+              <param>${USER_PATH}/${GROUP}</param>
+            </geniix:ls>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not find ${USER_PATH}/${GROUP} (user isn't in group)."/>
+          </catch>
+        </try>
+        <echo message="  Unlinking ${USER_PATH}/${GROUP}"/>
+        <try>
+          <block>
+            <geniix:unlink>
+              <param>${USER_PATH}/${GROUP}</param>
+            </geniix:unlink>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not unlink ${USER_PATH}/${GROUP}."/>
+          </catch>
+        </try>
+       <echo message=" Revoke access to the ${GROUP_PATH} from ${USER_PATH}."/>
+        <try>
+          <block>
+            <geniix:chmod>
+              <param>${GROUP_PATH}</param>
+              <param>0</param>
+              <param>${USER_PATH}</param>
+            </geniix:chmod>
+          </block>
+          <catch class="java.lang.Exception">
+            <echo message="Could not revoke group access from user."/>
+          </catch>
+        </try>
+
+</gsh:script>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-15-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="containerPath" source="${ARGV[1]}"/>
+
+<gsh:echo message="Testing 'set-container-service-properties' command"/>
+<geniix:set-container-service-properties/>
+
+<gsh:echo message="Testing 'set-container-service-properties --download-mgr-tmpdir' command"/>
+<geniix:set-container-service-properties>
+	<gsh:param>${containerPath}</gsh:param>
+	<gsh:param>--download-mgr-tmpdir=/tmp</gsh:param>
+</geniix:set-container-service-properties>
+
+<gsh:echo message="Testing 'set-container-service-properties --scratch-space-dir ' command"/>
+<geniix:set-container-service-properties>
+	<gsh:param>${containerPath}</gsh:param>
+	<gsh:param>--scratch-space-dir=/tmp</gsh:param>
+</geniix:set-container-service-properties>
+
+</gsh:script>
+
+

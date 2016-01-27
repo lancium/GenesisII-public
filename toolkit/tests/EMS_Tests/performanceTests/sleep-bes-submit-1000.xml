@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:echo message="Testing Submission of 1000 sleep jobs to the BES"/>
+
+<gsh:define name="besPath" source="${ARGV[1]}"/>
+<gsh:define name="jobsPath" source="${ARGV[2]}"/>
+
+<gsh:for param-name="i" initial-value="1" inclusive-limit="1000">
+        <geniix:run>
+        	<gsh:param>--async-name=${jobsPath}/testjob${i}</gsh:param>
+        	<gsh:param>--jsdl=local:./sleep-single-job.jsdl</gsh:param>
+			<gsh:param>${besPath}</gsh:param>
+        </geniix:run>
+</gsh:for>
+
+</gsh:script>
+
+
+

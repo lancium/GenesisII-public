@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Author:Vanamala Venkataswamy-->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<geniix:cd>
+	<gsh:param>${rnsPath}</gsh:param>
+</geniix:cd>
+
+<gsh:for param-name="i" initial-value="0" inclusive-limit="4">
+	<geniix:mkdir>
+		<gsh:param>test-rns</gsh:param>
+	</geniix:mkdir>
+	<geniix:cd>
+		<gsh:param>test-rns</gsh:param>
+	</geniix:cd>
+	<geniix:pwd/>
+</gsh:for>
+
+<geniix:cd>
+	<gsh:param>${rnsPath}</gsh:param>
+</geniix:cd>
+
+</gsh:script>

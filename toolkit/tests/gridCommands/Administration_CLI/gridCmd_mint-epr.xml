@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-14-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<geniix:echo>
+	<gsh:param>"Mint-Epr File"</gsh:param>
+	<gsh:param>></gsh:param>
+	<gsh:param>${rnsPath}/test1.txt</gsh:param>
+</geniix:echo>
+
+<gsh:echo message="Testing 'mint-epr' command - EPR for a file in grid namspace"/>
+<geniix:mint-epr>
+        <gsh:param>grid:${rnsPath}/test1.txt</gsh:param>
+</geniix:mint-epr>
+
+<gsh:echo message="Testing 'mint-epr' command - save the output in ${rnsPath}/minted-epr"/>
+<geniix:mint-epr>
+        <gsh:param>grid:${rnsPath}/test1.txt</gsh:param>
+        <gsh:param>></gsh:param>
+        <gsh:param>${rnsPath}/minted-epr</gsh:param>
+</geniix:mint-epr>
+
+<gsh:echo message="Testing 'mint-epr --output=${rnsPath}/output-epr' command - save the output in ${rnsPath}/minted-epr"/>
+<geniix:mint-epr>
+        <gsh:param>grid:${rnsPath}/test1.txt</gsh:param>
+        <gsh:param>--output=${rnsPath}/output-epr1</gsh:param>
+</geniix:mint-epr>
+
+<gsh:echo message="Testing 'mint-epr --link=${rnsPath}/minted-epr-link' command - save the output in ${rnsPath}/minted-epr"/>
+<geniix:mint-epr>
+        <gsh:param>grid:${rnsPath}/test1.txt</gsh:param>
+        <gsh:param>--link=${rnsPath}/minted-epr-link</gsh:param>
+</geniix:mint-epr>
+
+<geniix:ls>
+	<gsh:param>-l</gsh:param>
+	<gsh:param>${rnsPath}/</gsh:param>
+</geniix:ls>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/test1.txt</gsh:param>
+	<gsh:param>${rnsPath}/output-epr1</gsh:param>
+	<gsh:param>${rnsPath}/minted-epr</gsh:param>
+</geniix:rm>
+
+<geniix:unlink>
+	<gsh:param>${rnsPath}/minted-epr-link</gsh:param>
+</geniix:unlink>
+
+</gsh:script>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 01-09-2012 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+ 
+<gsh:echo message="Testing 'run --jsdl=local:./ls.jsdl ${rnsPath}/test-bes"/>
+<geniix:run>
+	<gsh:param>${rnsPath}/test-bes</gsh:param>
+	<gsh:param>--jsdl=local:./ls.jsdl</gsh:param>
+</geniix:run> 
+
+<gsh:echo message="Testing 'run --job-name=test-ls --async-name=${rnsPath}/test-ls --jsdl=local:./ls.jsdl ${rnsPath}/test-bes "/>
+<geniix:run>
+	<gsh:param>--name=test-ls</gsh:param>
+	<gsh:param>--async-name=${rnsPath}/test-ls</gsh:param>
+	<gsh:param>${rnsPath}/test-bes</gsh:param>
+	<gsh:param>--jsdl=local:./ls.jsdl</gsh:param>
+</geniix:run> 
+
+<gsh:sleep value="10" units="SECONDS"/>
+<gsh:echo message="Checking Job status"/>
+<geniix:run>
+	<gsh:param>--check-status</gsh:param>
+	<gsh:param>${rnsPath}/test-ls</gsh:param>
+</geniix:run>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/test-ls</gsh:param>
+</geniix:rm>
+
+</gsh:script>

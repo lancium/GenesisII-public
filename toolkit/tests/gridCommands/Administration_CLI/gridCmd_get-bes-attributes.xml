@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-14-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="containerPath" source="${ARGV[2]}"/>
+
+<gsh:echo message="creating dummy-bes in ${rnsPath}"/>
+<geniix:create-resource>
+        <gsh:param>${containerPath}/Services/GeniiBESPortType</gsh:param>
+        <gsh:param>${rnsPath}/dummy-bes</gsh:param>
+</geniix:create-resource>
+<geniix:chmod>
+        <gsh:param>${rnsPath}/dummy-bes</gsh:param>
+        <gsh:param>+rwx</gsh:param>
+        <gsh:param>--everyone</gsh:param>
+</geniix:chmod>
+<gsh:echo message="listing dummy-bes"/>
+<geniix:ls>
+        <gsh:param>-l</gsh:param>
+        <gsh:param>${rnsPath}</gsh:param>
+</geniix:ls>
+
+<geniix:get-bes-attributes>
+	<gsh:param>${rnsPath}/dummy-bes</gsh:param>
+</geniix:get-bes-attributes>
+
+<geniix:unlink>
+	<gsh:param>${rnsPath}/dummy-bes</gsh:param>
+</geniix:unlink>
+
+</gsh:script>

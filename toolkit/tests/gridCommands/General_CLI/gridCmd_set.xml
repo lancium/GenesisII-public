@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-15-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<gsh:echo message="Testing 'set myFile=${rnsPath}/set-file.txt' command - set myFile to point to ${rnsPath}/set-file.txt"/>
+<geniix:set>
+	<gsh:param>myFile=${rnsPath}/set-file.txt</gsh:param>
+</geniix:set>
+
+<!--<gsh:echo message="Writing to myfile that points to ${rnsPath}/set-file.txt"/>
+<geniix:echo>
+	<gsh:param>"SET sample file"</gsh:param>
+	<gsh:param>></gsh:param>
+	<gsh:param>${myFile}</gsh:param>
+</geniix:echo> -->
+
+<geniix:cd>
+	<gsh:param>/</gsh:param>
+</geniix:cd>
+
+<gsh:echo message="Testing 'set myPath=${rnsPath}' command - set myPath to point to ${rnsPath}"/>
+<geniix:set>
+	<gsh:param>myPath=${rnsPath}</gsh:param>
+</geniix:set>
+
+<gsh:echo message="cd myPath' that was just set using 'set' command"/>
+<geniix:cd>
+	<gsh:param>${myPath}</gsh:param>
+</geniix:cd>
+
+<geniix:pwd/>
+
+</gsh:script>

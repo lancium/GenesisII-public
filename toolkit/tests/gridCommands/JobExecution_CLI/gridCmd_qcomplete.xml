@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-19-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<gsh:echo message="Calling 'gridCmd_qsub.xml' to submit a job"/>
+<geniix:script>
+        <gsh:param>local:./gridCmd_qsub.xml</gsh:param>
+        <gsh:param>${rnsPath}</gsh:param>
+</geniix:script>
+
+<gsh:foreach param-name="i" source-file="./output.txt">
+	<gsh:define name="out" source="${i}" pattern="Job Submitted.  Ticket is " replacement=""/>
+	<gsh:define name="out1" source="${out}" pattern="\." replacement=""/>
+	<gsh:define name="out2" source="${out1}" pattern='\"' replacement=""/>
+`	<gsh:echo message="${out2}"/>
+	<geniix:qstat>
+		<gsh:param>${rnsPath}/test-queue</gsh:param>
+		<gsh:param>${out2}</gsh:param>
+	</geniix:qstat>
+	<gsh:sleep value="20" units="SECONDS"/>
+	<geniix:qcomplete>
+		<gsh:param>${rnsPath}/test-queue</gsh:param>
+		<gsh:param>${out2}</gsh:param>
+	</geniix:qcomplete>
+</gsh:foreach>
+
+</gsh:script>

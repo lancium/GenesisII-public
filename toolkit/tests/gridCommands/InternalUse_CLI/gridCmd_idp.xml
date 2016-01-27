@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 01-09-2012 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="localMountPoint" source="${ARGV[2]}"/>
+<gsh:define name="containerPath" source="${ARGV[3]}"/>
+
+<gsh:echo message="Testing 'GetUserDir' command - this should print the current GENII_USER_DIR being used"/>
+<gsh:echo message="Your User Dir is : "/>
+<geniix:GetUserDir/>
+
+</gsh:script>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-21-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="userName" source="${ARGV[2]}"/>
+<gsh:define name="passWord" source="${ARGV[3]}"/>
+
+<geniix:mkdir>
+	<gsh:param>${rnsPath}/chmod-Dir</gsh:param>
+</geniix:mkdir>
+
+<gsh:echo message="Testing 'chmod ${rnsPath}/chmod-Dir +r /users/${userName}' command"/>
+<geniix:chmod>
+	<gsh:param>${rnsPath}/chmod-Dir</gsh:param>
+	<gsh:param>+r</gsh:param>
+	<gsh:param>/users/${username}</gsh:param>
+</geniix:chmod>
+
+<gsh:echo message="Testing 'chmod ${rnsPath}/chmod-Dir +w /users/${userName}' command"/>
+<geniix:chmod>
+	<gsh:param>${rnsPath}/chmod-Dir</gsh:param>
+	<gsh:param>+w</gsh:param>
+	<gsh:param>/users/${userName}</gsh:param>
+</geniix:chmod>
+
+<gsh:echo message="Testing 'chmod ${rnsPath}/chmod-Dir +x /users/${userName}' command"/>
+<geniix:chmod>
+	<gsh:param>${rnsPath}/chmod-Dir</gsh:param>
+	<gsh:param>+x</gsh:param>
+	<gsh:param>/users/${userName}</gsh:param>
+</geniix:chmod>
+
+<gsh:echo message="Testing 'chmod ${rnsPath}/chmod-Dir 7 /users/${userName}' command"/>
+<geniix:chmod>
+	<gsh:param>${rnsPath}/chmod-Dir</gsh:param>
+	<gsh:param>7</gsh:param>
+	<gsh:param>/users/${userName}</gsh:param>
+</geniix:chmod>
+
+<geniix:rm>
+	<gsh:param>${rnsPath}/chmod-Dir</gsh:param>
+</geniix:rm>
+
+</gsh:script>

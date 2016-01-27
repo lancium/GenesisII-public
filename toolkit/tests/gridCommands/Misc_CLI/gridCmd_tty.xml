@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-19-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+<gsh:define name="containerPath" source="${ARGV[2]}"/>
+
+<gsh:echo message="Creating Dummy-bes 'create-resource ${containerPath}/Services/GeniiBESPortType ${rnsPath}/dummy-bes  ' command "/>
+<geniix:create-resource>
+        <gsh:param>${containerPath}/Services/GeniiBESPortType</gsh:param>
+        <gsh:param>${rnsPath}/dummy-bes</gsh:param>
+</geniix:create-resource>
+
+<gsh:echo message="Creating TTY object 'create-resource ${containerPath}/Services/TTYPortType ${rnsPath}/tty-object  ' command "/>
+<geniix:create-resource>
+        <gsh:param>${containerPath}/Services/TTYPortType</gsh:param>
+        <gsh:param>${rnsPath}/tty-object</gsh:param>
+</geniix:create-resource>
+
+<gsh:echo message="Testing 'tty watch ${rnsPath}/tty-object' - command"/>
+<geniix:tty>
+	<gsh:param>watch</gsh:param>
+	<gsh:param>${rnsPath}/tty-object</gsh:param>
+</geniix:tty>
+
+<geniix:ls>
+	<gsh:param>${rnsPath}/</gsh:param>
+</geniix:ls>
+
+<gsh:echo message="Testing 'tty unwatch' - command"/>
+<geniix:tty>
+	<gsh:param>unwatch</gsh:param>
+</geniix:tty>
+
+<geniix:unlink>
+	<gsh:param>${rnsPath}/dummy-bes</gsh:param>
+	<gsh:param>${rnsPath}/tty-object</gsh:param>
+</geniix:unlink>
+
+</gsh:script>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:echo message="Testing Submission of ls 100 jobs"/>
+
+<gsh:define name="container" source="${ARGV[1]}"/>
+
+<gsh:for param-name="i" initial-value="1" inclusive-limit="100">
+        <geniix:run>
+                <gsh:param>--name=plenitude_job${i}</gsh:param>
+                <gsh:param>--jsdl=local:./ls-single-job.jsdl</gsh:param>
+                <gsh:param>${container}</gsh:param>
+        </geniix:run>
+</gsh:for>
+
+</gsh:script>
+
+
+

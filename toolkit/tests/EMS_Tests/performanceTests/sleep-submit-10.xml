@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:echo message="Testing Submission of 10 sleep jobs to the Grid queue"/>
+
+<gsh:define name="queuePath" source="${ARGV[1]}"/>
+
+<gsh:for param-name="i" initial-value="1" inclusive-limit="10">
+        <geniix:qsub>
+                <gsh:param>${queuePath}</gsh:param>
+                <gsh:param>local:./sleep-single-job.jsdl</gsh:param>
+        </geniix:qsub>
+</gsh:for>
+
+</gsh:script>
+
+
+

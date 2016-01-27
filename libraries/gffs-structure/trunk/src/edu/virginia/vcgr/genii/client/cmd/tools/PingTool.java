@@ -27,6 +27,9 @@ public class PingTool extends BaseGridTool
 	static final private String _USAGE = "config/tooldocs/usage/uping";
 	static final private String _MANPAGE = "config/tooldocs/man/ping";
 
+	// if this is true, we will not allow a fault to escape runCommand and will instead just exit with a failure code from the app.
+	boolean _eatFaults = false; 
+	
 	public PingTool()
 	{
 		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.GENERAL);
@@ -40,30 +43,45 @@ public class PingTool extends BaseGridTool
 	{
 		_attempts = Integer.parseInt(attempts);
 	}
+	
+	@Option({ "eatfaults"})
+	public void setEatfaults()
+	{
+		_eatFaults = true;
+	}
 
 	@Override
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
 		IOException, ResourcePropertyException
 	{
-		GeniiPath gPath = new GeniiPath(getArgument(0));
-		if (gPath.pathType() != GeniiPathType.Grid)
-			throw new InvalidToolUsageException("<target> must be a grid path. ");
-		RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
+		try {
+			GeniiPath gPath = new GeniiPath(getArgument(0));
+			if (gPath.pathType() != GeniiPathType.Grid)
+				throw new InvalidToolUsageException("<target> must be a grid path. ");
+			RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 
-		EndpointReferenceType target = path.getEndpoint();
-		/*
-		 * target.getAddress().get_value().setQueryString("genii-container-id=" + new GUID());
-		 */
-		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target);
+			EndpointReferenceType target = path.getEndpoint();
+			/*
+			 * target.getAddress().get_value().setQueryString("genii-container-id=" + new GUID());
+			 */
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target);
 
-		String msg = _DEFAULT_MESSAGE;
-		if (numArguments() == 2)
-			msg = getArgument(1);
+			String msg = _DEFAULT_MESSAGE;
+			if (numArguments() == 2)
+				msg = getArgument(1);
 
-		for (int i = 0; i < _attempts; i++) {
-			String response = common.ping(msg);
-			stdout.format("Response %d:  %s\n", i, response);
-			stdout.format("Endpoint Information:  %s\n", ClientUtils.getLastEndpointInformation(common));
+			for (int i = 0; i < _attempts; i++) {
+				String response = common.ping(msg);
+				stdout.format("Response %d:  %s\n", i, response);
+				stdout.format("Endpoint Information:  %s\n", ClientUtils.getLastEndpointInformation(common));
+			}
+		} catch (Throwable t) {
+			if (_eatFaults) {
+				stderr.println("ping problem: " + t.getMessage());
+				return 1;
+			} else {
+				throw t;
+			}
 		}
 
 		return 0;

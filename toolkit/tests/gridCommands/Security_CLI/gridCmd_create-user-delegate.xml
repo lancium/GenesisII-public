@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gsh:script
+        xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+        xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid"
+        xmlns="http://vcgr.cs.virginia.edu/genii/xsh/script"> 
+
+	<condition property="CORRECTARGS">
+    		<compare numeric="true" arg1="5" arg2="${ARGV}" comparison="eq"/>
+  	</condition>
+
+	<!-- args 1=container 2=user 3=user path 4=passwd 5=group -->
+	<gsh:define name="containerPath" source="${ARGV[1]}"/>
+	<gsh:define name="oldIdpName" source="${ARGV[2]}"/>
+	<gsh:define name="oldUserName" source="${ARGV[2]}"/>
+	<gsh:define name="newIdpName" source="${ARGV[3]}"/>
+	<gsh:define name="newUserName" source="${ARGV[3]}"/>
+	<gsh:define name="newUserPassword" source="${ARGV[4]}"/>
+
+
+  	<if test="CORRECTARGS">
+    	<then>
+        	<echo message="Creating user ${ARGV[2]}"/>
+        	<try>
+          		<block>
+            			<geniix:create-user-delegate>
+					<param>--storetype=PKCS12</param>
+              				<param>${containerPath}/Services/X509AuthnPortType</param>
+              				<param>${containerPath}/Services/X509AuthnPortType/${idpName}</param>
+              				<param>--login-name=${newUserName}</param>
+              				<param>--login-password=${newUserPassword}</param>
+              				<!-- <param>validDuration=30s</param>	 -->
+            			</geniix:create-user-delegate>
+          		</block>
+	          	<catch class="java.lang.Exception">
+       	     			<echo message="Could not create user identity, accepting that it may exist."/>
+          		</catch>
+        	</try>
+
+		<echo message="Login as new user - ${userName}"/>
+		<try>
+			<block>	
+				<geniix:login>
+					<param>--username=${userName}</param>
+					<param>--password=${userName}</param>
+				</geniix:login>
+				<geniix:whoami/>
+			</block>
+			<catch class="java.lang.Exception">
+                        	<echo message="Could not login as new user, may be validDuration time expired"/>
+                	</catch>
+                </try>
+		
+    	</then>
+    	<else>
+      		<echo message="Wrong number of arguments: need 5 (plus command as first argument), got ${ARGV}"/>
+      		<echo message="Usage: script gridCmd_create-user-delegate.xml {container-name} {old-user-name} {new-user-name} {new-user-password}"/>
+      		<echo message="[FAILURE] invalid number of arguments."/>
+      		<exit exitcode="-1"/>
+    	</else>
+  	</if>
+</gsh:script>
+

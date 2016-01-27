@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Author: Vanamala Venkataswamy -->
+<!-- Date: 12-13-2011 -->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:define name="rnsPath" source="${ARGV[1]}"/>
+
+<geniix:mkdir>
+        <gsh:param>${rnsPath}/TestDir1</gsh:param>
+        <gsh:param>${rnsPath}/TestDir2</gsh:param>
+        <gsh:param>${rnsPath}/TestDir3</gsh:param>
+        <gsh:param>${rnsPath}/TestDir4</gsh:param>
+        <gsh:param>${rnsPath}/TestDir5</gsh:param>
+</geniix:mkdir>
+
+<gsh:echo message="Testing 'rm' command"/>
+<geniix:rm>
+        <gsh:param>${rnsPath}/TestDir1</gsh:param>
+</geniix:rm>
+
+<gsh:echo message="Testing 'rm' command - remove multiple directories"/>
+<geniix:rm>
+        <gsh:param>${rnsPath}/TestDir2</gsh:param>
+        <gsh:param>${rnsPath}/TestDir3</gsh:param>
+</geniix:rm>
+
+<gsh:echo message="Testing 'rm -f' command - Forces entries to be deleted (no prompting)"/>
+<geniix:rm>
+        <gsh:param>-f</gsh:param>
+        <gsh:param>TestDir4</gsh:param>
+</geniix:rm>
+
+<gsh:echo message="Testing 'rm --force' command - Forces entries to be deleted (no prompting)"/>
+<geniix:rm>
+        <gsh:param>--force</gsh:param>
+        <gsh:param>TestDir5</gsh:param>
+</geniix:rm>
+
+<geniix:mkdir>
+	<gsh:param>-p</gsh:param>
+        <gsh:param>${rnsPath}/RTestDir1/Dir1/Dir2/Dir3</gsh:param>
+</geniix:mkdir>
+
+<geniix:mkdir>
+	<gsh:param>-p</gsh:param>
+        <gsh:param>${rnsPath}/RTestDir2/Dir1/Dir2/Dir3</gsh:param>
+</geniix:mkdir>
+`
+<gsh:echo message="Testing 'rm -r' command - removes all entries recursively from that directory and so on"/>
+<geniix:rm>
+        <gsh:param>-r</gsh:param>
+        <gsh:param>RTestDir1</gsh:param>
+</geniix:rm>
+
+<gsh:echo message="Testing 'rm --recursive' command - removes all entries recursively from that directory and so on"/>
+<geniix:rm>
+        <gsh:param>--recursive</gsh:param>
+        <gsh:param>RTestDir2</gsh:param>
+</geniix:rm>
+
+<geniix:rm>
+        <gsh:param>RTestDir1</gsh:param>
+        <gsh:param>RTestDir2</gsh:param>
+</geniix:rm>
+
+<geniix:mkdir>
+        <gsh:param>--rns-service=${containerPath}/EnhancedRNSPortType</gsh:param>
+        <gsh:param>${rnsPath}/RNSDir</gsh:param>
+</geniix:mkdir>
+
+<gsh:echo message="Testing 'rm' command - remove directory created using --rns-service option"/>
+<geniix:rm>
+        <gsh:param>${rnsPath}/RNSDir</gsh:param>
+</geniix:rm>
+
+</gsh:script>
+

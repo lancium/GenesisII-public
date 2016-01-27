@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Author: Chris Koeritz-->
+
+<gsh:script xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script" xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+<gsh:echo message="Testing 'exit' command with success value"/>
+<gsh:exit exitcode="0" />
+
+</gsh:script>
+
