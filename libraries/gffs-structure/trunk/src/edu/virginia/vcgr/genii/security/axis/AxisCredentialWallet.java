@@ -171,6 +171,10 @@ public class AxisCredentialWallet
 			try {
 				TrustCredential delegation = new TrustCredential(node);
 				detachedDelegations.put(delegation.getId(), delegation);
+				// hmmm: reduce noise on this later. currently a useful testing metric.
+				if (_logger.isDebugEnabled())
+					_logger.debug("credential seen in SOAP: " + delegation.getId());
+
 			} catch (Throwable t) {
 				_logger.error("failed to decode trust delegation from soap, dropping it.", t);
 			}
