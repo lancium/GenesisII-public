@@ -188,8 +188,8 @@ public class ResourcePropertyManager
 		classes.add(ResourcePropertyRefresher.class);
 
 		try {
-			return (ResourcePropertyRefresher) Proxy.newProxyInstance(loader, classes.toArray(new Class<?>[0]), new RPInvoker(likelyRPs,
-				target, callingContext));
+			return (ResourcePropertyRefresher) Proxy.newProxyInstance(loader, classes.toArray(new Class<?>[0]),
+				new RPInvoker(likelyRPs, target, callingContext));
 		} catch (GenesisIISecurityException gse) {
 			throw new ResourcePropertyException("Security exception in Genesis II.", gse);
 		} catch (ResourceException re) {

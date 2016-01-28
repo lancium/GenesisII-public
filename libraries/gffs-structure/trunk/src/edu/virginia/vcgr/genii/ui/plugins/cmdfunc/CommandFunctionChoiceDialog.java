@@ -36,12 +36,12 @@ class CommandFunctionChoiceDialog extends JDialog
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new JLabel("Which command function do you want to call?"), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Which command function do you want to call?"),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		_functions = new JComboBox(new Vector<JavaCommandFunction>(functions));
-		content.add(_functions, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
-			5, 5, 5, 5), 5, 5));
+		content.add(_functions,
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		content.add(ButtonPanel.createHorizontalButtonPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));

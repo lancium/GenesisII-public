@@ -35,8 +35,8 @@ public class Credential implements Serializable
 {
 	static final long serialVersionUID = 0L;
 
-	@XmlElements({ @XmlElement(namespace = HPCFSEConstants.WSSEC_SECEXT_NS, name = "UsernameToken", required = false,
-		type = UsernameToken.class) })
+	@XmlElements({
+		@XmlElement(namespace = HPCFSEConstants.WSSEC_SECEXT_NS, name = "UsernameToken", required = false, type = UsernameToken.class) })
 	private List<SecurityToken> _tokens = new Vector<SecurityToken>();
 
 	@XmlAnyElement

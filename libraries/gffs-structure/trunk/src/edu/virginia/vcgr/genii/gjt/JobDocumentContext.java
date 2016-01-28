@@ -232,9 +232,8 @@ public class JobDocumentContext
 		if (((Boolean) (_applicationContext.preferences().preference(ToolPreference.PopupForWarnings))).booleanValue()) {
 			Analysis analysis = jobDocument().analyze();
 			if (analysis.hasWarnings()) {
-				int result =
-					JOptionPane.showConfirmDialog(_frame, "There are still warnings!  Do you still want to generate JSDL?",
-						"JSDL Generation Confirmation", JOptionPane.YES_NO_OPTION);
+				int result = JOptionPane.showConfirmDialog(_frame, "There are still warnings!  Do you still want to generate JSDL?",
+					"JSDL Generation Confirmation", JOptionPane.YES_NO_OPTION);
 
 				if (result != JOptionPane.YES_OPTION)
 					return;
@@ -272,9 +271,8 @@ public class JobDocumentContext
 						target = new File(target.getParentFile(), name + ".jsdl");
 
 					if (target.exists()) {
-						int result =
-							JOptionPane
-								.showConfirmDialog(_frame, "Overwrite existing file?", "File Exists", JOptionPane.YES_NO_CANCEL_OPTION);
+						int result = JOptionPane.showConfirmDialog(_frame, "Overwrite existing file?", "File Exists",
+							JOptionPane.YES_NO_CANCEL_OPTION);
 						if (result == JOptionPane.CANCEL_OPTION)
 							return;
 						else if (result == JOptionPane.NO_OPTION)

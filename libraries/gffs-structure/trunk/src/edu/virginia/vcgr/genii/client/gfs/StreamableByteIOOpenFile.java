@@ -22,8 +22,8 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 class StreamableByteIOOpenFile extends OperatorBasedOpenFile
 {
-	static private BasicFileOperator createOperator(StreamableByteIOPortType portType) throws ResourceException, GenesisIISecurityException,
-		RemoteException, IOException
+	static private BasicFileOperator createOperator(StreamableByteIOPortType portType)
+		throws ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
 		StreamableByteIOTransferer transferer = StreamableByteIOTransfererFactory.createStreamableByteIOTransferer(portType);
 

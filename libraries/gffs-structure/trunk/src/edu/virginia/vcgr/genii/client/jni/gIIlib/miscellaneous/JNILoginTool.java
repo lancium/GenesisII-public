@@ -28,8 +28,8 @@ public class JNILoginTool extends JNILibraryBase
 		String[] args = { "login" };
 
 		try {
-			runner.runCommand(args, new OutputStreamWriter(System.out), new OutputStreamWriter(System.err), new BufferedReader(
-				new InputStreamReader(System.in)));
+			runner.runCommand(args, new OutputStreamWriter(System.out), new OutputStreamWriter(System.err),
+				new BufferedReader(new InputStreamReader(System.in)));
 
 			// Checks to make sure login worked
 			ICallingContext callContext = ContextManager.getExistingContext();

@@ -36,8 +36,8 @@ public class SMBNTCreateAndX implements SMBCommand
 	public static final int FILE_NON_DIRECTORY_FILE = 0x40;
 
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		SMBAndX chain = SMBAndX.decode(params);
 		params.get();
@@ -97,14 +97,14 @@ public class SMBNTCreateAndX implements SMBCommand
 		Date accessTime = new Date();
 		Date writeTime = new Date();
 		if (info.isByteIO()) {
-			// hmmm: we don't have timestamp info for rns?  at least, if we call these methods on rns dirs, there are huge exceptions.
+			// hmmm: we don't have timestamp info for rns? at least, if we call these methods on rns dirs, there are huge exceptions.
 			createTime = info.getByteIOCreateTime();
 			accessTime = info.getByteIOAccessTime();
 			writeTime = info.getByteIOModificationTime();
 		}
-		
+
 		Date changeTime = writeTime;
-		
+
 		long fileSize = 0;
 		if (info.isByteIO()) {
 			fileSize = info.getByteIOSize();

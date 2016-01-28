@@ -86,8 +86,8 @@ public class DirHandler
 		}
 
 		if (!dir.isDirectory()) {
-			DefaultResponse
-				.send(socket, ErrorCode.LL_NOT_DIR_ERROR_CODE, ErrorCode.getErrorMsgFromErrorCode(ErrorCode.LL_NOT_DIR_ERROR_CODE));
+			DefaultResponse.send(socket, ErrorCode.LL_NOT_DIR_ERROR_CODE,
+				ErrorCode.getErrorMsgFromErrorCode(ErrorCode.LL_NOT_DIR_ERROR_CODE));
 			return ErrorCode.LL_NOT_DIR_ERROR_CODE;
 		}
 

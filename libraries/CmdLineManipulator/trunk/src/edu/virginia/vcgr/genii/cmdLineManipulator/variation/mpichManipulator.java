@@ -133,8 +133,8 @@ public class mpichManipulator extends AbstractCmdLineManipulator<MpichVariationC
 			}
 
 			if (!matchingSupport) {
-				throw new CmdLineManipulatorException(String.format("Requested SPMD variation not supported " + "by manipulator \"%s\"",
-					variationName));
+				throw new CmdLineManipulatorException(
+					String.format("Requested SPMD variation not supported " + "by manipulator \"%s\"", variationName));
 			}
 
 			// extract processNum flag

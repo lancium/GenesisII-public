@@ -29,8 +29,8 @@ public class DefaultSubscriptionFactory extends AbstractSubscriptionFactory
 	{
 		try {
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, publisher);
-			return new DefaultSubscription(common.subscribe(new SubscribeRequest(_consumerReference, topicFilter, terminationTime,
-				additionalUserData, policies).asRequestType()));
+			return new DefaultSubscription(common.subscribe(
+				new SubscribeRequest(_consumerReference, topicFilter, terminationTime, additionalUserData, policies).asRequestType()));
 		} catch (Throwable cause) {
 			throw new SubscribeException("Unable to subscribe consumer.", cause);
 		}

@@ -104,10 +104,10 @@ public class BrowserDialog extends JFrame
 		contentPane.setLayout(new GridBagLayout());
 		contentPane.add(new JLabel("GFFS Browser"), new GridBagConstraints(0, 0, 1, 1, 0.3, 0.0, GridBagConstraints.WEST,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		contentPane.add(new JScrollPane(_rnsTree), new GridBagConstraints(0, 1, 1, 1, 0.3, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		contentPane.add(tabWidget, new GridBagConstraints(1, 0, 1, 2, 0.7, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(new JScrollPane(_rnsTree),
+			new GridBagConstraints(0, 1, 1, 1, 0.3, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(tabWidget,
+			new GridBagConstraints(1, 0, 1, 2, 0.7, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		setJMenuBar(createMenuBar());
 

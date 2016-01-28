@@ -52,8 +52,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 {
 	static private Log _logger = LogFactory.getLog(ApplicationDeployerServiceImpl.class);
 
-	static private QName DEPLOYMENT_CONSTRUCTION_PARAM = new QName(WellKnownPortTypes.DEPLOYER_PORT_TYPE().getQName().getNamespaceURI(),
-		"deployment");
+	static private QName DEPLOYMENT_CONSTRUCTION_PARAM =
+		new QName(WellKnownPortTypes.DEPLOYER_PORT_TYPE().getQName().getNamespaceURI(), "deployment");
 
 	static private final String _DEPLOYMENT_PROPERTY = "edu.virginia.vcgr.genii.container.deployer.deployment-property";
 
@@ -80,9 +80,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 	@RWXMapping(RWXCategory.EXECUTE)
 	public CreateDeploymentResponseType createDeployment(CreateDeploymentRequestType createDeploymentRequest) throws RemoteException
 	{
-		VcgrCreate create =
-			new VcgrCreate(new MessageElement[] { new MessageElement(DEPLOYMENT_CONSTRUCTION_PARAM,
-				createDeploymentRequest.getDeploymentDescription()) });
+		VcgrCreate create = new VcgrCreate(
+			new MessageElement[] { new MessageElement(DEPLOYMENT_CONSTRUCTION_PARAM, createDeploymentRequest.getDeploymentDescription()) });
 		VcgrCreateResponse resp = vcgrCreate(create);
 		return new CreateDeploymentResponseType(resp.getEndpoint());
 	}
@@ -159,8 +158,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 
 	static public PlatformDescriptionType[] determineSupportedPlatforms()
 	{
-		return new PlatformDescriptionType[] { new PlatformDescriptionType(SystemUtils.getSupportedArchitectures(),
-			SystemUtils.getSupportedOperatingSystems(), null) };
+		return new PlatformDescriptionType[] {
+			new PlatformDescriptionType(SystemUtils.getSupportedArchitectures(), SystemUtils.getSupportedOperatingSystems(), null) };
 	}
 
 	static private IDeployment createZipJarDeployment(EndpointReferenceType deployDescEPR, ZipJarDeploymentType deploymentDescription)

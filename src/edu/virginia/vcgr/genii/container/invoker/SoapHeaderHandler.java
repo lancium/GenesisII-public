@@ -96,14 +96,14 @@ public class SoapHeaderHandler implements IAroundInvoker
 							isGeniiClient = true;
 					}
 				} else if (nodeName.equals(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_NAME)) {
-					//hmmm: THIS IS TURNED OFF FOR NOW until feature is implemented.
-					
-//					Node child = node.getFirstChild();
-//					if (child != null) {
-//						String value = child.getNodeValue();
-//						if (value != null && value.equalsIgnoreCase("true"))
-//							supportsShorthand = true;
-//					}
+					// hmmm: THIS IS TURNED OFF FOR NOW until feature is implemented.
+
+					// Node child = node.getFirstChild();
+					// if (child != null) {
+					// String value = child.getNodeValue();
+					// if (value != null && value.equalsIgnoreCase("true"))
+					// supportsShorthand = true;
+					// }
 				} else if (nodeName.equals(GENII_VERSION_ELEMENT_NAME)) {
 					Node child = node.getFirstChild();
 					if (child != null) {
@@ -126,7 +126,7 @@ public class SoapHeaderHandler implements IAroundInvoker
 				+ ", Action = " + action);
 
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
-		
+
 		// hmmm: these values that get set in the working context don't ever seem to be used.
 		ctxt.setProperty(GeniiSOAPHeaderConstants.GENII_ENDPOINT_NAME, isGeniiClient);
 		if (clientVersion != null)
@@ -163,15 +163,15 @@ public class SoapHeaderHandler implements IAroundInvoker
 			}
 		}
 
-		//hmmm: NOT ADDING CRED SHORTHAND HEADER YET
-		
-//		// add in the credential shorthand flag here too. again.
-//		// hmmm: really? adding these all twice?
-//		SOAPHeaderElement shorthand =
-//			new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_QNAME, Boolean.TRUE);
-//		shorthand.setActor(null);
-//		shorthand.setMustUnderstand(false);
-//		header.addChildElement(shorthand);
+		// hmmm: NOT ADDING CRED SHORTHAND HEADER YET
+
+		// // add in the credential shorthand flag here too. again.
+		// // hmmm: really? adding these all twice?
+		// SOAPHeaderElement shorthand =
+		// new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_QNAME, Boolean.TRUE);
+		// shorthand.setActor(null);
+		// shorthand.setMustUnderstand(false);
+		// header.addChildElement(shorthand);
 
 		// Add the relates to
 		if (messageID != null) {

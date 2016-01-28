@@ -60,9 +60,8 @@ final public class CredentialManagementContext
 
 	final public void logoutAll(Component source)
 	{
-		int response =
-			JOptionPane.showConfirmDialog(source, "Are you sure you want to log out from all credentials?", "Logout All Confirmation",
-				JOptionPane.YES_NO_OPTION);
+		int response = JOptionPane.showConfirmDialog(source, "Are you sure you want to log out from all credentials?",
+			"Logout All Confirmation", JOptionPane.YES_NO_OPTION);
 		if (response == JOptionPane.YES_OPTION) {
 			try {
 				ClientUtils.invalidateCredentials(_uiContext.callingContext());

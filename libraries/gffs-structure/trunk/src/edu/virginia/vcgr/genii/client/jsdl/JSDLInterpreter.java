@@ -681,8 +681,7 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
-	static private void understand(PersonalityProvider provider, Object parentUnderstanding, OperatingSystem_Type osType)
-		throws JSDLException
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, OperatingSystem_Type osType) throws JSDLException
 	{
 		if (osType == null)
 			return;

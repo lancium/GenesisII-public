@@ -45,18 +45,18 @@ public class IntegerLoopVariableDefinitionEditor extends VariableDefinitionEdito
 		Container container = getContentPane();
 		container.setLayout(new GridBagLayout());
 
-		container.add(new JLabel("Start Value"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JLabel("Start Value"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		container.add(start, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 
-		container.add(new JLabel("End Value"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JLabel("End Value"),
+			new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		container.add(stop, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 
-		container.add(new JLabel("Step By"), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JLabel("Step By"),
+			new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		container.add(step, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 

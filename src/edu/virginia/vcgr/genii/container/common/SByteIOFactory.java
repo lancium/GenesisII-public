@@ -66,8 +66,8 @@ public class SByteIOFactory implements Closeable
 		}
 	}
 
-	public EndpointReferenceType create() throws ResourceCreationFaultType, GenesisIISecurityException, ResourceException, RemoteException,
-		IOException
+	public EndpointReferenceType create()
+		throws ResourceCreationFaultType, GenesisIISecurityException, ResourceException, RemoteException, IOException
 	{
 		synchronized (this) {
 			_stream.flush();

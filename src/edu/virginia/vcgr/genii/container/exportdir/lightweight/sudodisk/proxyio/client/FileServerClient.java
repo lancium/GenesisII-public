@@ -90,8 +90,8 @@ public class FileServerClient
 		}
 	}
 
-	public static DefaultResponse truncAppend(String path, byte[] wb, long offset, byte[] nonce, int port) throws UnknownHostException,
-		IOException
+	public static DefaultResponse truncAppend(String path, byte[] wb, long offset, byte[] nonce, int port)
+		throws UnknownHostException, IOException
 	{
 
 		if (path == null) {

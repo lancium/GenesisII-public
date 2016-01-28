@@ -16,8 +16,8 @@ public class BasicResourceAttributes extends ResourceAttributes
 	private Long _physicalMemory;
 	private Long _virtualMemory;
 
-	public BasicResourceAttributes(OperatingSystem_Type operatingSystem, CPUArchitecture_Type architecture, Integer cpuCount,
-		Double cpuSpeed, Long physicalMemory, Long virtualMemory)
+	public BasicResourceAttributes(OperatingSystem_Type operatingSystem, CPUArchitecture_Type architecture, Integer cpuCount, Double cpuSpeed,
+		Long physicalMemory, Long virtualMemory)
 	{
 		_operatingSystem = operatingSystem;
 		_CPUArchitecture = architecture;

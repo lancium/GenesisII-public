@@ -48,9 +48,9 @@ public class SMBTrans2FindNext implements SMBTrans2Command
 		// future: this is probably wrong, although it does work for my machine
 		if ((flags & SMBFind.CONTINUE_FROM_LAST) != 0) {
 			// Continue from previous location; no-op
-		}/*
-		 * else if (search.getResume()) { // Continue from the resume key search.reset(resumeKey); }
-		 */else {
+		} /*
+			 * else if (search.getResume()) { // Continue from the resume key search.reset(resumeKey); }
+			 */else {
 			search.reset(fileName);
 		}
 

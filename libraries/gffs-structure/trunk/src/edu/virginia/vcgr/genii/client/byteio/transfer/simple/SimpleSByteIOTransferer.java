@@ -24,8 +24,8 @@ import org.apache.axis.message.MessageElement;
  * 
  * @author mmm2a
  */
-public class SimpleSByteIOTransferer extends AbstractByteIOTransferer<StreamableByteIOPortType> implements StreamableByteIOTransferer,
-	SimpleByteIOTransferer
+public class SimpleSByteIOTransferer extends AbstractByteIOTransferer<StreamableByteIOPortType>
+	implements StreamableByteIOTransferer, SimpleByteIOTransferer
 {
 	/**
 	 * Create a new SimpleSByteIO transferer.
@@ -53,9 +53,8 @@ public class SimpleSByteIOTransferer extends AbstractByteIOTransferer<Streamable
 		else
 			seekOrigin = ByteIOConstants.SEEK_ORIGIN_END_URI;
 
-		SeekRead seekReadRequest =
-			new SeekRead(offset, seekOrigin, new UnsignedInt(numBytes), new TransferInformationType(null,
-				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
+		SeekRead seekReadRequest = new SeekRead(offset, seekOrigin, new UnsignedInt(numBytes),
+			new TransferInformationType(null, ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
 		SeekReadResponse resp = _clientStub.seekRead(seekReadRequest);
 
 		if (resp.getTransferInformation() == null)

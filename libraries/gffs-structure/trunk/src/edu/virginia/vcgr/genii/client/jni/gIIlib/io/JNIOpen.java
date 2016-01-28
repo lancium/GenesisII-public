@@ -85,9 +85,9 @@ public class JNIOpen extends JNILibraryBase
 		String[] path = convertPath(fileName);
 
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("JNIOpen::open(%s, %s, %s, mustBeADirectory = %s)",
-				UnixFilesystemPathRepresentation.INSTANCE.toString(path), depositionToString(requestedDeposition),
-				desiredAccessToString(desiredAccess), mustBeADirectory));
+			_logger.trace(
+				String.format("JNIOpen::open(%s, %s, %s, mustBeADirectory = %s)", UnixFilesystemPathRepresentation.INSTANCE.toString(path),
+					depositionToString(requestedDeposition), desiredAccessToString(desiredAccess), mustBeADirectory));
 
 		if (path == null)
 			return null;

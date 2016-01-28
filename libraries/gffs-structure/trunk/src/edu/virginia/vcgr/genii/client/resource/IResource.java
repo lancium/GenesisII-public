@@ -34,8 +34,8 @@ public interface IResource extends Closeable
 	static public final String CACHE_COHERENCE_WINDOW_PROPERTY = "genesisII.resource.cache-coherence-window";
 
 	static public final QName CERTIFICATE_CHAIN_CONSTRUCTION_PARAM = new QName(GenesisIIConstants.GENESISII_NS, "certificate-chain");
-	static public final QName SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM = new QName(GenesisIIConstants.GENESISII_NS,
-		"service-certificate-chain");
+	static public final QName SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM =
+		new QName(GenesisIIConstants.GENESISII_NS, "service-certificate-chain");
 	static public QName CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM =
 		new QName(GenesisIIConstants.GENESISII_NS, "certificate-creation-spec");
 	static public QName DUPLICATED_CERTIFICATE_PARAM = new QName(GenesisIIConstants.GENESISII_NS, "duplicated-certificate");

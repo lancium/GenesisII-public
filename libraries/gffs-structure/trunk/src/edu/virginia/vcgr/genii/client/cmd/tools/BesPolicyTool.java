@@ -78,20 +78,18 @@ public class BesPolicyTool extends BaseGridTool
 			try {
 				DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 
-				ComboBoxDialog dialog =
-					provider.createComboBoxDialog("User Logged In Action", "User logged in action?", null, new SimpleMenuItem("N",
-						BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND), new SimpleMenuItem("SK",
-						BESPolicyActions.SUSPENDORKILL), new SimpleMenuItem("K", BESPolicyActions.KILL));
+				ComboBoxDialog dialog = provider.createComboBoxDialog("User Logged In Action", "User logged in action?", null,
+					new SimpleMenuItem("N", BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND),
+					new SimpleMenuItem("SK", BESPolicyActions.SUSPENDORKILL), new SimpleMenuItem("K", BESPolicyActions.KILL));
 				dialog.setHelp(new TextContent("Please select the action to take when a user logs in to the target computer."));
 				dialog.showDialog();
 				_userLoggedInAction = (BESPolicyActions) dialog.getSelectedItem().getContent();
 
-				dialog =
-					provider.createComboBoxDialog("Screensaver Inactive Action", "Screensaver inactive action?", null, new SimpleMenuItem(
-						"N", BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND), new SimpleMenuItem("SK",
-						BESPolicyActions.SUSPENDORKILL), new SimpleMenuItem("K", BESPolicyActions.KILL));
-				dialog.setHelp(new TextContent(
-					"Please select the action to take when the screensaver is de-activated on the target computer."));
+				dialog = provider.createComboBoxDialog("Screensaver Inactive Action", "Screensaver inactive action?", null,
+					new SimpleMenuItem("N", BESPolicyActions.NOACTION), new SimpleMenuItem("S", BESPolicyActions.SUSPEND),
+					new SimpleMenuItem("SK", BESPolicyActions.SUSPENDORKILL), new SimpleMenuItem("K", BESPolicyActions.KILL));
+				dialog.setHelp(
+					new TextContent("Please select the action to take when the screensaver is de-activated on the target computer."));
 				dialog.showDialog();
 				_screenSaverInactiveAction = (BESPolicyActions) dialog.getSelectedItem().getContent();
 

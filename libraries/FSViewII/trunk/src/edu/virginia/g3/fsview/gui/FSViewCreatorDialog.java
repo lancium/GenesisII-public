@@ -66,22 +66,22 @@ final public class FSViewCreatorDialog extends JDialog
 
 		ok.evalutateState();
 
-		content.add(_tabbedPane, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-			5, 5, 5, 5), 5, 5));
-		content.add(_readOnlyButton, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_tabbedPane,
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_readOnlyButton,
+			new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new JButton(ok), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new HelpAction()), new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(ok),
+			new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new CancelAction()),
+			new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new HelpAction()),
+			new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		JPanel errorPanel = new JPanel(new GridBagLayout());
 		errorPanel.setBorder(BorderFactory.createLoweredBevelBorder());
-		errorPanel.add(_errorLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		errorPanel.add(_errorLabel,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		content.add(errorPanel, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
@@ -178,23 +178,19 @@ final public class FSViewCreatorDialog extends JDialog
 			FSViewCombinedInformationPanel panel = (FSViewCombinedInformationPanel) _tabbedPane.getSelectedComponent();
 			String message = null;
 			if (panel.model().modelName() == "Filesystem") {
-				message =
-					"Enter Filesytem path."
-						+ "\n"
-						+ "This path should be a shared filesystem path on remote machine, and the path must be visible to the Container you choose in next steps."
-						+ "\n" + "User MUST have access rights to this path.";
+				message = "Enter Filesytem path." + "\n"
+					+ "This path should be a shared filesystem path on remote machine, and the path must be visible to the Container you choose in next steps."
+					+ "\n" + "User MUST have access rights to this path.";
 				JOptionPane.showMessageDialog(panel, message);
 			} else if (panel.model().modelName() == "SSH Access") {
-				message =
-					"Enter Hostname of the remote machine." + "\n"
-						+ "Enter Filesystem path on the remote machine. User should have access rights to this path" + "\n"
-						+ "Path must be visible to the Container you choose in next steps" + "\n"
-						+ "Enter Username and Password to SSH access the remote machine.";
+				message = "Enter Hostname of the remote machine." + "\n"
+					+ "Enter Filesystem path on the remote machine. User should have access rights to this path" + "\n"
+					+ "Path must be visible to the Container you choose in next steps" + "\n"
+					+ "Enter Username and Password to SSH access the remote machine.";
 				JOptionPane.showMessageDialog(panel, message);
 			} else if (panel.model().modelName() == "Windows Share") {
-				message =
-					"Enter Windows machine Hostname." + "\n" + "Enter the Windows share name" + "\n"
-						+ "Enter Domain name of your windows machine" + "\n" + "Enter Username and Password to access windows share";
+				message = "Enter Windows machine Hostname." + "\n" + "Enter the Windows share name" + "\n"
+					+ "Enter Domain name of your windows machine" + "\n" + "Enter Username and Password to access windows share";
 				JOptionPane.showMessageDialog(panel, message);
 			}
 		}

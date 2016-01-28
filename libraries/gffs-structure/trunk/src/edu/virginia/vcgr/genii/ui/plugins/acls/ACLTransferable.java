@@ -14,9 +14,8 @@ public class ACLTransferable implements Transferable
 
 	static {
 		try {
-			DATA_FLAVOR =
-				new DataFlavor(String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType,
-					ACLEntryWrapperTransferData.class.getName()));
+			DATA_FLAVOR = new DataFlavor(
+				String.format(FLAVOR_PATTERN, DataFlavor.javaJVMLocalObjectMimeType, ACLEntryWrapperTransferData.class.getName()));
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException("Unable to create ACL transferable.", e);
 		}

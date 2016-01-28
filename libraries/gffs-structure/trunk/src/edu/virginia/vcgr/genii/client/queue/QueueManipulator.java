@@ -252,8 +252,8 @@ public class QueueManipulator
 			}
 
 			return new JobInformation(ticket, jobInfo.getJobName(), identities, QueueStates.fromQueueStateType(jobInfo.getJobStatus()),
-				(int) jobInfo.getPriority(), jobInfo.getSubmitTime(), jobInfo.getStartTime(), jobInfo.getFinishTime(), jobInfo.getAttempts()
-					.intValue(), jobInfo.getBesStatus(), jobInfo.getScheduledOn());
+				(int) jobInfo.getPriority(), jobInfo.getSubmitTime(), jobInfo.getStartTime(), jobInfo.getFinishTime(),
+				jobInfo.getAttempts().intValue(), jobInfo.getBesStatus(), jobInfo.getScheduledOn());
 		}
 
 		@Override

@@ -103,8 +103,8 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * @throws RemoteException
 	 */
 
-	static public StreamableByteIOTransferer createStreamableByteIOTransferer(StreamableByteIOPortType target) throws RemoteException,
-		IOException
+	static public StreamableByteIOTransferer createStreamableByteIOTransferer(StreamableByteIOPortType target)
+		throws RemoteException, IOException
 	{
 		return (new StreamableByteIOTransfererFactory(target)).createStreamableByteIOTransferer();
 	}

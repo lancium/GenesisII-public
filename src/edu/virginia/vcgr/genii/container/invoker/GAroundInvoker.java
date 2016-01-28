@@ -44,8 +44,8 @@ public class GAroundInvoker extends RPCProvider
 		return (new InvocationContext(msgContext, obj, method, argValues, handlers)).proceed();
 	}
 
-	static private void fillInInvokers(Collection<IAroundInvoker> invokers, Class<?> cl, Method m) throws NoSuchMethodException,
-		IllegalAccessException, InstantiationException, InvocationTargetException
+	static private void fillInInvokers(Collection<IAroundInvoker> invokers, Class<?> cl, Method m)
+		throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
 	{
 		if (cl == null || cl.equals(Object.class))
 			return;
@@ -88,8 +88,8 @@ public class GAroundInvoker extends RPCProvider
 		}
 	}
 
-	static private IAroundInvoker getInvoker(Class<? extends IAroundInvoker> cl) throws NoSuchMethodException, IllegalAccessException,
-		InstantiationException, InvocationTargetException
+	static private IAroundInvoker getInvoker(Class<? extends IAroundInvoker> cl)
+		throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
 	{
 		Constructor<? extends IAroundInvoker> cons = cl.getConstructor(new Class[0]);
 		if (_logger.isTraceEnabled())

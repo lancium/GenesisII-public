@@ -130,8 +130,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
-		RemoteException
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 
@@ -171,8 +171,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	}
 
 	@RWXMapping(RWXCategory.READ)
-	public ReadResponse read(Read read) throws RemoteException, CustomFaultType, ReadNotPermittedFaultType, UnsupportedTransferFaultType,
-		ResourceUnknownFaultType
+	public ReadResponse read(Read read)
+		throws RemoteException, CustomFaultType, ReadNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
 	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
@@ -314,8 +314,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public WriteResponse write(Write write) throws RemoteException, CustomFaultType, WriteNotPermittedFaultType,
-		UnsupportedTransferFaultType, ResourceUnknownFaultType
+	public WriteResponse write(Write write)
+		throws RemoteException, CustomFaultType, WriteNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
 	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
@@ -357,8 +357,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			GeniiAttachment attachment = new GeniiAttachment(data);
 			TopicSet space = TopicSet.forPublisher(getClass());
 			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.Write, startOffset, bytesPerBlock, stride, data.length,
-				vvr), attachment);
+			publisherTopic.publish(
+				new ByteIOContentsChangedContents(ByteIOOperations.Write, startOffset, bytesPerBlock, stride, data.length, vvr), attachment);
 			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		} catch (IOException ioe) {
 			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
@@ -370,8 +370,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public AppendResponse append(Append append) throws RemoteException, CustomFaultType, WriteNotPermittedFaultType,
-		UnsupportedTransferFaultType, ResourceUnknownFaultType
+	public AppendResponse append(Append append)
+		throws RemoteException, CustomFaultType, WriteNotPermittedFaultType, UnsupportedTransferFaultType, ResourceUnknownFaultType
 	{
 		if (_resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME) != null) {
 			if (_logger.isDebugEnabled())
@@ -445,8 +445,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			GeniiAttachment attachment = new GeniiAttachment(data);
 			TopicSet space = TopicSet.forPublisher(getClass());
 			PublisherTopic publisherTopic = space.createPublisherTopic(BYTEIO_CONTENTS_CHANGED_TOPIC);
-			publisherTopic.publish(new ByteIOContentsChangedContents(ByteIOOperations.TruncAppend, startOffset, data.length, 0, data.length,
-				vvr), attachment);
+			publisherTopic.publish(
+				new ByteIOContentsChangedContents(ByteIOOperations.TruncAppend, startOffset, data.length, 0, data.length, vvr), attachment);
 			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		} catch (IOException ioe) {
 			throw FaultManipulator.fillInFault(new CustomFaultType(), ioe.toString());
@@ -523,8 +523,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 			int size = contents.size();
 			VersionVector remoteVector = contents.versionVector();
 			if (!(operation.equals(ByteIOOperations.Write) || operation.equals(ByteIOOperations.Append)
-				|| operation.equals(ByteIOOperations.TruncAppend) || operation.equals(ByteIOOperations.Destroy) || operation
-					.equals(ByteIOOperations.Unlink))) {
+				|| operation.equals(ByteIOOperations.TruncAppend) || operation.equals(ByteIOOperations.Destroy)
+				|| operation.equals(ByteIOOperations.Unlink))) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("RandomByteIOServiceImpl.notify: invalid parameters");
 				return NotificationConstants.FAIL;

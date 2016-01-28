@@ -4,20 +4,19 @@ import org.ggf.jsdl.FileSystemTypeEnumeration;
 
 public class FilesystemFactory
 {
-	static private Filesystem getScratchFilesystem(FileSystemTypeEnumeration type, String mountPoint, String mountSource)
-		throws JSDLException
+	static private Filesystem getScratchFilesystem(FileSystemTypeEnumeration type, String mountPoint, String mountSource) throws JSDLException
 	{
 		if (type != FileSystemTypeEnumeration.spool)
 			throw new InvalidJSDLException(String.format("%s filesytem must have a file system type of \"%s\".",
 				ScratchFilesystem.FILESYSTEM_NAME, ScratchFilesystem.FILESYSTEM_TYPE));
 
 		if (mountPoint != null)
-			throw new InvalidJSDLException(String.format("%s filesystem cannot have a mount point element.",
-				ScratchFilesystem.FILESYSTEM_NAME));
+			throw new InvalidJSDLException(
+				String.format("%s filesystem cannot have a mount point element.", ScratchFilesystem.FILESYSTEM_NAME));
 
 		if (mountSource != null)
-			throw new InvalidJSDLException(String.format("%s filesystem cannot have a mount source element.",
-				ScratchFilesystem.FILESYSTEM_NAME));
+			throw new InvalidJSDLException(
+				String.format("%s filesystem cannot have a mount source element.", ScratchFilesystem.FILESYSTEM_NAME));
 
 		return new ScratchFilesystem();
 	}
@@ -26,8 +25,8 @@ public class FilesystemFactory
 		throws JSDLException
 	{
 		if (type != GridFilesystem.FILESYSTEM_TYPE)
-			throw new InvalidJSDLException(String.format("Grid filesystem %s must have a file system type of \"%s\".", name,
-				GridFilesystem.FILESYSTEM_TYPE));
+			throw new InvalidJSDLException(
+				String.format("Grid filesystem %s must have a file system type of \"%s\".", name, GridFilesystem.FILESYSTEM_TYPE));
 
 		if (mountPoint != null)
 			throw new InvalidJSDLException(String.format("Grid filesystem %s cannot have a mount point element.", name));

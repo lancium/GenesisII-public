@@ -87,8 +87,8 @@ public class GenesisIIBaseAttributesHandler extends AbstractAttributeHandler
 
 	public MessageElement getFinalResourceInterface() throws SOAPException
 	{
-		return new MessageElement(OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME, _baseService.getFinalWSResourceInterface()
-			.getQName());
+		return new MessageElement(OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME,
+			_baseService.getFinalWSResourceInterface().getQName());
 	}
 
 	public MessageElement getScheduledTerminationTimeAttr() throws ResourceUnknownFaultType, ResourceException

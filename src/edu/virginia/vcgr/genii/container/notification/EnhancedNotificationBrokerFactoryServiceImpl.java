@@ -40,8 +40,8 @@ public class EnhancedNotificationBrokerFactoryServiceImpl extends GenesisIIBase 
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	@Override
-	public EndpointReferenceType createNotificationBroker(long lifeTimeOfBroker) throws RemoteException,
-		NotificationBrokerCreationFailedFaultType
+	public EndpointReferenceType createNotificationBroker(long lifeTimeOfBroker)
+		throws RemoteException, NotificationBrokerCreationFailedFaultType
 	{
 
 		NotificationBrokerConstructionParams cParams = new NotificationBrokerConstructionParams();

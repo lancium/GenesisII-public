@@ -26,8 +26,8 @@ class RemoteIdentityLookupTask extends AbstractTask<X509Identity[]>
 {
 	private Collection<RNSPath> _targets;
 
-	private X509Identity readFromByteIO(EndpointReferenceType target) throws FileNotFoundException, RemoteException, IOException,
-		CertificateException
+	private X509Identity readFromByteIO(EndpointReferenceType target)
+		throws FileNotFoundException, RemoteException, IOException, CertificateException
 	{
 		InputStream in = null;
 

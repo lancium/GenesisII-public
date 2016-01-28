@@ -21,22 +21,21 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 	private String _path;
 	private WSIterable<RNSEntryResponseType> _iterable;
 
-	public RNSIterable(LookupResponseType lookupResponse, ICallingContext callContext, int blockSize) throws ResourceException,
-		GenesisIISecurityException
+	public RNSIterable(LookupResponseType lookupResponse, ICallingContext callContext, int blockSize)
+		throws ResourceException, GenesisIISecurityException
 	{
 		this(null, lookupResponse, callContext, blockSize);
 	}
 
-	public RNSIterable(String path, LookupResponseType lookupResponse, ICallingContext callContext, int blockSize) throws ResourceException,
-		GenesisIISecurityException
+	public RNSIterable(String path, LookupResponseType lookupResponse, ICallingContext callContext, int blockSize)
+		throws ResourceException, GenesisIISecurityException
 	{
 		_path = path;
 
 		RNSEntryResponseType[] tmp = lookupResponse.getEntryResponse();
 
-		_iterable =
-			WSIterable.axisIterable(RNSEntryResponseType.class, tmp, new IteratorInitializationType(lookupResponse.getIterator(), null),
-				callContext, blockSize);
+		_iterable = WSIterable.axisIterable(RNSEntryResponseType.class, tmp,
+			new IteratorInitializationType(lookupResponse.getIterator(), null), callContext, blockSize);
 	}
 
 	final public RNSEntryResponseType[] toArray()

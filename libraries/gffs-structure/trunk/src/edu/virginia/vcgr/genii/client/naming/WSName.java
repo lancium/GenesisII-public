@@ -196,8 +196,8 @@ public class WSName implements Comparable<WSName>, Serializable
 					try {
 						EndpointReferenceType resolverEPR = (EndpointReferenceType) element.getObjectValue(EndpointReferenceType.class);
 						if (resolverEPR != null) {
-							ResolverDescription resolver =
-								new ResolverDescription(_endpointIdentifier, resolverEPR, ResolverDescription.ResolverType.REFERENCE_RESOLVER);
+							ResolverDescription resolver = new ResolverDescription(_endpointIdentifier, resolverEPR,
+								ResolverDescription.ResolverType.REFERENCE_RESOLVER);
 							_resolvers.add(resolver);
 						}
 					} catch (Throwable t) {
@@ -292,8 +292,8 @@ public class WSName implements Comparable<WSName>, Serializable
 
 	private static boolean isResolverElement(MessageElement element)
 	{
-		return (element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_RESOLVER_QNAME) || element.getQName().equals(
-			WSName.REFERENCE_RESOLVER_QNAME));
+		return (element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_RESOLVER_QNAME)
+			|| element.getQName().equals(WSName.REFERENCE_RESOLVER_QNAME));
 	}
 
 	private static MessageElement makeResolverMessageElement(EndpointReferenceType resolverEPR, ResolverType resolverType)

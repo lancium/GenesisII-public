@@ -261,9 +261,8 @@ public class InCommonLoginTool extends BaseLoginTool
 		if (username == null || password == null || idpUrl == null || csrFileName == null || csrKeyFileName == null) {
 			return promptForParams();
 		} else {
-			CILogonParameters params =
-				new CILogonParameters(idpUrl, username, password, readFile(csrFileName), parseKeyFile(csrKeyFileName).getPrivate(), stdout,
-					stderr);
+			CILogonParameters params = new CILogonParameters(idpUrl, username, password, readFile(csrFileName),
+				parseKeyFile(csrKeyFileName).getPrivate(), stdout, stderr);
 			return params;
 		}
 	}
@@ -277,16 +276,16 @@ public class InCommonLoginTool extends BaseLoginTool
 			 * future: get these from server instead of hard code; list hosted at: https://cilogon.org/include/ecpidps.txt
 			 */
 			try {
-				ComboBoxDialog idpDialog =
-					provider.createSingleListSelectionDialog("IDP Choice", "Please choose IDP", new SimpleMenuItem("ProtectNetwork",
-						"https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem("ProtectNetwork",
-						"https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
-						"LIGO Scientific Collaboration", "https://login.ligo.org/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
-						"LTER Network", "https://shib.lternet.edu/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem("University of Chicago",
-						"https://shibboleth2.uchicago.edu/idp/profile/SAML2/SOAP/ECP"), new SimpleMenuItem(
-						"University of Illinois at Urbana-Champaign", "https://shibboleth.illinois.edu/idp/profile/SAML2/SOAP/ECP"),
-						new SimpleMenuItem("University of Washington", "https://idp.u.washington.edu/idp/profile/SAML2/SOAP/ECP"),
-						new SimpleMenuItem("University of Wisconsin-Madison", "https://login.wisc.edu/idp/profile/SAML2/SOAP/ECP"));
+				ComboBoxDialog idpDialog = provider.createSingleListSelectionDialog("IDP Choice", "Please choose IDP",
+					new SimpleMenuItem("ProtectNetwork", "https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"),
+					new SimpleMenuItem("ProtectNetwork", "https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"),
+					new SimpleMenuItem("LIGO Scientific Collaboration", "https://login.ligo.org/idp/profile/SAML2/SOAP/ECP"),
+					new SimpleMenuItem("LTER Network", "https://shib.lternet.edu/idp/profile/SAML2/SOAP/ECP"),
+					new SimpleMenuItem("University of Chicago", "https://shibboleth2.uchicago.edu/idp/profile/SAML2/SOAP/ECP"),
+					new SimpleMenuItem("University of Illinois at Urbana-Champaign",
+						"https://shibboleth.illinois.edu/idp/profile/SAML2/SOAP/ECP"),
+					new SimpleMenuItem("University of Washington", "https://idp.u.washington.edu/idp/profile/SAML2/SOAP/ECP"),
+					new SimpleMenuItem("University of Wisconsin-Madison", "https://login.wisc.edu/idp/profile/SAML2/SOAP/ECP"));
 				idpDialog.showDialog();
 
 				MenuItem response = idpDialog.getSelectedItem();

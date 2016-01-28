@@ -167,8 +167,8 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 		ArchiveDetails detail = ArchiveDetails.isRecognizedArchiveType(_target);
 		if (detail == null) {
 			// this is a failure; we know we needed to figure out the structure of the name before here.
-			throw new JSDLException("failure to determine type of archive (due to HandleAsArchive flag) for file '"
-				+ _target.getAbsolutePath() + "'");
+			throw new JSDLException(
+				"failure to determine type of archive (due to HandleAsArchive flag) for file '" + _target.getAbsolutePath() + "'");
 		}
 
 		File compressedFile = new File(_target.getPath());

@@ -138,8 +138,8 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 					SwingUtilities.invokeLater(new DocumentUpdater(true, _widget.PLAIN_STYLE, "", _widget, true));
 				}
 			} catch (Throwable e) {
-				SwingUtilities.invokeLater(new DocumentUpdater(false, _widget.ERROR_STYLE, "Unable to read file contents:  " + e, _widget,
-					true));
+				SwingUtilities
+					.invokeLater(new DocumentUpdater(false, _widget.ERROR_STYLE, "Unable to read file contents:  " + e, _widget, true));
 			} finally {
 				StreamUtils.close(reader);
 				StreamUtils.close(in);

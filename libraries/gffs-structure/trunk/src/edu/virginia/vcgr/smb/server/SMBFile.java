@@ -41,7 +41,7 @@ public abstract class SMBFile
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("smb read: acc=" + acc + " offset=" + off + " len=" + len);
-		
+
 		// check that we won't go past end of file.
 		TypeInformation typo = SMBTree.stat(path);
 		long fileSize = typo.getByteIOSize();
@@ -51,13 +51,13 @@ public abstract class SMBFile
 		}
 		if (off + len > fileSize) {
 			// trim the length a bit.
-			len = (int)(fileSize - off);
+			len = (int) (fileSize - off);
 			if (len <= 0) {
 				_logger.debug("smb shortcutting read that's past eof (offset+len).");
 				return 0;
 			}
 		}
-		
+
 		IO io = getIO();
 
 		ByteBuffer read = acc.slice().prepareBuffer();

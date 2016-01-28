@@ -172,11 +172,8 @@ public class CreateGroupPlugin extends AbstractCombinedUIMenusPlugin
 		Collection<RNSPath> paths = retriever.getTargetEndpoints();
 		RNSPath path = paths.iterator().next();
 
-		context
-			.uiContext()
-			.progressMonitorFactory()
-			.createMonitor(context.ownerComponent(), "Creating Group", "Create Group Object", 1000L,
-				new GroupCreatorTask(context, path, answer), new GroupCreationListener(context, retriever)).start();
+		context.uiContext().progressMonitorFactory().createMonitor(context.ownerComponent(), "Creating Group", "Create Group Object", 1000L,
+			new GroupCreatorTask(context, path, answer), new GroupCreationListener(context, retriever)).start();
 	}
 
 	@Override

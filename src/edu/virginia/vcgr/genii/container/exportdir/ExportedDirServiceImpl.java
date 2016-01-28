@@ -93,9 +93,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			_logger.debug("Creating new ExportedDir Resource.");
 
 		if (constructionParameters == null) {
-			ResourceCreationFaultType rcft =
-				new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Could not create ExportedDir resource without cerationProperties") }, null);
+			ResourceCreationFaultType rcft = new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+				new BaseFaultTypeDescription("Could not create ExportedDir resource without cerationProperties") }, null);
 			throw FaultManipulator.fillInFault(rcft);
 		}
 
@@ -122,8 +121,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 	 */
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) throws RemoteException, RNSEntryExistsFaultType,
-		ResourceUnknownFaultType
+	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest)
+		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		String filename = null;
 		EndpointReferenceType entryReference = null;
@@ -152,10 +151,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			try {
 				WorkingContext.temporarilyAssumeNewIdentity(EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType"), false));
 
-				entryReference =
-					new ExportedFileServiceImpl().vcgrCreate(
+				entryReference = new ExportedFileServiceImpl()
+					.vcgrCreate(
 						new VcgrCreate(ExportedFileUtils.createCreationProperties(fullPath, parentIds, _resource.getReplicationState())))
-						.getEndpoint();
+					.getEndpoint();
 
 				String newEntryId = (new GUID()).toString();
 				ExportedDirEntry newEntry =
@@ -210,9 +209,11 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 		MessageElement[] attrs = (mdt == null) ? null : mdt.get_any();
 
 		if (entryReference != null) {
-			throw FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Add not allowed in ExportDirs (unless you are creating "
-					+ "a new directory.") }, null));
+			throw FaultManipulator
+				.fillInFault(new BaseFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription("Add not allowed in ExportDirs (unless you are creating " + "a new directory.") },
+					null));
 		}
 
 		if (_logger.isDebugEnabled())
@@ -232,10 +233,9 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 			if (_logger.isDebugEnabled())
 				_logger.debug("got preferred identity for new export: '" + owner + "'");
 
-			newRef =
-				vcgrCreate(
-					new VcgrCreate(ExportedDirUtils
-						.createCreationProperties(null, fullPath, null, null, null, parentIds, isReplicated, owner))).getEndpoint();
+			newRef = vcgrCreate(
+				new VcgrCreate(ExportedDirUtils.createCreationProperties(null, fullPath, null, null, null, parentIds, isReplicated, owner)))
+					.getEndpoint();
 
 			String newEntryId = (new GUID()).toString();
 			ExportedDirEntry newEntry = new ExportedDirEntry(_resource.getId(), name, newRef, newEntryId, ExportedDirEntry._DIR_TYPE, attrs);
@@ -268,11 +268,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 				ret[lcv] = new RNSEntryResponseType(null, null, bft, addRequest[lcv].getEntryName());
 			} catch (Throwable cause) {
 				_logger.error("failure during add request", cause);
-				ret[lcv] =
-					new RNSEntryResponseType(null, null,
-						FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: " + cause.getMessage()) },
-							null)), addRequest[lcv].getEntryName());
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: " + cause.getMessage()) }, null)),
+					addRequest[lcv].getEntryName());
 			}
 		}
 
@@ -305,9 +304,9 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements ExportedDir
 		entryCollection = new LinkedList<RNSEntryResponseType>();
 		timer = tSink.getTimer("Prepare Entries");
 		for (ExportedDirEntry exportDirEntry : entries) {
-			RNSEntryResponseType entry =
-				new RNSEntryResponseType(exportDirEntry.getEntryReference(), RNSUtilities.createMetadata(exportDirEntry.getEntryReference(),
-					exportDirEntry.getAttributes()), null, exportDirEntry.getName());
+			RNSEntryResponseType entry = new RNSEntryResponseType(exportDirEntry.getEntryReference(),
+				RNSUtilities.createMetadata(exportDirEntry.getEntryReference(), exportDirEntry.getAttributes()), null,
+				exportDirEntry.getName());
 
 			entryCollection.add(entry);
 		}

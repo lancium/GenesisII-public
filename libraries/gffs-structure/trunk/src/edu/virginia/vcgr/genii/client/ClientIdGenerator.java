@@ -6,6 +6,7 @@ public class ClientIdGenerator
 {
 
 	private static final String CLIENT_ID;
+
 	static {
 		CLIENT_ID = new GUID().toString();
 	}

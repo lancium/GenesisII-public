@@ -97,9 +97,9 @@ public class GeniiWSNBrokerServiceImpl extends GenesisIIBase implements GeniiWSN
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public RegisterPublisherResponse registerPublisher(RegisterPublisher arg0) throws RemoteException,
-		PublisherRegistrationRejectedFaultType, TopicNotSupportedFaultType, UnacceptableInitialTerminationTimeFaultType,
-		InvalidTopicExpressionFaultType, ResourceUnknownFaultType, PublisherRegistrationFailedFaultType
+	public RegisterPublisherResponse registerPublisher(RegisterPublisher arg0) throws RemoteException, PublisherRegistrationRejectedFaultType,
+		TopicNotSupportedFaultType, UnacceptableInitialTerminationTimeFaultType, InvalidTopicExpressionFaultType, ResourceUnknownFaultType,
+		PublisherRegistrationFailedFaultType
 	{
 		throw FaultManipulator.fillInFault(new PublisherRegistrationRejectedFaultType());
 	}

@@ -89,8 +89,8 @@ public class LightweightNotificationServer
 	private class NotificationJettyHandler extends AbstractHandler
 	{
 		@Override
-		public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException,
-			ServletException
+		public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException
 		{
 			InputStream in = null;
 
@@ -131,8 +131,8 @@ public class LightweightNotificationServer
 		}
 
 		@Override
-		final public <ContentsType extends NotificationMessageContents> NotificationRegistration registerNotificationHandler(
-			NotificationHandler<ContentsType> handler)
+		final public <ContentsType extends NotificationMessageContents> NotificationRegistration
+			registerNotificationHandler(NotificationHandler<ContentsType> handler)
 		{
 			return _multiplexer.registerNotificationHandler(_queryExpression, handler);
 		}
@@ -155,8 +155,8 @@ public class LightweightNotificationServer
 		if (!_httpServer.isStarted())
 			throw new IOException("Server not started!");
 
-		return new EndpointReferenceType(new AttributedURIType(String.format(URL_PATTERN, _protocol, ConfiguredHostname.getMostGlobal()
-			.getCanonicalHostName(), _httpServer.getConnectors()[0].getLocalPort())), null, null, null);
+		return new EndpointReferenceType(new AttributedURIType(String.format(URL_PATTERN, _protocol,
+			ConfiguredHostname.getMostGlobal().getCanonicalHostName(), _httpServer.getConnectors()[0].getLocalPort())), null, null, null);
 	}
 
 	private ContextHandler createContext()
@@ -228,15 +228,15 @@ public class LightweightNotificationServer
 	{
 		try {
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, publisher);
-			return new LightweightSubscriptionImpl(topicFilter, common.subscribe(createSubscribeRequest(topicFilter, terminationTime,
-				additionalUserData, policies).asRequestType()));
+			return new LightweightSubscriptionImpl(topicFilter,
+				common.subscribe(createSubscribeRequest(topicFilter, terminationTime, additionalUserData, policies).asRequestType()));
 		} catch (IOException e) {
 			throw new SubscribeException("Unable to subscribe consumer to publisher!", e);
 		}
 	}
 
-	final public <ContentsType extends NotificationMessageContents> NotificationRegistration registerNotificationHandler(
-		TopicQueryExpression topicFilter, NotificationHandler<ContentsType> handler)
+	final public <ContentsType extends NotificationMessageContents> NotificationRegistration
+		registerNotificationHandler(TopicQueryExpression topicFilter, NotificationHandler<ContentsType> handler)
 	{
 		return _multiplexer.registerNotificationHandler(topicFilter, handler);
 	}

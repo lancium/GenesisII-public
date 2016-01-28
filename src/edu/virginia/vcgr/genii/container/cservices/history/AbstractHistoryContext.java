@@ -132,68 +132,71 @@ abstract class AbstractHistoryContext implements HistoryContext
 	@Override
 	final public HistoryEventWriter createTraceWriter(Throwable cause, String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Trace, new HistoryEventData(String.format(shortDescriptionFormat, formatArguments),
-			cause));
+		return new HistoryContextWriter(HistoryEventLevel.Trace,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments), cause));
 	}
 
 	@Override
 	final public HistoryEventWriter createDebugWriter(Throwable cause, String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Debug, new HistoryEventData(String.format(shortDescriptionFormat, formatArguments),
-			cause));
+		return new HistoryContextWriter(HistoryEventLevel.Debug,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments), cause));
 	}
 
 	@Override
 	final public HistoryEventWriter createInfoWriter(Throwable cause, String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Information, new HistoryEventData(String.format(shortDescriptionFormat,
-			formatArguments), cause));
+		return new HistoryContextWriter(HistoryEventLevel.Information,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments), cause));
 	}
 
 	@Override
 	final public HistoryEventWriter createWarnWriter(Throwable cause, String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Warning, new HistoryEventData(
-			String.format(shortDescriptionFormat, formatArguments), cause));
+		return new HistoryContextWriter(HistoryEventLevel.Warning,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments), cause));
 	}
 
 	@Override
 	final public HistoryEventWriter createErrorWriter(Throwable cause, String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Error, new HistoryEventData(String.format(shortDescriptionFormat, formatArguments),
-			cause));
+		return new HistoryContextWriter(HistoryEventLevel.Error,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments), cause));
 	}
 
 	@Override
 	final public HistoryEventWriter createTraceWriter(String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Trace, new HistoryEventData(String.format(shortDescriptionFormat, formatArguments)));
+		return new HistoryContextWriter(HistoryEventLevel.Trace,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments)));
 	}
 
 	@Override
 	final public HistoryEventWriter createDebugWriter(String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Debug, new HistoryEventData(String.format(shortDescriptionFormat, formatArguments)));
+		return new HistoryContextWriter(HistoryEventLevel.Debug,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments)));
 	}
 
 	@Override
 	final public HistoryEventWriter createInfoWriter(String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Information, new HistoryEventData(String.format(shortDescriptionFormat,
-			formatArguments)));
+		return new HistoryContextWriter(HistoryEventLevel.Information,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments)));
 	}
 
 	@Override
 	final public HistoryEventWriter createWarnWriter(String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Warning, new HistoryEventData(
-			String.format(shortDescriptionFormat, formatArguments)));
+		return new HistoryContextWriter(HistoryEventLevel.Warning,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments)));
 	}
 
 	@Override
 	final public HistoryEventWriter createErrorWriter(String shortDescriptionFormat, Object... formatArguments)
 	{
-		return new HistoryContextWriter(HistoryEventLevel.Error, new HistoryEventData(String.format(shortDescriptionFormat, formatArguments)));
+		return new HistoryContextWriter(HistoryEventLevel.Error,
+			new HistoryEventData(String.format(shortDescriptionFormat, formatArguments)));
 	}
 
 	@Override

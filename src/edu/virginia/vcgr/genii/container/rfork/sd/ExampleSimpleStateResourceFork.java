@@ -41,7 +41,7 @@ public class ExampleSimpleStateResourceFork extends SimpleStateResourceFork<Inte
 		return _initialValue;
 	}
 
-	/** {@inheritDoc  */
+	/** {@inheritDoc */
 	@Override
 	protected void set(Integer state)
 	{

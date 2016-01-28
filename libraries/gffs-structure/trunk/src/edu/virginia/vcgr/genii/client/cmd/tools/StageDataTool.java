@@ -120,7 +120,8 @@ public class StageDataTool extends BaseGridTool
 			} else if (_direction.equals("out")) {
 				for (ContainerDataStage tStage : tJob.getStageOuts()) {
 					try {
-						stageOUT(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getTargetURI()), tStage.getCredentials());
+						stageOUT(wDir.getAbsolutePath() + "/" + tStage.getFileName(), new URI(tStage.getTargetURI()),
+							tStage.getCredentials());
 					} catch (URISyntaxException e) {
 						throw new ToolException("failure to create URI: " + e.getLocalizedMessage(), e);
 					}

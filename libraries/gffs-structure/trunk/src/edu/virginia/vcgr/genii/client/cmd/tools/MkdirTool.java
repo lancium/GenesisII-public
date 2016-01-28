@@ -88,8 +88,8 @@ public class MkdirTool extends BaseGridTool
 			new GeniiPath(path).path()).getEndpoint();
 	}
 
-	public static int makeDirectory(boolean parents, String rnsService, List<String> pathsToCreate, PrintWriter stderr) throws RNSException,
-		InvalidToolUsageException, FileNotFoundException, IOException
+	public static int makeDirectory(boolean parents, String rnsService, List<String> pathsToCreate, PrintWriter stderr)
+		throws RNSException, InvalidToolUsageException, FileNotFoundException, IOException
 	{
 		boolean createParents = false;
 		EndpointReferenceType service = null;

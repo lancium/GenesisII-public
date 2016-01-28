@@ -32,8 +32,8 @@ import edu.virginia.vcgr.genii.ui.plugins.queue.history.JobHistoryFrame;
 
 public class JobHistoryPlugin extends AbstractCombinedUIMenusPlugin
 {
-	private Collection<HistoryEvent> readHistoryEvents(UIPluginContext context, MenuType menuType) throws IOException,
-		RNSPathDoesNotExistException, ClassNotFoundException
+	private Collection<HistoryEvent> readHistoryEvents(UIPluginContext context, MenuType menuType)
+		throws IOException, RNSPathDoesNotExistException, ClassNotFoundException
 	{
 		Collection<HistoryEvent> events = null;
 		InputStream in = null;

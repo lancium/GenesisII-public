@@ -35,12 +35,12 @@ public class MFontChooserDialog extends JDialog
 		setAlwaysOnTop(true);
 		setResizable(false);
 
-		content.add(panel, new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5,
-			5, 5), 5, 5));
-		content.add(new JButton(new OKAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new CancelAction()), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(panel,
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new OKAction()),
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new CancelAction()),
+			new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	private class OKAction extends AbstractAction

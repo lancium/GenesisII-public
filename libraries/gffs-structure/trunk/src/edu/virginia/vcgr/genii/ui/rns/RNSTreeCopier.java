@@ -65,8 +65,8 @@ public class RNSTreeCopier extends RNSTreeOperator
 		}
 	}
 
-	private void doCopy(TaskProgressListener progressListener, File source, RNSPath target) throws RNSPathAlreadyExistsException,
-		RNSPathDoesNotExistException, RNSException, RemoteException, IOException
+	private void doCopy(TaskProgressListener progressListener, File source, RNSPath target)
+		throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException, RNSException, RemoteException, IOException
 	{
 		if (source.isDirectory()) {
 			target.mkdir();
@@ -88,8 +88,8 @@ public class RNSTreeCopier extends RNSTreeOperator
 		}
 	}
 
-	private void doCopy(TaskProgressListener progressListener, RNSPath source, RNSPath target) throws RNSPathAlreadyExistsException,
-		RNSPathDoesNotExistException, RNSException, FileNotFoundException, RemoteException, IOException
+	private void doCopy(TaskProgressListener progressListener, RNSPath source, RNSPath target)
+		throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException, RNSException, FileNotFoundException, RemoteException, IOException
 	{
 		TypeInformation tInfo = new TypeInformation(source.getEndpoint());
 

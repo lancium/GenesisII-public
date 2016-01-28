@@ -152,8 +152,8 @@ public class BasicDBResource implements IResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("load time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("load time is " + (System.currentTimeMillis() - startTime));
+
 			if (!rs.next()) {
 				// the special key is not always found as a database resource.
 				if (_logger.isDebugEnabled() && !_resourceKey.contains(_SPECIAL_SERVICE_KEY_TEMPLATE)) {
@@ -194,8 +194,8 @@ public class BasicDBResource implements IResource
 				if (b.length() <= 0) {
 					_logger.error("Attempt to serialize property \"" + propertyName + "\" with 0 bytes into the property database.");
 				} else if (b.length() >= 128 * 1024) {
-					_logger.error("Attempt to serialize property \"" + propertyName + "\" of length " + b.length() + " bytes into a "
-						+ "128K space.");
+					_logger.error(
+						"Attempt to serialize property \"" + propertyName + "\" of length " + b.length() + " bytes into a " + "128K space.");
 				}
 			}
 
@@ -229,8 +229,8 @@ public class BasicDBResource implements IResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("getProperty time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("getProperty time is " + (System.currentTimeMillis() - startTime));
+
 			if (!rs.next())
 				return null;
 
@@ -400,8 +400,8 @@ public class BasicDBResource implements IResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("getMatchingParameters time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("getMatchingParameters time is " + (System.currentTimeMillis() - startTime));
+
 			while (rs.next()) {
 				ret.add(new MatchingParameter(rs.getString(1), rs.getString(2)));
 			}
@@ -444,9 +444,8 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				_connection
-					.prepareStatement("DELETE FROM matchingparams " + "WHERE resourceid = ? AND paramname = ? " + "AND paramvalue = ?");
+			stmt = _connection
+				.prepareStatement("DELETE FROM matchingparams " + "WHERE resourceid = ? AND paramname = ? " + "AND paramvalue = ?");
 
 			for (MatchingParameter param : parameters) {
 				stmt.setString(1, _resourceKey);
@@ -474,7 +473,7 @@ public class BasicDBResource implements IResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("getEPI time is " + (System.currentTimeMillis()-startTime));
+				_logger.debug("getEPI time is " + (System.currentTimeMillis() - startTime));
 			if (rs.next())
 				return rs.getString(1);
 
@@ -517,8 +516,8 @@ public class BasicDBResource implements IResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("getResourceIDtime is " + (System.currentTimeMillis()-startTime));
-		
+				_logger.debug("getResourceIDtime is " + (System.currentTimeMillis() - startTime));
+
 			if (rs.next())
 				return rs.getString(1);
 		} finally {
@@ -540,8 +539,8 @@ public class BasicDBResource implements IResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("createTime time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("createTime time is " + (System.currentTimeMillis() - startTime));
+
 			if (!rs.next())
 				return null;
 			Timestamp ts = rs.getTimestamp(1);
@@ -580,8 +579,7 @@ public class BasicDBResource implements IResource
 		return cParams;
 	}
 
-	static public void constructionParameters(Connection connection, String resourceid, ConstructionParameters parameters)
-		throws SQLException
+	static public void constructionParameters(Connection connection, String resourceid, ConstructionParameters parameters) throws SQLException
 	{
 		setProperty(connection, resourceid, ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString(), parameters);
 	}
@@ -605,8 +603,8 @@ public class BasicDBResource implements IResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("get unkownattributes time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("get unkownattributes time is " + (System.currentTimeMillis() - startTime));
+
 			while (rs.next()) {
 				Blob blob = rs.getBlob(1);
 				long blobLength = blob.length();

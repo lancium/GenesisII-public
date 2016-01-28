@@ -1,7 +1,7 @@
 package edu.virginia.g3.fsview;
 
-public abstract class AbstractFSViewFileEntry<SessionType extends FSViewSession> extends AbstractFSViewEntry<SessionType> implements
-	FSViewFileEntry
+public abstract class AbstractFSViewFileEntry<SessionType extends FSViewSession> extends AbstractFSViewEntry<SessionType>
+	implements FSViewFileEntry
 {
 	private FSViewFileEntryType _fileEntryType;
 

@@ -30,10 +30,10 @@ public class SMBAndX
 	{
 		int cmd = buffer.getUShort();
 
-		//hmmm: trying this more to spec.  doesn't work...
-//		int cmd = buffer.get();		
-//		@SuppressWarnings("unused")
-//		int reserved = buffer.get();		
+		// hmmm: trying this more to spec. doesn't work...
+		// int cmd = buffer.get();
+		// @SuppressWarnings("unused")
+		// int reserved = buffer.get();
 
 		if (_logger.isDebugEnabled()) {
 			if (cmd == 0xff) {
@@ -42,7 +42,6 @@ public class SMBAndX
 				_logger.debug("saw normal command in AND_X: 0x" + Integer.toHexString(cmd));
 			}
 		}
-		
 
 		int offset = buffer.getUShort();
 
@@ -61,11 +60,11 @@ public class SMBAndX
 		int to = output.position();
 		output.putShort(from, (short) command);
 
-		//hmmm: trying more canonical version.  no worky.
-//		output.put(from, (byte)command);
-//		// reserved field.
-//		output.put(from + 1, (byte)0);
-		
+		// hmmm: trying more canonical version. no worky.
+		// output.put(from, (byte)command);
+		// // reserved field.
+		// output.put(from + 1, (byte)0);
+
 		output.putShort(from + 2, (short) to);
 	}
 }

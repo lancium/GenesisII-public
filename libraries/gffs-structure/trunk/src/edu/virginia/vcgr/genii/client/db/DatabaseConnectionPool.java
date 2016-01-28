@@ -19,7 +19,7 @@ public class DatabaseConnectionPool
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
 
 	// set this to true if you want more diagnostics for timing printed at debug level.
-	public static boolean ENABLE_DB_TIMING_LOGS = false;	
+	public static boolean ENABLE_DB_TIMING_LOGS = false;
 
 	// how many connections to the database should be pooled?
 	static protected final int _DB_POOL_SIZE_DEFAULT = 16;

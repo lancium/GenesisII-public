@@ -301,9 +301,8 @@ public class PathDisposal
 			return PathOutcome.OUTCOME_NOTHING;
 		JavaFileHierarchyHelper helping = new JavaFileHierarchyHelper();
 		RemoveBouncerJavaFile ourBouncer = new RemoveBouncerJavaFile();
-		JavaFileRecurser zapper =
-			new JavaFileRecurser(null, new RemoveDirectoryJavaFile(helping, ourBouncer), new RemoveFileJavaFile(helping, ourBouncer),
-				ourBouncer);
+		JavaFileRecurser zapper = new JavaFileRecurser(null, new RemoveDirectoryJavaFile(helping, ourBouncer),
+			new RemoveFileJavaFile(helping, ourBouncer), ourBouncer);
 		zapper.setMaximumRecursionDepth(MAX_DELETE_DEPTH);
 		PathOutcome ret = PathOutcome.OUTCOME_NO_ACCESS;
 		ret = zapper.recursePath(path);

@@ -113,7 +113,8 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 				cert.checkValidity(date);
 			}
 		} catch (CertificateException e) {
-			throw new AttributeInvalidException("Security attribute asserting identity contains an invalid certificate: " + e.getMessage(), e);
+			throw new AttributeInvalidException("Security attribute asserting identity contains an invalid certificate: " + e.getMessage(),
+				e);
 		} catch (Exception e) {
 			throw new AttributeInvalidException("Failure during certificate validation: " + e.getMessage(), e);
 		}

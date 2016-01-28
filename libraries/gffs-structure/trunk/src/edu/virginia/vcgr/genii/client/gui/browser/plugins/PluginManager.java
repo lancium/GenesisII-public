@@ -116,8 +116,8 @@ public class PluginManager
 	 * @throws SAXException
 	 */
 	static private void parsePlugin(Element pluginElement, HashMap<String, HashMap<String, Collection<MainMenuDescriptor>>> mainMenuPlugins,
-		HashMap<String, Collection<ContextMenuDescriptor>> contextMenuPlugins, TreeSet<TabPluginDescriptor> tabs) throws PluginException,
-		SAXException
+		HashMap<String, Collection<ContextMenuDescriptor>> contextMenuPlugins, TreeSet<TabPluginDescriptor> tabs)
+			throws PluginException, SAXException
 	{
 		/* First, get attributes from the element that describe the plugin */
 		String name = XMLUtilities.getRequiredAttribute(pluginElement, PLUGIN_NAME_ATTR, null);
@@ -162,8 +162,8 @@ public class PluginManager
 
 					MainMenuDescriptor descriptor =
 						new MainMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child, MENU_NAME_ATTR, null),
-							XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null), XMLUtilities.getRequiredAttribute(child,
-								MENU_GROUP_ATTR, null));
+							XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null),
+							XMLUtilities.getRequiredAttribute(child, MENU_GROUP_ATTR, null));
 
 					/*
 					 * Let's see if the menu already exists (i.e., another plugin is also in the same menu).
@@ -192,9 +192,8 @@ public class PluginManager
 						throw new PluginException("Plugin \"" + name + "\" does not appear to implement the IMenuPlugin interface.");
 
 					ContextMenuDescriptor descriptor =
-						new ContextMenuDescriptor(name, (IMenuPlugin) plugin,
-							XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null), XMLUtilities.getRequiredAttribute(child,
-								MENU_GROUP_ATTR, null));
+						new ContextMenuDescriptor(name, (IMenuPlugin) plugin, XMLUtilities.getRequiredAttribute(child, MENU_LABEL_ATTR, null),
+							XMLUtilities.getRequiredAttribute(child, MENU_GROUP_ATTR, null));
 
 					/* See if another plugin already registered the group */
 					Collection<ContextMenuDescriptor> group = contextMenuPlugins.get(descriptor.getMenuGroup());
@@ -212,9 +211,8 @@ public class PluginManager
 						throw new PluginException("Plugin \"" + name + "\" does not appear to implement the ITabPlugin interface.");
 
 					/* Just go ahead and add the tab plugin descriptor to the collection */
-					tabs.add(new TabPluginDescriptor(name, (ITabPlugin) plugin,
-						XMLUtilities.getRequiredAttribute(child, TAB_NAME_ATTR, null), Integer.parseInt(XMLUtilities.getRequiredAttribute(
-							child, TAB_PRIORITY_ATTR, "0"))));
+					tabs.add(new TabPluginDescriptor(name, (ITabPlugin) plugin, XMLUtilities.getRequiredAttribute(child, TAB_NAME_ATTR, null),
+						Integer.parseInt(XMLUtilities.getRequiredAttribute(child, TAB_PRIORITY_ATTR, "0"))));
 				} else
 					throw new PluginException("Unrecognized element \"" + nodeName + " in plugin configuration.");
 			}
@@ -252,8 +250,8 @@ public class PluginManager
 				/*
 				 * Otherwise, it's an error -- plugins is all the document should have.
 				 */
-				throw new PluginException("Unexpected element \"" + name + "\" in configuration while looking for \"" + PLUGIN_ELEMENT
-					+ "\".");
+				throw new PluginException(
+					"Unexpected element \"" + name + "\" in configuration while looking for \"" + PLUGIN_ELEMENT + "\".");
 		}
 
 		return new PluginManager(mainMenuPlugins, contextMenuPlugins, tabs);

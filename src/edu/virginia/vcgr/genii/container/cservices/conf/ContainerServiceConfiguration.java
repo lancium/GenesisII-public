@@ -114,8 +114,8 @@ public class ContainerServiceConfiguration
 			ret = cons.newInstance((Object) any);
 		} catch (NoSuchMethodException nsme1) {
 			if (any.length > 1)
-				throw new NoSuchMethodException(String.format("Unable to find suitable constructor for " + "service %s defined in file %s.",
-					_serviceClass, _sourceFile));
+				throw new NoSuchMethodException(
+					String.format("Unable to find suitable constructor for " + "service %s defined in file %s.", _serviceClass, _sourceFile));
 			try {
 				cons = _serviceClass.getConstructor(Element.class);
 				if (any.length == 0)

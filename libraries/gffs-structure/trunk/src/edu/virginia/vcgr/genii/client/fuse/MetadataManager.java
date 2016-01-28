@@ -227,23 +227,20 @@ public class MetadataManager
 				if (size == null)
 					return null;
 
-				Calendar createTime =
-					(Calendar) getDeserializedAttributeFromCache(Calendar.class, wsIdentifier, ByteIOConstants.rcreatTime,
-						ByteIOConstants.screatTime);
+				Calendar createTime = (Calendar) getDeserializedAttributeFromCache(Calendar.class, wsIdentifier, ByteIOConstants.rcreatTime,
+					ByteIOConstants.screatTime);
 				if (createTime == null)
 					return null;
 				created = createTime.getTimeInMillis();
 
-				Calendar modificationTime =
-					(Calendar) getDeserializedAttributeFromCache(Calendar.class, wsIdentifier, ByteIOConstants.rmodTime,
-						ByteIOConstants.smodTime);
+				Calendar modificationTime = (Calendar) getDeserializedAttributeFromCache(Calendar.class, wsIdentifier,
+					ByteIOConstants.rmodTime, ByteIOConstants.smodTime);
 				if (modificationTime == null)
 					return null;
 				modified = modificationTime.getTimeInMillis();
 
-				Calendar accessTime =
-					(Calendar) getDeserializedAttributeFromCache(Calendar.class, wsIdentifier, ByteIOConstants.raccessTime,
-						ByteIOConstants.saccessTime);
+				Calendar accessTime = (Calendar) getDeserializedAttributeFromCache(Calendar.class, wsIdentifier, ByteIOConstants.raccessTime,
+					ByteIOConstants.saccessTime);
 				if (accessTime == null)
 					return null;
 				accessed = accessTime.getTimeInMillis();

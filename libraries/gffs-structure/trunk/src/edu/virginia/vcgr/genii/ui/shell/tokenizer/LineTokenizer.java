@@ -28,8 +28,8 @@ public class LineTokenizer
 					builder.append(c);
 				} else {
 					if (spaceMode.booleanValue() != isSpace) {
-						tokens.add(spaceMode.booleanValue() ? Token.createSpaceToken(builder.toString()) : Token.createWordToken(builder
-							.toString()));
+						tokens.add(spaceMode.booleanValue() ? Token.createSpaceToken(builder.toString())
+							: Token.createWordToken(builder.toString()));
 						builder.setLength(0);
 						spaceMode = new Boolean(isSpace);
 					}

@@ -173,8 +173,8 @@ public class ExportedDirUtils
 	static public void createResolverCreationProperties(Collection<MessageElement> resolverCreationParams, ExportedDirInitInfo initInfo)
 	{
 		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), initInfo.getPath()));
-		resolverCreationParams.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR), initInfo
-			.getResolverFactoryEPR()));
+		resolverCreationParams
+			.add(new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR), initInfo.getResolverFactoryEPR()));
 	}
 
 	static public ExportedDirInitInfo extractCreationProperties(GenesisHashMap properties) throws ResourceException

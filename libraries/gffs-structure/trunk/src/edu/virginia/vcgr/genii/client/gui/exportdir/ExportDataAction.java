@@ -87,9 +87,8 @@ class ExportDataAction extends AbstractAction
 		String rnsPath = creationInfo.getRNSPath();
 		RNSPath rPath;
 		try {
-			rPath =
-				ExportManipulator.createExport(creationInfo.getContainerPath(), creationInfo.getLocalPath(), rnsPath,
-					creationInfo.isLightWeight());
+			rPath = ExportManipulator.createExport(creationInfo.getContainerPath(), creationInfo.getLocalPath(), rnsPath,
+				creationInfo.isLightWeight());
 		} catch (Exception cause) {
 			throw new ExportException("exception occurred; failed to create export", cause);
 		}

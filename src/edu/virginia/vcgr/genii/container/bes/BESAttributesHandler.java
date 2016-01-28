@@ -104,8 +104,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		return getActivityReferences().length;
 	}
 
-	static public EndpointReferenceType[] getActivityReferences() throws ResourceUnknownFaultType, ResourceException, RemoteException,
-		SQLException
+	static public EndpointReferenceType[] getActivityReferences()
+		throws ResourceUnknownFaultType, ResourceException, RemoteException, SQLException
 	{
 		return new EndpointReferenceType[0];
 	}
@@ -340,8 +340,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		return ret;
 	}
 
-	public ArrayList<MessageElement> getActivityReferencesAttr() throws ResourceException, ResourceUnknownFaultType, RemoteException,
-		SQLException
+	public ArrayList<MessageElement> getActivityReferencesAttr()
+		throws ResourceException, ResourceUnknownFaultType, RemoteException, SQLException
 	{
 		EndpointReferenceType[] eprs = getActivityReferences();
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(eprs.length);

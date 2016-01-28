@@ -16,8 +16,8 @@ public class SMBSetInformation2 implements SMBCommand
 {
 
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		int FID = params.getUShort();
 		SMBDate createDate = SMBDate.decode(acc);

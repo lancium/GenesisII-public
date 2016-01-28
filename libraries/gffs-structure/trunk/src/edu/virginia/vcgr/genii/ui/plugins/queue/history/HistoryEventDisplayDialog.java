@@ -47,10 +47,10 @@ class HistoryEventDisplayDialog extends JDialog
 	{
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(_headerLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
-		panel.add(_sourceLabel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
+		panel.add(_headerLabel,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(_sourceLabel,
+			new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}
@@ -59,10 +59,10 @@ class HistoryEventDisplayDialog extends JDialog
 	{
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(new JLabel("Event Title"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(_titleField, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
+		panel.add(new JLabel("Event Title"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(_titleField,
+			new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}
@@ -71,14 +71,14 @@ class HistoryEventDisplayDialog extends JDialog
 	{
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(new JLabel("Event Level"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(_levelLabel, new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
-		panel.add(new JLabel("Event Category"), new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(_categoryLabel, new GridBagConstraints(3, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(
-			5, 5, 5, 5), 5, 5));
+		panel.add(new JLabel("Event Level"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(_levelLabel,
+			new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JLabel("Event Category"),
+			new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(_categoryLabel,
+			new GridBagConstraints(3, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}
@@ -112,8 +112,8 @@ class HistoryEventDisplayDialog extends JDialog
 		_sourceLabel = new EventSource(context);
 
 		_titleField.setEditable(false);
-		_sourceLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.black),
-			BorderFactory.createEmptyBorder(0, 5, 0, 5)));
+		_sourceLabel.setBorder(
+			BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(0, 5, 0, 5)));
 
 		_levelLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 			BorderFactory.createEmptyBorder(0, 2, 0, 2)));
@@ -138,8 +138,8 @@ class HistoryEventDisplayDialog extends JDialog
 		propertiesScroller.setMinimumSize(dim);
 		propertiesScroller.setMaximumSize(dim);
 		propertiesScroller.setPreferredSize(dim);
-		content.add(new TitledPanel("Event Properties", propertiesScroller), new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new TitledPanel("Event Properties", propertiesScroller),
+			new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		JScrollPane detailsScroller = new JScrollPane(_detailsArea);
 		dim = new Dimension(800, 200);

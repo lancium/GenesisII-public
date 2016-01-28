@@ -15,8 +15,7 @@ public class TextComboBoxDialog extends TextInputDialog implements ComboBoxDialo
 	private Map<String, MenuItem> _itemMap;
 	private int _longestTag;
 
-	public TextComboBoxDialog(String title, ConsolePackage pkg, String prompt, MenuItem defaultItem, MenuItem... items)
-		throws DialogException
+	public TextComboBoxDialog(String title, ConsolePackage pkg, String prompt, MenuItem defaultItem, MenuItem... items) throws DialogException
 	{
 		super(title, pkg, prompt);
 

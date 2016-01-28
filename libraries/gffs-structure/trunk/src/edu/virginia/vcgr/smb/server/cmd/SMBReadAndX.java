@@ -14,8 +14,8 @@ import edu.virginia.vcgr.smb.server.SMBTree;
 public class SMBReadAndX implements SMBCommand
 {
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		SMBAndX chain = SMBAndX.decode(params);
 		int FID = params.getUShort();

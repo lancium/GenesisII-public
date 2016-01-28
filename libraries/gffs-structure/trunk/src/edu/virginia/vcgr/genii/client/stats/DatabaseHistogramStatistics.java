@@ -27,7 +27,7 @@ public class DatabaseHistogramStatistics
 
 	public Histogram<TimeRange> histogram()
 	{
-		return _histoData.histogram(5, TimeUnit.SECONDS, HistogramDataCombiners.MaximumCombiner, new RelativeTimeRangeLabelDelegate(
-			TimeUnit.SECONDS));
+		return _histoData.histogram(5, TimeUnit.SECONDS, HistogramDataCombiners.MaximumCombiner,
+			new RelativeTimeRangeLabelDelegate(TimeUnit.SECONDS));
 	}
 }

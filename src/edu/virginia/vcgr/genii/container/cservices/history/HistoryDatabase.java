@@ -147,10 +147,10 @@ public class HistoryDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("INSERT INTO historyrecords" + "(resourceid, sequencenumber, level, category, "
+			stmt = connection.prepareStatement(
+				"INSERT INTO historyrecords" + "(resourceid, sequencenumber, level, category, "
 					+ "properties, eventsource, eventdata, expirationtime," + " createtimestamp) " + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
+				Statement.RETURN_GENERATED_KEYS);
 
 			stmt.setString(1, resourceID);
 			stmt.setString(2, number.toString());
@@ -215,9 +215,8 @@ public class HistoryDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
-					+ "eventdata FROM historyrecords " + "WHERE hrid = ?");
+			stmt = connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
+				+ "eventdata FROM historyrecords " + "WHERE hrid = ?");
 			stmt.setLong(1, hrid);
 			rs = stmt.executeQuery();
 
@@ -238,9 +237,8 @@ public class HistoryDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
-					+ "eventdata FROM historyrecords " + "WHERE resourceid = ?");
+			stmt = connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
+				+ "eventdata FROM historyrecords " + "WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
 			rs = stmt.executeQuery();
 
@@ -254,16 +252,15 @@ public class HistoryDatabase
 		}
 	}
 
-	static CloseableIterator<HistoryEvent>
-		iterateEvents(ServerDatabaseConnectionPool connectionPool, Connection connection, String resourceID) throws SQLException
+	static CloseableIterator<HistoryEvent> iterateEvents(ServerDatabaseConnectionPool connectionPool, Connection connection,
+		String resourceID) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
-					+ "eventdata FROM historyrecords " + "WHERE resourceid = ?");
+			stmt = connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
+				+ "eventdata FROM historyrecords " + "WHERE resourceid = ?");
 			stmt.setString(1, resourceID);
 			rs = stmt.executeQuery();
 
@@ -285,8 +282,8 @@ public class HistoryDatabase
 
 		try {
 			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM historyrecords WHERE " + "(expirationtime IS NOT NULL) AND "
-				+ "(expirationtime < CURRENT TIMESTAMP)");
+			stmt.executeUpdate(
+				"DELETE FROM historyrecords WHERE " + "(expirationtime IS NOT NULL) AND " + "(expirationtime < CURRENT TIMESTAMP)");
 		} finally {
 			StreamUtils.close(stmt);
 		}
@@ -299,9 +296,8 @@ public class HistoryDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, "
-					+ "eventdata FROM historyrecords");
+			stmt = connection.prepareStatement(
+				"SELECT sequencenumber, level, category, " + "createtimestamp, properties, eventsource, " + "eventdata FROM historyrecords");
 			rs = stmt.executeQuery();
 
 			while (rs.next())

@@ -40,18 +40,18 @@ class MailtoStageEditor extends StageEditor<MailtoStageData>
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new JLabel("Email Address"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Email Address"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(_emailAddress, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new JLabel("Email Subject"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Email Subject"),
+			new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(_subject, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new JLabel("Attachment Filename"), new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Attachment Filename"),
+			new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(_attachmentName, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 

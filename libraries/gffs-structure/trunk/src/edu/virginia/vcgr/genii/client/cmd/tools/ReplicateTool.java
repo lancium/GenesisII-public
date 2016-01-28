@@ -264,10 +264,9 @@ public class ReplicateTool extends BaseGridTool
 				// To determine if the two replica instances are the same we check if their
 				// container address and resource key are the same.
 				// The EPR equals operator does not do it correctly.
-				sameEPR =
-					replicaEPR.getAddress().toString().compareTo(dir.getEntryResponse(index).getEndpoint().getAddress().toString()) == 0
-						&& replicaEPR.getReferenceParameters().get_any()[0].toString().compareTo(
-							dir.getEntryResponse(index).getEndpoint().getReferenceParameters().get_any()[0].toString()) == 0;
+				sameEPR = replicaEPR.getAddress().toString().compareTo(dir.getEntryResponse(index).getEndpoint().getAddress().toString()) == 0
+					&& replicaEPR.getReferenceParameters().get_any()[0].toString()
+						.compareTo(dir.getEntryResponse(index).getEndpoint().getReferenceParameters().get_any()[0].toString()) == 0;
 
 				if (sameEPR) {
 					// 2014-10-04 ASG. I had code to pick a different EPR, but the list of EPR's I

@@ -126,8 +126,8 @@ public class UserConfig
 	{
 		QName rootNodeQName = XMLConfiguration.getQName(node);
 		if (!rootNodeQName.equals(USER_CONFIG_QNAME))
-			throw new ConfigurationException("Invalid root element.  Root element must be " + USER_CONFIG_ELEMENT + ".  Name is "
-				+ rootNodeQName.toString());
+			throw new ConfigurationException(
+				"Invalid root element.  Root element must be " + USER_CONFIG_ELEMENT + ".  Name is " + rootNodeQName.toString());
 
 		NodeList children = node.getChildNodes();
 		int length = children.getLength();
@@ -190,8 +190,8 @@ public class UserConfig
 	}
 
 	/*
-	 * static public void main(String [] args) throws ConfigurationException, FileNotFoundException, IOException {
-	 * System.out.print("Trying to parse file " + args[0] + "\n"); File userConfigFile = new File(args[0]); UserConfig testInConfig = new
+	 * static public void main(String [] args) throws ConfigurationException, FileNotFoundException, IOException { System.out.print(
+	 * "Trying to parse file " + args[0] + "\n"); File userConfigFile = new File(args[0]); UserConfig testInConfig = new
 	 * UserConfig(userConfigFile); System.out.print("Done parsing file " + args[0] + ".  Deployment path is " +
 	 * testInConfig.getDeploymentPath() + "\n"); File testFile = new File(testInConfig.getDeploymentPath()); if (testFile.exists())
 	 * System.out.print("File path works");

@@ -43,8 +43,7 @@ public class ResourceSummary
 			long startTime = System.currentTimeMillis();
 			rs = ps.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("get resources time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("get resources time is " + (System.currentTimeMillis() - startTime));
 
 			while (rs.next()) {
 				String implClassString = rs.getString(4);
@@ -80,8 +79,7 @@ public class ResourceSummary
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("resourcesforclass time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("resourcesforclass time is " + (System.currentTimeMillis() - startTime));
 
 			while (rs.next()) {
 				ret.add(new ResourceSummaryInformation(rs.getString(1), rs.getString(2), rs.getString(3), implementingClassName));
@@ -105,8 +103,8 @@ public class ResourceSummary
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("getEPR time is " + (System.currentTimeMillis()-startTime));
-		
+				_logger.debug("getEPR time is " + (System.currentTimeMillis() - startTime));
+
 			if (rs.next())
 				return EPRUtils.fromBlob(rs.getBlob(1));
 
@@ -128,8 +126,8 @@ public class ResourceSummary
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("getEPR from EPI time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("getEPR from EPI time is " + (System.currentTimeMillis() - startTime));
+
 			if (rs.next())
 				return EPRUtils.fromBlob(rs.getBlob(1));
 
@@ -149,9 +147,8 @@ public class ResourceSummary
 		String epi = name.getEndpointIdentifier().toString();
 
 		try {
-			stmt =
-				connection.prepareStatement("INSERT INTO resources2(" + "resourceid, humanname, epi, epr, implementingclass) "
-					+ "VALUES(?, ?, ?, ?, ?)");
+			stmt = connection.prepareStatement(
+				"INSERT INTO resources2(" + "resourceid, humanname, epi, epr, implementingclass) " + "VALUES(?, ?, ?, ?, ?)");
 			stmt.setString(1, resourceID);
 			if (humanName == null)
 				stmt.setNull(2, Types.VARCHAR);

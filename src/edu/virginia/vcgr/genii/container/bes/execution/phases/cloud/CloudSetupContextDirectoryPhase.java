@@ -36,8 +36,8 @@ public class CloudSetupContextDirectoryPhase implements ExecutionPhase, Serializ
 		File dir = new File(_localWorkingDirectory);
 		dir.mkdirs();
 
-		ContextFileSystem.store(new File(dir, ClientContextResolver.USER_CONTEXT_FILENAME), new File(dir,
-			ClientContextResolver.USER_TRANSIENT_FILENAME), context.getCallingContext());
+		ContextFileSystem.store(new File(dir, ClientContextResolver.USER_CONTEXT_FILENAME),
+			new File(dir, ClientContextResolver.USER_TRANSIENT_FILENAME), context.getCallingContext());
 
 	}
 

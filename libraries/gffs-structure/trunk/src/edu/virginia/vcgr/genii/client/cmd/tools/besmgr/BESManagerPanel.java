@@ -56,16 +56,16 @@ public class BESManagerPanel extends JPanel
 	{
 		JPanel ret = new JPanel(new GridBagLayout());
 
-		ret.add(new JLabel("Screen Saver Inactive"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		ret.add(new JLabel("Screen Saver Inactive"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		ret.add(_screenSaverInactiveCombo, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		ret.add(new JLabel("User Logged In"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		ret.add(new JLabel("User Logged In"),
+			new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		ret.add(_userLoggedInCombo, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
-		ret.add(new JLabel("Activity Threshold"), new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		ret.add(new JLabel("Activity Threshold"),
+			new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		ret.add(_thresholdField, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 
@@ -117,12 +117,15 @@ public class BESManagerPanel extends JPanel
 		ProgressMonitor<ManagementData> monitor = new ProgressMonitor<ManagementData>();
 
 		monitor.addProgressListener(new ApplyFinishProgressListener(), true);
-		monitor.addProgressNotifier(
-			new DefaultProgressNotifier(this, "Applying BES Configuration", "Applying new BES configuration.", 1000L), false);
+		monitor.addProgressNotifier(new DefaultProgressNotifier(this, "Applying BES Configuration", "Applying new BES configuration.", 1000L),
+			false);
 
-		monitor.startTask(new BESManagerConfigurationTask(_callingContext, _target, new ManagementData(new BESPolicy(
-			((BESPolicyActionWrapper) _userLoggedInCombo.getSelectedItem()).action(), ((BESPolicyActionWrapper) _screenSaverInactiveCombo
-				.getSelectedItem()).action()), threshold, _isAccepting.isSelected())));
+		monitor
+			.startTask(new BESManagerConfigurationTask(_callingContext, _target,
+				new ManagementData(
+					new BESPolicy(((BESPolicyActionWrapper) _userLoggedInCombo.getSelectedItem()).action(),
+						((BESPolicyActionWrapper) _screenSaverInactiveCombo.getSelectedItem()).action()),
+					threshold, _isAccepting.isSelected())));
 	}
 
 	public BESManagerPanel(ICallingContext callingContext, EndpointReferenceType target)
@@ -139,16 +142,16 @@ public class BESManagerPanel extends JPanel
 		_thresholdField.addCaretListener(changeListener);
 		_isAccepting.addActionListener(changeListener);
 
-		add(createActivityPoliciesPanel(), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(_isAccepting, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5,
-			5), 5, 5));
-		add(new JButton(_applyAction), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(new JButton(_refreshAction), new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		add(_statusLabel, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5,
-			5), 5, 5));
+		add(createActivityPoliciesPanel(),
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(_isAccepting,
+			new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(_applyAction),
+			new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(_refreshAction),
+			new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_statusLabel,
+			new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		acquireState();
 	}

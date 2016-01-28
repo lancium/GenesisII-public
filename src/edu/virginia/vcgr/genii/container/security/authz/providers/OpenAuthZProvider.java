@@ -38,8 +38,8 @@ import edu.virginia.vcgr.genii.security.credentials.NuCredential;
  */
 public class OpenAuthZProvider implements IAuthZProvider
 {
-	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec = new MessageLevelSecurityRequirements(
-		MessageLevelSecurityRequirements.NONE);
+	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec =
+		new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(OpenAuthZProvider.class);
@@ -70,8 +70,8 @@ public class OpenAuthZProvider implements IAuthZProvider
 		return true; // all is allowed.
 	}
 
-	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
-		ResourceException
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource)
+		throws AuthZSecurityException, ResourceException
 	{
 		return _defaultMinMsgSec;
 	}
@@ -91,8 +91,8 @@ public class OpenAuthZProvider implements IAuthZProvider
 	{
 	}
 
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource) throws AuthZSecurityException,
-		ResourceException
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
+		throws AuthZSecurityException, ResourceException
 	{
 	}
 

@@ -166,9 +166,8 @@ public class ExportTool extends BaseGridTool
 				exportServiceEPR = EPRUtils.makeEPR(serviceLocation);
 			} else {
 				NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
-				exportServiceEPR =
-					RNSUtilities.findService(nsd.getRootContainer(), _portTypeString, new PortType[] { _portTypeObj }, serviceLocation)
-						.getEndpoint();
+				exportServiceEPR = RNSUtilities
+					.findService(nsd.getRootContainer(), _portTypeString, new PortType[] { _portTypeObj }, serviceLocation).getEndpoint();
 			}
 
 			/* get local directory path to be exported */
@@ -188,9 +187,8 @@ public class ExportTool extends BaseGridTool
 				owner = "force:" + _exportCreatorFilter;
 			}
 
-			EndpointReferenceType epr =
-				createExportedRoot(targetRNSName, exportServiceEPR, localPath, _svnUser, _svnPass, _svnRevision, targetRNSName, _replicate,
-					owner);
+			EndpointReferenceType epr = createExportedRoot(targetRNSName, exportServiceEPR, localPath, _svnUser, _svnPass, _svnRevision,
+				targetRNSName, _replicate, owner);
 
 			if (targetRNSName == null) {
 				stdout.println(ObjectSerializer.toString(epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint")));
@@ -226,12 +224,10 @@ public class ExportTool extends BaseGridTool
 				exportServiceEPR = EPRUtils.makeEPR(primaryLocation);
 				replicationServiceEPR = EPRUtils.makeEPR(replicationLocation);
 			} else {
-				exportServiceEPR =
-					RNSUtilities.findService(nsd.getRootContainer(), "ExportedRootPortType",
-						new PortType[] { WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE() }, primaryLocation).getEndpoint();
-				replicationServiceEPR =
-					RNSUtilities.findService(nsd.getRootContainer(), "RExportResolverPortType",
-						new PortType[] { WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE() }, replicationLocation).getEndpoint();
+				exportServiceEPR = RNSUtilities.findService(nsd.getRootContainer(), "ExportedRootPortType",
+					new PortType[] { WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE() }, primaryLocation).getEndpoint();
+				replicationServiceEPR = RNSUtilities.findService(nsd.getRootContainer(), "RExportResolverPortType",
+					new PortType[] { WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE() }, replicationLocation).getEndpoint();
 			}
 
 			/* get local directory path to be exported */
@@ -312,7 +308,7 @@ public class ExportTool extends BaseGridTool
 
 	static public EndpointReferenceType createExportedRoot(String humanName, EndpointReferenceType exportServiceEPR, String localPath,
 		String svnUser, String svnPass, Long svnRevision, String RNSPath, boolean isReplicated, String owner) throws ResourceException,
-		ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
+			ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 
@@ -356,9 +352,9 @@ public class ExportTool extends BaseGridTool
 	 * @throws IOException
 	 * @throws InvalidToolUsageException
 	 */
-	static public EndpointReferenceType
-		createInstance(EndpointReferenceType service, String optTargetName, MessageElement[] createProperties) throws ResourceException,
-			ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
+	static public EndpointReferenceType createInstance(EndpointReferenceType service, String optTargetName, MessageElement[] createProperties)
+		throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException,
+		InvalidToolUsageException
 	{
 		EndpointReferenceType epr = ResourceCreator.createNewResource(service, createProperties, null);
 
@@ -374,9 +370,9 @@ public class ExportTool extends BaseGridTool
 		return epr;
 	}
 
-	static public EndpointReferenceType createReplicatedExportedRoot(EndpointReferenceType exportServiceEPR, String localPath,
-		String RNSPath, boolean isReplicated, EndpointReferenceType replicationService) throws ResourceException, ResourceCreationFaultType,
-		RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
+	static public EndpointReferenceType createReplicatedExportedRoot(EndpointReferenceType exportServiceEPR, String localPath, String RNSPath,
+		boolean isReplicated, EndpointReferenceType replicationService) throws ResourceException, ResourceCreationFaultType, RemoteException,
+			RNSException, CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 		String replicationIndicator = "false";

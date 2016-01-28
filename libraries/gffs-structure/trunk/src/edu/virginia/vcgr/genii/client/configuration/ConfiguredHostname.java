@@ -52,9 +52,8 @@ public class ConfiguredHostname extends Hostname
 	@Override
 	public String getHostnameOverride()
 	{
-		String toReturn =
-			InstallationProperties.getInstallationProperties().getProperty(
-				edu.virginia.vcgr.appmgr.net.Hostname._EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
+		String toReturn = InstallationProperties.getInstallationProperties()
+			.getProperty(edu.virginia.vcgr.appmgr.net.Hostname._EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
 		if (toReturn == null)
 			toReturn = getGlobalProperty(edu.virginia.vcgr.appmgr.net.Hostname._EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
 

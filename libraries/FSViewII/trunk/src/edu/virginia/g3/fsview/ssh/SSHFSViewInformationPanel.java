@@ -33,20 +33,20 @@ final class SSHFSViewInformationPanel extends JPanel
 
 		_model = model;
 
-		add(new JLabel("Host"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
-		add(_hostname, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
-			5, 5, 5), 5, 5));
+		add(new JLabel("Host"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_hostname, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
-		add(new JLabel("Port"), new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
-		add(_port, new GridBagConstraints(3, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5,
-			5), 5, 5));
+		add(new JLabel("Port"),
+			new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_port, new GridBagConstraints(3, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
-		add(new JLabel("Path"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
-		add(_path, new GridBagConstraints(1, 1, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5,
-			5), 5, 5));
+		add(new JLabel("Path"),
+			new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_path, new GridBagConstraints(1, 1, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		_hostname.addCaretListener(new CaretListenerImpl(HOST_FIELD));
 		_port.addChangeListener(new PortChangeListener());

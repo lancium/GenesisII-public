@@ -76,9 +76,8 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 
 		try {
 			queryStmt = conn.prepareStatement("SELECT resourceid, propvalue FROM properties " + "WHERE propname = ?");
-			insertStmt =
-				conn.prepareStatement("INSERT INTO persistedproperties " + "(resourceid, category, propertyname, propertyvalue) "
-					+ "VALUES(?, ?, ?, ?)");
+			insertStmt = conn.prepareStatement(
+				"INSERT INTO persistedproperties " + "(resourceid, category, propertyname, propertyvalue) " + "VALUES(?, ?, ?, ?)");
 			deleteStmt = conn.prepareStatement("DELETE FROM properties WHERE resourceid = ? AND propname = ?");
 			queryStmt.setString(1, GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
 			rs = queryStmt.executeQuery();

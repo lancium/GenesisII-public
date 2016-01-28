@@ -242,8 +242,8 @@ public class CertGeneratorTool extends BaseGridTool
 	}
 
 	public EndpointReferenceType createGenerator(String service, boolean url, String optTargetName, String issuerCertKSPath,
-		String issuerCertKSPassword, String issuerCertAlias, String issuerCertEntryPassword, Long defaultValidity) throws IOException,
-		RNSException, CreationException, KeyStoreException, GeneralSecurityException, InvalidToolUsageException
+		String issuerCertKSPassword, String issuerCertAlias, String issuerCertEntryPassword, Long defaultValidity)
+			throws IOException, RNSException, CreationException, KeyStoreException, GeneralSecurityException, InvalidToolUsageException
 	{
 		EndpointReferenceType epr;
 		PrivateKey issuerPrivateKey = null;
@@ -301,13 +301,11 @@ public class CertGeneratorTool extends BaseGridTool
 		if (!url) {
 			RNSPath path = RNSPath.getCurrent();
 			path = path.lookup(service, RNSPathQueryFlags.MUST_EXIST);
-			epr =
-				CreateResourceTool.createInstance(path.getEndpoint(), (optTargetName == null) ? null : new GeniiPath(optTargetName),
-					createProps);
+			epr = CreateResourceTool.createInstance(path.getEndpoint(), (optTargetName == null) ? null : new GeniiPath(optTargetName),
+				createProps);
 		} else {
-			epr =
-				CreateResourceTool.createInstance(EPRUtils.makeEPR(service), (optTargetName == null) ? null : new GeniiPath(optTargetName),
-					createProps);
+			epr = CreateResourceTool.createInstance(EPRUtils.makeEPR(service), (optTargetName == null) ? null : new GeniiPath(optTargetName),
+				createProps);
 		}
 		return epr;
 	}

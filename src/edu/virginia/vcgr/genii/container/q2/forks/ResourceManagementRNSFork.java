@@ -36,8 +36,8 @@ public class ResourceManagementRNSFork extends ReadOnlyRNSResourceFork
 			entries = mgr.listBESs(entryName);
 			ret = new ArrayList<InternalEntry>(entries.size());
 			for (LegacyEntryType entry : entries) {
-				ret.add(createInternalEntry(exemplarEPR, entry.getEntry_name(), new ResourceManagementCmdFork(getService(),
-					formForkPath(entry.getEntry_name())).describe()));
+				ret.add(createInternalEntry(exemplarEPR, entry.getEntry_name(),
+					new ResourceManagementCmdFork(getService(), formForkPath(entry.getEntry_name())).describe()));
 			}
 
 			return ret;

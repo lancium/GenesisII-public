@@ -166,9 +166,8 @@ public class IdpTool extends BaseLoginTool
 						}
 
 					} else {
-						RNSPath authnPath =
-							ContextManager.getExistingContext().getCurrentPath()
-								.lookup(authnSource.getSchemeSpecificPart(), RNSPathQueryFlags.MUST_EXIST);
+						RNSPath authnPath = ContextManager.getExistingContext().getCurrentPath().lookup(authnSource.getSchemeSpecificPart(),
+							RNSPathQueryFlags.MUST_EXIST);
 						EndpointReferenceType epr = authnPath.getEndpoint();
 						TypeInformation type = new TypeInformation(epr);
 						if (type.isIDP()) {

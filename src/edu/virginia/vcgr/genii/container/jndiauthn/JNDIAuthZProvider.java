@@ -57,8 +57,8 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
 public class JNDIAuthZProvider implements IAuthZProvider
 {
 
-	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec = new MessageLevelSecurityRequirements(
-		MessageLevelSecurityRequirements.SIGN | MessageLevelSecurityRequirements.ENCRYPT);
+	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec =
+		new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.SIGN | MessageLevelSecurityRequirements.ENCRYPT);
 
 	static private Log _logger = LogFactory.getLog(JNDIAuthZProvider.class);
 	static private AclAuthZProvider _aclProvider = null;
@@ -149,9 +149,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 						case NIS:
 
 							jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.nis.NISCtxFactory");
-							providerUrl =
-								"nis://" + jndiResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) + "/"
-									+ jndiResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
+							providerUrl = "nis://" + jndiResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) + "/"
+								+ jndiResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
 							jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
 
 							InitialDirContext initialContext = new InitialDirContext(jndiEnv);
@@ -199,8 +198,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 		return false;
 	}
 
-	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
-		ResourceException
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource)
+		throws AuthZSecurityException, ResourceException
 	{
 
 		JNDIResource jndiResource = (JNDIResource) resource;
@@ -237,8 +236,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 		_aclProvider.setAuthZConfig(config, resource);
 	}
 
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource) throws AuthZSecurityException,
-		ResourceException
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
+		throws AuthZSecurityException, ResourceException
 	{
 		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource())
 			return;

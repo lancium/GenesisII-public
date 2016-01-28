@@ -252,9 +252,9 @@ public class DirectoryHandler
 			aTime.setTimeInMillis(accessTime.getSeconcds() * 1000L + accessTime.getMicroSeconds() / 1000L);
 			mTime.setTimeInMillis(modTime.getSeconcds() * 1000L + modTime.getMicroSeconds() / 1000L);
 
-			proxy.updateResourceProperties(new UpdateResourceProperties(new UpdateType(new MessageElement[] {
-				new MessageElement(new QName(ns, ByteIOConstants.ACCESSTIME_ATTR_NAME), aTime),
-				new MessageElement(new QName(ns, ByteIOConstants.MODTIME_ATTR_NAME), mTime) })));
+			proxy.updateResourceProperties(new UpdateResourceProperties(
+				new UpdateType(new MessageElement[] { new MessageElement(new QName(ns, ByteIOConstants.ACCESSTIME_ATTR_NAME), aTime),
+					new MessageElement(new QName(ns, ByteIOConstants.MODTIME_ATTR_NAME), mTime) })));
 
 			return 0;
 		} catch (OGRSHException oe) {

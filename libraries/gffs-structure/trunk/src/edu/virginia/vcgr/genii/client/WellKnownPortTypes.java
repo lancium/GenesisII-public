@@ -20,14 +20,14 @@ public class WellKnownPortTypes
 {
 	static public PortType GENII_NOTIFICATION_PRODUCER_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification", "GeniiNotificiationProducerPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification", "GeniiNotificiationProducerPortType"));
 	}
 
 	static public PortType GENII_SUBSCRIPTION_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification", "GeniiSubscriptionPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification", "GeniiSubscriptionPortType"));
 	}
 
 	static public PortType GENII_WSNBROKER_PORT_TYPE()
@@ -37,14 +37,14 @@ public class WellKnownPortTypes
 
 	static public PortType GENII_PUB_REG_MGR_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/genii/2010/08/notification", "GeniiPublisherRegistrationManagerPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/genii/2010/08/notification", "GeniiPublisherRegistrationManagerPortType"));
 	}
 
 	static public PortType GENII_NOTIFICATION_CONSUMER_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification", "GeniiNotificationConsumerPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification", "GeniiNotificationConsumerPortType"));
 	}
 
 	static public PortType GENII_RESOURCE_FACTORY_PORT_TYPE()
@@ -80,14 +80,14 @@ public class WellKnownPortTypes
 
 	static public PortType APPDESC_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/genii/application-description", "ApplicationDescriptionPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/genii/application-description", "ApplicationDescriptionPortType"));
 	}
 
 	static public PortType DEPLOYER_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/genii/application-deployer", "ApplicationDeployerPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/genii/application-deployer", "ApplicationDeployerPortType"));
 	}
 
 	static public PortType SCHEDULER_PORT_TYPE()
@@ -97,8 +97,8 @@ public class WellKnownPortTypes
 
 	static public PortType BASIC_SCHEDULER_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/genii/2007/01/scheduler/basic", "BasicSchedulerPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/genii/2007/01/scheduler/basic", "BasicSchedulerPortType"));
 	}
 
 	static public PortType RNS_PORT_TYPE()
@@ -118,8 +118,8 @@ public class WellKnownPortTypes
 
 	static public PortType SBYTEIO_SERVICE_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://schemas.ggf.org/byteio/2005/10/streamable-access", "StreamableByteIOPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://schemas.ggf.org/byteio/2005/10/streamable-access", "StreamableByteIOPortType"));
 	}
 
 	static public PortType SBYTEIO_FACTORY_PORT_TYPE()
@@ -139,8 +139,8 @@ public class WellKnownPortTypes
 
 	static public PortType EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/export/2009/05/light-export", "LightWeightExportPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/export/2009/05/light-export", "LightWeightExportPortType"));
 	}
 
 	static public PortType EXPORTED_FILE_SERVICE_PORT_TYPE()
@@ -186,8 +186,8 @@ public class WellKnownPortTypes
 
 	static public PortType REFERENCE_RESOLVER_SERVICE_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://schemas.ogf.org/naming/2006/08/naming/wsdl/ReferenceResolver", "ReferenceResolverPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://schemas.ogf.org/naming/2006/08/naming/wsdl/ReferenceResolver", "ReferenceResolverPortType"));
 	}
 
 	static public PortType GENII_RESOLVER_PORT_TYPE()
@@ -197,14 +197,14 @@ public class WellKnownPortTypes
 
 	static public PortType REXPORT_RESOLVER_FACTORY_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver-factory", "RExportResolverFactoryPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver-factory", "RExportResolverFactoryPortType"));
 	}
 
 	static public PortType REXPORT_RESOLVER_PORT_TYPE()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver", "RExportResolverPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver", "RExportResolverPortType"));
 	}
 
 	static public PortType REXPORT_DIR_PORT_TYPE()
@@ -255,8 +255,8 @@ public class WellKnownPortTypes
 
 	static public PortType GENII_PULL_POINT_PORT()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/genii/2010/08/notification/pull-point", "GeniiPullPointPortType"));
+		return PortType.portTypeFactory()
+			.get(new QName("http://vcgr.cs.virginia.edu/genii/2010/08/notification/pull-point", "GeniiPullPointPortType"));
 	}
 
 	static public PortType JOB_MANAGEMENT_PORT_TYPE()
@@ -271,9 +271,8 @@ public class WellKnownPortTypes
 
 	static public PortType ENHANCED_NOTIFICATION_BROKER_FACTORY__PORT()
 	{
-		return PortType.portTypeFactory().get(
-			new QName("http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory",
-				"EnhancedNotificationBrokerFactoryPortType"));
+		return PortType.portTypeFactory().get(new QName("http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory",
+			"EnhancedNotificationBrokerFactoryPortType"));
 	}
 
 	static public PortType ENHANCED_NOTIFICATION_BROKER_PORT()

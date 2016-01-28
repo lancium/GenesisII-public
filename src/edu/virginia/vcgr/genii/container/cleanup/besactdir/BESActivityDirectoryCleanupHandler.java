@@ -31,8 +31,8 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 	static final private long KEEP_WINDOW = 31l;
 	static final private TimeUnit KEEP_WINDOW_UNITS = TimeUnit.DAYS;
 
-	static final private Pattern GUID_PATTERN = Pattern
-		.compile("^\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}$");
+	static final private Pattern GUID_PATTERN =
+		Pattern.compile("^\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}$");
 
 	static private Set<File> findBESDirectories(Connection connection) throws Throwable
 	{
@@ -43,9 +43,8 @@ final public class BESActivityDirectoryCleanupHandler implements CleanupHandler
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				connection
-					.prepareStatement("SELECT b.propvalue FROM bespolicytable AS a, properties AS b WHERE a.besid = b.resourceid AND b.propname = ?");
+			stmt = connection.prepareStatement(
+				"SELECT b.propvalue FROM bespolicytable AS a, properties AS b WHERE a.besid = b.resourceid AND b.propname = ?");
 			stmt.setString(1, ConstructionParameters.CONSTRUCTION_PARAMETERS_QNAME.toString());
 			rs = stmt.executeQuery();
 

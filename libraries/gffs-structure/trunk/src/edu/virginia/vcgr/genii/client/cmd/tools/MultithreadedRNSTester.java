@@ -224,8 +224,8 @@ public class MultithreadedRNSTester extends BaseGridTool
 					}
 				}
 			} catch (Throwable e) {
-				_logger.info("could not successfully lookup contents of: " + rpath.pwd() + ", exception was: "
-					+ e.getClass().getCanonicalName());
+				_logger.info(
+					"could not successfully lookup contents of: " + rpath.pwd() + ", exception was: " + e.getClass().getCanonicalName());
 				synchronized (_storedDirectories) {
 					// we only want to mark it as bad if this is an access problem! temporary screwup problems should be tried again.
 					if (e instanceof PermissionDeniedException || e instanceof RNSPathDoesNotExistException) {
@@ -234,9 +234,8 @@ public class MultithreadedRNSTester extends BaseGridTool
 							if (_storedDirectories.get(rpath.pwd()) == DirectoryStatus.LOOKUP_NOT_DONE) {
 								// we only whack the item if it didn't have any existing contents.
 								_logger.info("removing path permanently from consideration: " + rpath.pwd());
-								_storedDirectories.put(rpath.pwd(),
-									(e instanceof PermissionDeniedException) ? DirectoryStatus.LOOKUP_FAILED_PERMISSION
-										: DirectoryStatus.LOOKUP_FAILED_NON_EXISTENT);
+								_storedDirectories.put(rpath.pwd(), (e instanceof PermissionDeniedException)
+									? DirectoryStatus.LOOKUP_FAILED_PERMISSION : DirectoryStatus.LOOKUP_FAILED_NON_EXISTENT);
 							} else {
 								// this one had already been looked up in some way, so just mention this if it used to be good.
 								if (_storedDirectories.get(rpath.pwd()) == DirectoryStatus.LOOKUP_OKAY) {

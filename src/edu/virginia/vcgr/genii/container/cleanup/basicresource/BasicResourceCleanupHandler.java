@@ -22,7 +22,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerServi
 public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 {
 	static private Log _logger = LogFactory.getLog(BasicResourceCleanupHandler.class);
-	
+
 	static private void cleanupSubscriptions(Connection connection, String publisherKey) throws Throwable
 	{
 		ResultSet rs = null;
@@ -34,8 +34,7 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("clean up subscriptions time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("clean up subscriptions time is " + (System.currentTimeMillis() - startTime));
 
 			while (rs.next()) {
 				WSNSubscriptionCleanupHandler handler = new WSNSubscriptionCleanupHandler();
@@ -52,9 +51,8 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				connection.prepareStatement(String.format("DELETE FROM %s WHERE %s = ?", tableResourceTriple.first(),
-					tableResourceTriple.second()));
+			stmt = connection
+				.prepareStatement(String.format("DELETE FROM %s WHERE %s = ?", tableResourceTriple.first(), tableResourceTriple.second()));
 			stmt.setString(1, tableResourceTriple.third());
 			stmt.executeUpdate();
 		} finally {
@@ -133,8 +131,7 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("evaluate properties time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("evaluate properties time is " + (System.currentTimeMillis() - startTime));
 
 			while (rs.next()) {
 				Blob blob = rs.getBlob(1);
@@ -158,8 +155,7 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("evaluate resources table time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("evaluate resources table time is " + (System.currentTimeMillis() - startTime));
 
 			boolean wasItThere = rs.next();
 
@@ -183,8 +179,7 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("evaluate resource2 table time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("evaluate resource2 table time is " + (System.currentTimeMillis() - startTime));
 
 			boolean wasItThere = rs.next();
 

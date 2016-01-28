@@ -127,9 +127,8 @@ public class TerminateActivitiesTool extends BaseGridTool
 
 			List<EndpointReferenceType> currActivityEprs = activityEprs.subList(start, end);
 
-			TerminateActivitiesResponseType resp =
-				bes.terminateActivities(new TerminateActivitiesType(currActivityEprs.toArray(new EndpointReferenceType[currActivityEprs
-					.size()]), null));
+			TerminateActivitiesResponseType resp = bes.terminateActivities(
+				new TerminateActivitiesType(currActivityEprs.toArray(new EndpointReferenceType[currActivityEprs.size()]), null));
 
 			if (resp != null) {
 				TerminateActivityResponseType[] resps = resp.getResponse();
@@ -137,8 +136,8 @@ public class TerminateActivitiesTool extends BaseGridTool
 					int i = 0;
 					for (TerminateActivityResponseType r : resps) {
 						if (!r.isTerminated()) {
-							stderr.println("Failed to terminate the activity " + activityPaths.get(start + i) + ": "
-								+ r.getFault().getFaultstring());
+							stderr.println(
+								"Failed to terminate the activity " + activityPaths.get(start + i) + ": " + r.getFault().getFaultstring());
 							exitCode = 1;
 						}
 						i++;

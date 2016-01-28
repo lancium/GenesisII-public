@@ -22,8 +22,8 @@ import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
  * 
  * @author mmm2a
  */
-public class DimeRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIOPortType> implements RandomByteIOTransferer,
-	DimeByteIOTransferer
+public class DimeRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIOPortType>
+	implements RandomByteIOTransferer, DimeByteIOTransferer
 {
 	/**
 	 * Construct a new DIMERByteIO transferer.

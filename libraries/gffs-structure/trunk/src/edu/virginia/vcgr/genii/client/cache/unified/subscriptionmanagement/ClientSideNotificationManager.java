@@ -33,8 +33,8 @@ public class ClientSideNotificationManager implements NotificationMultiplexer
 	private static Log _logger = LogFactory.getLog(ClientSideNotificationManager.class);
 
 	@Override
-	public <ContentsType extends NotificationMessageContents> NotificationRegistration registerNotificationHandler(
-		TopicQueryExpression topicFilter, NotificationHandler<ContentsType> handler)
+	public <ContentsType extends NotificationMessageContents> NotificationRegistration
+		registerNotificationHandler(TopicQueryExpression topicFilter, NotificationHandler<ContentsType> handler)
 	{
 		// Do nothing
 		return null;

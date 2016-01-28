@@ -203,8 +203,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
-		RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 
 		ResourceKey myKey = ResourceManager.getCurrentResource();
@@ -221,8 +221,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		String newStsName = (String) constructionParameters.get(SecurityConstants.NEW_JNDI_STS_NAME_QNAME);
 		Collection<String> entries = myResource.listEntries(null);
 		if (entries.contains(newStsName)) {
-			throw edu.virginia.vcgr.genii.client.wsrf.FaultManipulator.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null,
-				null, newStsName));
+			throw edu.virginia.vcgr.genii.client.wsrf.FaultManipulator
+				.fillInFault(new RNSEntryExistsFaultType(null, null, null, null, null, null, newStsName));
 		}
 
 		// add the entry to the service's list of STSs
@@ -278,8 +278,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		return formatIdentity();
 	}
 
-	protected RequestSecurityTokenResponseType formatIdentity() throws AuthZSecurityException, SOAPException, ConfigurationException,
-		RemoteException
+	protected RequestSecurityTokenResponseType formatIdentity()
+		throws AuthZSecurityException, SOAPException, ConfigurationException, RemoteException
 	{
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -300,9 +300,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 		MessageElement wseTokenRef = WSSecurityUtils.makePkiPathSecTokenRef(identity);
 
-		elements[1] =
-			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
-				new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
+		elements[1] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
+			new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		response.set_any(elements);
@@ -360,9 +359,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 		org.apache.axis.message.MessageElement wseTokenRef = creds.convertToSOAPElement();
 
-		elements[1] =
-			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
-				new RequestedSecurityTokenType(Elementals.unitaryArray(wseTokenRef)));
+		elements[1] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
+			new RequestedSecurityTokenType(Elementals.unitaryArray(wseTokenRef)));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		response.set_any(elements);
@@ -413,15 +411,16 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 								subElement = subElement.getChildElement(BinarySecurity.TOKEN_BST);
 								if (subElement != null) {
 									try {
-										if (subElement.getAttributeValue("ValueType").equals(
-											edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE)) {
+										if (subElement.getAttributeValue("ValueType")
+											.equals(edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE)) {
 											X509Security bstToken = new X509Security(subElement);
 											X509Certificate delegateTo = bstToken.getX509Certificate(new GIIBouncyCrypto());
 											delegateToChain = new X509Certificate[] { delegateTo };
 										} else {
 											if (delegateToChain == null) {
-												throw new AxisFault(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-													"BadRequest"), "Missing or unsupported DelegateTo security ValueType", null, null);
+												throw new AxisFault(
+													new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"),
+													"Missing or unsupported DelegateTo security ValueType", null, null);
 											}
 										}
 									} catch (GenesisIISecurityException e) {
@@ -480,8 +479,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		return responseArray.toArray(new RequestSecurityTokenResponseType[responseArray.size()]);
 	}
 
-	protected X509Certificate[] createCertChainForListing(IJNDIResource idpResource, IJNDIResource stsResource) throws RemoteException,
-		GeneralSecurityException
+	protected X509Certificate[] createCertChainForListing(IJNDIResource idpResource, IJNDIResource stsResource)
+		throws RemoteException, GeneralSecurityException
 	{
 
 		try {
@@ -497,9 +496,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 			String epiString = (String) idpResource.getKey();
 			String userName = idpResource.getIdpName();
 
-			CertCreationSpec certSpec =
-				new CertCreationSpec(containerChain[0].getPublicKey(), containerChain, Container.getContainerPrivateKey(),
-					getResourceCertificateLifetime());
+			CertCreationSpec certSpec = new CertCreationSpec(containerChain[0].getPublicKey(), containerChain,
+				Container.getContainerPrivateKey(), getResourceCertificateLifetime());
 
 			Properties jndiEnv = new Properties();
 			String providerUrl = null;
@@ -509,9 +507,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 				case NIS:
 
 					jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.nis.NISCtxFactory");
-					providerUrl =
-						"nis://" + stsResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) + "/"
-							+ stsResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
+					providerUrl = "nis://" + stsResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) + "/"
+						+ stsResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());
 					jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
 
 					InitialDirContext initialContext = new InitialDirContext(jndiEnv);
@@ -556,8 +553,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 
 	/* EndpointIdentifierResolver port type. */
 	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType resolveEPI(org.apache.axis.types.URI resolveEPI) throws RemoteException, ResourceUnknownFaultType,
-		ResolveFailedFaultType
+	public EndpointReferenceType resolveEPI(org.apache.axis.types.URI resolveEPI)
+		throws RemoteException, ResourceUnknownFaultType, ResolveFailedFaultType
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Entered resolveEPI method.");

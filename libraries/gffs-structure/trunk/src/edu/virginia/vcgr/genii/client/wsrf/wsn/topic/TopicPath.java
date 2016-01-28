@@ -223,12 +223,11 @@ public class TopicPath implements Serializable
 					int index = pathElement.indexOf(':');
 					if (index < 0) {
 						if (current == null)
-							throw new IllegalArgumentException(String.format("TopicPath element %s is invalid "
-								+ "without preceeding topic definnitions.", path));
+							throw new IllegalArgumentException(
+								String.format("TopicPath element %s is invalid " + "without preceeding topic definnitions.", path));
 
-						current =
-							new TopicPath(current, new QName(currentNamespaceURI, pathElement,
-								(currentPrefix == null) ? XMLConstants.DEFAULT_NS_PREFIX : currentPrefix));
+						current = new TopicPath(current, new QName(currentNamespaceURI, pathElement,
+							(currentPrefix == null) ? XMLConstants.DEFAULT_NS_PREFIX : currentPrefix));
 					} else {
 						String prefix = pathElement.substring(0, index).trim();
 						String localName = pathElement.substring(index + 1).trim();

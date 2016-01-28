@@ -11,6 +11,6 @@ public interface NotificationBrokerTopics
 {
 
 	@WSNTopic(contentsType = TestNotificationMessageContents.class)
-	static final public TopicPath TEST_NOTIFICAION_TOPIC = TopicPath.createTopicPath(new QName(
-		GenesisIIConstants.ENHANCED_NOTIFICATION_BROKER_NS, "TestNotification", "genii-enhanced-notification"));
+	static final public TopicPath TEST_NOTIFICAION_TOPIC = TopicPath
+		.createTopicPath(new QName(GenesisIIConstants.ENHANCED_NOTIFICATION_BROKER_NS, "TestNotification", "genii-enhanced-notification"));
 }

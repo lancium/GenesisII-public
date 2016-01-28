@@ -90,9 +90,10 @@ public class SMBTree
 	{
 		searches.remove(SID);
 	}
-	
-	//hmmm: case-insensitive matching should be turned off since it is awfully slow.
-	//hmmm: but we have also found it cannot be turned off because windows whips out these all upper case versions of our file names sometimes.
+
+	// hmmm: case-insensitive matching should be turned off since it is awfully slow.
+	// hmmm: but we have also found it cannot be turned off because windows whips out these all upper case versions of our file names
+	// sometimes.
 	// the protection we did by ignoring all those bogus file names may make this usable again?
 
 	private static RNSPath lookupInsensitive(RNSPath dir, String file)
@@ -172,35 +173,32 @@ public class SMBTree
 		path = FileSystemHelper.sanitizeFilename(path);
 
 		/*
-		 * hmmm: !!!! ham-handed kludge for the names windows keeps asking us about and which cause us to endlessly look for things in the grid.
+		 * hmmm: !!!! ham-handed kludge for the names windows keeps asking us about and which cause us to endlessly look for things in the
+		 * grid.
 		 */
-		if (path.endsWith("folder.gif") ||
-			path.endsWith("folder.jpg") ||
-			path.endsWith("Thumbs.db") ||
-			path.endsWith("desktop.ini") ) {
+		if (path.endsWith("folder.gif") || path.endsWith("folder.jpg") || path.endsWith("Thumbs.db") || path.endsWith("desktop.ini")) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("ignoring windows specific file name: " + path);
 			throw new SMBException(NTStatus.NO_SUCH_FILE);
 		}
-		
+
 		if (path.endsWith("srvsvc")) {
 			// attempting to shut it up fast on srvsvc, although this is more problematic than these others.
 			// it indicates a whole slew of expected services.
-			
+
 			if (_logger.isDebugEnabled())
 				_logger.debug("special path seen; saying not implemented: " + path);
-			
-			throw new SMBException(NTStatus.NOT_IMPLEMENTED);
-			
-			// pretend they're asking about the root.
-			//return root;
-		}			
 
-		
+			throw new SMBException(NTStatus.NOT_IMPLEMENTED);
+
+			// pretend they're asking about the root.
+			// return root;
+		}
+
 		RNSPath file = root.lookup(path);
-		
-		//hmmm: disabling case insensitive searches here.
-//		return file; //added to disable case insensitivity.
+
+		// hmmm: disabling case insensitive searches here.
+		// return file; //added to disable case insensitivity.
 		// File exists or no case-insensitive search needed?
 		if (caseSensitive || file.exists()) {
 			if (_logger.isDebugEnabled())

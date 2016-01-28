@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An access-control policy data-structure comprised of policy-sets. Conveys sets of policies for three types of access: "read",
- * write", and "execute".
+ * An access-control policy data-structure comprised of policy-sets. Conveys sets of policies for three types of access: "read", write", and "
+ * execute".
  * 
  * Additionally conveys a flag indicating a confidentiality requirement for secure communication.
  * 

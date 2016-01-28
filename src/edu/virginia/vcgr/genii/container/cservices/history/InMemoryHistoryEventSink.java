@@ -64,8 +64,8 @@ public class InMemoryHistoryEventSink
 						HistoryEventBundleType bundle = (HistoryEventBundleType) e.getObjectValue(HistoryEventBundleType.class);
 						HistoryEvent event = (HistoryEvent) DBSerializer.deserialize(bundle.getData());
 						ret.add(new HistoryEvent(event.eventNumber().wrapWith(parentNumber), event.eventTimestamp(),
-							new SimpleStringHistoryEventSource(stringName, knownTo, event.eventSource()), event.eventLevel(), event
-								.eventCategory(), event.eventProperties(), event.eventData()));
+							new SimpleStringHistoryEventSource(stringName, knownTo, event.eventSource()), event.eventLevel(),
+							event.eventCategory(), event.eventProperties(), event.eventData()));
 					} catch (Throwable cause) {
 						_logger.warn("Error trying to retrieve sub events.", cause);
 					}

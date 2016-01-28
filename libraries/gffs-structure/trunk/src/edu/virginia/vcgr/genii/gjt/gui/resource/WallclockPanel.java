@@ -26,9 +26,9 @@ public class WallclockPanel extends TitledPanel
 
 		add(new JLabel("Wallclock Time Limit"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(upperBound, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5,
-			5, 5, 5), 5, 5));
-		add(upperBoundUnit, new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
+		add(upperBound, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
+		add(upperBoundUnit, new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 	}
 }

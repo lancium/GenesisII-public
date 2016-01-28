@@ -26,14 +26,14 @@ class PersistentOutcallJobKiller
 
 	static private AttemptScheduler SCHEDULER()
 	{
-		return new ExponentialBackoffScheduler(LIFETIME_CAP, LIFETIME_CAP_UNITS, null, EXPONENT_ATTEMPT_CAP, BACKOFF_BASE,
-			BACKOFF_BASE_UNITS, BACKOFF_JITTER_BASE, BACKOFF_JITTER_BASE_UNITS);
+		return new ExponentialBackoffScheduler(LIFETIME_CAP, LIFETIME_CAP_UNITS, null, EXPONENT_ATTEMPT_CAP, BACKOFF_BASE, BACKOFF_BASE_UNITS,
+			BACKOFF_JITTER_BASE, BACKOFF_JITTER_BASE_UNITS);
 	}
 
 	static boolean killJob(String besName, EndpointReferenceType bes, String historyKey, HistoryEventToken historyToken,
 		EndpointReferenceType activity, ICallingContext context)
 	{
-		return PersistentOutcallContainerService.schedulePersistentOutcall(new BESActivityTerminatorActor(historyKey, historyToken, besName,
-			activity), SCHEDULER(), bes, context);
+		return PersistentOutcallContainerService.schedulePersistentOutcall(
+			new BESActivityTerminatorActor(historyKey, historyToken, besName, activity), SCHEDULER(), bes, context);
 	}
 }

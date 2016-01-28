@@ -40,8 +40,8 @@ public class SetupOGRSHPhase extends AbstractExecutionPhase
 			writeGlobalConfig(config, "/home/bes-job");
 			writeLocalProvider(config);
 			writeGridProvider(config, contextFile);
-			writeMount(config, "/home/bes-job", "local-fs-provider", "local-fs-session", context.getCurrentWorkingDirectory()
-				.getWorkingDirectory().getAbsolutePath());
+			writeMount(config, "/home/bes-job", "local-fs-provider", "local-fs-session",
+				context.getCurrentWorkingDirectory().getWorkingDirectory().getAbsolutePath());
 			writeMount(config, "/bin", "local-fs-provider", "local-fs-session", "/bin");
 			writeMount(config, "/proc", "local-fs-provider", "local-fs-session", "/proc");
 			writeMount(config, "/sbin", "local-fs-provider", "local-fs-session", "/sbin");

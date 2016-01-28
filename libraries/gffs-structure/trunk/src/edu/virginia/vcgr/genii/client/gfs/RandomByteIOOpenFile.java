@@ -161,8 +161,8 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 	 * Made the method synchonized so that only once call can happen at a time, and so that we can use a static variable as a temporary. The
 	 * compiler will not let us allocate a local variable without an instance of RandomByteIOOpenFile existing. ARGH
 	 */
-	synchronized static private BasicFileOperator createOperator(EndpointReferenceType target) throws ResourceException,
-		GenesisIISecurityException, RemoteException, IOException
+	synchronized static private BasicFileOperator createOperator(EndpointReferenceType target)
+		throws ResourceException, GenesisIISecurityException, RemoteException, IOException
 	{
 
 		TypeInformation typeInfo = new TypeInformation(target);

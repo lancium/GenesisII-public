@@ -120,9 +120,8 @@ public class WSNotificationContainerService extends AbstractContainerService
 			for (WSNSubscriptionInformation subscription : subscriptions) {
 				NotificationOutcallActor actor;
 
-				actor =
-					new NotificationOutcallActor(new NotificationMessageOutcallContent(subscription.subscriptionReference(), topic,
-						publisherEPR, contents, subscription.additionalUserData()));
+				actor = new NotificationOutcallActor(new NotificationMessageOutcallContent(subscription.subscriptionReference(), topic,
+					publisherEPR, contents, subscription.additionalUserData()));
 
 				boolean isPersistent = subscription.policies().containsKey(SubscriptionPolicyTypes.PersistentNotification);
 				if (_logger.isDebugEnabled())
@@ -131,8 +130,9 @@ public class WSNotificationContainerService extends AbstractContainerService
 				if (isPersistent) {
 					actor.setPersistent(true);
 					PersistentOutcallContainerService service = ContainerServices.findService(PersistentOutcallContainerService.class);
-					service.schedule(actor, new ExponentialBackoffScheduler(7L, TimeUnit.DAYS, null, null, 1L, TimeUnit.MINUTES, 30L,
-						TimeUnit.MILLISECONDS), subscription.consumerReference(), null, attachment);
+					service.schedule(actor,
+						new ExponentialBackoffScheduler(7L, TimeUnit.DAYS, null, null, 1L, TimeUnit.MINUTES, 30L, TimeUnit.MILLISECONDS),
+						subscription.consumerReference(), null, attachment);
 				} else {
 					_executor.submit(new NotificationWorker(subscription.consumerReference(), actor, attachment));
 				}
@@ -244,8 +244,8 @@ public class WSNotificationContainerService extends AbstractContainerService
 	 * out-calls from those that need message polling. Then it store the change-log for all brokers, update the message index for all of them,
 	 * push the message in queues of pull-point type brokers, and finally use out-calls to notify active loggers.
 	 */
-	public void processNotificationMessageForBrokers(List<NotificationBrokerDBResource> brokerList,
-		NotificationMessageOutcallContent message, Connection connection) throws Exception
+	public void processNotificationMessageForBrokers(List<NotificationBrokerDBResource> brokerList, NotificationMessageOutcallContent message,
+		Connection connection) throws Exception
 	{
 
 		if (brokerList == null || brokerList.isEmpty())

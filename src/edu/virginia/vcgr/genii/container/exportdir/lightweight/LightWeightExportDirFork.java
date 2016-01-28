@@ -291,10 +291,10 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				// We also want to do this the old way if shortForm==false
 				if ((!isDir && lastF == null) || (isDir && lastD == null) || requestedShortForm == false) {
 					AttributesPreFetcherFactory factory = new LightWeightExportAttributePrefetcherFactoryImpl();
-					RNSEntryResponseType entry =
-						new RNSEntryResponseType(requestedShortForm ? null : epr, RNSUtilities.createMetadata(epr,
-							Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, rKey, null, requestedShortForm)), null,
-							internalEntry.getName());
+					RNSEntryResponseType entry = new RNSEntryResponseType(requestedShortForm ? null : epr,
+						RNSUtilities.createMetadata(epr,
+							Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, rKey, null, requestedShortForm)),
+						null, internalEntry.getName());
 					// ---------------------------------------------------------------------------------------------
 					// Removing EPR from entry when short form is requested
 					if (requestedShortForm)
@@ -514,12 +514,14 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 								new LightWeightExportFileFork(service, RForkUtils.formForkPathFromPath(forkPath, dName));
 							info = lweff.describe();
 						} else {
-							resp =
-								new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null,
-									null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format("Entry"
-										+ " %s does not exist!", dName)) }, null, dName)), dName);
-							ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType
-								.getTypeDesc().getXmlType(), resp)));
+							resp = new RNSEntryResponseType(null, null,
+								FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
+									new BaseFaultTypeDescription[] {
+										new BaseFaultTypeDescription(String.format("Entry" + " %s does not exist!", dName)) },
+									null, dName)),
+								dName);
+							ret.add(new Pair<Long, MessageElement>((long) lcv,
+								MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp)));
 							continue;
 						}
 					}
@@ -550,11 +552,11 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 					EndpointReferenceType epr = ie.getEntryReference();
 					AttributesPreFetcherFactory factory = new LightWeightExportAttributePrefetcherFactoryImpl();
 
-					resp =
-						new RNSEntryResponseType(shortForm ? null : epr, RNSUtilities.createMetadata(epr,
-							Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service, shortForm)), null, ie.getName());
-					ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc()
-						.getXmlType(), resp)));
+					resp = new RNSEntryResponseType(shortForm ? null : epr,
+						RNSUtilities.createMetadata(epr, Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service, shortForm)),
+						null, ie.getName());
+					ret.add(new Pair<Long, MessageElement>((long) lcv,
+						MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp)));
 
 					if (fd == FileOrDir.FILE) {
 						lastF = resp;
@@ -636,8 +638,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						}
 						next.setMetadata(new RNSMetadataType(ent.getMetadata().getSupportsRns(), me));
 
-						ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType
-							.getTypeDesc().getXmlType(), next)));
+						ret.add(new Pair<Long, MessageElement>((long) lcv,
+							MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), next)));
 
 					} else if (fd == FileOrDir.DIRECTORY) {
 						int elements = forkFile.list().length;
@@ -667,8 +669,8 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						}
 						next.setMetadata(new RNSMetadataType(ent.getMetadata().getSupportsRns(), me));
 
-						ret.add(new Pair<Long, MessageElement>((long) lcv, MessageElementSerializer.serialize(RNSEntryResponseType
-							.getTypeDesc().getXmlType(), ent)));
+						ret.add(new Pair<Long, MessageElement>((long) lcv,
+							MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), ent)));
 
 					}
 				}
@@ -728,9 +730,12 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 				else {
 
 					resp =
-						new RNSEntryResponseType(null, null, FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null,
-							null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(String.format(
-								"Entry" + " %s does not exist!", dName)) }, null, dName)), dName);
+						new RNSEntryResponseType(null, null,
+							FaultManipulator.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
+								new BaseFaultTypeDescription[] {
+									new BaseFaultTypeDescription(String.format("Entry" + " %s does not exist!", dName)) },
+								null, dName)),
+							dName);
 
 					return MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp);
 				}
@@ -763,9 +768,9 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		EndpointReferenceType epr = ie.getEntryReference();
 		AttributesPreFetcherFactory factory = new LightWeightExportAttributePrefetcherFactoryImpl();
 
-		resp =
-			new RNSEntryResponseType(shortForm ? null : epr, RNSUtilities.createMetadata(epr,
-				Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service, shortForm)), null, ie.getName());
+		resp = new RNSEntryResponseType(shortForm ? null : epr,
+			RNSUtilities.createMetadata(epr, Prefetcher.preFetch(epr, ie.getAttributes(), factory, rKey, service, shortForm)), null,
+			ie.getName());
 
 		return MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp);
 

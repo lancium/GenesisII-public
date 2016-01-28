@@ -33,7 +33,7 @@ public class FileChangeTracker
 	public FileChangeTracker(File toWatch, boolean createFile)
 	{
 		if (toWatch == null)
-			throw new RuntimeException("null file passed to file change watcher");		
+			throw new RuntimeException("null file passed to file change watcher");
 		_toWatch = toWatch;
 		if (_toWatch.exists()) {
 			_lastChangeTime = _toWatch.lastModified();

@@ -111,18 +111,17 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		ProcessWrapperToken token;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
-		
-		// ASG 2015-11-05. Updated to get a nice log message 
+		// ASG 2015-11-05. Updated to get a nice log message
 		ICallingContext callContext = context.getCallingContext();
 
 		String prefId = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
 		X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(callContext, prefId);
 		String userName = CredentialWallet.extractUsername(owner);
-		if (userName==null) userName="UnKnown";
+		if (userName == null)
+			userName = "UnKnown";
 
-		
 		// End of updates
-		
+
 		synchronized (_processLock) {
 			command = new Vector<String>();
 			command.add(_executable.getAbsolutePath());
@@ -167,8 +166,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 			HashMap<String, Object> jobProperties = new HashMap<String, Object>();
 			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, _executable.getAbsolutePath(), args);
-			CmdLineManipulatorUtils.addEnvProperties(jobProperties, _fuseMountPoint, _environment, workingDirectory,
-				_redirects.stdinSource(), _redirects.stdoutSink(), stderrFile, resourceUsageFile, wrapper.getPathToWrapper());
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties, _fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(),
+				_redirects.stdoutSink(), stderrFile, resourceUsageFile, wrapper.getPathToWrapper());
 			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, _spmdVariation, _numProcesses, _numProcessesPerHost,
 				_threadsPerProcess);
 
@@ -183,9 +182,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			for (int lcv = 1; lcv < command.size(); lcv++)
 				arguments[lcv - 1] = command.get(lcv);
 
-			Vector<String> testCmdLine =
-				wrapper.formCommandLine(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), _redirects.stdoutSink(),
-					stderrFile, resourceUsageFile, command.get(0), arguments);
+			Vector<String> testCmdLine = wrapper.formCommandLine(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(),
+				_redirects.stdoutSink(), stderrFile, resourceUsageFile, command.get(0), arguments);
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Previous cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
 
@@ -197,8 +195,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			for (String arg : newCmdLine)
 				hWriter.format(" %s", arg);
 			hWriter.close();
-			_logger.info(String.format("Executing job for userID '%s' using command line:\n\t%s", userName,testCmdLine.toString()));
-			
+			_logger.info(String.format("Executing job for userID '%s' using command line:\n\t%s", userName, testCmdLine.toString()));
+
 			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, newCmdLine);
 		}
 

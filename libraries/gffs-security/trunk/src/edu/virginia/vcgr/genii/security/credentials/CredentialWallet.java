@@ -107,9 +107,8 @@ public class CredentialWallet implements Externalizable, Describable
 				return priorDelegation;
 			}
 
-			TrustCredential assertion =
-				CredentialCache.getCachedDelegationChain(delegatee, delegateeType, issuer, issuerPrivateKey, restrictions, accessCategories,
-					priorDelegation);
+			TrustCredential assertion = CredentialCache.getCachedDelegationChain(delegatee, delegateeType, issuer, issuerPrivateKey,
+				restrictions, accessCategories, priorDelegation);
 			if (!assertionChains.containsKey(priorDelegation.getId())) {
 				throw new SecurityException("failure to delegate trust; assertion is not part of credential wallet.");
 			}
@@ -297,8 +296,8 @@ public class CredentialWallet implements Externalizable, Describable
 					if ((priorDelegationId != null) && (delegation.getPriorDelegation() != null) && chainsAreIntact(delegation)) {
 						// this one looks okay already, so we'll just add it.
 						if (_logger.isTraceEnabled()) {
-							_logger.debug("found complete credential during reassembly; adding directly: "
-								+ delegation.describe(VerbosityLevel.HIGH));
+							_logger.debug(
+								"found complete credential during reassembly; adding directly: " + delegation.describe(VerbosityLevel.HIGH));
 						}
 						assertionChains.put(delegation.getId(), delegation);
 						delegationIterator.remove();
@@ -439,8 +438,8 @@ public class CredentialWallet implements Externalizable, Describable
 					if (superNoisyDebug) {
 						boolean worked = testXmlDump(xmlDump);
 						if (!worked) {
-							_logger
-								.error("validation of xml dump that was just created from TrustDelegation failed to be parsed back into object.");
+							_logger.error(
+								"validation of xml dump that was just created from TrustDelegation failed to be parsed back into object.");
 						}
 					}
 
@@ -513,8 +512,8 @@ public class CredentialWallet implements Externalizable, Describable
 				 */
 				long codeForNewSerialization = in.readLong();
 				if (codeForNewSerialization != secretishCode) {
-					_logger.warn("old school trust delegation serialization found, or other corruption, wrong code was: "
-						+ codeForNewSerialization);
+					_logger.warn(
+						"old school trust delegation serialization found, or other corruption, wrong code was: " + codeForNewSerialization);
 					// how would this happen? we're hosed here too since we expect more credential
 					// data following.
 					continue;

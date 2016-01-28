@@ -266,8 +266,8 @@ public class Scheduler implements Closeable
 		} finally {
 			for (Map.Entry<JobResourceRequirements, Counter> entry : jobCounts.entrySet()) {
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("%d jobs failed to match any resources with requirements %s", entry.getValue().get(),
-						entry.getKey()));
+					_logger.debug(
+						String.format("%d jobs failed to match any resources with requirements %s", entry.getValue().get(), entry.getKey()));
 			}
 		}
 	}

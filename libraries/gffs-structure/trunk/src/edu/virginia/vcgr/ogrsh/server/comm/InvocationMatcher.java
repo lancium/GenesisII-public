@@ -51,8 +51,8 @@ public class InvocationMatcher
 					invocationName = m.getName();
 
 				if (_logger.isTraceEnabled())
-					_logger.trace("Adding method \"" + cl.getName() + "." + m.getName() + "\" as handler for function \"" + invocationName
-						+ "\".");
+					_logger.trace(
+						"Adding method \"" + cl.getName() + "." + m.getName() + "\" as handler for function \"" + invocationName + "\".");
 
 				_handlers.put(invocationName, new HandlerInformation(invocationName, obj, m));
 			}

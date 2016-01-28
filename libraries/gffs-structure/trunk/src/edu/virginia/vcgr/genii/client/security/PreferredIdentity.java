@@ -188,8 +188,8 @@ public class PreferredIdentity implements Serializable
 				 */
 				return (PreferredIdentity) prefChunk;
 			} else {
-				_logger
-					.debug("got something called a preferred identity in calling context, but it's the wrong type of object!  object type is: "
+				_logger.debug(
+					"got something called a preferred identity in calling context, but it's the wrong type of object!  object type is: "
 						+ prefChunk.getClass().getCanonicalName());
 				return null;
 			}

@@ -41,8 +41,7 @@ public class TextDialogProvider implements DialogProvider
 	}
 
 	@Override
-	public InformationDialog createInformationDialog(String title, TextContent informationContent) throws DialogException,
-		UserCancelException
+	public InformationDialog createInformationDialog(String title, TextContent informationContent) throws DialogException, UserCancelException
 	{
 		return new TextInformationDialog(title, _package, informationContent, false);
 	}
@@ -54,8 +53,8 @@ public class TextDialogProvider implements DialogProvider
 	}
 
 	@Override
-	public ComboBoxDialog createComboBoxDialog(String title, String prompt, MenuItem defaultItem, MenuItem... items) throws DialogException,
-		UserCancelException
+	public ComboBoxDialog createComboBoxDialog(String title, String prompt, MenuItem defaultItem, MenuItem... items)
+		throws DialogException, UserCancelException
 	{
 		return new TextComboBoxDialog(title, _package, prompt, defaultItem, items);
 	}
@@ -68,15 +67,14 @@ public class TextDialogProvider implements DialogProvider
 	}
 
 	@Override
-	public CheckBoxDialog createCheckBoxDialog(String title, String prompt, CheckBoxItem... items) throws DialogException,
-		UserCancelException
+	public CheckBoxDialog createCheckBoxDialog(String title, String prompt, CheckBoxItem... items) throws DialogException, UserCancelException
 	{
 		return new TextCheckBoxDialog(title, _package, prompt, items);
 	}
 
 	@Override
-	public YesNoDialog createYesNoDialog(String title, String prompt, YesNoSelection defaultAnswer) throws DialogException,
-		UserCancelException
+	public YesNoDialog createYesNoDialog(String title, String prompt, YesNoSelection defaultAnswer)
+		throws DialogException, UserCancelException
 	{
 		return new TextYesNoDialog(title, _package, prompt, defaultAnswer);
 	}

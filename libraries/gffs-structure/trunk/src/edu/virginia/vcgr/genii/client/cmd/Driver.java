@@ -73,7 +73,7 @@ public class Driver extends ApplicationBase
 
 		// configure the connection pooling to our whims.
 		VcgrSslSocketFactory.setupConnectionPool();
-		
+
 		GridEnvironment.loadGridEnvironment();
 
 		String deploymentName = DeploymentName.figureOutDefaultDeploymentName();
@@ -140,9 +140,8 @@ public class Driver extends ApplicationBase
 			if (_logger.isDebugEnabled())
 				_logger.debug("not trying auto-connect as this is a connect command.");
 		} else {
-			gridOkay =
-				establishGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true),
-					new InputStreamReader(System.in));
+			gridOkay = establishGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true),
+				new InputStreamReader(System.in));
 			switch (gridOkay) {
 				case CONNECTION_FAILED: {
 					// this means we are not on the grid when we think we should have been able to

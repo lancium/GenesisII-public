@@ -102,10 +102,10 @@ public class LogDisplay extends JDialog
 		_text.setPreferredSize(d);
 		JScrollPane scroller = new JScrollPane(_text);
 		scroller.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Job Log"));
-		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
-			5, 5, 5), 5, 5));
-		content.add(new JButton(new OKAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(scroller,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new OKAction()),
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		Thread th = new Thread(new UpdateWorker());
 		th.setName("Job Log Updater Thread");

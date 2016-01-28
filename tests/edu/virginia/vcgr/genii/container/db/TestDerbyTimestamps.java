@@ -46,9 +46,8 @@ public class TestDerbyTimestamps
 			insertStmt.executeUpdate();
 			conn.commit();
 
-			queryStmt =
-				conn.prepareStatement("SELECT ts, CURRENT_TIMESTAMP, " + "{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND, CURRENT_TIMESTAMP, ts)} "
-					+ "FROM test1 WHERE ID = 0");
+			queryStmt = conn.prepareStatement("SELECT ts, CURRENT_TIMESTAMP, "
+				+ "{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND, CURRENT_TIMESTAMP, ts)} " + "FROM test1 WHERE ID = 0");
 			rs = queryStmt.executeQuery();
 			rs.next();
 

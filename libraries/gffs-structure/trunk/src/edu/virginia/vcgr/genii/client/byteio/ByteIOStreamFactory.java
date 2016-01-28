@@ -70,8 +70,8 @@ public class ByteIOStreamFactory
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 */
-	static public InputStream createInputStream(EndpointReferenceType target, boolean createBuffered) throws FileNotFoundException,
-		RemoteException, IOException
+	static public InputStream createInputStream(EndpointReferenceType target, boolean createBuffered)
+		throws FileNotFoundException, RemoteException, IOException
 	{
 		return createInputStream(target, null, createBuffered);
 	}
@@ -118,8 +118,8 @@ public class ByteIOStreamFactory
 	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
-	static public InputStream createInputStream(RNSPath target, boolean createBuffered) throws FileNotFoundException, RemoteException,
-		RNSException, IOException
+	static public InputStream createInputStream(RNSPath target, boolean createBuffered)
+		throws FileNotFoundException, RemoteException, RNSException, IOException
 	{
 		return createInputStream(target, null, createBuffered);
 	}
@@ -192,8 +192,8 @@ public class ByteIOStreamFactory
 	 * @throws RemoteException
 	 * @throws ConfigurationException
 	 */
-	static public OutputStream createOutputStream(EndpointReferenceType target, boolean createBuffered) throws FileNotFoundException,
-		RemoteException, IOException
+	static public OutputStream createOutputStream(EndpointReferenceType target, boolean createBuffered)
+		throws FileNotFoundException, RemoteException, IOException
 	{
 		return createOutputStream(target, null, createBuffered);
 	}
@@ -257,8 +257,8 @@ public class ByteIOStreamFactory
 	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
-	static public OutputStream createOutputStream(RNSPath target, boolean createBuffered) throws FileNotFoundException, RemoteException,
-		RNSException, IOException
+	static public OutputStream createOutputStream(RNSPath target, boolean createBuffered)
+		throws FileNotFoundException, RemoteException, RNSException, IOException
 	{
 		return createOutputStream(target, null, createBuffered);
 	}

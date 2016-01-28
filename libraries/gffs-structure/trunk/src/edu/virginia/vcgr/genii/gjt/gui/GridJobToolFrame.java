@@ -60,10 +60,10 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 		Container container = getContentPane();
 		container.setLayout(new GridBagLayout());
 
-		add(_tabbedPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5,
-			5), 5, 5));
-		add(ePanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
-			5, 5), 5, 5));
+		add(_tabbedPane,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(ePanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		addTabs(documentContext);
 

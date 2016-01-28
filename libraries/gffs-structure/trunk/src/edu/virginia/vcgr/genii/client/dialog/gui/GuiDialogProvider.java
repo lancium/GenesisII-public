@@ -28,8 +28,7 @@ public class GuiDialogProvider implements DialogProvider
 	}
 
 	@Override
-	public InformationDialog createInformationDialog(String title, TextContent informationContent) throws DialogException,
-		UserCancelException
+	public InformationDialog createInformationDialog(String title, TextContent informationContent) throws DialogException, UserCancelException
 	{
 		return new GuiInformationDialog(title, informationContent);
 	}
@@ -41,8 +40,8 @@ public class GuiDialogProvider implements DialogProvider
 	}
 
 	@Override
-	public ComboBoxDialog createComboBoxDialog(String title, String prompt, MenuItem defaultItem, MenuItem... items) throws DialogException,
-		UserCancelException
+	public ComboBoxDialog createComboBoxDialog(String title, String prompt, MenuItem defaultItem, MenuItem... items)
+		throws DialogException, UserCancelException
 	{
 		return new GuiComboBoxDialog(title, prompt, defaultItem, items);
 	}
@@ -55,15 +54,14 @@ public class GuiDialogProvider implements DialogProvider
 	}
 
 	@Override
-	public CheckBoxDialog createCheckBoxDialog(String title, String prompt, CheckBoxItem... items) throws DialogException,
-		UserCancelException
+	public CheckBoxDialog createCheckBoxDialog(String title, String prompt, CheckBoxItem... items) throws DialogException, UserCancelException
 	{
 		return new GuiCheckBoxDialog(title, prompt, items);
 	}
 
 	@Override
-	public YesNoDialog createYesNoDialog(String title, String prompt, YesNoSelection defaultAnswer) throws DialogException,
-		UserCancelException
+	public YesNoDialog createYesNoDialog(String title, String prompt, YesNoSelection defaultAnswer)
+		throws DialogException, UserCancelException
 	{
 		return new GuiYesNoDialog(title, prompt);
 	}

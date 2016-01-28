@@ -100,8 +100,8 @@ public class BESManager implements Closeable
 	private BESResourceUpdater _updater;
 
 	public BESManager(QueueDatabase database, SchedulingEvent schedulingEvent, Connection connection,
-		InformationPortal<BESInformation> informationPortal, ServerDatabaseConnectionPool connectionPool) throws SQLException,
-		ResourceException, GenesisIISecurityException
+		InformationPortal<BESInformation> informationPortal, ServerDatabaseConnectionPool connectionPool)
+			throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		_besInformation = new HashMap<Long, BESInformation>();
 
@@ -203,8 +203,8 @@ public class BESManager implements Closeable
 	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
-	public void addNewBES(Connection connection, String name, EndpointReferenceType epr) throws SQLException, ResourceException,
-		GenesisIISecurityException
+	public void addNewBES(Connection connection, String name, EndpointReferenceType epr)
+		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		BESUpdateInformation updateInfo;
 		Collection<BESUpdateInformation> toUpdate = new ArrayList<BESUpdateInformation>(1);
@@ -511,8 +511,8 @@ public class BESManager implements Closeable
 				else
 					markBESAsUnavailable(besEndpoint.getBESID(), "Not currently accepting activities.");
 			} else {
-				markBESAsMissed(besEndpoint.getBESID(), String.format("Exception during communication %s(%s)", information.exception()
-					.getClass().getName(), information.exception().getLocalizedMessage()));
+				markBESAsMissed(besEndpoint.getBESID(), String.format("Exception during communication %s(%s)",
+					information.exception().getClass().getName(), information.exception().getLocalizedMessage()));
 			}
 		}
 	}

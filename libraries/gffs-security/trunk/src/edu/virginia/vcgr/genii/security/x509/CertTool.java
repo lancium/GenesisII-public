@@ -251,9 +251,8 @@ public class CertTool
 
 		dn = new X509Name(oids, values);
 
-		X509Certificate newCert =
-			CertTool.createIntermediateCert(dn.toString(), certSpec.validityMillis, certSpec.newPublicKey, certSpec.issuerPrivateKey,
-				certSpec.issuerChain[0]);
+		X509Certificate newCert = CertTool.createIntermediateCert(dn.toString(), certSpec.validityMillis, certSpec.newPublicKey,
+			certSpec.issuerPrivateKey, certSpec.issuerChain[0]);
 		X509Certificate[] newCertChain = new X509Certificate[certSpec.issuerChain.length + 1];
 		newCertChain[0] = newCert;
 		for (int i = 0; i < certSpec.issuerChain.length; i++) {
@@ -328,7 +327,7 @@ public class CertTool
 	{
 		System.out.println("\nUSAGE: " + CertTool.class.getName() + " <import | gen> <options>\n\n"
 
-		+ "import options:\n" + "  Notes: Reads an X.509 certificate from one store and optionally places\n"
+			+ "import options:\n" + "  Notes: Reads an X.509 certificate from one store and optionally places\n"
 			+ "  it in another store as a trusted certificate.  If the output-store is not\n"
 			+ "  specified, then the certificate will be displayed to the console.\n\n" + "  -base64-cert-file=<cert file path> | \n\n"
 			+ "  -input-keystore=<keystore> \n" + "  -input-keystore-pass=<keystore password> \n"
@@ -343,8 +342,8 @@ public class CertTool
 
 			+ "-keysize=<rsa-keysize> \n" + "-dn=<distinguished name> \n" + "[ -validity=<days (default:12 years)> ]\n"
 			+ "[ -input-keystore=<keystore> \n" + "  -input-keystore-pass=<keystore password> \n"
-			+ "  -input-storetype=<storetype: PKCS12(default) | BKS> \n" + "  -input-alias=<alias> \n"
-			+ "  -input-entry-pass=<password> ] \n" + "[ -output-keystore=<keystore> \n" + "  -output-keystore-pass=<keystore password> \n"
+			+ "  -input-storetype=<storetype: PKCS12(default) | BKS> \n" + "  -input-alias=<alias> \n" + "  -input-entry-pass=<password> ] \n"
+			+ "[ -output-keystore=<keystore> \n" + "  -output-keystore-pass=<keystore password> \n"
 			+ "  -output-storetype=<storetype: PKCS12(default) | BKS> \n" + "  -output-alias=<alias> \n"
 			+ "  -output-entry-pass=<password> ]");
 	}

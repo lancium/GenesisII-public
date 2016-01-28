@@ -28,8 +28,8 @@ public class PingTool extends BaseGridTool
 	static final private String _MANPAGE = "config/tooldocs/man/ping";
 
 	// if this is true, we will not allow a fault to escape runCommand and will instead just exit with a failure code from the app.
-	boolean _eatFaults = false; 
-	
+	boolean _eatFaults = false;
+
 	public PingTool()
 	{
 		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.GENERAL);
@@ -43,8 +43,8 @@ public class PingTool extends BaseGridTool
 	{
 		_attempts = Integer.parseInt(attempts);
 	}
-	
-	@Option({ "eatfaults"})
+
+	@Option({ "eatfaults" })
 	public void setEatfaults()
 	{
 		_eatFaults = true;

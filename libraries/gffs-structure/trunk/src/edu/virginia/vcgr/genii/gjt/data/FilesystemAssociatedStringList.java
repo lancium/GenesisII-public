@@ -11,8 +11,8 @@ import edu.virginia.vcgr.genii.gjt.data.variables.Clearable;
 import edu.virginia.vcgr.genii.gjt.data.variables.ParameterizableBroker;
 import edu.virginia.vcgr.genii.gjt.data.xml.PostUnmarshallListener;
 
-public class FilesystemAssociatedStringList extends DefaultDataItem implements Clearable, PostUnmarshallListener,
-	Iterable<StringFilesystemPair>
+public class FilesystemAssociatedStringList extends DefaultDataItem
+	implements Clearable, PostUnmarshallListener, Iterable<StringFilesystemPair>
 {
 	static final long serialVersionUID = 0L;
 

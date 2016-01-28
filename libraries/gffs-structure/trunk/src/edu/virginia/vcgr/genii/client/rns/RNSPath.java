@@ -116,8 +116,8 @@ public class RNSPath implements Serializable, Cloneable
 		_attemptedResolve = attemptedResolve;
 
 		if ((_parent == null && _nameFromParent != null) || (_parent != null && _nameFromParent == null)) {
-			throw new IllegalArgumentException("The parent and the nameFromParent parameters must either "
-				+ "both be null, or both be non-null.");
+			throw new IllegalArgumentException(
+				"The parent and the nameFromParent parameters must either " + "both be null, or both be non-null.");
 		}
 
 		if (_parent == null && _cachedEPR == null)
@@ -302,7 +302,7 @@ public class RNSPath implements Serializable, Cloneable
 	 * don't want to have any unaccounted outcall.
 	 * 
 	 * @return the EPR of this entry if it exists in the cache
-	 * */
+	 */
 	public EndpointReferenceType getCachedEPR()
 	{
 		return _cachedEPR;

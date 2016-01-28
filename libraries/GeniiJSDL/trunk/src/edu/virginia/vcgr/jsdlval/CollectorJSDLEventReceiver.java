@@ -223,7 +223,7 @@ public class CollectorJSDLEventReceiver implements JSDLEventReceiver
 	@Override
 	public void handleTotalResourceRanges(XMLDocumentPath path, RangeValue totalCPUTime, RangeValue totalCPUCount,
 		RangeValue totalPhysicalMemory, RangeValue totalVirtualMemory, RangeValue totalDiskSpace, RangeValue totalResourceCount)
-		throws JSDLValidationException
+			throws JSDLValidationException
 	{
 		add(path);
 	}

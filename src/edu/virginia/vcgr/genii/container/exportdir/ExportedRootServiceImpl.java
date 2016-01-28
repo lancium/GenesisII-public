@@ -75,9 +75,11 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements E
 		try {
 			// check if directory exists
 			if (!ExportedDirUtils.dirReadable(initInfo.getPath())) {
-				throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
-						+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+				throw FaultManipulator
+					.fillInFault(new ResourceCreationFaultType(null,
+						null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory "
+							+ initInfo.getPath() + " does not exist or is not readable.  " + "Cannot create export from this path.") },
+					null));
 			}
 		} catch (IOException ioe) {
 			throw new ResourceException("Could not determine if export localpath is readable.", ioe);
@@ -110,8 +112,8 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements E
 
 	@Override
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
-		RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		// get construction params
 		ExportedDirUtils.ExportedDirInitInfo initInfo = ExportedDirUtils.extractCreationProperties(constructionParameters);

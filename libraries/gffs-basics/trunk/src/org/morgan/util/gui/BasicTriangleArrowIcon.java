@@ -88,22 +88,14 @@ public final class BasicTriangleArrowIcon implements Icon
 		int width = 2;
 		for (int line = 0; line < 4; line++) {
 			width = (int) (width * 1.8);
-			dialog.getContentPane().add(
-				new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)),
-				new GridBagConstraints(0, line, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
-					5, 5));
-			dialog.getContentPane().add(
-				new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)),
-				new GridBagConstraints(1, line, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
-					5, 5));
-			dialog.getContentPane().add(
-				new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)),
-				new GridBagConstraints(2, line, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
-					5, 5));
-			dialog.getContentPane().add(
-				new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)),
-				new GridBagConstraints(3, line, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
-					5, 5));
+			dialog.getContentPane().add(new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)), new GridBagConstraints(0, line,
+				1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			dialog.getContentPane().add(new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)), new GridBagConstraints(1, line,
+				1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			dialog.getContentPane().add(new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)), new GridBagConstraints(2, line,
+				1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+			dialog.getContentPane().add(new JButton(new BasicTriangleArrowIcon(ArrowDirection.LEFT, width)), new GridBagConstraints(3, line,
+				1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		}
 
 		dialog.pack();

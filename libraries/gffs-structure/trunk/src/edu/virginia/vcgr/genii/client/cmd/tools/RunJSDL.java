@@ -192,9 +192,7 @@ public class RunJSDL extends BaseGridTool
 			if (!execName.contains("/"))
 				execName = String.format("./%s", execName);
 
-			for (String element : wrapper.formCommandLine(
-				null,
-				null, // app.getEnvironment()
+			for (String element : wrapper.formCommandLine(null, null, // app.getEnvironment()
 				workingDir, getRedirect(job.getStdinRedirect(), workingDir), getRedirect(job.getStdoutRedirect(), workingDir),
 				getRedirect(job.getStderrRedirect(), workingDir), resourceUsage, execName,
 				getArguments(new String[job.getArguments().size()], job.getArguments())))

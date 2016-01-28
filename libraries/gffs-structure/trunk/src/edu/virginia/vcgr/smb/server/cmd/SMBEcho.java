@@ -11,8 +11,8 @@ import edu.virginia.vcgr.smb.server.SMBHeader;
 public class SMBEcho implements SMBCommand
 {
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		int echoCount = params.getUShort();
 

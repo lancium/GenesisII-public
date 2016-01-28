@@ -10,6 +10,6 @@ public interface ResourceForkService
 {
 	public ResourceKey getResourceKey() throws ResourceUnknownFaultType, ResourceException;
 
-	public EndpointReferenceType createForkEPR(String forkPath, ResourceForkInformation rif) throws ResourceUnknownFaultType,
-		ResourceException;
+	public EndpointReferenceType createForkEPR(String forkPath, ResourceForkInformation rif)
+		throws ResourceUnknownFaultType, ResourceException;
 }

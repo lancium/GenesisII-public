@@ -47,8 +47,8 @@ class ResourceProviders
 		provider = conf.resourceProvider();
 
 		if (provider == null)
-			throw new ResourceException(String.format("Unable to find resource provider for service %s " + "(implemented by class %s).",
-				serviceName, serviceClass));
+			throw new ResourceException(
+				String.format("Unable to find resource provider for service %s " + "(implemented by class %s).", serviceName, serviceClass));
 
 		synchronized (_providerCache) {
 			_providerCache.put(serviceName, provider);

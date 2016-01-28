@@ -80,10 +80,10 @@ public class OSGiSupport
 		File osgiStorageDir = chopUpPath(System.getProperty("java.io.tmpdir"), pathChow, "osgi-genII");
 
 		/*
-		 * // let's not forget ugly paths windows and others might hand us. String justDir =
-		 * pathChow.getAbsolutePath().replaceAll("[/\\: ()]", "-"); if (_logger.isTraceEnabled()) _logger.trace("gotta chopped path of: " +
-		 * justDir); String tmpDir = System.getProperty("java.io.tmpdir"); tmpDir = tmpDir.replace('\\', '/'); File osgiStorageDir = new
-		 * File(tmpDir + "/osgi-genII-" + username + "/" + justDir); if (_logger.isTraceEnabled()) _logger.trace("osgi storage area is: " +
+		 * // let's not forget ugly paths windows and others might hand us. String justDir = pathChow.getAbsolutePath().replaceAll("[/\\: ()]"
+		 * , "-"); if (_logger.isTraceEnabled()) _logger.trace("gotta chopped path of: " + justDir); String tmpDir =
+		 * System.getProperty("java.io.tmpdir"); tmpDir = tmpDir.replace('\\', '/'); File osgiStorageDir = new File(tmpDir + "/osgi-genII-" +
+		 * username + "/" + justDir); if (_logger.isTraceEnabled()) _logger.trace("osgi storage area is: " +
 		 * osgiStorageDir.getAbsolutePath());
 		 */
 		osgiStorageDir.mkdirs();

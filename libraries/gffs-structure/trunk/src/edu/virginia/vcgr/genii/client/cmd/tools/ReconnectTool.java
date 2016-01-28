@@ -42,9 +42,8 @@ public class ReconnectTool extends BaseGridTool
 		Driver.dropGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true), new InputStreamReader(System.in));
 
 		// now make a new connection.
-		GridStates gridOkay =
-			Driver.establishGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true), new InputStreamReader(
-				System.in));
+		GridStates gridOkay = Driver.establishGridConnection(new PrintWriter(System.out, true), new PrintWriter(System.err, true),
+			new InputStreamReader(System.in));
 
 		if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
 			System.out.println("Successfully connected to '" + InstallationProperties.getSimpleGridName() + "' grid.");

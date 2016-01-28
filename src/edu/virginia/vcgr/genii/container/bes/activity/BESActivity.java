@@ -147,8 +147,8 @@ public class BESActivity implements Closeable
 				throw new SQLException("Unable to load owner information from database " + "for bes activity.");
 
 			if (!QueueSecurity.isOwner((Collection<Identity>) DBSerializer.fromBlob(rs.getBlob(1))))
-				throw new GenesisIISecurityException("Caller does not have permission to get " + "activity status for activity \""
-					+ _activityid + "\".");
+				throw new GenesisIISecurityException(
+					"Caller does not have permission to get " + "activity status for activity \"" + _activityid + "\".");
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
@@ -293,9 +293,8 @@ public class BESActivity implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt =
-				connection.prepareStatement("UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ? "
-					+ "WHERE activityid = ?");
+			stmt = connection.prepareStatement(
+				"UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ? " + "WHERE activityid = ?");
 			stmt.setShort(1, suspendRequested ? (short) 1 : (short) 0);
 			stmt.setShort(2, terminateRequested ? (short) 1 : (short) 0);
 			stmt.setString(3, _activityid);
@@ -375,8 +374,8 @@ public class BESActivity implements Closeable
 		WorkingContext ctxt = createWorkingContext();
 
 		try {
-			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, new ResourceKey(_activityServiceName, new AddressingParameters(_activityid,
-				null, null)));
+			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
+				new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
 			WorkingContext.setCurrentWorkingContext(ctxt);
 			phase.execute(getExecutionContext());
 		} finally {
@@ -460,9 +459,8 @@ public class BESActivity implements Closeable
 
 				try {
 					connection = _connectionPool.acquire(true);
-					stmt =
-						connection.prepareStatement("SELECT propertyvalue FROM besactivitypropertiestable "
-							+ "WHERE activityid = ? AND propertyname = ?");
+					stmt = connection.prepareStatement(
+						"SELECT propertyvalue FROM besactivitypropertiestable " + "WHERE activityid = ? AND propertyname = ?");
 					stmt.setString(1, _activityid);
 					stmt.setString(2, name);
 

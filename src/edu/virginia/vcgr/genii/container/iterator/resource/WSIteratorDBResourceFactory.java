@@ -17,10 +17,10 @@ public class WSIteratorDBResourceFactory extends BasicDBResourceFactory
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(WSIteratorDBResourceFactory.class);
 
-	static private final String[] _CREATE_STMTS = new String[] { "CREATE TABLE iterators ("
-		+ "entryid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " + "iteratorid VARCHAR(256) NOT NULL, "
-		+ "elementindex BIGINT NOT NULL, " + "contents BLOB(2G) NOT NULL, "
-		+ "CONSTRAINT iteratorsuniqueconstraint UNIQUE (iteratorid, elementindex))" };
+	static private final String[] _CREATE_STMTS =
+		new String[] { "CREATE TABLE iterators (" + "entryid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
+			+ "iteratorid VARCHAR(256) NOT NULL, " + "elementindex BIGINT NOT NULL, " + "contents BLOB(2G) NOT NULL, "
+			+ "CONSTRAINT iteratorsuniqueconstraint UNIQUE (iteratorid, elementindex))" };
 
 	public WSIteratorDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{

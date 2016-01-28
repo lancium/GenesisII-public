@@ -310,10 +310,8 @@ public class CommandField extends JTextField
 				_display.header().format("Command:  ");
 				_display.command().println(line);
 
-				_uiContext
-					.progressMonitorFactory()
-					.createMonitor(CommandField.this, "Executing Command", "Executing command.", 1000L,
-						new CommandExecutionTask(line, reader), new CommandCompletionListener()).start();
+				_uiContext.progressMonitorFactory().createMonitor(CommandField.this, "Executing Command", "Executing command.", 1000L,
+					new CommandExecutionTask(line, reader), new CommandCompletionListener()).start();
 			} else {
 				reader.addLine(line);
 			}
@@ -427,10 +425,8 @@ public class CommandField extends JTextField
 			else {
 				setText("forming completions...");
 				setEnabled(false);
-				_uiContext
-					.progressMonitorFactory()
-					.createMonitor(CommandField.this, "Forming Completions", "Forming completions.", 1000L,
-						new CompleterTask(completer, partial), new CompletionFinisher(lastWord, right, words, left)).start();
+				_uiContext.progressMonitorFactory().createMonitor(CommandField.this, "Forming Completions", "Forming completions.", 1000L,
+					new CompleterTask(completer, partial), new CompletionFinisher(lastWord, right, words, left)).start();
 			}
 
 			_historyIterator = null;

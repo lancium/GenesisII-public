@@ -79,8 +79,9 @@ public class VCGRContainerServiceImpl extends ResourceForkBaseService implements
 		ContainerStatistics stats = ContainerStatistics.instance();
 
 		try {
-			return new ContainerStatisticsResultType(stats.getStartTime(), DBSerializer.serialize(stats.getDatabaseStatistics().report(),
-				Long.MAX_VALUE), DBSerializer.serialize(stats.getMethodStatistics().report(), Long.MAX_VALUE));
+			return new ContainerStatisticsResultType(stats.getStartTime(),
+				DBSerializer.serialize(stats.getDatabaseStatistics().report(), Long.MAX_VALUE),
+				DBSerializer.serialize(stats.getMethodStatistics().report(), Long.MAX_VALUE));
 		} catch (IOException ioe) {
 			throw new RemoteException("An IO Exception occurred trying to serialize statistics.", ioe);
 		}

@@ -55,10 +55,9 @@ public class GeniiCachedFile extends GeniiCachedResource implements GeniiCacheGe
 			if (fh.getFlags().isTruncate()) {
 				_fs.truncate(_path, 0);
 				_fs.flush(_fileHandle);
-				_statStructure =
-					new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(), 0,
-						_statStructure.getCreated(), _statStructure.getLastModified(), _statStructure.getLastAccessed(),
-						_statStructure.getPermissions());
+				_statStructure = new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(),
+					_statStructure.getEntryType(), 0, _statStructure.getCreated(), _statStructure.getLastModified(),
+					_statStructure.getLastAccessed(), _statStructure.getPermissions());
 			}
 			synchronized (myHandles) {
 				myHandles.add(fh);
@@ -123,10 +122,9 @@ public class GeniiCachedFile extends GeniiCachedResource implements GeniiCacheGe
 		_fs.write(_fileHandle, offset, source);
 		long newLength = offset + source.position();
 		if (newLength > _statStructure.getSize()) {
-			_statStructure =
-				new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(), newLength,
-					_statStructure.getCreated(), _statStructure.getLastModified(), _statStructure.getLastAccessed(),
-					_statStructure.getPermissions());
+			_statStructure = new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(),
+				newLength, _statStructure.getCreated(), _statStructure.getLastModified(), _statStructure.getLastAccessed(),
+				_statStructure.getPermissions());
 		}
 	}
 
@@ -150,9 +148,8 @@ public class GeniiCachedFile extends GeniiCachedResource implements GeniiCacheGe
 	public synchronized void truncate(long newSize) throws FSException
 	{
 		_fs.truncate(_path, newSize);
-		_statStructure =
-			new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(), newSize,
-				_statStructure.getCreated(), _statStructure.getLastModified(), _statStructure.getLastAccessed(),
-				_statStructure.getPermissions());
+		_statStructure = new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(),
+			newSize, _statStructure.getCreated(), _statStructure.getLastModified(), _statStructure.getLastAccessed(),
+			_statStructure.getPermissions());
 	}
 }

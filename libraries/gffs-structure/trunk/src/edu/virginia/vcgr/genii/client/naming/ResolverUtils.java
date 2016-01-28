@@ -27,8 +27,8 @@ public class ResolverUtils
 {
 	static private Log _logger = LogFactory.getLog(ResolverUtils.class);
 
-	static public EndpointReferenceType resolve(EndpointReferenceType originalEPR) throws NameResolutionFailedException, ResourceException,
-		GenesisIISecurityException, ConfigurationException, RemoteException
+	static public EndpointReferenceType resolve(EndpointReferenceType originalEPR)
+		throws NameResolutionFailedException, ResourceException, GenesisIISecurityException, ConfigurationException, RemoteException
 	{
 		WSName wsname = new WSName(originalEPR);
 		List<ResolverDescription> resolvers = wsname.getResolvers();
@@ -43,8 +43,8 @@ public class ResolverUtils
 		return null;
 	}
 
-	static public EndpointReferenceType resolve(ResolverDescription resolver) throws NameResolutionFailedException, ResourceException,
-		GenesisIISecurityException, ConfigurationException, RemoteException
+	static public EndpointReferenceType resolve(ResolverDescription resolver)
+		throws NameResolutionFailedException, ResourceException, GenesisIISecurityException, ConfigurationException, RemoteException
 	{
 		try {
 			if (resolver.getType() == ResolverDescription.ResolverType.EPI_RESOLVER) {

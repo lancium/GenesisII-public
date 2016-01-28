@@ -192,8 +192,8 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		for (DataStagingUnderstanding stage : _stageIns) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());
 
-			ret.add(new StageInPhase(stage.getSourceURI(), stageFile, stage.getCreationFlag(), stage.isHandleAsArchive(), stage
-				.getUsernamePassword()));
+			ret.add(new StageInPhase(stage.getSourceURI(), stageFile, stage.getCreationFlag(), stage.isHandleAsArchive(),
+				stage.getUsernamePassword()));
 
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stageFile));
@@ -231,8 +231,8 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 				Double requestedSize = resourceConstraints.getTotalPhysicalMemory();
 				if (besUpperLimit != null && requestedSize != null) {
 					if (requestedSize > besUpperLimit.as(SizeUnits.Bytes))
-						throw new JSDLMatchException(String.format("Job requested %f bytes, but BES limits to %s.", requestedSize,
-							besUpperLimit));
+						throw new JSDLMatchException(
+							String.format("Job requested %f bytes, but BES limits to %s.", requestedSize, besUpperLimit));
 				}
 
 				// Wallclock
@@ -240,8 +240,8 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 				Double requestedWall = resourceConstraints.getWallclockTimeLimit();
 				if (besUpperWall != null && requestedWall != null) {
 					if (requestedWall > besUpperWall.as(DurationUnits.Seconds))
-						throw new JSDLMatchException(String.format("Job requested %f seconds, but BES limits to %s.", requestedWall,
-							besUpperWall));
+						throw new JSDLMatchException(
+							String.format("Job requested %f seconds, but BES limits to %s.", requestedWall, besUpperWall));
 				}
 			}
 		}

@@ -86,8 +86,8 @@ public class LowMemoryWarning
 			if (usage.getUsed() >= threshold) {
 				fireLowMemoryWarning(usage.getUsed(), usage.getMax());
 			} else {
-				_logger.info(String.format("+++++ Current Memory usage is %.2f%% +++++", (double) usage.getUsed() / (double) usage.getMax()
-					* 100));
+				_logger.info(
+					String.format("+++++ Current Memory usage is %.2f%% +++++", (double) usage.getUsed() / (double) usage.getMax() * 100));
 			}
 		}
 	}

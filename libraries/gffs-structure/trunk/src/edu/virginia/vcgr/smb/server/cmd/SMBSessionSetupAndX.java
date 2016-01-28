@@ -18,17 +18,17 @@ public class SMBSessionSetupAndX implements SMBCommand
 	static private Log _logger = LogFactory.getLog(SMBSessionSetupAndX.class);
 
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		SMBDialect dialect = c.getDialect();
 
 		SMBAndX chain = SMBAndX.decode(params);
 		int maxBufferSize = params.getUShort();
-		
+
 		if (_logger.isDebugEnabled())
 			_logger.debug("seeing max buffer size in session setup of " + maxBufferSize);
-		
+
 		// The number of simultaneous requests
 		/* int maxMpxCount = */params.getUShort();
 		// The connection number; zero means reset ?

@@ -20,6 +20,7 @@ class ApplicationListenerWrapper implements InvocationHandler
 			System.exit(1);
 		}
 	}
+
 	private ApplicationListener _newListener;
 
 	private ApplicationListenerWrapper(ApplicationListener newListener)

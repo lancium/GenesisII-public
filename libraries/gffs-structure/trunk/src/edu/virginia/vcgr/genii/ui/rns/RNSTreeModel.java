@@ -44,8 +44,8 @@ public class RNSTreeModel extends DefaultTreeModel
 		throws RNSPathDoesNotExistException
 	{
 		// First we need to create an RNSPath from the string.
-		super(new RNSTreeNode(new RNSFilledInTreeObject(uiContext.callingContext().getCurrentPath()
-			.lookup(startPath == null ? "/" : startPath))), true);
+		super(new RNSTreeNode(
+			new RNSFilledInTreeObject(uiContext.callingContext().getCurrentPath().lookup(startPath == null ? "/" : startPath))), true);
 		_uiContext = uiContext;
 		_appContext = appContext;
 		_whichTypes = showFiles;

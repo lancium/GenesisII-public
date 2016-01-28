@@ -43,8 +43,9 @@ public class DBSerializer
 				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a " + "max length of %d bytes.",
 					blob.length(), tableName, columnName, maxLength));
 			if (blob.length() > maxLength) {
-				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
-					+ "but the maximum length for that column is %d bytes.", blob.length(), tableName, columnName, maxLength));
+				_logger.error(String.format(
+					"Error:  Blob was created with %d bytes for %s.%s, " + "but the maximum length for that column is %d bytes.",
+					blob.length(), tableName, columnName, maxLength));
 			}
 
 			return blob;
@@ -67,8 +68,8 @@ public class DBSerializer
 			Object toReturn = oin.readObject();
 			if (toReturn instanceof CredentialWallet) {
 				if (_logger.isTraceEnabled())
-					_logger.debug("fromBlob: loaded credential wallet successfully: "
-						+ ((CredentialWallet) toReturn).describe(VerbosityLevel.HIGH));
+					_logger.debug(
+						"fromBlob: loaded credential wallet successfully: " + ((CredentialWallet) toReturn).describe(VerbosityLevel.HIGH));
 			}
 			return toReturn;
 		} catch (IOException e) {
@@ -192,8 +193,9 @@ public class DBSerializer
 				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a " + "max length of %d bytes.",
 					data.length, tableName, columnName, maxLength));
 			if (data.length > maxLength) {
-				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
-					+ "but the maximum length for that column is %d bytes.", data.length, tableName, columnName, maxLength));
+				_logger.error(String.format(
+					"Error:  Blob was created with %d bytes for %s.%s, " + "but the maximum length for that column is %d bytes.", data.length,
+					tableName, columnName, maxLength));
 			}
 
 			return new SerialBlob(data);

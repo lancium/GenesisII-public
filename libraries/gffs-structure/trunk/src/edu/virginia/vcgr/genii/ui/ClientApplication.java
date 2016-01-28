@@ -77,8 +77,8 @@ public class ClientApplication extends UIFrame
 	}
 
 	@SuppressWarnings("unchecked")
-	public ClientApplication(UIContext context, boolean launchShell, String startPath) throws FileNotFoundException, IOException,
-		RNSPathDoesNotExistException
+	public ClientApplication(UIContext context, boolean launchShell, String startPath)
+		throws FileNotFoundException, IOException, RNSPathDoesNotExistException
 	{
 		super(context, "XSEDE GFFS Browser");
 
@@ -123,21 +123,21 @@ public class ClientApplication extends UIFrame
 			new TearoffPanel(scroller, _browserTree.createTearoffHandler(getUIContext().applicationContext()), new IconBasedTearoffThumb())));
 		splitPane.setRightComponent(_tabbedPane);
 
-		content.add(splitPane, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
-			5, 5, 5), 5, 5));
+		content.add(splitPane,
+			new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new CredentialManagementButton(_uiContext), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new CredentialManagementButton(_uiContext),
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-		content.add(new TrashCanWidget(getUIContext().applicationContext(), _uiContext), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
-			GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new TrashCanWidget(getUIContext().applicationContext(), _uiContext),
+			new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		// new code to add a diagnostics logging view.
 		LoggingListModel listModel = new LoggingListModel();
 		_debugTarget = new JList(listModel);
 		JScrollPane debugScroller = new JScrollPane(_debugTarget);
-		content.add(debugScroller, new GridBagConstraints(0, 2, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(debugScroller,
+			new GridBagConstraints(0, 2, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		UIPlugins plugins = new UIPlugins(new UIPluginContext(_uiContext, _browserTree, _browserTree));
 		plugins.addTopLevelMenus(getJMenuBar());

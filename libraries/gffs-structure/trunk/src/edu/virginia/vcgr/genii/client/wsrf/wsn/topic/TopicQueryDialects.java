@@ -28,17 +28,14 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.UnsupportedTopicQ
  */
 @XmlEnum(URI.class)
 public enum TopicQueryDialects implements TopicQueryDialectable {
-	@XmlEnumValue(TopicConstants.SIMPLE_DIALECT_URI)
-	Simple(TopicConstants.SIMPLE_DIALECT_URI, new SimpleTopicQueryExpressionFactory()),
+	@XmlEnumValue(TopicConstants.SIMPLE_DIALECT_URI) Simple(TopicConstants.SIMPLE_DIALECT_URI, new SimpleTopicQueryExpressionFactory()),
 
-	@XmlEnumValue(TopicConstants.CONCRETE_DIALECT_URI)
-	Concrete(TopicConstants.CONCRETE_DIALECT_URI, new ConcreteTopicQueryExpressionFactory()),
+	@XmlEnumValue(TopicConstants.CONCRETE_DIALECT_URI) Concrete(TopicConstants.CONCRETE_DIALECT_URI,
+		new ConcreteTopicQueryExpressionFactory()),
 
-	@XmlEnumValue(TopicConstants.FULL_DIALECT_URI)
-	Full(TopicConstants.FULL_DIALECT_URI, new UnsupportedTopicQueryExpressionFactory()),
+	@XmlEnumValue(TopicConstants.FULL_DIALECT_URI) Full(TopicConstants.FULL_DIALECT_URI, new UnsupportedTopicQueryExpressionFactory()),
 
-	@XmlEnumValue(TopicConstants.XPATH_DIALECT_URI)
-	XPath(TopicConstants.XPATH_DIALECT_URI, new UnsupportedTopicQueryExpressionFactory());
+	@XmlEnumValue(TopicConstants.XPATH_DIALECT_URI) XPath(TopicConstants.XPATH_DIALECT_URI, new UnsupportedTopicQueryExpressionFactory());
 
 	private URI _dialect;
 	private TopicQueryExpressionFactory _factory;

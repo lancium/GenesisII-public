@@ -51,25 +51,25 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 	static private final String _UPDATE_MODIFY_TIME = "UPDATE exporteddir SET lastModified = ? WHERE dirid = ?";
 	static private final String _ADD_ENTRY_STMT = "INSERT INTO exporteddirentry VALUES(?, ?, ?, ?, ?)";
 	static private final String _ADD_DIR_ATTR_STMT = "INSERT INTO exporteddirattr VALUES(?, ?)";
-	static private final String _RETRIEVE_EXPORTED_ENTRIES_STMT = "SELECT dirid, name, endpoint, entryid, type "
-		+ "FROM exporteddirentry WHERE dirid = ?";
+	static private final String _RETRIEVE_EXPORTED_ENTRIES_STMT =
+		"SELECT dirid, name, endpoint, entryid, type " + "FROM exporteddirentry WHERE dirid = ?";
 	static private final String _RETRIEVE_EXPORTED_ENTRY_ATTRS_FOR_DIR_STMT = "SELECT attrtab.entryid, attrtab.attr "
 		+ "FROM exportedentryattr attrtab, exporteddirentry entrytab " + "WHERE attrtab.entryid = entrytab.entryid AND entrytab.dirid = ?";
 	static private final String _DELETE_EXPORTED_ENTRY_STMT = "DELETE FROM exporteddirentry WHERE entryid = ?";
 	static private final String _DELETE_EXPORTED_ENTRY_ATTRS_STMT = "DELETE FROM exportedentryattr WHERE entryid = ?";
 	static private final String _DELETE_EXPORTED_DIR_STMT = "DELETE FROM exporteddir WHERE dirid = ?";
-	static private final String _DELETE_EXPORTED_DIR_ENTRY_ATTR = "DELETE FROM exportedentryattr WHERE entryid in "
-		+ "(SELECT entryid FROM exporteddirentry WHERE dirid = ?)";
+	static private final String _DELETE_EXPORTED_DIR_ENTRY_ATTR =
+		"DELETE FROM exportedentryattr WHERE entryid in " + "(SELECT entryid FROM exporteddirentry WHERE dirid = ?)";
 	static private final String _DELETE_EXPORTED_DIR_ENTRIES_STMT = "DELETE FROM exporteddirentry WHERE dirid = ?";
 	static private final String _DESTROY_ALL_ATTRS_FOR_PARENT_STMT = "DELETE FROM exportedentryattr "
 		+ "WHERE entryid in (SELECT entryid FROM exporteddir WHERE dirid in " + "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?))";
-	static private final String _DESTROY_ALL_ENTRIES_FOR_PARENT_STMT = "DELETE FROM exporteddirentry " + "WHERE dirid in "
-		+ "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?)";
+	static private final String _DESTROY_ALL_ENTRIES_FOR_PARENT_STMT =
+		"DELETE FROM exporteddirentry " + "WHERE dirid in " + "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?)";
 	static private final String _DESTROY_ALL_DIRS_FOR_PARENT_STMT = "DELETE FROM exporteddir WHERE parentIds LIKE ?";
 	static private final String _RETRIEVE_ALL_DIR_IDS_FOR_PARENT_STMT = "SELECT dirid FROM exporteddir WHERE parentIds LIKE ?";
 
-	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT = "SELECT endpoint " + "FROM exporteddirentry " + "WHERE dirid in "
-		+ "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?)";
+	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT =
+		"SELECT endpoint " + "FROM exporteddirentry " + "WHERE dirid in " + "(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?)";
 
 	static final private String _CREATE_TIME_PROP_NAME = "create-time";
 	static final private String _MOD_TIME_PROP_NAME = "mod-time";
@@ -607,9 +607,8 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 						String owner = current != null ? current.getIdentityString() : null;
 						if (_logger.isDebugEnabled())
 							_logger.debug("got preferred identity for new export: '" + owner + "'");
-						creationProperties =
-							ExportedDirUtils.createCreationProperties(null, newPath, null, null, null, childrenParentIds,
-								getReplicationState(), owner);
+						creationProperties = ExportedDirUtils.createCreationProperties(null, newPath, null, null, null, childrenParentIds,
+							getReplicationState(), owner);
 					} catch (RemoteException re) {
 						throw new ResourceException("Unable to create construction parameters.", re);
 					}
@@ -738,9 +737,8 @@ public class ExportedDirDBResource extends BasicDBResource implements IExportedD
 			rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				ExportedDirEntry entry =
-					new ExportedDirEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4),
-						rs.getString(5), null);
+				ExportedDirEntry entry = new ExportedDirEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)),
+					rs.getString(4), rs.getString(5), null);
 				ret.add(entry);
 			}
 

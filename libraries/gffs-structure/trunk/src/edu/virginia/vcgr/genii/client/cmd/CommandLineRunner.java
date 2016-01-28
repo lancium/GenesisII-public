@@ -67,8 +67,8 @@ public class CommandLineRunner
 		return new OutputStreamWriter(new GeniiPath(redirectTarget).openOutputStream());
 	}
 
-	public int runCommand(String[] cLine, Writer out, Writer err, Reader in) throws ToolException, IOException, RNSException,
-		ReloadShellException
+	public int runCommand(String[] cLine, Writer out, Writer err, Reader in)
+		throws ToolException, IOException, RNSException, ReloadShellException
 	{
 		Writer target = out;
 		int resultSoFar = 0;

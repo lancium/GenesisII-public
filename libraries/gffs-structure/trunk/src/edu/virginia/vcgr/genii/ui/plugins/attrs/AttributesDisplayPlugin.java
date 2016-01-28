@@ -52,7 +52,8 @@ public class AttributesDisplayPlugin extends AbstractUITabPlugin
 			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 			XMLTreeSelectionWidget textWidget = new XMLTreeSelectionWidget();
 			tree.addTreeSelectionListener(textWidget);
-			return new LazilyLoadedTab(handler, new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(tree), new JScrollPane(textWidget)));
+			return new LazilyLoadedTab(handler,
+				new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(tree), new JScrollPane(textWidget)));
 		}
 	}
 

@@ -37,9 +37,8 @@ public class MatchingParametersPlugin extends AbstractCombinedUIMenusPlugin
 
 		try {
 			EndpointReferenceType target = context.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint();
-			GenesisIIBaseRP rp =
-				(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(context.uiContext().callingContext(), target,
-					GenesisIIBaseRP.class);
+			GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(context.uiContext().callingContext(), target,
+				GenesisIIBaseRP.class);
 			for (MatchingParameter mp : rp.getMatchingParameter()) {
 				parameters.add(new Pair<String, String>(mp.getName(), mp.getValue()));
 			}

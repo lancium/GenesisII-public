@@ -58,9 +58,8 @@ public class WorkingContextHandler extends BasicHandler
 					else if (value.equals(_FLOW_SIDE_RESPONSE_VALUE))
 						_isRequest = Boolean.FALSE;
 					else
-						fault =
-							new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE + " or "
-								+ _FLOW_SIDE_RESPONSE_VALUE);
+						fault = new AxisFault(_FLOW_SIDE_KEY + " property not recognized.  Expected " + _FLOW_SIDE_REQUEST_VALUE + " or "
+							+ _FLOW_SIDE_RESPONSE_VALUE);
 				} else {
 					fault = new AxisFault("Couldn't find " + _FLOW_SIDE_KEY + " parameter.");
 				}
@@ -91,7 +90,8 @@ public class WorkingContextHandler extends BasicHandler
 
 		EndpointReferenceType epr = (EndpointReferenceType) ctxt.getProperty(WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY);
 		if (epr == null) {
-			throw new AxisFault("Couldn't find \"" + WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY + "\" property in message context.");
+			throw new AxisFault(
+				"Couldn't find \"" + WSAddressingExtractor.AXIS_MESSAGE_CTXT_EPR_PROPERTY + "\" property in message context.");
 		}
 
 		// 2014-11-05 ASG - code added to place calling host dns/ip into working context
@@ -118,9 +118,8 @@ public class WorkingContextHandler extends BasicHandler
 		// from the message context's operation).
 		try {
 			ResourceKey rKey = ResourceManager.getCurrentResource();
-			epr =
-				ResourceManager.createEPR(rKey, epr.getAddress().get_value().toString(), EPRUtils.getImplementedPortTypes(epr),
-					EPRUtils.getMasterPortType(epr));
+			epr = ResourceManager.createEPR(rKey, epr.getAddress().get_value().toString(), EPRUtils.getImplementedPortTypes(epr),
+				EPRUtils.getMasterPortType(epr));
 			newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 		} catch (Throwable t) {
 		}

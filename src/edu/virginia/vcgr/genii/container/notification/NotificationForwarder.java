@@ -72,8 +72,8 @@ public class NotificationForwarder implements Runnable
 				// placed at the beginning.
 				brokerSpecificMessageElements.add(new MessageElement(GenesisIIConstants.NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR, 0));
 				brokerSpecificMessageElements.addAll(messageElements);
-				brokerSpecificMessageElements.add(new MessageElement(NotificationBrokerConstants.MESSAGE_INDEX_QNAME,
-					messageIndexOfCurrentBroker));
+				brokerSpecificMessageElements
+					.add(new MessageElement(NotificationBrokerConstants.MESSAGE_INDEX_QNAME, messageIndexOfCurrentBroker));
 
 				notify.set_any(Elementals.toArray(brokerSpecificMessageElements));
 

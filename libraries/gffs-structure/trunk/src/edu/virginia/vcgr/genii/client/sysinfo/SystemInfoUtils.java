@@ -23,6 +23,7 @@ public class SystemInfoUtils
 	static private Log _logger = LogFactory.getLog(SystemInfoUtils.class);
 
 	static private ISystemInfoProvider _provider;
+
 	static {
 		OperatingSystemTypes osType = OperatingSystemType.getCurrent();
 

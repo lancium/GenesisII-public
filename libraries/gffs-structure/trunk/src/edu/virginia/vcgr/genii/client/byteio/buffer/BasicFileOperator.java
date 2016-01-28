@@ -18,8 +18,8 @@ public class BasicFileOperator implements Closeable
 	private WritableBuffer _writeBuffer = null;
 	private AppendableBuffer _appendBuffer = null;
 
-	public BasicFileOperator(ByteIOBufferLeaser leaser, ReadResolver readResolver, WriteResolver writeResolver,
-		AppendResolver appendResolver, boolean truncate) throws IOException
+	public BasicFileOperator(ByteIOBufferLeaser leaser, ReadResolver readResolver, WriteResolver writeResolver, AppendResolver appendResolver,
+		boolean truncate) throws IOException
 	{
 		_leaser = leaser;
 

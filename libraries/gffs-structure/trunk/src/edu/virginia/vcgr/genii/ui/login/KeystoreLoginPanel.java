@@ -54,14 +54,14 @@ final class KeystoreLoginPanel extends LoginPanel
 
 		add(new JLabel("Keystore Path"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(_keystoreFile, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(
-			5, 5, 5, 5), 5, 5));
-		add(new JButton(new BrowseAction()), new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.NONE,
+		add(_keystoreFile, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(new BrowseAction()),
+			new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		add(new JLabel("Keystore Password"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(_password, new GridBagConstraints(1, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(
-			5, 5, 5, 5), 5, 5));
+		add(_password, new GridBagConstraints(1, 1, 2, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	@Override
@@ -76,17 +76,14 @@ final class KeystoreLoginPanel extends LoginPanel
 				GuiLoginHandler handler = new GuiLoginHandler(null, null, null);
 				CertEntry entry = handler.selectCert(inputStreamFile, "PKCS12", new String(_password.getPassword()), false, null);
 				if (entry != null) {
-					KeyAndCertMaterial clientKeyMaterial =
-						ClientUtils.checkAndRenewCredentials(uiContext.callingContext(), BaseGridTool.credsValidUntil(),
-							new SecurityUpdateResults());
+					KeyAndCertMaterial clientKeyMaterial = ClientUtils.checkAndRenewCredentials(uiContext.callingContext(),
+						BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
 
 					// Delegate the identity assertion to the temporary client identity.
-					BasicConstraints bc =
-						new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset,
-							SecurityConstants.CredentialExpirationMillis, SecurityConstants.MaxDelegationDepth);
-					TrustCredential tc =
-						new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, entry._certChain, IdentityType.USER,
-							bc, RWXCategory.FULL_ACCESS);
+					BasicConstraints bc = new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset,
+						SecurityConstants.CredentialExpirationMillis, SecurityConstants.MaxDelegationDepth);
+					TrustCredential tc = new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, entry._certChain,
+						IdentityType.USER, bc, RWXCategory.FULL_ACCESS);
 					tc.signAssertion(entry._privateKey);
 
 					Collection<NuCredential> ret = new ArrayList<NuCredential>(1);

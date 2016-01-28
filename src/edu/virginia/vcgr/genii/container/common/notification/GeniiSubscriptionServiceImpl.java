@@ -50,8 +50,8 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements Genii
 {
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
 
@@ -92,8 +92,8 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements Genii
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public PauseSubscriptionResponse pauseSubscription(PauseSubscription arg0) throws RemoteException, PauseFailedFaultType,
-		ResourceUnknownFaultType
+	public PauseSubscriptionResponse pauseSubscription(PauseSubscription arg0)
+		throws RemoteException, PauseFailedFaultType, ResourceUnknownFaultType
 	{
 		DBSubscriptionResource resource = (DBSubscriptionResource) ResourceManager.getCurrentResource().dereference();
 		resource.toggleSubscriptionPause(true);
@@ -117,8 +117,8 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements Genii
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public ResumeSubscriptionResponse resumeSubscription(ResumeSubscription arg0) throws RemoteException, ResourceUnknownFaultType,
-		ResumeFailedFaultType
+	public ResumeSubscriptionResponse resumeSubscription(ResumeSubscription arg0)
+		throws RemoteException, ResourceUnknownFaultType, ResumeFailedFaultType
 	{
 		DBSubscriptionResource resource = (DBSubscriptionResource) ResourceManager.getCurrentResource().dereference();
 		resource.toggleSubscriptionPause(false);
@@ -127,8 +127,8 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements Genii
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public UnsubscribeResponse unsubscribe(Unsubscribe arg0) throws RemoteException, UnableToDestroySubscriptionFaultType,
-		ResourceUnknownFaultType
+	public UnsubscribeResponse unsubscribe(Unsubscribe arg0)
+		throws RemoteException, UnableToDestroySubscriptionFaultType, ResourceUnknownFaultType
 	{
 		super.destroy(new Destroy());
 

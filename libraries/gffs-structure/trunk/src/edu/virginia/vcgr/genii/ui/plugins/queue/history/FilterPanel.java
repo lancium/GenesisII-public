@@ -31,19 +31,19 @@ class FilterPanel extends JPanel
 
 		_filter = filter;
 
-		add(new JLabel("Minimum Event Level"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel("Minimum Event Level"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		EnumComboBox<HistoryEventLevel> levelBox =
 			new EnumComboBox<HistoryEventLevel>(HistoryEventLevel.class, EnumComboSort.ByOrdinal, false, LevelIcon.ICON_MAP);
 		levelBox.setSelectedItem(filter.levelFilter());
 		levelBox.addItemListener(new LevelSelectionListener());
 
-		add(levelBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
-			5, 5));
+		add(levelBox,
+			new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-		add(new JButton(new CategoryFilterAction()), new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(new CategoryFilterAction()),
+			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	private class LevelSelectionListener implements ItemListener

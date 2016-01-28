@@ -36,11 +36,11 @@ public class CommandPanel extends JPanel
 		scroller.setMinimumSize(OUTPUT_SIZE);
 		scroller.setPreferredSize(OUTPUT_SIZE);
 
-		add(GUIUtils.addTitle("Output", scroller), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		add(label, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5,
-			5));
-		add(field, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5,
-			5), 5, 5));
+		add(GUIUtils.addTitle("Output", scroller),
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(label,
+			new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(field, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 	}
 }

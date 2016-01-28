@@ -32,8 +32,7 @@ public class XMLStateTranslator implements StateTranslator
 
 	/** {@inheritDoc} */
 	@Override
-	public <StateType> void write(SimpleStateResourceFork<StateType> originatingFork, StateType state, OutputStream output)
-		throws IOException
+	public <StateType> void write(SimpleStateResourceFork<StateType> originatingFork, StateType state, OutputStream output) throws IOException
 	{
 		XMLStateDescription description = originatingFork.getClass().getAnnotation(XMLStateDescription.class);
 		if (description == null)

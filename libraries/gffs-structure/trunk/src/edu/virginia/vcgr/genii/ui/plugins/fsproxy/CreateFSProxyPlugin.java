@@ -69,9 +69,8 @@ public class CreateFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 					RNSPath path = paths.iterator().next();
 					path = path.lookup(answer, RNSPathQueryFlags.MUST_NOT_EXIST);
 
-					RNSSelectionDialog rDialog =
-						new RNSSelectionDialog(SwingUtilities.getWindowAncestor(context.ownerComponent()), context.uiContext(),
-							new RNSTreeSelectionContainerFilter());
+					RNSSelectionDialog rDialog = new RNSSelectionDialog(SwingUtilities.getWindowAncestor(context.ownerComponent()),
+						context.uiContext(), new RNSTreeSelectionContainerFilter());
 					rDialog.pack();
 					rDialog.setModalityType(ModalityType.DOCUMENT_MODAL);
 					GUIUtils.centerWindow(rDialog);

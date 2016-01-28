@@ -35,9 +35,8 @@ class MethodInjectionPoint extends InjectionPoint
 			if (types == null || types.length == 0)
 				types = new Class<?>[] { _targetType };
 
-			value =
-				Proxy.newProxyInstance(FieldInjectionPoint.class.getClassLoader(), types, new LazyInjectionPointHandler(
-					getInjectFactory(resolver), _injectionInformation, _targetType));
+			value = Proxy.newProxyInstance(FieldInjectionPoint.class.getClassLoader(), types,
+				new LazyInjectionPointHandler(getInjectFactory(resolver), _injectionInformation, _targetType));
 		} else
 			value = doResolve(resolver, _targetType);
 

@@ -52,8 +52,8 @@ public class RExportResolverEntry
 	 * @throws ResourceException
 	 * @throws InvalidWSNameFaultType
 	 */
-	public RExportResolverEntry(EndpointReferenceType primaryEPR, URI resolverEPI, EndpointReferenceType resolverEPR,
-		String primaryLocalPath, EndpointReferenceType resolverServiceEPR) throws ResourceException, InvalidWSNameFaultType
+	public RExportResolverEntry(EndpointReferenceType primaryEPR, URI resolverEPI, EndpointReferenceType resolverEPR, String primaryLocalPath,
+		EndpointReferenceType resolverServiceEPR) throws ResourceException, InvalidWSNameFaultType
 	{
 		WSName tmp = new WSName(primaryEPR);
 

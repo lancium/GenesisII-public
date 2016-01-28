@@ -16,8 +16,8 @@ public class ServerDatabaseConnectionPool extends DatabaseConnectionPool
 	static private final String _SERVER_SPECIAL_STRING = "${server-dir}";
 	static private int _poolInstances = 0;
 
-	public ServerDatabaseConnectionPool(Properties connectionProperties) throws IllegalAccessException, ClassNotFoundException,
-		InstantiationException
+	public ServerDatabaseConnectionPool(Properties connectionProperties)
+		throws IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		super(new DBPropertyNames(), connectionProperties, _SERVER_SPECIAL_STRING);
 		synchronized (ServerDatabaseConnectionPool.class) {

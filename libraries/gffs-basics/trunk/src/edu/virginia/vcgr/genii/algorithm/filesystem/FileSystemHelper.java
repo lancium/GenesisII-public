@@ -62,23 +62,23 @@ public class FileSystemHelper
 	public static String sanitizeFilename(String toClean)
 	{
 		if (toClean == null)
-			return toClean; // can't fix nothing.		
-		//_logger.debug("before='" + toClean + "'");
-		
-		//String toReturn = toClean.replaceAll("[\\\\]", "/");
+			return toClean; // can't fix nothing.
+		// _logger.debug("before='" + toClean + "'");
+
+		// String toReturn = toClean.replaceAll("[\\\\]", "/");
 		String toReturn = toClean.replace('\\', '/');
-		
-		//future: any other cleanings we should do on the path?
-		
-		//_logger.debug("after='" + toReturn + "'");		
+
+		// future: any other cleanings we should do on the path?
+
+		// _logger.debug("after='" + toReturn + "'");
 		return toReturn;
 	}
 
-	static public void main(String [] args)
+	static public void main(String[] args)
 	{
 		String uglyPath = "C:\\Program Files\\GenesisII\\";
 		String fixedPath = sanitizeFilename(uglyPath);
-		String expectedPath ="C:/Program Files/GenesisII/"; 
+		String expectedPath = "C:/Program Files/GenesisII/";
 		if (!fixedPath.equals(expectedPath)) {
 			System.err.println("FAILURE IN PARSING!  result is not right: '" + fixedPath + "' when it should be '" + expectedPath);
 			System.exit(1);
@@ -87,5 +87,5 @@ public class FileSystemHelper
 		}
 		System.exit(0);
 	}
-	
+
 }

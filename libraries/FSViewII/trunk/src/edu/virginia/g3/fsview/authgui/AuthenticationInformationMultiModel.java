@@ -89,8 +89,8 @@ final public class AuthenticationInformationMultiModel extends AbstractFSViewInf
 		JPanel panel = new JPanel(new GridBagLayout());
 
 		if (!_isSingletonAnonymous) {
-			panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-				"Authentication Information"));
+			panel.setBorder(
+				BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Authentication Information"));
 
 			if (_models.size() == 1) {
 				panel.add(_models.get(_selectedType).createGuiComponent(), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,

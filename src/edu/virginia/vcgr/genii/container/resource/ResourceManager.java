@@ -254,9 +254,8 @@ public class ResourceManager
 					org.apache.axis.types.URI serverTlsUri = new org.apache.axis.types.URI(SecurityConstants.SERVER_TLS_URI);
 					PolicyReference serverTlsReference = new PolicyReference();
 					serverTlsReference.setURI(serverTlsUri);
-					MessageElement tlsMel =
-						new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
-							serverTlsReference);
+					MessageElement tlsMel = new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(),
+						"PolicyReference", serverTlsReference);
 					policyComponents.add(tlsMel);
 				}
 
@@ -267,9 +266,8 @@ public class ResourceManager
 					org.apache.axis.types.URI mutualX509Uri = new org.apache.axis.types.URI(SecurityConstants.MUTUAL_X509_URI);
 					PolicyReference mutualX509Reference = new PolicyReference();
 					mutualX509Reference.setURI(mutualX509Uri);
-					MessageElement x509Mel =
-						new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
-							mutualX509Reference);
+					MessageElement x509Mel = new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(),
+						"PolicyReference", mutualX509Reference);
 					policyComponents.add(x509Mel);
 
 					// add our optional blend of Credentials
@@ -295,11 +293,11 @@ public class ResourceManager
 					samlPolicy.set_any(policySubEls);
 
 					// create SignedSupporting Tokens
-					MessageElement signedSupportingTokensMel =
-						new MessageElement(new QName(NestedPolicyType.getTypeDesc().getXmlType().getNamespaceURI(), "SignedSupportingTokens"));
+					MessageElement signedSupportingTokensMel = new MessageElement(
+						new QName(NestedPolicyType.getTypeDesc().getXmlType().getNamespaceURI(), "SignedSupportingTokens"));
 					signedSupportingTokensMel.setAttribute(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Optional", "true");
-					signedSupportingTokensMel.addChild(new MessageElement(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Policy",
-						samlPolicy));
+					signedSupportingTokensMel
+						.addChild(new MessageElement(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Policy", samlPolicy));
 
 					policyComponents.add(signedSupportingTokensMel);
 				}
@@ -317,9 +315,8 @@ public class ResourceManager
 				org.apache.axis.types.URI usernameTokenUri = new org.apache.axis.types.URI(SecurityConstants.USERNAME_TOKEN_URI);
 				PolicyReference usernameTokenReference = new PolicyReference();
 				usernameTokenReference.setURI(usernameTokenUri);
-				MessageElement usernameTokenMel =
-					new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference",
-						usernameTokenReference);
+				MessageElement usernameTokenMel = new MessageElement(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(),
+					"PolicyReference", usernameTokenReference);
 				usernameTokenMel.setAttribute(Policy.getTypeDesc().getXmlType().getNamespaceURI(), "Optional", "true");
 				policyComponents.add(usernameTokenMel);
 
@@ -389,8 +386,8 @@ public class ResourceManager
 			String porttypeString = "unknown"; // ASG Added
 
 			if (portTypes.length == 0) {
-				any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(GenesisIIConstants.GENESISII_NS,
-					porttypeString = "NullPortType")));
+				any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"),
+					new QName(GenesisIIConstants.GENESISII_NS, porttypeString = "NullPortType")));
 			} else {
 				if (masterType == null) // handles the case for RootRNSForks !
 				{
@@ -398,14 +395,14 @@ public class ResourceManager
 						porttypeString = "NullPortType";
 						throw new ResourceException("Couldn't locate target service name in the resource key");
 					} else {
-						any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
-							GenesisIIConstants.GENESISII_NS, porttypeString = resourceKey.getServiceName())));
+						any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"),
+							new QName(GenesisIIConstants.GENESISII_NS, porttypeString = resourceKey.getServiceName())));
 					}
 				}
 
 				else {
-					any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"), new QName(
-						GenesisIIConstants.GENESISII_NS, porttypeString = masterType)));
+					any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS, "PortType"),
+						new QName(GenesisIIConstants.GENESISII_NS, porttypeString = masterType)));
 				}
 			}
 			if (_logger.isTraceEnabled()) {
@@ -427,12 +424,8 @@ public class ResourceManager
 			// add security metadata (Use OGSA Secure Addressing depending on
 			// config setting)
 			try {
-				String useEap =
-					Installation
-						.getDeployment(new DeploymentName())
-						.security()
-						.getProperty(
-							edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);
+				String useEap = Installation.getDeployment(new DeploymentName()).security().getProperty(
+					edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);
 				if (useEap.equalsIgnoreCase("true")) {
 					addSecureAddressingElements(any, resource);
 				} else {

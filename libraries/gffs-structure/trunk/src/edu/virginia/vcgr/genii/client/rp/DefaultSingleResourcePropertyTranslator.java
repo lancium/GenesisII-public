@@ -49,9 +49,8 @@ public class DefaultSingleResourcePropertyTranslator implements SingleResourcePr
 				_logger.trace("...now returning type " + toReturn.getClass().getCanonicalName());
 			return toReturn;
 		} catch (ResourceException re) {
-			String msg =
-				"Unable to deserialize resource property " + element.getQName() + " for type " + clazz.getCanonicalName()
-					+ " from elem real type " + element.getClass().getCanonicalName();
+			String msg = "Unable to deserialize resource property " + element.getQName() + " for type " + clazz.getCanonicalName()
+				+ " from elem real type " + element.getClass().getCanonicalName();
 			_logger.error(msg, re);
 			throw new ResourcePropertyException(msg, re);
 		}

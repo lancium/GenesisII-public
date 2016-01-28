@@ -198,9 +198,8 @@ public class SudoExportUtils
 	public static void chownIfACLandChownEnabled(File localPath) throws IOException
 	{
 		// look up the export mechanism setting for the export resource.
-		ExportMechanisms expMech =
-			ExportMechanisms.parse((String) ResourceManager.getCurrentResource().dereference()
-				.getProperty(LightWeightExportConstants.EXPORT_MECHANISM));
+		ExportMechanisms expMech = ExportMechanisms
+			.parse((String) ResourceManager.getCurrentResource().dereference().getProperty(LightWeightExportConstants.EXPORT_MECHANISM));
 		if (expMech == null) {
 			// if we have no record of the type of export, then we fall back to the old style.
 			expMech = ExportMechanisms.EXPORT_MECH_ACL;

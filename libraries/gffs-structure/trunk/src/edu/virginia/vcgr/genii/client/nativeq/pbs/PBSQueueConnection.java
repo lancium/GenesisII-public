@@ -200,8 +200,8 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 
 			// hmmm: use threadsPerProcess here! although PBS doesn't seem to have a notion of threads separate from processes...
 
-			_logger.info("pbs spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc="
-				+ threadsPerProcess);
+			_logger
+				.info("pbs spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc=" + threadsPerProcess);
 
 			// hmmm: the place= excl or shared option doesn't necessarily seem to be standard.
 			// new section for checking whether they've asked for exclusivity or are okay with sharing the node for sequential jobs.

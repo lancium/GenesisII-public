@@ -23,8 +23,8 @@ import org.apache.axis.message.MessageElement;
  * 
  * @author mmm2a
  */
-public class SimpleRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIOPortType> implements RandomByteIOTransferer,
-	SimpleByteIOTransferer
+public class SimpleRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIOPortType>
+	implements RandomByteIOTransferer, SimpleByteIOTransferer
 {
 	/**
 	 * Construct a new SimpleRByteIO transferer.

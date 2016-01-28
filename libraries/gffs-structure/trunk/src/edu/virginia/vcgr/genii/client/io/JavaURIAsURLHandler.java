@@ -73,8 +73,9 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 		else
 			portString = "";
 
-		return new URI(uri.getScheme(), String.format("%s:%s@%s%s", credentials.getUserName(), credentials.getPassword(), uri.getHost(),
-			portString), uri.getPath(), uri.getQuery(), uri.getFragment());
+		return new URI(uri.getScheme(),
+			String.format("%s:%s@%s%s", credentials.getUserName(), credentials.getPassword(), uri.getHost(), portString), uri.getPath(),
+			uri.getQuery(), uri.getFragment());
 	}
 
 	public InputStream openInputStream(URI uri, UsernamePasswordIdentity credential) throws IOException

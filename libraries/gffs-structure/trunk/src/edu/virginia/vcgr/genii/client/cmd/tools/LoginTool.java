@@ -255,7 +255,7 @@ public class LoginTool extends BaseLoginTool
 
 		// reset caching system again prior to changing directory to make sure nothing old is left.
 		CacheManager.resetCachingSystem();
-		
+
 		{
 			// jumps to the user's home directory.
 			// Assumption is that user idp's are off /user and homes off /home

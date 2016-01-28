@@ -201,15 +201,16 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 								subElement = subElement.getChildElement(BinarySecurity.TOKEN_BST);
 								if (subElement != null) {
 									try {
-										if (subElement.getAttributeValue("ValueType").equals(
-											edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE)) {
+										if (subElement.getAttributeValue("ValueType")
+											.equals(edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE)) {
 											X509Security bstToken = new X509Security(subElement);
 											X509Certificate delegateTo = bstToken.getX509Certificate(new GIIBouncyCrypto());
 											delegateToChain = new X509Certificate[] { delegateTo };
 										} else {
 											if (delegateToChain == null) {
-												throw new AxisFault(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-													"BadRequest"), "Missing or unsupported DelegateTo security ValueType", null, null);
+												throw new AxisFault(
+													new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"),
+													"Missing or unsupported DelegateTo security ValueType", null, null);
 											}
 										}
 									} catch (GenesisIISecurityException e) {
@@ -334,7 +335,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	 */
 	public static void sharedPostCreate(BaseAuthenticationServiceImpl theThis, ResourceKey rKey, EndpointReferenceType newEPR,
 		ConstructionParameters cParams, GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		// determine the credential the idp will front.
 		NuCredential credential = null;
@@ -390,11 +391,11 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 					 * Delegate the assertion to delegateTo. note that we are using a ridiculously long time limit here rather than not create
 					 * a basic constraints object.
 					 */
-					TrustCredential newTC =
-						new TrustCredential(resourceCertChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
-							wrapped.getDelegateeType(), new BasicConstraints(System.currentTimeMillis()
-								- SecurityConstants.CredentialGoodFromOffset, Long.MAX_VALUE, SecurityConstants.MaxDelegationDepth),
-							RWXCategory.FULL_ACCESS);
+					TrustCredential newTC = new TrustCredential(resourceCertChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
+						wrapped.getDelegateeType(),
+						new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset, Long.MAX_VALUE,
+							SecurityConstants.MaxDelegationDepth),
+						RWXCategory.FULL_ACCESS);
 					newTC.extendTrustChain(wrapped);
 					newTC.signAssertion(privateKey);
 					credential = newTC;
@@ -440,8 +441,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
-		RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {
 			super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
@@ -455,8 +456,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	 * builds the initial credential for the client that states that the STS trusts the client's TLS cert.
 	 */
 	public static TrustCredential delegateCredential(BaseAuthenticationServiceImpl theThis, IRNSResource resource,
-		X509Certificate[] delegateToChain, Date created, Date expiry) throws AuthZSecurityException, SOAPException, ConfigurationException,
-		RemoteException
+		X509Certificate[] delegateToChain, Date created, Date expiry)
+			throws AuthZSecurityException, SOAPException, ConfigurationException, RemoteException
 	{
 		TrustCredential newTC = null;
 
@@ -467,8 +468,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		_logger.debug("resource's credential is: " + resourceCred.toString());
 		// 2014-11-05 ASG - adding logging
 		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
-		StatsLogger.logStats("X509AuthnServiceImpl: authenticating " + resourceCred.getOriginalAsserter()[0].getSubjectDN()
-			+ " to client at " + caller);
+		StatsLogger.logStats(
+			"X509AuthnServiceImpl: authenticating " + resourceCred.getOriginalAsserter()[0].getSubjectDN() + " to client at " + caller);
 		// End logging
 
 		KeyAndCertMaterial resourceKeyMaterial = null;
@@ -494,29 +495,27 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				TrustCredential wrapped = (TrustCredential) resourceCred;
 				// Delegate the assertion to delegateTo.
 				newTC =
-					new TrustCredential(delegateToChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain,
-						wrapped.getDelegateeType(), new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(),
-							SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+					new TrustCredential(delegateToChain, IdentityType.OTHER, resourceKeyMaterial._clientCertChain, wrapped.getDelegateeType(),
+						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(), SecurityConstants.MaxDelegationDepth),
+						RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
 			} else if (resourceCred instanceof FullX509Identity) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("creating trust credential from full x509 with key: " + resourceCred.toString());
 				FullX509Identity realId = (FullX509Identity) resourceCred;
 				// Delegate the assertion to delegateTo.
-				newTC =
-					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
-						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(), SecurityConstants.MaxDelegationDepth),
-						RWXCategory.FULL_ACCESS);
+				newTC = new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
+					new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(), SecurityConstants.MaxDelegationDepth),
+					RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(realId.getKey());
 			} else if (resourceCred instanceof X509Identity) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("creating trust credential from x509: " + resourceCred.toString());
 				X509Identity realId = (X509Identity) resourceCred;
 				// Delegate the assertion to delegateTo.
-				newTC =
-					new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
-						new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(), SecurityConstants.MaxDelegationDepth),
-						RWXCategory.FULL_ACCESS);
+				newTC = new TrustCredential(delegateToChain, IdentityType.CONNECTION, realId.getOriginalAsserter(), realId.getType(),
+					new BasicConstraints(created.getTime(), expiry.getTime() - created.getTime(), SecurityConstants.MaxDelegationDepth),
+					RWXCategory.FULL_ACCESS);
 				newTC.signAssertion(resourceKeyMaterial._clientPrivateKey);
 			} else {
 				_logger.error("failure, unknown type of assertion found.");
@@ -558,9 +557,8 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		 */
 		MessageElement[] delegations = new MessageElement[] { elemConvert };
 
-		elements[1] =
-			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
-				new RequestedSecurityTokenType(delegations));
+		elements[1] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
+			new RequestedSecurityTokenType(delegations));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		response.set_any(elements);

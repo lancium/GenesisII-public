@@ -42,11 +42,11 @@ public class MatchingParameterPanel extends TitledPanel
 
 		JScrollPane scroller = new JScrollPane(table);
 
-		add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
-		add(ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()), new SimpleIconButton(ShapeIcons.Minus,
-			_minusAction)), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0,
-			0, 0), 0, 0));
+		add(scroller,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()),
+			new SimpleIconButton(ShapeIcons.Minus, _minusAction)),
+			new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListenerImpl());
 	}

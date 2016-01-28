@@ -36,9 +36,8 @@ public class DatabaseHandler implements IAroundInvoker
 			throw new AuthZSecurityException(msg);
 		}
 
-		MethodDataPoint mdp =
-			ContainerStatistics.instance().getMethodStatistics()
-				.startMethod(invocationContext.getTarget().getClass(), invocationContext.getMethod());
+		MethodDataPoint mdp = ContainerStatistics.instance().getMethodStatistics().startMethod(invocationContext.getTarget().getClass(),
+			invocationContext.getMethod());
 		MethodHistogramStatistics mhs = ContainerStatistics.instance().getMethodHistogramStatistics();
 
 		mhs.addActiveMethod();

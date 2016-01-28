@@ -77,19 +77,18 @@ public class AccountingTool extends BaseGridTool
 		private StatementBundle(Connection connection) throws SQLException
 		{
 			_lookupCID = connection.prepareStatement("SELECT cid, credential FROM xcgcredentials " + "WHERE credentialhash = ?");
-			_insertCredential =
-				connection.prepareStatement("INSERT INTO xcgcredentials " + "(credential, credentialdesc, credentialhash) "
-					+ "VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+			_insertCredential = connection.prepareStatement(
+				"INSERT INTO xcgcredentials " + "(credential, credentialdesc, credentialhash) " + "VALUES (?, ?, ?)",
+				Statement.RETURN_GENERATED_KEYS);
 			_lookupBESID = connection.prepareStatement("SELECT besid, besmachinename, arch, os " + "FROM xcgbescontainers WHERE besepi = ?");
-			_insertBES =
-				connection.prepareStatement("INSERT INTO xcgbescontainers " + "(besepi, besmachinename, arch, os) VALUES (?, ?, ?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
+			_insertBES = connection.prepareStatement(
+				"INSERT INTO xcgbescontainers " + "(besepi, besmachinename, arch, os) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			_lookupAccountingRecord =
 				connection.prepareStatement("SELECT arid FROM xcgaccountingrecords " + "WHERE besaccountingrecordid = ? AND besid = ?");
-			_insertAccountingRecord =
-				connection.prepareStatement("INSERT INTO xcgaccountingrecords " + "(besaccountingrecordid, besid, exitcode, "
-					+ "usertimemicrosecs, kerneltimemicrosecs, " + "wallclocktimemicrosecs, maxrssbytes, recordtimestamp) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+			_insertAccountingRecord = connection.prepareStatement(
+				"INSERT INTO xcgaccountingrecords " + "(besaccountingrecordid, besid, exitcode, " + "usertimemicrosecs, kerneltimemicrosecs, "
+					+ "wallclocktimemicrosecs, maxrssbytes, recordtimestamp) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+				Statement.RETURN_GENERATED_KEYS);
 			_insertMapping = connection.prepareStatement("INSERT INTO xcgareccredmap (cid, arid) VALUES (?, ?)");
 
 			_insertCommandLineElement =
@@ -236,8 +235,8 @@ public class AccountingTool extends BaseGridTool
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addRecordToTargetDatabase(AccountingRecordType art, StatementBundle sBundle) throws IOException, ClassNotFoundException,
-		SQLException
+	private void addRecordToTargetDatabase(AccountingRecordType art, StatementBundle sBundle)
+		throws IOException, ClassNotFoundException, SQLException
 	{
 		ResultSet rs = null;
 

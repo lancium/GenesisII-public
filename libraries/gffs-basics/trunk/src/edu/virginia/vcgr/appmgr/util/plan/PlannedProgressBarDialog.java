@@ -46,16 +46,16 @@ public class PlannedProgressBarDialog<PlanContext extends Closeable> extends JDi
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new JLabel("Progress"), new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Progress"),
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(_bar = new JProgressBar(JProgressBar.HORIZONTAL, 0, _actions.size()), new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(_label = new JLabel(), new GridBagConstraints(0, 2, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(_okAction = new OKAction()), new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0, GridBagConstraints.SOUTH,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new CancelAction()), new GridBagConstraints(1, 3, 1, 1, 1.0, 1.0, GridBagConstraints.SOUTH,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_label = new JLabel(),
+			new GridBagConstraints(0, 2, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(_okAction = new OKAction()),
+			new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new CancelAction()),
+			new GridBagConstraints(1, 3, 1, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	public void start(PlanContext planContext)

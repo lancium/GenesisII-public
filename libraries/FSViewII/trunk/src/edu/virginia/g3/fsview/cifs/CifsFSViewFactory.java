@@ -39,8 +39,8 @@ final public class CifsFSViewFactory extends AbstractFSViewFactory
 				break;
 
 			default:
-				throw new IllegalArgumentException("Authentication information must be either "
-					+ "UsernamePassword or DomainUsernamePassword.");
+				throw new IllegalArgumentException(
+					"Authentication information must be either " + "UsernamePassword or DomainUsernamePassword.");
 		}
 
 		NtlmPasswordAuthentication smbAuthInfo = new NtlmPasswordAuthentication(dup.domain(), dup.username(), dup.password());

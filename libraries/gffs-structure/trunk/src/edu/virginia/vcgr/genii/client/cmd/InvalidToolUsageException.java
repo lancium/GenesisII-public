@@ -9,14 +9,14 @@ public class InvalidToolUsageException extends ToolException
 	public InvalidToolUsageException()
 	{
 		super(_INVALID_USAGE_MSG);
-		// inappropriate detail output to user. + "...  call chain was " +
+		// inappropriate detail output to user. + "... call chain was " +
 		// ProgramTools.showLastFewOnStack(7));
 	}
 
 	public InvalidToolUsageException(String additionalMessage)
 	{
 		super(_INVALID_USAGE_MSG + ": " + additionalMessage);
-		// inappropriate detail output to user. + "...  call chain was " +
+		// inappropriate detail output to user. + "... call chain was " +
 		// ProgramTools.showLastFewOnStack(7));
 	}
 }

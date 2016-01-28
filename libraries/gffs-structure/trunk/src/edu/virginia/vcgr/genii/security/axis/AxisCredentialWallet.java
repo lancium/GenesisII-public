@@ -127,10 +127,10 @@ public class AxisCredentialWallet
 		}
 	}
 
-	//hmmm: !!!! important place here; we need to not verify the whole chains we're getting back.
+	// hmmm: !!!! important place here; we need to not verify the whole chains we're getting back.
 	// instead of returning a fully assembled credential wallet, we just need to give back everything we found in the
 	// soap WITHOUT verifying it!....
-	
+
 	private void constructFromSOAPHeaderElement(MessageElement encodedCredentials)
 	{
 		/*
@@ -181,16 +181,16 @@ public class AxisCredentialWallet
 		}
 		getRealCreds().getAssertionChains().clear();
 		getRealCreds().getAssertionChains().putAll(detachedDelegations);
-		
-		//hmmm: DONT VERIFY YET!!!!>......
-		//hmmm: BUT DO VERIFY EACH ITEM AT LEAST ONCE!!!!
-		
-		//hmmm: perhaps the credential cache should actually cache higher order credential pieces too! then we would
-		// not have to test those things, if we had already seen and verified them.  maybe only place to verify
+
+		// hmmm: DONT VERIFY YET!!!!>......
+		// hmmm: BUT DO VERIFY EACH ITEM AT LEAST ONCE!!!!
+
+		// hmmm: perhaps the credential cache should actually cache higher order credential pieces too! then we would
+		// not have to test those things, if we had already seen and verified them. maybe only place to verify
 		// is before putting the things into the cache.
-		
-		//hmmm: careful; can't allow the cred wallet reassembly code to remove things from our cached credentials list!!!!
-		
+
+		// hmmm: careful; can't allow the cred wallet reassembly code to remove things from our cached credentials list!!!!
+
 		getRealCreds().flexReattachDelegations(true);
 	}
 

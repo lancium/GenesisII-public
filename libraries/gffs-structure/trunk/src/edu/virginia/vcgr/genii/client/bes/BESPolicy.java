@@ -66,8 +66,8 @@ public class BESPolicy
 
 		MessageElement loggedIn =
 			new MessageElement(new QName(BESConstants.GENII_BES_NS, "user-logged-in-action"), getUserLoggedInAction().toString());
-		MessageElement screenSaverInactive =
-			new MessageElement(new QName(BESConstants.GENII_BES_NS, "screensaver-inactive-action"), getScreenSaverInactiveAction().toString());
+		MessageElement screenSaverInactive = new MessageElement(new QName(BESConstants.GENII_BES_NS, "screensaver-inactive-action"),
+			getScreenSaverInactiveAction().toString());
 
 		try {
 			ret.addChild(loggedIn);

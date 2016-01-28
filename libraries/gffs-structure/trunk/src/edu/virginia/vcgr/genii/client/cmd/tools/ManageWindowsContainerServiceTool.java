@@ -90,16 +90,14 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 		ExecutionTask tasks[];
 
 		if (_install)
-			tasks =
-				new ExecutionTask[] { GenesisIIContainerService.installGenesisIIContainer(_account, _password),
-					WindowsRights.grantLogonAsService(_account),
-					WindowsFirewall.createOpenPortTask(_serviceName, port, WindowsFirewall.FirewallPortTypes.TCP),
-					WindowsServices.createStartServiceTask("Genesis II Container"), };
+			tasks = new ExecutionTask[] { GenesisIIContainerService.installGenesisIIContainer(_account, _password),
+				WindowsRights.grantLogonAsService(_account),
+				WindowsFirewall.createOpenPortTask(_serviceName, port, WindowsFirewall.FirewallPortTypes.TCP),
+				WindowsServices.createStartServiceTask("Genesis II Container"), };
 		else
-			tasks =
-				new ExecutionTask[] { WindowsServices.createStopServiceTask("Genesis II Container"),
-					WindowsFirewall.createClosePortTask(port, WindowsFirewall.FirewallPortTypes.TCP),
-					GenesisIIContainerService.uninstallGenesisIIContainer() };
+			tasks = new ExecutionTask[] { WindowsServices.createStopServiceTask("Genesis II Container"),
+				WindowsFirewall.createClosePortTask(port, WindowsFirewall.FirewallPortTypes.TCP),
+				GenesisIIContainerService.uninstallGenesisIIContainer() };
 
 		for (ExecutionTask eTask : tasks) {
 			boolean success = false;

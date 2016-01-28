@@ -31,8 +31,7 @@ public class RNSContainerUtilities
 {
 	static private Log _logger = LogFactory.getLog(RNSContainerUtilities.class);
 
-	static public LookupResponseType translate(Iterable<RNSEntryResponseType> entries, IteratorBuilder<Object> builder)
-		throws RemoteException
+	static public LookupResponseType translate(Iterable<RNSEntryResponseType> entries, IteratorBuilder<Object> builder) throws RemoteException
 	{
 
 		return indexedTranslate(entries, builder, null);
@@ -83,7 +82,8 @@ public class RNSContainerUtilities
 			}
 		}
 
-		return new LookupResponseType(batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]), iit.getIteratorEndpoint());
+		return new LookupResponseType(batch == null ? null : batch.toArray(new RNSEntryResponseType[batch.size()]),
+			iit.getIteratorEndpoint());
 	}
 
 	public static NuCredential loadRNSResourceCredential(IRNSResource resource)

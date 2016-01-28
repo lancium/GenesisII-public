@@ -53,8 +53,8 @@ public class DefaultStreamableByteIOResourceFork extends AbstractStreamableByteI
 						} else if (operation.getName().equals("destroy")) {
 							return RWXCategory.OPEN;
 						} else
-							throw new RWXMappingException("Target method \"" + operation.getName()
-								+ "\" is not one of seekRead or seekWrite.");
+							throw new RWXMappingException(
+								"Target method \"" + operation.getName() + "\" is not one of seekRead or seekWrite.");
 
 						return RWXManager.lookup(dependentForkClass, targetMethod);
 					}

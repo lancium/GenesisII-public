@@ -126,8 +126,8 @@ public class WinCryptoLib extends JNIClientBaseClass
 		return cert;
 	}
 
-	public X509Certificate[] getCertificateChain(String certStore, String alias) throws WinCryptoChainInvalidException, WinCryptoException,
-		CertificateException
+	public X509Certificate[] getCertificateChain(String certStore, String alias)
+		throws WinCryptoChainInvalidException, WinCryptoException, CertificateException
 	{
 
 		ArrayList<byte[]> certBlobs = getCertChain(certStore, Base64.base64ToByteArray(alias));

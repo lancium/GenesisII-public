@@ -63,7 +63,7 @@ public class FileLock implements Closeable
 			 * file really should be fixed in that location, which means file locking could be cross-container, so the state dir is not an
 			 * appropriate place to store the lock file.
 			 */
-//			_logger.debug("saw user.home in this path: " + path);
+			// _logger.debug("saw user.home in this path: " + path);
 			toReturn = new File(path + ".lock");
 		} else {
 			/*
@@ -71,7 +71,7 @@ public class FileLock implements Closeable
 			 * different container. it's just too bad if we do need to share the lock file with a different container for most arbitrary
 			 * paths, since we cannot guarantee we can create the lock file in read-only locations such as the system-wide install directory.
 			 */
-//			_logger.debug("this path was someplace else in fs, so we will make a name under userdir: " + path);
+			// _logger.debug("this path was someplace else in fs, so we will make a name under userdir: " + path);
 			toReturn = OSGiSupport.chopUpPath(InstallationProperties.getUserDir(), new File(file.getAbsolutePath() + ".lock"), "flock");
 		}
 		if (_logger.isTraceEnabled())

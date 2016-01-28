@@ -77,8 +77,8 @@ public class InvocationInterceptorManager
 			portMethod = m.getName();
 
 		portType.getMethod(portMethod, portTypePTypes);
-		handlers.put(new MethodDescription(portMethod, portTypePTypes), new OperationHandler(interceptor, m,
-			portTypePTypes.length == interceptorPTypes.length));
+		handlers.put(new MethodDescription(portMethod, portTypePTypes),
+			new OperationHandler(interceptor, m, portTypePTypes.length == interceptorPTypes.length));
 	}
 
 	public Object invoke(EndpointReferenceType target, ICallingContext callingContext, IFinalInvoker finalObject, Method finalMethod,

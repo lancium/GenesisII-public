@@ -174,9 +174,8 @@ public class ScriptTool extends BaseGridTool
 			} else {
 				GeniiPath scriptFilePath = new GeniiPath(getArgument(lcv));
 				if (scriptFilePath.pathType() == GeniiPathType.Local) {
-					File scriptFile =
-						PathVariable.lookupVariable(System.getProperties(), GridEnvironment.GRID_PATH_ENV_VARIABLE).find(
-							scriptFilePath.path(), PathVariable.FindTypes.FILE);
+					File scriptFile = PathVariable.lookupVariable(System.getProperties(), GridEnvironment.GRID_PATH_ENV_VARIABLE)
+						.find(scriptFilePath.path(), PathVariable.FindTypes.FILE);
 					if (scriptFile == null)
 						throw new FileNotFoundException(String.format("Unable to locate script file %s.", scriptFilePath));
 					scriptFilePath = new GeniiPath("local:" + scriptFile.getAbsolutePath());

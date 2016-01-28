@@ -213,8 +213,8 @@ public class SecurityUtilities implements CertificateValidator
 			trustOkay = true;
 		} catch (Throwable e) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("could not validate this cert with jdk ssl against trust store: " + certChain[0].getSubjectDN()
-					+ e.getMessage());
+				_logger
+					.debug("could not validate this cert with jdk ssl against trust store: " + certChain[0].getSubjectDN() + e.getMessage());
 		}
 		return trustOkay;
 	}
@@ -680,8 +680,7 @@ public class SecurityUtilities implements CertificateValidator
 		}
 	}
 
-	static public KeyStore
-		createTrustStoreFromCertificates(String proposedTrustStoreType, String password, List<Certificate> certificateList)
+	static public KeyStore createTrustStoreFromCertificates(String proposedTrustStoreType, String password, List<Certificate> certificateList)
 	{
 		KeyStore trustStore = null;
 		char[] trustStorePassword = (password == null) ? "genesisII".toCharArray() : password.toCharArray();

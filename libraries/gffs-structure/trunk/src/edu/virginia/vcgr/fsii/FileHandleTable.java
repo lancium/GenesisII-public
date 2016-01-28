@@ -76,13 +76,13 @@ public class FileHandleTable<FileObjectType>
 			}
 		} else {
 			if (_logger.isTraceEnabled())
-				_logger.debug(String.format("Releasing instance of %s without closing.", entry == null ? "<null>" : entry.getClass()
-					.getName()));
+				_logger
+					.debug(String.format("Releasing instance of %s without closing.", entry == null ? "<null>" : entry.getClass().getName()));
 		}
 
 		if (_logger.isTraceEnabled())
-			_logger.debug(String.format("FileHandleTable[%x] -- Released handle %d and pointing that slot to %d.", this.hashCode(), handle,
-				_nextFree));
+			_logger.debug(
+				String.format("FileHandleTable[%x] -- Released handle %d and pointing that slot to %d.", this.hashCode(), handle, _nextFree));
 		_table[handle] = new Integer(_nextFree);
 		_nextFree = handle;
 	}

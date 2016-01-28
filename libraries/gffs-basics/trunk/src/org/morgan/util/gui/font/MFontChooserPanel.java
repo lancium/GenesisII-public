@@ -47,10 +47,10 @@ public class MFontChooserPanel extends JPanel
 		italic.setSelected(_model.selectedFont().isItalic());
 
 		TitledPanel panel = new TitledPanel("Font Style");
-		panel.add(bold, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5,
-			5), 5, 5));
-		panel.add(italic, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5,
-			5, 5), 5, 5));
+		panel.add(bold,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(italic,
+			new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		return panel;
 	}
@@ -71,8 +71,8 @@ public class MFontChooserPanel extends JPanel
 		_sample = new FontSample(_model);
 
 		TitledPanel panel = new TitledPanel("Sample");
-		panel.add(_sample, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5,
-			5, 5), 5, 5));
+		panel.add(_sample,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		return panel;
 	}
 
@@ -88,14 +88,14 @@ public class MFontChooserPanel extends JPanel
 
 		_model = model;
 
-		add(createFontFamilyList(model), new GridBagConstraints(0, 0, 1, 3, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(createFontFamilyList(model),
+			new GridBagConstraints(0, 0, 1, 3, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		add(createFontStylePanel(), new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 		add(createFontSizePanel(), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(createFontSamplePanel(), new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(createFontSamplePanel(),
+			new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	public MFontChooserPanel()
@@ -151,8 +151,8 @@ public class MFontChooserPanel extends JPanel
 		dialog.setTitle("Font Chooser");
 		Container content = dialog.getContentPane();
 		content.setLayout(new GridBagLayout());
-		content.add(new MFontChooserPanel(), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new MFontChooserPanel(),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		dialog.pack();
 		dialog.setVisible(true);
 	}

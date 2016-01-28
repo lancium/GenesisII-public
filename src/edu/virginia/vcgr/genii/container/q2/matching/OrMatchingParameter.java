@@ -83,14 +83,14 @@ class OrMatchingParameter extends MatchingParameter
 	}
 
 	@Override
-	boolean isRequired()
+		boolean isRequired()
 	{
 		// ORS always required
 		return true;
 	}
 
 	@Override
-	boolean matches(Collection<MatchingParameter> params)
+		boolean matches(Collection<MatchingParameter> params)
 	{
 		for (MatchingParameter p : params) {
 			if (this.matches(p))

@@ -49,8 +49,8 @@ public class NotificationMessageHolder
 			if (any != null) {
 				if (any.length > 0) {
 					if (any.length > 1)
-						throw new IllegalArgumentException(String.format("Expected a message contents of size 0 or 1, but got %d.",
-							any.length));
+						throw new IllegalArgumentException(
+							String.format("Expected a message contents of size 0 or 1, but got %d.", any.length));
 
 					if (contentsType != null) {
 						JAXBContext context = JAXBContext.newInstance(contentsType);
@@ -100,8 +100,8 @@ public class NotificationMessageHolder
 		if (_contents != null)
 			me = _contents.toAxisType();
 
-		return new NotificationMessageHolderType(_subscriptionReference, _publisherReference, me == null ? null
-			: new NotificationMessageHolderTypeMessage(new MessageElement[] { me }), _topic == null ? null : new MessageElement[] { _topic
-			.asConcreteQueryExpression().toTopicExpressionElement(TOPIC_QNAME, "ts%d") });
+		return new NotificationMessageHolderType(_subscriptionReference, _publisherReference,
+			me == null ? null : new NotificationMessageHolderTypeMessage(new MessageElement[] { me }), _topic == null ? null
+				: new MessageElement[] { _topic.asConcreteQueryExpression().toTopicExpressionElement(TOPIC_QNAME, "ts%d") });
 	}
 }

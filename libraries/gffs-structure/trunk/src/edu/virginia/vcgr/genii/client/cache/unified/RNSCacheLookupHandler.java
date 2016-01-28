@@ -178,8 +178,8 @@ public class RNSCacheLookupHandler
 					removePossiblyStaleEntries(entryKeys);
 
 					if (_logger.isDebugEnabled())
-						_logger.debug("cache miss: count mismatch: " + resourceConfig.getRnsPath() + " entries " + entries.size()
-							+ " count " + elementCount);
+						_logger.debug("cache miss: count mismatch: " + resourceConfig.getRnsPath() + " entries " + entries.size() + " count "
+							+ elementCount);
 					return null;
 				}
 				/*
@@ -427,9 +427,8 @@ public class RNSCacheLookupHandler
 			if (targetContainerId.equals(entryContainerId)) {
 				// A checking on permissions-string attribute has been made because it is applicable
 				// for both RNS and ByteIO. A thorough testing on all attributes will be an overkill.
-				Object permissionProperty =
-					CacheManager.getItemFromCache(entryConfig.getWsIdentifier(), GenesisIIBaseRP.PERMISSIONS_STRING_QNAME,
-						MessageElement.class);
+				Object permissionProperty = CacheManager.getItemFromCache(entryConfig.getWsIdentifier(),
+					GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, MessageElement.class);
 				if (permissionProperty == null) {
 					attributesMissingFromResourcesOfSameContainer = true;
 					break;

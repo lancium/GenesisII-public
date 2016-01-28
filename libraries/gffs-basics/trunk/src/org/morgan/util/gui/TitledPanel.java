@@ -17,8 +17,8 @@ public class TitledPanel extends JPanel
 	{
 		this(title);
 
-		add(contents, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(contents,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	public TitledPanel(String title)

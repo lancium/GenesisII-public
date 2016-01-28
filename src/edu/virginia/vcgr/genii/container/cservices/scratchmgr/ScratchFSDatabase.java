@@ -22,13 +22,15 @@ public class ScratchFSDatabase
 
 	public ScratchFSDatabase(Connection conn) throws SQLException
 	{
-		DatabaseTableUtils.createTables(conn, false, "CREATE TABLE swapmgrdirectories ("
-			+ "dirid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " + "directory VARCHAR(512) UNIQUE NOT NULL, "
-			+ "lastidlestart TIMESTAMP)", "CREATE TABLE swapmgrdirectoryreservations ("
-			+ "reservationid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " + "dirid BIGINT NOT NULL, timeacquired TIMESTAMP NOT NULL, "
-			+ "CONSTRAINT swapmgrdirresdiridfk " + "FOREIGN KEY (dirid) " + "REFERENCES swapmgrdirectories (dirid))",
-			"CREATE INDEX swapmgrdirdirectoryidx " + "ON swapmgrdirectories (directory)", "CREATE INDEX swapmgrdirlastidlestartidx "
-				+ "ON swapmgrdirectories (lastidlestart)", "CREATE INDEX swapmgrdirresdirididx " + "ON swapmgrdirectoryreservations (dirid)",
+		DatabaseTableUtils.createTables(conn, false,
+			"CREATE TABLE swapmgrdirectories (" + "dirid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
+				+ "directory VARCHAR(512) UNIQUE NOT NULL, " + "lastidlestart TIMESTAMP)",
+			"CREATE TABLE swapmgrdirectoryreservations (" + "reservationid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
+				+ "dirid BIGINT NOT NULL, timeacquired TIMESTAMP NOT NULL, " + "CONSTRAINT swapmgrdirresdiridfk " + "FOREIGN KEY (dirid) "
+				+ "REFERENCES swapmgrdirectories (dirid))",
+			"CREATE INDEX swapmgrdirdirectoryidx " + "ON swapmgrdirectories (directory)",
+			"CREATE INDEX swapmgrdirlastidlestartidx " + "ON swapmgrdirectories (lastidlestart)",
+			"CREATE INDEX swapmgrdirresdirididx " + "ON swapmgrdirectoryreservations (dirid)",
 			"CREATE INDEX swapmgrdirrestimeacquiredidx " + "ON swapmgrdirectoryreservations (timeacquired)");
 	}
 
@@ -71,9 +73,8 @@ public class ScratchFSDatabase
 			stmt = conn.createStatement();
 			pStmt = conn.prepareStatement("DELETE FROM swapmgrdirectories WHERE dirid = ?");
 
-			rs =
-				stmt.executeQuery(String.format("SELECT dirid, directory FROM swapmgrdirectories " + "WHERE "
-					+ "{fn TIMESTAMPDIFF(SQL_TSI_SECOND, " + "lastidlestart, CURRENT_TIMESTAMP)} > %d", (idleTimeoutMillis / 1000L)));
+			rs = stmt.executeQuery(String.format("SELECT dirid, directory FROM swapmgrdirectories " + "WHERE "
+				+ "{fn TIMESTAMPDIFF(SQL_TSI_SECOND, " + "lastidlestart, CURRENT_TIMESTAMP)} > %d", (idleTimeoutMillis / 1000L)));
 			while (rs.next()) {
 				pStmt.setLong(1, rs.getLong(1));
 				pStmt.addBatch();
@@ -206,9 +207,8 @@ public class ScratchFSDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				conn.prepareStatement("UPDATE swapmgrdirectories " + "SET lastidlestart = CURRENT_TIMESTAMP " + "WHERE dirid = ? AND "
-					+ "dirid NOT IN " + "(SELECT dirid FROM swapmgrdirectoryreservations)");
+			stmt = conn.prepareStatement("UPDATE swapmgrdirectories " + "SET lastidlestart = CURRENT_TIMESTAMP " + "WHERE dirid = ? AND "
+				+ "dirid NOT IN " + "(SELECT dirid FROM swapmgrdirectoryreservations)");
 			stmt.setLong(1, dirid);
 
 			stmt.executeUpdate();

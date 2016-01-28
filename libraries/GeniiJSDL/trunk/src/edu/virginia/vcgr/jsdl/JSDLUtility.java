@@ -38,9 +38,8 @@ public class JSDLUtility
 
 	static {
 		try {
-			JSDLContext =
-				JAXBContext.newInstance(JobDefinition.class, Sweep.class, POSIXApplication.class, HPCProfileApplication.class,
-					SPMDApplication.class);
+			JSDLContext = JAXBContext.newInstance(JobDefinition.class, Sweep.class, POSIXApplication.class, HPCProfileApplication.class,
+				SPMDApplication.class);
 		} catch (JAXBException e) {
 			throw new RuntimeException("Unable to configure JSDL JAXB Context.", e);
 		}

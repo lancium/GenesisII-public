@@ -147,9 +147,8 @@ public class RandomByteIOInputStream extends InputStream
 			}
 
 			// Handles the case when length is not a perfect multiple of the number of threads
-			fr[numThreads - 1] =
-				new FastRead(transferer[numThreads - 1], _offset + subLength, threadBlkReadSize + (length % numThreads), fac, numThreads - 1,
-					threadBlkReadSize);
+			fr[numThreads - 1] = new FastRead(transferer[numThreads - 1], _offset + subLength, threadBlkReadSize + (length % numThreads), fac,
+				numThreads - 1, threadBlkReadSize);
 
 			thread[numThreads - 1] = new Thread(fr[numThreads - 1]);
 

@@ -7,15 +7,14 @@ class PageContextDescription
 	private ObjectInjectionHandlerFactory _injectionHandlerFactory;
 
 	@SuppressWarnings("unchecked")
-	PageContextDescription(String context, String resourceBase, String injectionHandlerFactoryClassName) throws ClassNotFoundException,
-		InstantiationException, IllegalAccessException
+	PageContextDescription(String context, String resourceBase, String injectionHandlerFactoryClassName)
+		throws ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
 		_context = context;
 		_resourceBase = resourceBase;
 
-		Class<? extends ObjectInjectionHandlerFactory> factoryClass =
-			(Class<? extends ObjectInjectionHandlerFactory>) Thread.currentThread().getContextClassLoader()
-				.loadClass(injectionHandlerFactoryClassName);
+		Class<? extends ObjectInjectionHandlerFactory> factoryClass = (Class<? extends ObjectInjectionHandlerFactory>) Thread.currentThread()
+			.getContextClassLoader().loadClass(injectionHandlerFactoryClassName);
 		_injectionHandlerFactory = factoryClass.newInstance();
 	}
 

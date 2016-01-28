@@ -102,8 +102,8 @@ public class AttributesUpdateNotificationsHandler
 			AuthZConfig config = notification.getNewConfig();
 			if (config == null)
 				return;
-			CacheManager.putItemInCache(endPoint, GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, new MessageElement(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME,
-				config));
+			CacheManager.putItemInCache(endPoint, GenesisIIBaseRP.AUTHZ_CONFIG_QNAME,
+				new MessageElement(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, config));
 		} catch (Exception e) {
 			_logger.info("failed to process authzUpdate notification");
 		}

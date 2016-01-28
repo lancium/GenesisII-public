@@ -73,8 +73,8 @@ public class StageOutPhase extends AbstractExecutionPhase implements Serializabl
 		ArchiveDetails detail = StageInPhase.ArchiveDetails.isRecognizedArchiveType(_source);
 		if (detail == null) {
 			// this is a failure; we know we needed to figure out the structure of the name before here.
-			throw new JSDLException("failure to determine type of archive (due to HandleAsArchive flag) for file '"
-				+ _source.getAbsolutePath() + "'");
+			throw new JSDLException(
+				"failure to determine type of archive (due to HandleAsArchive flag) for file '" + _source.getAbsolutePath() + "'");
 		}
 
 		_logger.debug("into compressArchive with source path '" + _source + "' and eventual target '" + _target + "'");
@@ -125,8 +125,8 @@ public class StageOutPhase extends AbstractExecutionPhase implements Serializabl
 			history.createErrorWriter("Can't stage %s out.", _source.getName()).format("Source file (%s) does not seem to exist.", _source)
 				.close();
 
-			throw new ContinuableExecutionException("Unable to locate source file \"" + _source.getName()
-				+ "\" for staging-out -- skipping it.");
+			throw new ContinuableExecutionException(
+				"Unable to locate source file \"" + _source.getName() + "\" for staging-out -- skipping it.");
 		}
 
 		try {

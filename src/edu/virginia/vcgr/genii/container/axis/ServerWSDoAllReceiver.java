@@ -336,8 +336,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			throw new WSSecurityException(e.getMessage(), e);
 		}
 	}
-	
-	//hmmm: !!!!!! move the authentication stuff to a more stable place.  this class is way too big!
+
+	// hmmm: !!!!!! move the authentication stuff to a more stable place. this class is way too big!
 
 	/**
 	 * Evaluate whether a given certificate should be trusted. Hook to allow subclasses to implement custom validation methods however they

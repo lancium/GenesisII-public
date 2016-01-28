@@ -113,9 +113,8 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("INSERT INTO q2resources " + "(queueid, resourcename, resourceendpoint, totalslots) "
-					+ "VALUES (?, ?, ?, 1)");
+			stmt = connection.prepareStatement(
+				"INSERT INTO q2resources " + "(queueid, resourcename, resourceendpoint, totalslots) " + "VALUES (?, ?, ?, 1)");
 			stmt.setString(1, _queueID);
 			stmt.setString(2, name);
 			stmt.setBlob(3, EPRUtils.toBlob(epr, "q2resources", "resourceendpoint"));
@@ -288,10 +287,9 @@ public class QueueDatabase
 		Collection<JobData> allJobs = new LinkedList<JobData>();
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT a.jobid, a.jobticket, a.priority, a.state, a.submittime, "
-					+ "a.runattempts, a.resourceid, b.historytoken, a.callingcontext," + "a.jsdl " + ", a.rpcid "
-					+ "FROM q2jobs AS a LEFT OUTER JOIN q2jobhistorytokens AS b " + "ON a.jobid = b.jobid WHERE a.queueid = ?");
+			stmt = connection.prepareStatement("SELECT a.jobid, a.jobticket, a.priority, a.state, a.submittime, "
+				+ "a.runattempts, a.resourceid, b.historytoken, a.callingcontext," + "a.jsdl " + ", a.rpcid "
+				+ "FROM q2jobs AS a LEFT OUTER JOIN q2jobhistorytokens AS b " + "ON a.jobid = b.jobid WHERE a.queueid = ?");
 			stmt.setString(1, _queueID);
 			rs = stmt.executeQuery();
 
@@ -333,17 +331,15 @@ public class QueueDatabase
 						state = QueueStates.ERROR;
 					}
 
-					data =
-						new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket,
-							rs.getShort(3), state, new Date(rs.getTimestamp(5).getTime()), rs.getShort(6),
-							HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)));
+					data = new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket,
+						rs.getShort(3), state, new Date(rs.getTimestamp(5).getTime()), rs.getShort(6),
+						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)));
 
 				} else {
 
-					data =
-						new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
-							new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
-							HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)));
+					data = new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
+						new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
+						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)));
 				}
 
 				Blob blob = rs.getBlob(8);
@@ -395,9 +391,8 @@ public class QueueDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("UPDATE q2jobs SET runattempts = ?, state = ?, "
-					+ "finishtime = ?, jobendpoint = ?, resourceid = ?, " + "resourceendpoint = ? WHERE jobid = ?");
+			stmt = connection.prepareStatement("UPDATE q2jobs SET runattempts = ?, state = ?, "
+				+ "finishtime = ?, jobendpoint = ?, resourceid = ?, " + "resourceendpoint = ? WHERE jobid = ?");
 			stmt.setShort(1, attempts);
 			stmt.setString(2, newState.name());
 			stmt.setTimestamp(3, new Timestamp(finishTime.getTime()));
@@ -494,9 +489,8 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
-					+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
+			stmt = connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
+				+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));
@@ -536,8 +530,7 @@ public class QueueDatabase
 	}
 
 	public long submitJob(SweepingJob sweep, Connection connection, String ticket, short priority, JobDefinition_Type jsdl,
-		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime)
-		throws SQLException, IOException
+		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime) throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -551,9 +544,8 @@ public class QueueDatabase
 			if (_logger.isDebugEnabled())
 				_logger.debug("loaded sweep job state of: " + sweepState);
 
-			stmt =
-				connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
-					+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
+			stmt = connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
+				+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));
@@ -610,8 +602,8 @@ public class QueueDatabase
 	 * @throws ResourceException
 	 */
 	@SuppressWarnings("unchecked")
-	public HashMap<Long, PartialJobInfo> getPartialJobInfos(Connection connection, Collection<Long> jobIDs) throws SQLException,
-		ResourceException
+	public HashMap<Long, PartialJobInfo> getPartialJobInfos(Connection connection, Collection<Long> jobIDs)
+		throws SQLException, ResourceException
 	{
 		HashMap<Long, PartialJobInfo> ret = new HashMap<Long, PartialJobInfo>();
 		PreparedStatement stmt = null;
@@ -696,8 +688,8 @@ public class QueueDatabase
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	public void markStarting(Connection connection, Collection<ResourceMatch> matches, Set<ResourceMatch> badMatches) throws SQLException,
-		ResourceException
+	public void markStarting(Connection connection, Collection<ResourceMatch> matches, Set<ResourceMatch> badMatches)
+		throws SQLException, ResourceException
 	{
 		PreparedStatement query = null;
 		ResultSet rs = null;
@@ -705,9 +697,8 @@ public class QueueDatabase
 
 		try {
 			query = connection.prepareStatement("SELECT resourceendpoint " + "FROM q2resources WHERE resourceid = ?");
-			stmt =
-				connection.prepareStatement("UPDATE q2jobs SET state = ?, starttime = ?, "
-					+ "resourceid = ?, resourceendpoint = ? WHERE jobid = ?");
+			stmt = connection
+				.prepareStatement("UPDATE q2jobs SET state = ?, starttime = ?, " + "resourceid = ?, resourceendpoint = ? WHERE jobid = ?");
 
 			for (ResourceMatch match : matches) {
 				if (badMatches.contains(match)) {
@@ -813,8 +804,8 @@ public class QueueDatabase
 			if (!rs.next())
 				throw new ResourceException("Unable to find entry for job " + jobID);
 
-			return new JobStartInformation((ICallingContext) DBSerializer.fromBlob(rs.getBlob(1)), DBSerializer.xmlFromBlob(
-				JobDefinition_Type.class, rs.getBlob(2)));
+			return new JobStartInformation((ICallingContext) DBSerializer.fromBlob(rs.getBlob(1)),
+				DBSerializer.xmlFromBlob(JobDefinition_Type.class, rs.getBlob(2)));
 		} catch (ClassNotFoundException cnfe) {
 			throw new ResourceException("Unable to deserialize calling " + "context and jsdl for job " + jobID, cnfe);
 		} catch (IOException ioe) {

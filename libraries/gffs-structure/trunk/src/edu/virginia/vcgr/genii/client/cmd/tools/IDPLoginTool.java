@@ -140,17 +140,16 @@ public class IDPLoginTool extends BaseLoginTool
 		ArrayList<MessageElement> elements = new ArrayList<MessageElement>();
 
 		// Add RequestType element
-		MessageElement element =
-			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestType"), new RequestTypeOpenEnum(
-				RequestTypeEnum._value1));
+		MessageElement element = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestType"),
+			new RequestTypeOpenEnum(RequestTypeEnum._value1));
 		element.setType(RequestTypeOpenEnum.getTypeDesc().getXmlType());
 		elements.add(element);
 
 		// Add Lifetime element
 		SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		zulu.setTimeZone(TimeZone.getTimeZone("ZULU"));
-		element =
-			new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "Lifetime"), new LifetimeType(
+		element = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "Lifetime"),
+			new LifetimeType(
 				new AttributedDateTime(zulu.format(new Date(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset))),
 				new AttributedDateTime(zulu.format(new Date(System.currentTimeMillis() + validMillis)))));
 		element.setType(LifetimeType.getTypeDesc().getXmlType());
@@ -174,9 +173,8 @@ public class IDPLoginTool extends BaseLoginTool
 				MessageElement wseTokenRef = new MessageElement(GenesisIIConstants.WSSE11_NS_SECURITY_QNAME);
 				wseTokenRef.addChild(embedded);
 
-				element =
-					new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "DelegateTo"), new DelegateToType(
-						new MessageElement[] { wseTokenRef }));
+				element = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "DelegateTo"),
+					new DelegateToType(new MessageElement[] { wseTokenRef }));
 				element.setType(DelegateToType.getTypeDesc().getXmlType());
 				elements.add(element);
 				if (_logger.isDebugEnabled())

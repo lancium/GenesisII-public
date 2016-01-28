@@ -41,8 +41,8 @@ public class PasswordDialog extends JDialog implements ActionListener
 
 		container.setLayout(new GridBagLayout());
 
-		container.add(new JLabel(prompt), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.WEST,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JLabel(prompt), new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 		container.add((_password = new JPasswordField()), new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		_password.setActionCommand(_OK_ACTION);
@@ -51,14 +51,14 @@ public class PasswordDialog extends JDialog implements ActionListener
 		JButton button = new JButton("OK");
 		button.setActionCommand(_OK_ACTION);
 		button.addActionListener(this);
-		container.add(button, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10,
-			10, 10, 10), 10, 10));
+		container.add(button, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(10, 10, 10, 10), 10, 10));
 
 		button = new JButton("Cancel");
 		button.setActionCommand(_CANCEL_ACTION);
 		button.addActionListener(this);
-		container.add(button, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10,
-			10, 10, 10), 10, 10));
+		container.add(button, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+			new Insets(10, 10, 10, 10), 10, 10));
 	}
 
 	public void actionPerformed(ActionEvent arg0)

@@ -31,8 +31,8 @@ public class LazilyLoadedTab extends JPanel
 		super(new GridBagLayout());
 
 		_loadHandler = handler;
-		add(component, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(component,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		addComponentListener(new ComponentListenerImpl());
 	}

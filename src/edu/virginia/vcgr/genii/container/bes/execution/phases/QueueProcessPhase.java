@@ -139,16 +139,16 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 		setExportedEnvironment(_environment);
 		history.createDebugWriter("Activity Environment Set").format("Activity environment set to %s", _environment).close();
-		
-		// ASG 2015-11-05. Updated to get a nice log message 
+
+		// ASG 2015-11-05. Updated to get a nice log message
 		ICallingContext callContext = context.getCallingContext();
 
 		String prefId = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
 		X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(callContext, prefId);
 		String userName = CredentialWallet.extractUsername(owner);
-		if (userName==null) userName="UnKnown";
+		if (userName == null)
+			userName = "UnKnown";
 
-		
 		// End of updates
 
 		synchronized (_phaseShiftLock) {
@@ -182,12 +182,12 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					hWriter.format(" %s", arg);
 				hWriter.close();
 
-				_jobToken =
-					queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
-						_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null), fileToPath(
-							_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
+				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
+					_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null),
+					fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
 
-				_logger.info(String.format("Queue submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,_jobToken.getCmdLine()));
+				_logger.info(String.format("Queue submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,
+					_jobToken.getCmdLine()));
 				history.createTraceWriter("Job Queued into Batch System")
 					.format("BES submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()).close();
 
@@ -253,8 +253,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			}
 
 			ExitCondition exitCondition = interpretExitCode(exitCode);
-			_logger.info(String.format("Process exited with %s.", (exitCondition instanceof SignaledExit) ? ("Signal " + exitCondition)
-				: ("Exit code " + exitCondition)));
+			_logger.info(String.format("Process exited with %s.",
+				(exitCondition instanceof SignaledExit) ? ("Signal " + exitCondition) : ("Exit code " + exitCondition)));
 			if (exitCode == 257)
 				throw new IgnoreableFault("Queue process exited with signal.");
 		}

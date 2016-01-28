@@ -206,9 +206,8 @@ public class Container extends ApplicationBase
 			// Determine if we should accept self signed certificates
 			if (_containerConfiguration.trustSelfSigned()) {
 				SslInformation sslinfo = _containerConfiguration.getSslInformation();
-				SslContextFactory fac =
-					new TrustAllSslContextFactory(sslinfo.getKeystoreFilename(), sslinfo.getKeyPassword(), sslinfo.getKeystorePassword(),
-						sslinfo.getKeystoreType());
+				SslContextFactory fac = new TrustAllSslContextFactory(sslinfo.getKeystoreFilename(), sslinfo.getKeyPassword(),
+					sslinfo.getKeystorePassword(), sslinfo.getKeystoreType());
 				connector = new SslSelectChannelConnector(fac);
 				_logger.info("Note: accepting connections from self signed certificates");
 
@@ -316,15 +315,15 @@ public class Container extends ApplicationBase
 			}
 		}
 
-		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue, Installation.getDeployment(new DeploymentName())
-			.getServicesDirectory());
+		ServiceDeployer.startServiceDeployer(_axisServer, _postStartupWorkQueue,
+			Installation.getDeployment(new DeploymentName()).getServicesDirectory());
 
 		ServerWSDoAllReceiver.beginNormalRuntime();
 	}
 
 	@SuppressWarnings("unchecked")
-	static private Collection<Class<? extends IServiceWithCleanupHook>> initializeServices(WebAppContext ctxt) throws ServletException,
-		AxisFault
+	static private Collection<Class<? extends IServiceWithCleanupHook>> initializeServices(WebAppContext ctxt)
+		throws ServletException, AxisFault
 	{
 		Collection<Class<? extends IServiceWithCleanupHook>> managedServiceClasses =
 			new LinkedList<Class<? extends IServiceWithCleanupHook>>();
@@ -372,8 +371,8 @@ public class Container extends ApplicationBase
 		}
 	}
 
-	static private void initializeIdentitySecurity(XMLConfiguration serverConf) throws ConfigurationException, KeyStoreException,
-		GeneralSecurityException, IOException
+	static private void initializeIdentitySecurity(XMLConfiguration serverConf)
+		throws ConfigurationException, KeyStoreException, GeneralSecurityException, IOException
 	{
 		Security resourceIdSecProps = Installation.getDeployment(new DeploymentName()).security();
 		String keyStoreLoc = resourceIdSecProps.getSigningKeystoreFile();

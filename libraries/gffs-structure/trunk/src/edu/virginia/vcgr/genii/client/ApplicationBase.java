@@ -221,7 +221,8 @@ public class ApplicationBase
 	// a default for the state directory, if one cannot be found elsewhere.
 	static String getDefaultUserDir()
 	{
-		return String.format("%s/%s", FileSystemHelper.sanitizeFilename(System.getProperty("user.home")), GenesisIIConstants.GENESISII_STATE_DIR_NAME);
+		return String.format("%s/%s", FileSystemHelper.sanitizeFilename(System.getProperty("user.home")),
+			GenesisIIConstants.GENESISII_STATE_DIR_NAME);
 	}
 
 	/**

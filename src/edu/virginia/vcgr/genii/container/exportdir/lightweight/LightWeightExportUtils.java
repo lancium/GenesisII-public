@@ -49,9 +49,8 @@ public class LightWeightExportUtils
 				if (svnEnabled && (rootDirString.matches("^.+:.*$"))) {
 					// Handle SVN export types.
 					Long revision = (Long) resource.getProperty(LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME);
-					vroot =
-						new SVNExportRoot(rootDirString, (String) resource.getProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME),
-							(String) resource.getProperty(LightWeightExportConstants.SVN_PASS_PROPERTY_NAME), revision);
+					vroot = new SVNExportRoot(rootDirString, (String) resource.getProperty(LightWeightExportConstants.SVN_USER_PROPERTY_NAME),
+						(String) resource.getProperty(LightWeightExportConstants.SVN_PASS_PROPERTY_NAME), revision);
 					if (revision == null)
 						return vroot;
 				} else {
@@ -67,8 +66,8 @@ public class LightWeightExportUtils
 						 */
 						exportType = ExportMechanisms.EXPORT_MECH_ACL;
 						if (_logger.isDebugEnabled())
-							_logger.debug("did not find stored export mode; falling back to older export creation mode of: "
-								+ exportType.toString());
+							_logger.debug(
+								"did not find stored export mode; falling back to older export creation mode of: " + exportType.toString());
 					}
 					if (exportType.equals(ExportMechanisms.EXPORT_MECH_PROXYIO)) {
 						String unixUsername = SudoExportUtils.getExportOwnerUser(rKey);

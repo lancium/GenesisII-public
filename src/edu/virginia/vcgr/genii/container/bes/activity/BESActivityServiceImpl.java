@@ -106,8 +106,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType activityEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
-		RemoteException
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, activityEPR, cParams, creationParameters, resolverCreationParams);
 
@@ -139,9 +139,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			if (cConfig != null) {
 				PersonalityProvider provider = new ExecutionProvider();
 				JobRequest tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
-				executionPlan =
-					CloudJobWrapper.createExecutionPlan(_resource.getKey().toString(), initInfo.getContainerID(), tJob,
-						((BESConstructionParameters) cParams));
+				executionPlan = CloudJobWrapper.createExecutionPlan(_resource.getKey().toString(), initInfo.getContainerID(), tJob,
+					((BESConstructionParameters) cParams));
 				jobName = tJob.getJobName();
 			} else {
 
@@ -172,8 +171,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			try {
 				WSName wsname = new WSName(activityEPR);
 				if (wsname.isValidWSName())
-					_logger.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(),
-						_resource.getKey()));
+					_logger
+						.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(), _resource.getKey()));
 			} catch (Throwable cause) {
 				// This shouldn't fail, but I can't test it now and it's just
 				// for a print statement.

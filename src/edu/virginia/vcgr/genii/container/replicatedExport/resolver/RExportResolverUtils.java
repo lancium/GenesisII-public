@@ -164,9 +164,8 @@ public class RExportResolverUtils
 		RExportResolverFactoryPortType resolverFactoryProxy = null;
 
 		try {
-			resolverFactoryProxy =
-				ClientUtils.createProxy(RExportResolverFactoryPortType.class,
-					EPRUtils.makeEPR(Container.getServiceURL("RExportResolverFactoryPortType")));
+			resolverFactoryProxy = ClientUtils.createProxy(RExportResolverFactoryPortType.class,
+				EPRUtils.makeEPR(Container.getServiceURL("RExportResolverFactoryPortType")));
 		} catch (Exception e) {
 			throw new CreationException("Could not create proxy to resolver factory", e);
 		}
@@ -217,9 +216,8 @@ public class RExportResolverUtils
 			// setup proxy to export resolver (to container where resolver was created)
 			RExportResolverPortType resolverService = ClientUtils.createProxy(RExportResolverPortType.class, resolverEPR);
 
-			replicaEPR =
-				resolverService.createReplica(new CreateReplicaRequest(resolvedEPR, primaryDataStream, replicaType, replicaName))
-					.getReplica_EPR();
+			replicaEPR = resolverService.createReplica(new CreateReplicaRequest(resolvedEPR, primaryDataStream, replicaType, replicaName))
+				.getReplica_EPR();
 		} catch (Exception e) {
 			throw new ResourceException("Unable to connect to rexport resolver to create replica.", e);
 		} finally {
@@ -439,7 +437,7 @@ public class RExportResolverUtils
 
 	/**
 	 * Notify specified resolver to terminate
-	 * */
+	 */
 	static protected void destroyResolver(EndpointReferenceType resolverEPR) throws ResourceException
 	{
 		RExportResolverPortType resolverServiceProxy = null;

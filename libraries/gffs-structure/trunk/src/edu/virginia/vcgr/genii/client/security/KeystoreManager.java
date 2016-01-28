@@ -92,9 +92,8 @@ public class KeystoreManager
 
 			Security sslProps = getSSLProperties();
 
-			String trustStoreType =
-				sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
-					KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+			String trustStoreType = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
+				KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
 
 			{
 				// load the local certificates from the state directory. this is the only place
@@ -170,8 +169,8 @@ public class KeystoreManager
 		 */
 		String gridCertificatesDirectory = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_GRID_CERTIFICATES_LOCATION_PROP);
 		if (gridCertificatesDirectory == null) {
-			_logger.warn("no grid-certificates folder listed for property: "
-				+ KeystoreSecurityConstants.Client.SSL_GRID_CERTIFICATES_LOCATION_PROP);
+			_logger.warn(
+				"no grid-certificates folder listed for property: " + KeystoreSecurityConstants.Client.SSL_GRID_CERTIFICATES_LOCATION_PROP);
 			return null;
 		}
 		boolean absolutePath = gridCertificatesDirectory.startsWith("/");
@@ -203,9 +202,8 @@ public class KeystoreManager
 			try {
 				trustStore = loadTLSTrustStoreFile();
 
-				String trustStoreType =
-					sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
-						KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+				String trustStoreType = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
+					KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
 
 				{
 					// load the local certificates from the state directory. this is the only place
@@ -286,9 +284,8 @@ public class KeystoreManager
 		try {
 			Security security = Installation.getDeployment(new DeploymentName()).security();
 			String trustStoreLoc = security.getProperty(KeystoreSecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_LOCATION_PROP);
-			String trustStoreType =
-				security.getProperty(KeystoreSecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_TYPE_PROP,
-					KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+			String trustStoreType = security.getProperty(KeystoreSecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_TYPE_PROP,
+				KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
 			String trustStorePass = security.getProperty(KeystoreSecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_PASSWORD_PROP);
 
 			// open the trust store
@@ -365,9 +362,8 @@ public class KeystoreManager
 
 		// open the trust store file.
 		String trustStoreLoc = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_LOCATION_PROP);
-		String trustStoreType =
-			sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
-				KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+		String trustStoreType = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP,
+			KeystoreSecurityConstants.TRUST_STORE_TYPE_DEFAULT);
 		String trustStorePass = sslProps.getProperty(KeystoreSecurityConstants.Client.SSL_TRUST_STORE_PASSWORD_PROP);
 
 		KeyStore trustStore = null;
@@ -383,8 +379,9 @@ public class KeystoreManager
 					CertTool.openStoreDirectPath(Installation.getDeployment(new DeploymentName()).security().getSecurityFile(trustStoreLoc),
 						trustStoreType, trustStorePassChars);
 			} catch (Throwable cause) {
-				_logger.warn("Trust store failed to load from file " + trustStoreLoc
-					+ "; will attempt to load trusted certificates from directory.", cause);
+				_logger.warn(
+					"Trust store failed to load from file " + trustStoreLoc + "; will attempt to load trusted certificates from directory.",
+					cause);
 			}
 		}
 

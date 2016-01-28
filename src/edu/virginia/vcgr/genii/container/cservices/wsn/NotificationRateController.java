@@ -31,6 +31,7 @@ public class NotificationRateController
 	static private Log _logger = LogFactory.getLog(NotificationRateController.class);
 
 	private static final List<TopicPath> CONSTRICTED_NOTIFICATION_TYPES;
+
 	static {
 		CONSTRICTED_NOTIFICATION_TYPES = new ArrayList<TopicPath>();
 		CONSTRICTED_NOTIFICATION_TYPES.add(RNSTopics.RNS_CONTENT_CHANGE_TOPIC);

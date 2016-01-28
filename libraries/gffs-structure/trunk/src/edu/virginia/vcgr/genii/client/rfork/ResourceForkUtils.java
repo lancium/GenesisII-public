@@ -15,7 +15,7 @@ public class ResourceForkUtils
 		if (mt != null)
 			mt = new MetadataType(mt.get_any());
 
-		return new EndpointReferenceType(new AttributedURIType(originalEPR.getAddress().get_value()), new AddressingParameters(
-			originalEPR.getReferenceParameters()).toReferenceParameters(), mt, originalEPR.get_any());
+		return new EndpointReferenceType(new AttributedURIType(originalEPR.getAddress().get_value()),
+			new AddressingParameters(originalEPR.getReferenceParameters()).toReferenceParameters(), mt, originalEPR.get_any());
 	}
 }

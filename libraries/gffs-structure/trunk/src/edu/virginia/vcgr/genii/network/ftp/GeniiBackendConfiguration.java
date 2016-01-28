@@ -80,8 +80,8 @@ public class GeniiBackendConfiguration implements Cloneable
 		}
 	}
 
-	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr) throws RNSException,
-		FileNotFoundException, IOException, ReloadShellException, ToolException
+	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr)
+		throws RNSException, FileNotFoundException, IOException, ReloadShellException, ToolException
 	{
 		this(stdin, stdout, stderr, ContextManager.getExistingContext());
 	}

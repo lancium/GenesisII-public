@@ -34,8 +34,8 @@ public class JobHistoryFrame extends JFrame
 					if (id != null && (id.equals(queueName)))
 						source = new SimpleStringHistoryEventSource(queue.toString(), null, source);
 
-					tempEvents.add(new HistoryEvent(event.eventNumber(), event.eventTimestamp(), source, event.eventLevel(), event
-						.eventCategory(), event.eventProperties(), event.eventData()));
+					tempEvents.add(new HistoryEvent(event.eventNumber(), event.eventTimestamp(), source, event.eventLevel(),
+						event.eventCategory(), event.eventProperties(), event.eventData()));
 				}
 
 				events = tempEvents;
@@ -47,8 +47,8 @@ public class JobHistoryFrame extends JFrame
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new HistoryTreePanel(context, queue, ticketNumber, events), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new HistoryTreePanel(context, queue, ticketNumber, events),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}

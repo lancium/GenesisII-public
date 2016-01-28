@@ -175,8 +175,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	// converts from unicore's delegation restrictions object to our basic constraints form.
 	public static BasicConstraints convert(DelegationRestrictions toConvert)
 	{
-		return new BasicConstraints(toConvert.getNotBefore().getTime(), toConvert.getNotOnOrAfter().getTime()
-			- toConvert.getNotBefore().getTime(), toConvert.getMaxProxyCount());
+		return new BasicConstraints(toConvert.getNotBefore().getTime(),
+			toConvert.getNotOnOrAfter().getTime() - toConvert.getNotBefore().getTime(), toConvert.getMaxProxyCount());
 	}
 
 	public X509Certificate[] getDelegatee()
@@ -280,7 +280,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		try {
 			checkValidity(new Date());
 		} catch (AttributeInvalidException cause) {
-			_logger.error("caught invalid attribute in TrustCredential isValid check", cause);			
+			_logger.error("caught invalid attribute in TrustCredential isValid check", cause);
 			return false;
 		}
 		return true;
@@ -373,8 +373,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 			throw new SecurityException("failure: an attempt to link a null credential.");
 
 		if (_logger.isTraceEnabled()) {
-			_logger.debug("linking trust delegations:\nthis one is:\n" + this.toString() + "\nand we will link to:\n"
-				+ priorPortionOfChain.toString());
+			_logger.debug(
+				"linking trust delegations:\nthis one is:\n" + this.toString() + "\nand we will link to:\n" + priorPortionOfChain.toString());
 		}
 
 		// check the length of chain to catch any attempt to over-extend it.
@@ -479,9 +479,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				stc.checkTrust(delegation.getXMLBeanDoc());
 				_logger.debug("SUCCESS checking trust delegation just made.");
 			} catch (Exception e) {
-				_logger.error(
-					"exception checking signature just made for cred: " + toString() + " and last few frames are: "
-						+ ProgramTools.showLastFewOnStack(28), e);
+				_logger.error("exception checking signature just made for cred: " + toString() + " and last few frames are: "
+					+ ProgramTools.showLastFewOnStack(28), e);
 			}
 
 			AssertionDocument doc = delegation.getXMLBeanDoc();
@@ -590,8 +589,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				stc.checkTrust(delegation.getXMLBeanDoc());
 			}
 		} catch (Exception e) {
-			throw new SecurityException("failure: an invalid trust delegation was found!  delegation has subject "
-				+ delegation.getSubjectDN() + ", custodian " + delegation.getCustodianDN() + ", and issuer " + delegation.getIssuerDN(), e);
+			throw new SecurityException("failure: an invalid trust delegation was found!  delegation has subject " + delegation.getSubjectDN()
+				+ ", custodian " + delegation.getCustodianDN() + ", and issuer " + delegation.getIssuerDN(), e);
 		}
 		this.delegation = delegation;
 		this.signed = true;
@@ -692,13 +691,13 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				throw new AttributeInvalidException(msg);
 			}
 		}
-		
+
 		try {
 			// test our constraints.
 			getConstraints().checkValidity(getDelegationDepth(), date);
 		} catch (AttributeInvalidException t) {
 			if (performLogging) {
-				_logger.error("failed to validate basic date validity or delegation depth", t);				
+				_logger.error("failed to validate basic date validity or delegation depth", t);
 			}
 			throw t;
 		}
@@ -711,9 +710,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 		try {
 			synchronized (delegation) {
 				if (!delegation.getIssuerFromSignature()[0].equals(getIssuer()[0])) {
-					String msg =
-						"the signature in TD and signature here do not match! deleg issuer="
-							+ delegation.getIssuerFromSignature()[0].getSubjectDN() + " vs. issuer here=" + getIssuer()[0].getSubjectDN();
+					String msg = "the signature in TD and signature here do not match! deleg issuer="
+						+ delegation.getIssuerFromSignature()[0].getSubjectDN() + " vs. issuer here=" + getIssuer()[0].getSubjectDN();
 					if (performLogging)
 						_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
 					throw new AttributeInvalidException(msg);
@@ -722,9 +720,8 @@ public class TrustCredential implements NuCredential, RWXAccessible
 				stc.checkTrust(delegation.getXMLBeanDoc());
 			}
 		} catch (SAMLValidationException e) {
-			String msg =
-				"failed to validate signature on our TrustDelegation: " + e.getMessage() + "\n...testing on: " + toString() + " signed by "
-					+ getIssuer()[0].getSubjectDN();
+			String msg = "failed to validate signature on our TrustDelegation: " + e.getMessage() + "\n...testing on: " + toString()
+				+ " signed by " + getIssuer()[0].getSubjectDN();
 			if (performLogging)
 				_logger.error(msg + " ...came in via: " + ProgramTools.showLastFewOnStack(5));
 			throw new AttributeInvalidException(msg);
@@ -735,7 +732,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	}
 
 	/**
-	 * tests that the credential is valid.  this method is used by unicore gffs interop.
+	 * tests that the credential is valid. this method is used by unicore gffs interop.
 	 */
 	@Override
 	public void checkValidity(Date date) throws AttributeInvalidException

@@ -53,8 +53,8 @@ public class DynamicPageLoader
 			PageContextDescription pageDescription = pageDescriptions.get(context);
 
 			ContextHandler cHandler = new ContextHandler(context);
-			addHandler(cHandler,
-				new DynamicPageContext(dpagePackage.classLoader(), pageDescription.resourceBase(), pageDescription.injectionHandlerFactory()));
+			addHandler(cHandler, new DynamicPageContext(dpagePackage.classLoader(), pageDescription.resourceBase(),
+				pageDescription.injectionHandlerFactory()));
 			addHandler(jettyServer, cHandler);
 		}
 		dpagePackage.close();

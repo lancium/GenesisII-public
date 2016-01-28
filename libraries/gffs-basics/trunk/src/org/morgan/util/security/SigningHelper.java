@@ -41,8 +41,8 @@ import org.morgan.util.io.StreamUtils;
  */
 public class SigningHelper
 {
-	static public byte[] signStream(InputStream in, PrivateKey k) throws NoSuchAlgorithmException, InvalidKeyException, IOException,
-		SignatureException
+	static public byte[] signStream(InputStream in, PrivateKey k)
+		throws NoSuchAlgorithmException, InvalidKeyException, IOException, SignatureException
 	{
 		Signature signer = Signature.getInstance(k.getAlgorithm());
 		signer.initSign(k);
@@ -86,8 +86,8 @@ public class SigningHelper
 		}
 	}
 
-	static public void signFile(File input, File signatureFile, PrivateKey key) throws KeyStoreException, UnrecoverableKeyException,
-		NoSuchAlgorithmException, IOException, InvalidKeyException, SignatureException
+	static public void signFile(File input, File signatureFile, PrivateKey key)
+		throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, InvalidKeyException, SignatureException
 	{
 		FileInputStream fin = null;
 		FileOutputStream fout = null;
@@ -103,8 +103,8 @@ public class SigningHelper
 		}
 	}
 
-	static public boolean verifySignature(InputStream in, byte[] signature, Certificate cert) throws SignatureException, IOException,
-		NoSuchAlgorithmException, InvalidKeyException
+	static public boolean verifySignature(InputStream in, byte[] signature, Certificate cert)
+		throws SignatureException, IOException, NoSuchAlgorithmException, InvalidKeyException
 	{
 		PublicKey key = cert.getPublicKey();
 		Signature signer = Signature.getInstance(key.getAlgorithm());
@@ -161,8 +161,8 @@ public class SigningHelper
 		}
 	}
 
-	static public boolean verifySignature(File inputFile, File signatureFile, Certificate cert) throws SignatureException, IOException,
-		NoSuchAlgorithmException, InvalidKeyException
+	static public boolean verifySignature(File inputFile, File signatureFile, Certificate cert)
+		throws SignatureException, IOException, NoSuchAlgorithmException, InvalidKeyException
 	{
 		FileInputStream fin = null;
 

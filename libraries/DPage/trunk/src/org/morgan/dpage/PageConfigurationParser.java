@@ -59,14 +59,14 @@ class PageConfigurationParser extends DefaultHandler
 			try {
 				_pageDescriptions.put(context, new PageContextDescription(context, resourceBase, injectionHandlerFactoryClassName));
 			} catch (ClassNotFoundException e) {
-				throw new SAXParseException(String.format("Unable to create injection handler factory \"%s\".",
-					injectionHandlerFactoryClassName), _locator, e);
+				throw new SAXParseException(
+					String.format("Unable to create injection handler factory \"%s\".", injectionHandlerFactoryClassName), _locator, e);
 			} catch (InstantiationException e) {
-				throw new SAXParseException(String.format("Unable to create injection handler factory \"%s\".",
-					injectionHandlerFactoryClassName), _locator, e);
+				throw new SAXParseException(
+					String.format("Unable to create injection handler factory \"%s\".", injectionHandlerFactoryClassName), _locator, e);
 			} catch (IllegalAccessException e) {
-				throw new SAXParseException(String.format("Unable to create injection handler factory \"%s\".",
-					injectionHandlerFactoryClassName), _locator, e);
+				throw new SAXParseException(
+					String.format("Unable to create injection handler factory \"%s\".", injectionHandlerFactoryClassName), _locator, e);
 			}
 		}
 	}

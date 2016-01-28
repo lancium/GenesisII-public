@@ -57,16 +57,17 @@ public class SMBConnection implements Runnable
 	static private Log _logger = LogFactory.getLog(SMBConnection.class);
 
 	private SocketChannel client;
-//	private int maxBufferSize = 0x20000;
-	//subtracting 4 bytes for netbios header.
+	// private int maxBufferSize = 0x20000;
+	// subtracting 4 bytes for netbios header.
 	private int maxBufferSize = 0x10000 - 4;
-//	private int maxBufferSize = 16644 - 4;
-	//hmmm: theorizing that we were using too big a buffer before...  
-	//this new value was causing problems in getting the buffers!
-	
+	// private int maxBufferSize = 16644 - 4;
+	// hmmm: theorizing that we were using too big a buffer before...
+	// this new value was causing problems in getting the buffers!
+
 	private SMBDialect dialect = SMBDialect.CORE;
 
 	public static SMBCommand[] commands = new SMBCommand[256];
+
 	static {
 		// Core (0x0 - 0x12)
 		commands[0x0] = new SMBCreateDirectory();
@@ -94,10 +95,10 @@ public class SMBConnection implements Runnable
 		// LM10 (0x22 - 0x2F)
 		commands[0x22] = new SMBSetInformation2();
 		commands[0x23] = new SMBQueryInformation2();
-		
-		//commands [0x25] = ...?  this is asked for a lot and we do not implement.
-		//it wants SMB_COM_TRANSACTION 
-			
+
+		// commands [0x25] = ...? this is asked for a lot and we do not implement.
+		// it wants SMB_COM_TRANSACTION
+
 		commands[0x2B] = new SMBEcho();
 		commands[0x2D] = new SMBOpenAndX();
 		commands[0x2E] = new SMBReadAndX();
@@ -153,6 +154,7 @@ public class SMBConnection implements Runnable
 	private SMBTransactionInfo transPending;
 
 	private static SMBTrans2Command[] cmdTrans2 = new SMBTrans2Command[256];
+
 	static {
 		cmdTrans2[1] = new SMBTrans2FindFirst();
 		cmdTrans2[2] = new SMBTrans2FindNext();
@@ -247,8 +249,8 @@ public class SMBConnection implements Runnable
 		if (suffix.length() > 3)
 			return null;
 
-		// prefix = (prefix + "        ").substring(0, 8);
-		// suffix = (suffix + "   ").substring(0, 3);
+		// prefix = (prefix + " ").substring(0, 8);
+		// suffix = (suffix + " ").substring(0, 3);
 
 		if (suffix.isEmpty()) {
 			return prefix;
@@ -294,7 +296,7 @@ public class SMBConnection implements Runnable
 	public void send(SMBBuffer buffer) throws IOException
 	{
 		// way too noisy for normal debug.
-		//hmmm: reads will be way too noisy when they are chunks of file updates too.
+		// hmmm: reads will be way too noisy when they are chunks of file updates too.
 		if (_logger.isTraceEnabled())
 			_logger.debug("sending buffer:\n" + TextHelper.dumpByteArray(buffer.preparePacket().array()));
 		CommUtils.writeFully(client, buffer.preparePacket());
@@ -394,15 +396,16 @@ public class SMBConnection implements Runnable
 
 		/* Locate the command handler */
 		SMBCommand handler = commands[command];
-		
+
 		if (handler == null) {
 			_logger.warn("failed to find handler for command!  cmd=0x" + Integer.toHexString(command));
 			sendError(h, acc, NTStatus.NOT_IMPLEMENTED);
 			return;
 		}
-		
+
 		if (_logger.isDebugEnabled()) {
-			_logger.debug("Handling command (AND_X): 0x" + Integer.toHexString(command) + " with handler " + handler.getClass().getSimpleName());
+			_logger
+				.debug("Handling command (AND_X): 0x" + Integer.toHexString(command) + " with handler " + handler.getClass().getSimpleName());
 		}
 
 		// Remember the position so we can undo any changes if an exception occurs
@@ -439,7 +442,7 @@ public class SMBConnection implements Runnable
 			sendError(h, acc, NTStatus.BUFFER_OVERFLOW);
 		}
 	}
-	
+
 	public boolean doPacket() throws IOException
 	{
 		/* First the packet length */
@@ -466,11 +469,11 @@ public class SMBConnection implements Runnable
 		/* Now the actual SMB packet */
 		ByteBuffer packet = ByteBuffer.allocate(length);
 		CommUtils.readFully(client, packet);
-		
-		//hmmm: reduce the logging level here!
+
+		// hmmm: reduce the logging level here!
 		if (_logger.isDebugEnabled())
 			_logger.debug("received buffer:\n" + TextHelper.dumpByteArray(packet.array()));
-		
+
 		packet.flip();
 
 		/* Convert into an easy to parse form */

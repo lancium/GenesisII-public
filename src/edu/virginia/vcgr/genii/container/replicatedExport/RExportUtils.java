@@ -57,8 +57,8 @@ public class RExportUtils
 	 *            : true if new export entry is dir; false if file
 	 */
 	static public EndpointReferenceType createReplica(EndpointReferenceType primaryEPR, String commonEPI, EndpointReferenceType resolverEPR,
-		String primaryLocalPath, String replicaName, String entryType, EndpointReferenceType dataStreamEPR) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType
+		String primaryLocalPath, String replicaName, String entryType, EndpointReferenceType dataStreamEPR)
+			throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 
 		/* create creation params for replica */

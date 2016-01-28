@@ -109,9 +109,8 @@ public class BESActivityCleanupHandler extends BasicResourceCleanupHandler
 
 		try {
 			stmt = connection.createStatement();
-			rs =
-				stmt.executeQuery("SELECT activityid, besid, jsdl, owners, callingcontext, " + "state, executionplan, activityepr, jobname "
-					+ "FROM besactivitiestable");
+			rs = stmt.executeQuery("SELECT activityid, besid, jsdl, owners, callingcontext, " + "state, executionplan, activityepr, jobname "
+				+ "FROM besactivitiestable");
 
 			while (rs.next()) {
 				try {

@@ -76,9 +76,8 @@ public class EnvironmentExport
 	{
 		try {
 			if (CONTAINER_EXPORT == null) {
-				File file =
-					Installation.getDeployment(new DeploymentName()).getConfigurationFile(
-						EnvironmentVariableExportConstants.GLOBAL_CONFIG_FILE_NAME);
+				File file = Installation.getDeployment(new DeploymentName())
+					.getConfigurationFile(EnvironmentVariableExportConstants.GLOBAL_CONFIG_FILE_NAME);
 				if (file.exists()) {
 					JAXBContext context = JAXBContext.newInstance(EnvironmentExport.class);
 					Unmarshaller u = context.createUnmarshaller();

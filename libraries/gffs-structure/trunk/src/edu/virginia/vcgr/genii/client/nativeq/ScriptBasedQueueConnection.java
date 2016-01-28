@@ -34,8 +34,8 @@ import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 
-public abstract class ScriptBasedQueueConnection<ProviderConfigType extends ScriptBasedQueueConfiguration> extends
-	AbstractNativeQueueConnection<ProviderConfigType>
+public abstract class ScriptBasedQueueConnection<ProviderConfigType extends ScriptBasedQueueConfiguration>
+	extends AbstractNativeQueueConnection<ProviderConfigType>
 {
 	static private Log _logger = LogFactory.getLog(ScriptBasedQueueConnection.class);
 
@@ -45,7 +45,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 	protected ScriptBasedQueueConnection(File workingDirectory, ResourceOverrides resourceOverrides,
 		CmdLineManipulatorConfiguration cmdLineManipulatorConf, NativeQueueConfiguration queueConfig, ProviderConfigType providerConfig)
-		throws NativeQueueException
+			throws NativeQueueException
 	{
 		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, queueConfig, providerConfig);
 	}

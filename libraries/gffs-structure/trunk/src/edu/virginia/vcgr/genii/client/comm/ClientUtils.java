@@ -98,9 +98,8 @@ public class ClientUtils
 			return __clientRsaKeyLength;
 		}
 
-		String rsaKeyLength =
-			Installation.getDeployment(new DeploymentName()).security()
-				.getProperty(KeystoreSecurityConstants.Client.CLIENT_RSA_KEY_LENGTH_PROP);
+		String rsaKeyLength = Installation.getDeployment(new DeploymentName()).security()
+			.getProperty(KeystoreSecurityConstants.Client.CLIENT_RSA_KEY_LENGTH_PROP);
 
 		__clientRsaKeyLength = Integer.parseInt(rsaKeyLength);
 		return __clientRsaKeyLength;
@@ -124,9 +123,9 @@ public class ClientUtils
 		}
 		X509Certificate[] clientCertChain = null;
 		try {
-			clientCertChain =
-				new X509Certificate[] { CertTool.createMasterCert("C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert "
-					+ (new GUID()).toString(), TimeUnit.MILLISECONDS.convert(timeout, units), keyPair.getPublic(), keyPair.getPrivate()) };
+			clientCertChain = new X509Certificate[] {
+				CertTool.createMasterCert("C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert " + (new GUID()).toString(),
+					TimeUnit.MILLISECONDS.convert(timeout, units), keyPair.getPublic(), keyPair.getPrivate()) };
 		} catch (GeneralSecurityException e) {
 			throw new AuthZSecurityException("failure generating keypair: " + e.getLocalizedMessage(), e);
 
@@ -186,9 +185,8 @@ public class ClientUtils
 				 * plus 10 seconds of slop for in transit time outs.
 				 */
 				retval =
-					generateKeyAndCertMaterial(
-						Math.max(edu.virginia.vcgr.genii.security.SecurityConstants.defaultCredentialExpirationMillis, validUntil.getTime()
-							- System.currentTimeMillis() + 10000), TimeUnit.MILLISECONDS);
+					generateKeyAndCertMaterial(Math.max(edu.virginia.vcgr.genii.security.SecurityConstants.defaultCredentialExpirationMillis,
+						validUntil.getTime() - System.currentTimeMillis() + 10000), TimeUnit.MILLISECONDS);
 				callContext.setActiveKeyAndCertMaterial(retval);
 				updated = true;
 
@@ -340,8 +338,8 @@ public class ClientUtils
 	 * @return An dynamically generated client proxy which implements the passed in interface and is configured to communicate to the given
 	 *         EPR.
 	 */
-	static public <IFace> IFace createProxy(Class<IFace> iface, EndpointReferenceType epr) throws ResourceException,
-		GenesisIISecurityException
+	static public <IFace> IFace createProxy(Class<IFace> iface, EndpointReferenceType epr)
+		throws ResourceException, GenesisIISecurityException
 	{
 		try {
 			ICallingContext context = null;
@@ -370,8 +368,8 @@ public class ClientUtils
 	 * @return An dynamically generated client proxy which implements the passed in interface and is configured to communicate to the given
 	 *         EPR.
 	 */
-	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr) throws ResourceException,
-		GenesisIISecurityException
+	static public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, EndpointReferenceType epr)
+		throws ResourceException, GenesisIISecurityException
 	{
 		try {
 			return createProxy(loader, iface, epr, ContextManager.getExistingContext());

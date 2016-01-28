@@ -89,15 +89,13 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 		@Override
 		protected void modifyImpl(QueueResourceInformation row, Integer column)
 		{
-			int answer =
-				JOptionPane.showConfirmDialog(row.parent(), String.format("Change Max Slots for %s to %d?", row.name(), column),
-					"Confirm Slot Change", JOptionPane.YES_NO_OPTION);
+			int answer = JOptionPane.showConfirmDialog(row.parent(), String.format("Change Max Slots for %s to %d?", row.name(), column),
+				"Confirm Slot Change", JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
-				_uiContext
-					.uiContext()
-					.progressMonitorFactory()
-					.createMonitor(row.parent(), "Modifying Slot Count", String.format("Changing %s's slots to %d", row.name(), column),
-						100L, new SlotChangerTask(row, column), new RefreshCompletionListener(row.parent())).start();
+				_uiContext.uiContext().progressMonitorFactory()
+					.createMonitor(row.parent(), "Modifying Slot Count", String.format("Changing %s's slots to %d", row.name(), column), 100L,
+						new SlotChangerTask(row, column), new RefreshCompletionListener(row.parent()))
+					.start();
 			}
 		}
 
@@ -185,20 +183,17 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 
 	void refresh(Component parentComponent)
 	{
-		_uiContext
-			.uiContext()
-			.progressMonitorFactory()
-			.createMonitor(parentComponent, "Loading Queue Resources", "Fetching resources from queue", 1000L,
-				new QueueResourcesFetcherTask(), new QueueResourcesCompletionListener(parentComponent)).start();
+		_uiContext.uiContext().progressMonitorFactory().createMonitor(parentComponent, "Loading Queue Resources",
+			"Fetching resources from queue", 1000L, new QueueResourcesFetcherTask(), new QueueResourcesCompletionListener(parentComponent))
+			.start();
 	}
 
 	ResourcesTableModel(UIPluginContext uiContext) throws ResourceException, GenesisIISecurityException, RNSPathDoesNotExistException
 	{
 		_uiContext = uiContext;
 		_rnsFuture = uiContext.uiContext().executor().submit(new AsynchronousQueueResourcesExtractor(uiContext));
-		_queue =
-			ClientUtils.createProxy(QueuePortType.class, _uiContext.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint(),
-				_uiContext.uiContext().callingContext());
+		_queue = ClientUtils.createProxy(QueuePortType.class,
+			_uiContext.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint(), _uiContext.uiContext().callingContext());
 	}
 
 	@Override

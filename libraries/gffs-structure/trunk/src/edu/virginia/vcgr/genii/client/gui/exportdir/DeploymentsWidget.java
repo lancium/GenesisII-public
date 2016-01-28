@@ -33,8 +33,8 @@ public class DeploymentsWidget extends JComponent
 		super();
 
 		setLayout(new GridBagLayout());
-		add(new JLabel(_DEPLOYMENTS), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel(_DEPLOYMENTS),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		Vector<ContainerInformation> containers = new Vector<ContainerInformation>();
 
@@ -47,8 +47,8 @@ public class DeploymentsWidget extends JComponent
 		}
 
 		_comboBox = new JComboBox(containers);
-		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
-			5, 5, 5), 5, 5));
+		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		_comboBox.addItemListener(new ItemListener()
 		{

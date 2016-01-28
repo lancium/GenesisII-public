@@ -90,8 +90,7 @@ final class SSHFSViewSession extends AbstractFSViewSession
 		}
 	}
 
-	final SSHFSViewStreamableAccessFileEntry createFile(SSHFSViewDirectoryEntry parentEntry, String entryName, String path)
-		throws IOException
+	final SSHFSViewStreamableAccessFileEntry createFile(SSHFSViewDirectoryEntry parentEntry, String entryName, String path) throws IOException
 	{
 		try {
 			_ftpChannel.put(path).close();

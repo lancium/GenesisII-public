@@ -97,8 +97,8 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		}
 	}
 
-	public void setAttributeValues(Collection<MessageElement> values) throws ResourceUnknownFaultType, RemoteException,
-		UnableToModifyResourcePropertyFaultType
+	public void setAttributeValues(Collection<MessageElement> values)
+		throws ResourceUnknownFaultType, RemoteException, UnableToModifyResourcePropertyFaultType
 	{
 		Object[] params = null;
 

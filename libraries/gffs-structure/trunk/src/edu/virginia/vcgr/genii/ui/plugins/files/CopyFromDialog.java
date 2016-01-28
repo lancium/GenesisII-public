@@ -68,11 +68,8 @@ public class CopyFromDialog extends AbstractCombinedUIMenusPlugin
 			if (retPick == JFileChooser.APPROVE_OPTION) {
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
-				context
-					.uiContext()
-					.progressMonitorFactory()
-					.createMonitor(context.ownerComponent(), "Copy from local filesystem", "", 1000L,
-						new SaveToTask(context, "local:" + _fileDialog.getSelectedFile().toString(), path.pwd()), null).start();
+				context.uiContext().progressMonitorFactory().createMonitor(context.ownerComponent(), "Copy from local filesystem", "", 1000L,
+					new SaveToTask(context, "local:" + _fileDialog.getSelectedFile().toString(), path.pwd()), null).start();
 			}
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);

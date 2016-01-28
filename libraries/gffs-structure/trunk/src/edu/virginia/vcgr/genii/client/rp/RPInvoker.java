@@ -467,8 +467,8 @@ public class RPInvoker implements InvocationHandler
 				return false;
 		}
 
-		throw new ResourcePropertyException("The method \"" + method.toGenericString()
-			+ "\" does not match either the RP getter or RP setter pattern.");
+		throw new ResourcePropertyException(
+			"The method \"" + method.toGenericString() + "\" does not match either the RP getter or RP setter pattern.");
 	}
 
 	/**
@@ -521,8 +521,8 @@ public class RPInvoker implements InvocationHandler
 				return new MultiGetterHandler(propertyName, translator);
 		}
 
-		throw new ResourcePropertyException("Multi-value resource property setter/getter (" + method.toGenericString()
-			+ ") does not take/return a collection.");
+		throw new ResourcePropertyException(
+			"Multi-value resource property setter/getter (" + method.toGenericString() + ") does not take/return a collection.");
 	}
 
 	/**
@@ -613,8 +613,8 @@ public class RPInvoker implements InvocationHandler
 	 * 
 	 * @throws ConfigurationException
 	 */
-	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target, ICallingContext callingContext) throws FileNotFoundException,
-		IOException
+	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target, ICallingContext callingContext)
+		throws FileNotFoundException, IOException
 	{
 		_likelyRPs = likelyRPs;
 		if (callingContext == null)

@@ -51,6 +51,7 @@ public class ListTransferable extends Vector<Object> implements Transferable
 	 * http://gruntose.com\r\n ...
 	 */
 	private static DataFlavor URIListFlavor;
+
 	static {
 		try {
 			URIListFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
@@ -58,7 +59,9 @@ public class ListTransferable extends Vector<Object> implements Transferable
 			_logger.error("should never happen", e);
 		}
 	}
+
 	private static DataFlavor AltURIListFlavor;
+
 	static {
 		try {
 			AltURIListFlavor = new DataFlavor("text/uri-list;representationclass=java.lang.String");
@@ -83,8 +86,8 @@ public class ListTransferable extends Vector<Object> implements Transferable
 	/**
 	 * register the types of transfers that we understand. this is really only the normal java file list and our new URI list.
 	 */
-	protected ArrayList<DataFlavor> FLAVORS = new ArrayList<DataFlavor>(Arrays.asList(DataFlavor.javaFileListFlavor, URIListFlavor,
-		AltURIListFlavor));
+	protected ArrayList<DataFlavor> FLAVORS =
+		new ArrayList<DataFlavor>(Arrays.asList(DataFlavor.javaFileListFlavor, URIListFlavor, AltURIListFlavor));
 
 	/**
 	 * a function that must be overridden by derived classes if they are not initially seeding the vector of objects that we hold. the caller

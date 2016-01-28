@@ -150,8 +150,8 @@ public class AxisBasedContextResolver implements IContextResolver
 		}
 		Certificate[] targetCertChain = (Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 		if ((targetCertChain != null) && (targetCertChain.length > 0)) {
-			retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain, (privateKey != null) ? privateKey
-				: Container.getContainerPrivateKey()));
+			retval.setActiveKeyAndCertMaterial(new KeyAndCertMaterial((X509Certificate[]) targetCertChain,
+				(privateKey != null) ? privateKey : Container.getContainerPrivateKey()));
 		}
 
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);

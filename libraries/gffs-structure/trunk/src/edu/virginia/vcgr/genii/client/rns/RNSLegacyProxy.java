@@ -61,8 +61,8 @@ final public class RNSLegacyProxy
 		return new RNSIterable(resp, _callContext, RNSConstants.PREFERRED_BATCH_SIZE);
 	}
 
-	final public EndpointReferenceType add(String name, EndpointReferenceType epr, MessageElement[] any) throws WriteNotPermittedFaultType,
-		RemoteException
+	final public EndpointReferenceType add(String name, EndpointReferenceType epr, MessageElement[] any)
+		throws WriteNotPermittedFaultType, RemoteException
 	{
 		RNSMetadataType mdt = null;
 		if (any != null && any.length > 0)

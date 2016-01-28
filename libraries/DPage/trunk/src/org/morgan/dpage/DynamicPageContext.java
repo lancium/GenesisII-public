@@ -54,9 +54,8 @@ class DynamicPageContext extends AbstractHandler
 			PageMap map = new PageMap(_loader, _resourceBase + targetDirectory);
 
 			DynamicPage page = map.loadPage(targetName);
-			context =
-				new InjectionContext(request, _injectionHandlerFactory.createHandler(
-					String.format("%s%s%s", targetDirectory, targetDirectory.endsWith("/") ? "" : "/", targetName), request));
+			context = new InjectionContext(request, _injectionHandlerFactory
+				.createHandler(String.format("%s%s%s", targetDirectory, targetDirectory.endsWith("/") ? "" : "/", targetName), request));
 			Injector.injectValues(page, context);
 			page.generatePage(ps);
 

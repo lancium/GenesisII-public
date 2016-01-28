@@ -44,8 +44,8 @@ public class UIContext implements Cloneable
 
 	public UIContext(ApplicationContext applicationContext) throws FileNotFoundException, IOException
 	{
-		this(applicationContext, Executors.newCachedThreadPool(new InternalThreadFactory()), null, new UIConfiguration(),
-			new UIPreferences(), new TrashCan(), ContextManager.getExistingContext(), new DirectoryChangeNexus());
+		this(applicationContext, Executors.newCachedThreadPool(new InternalThreadFactory()), null, new UIConfiguration(), new UIPreferences(),
+			new TrashCan(), ContextManager.getExistingContext(), new DirectoryChangeNexus());
 	}
 
 	@Override

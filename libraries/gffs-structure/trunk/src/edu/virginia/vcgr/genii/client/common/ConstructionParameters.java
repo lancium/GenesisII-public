@@ -69,8 +69,8 @@ public class ConstructionParameters implements Serializable
 		if (ret == null) {
 			ret = findConstructionParameterType(serviceClass);
 			if (ret == null)
-				throw new IllegalArgumentException(String.format(
-					"Service class %s does not have the required ConstructionParametersType annotation.", serviceClass));
+				throw new IllegalArgumentException(
+					String.format("Service class %s does not have the required ConstructionParametersType annotation.", serviceClass));
 			synchronized (_typeMap) {
 				_typeMap.put(serviceClass, ret);
 			}
@@ -87,11 +87,11 @@ public class ConstructionParameters implements Serializable
 			pType = getConstructionParameterType(serviceClass);
 			return pType.newInstance();
 		} catch (IllegalAccessException iae) {
-			throw new RuntimeException(
-				String.format("Construction parameter type %s does not " + "have a public no-arg constructor.", pType), iae);
+			throw new RuntimeException(String.format("Construction parameter type %s does not " + "have a public no-arg constructor.", pType),
+				iae);
 		} catch (InstantiationException e) {
-			throw new RuntimeException(
-				String.format("Construction parameter type %s does not " + "have a public no-arg constructor.", pType), e);
+			throw new RuntimeException(String.format("Construction parameter type %s does not " + "have a public no-arg constructor.", pType),
+				e);
 		}
 	}
 
@@ -110,8 +110,7 @@ public class ConstructionParameters implements Serializable
 		return context;
 	}
 
-	static public ConstructionParameters deserializeConstructionParameters(Class<?> serviceClass, Node serializedContent)
-		throws JAXBException
+	static public ConstructionParameters deserializeConstructionParameters(Class<?> serviceClass, Node serializedContent) throws JAXBException
 	{
 		Class<? extends ConstructionParameters> pType = getConstructionParameterType(serviceClass);
 		JAXBContext context = getContext(pType);

@@ -94,8 +94,8 @@ class EventSource extends JLabel
 			Graphics2D g2 = (Graphics2D) g.create();
 			Shape dot = new Rectangle(getWidth(), getHeight());
 
-			g2.setPaint(new RadialGradientPaint(getWidth() / 2.0f, getHeight() / 2.0f, Math.max(getWidth(), getHeight()) / 2.0f, new float[] {
-				0.0f, 1.0f }, new Color[] { _highlightColor1, _highlightColor2 }));
+			g2.setPaint(new RadialGradientPaint(getWidth() / 2.0f, getHeight() / 2.0f, Math.max(getWidth(), getHeight()) / 2.0f,
+				new float[] { 0.0f, 1.0f }, new Color[] { _highlightColor1, _highlightColor2 }));
 
 			g2.fill(dot);
 

@@ -47,9 +47,8 @@ public class RNSUtilities
 	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
-	static public RNSPath
-		findService(String pathToDefaultContainer, String defaultServiceName, PortType[] requiredPortTypes, String userHints)
-			throws RNSException, FileNotFoundException
+	static public RNSPath findService(String pathToDefaultContainer, String defaultServiceName, PortType[] requiredPortTypes,
+		String userHints) throws RNSException, FileNotFoundException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath result;
@@ -127,8 +126,8 @@ public class RNSUtilities
 				/*
 				 * It isn't the service, and it isn't a container, so we basically have to give up.
 				 */
-				throw new RNSException("Couldn't find an IDP service named '" + defaultServiceName + "' using the supplied information '"
-					+ userHints + "'.");
+				throw new RNSException(
+					"Couldn't find an IDP service named '" + defaultServiceName + "' using the supplied information '" + userHints + "'.");
 			}
 		}
 

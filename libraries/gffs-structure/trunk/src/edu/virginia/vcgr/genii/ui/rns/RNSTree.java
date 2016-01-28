@@ -375,14 +375,12 @@ public class RNSTree extends JTree implements EndpointRetriever
 				int answer;
 
 				if (paths.length == 1)
-					answer =
-						JOptionPane.showConfirmDialog(RNSTree.this,
-							String.format("Are you sure you wish to delete \"%s\"?", paths[0].getLastPathComponent()), "Delete Confirmation",
-							JOptionPane.YES_NO_OPTION);
+					answer = JOptionPane.showConfirmDialog(RNSTree.this,
+						String.format("Are you sure you wish to delete \"%s\"?", paths[0].getLastPathComponent()), "Delete Confirmation",
+						JOptionPane.YES_NO_OPTION);
 				else
-					answer =
-						JOptionPane.showConfirmDialog(RNSTree.this, "Are you sure you wish to delete the selected endpoints?",
-							"Delete Confirmation", JOptionPane.YES_NO_OPTION);
+					answer = JOptionPane.showConfirmDialog(RNSTree.this, "Are you sure you wish to delete the selected endpoints?",
+						"Delete Confirmation", JOptionPane.YES_NO_OPTION);
 
 				if (answer == JOptionPane.YES_OPTION)
 					deletePaths(paths);
@@ -516,8 +514,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 		iMap.put(CommonKeyStrokes.DELETE, _deleteAction.getValue(Action.NAME));
 		/* for now, we ignore cut/copy/paste */
 		/*
-		 * iMap.put(KeyStroke.getKeyStroke("ctrl X"), TransferHandler.getCutAction().getValue(Action.NAME));
-		 * iMap.put(KeyStroke.getKeyStroke("ctrl C"), TransferHandler.getCopyAction().getValue(Action.NAME));
+		 * iMap.put(KeyStroke.getKeyStroke("ctrl X"), TransferHandler.getCutAction().getValue(Action.NAME)); iMap.put(KeyStroke.getKeyStroke(
+		 * "ctrl C"), TransferHandler.getCopyAction().getValue(Action.NAME));
 		 */
 	}
 

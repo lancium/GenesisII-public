@@ -27,8 +27,8 @@ abstract class TransfererFactory
 	 * These are the known transfer types supported by the transferers at this time. They are sorted in order from most preferred, to least
 	 * preferred in terms of efficiency.
 	 */
-	static final private String[] _SORTED_TRANSFER_TYPES = new String[] { ByteIOConstants.TRANSFER_TYPE_MTOM,
-		ByteIOConstants.TRANSFER_TYPE_DIME, ByteIOConstants.TRANSFER_TYPE_SIMPLE };
+	static final private String[] _SORTED_TRANSFER_TYPES =
+		new String[] { ByteIOConstants.TRANSFER_TYPE_MTOM, ByteIOConstants.TRANSFER_TYPE_DIME, ByteIOConstants.TRANSFER_TYPE_SIMPLE };
 
 	/**
 	 * Each given target byteIO may or may not supported all of the known transfer types (it depends on the target implementation). This
@@ -176,8 +176,8 @@ abstract class TransfererFactory
 		else if (requestedTransferType.equals(ByteIOConstants.TRANSFER_TYPE_SIMPLE))
 			return createSimpleTransferer(_clientStub);
 		else
-			throw new IOException("Internal error -- Don't know " + "how to create a transferer for transfer type \"" + requestedTransferType
-				+ "\".");
+			throw new IOException(
+				"Internal error -- Don't know " + "how to create a transferer for transfer type \"" + requestedTransferType + "\".");
 	}
 
 	/**

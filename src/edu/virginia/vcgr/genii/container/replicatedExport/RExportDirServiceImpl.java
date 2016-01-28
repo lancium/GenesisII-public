@@ -131,8 +131,8 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) throws RemoteException, RNSEntryExistsFaultType,
-		ResourceUnknownFaultType
+	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest)
+		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		throw new RemoteException("createFile operation not supported in RExportDir.");
 	}
@@ -162,8 +162,8 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 		// create EntryType list of found entries for response
 		Collection<RNSEntryResponseType> result = new ArrayList<RNSEntryResponseType>(entries.size());
 		for (RExportEntry entry : entries) {
-			result.add(new RNSEntryResponseType(entry.getEntryReference(), RNSUtilities.createMetadata(entry.getEntryReference(),
-				entry.getAttributes()), null, entry.getName()));
+			result.add(new RNSEntryResponseType(entry.getEntryReference(),
+				RNSUtilities.createMetadata(entry.getEntryReference(), entry.getAttributes()), null, entry.getName()));
 		}
 
 		return RNSContainerUtilities.translate(result, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()));
@@ -194,7 +194,7 @@ public class RExportDirServiceImpl extends GenesisIIBase implements RExportDirPo
 																				// current dir
 			replicaName, // passed in name of replica
 			replicaEPR, // passed in epr of replica
-			(new GUID()).toString(),// newly created GUID as entryID
+			(new GUID()).toString(), // newly created GUID as entryID
 			replicaType, // passed in type of replica
 			null); // null attrs
 

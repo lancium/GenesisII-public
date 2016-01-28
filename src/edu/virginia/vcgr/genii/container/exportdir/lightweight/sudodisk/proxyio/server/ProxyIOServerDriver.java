@@ -97,8 +97,8 @@ public class ProxyIOServerDriver
 				 * checking just to make sure we never see a connection from elsewhere.
 				 */
 				if (!connxn.getInetAddress().isLoopbackAddress()) {
-					_logger.error("Not loopback request - ignoring!  (how did this happen?)  address is: "
-						+ connxn.getInetAddress().getHostAddress());
+					_logger.error(
+						"Not loopback request - ignoring!  (how did this happen?)  address is: " + connxn.getInetAddress().getHostAddress());
 					continue;
 				} else {
 					Monitor.setLastReqTime(System.currentTimeMillis());

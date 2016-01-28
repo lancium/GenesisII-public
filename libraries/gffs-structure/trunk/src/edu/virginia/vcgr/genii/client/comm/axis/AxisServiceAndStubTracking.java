@@ -95,8 +95,8 @@ public class AxisServiceAndStubTracking
 	// ................
 
 	// cache of signed, serialized delegation assertions.
-	static LRUCache<X509Certificate, Boolean> _validatedCerts = new LRUCache<X509Certificate, Boolean>(
-		AxisServiceAndStubTracking.VALIDATED_CERT_CACHE_SIZE);
+	static LRUCache<X509Certificate, Boolean> _validatedCerts =
+		new LRUCache<X509Certificate, Boolean>(AxisServiceAndStubTracking.VALIDATED_CERT_CACHE_SIZE);
 
 	// ................
 

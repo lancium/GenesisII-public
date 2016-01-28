@@ -77,8 +77,8 @@ public class ContextManager
 	static public void storeCurrentContext(ICallingContext context) throws FileNotFoundException, IOException
 	{
 		if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
-			_logger.error("saving calling context on server side; do we really want to???  backtrace:\n"
-				+ ProgramTools.showLastFewOnStack(15));
+			_logger
+				.error("saving calling context on server side; do we really want to???  backtrace:\n" + ProgramTools.showLastFewOnStack(15));
 		}
 
 		getResolver().storeCurrentContext(context);

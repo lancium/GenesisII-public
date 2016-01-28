@@ -41,8 +41,8 @@ public class DeadHostChecker
 		public int hashCode()
 		{
 			return new HashCodeBuilder(37, 839). // two randomly chosen prime numbers
-				// if deriving: appendSuper(super.hashCode()).
-				append(hostname).append(port).toHashCode();
+			// if deriving: appendSuper(super.hashCode()).
+			append(hostname).append(port).toHashCode();
 		}
 
 		@Override

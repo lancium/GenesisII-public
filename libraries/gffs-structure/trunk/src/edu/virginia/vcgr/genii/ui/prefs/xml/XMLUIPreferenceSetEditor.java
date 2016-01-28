@@ -27,10 +27,10 @@ class XMLUIPreferenceSetEditor extends JPanel
 		JRadioButton tree = new JRadioButton("Display XML as a Tree", !preferText);
 		group.add(text);
 		group.add(tree);
-		preferTextPanel.add(text, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(
-			5, 5, 5, 5), 5, 5));
-		preferTextPanel.add(tree, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(
-			5, 5, 5, 5), 5, 5));
+		preferTextPanel.add(text,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		preferTextPanel.add(tree,
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		add(GUIUtils.addTitle("XML Display", preferTextPanel), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));

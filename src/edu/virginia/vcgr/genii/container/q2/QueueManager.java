@@ -92,9 +92,8 @@ public class QueueManager implements Closeable
 	{
 		if (_informationPortal == null) {
 			InformationContainerService service = ContainerServices.findService(InformationContainerService.class);
-			_informationPortal =
-				service.createNewPortal(new InMemoryPersister<BESInformation>(), new BESInformationResolver(_connectionPool), new Duration(
-					30, TimeUnit.SECONDS), new Duration(10, TimeUnit.MINUTES));
+			_informationPortal = service.createNewPortal(new InMemoryPersister<BESInformation>(), new BESInformationResolver(_connectionPool),
+				new Duration(30, TimeUnit.SECONDS), new Duration(10, TimeUnit.MINUTES));
 		}
 
 		return _informationPortal;

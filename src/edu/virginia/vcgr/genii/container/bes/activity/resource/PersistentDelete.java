@@ -44,7 +44,7 @@ public class PersistentDelete
 	static public void persistentDelete(File dir)
 	{
 		PersistentOutcallContainerService service = ContainerServices.findService(PersistentOutcallContainerService.class);
-		service.schedule(new PersistentDeleteActor(dir), new ExponentialBackoffScheduler(30L, TimeUnit.DAYS, null, 8, 1L, TimeUnit.MINUTES,
-			15L, TimeUnit.SECONDS), null, null, null);
+		service.schedule(new PersistentDeleteActor(dir),
+			new ExponentialBackoffScheduler(30L, TimeUnit.DAYS, null, 8, 1L, TimeUnit.MINUTES, 15L, TimeUnit.SECONDS), null, null, null);
 	}
 }

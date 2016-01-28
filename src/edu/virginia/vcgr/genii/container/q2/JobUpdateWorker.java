@@ -98,9 +98,8 @@ public class JobUpdateWorker implements OutcallHandler
 			try {
 				jobEndpoint = _jobEndpointResolver.getJobEndpoint(connection, _jobInfo.getJobID());
 			} catch (Throwable cause) {
-				String message =
-					String
-						.format("Failure to get job endpoint on job %s with connection=%s jobId=%s", _data, connection, _jobInfo.getJobID());
+				String message = String.format("Failure to get job endpoint on job %s with connection=%s jobId=%s", _data, connection,
+					_jobInfo.getJobID());
 				_logger.error(message);
 				history.error(message);
 				throw cause;
@@ -119,8 +118,8 @@ public class JobUpdateWorker implements OutcallHandler
 
 				// Another thread has removed this from the database.
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Asked to check status on job %s which is " + "no longer running according to the database.",
-						_data));
+					_logger.debug(
+						String.format("Asked to check status on job %s which is " + "no longer running according to the database.", _data));
 				_jobManager.failJob(connection, _jobInfo.getJobID(), false, false, false);
 				return;
 			}
@@ -128,8 +127,8 @@ public class JobUpdateWorker implements OutcallHandler
 			String oldAction = _data.setJobAction("Checking");
 			if (oldAction != null) {
 				history.debug("Job Busy Doing %s", oldAction);
-				_logger.error(String.format("Attempting to check job status for %s, found that " + "we are in the process of doing action:  "
-					+ oldAction, _data));
+				_logger.error(String.format(
+					"Attempting to check job status for %s, found that " + "we are in the process of doing action:  " + oldAction, _data));
 				return;
 			}
 
@@ -139,9 +138,8 @@ public class JobUpdateWorker implements OutcallHandler
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Making grid outcall to check status of job %s", _data));
 				/* call the BES container to get the activity's status. */
-				activityStatuses =
-					clientStub.getActivityStatuses(new GetActivityStatusesType(new EndpointReferenceType[] { jobEndpoint }, null))
-						.getResponse();
+				activityStatuses = clientStub
+					.getActivityStatuses(new GetActivityStatusesType(new EndpointReferenceType[] { jobEndpoint }, null)).getResponse();
 				_jobManager.resetJobCommunicationAttempts(connection, _jobInfo.getJobID());
 				connection.commit();
 			} catch (GenesisIISecurityException gse) {
@@ -151,9 +149,8 @@ public class JobUpdateWorker implements OutcallHandler
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("There was a security exception checking on status of job %s.", _data), gse);
 				wasSecurityException = true;
-				activityStatuses =
-					new GetActivityStatusResponseType[] { new GetActivityStatusResponseType(jobEndpoint, new ActivityStatusType(null,
-						ActivityStateEnumeration.Failed), null, null) };
+				activityStatuses = new GetActivityStatusResponseType[] { new GetActivityStatusResponseType(jobEndpoint,
+					new ActivityStatusType(null, ActivityStateEnumeration.Failed), null, null) };
 			} finally {
 				_data.clearJobAction();
 			}

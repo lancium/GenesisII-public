@@ -16,8 +16,8 @@ public class ResourceMInjectResolver implements MInjectResolver
 	@Override
 	public boolean handles(MInject arg, Class<?> targetType)
 	{
-		return (arg.name().isEmpty() && (IResource.class.isAssignableFrom(targetType) || ResourceLock.class.isAssignableFrom(targetType) || StringResourceIdentifier.class
-			.isAssignableFrom(targetType)));
+		return (arg.name().isEmpty() && (IResource.class.isAssignableFrom(targetType) || ResourceLock.class.isAssignableFrom(targetType)
+			|| StringResourceIdentifier.class.isAssignableFrom(targetType)));
 	}
 
 	@Override

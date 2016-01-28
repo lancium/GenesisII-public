@@ -67,8 +67,8 @@ public class ContainerServicesProperties
 
 		try {
 			connection = connectionPool.acquire(false);
-			DatabaseTableUtils.createTables(connection, false, "CREATE TABLE containerservicesproperties ("
-				+ "name VARCHAR(256) PRIMARY KEY, " + "value BLOB(2G) NOT NULL)");
+			DatabaseTableUtils.createTables(connection, false,
+				"CREATE TABLE containerservicesproperties (" + "name VARCHAR(256) PRIMARY KEY, " + "value BLOB(2G) NOT NULL)");
 			connection.commit();
 		} catch (SQLException sqe) {
 			_logger.error("Cannot create container services properties table.", sqe);

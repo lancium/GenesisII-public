@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
  */
 public class GUID extends RandomToken implements Serializable
 {
-	static private Pattern _GUID_PATTERN = Pattern
-		.compile("([0-9a-fA-F]{8})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{12})");
+	static private Pattern _GUID_PATTERN =
+		Pattern.compile("([0-9a-fA-F]{8})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{12})");
 
 	static final long serialVersionUID = 0;
 

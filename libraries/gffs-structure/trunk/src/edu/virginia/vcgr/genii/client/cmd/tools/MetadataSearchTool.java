@@ -217,8 +217,8 @@ public class MetadataSearchTool extends BaseGridTool
 	 * 
 	 * XQConnection conn = xqs.getConnection("SYSTEM", "MANAGER"); XQExpression xqe = conn.createExpression(); _count++; String xpathq = "",
 	 * second = ""; RNSPath rpath = null; String name = path.getName(); //System.out.println(name); if (name.startsWith(".") && !isAll)
-	 * return; GeniiPath gPath = new GeniiPath(path); try{ if ( gPath.pathType() != GeniiPathType.Grid) throw new
-	 * InvalidToolUsageException("<target> must be a grid path. "); rpath = lookup(gPath, RNSPathQueryFlags.MUST_EXIST); GeniiCommon common =
+	 * return; GeniiPath gPath = new GeniiPath(path); try{ if ( gPath.pathType() != GeniiPathType.Grid) throw new InvalidToolUsageException(
+	 * "<target> must be a grid path. "); rpath = lookup(gPath, RNSPathQueryFlags.MUST_EXIST); GeniiCommon common =
 	 * ClientUtils.createProxy(GeniiCommon.class, rpath.getEndpoint()); GetResourcePropertyDocumentResponse resp =
 	 * common.getResourcePropertyDocument( new GetResourcePropertyDocument()); MessageElement document = new MessageElement( new
 	 * QName(GenesisIIConstants.GENESISII_NS, "attributes")); for (MessageElement child : resp.get_any()) {
@@ -236,8 +236,7 @@ public class MetadataSearchTool extends BaseGridTool
 	 * }catch(Exception ex){ ex.printStackTrace(); } }catch(Exception ex){ ex.printStackTrace(); } }
 	 */
 	static private void printEntry(PrintWriter out, TypeInformation type, RNSPath path, boolean isLong, boolean isAll, boolean isexistence,
-		boolean isMultiline, boolean isCompare, boolean isAttributes, boolean isDisplay, String xpath1) throws RNSException,
-		ResourceException
+		boolean isMultiline, boolean isCompare, boolean isAttributes, boolean isDisplay, String xpath1) throws RNSException, ResourceException
 	{
 		_count++;
 		String xpathq = "", second = "";
@@ -401,8 +400,8 @@ public class MetadataSearchTool extends BaseGridTool
 									out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName() + ") = "
 										+ nodes.item(i).getTextContent());
 								else
-									out.println(nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName()
-										+ ") = nil");
+									out.println(
+										nodes.item(i).getLocalName() + " of (" + rpath.getParent() + "/" + rpath.getName() + ") = nil");
 							if (isCompare) {
 								if (xpath1.contains("=")) {
 									if (nodes.item(i).getTextContent().equals(second)) {
@@ -434,7 +433,7 @@ public class MetadataSearchTool extends BaseGridTool
 
 	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll, boolean isexistence,
 		boolean isMultiline, boolean isCompare, boolean isRecursive, boolean isAttributes, boolean isDisplay, String xpathq)
-		throws RNSException, ResourceException
+			throws RNSException, ResourceException
 	{
 		String name = path.getName();
 		if (name == null)

@@ -81,9 +81,8 @@ public class ExportManipulator
 		if (_logger.isDebugEnabled())
 			_logger.debug("got preferred identity for new export: '" + owner + "'");
 		try {
-			EndpointReferenceType exEPR =
-				ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "", 0L, targetpath.toString(),
-					false, owner);
+			EndpointReferenceType exEPR = ExportTool.createExportedRoot(targetpath.toString(), servicepath.getEndpoint(), localPath, "", "",
+				0L, targetpath.toString(), false, owner);
 			if (exEPR == null)
 				_logger.debug("created null EPR with createExportedRoot");
 		} catch (Exception r) {

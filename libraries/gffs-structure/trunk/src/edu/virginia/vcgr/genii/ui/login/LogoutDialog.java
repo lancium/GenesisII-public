@@ -75,9 +75,8 @@ class LogoutDialog extends JDialog
 		@Override
 		final public void actionPerformed(ActionEvent e)
 		{
-			int answer =
-				JOptionPane.showConfirmDialog((Component) e.getSource(), "Log out from selected credentials?", "Logout Confirmation",
-					JOptionPane.YES_NO_OPTION);
+			int answer = JOptionPane.showConfirmDialog((Component) e.getSource(), "Log out from selected credentials?", "Logout Confirmation",
+				JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
 				Object[] values = _credentialList.getSelectedValues();
 				NuCredential[] logoutItems = new NuCredential[values.length];
@@ -133,8 +132,8 @@ class LogoutDialog extends JDialog
 
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
-		content.add(new JScrollPane(_credentialList), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JScrollPane(_credentialList),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(ButtonPanel.createHorizontalButtonPanel(logout, cancel), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 

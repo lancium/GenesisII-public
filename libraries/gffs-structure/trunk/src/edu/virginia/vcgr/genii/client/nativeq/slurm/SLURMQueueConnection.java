@@ -111,8 +111,8 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 
 	static private class JobStatusParser implements ScriptLineParser
 	{
-		static private Pattern JOB_TOKEN_AND_STATE_PATTERN = Pattern
-			.compile("^\\s*id\\s*=\\s*(\\S+)\\s+state\\s*=\\s*(\\S+)\\s+user\\s*=\\s*(\\S+)\\s*$");
+		static private Pattern JOB_TOKEN_AND_STATE_PATTERN =
+			Pattern.compile("^\\s*id\\s*=\\s*(\\S+)\\s+state\\s*=\\s*(\\S+)\\s+user\\s*=\\s*(\\S+)\\s*$");
 
 		private Map<String, String> _matchedPairs = new HashMap<String, String>();
 
@@ -226,8 +226,8 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			Integer threadsPerProcess = application.getThreadsPerProcess();
 
 			if (_logger.isDebugEnabled())
-				_logger.debug("slurm spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc="
-					+ threadsPerProcess);
+				_logger.debug(
+					"slurm spmd info: numProcs=" + numProcs + " numProcsPerHost=" + numProcsPerHost + " threadsPerProc=" + threadsPerProcess);
 
 			// new section for checking whether they've asked for exclusivity or are okay with sharing the node for sequential jobs.
 			if (application.getSPMDVariation().toString().contains(CmdLineManipulatorConstants.NODE_EXCLUSIVE_THREADED_PHRASE)) {
@@ -345,9 +345,9 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 	public static void main(String[] args)
 	{
 		JobStatusParser parser = new JobStatusParser();
-		String[] lines =
-			{ "id=36697 state=CG user=ak3ka", "id=36799 state=R user=ak3ka", "id=36808 state=R user=ak3ka", "id=36809 state=R user=ak3ka",
-				"id=36810 state=R user=ak3ka", "id=36901 state=PD user=cak0l", "id=36902 state=PD user=cak0l", "id=36903 state=PD user=cak0l" };
+		String[] lines = { "id=36697 state=CG user=ak3ka", "id=36799 state=R user=ak3ka", "id=36808 state=R user=ak3ka",
+			"id=36809 state=R user=ak3ka", "id=36810 state=R user=ak3ka", "id=36901 state=PD user=cak0l", "id=36902 state=PD user=cak0l",
+			"id=36903 state=PD user=cak0l" };
 
 		for (String line : lines) {
 			for (Pattern pattern : parser.getHandledPatterns()) {

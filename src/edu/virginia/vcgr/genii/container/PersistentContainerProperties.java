@@ -39,8 +39,8 @@ public class PersistentContainerProperties
 		Connection connection = null;
 		try {
 			connection = _pool.acquire(false);
-			DatabaseTableUtils.createTables(connection, false, "CREATE TABLE containerproperties ("
-				+ "propertyname VARCHAR(256) PRIMARY KEY," + "propertyvalue BLOB(2G))");
+			DatabaseTableUtils.createTables(connection, false,
+				"CREATE TABLE containerproperties (" + "propertyname VARCHAR(256) PRIMARY KEY," + "propertyvalue BLOB(2G))");
 			connection.commit();
 		} catch (SQLException e) {
 			throw new ConfigurationException("Unable to initialize container.", e);

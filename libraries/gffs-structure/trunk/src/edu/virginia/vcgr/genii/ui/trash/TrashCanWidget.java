@@ -24,9 +24,8 @@ public class TrashCanWidget extends JComponent
 		_appContext = appContext;
 		_context = context;
 
-		Dimension size =
-			new Dimension(Math.max(Images.emptyTrashcan().getWidth(), Images.fullTrashcan().getWidth()), Math.max(Images.emptyTrashcan()
-				.getHeight(), Images.fullTrashcan().getHeight()));
+		Dimension size = new Dimension(Math.max(Images.emptyTrashcan().getWidth(), Images.fullTrashcan().getWidth()),
+			Math.max(Images.emptyTrashcan().getHeight(), Images.fullTrashcan().getHeight()));
 
 		setMinimumSize(size);
 		setPreferredSize(size);

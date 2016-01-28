@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.wsrf.wsn;
 
-public abstract class AbstractNotificationHandler<ContentsType extends NotificationMessageContents> implements
-	NotificationHandler<ContentsType>
+public abstract class AbstractNotificationHandler<ContentsType extends NotificationMessageContents>
+	implements NotificationHandler<ContentsType>
 {
 	private Class<ContentsType> _contentsType;
 

@@ -76,8 +76,8 @@ public class WindowsExecutionEngine
 		_logger.info(String.format("Task(%s) -- Executing command:  %s", task, builder));
 	}
 
-	static public void execute(InputStream stdin, OutputStream stdout, OutputStream stderr, ExecutionTask task) throws ExecutionException,
-		IOException
+	static public void execute(InputStream stdin, OutputStream stdout, OutputStream stderr, ExecutionTask task)
+		throws ExecutionException, IOException
 	{
 		ByteArrayOutputStream outStorage = new ByteArrayOutputStream();
 		ByteArrayOutputStream errStorage = new ByteArrayOutputStream();
@@ -91,9 +91,8 @@ public class WindowsExecutionEngine
 		ProcessBuilder builder = new ProcessBuilder(cLine);
 		Process proc = builder.start();
 
-		copiers =
-			new StreamCopier[] { new StreamCopier(proc.getErrorStream(), stderr), new StreamCopier(proc.getInputStream(), stdout),
-				new StreamCopier(stdin, proc.getOutputStream()) };
+		copiers = new StreamCopier[] { new StreamCopier(proc.getErrorStream(), stderr), new StreamCopier(proc.getInputStream(), stdout),
+			new StreamCopier(stdin, proc.getOutputStream()) };
 		for (StreamCopier copier : copiers)
 			copier.start();
 

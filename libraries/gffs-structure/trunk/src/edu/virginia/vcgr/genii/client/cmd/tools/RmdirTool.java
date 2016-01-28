@@ -50,8 +50,8 @@ public class RmdirTool extends BaseGridTool
 			throw new InvalidToolUsageException();
 	}
 
-	public static int removeDirectory(List<String> pathsToRemove, PrintWriter stderr) throws RNSException, InvalidToolUsageException,
-		FileNotFoundException, IOException
+	public static int removeDirectory(List<String> pathsToRemove, PrintWriter stderr)
+		throws RNSException, InvalidToolUsageException, FileNotFoundException, IOException
 	{
 		RNSPath path = RNSPath.getCurrent();
 		int toReturn = 0;
@@ -67,7 +67,8 @@ public class RmdirTool extends BaseGridTool
 			}
 			if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
 				String msg = "Failed to remove " + gPath.toString() + " because " + PathOutcome.outcomeText(ret) + ".";
-				if (stderr!=null) stderr.println(msg);
+				if (stderr != null)
+					stderr.println(msg);
 				_logger.error(msg);
 				toReturn = 1;
 			}

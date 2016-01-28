@@ -127,8 +127,8 @@ public class CmdLineManipulatorUtils
 			if (manipulatorCount > 1)
 				throw new IllegalArgumentException("Construction params contain " + "mulitple manipulator variations with same name.");
 			if (spmdJob && (!mpiManipulatorCalled))
-				throw new IllegalArgumentException("No MPI manipulator " + "in manipulator call chain: Attempting to run SPMD job "
-					+ "on BES with no SPMD support.");
+				throw new IllegalArgumentException(
+					"No MPI manipulator " + "in manipulator call chain: Attempting to run SPMD job " + "on BES with no SPMD support.");
 
 		}
 

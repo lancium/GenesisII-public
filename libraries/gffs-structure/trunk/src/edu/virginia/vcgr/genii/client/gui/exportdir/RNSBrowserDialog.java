@@ -48,10 +48,10 @@ public class RNSBrowserDialog extends JDialog
 
 		container.setLayout(new GridBagLayout());
 
-		container.add(new JScrollPane(_rnsTree = new RNSTree()), new GridBagConstraints(0, 0, 4, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(new JLabel("RNS Path"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JScrollPane(_rnsTree = new RNSTree()),
+			new GridBagConstraints(0, 0, 4, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JLabel("RNS Path"),
+			new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		container.add(_rnsPath = new JTextField(), new GridBagConstraints(1, 1, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
@@ -59,10 +59,10 @@ public class RNSBrowserDialog extends JDialog
 
 		container.add(new JPanel(), new GridBagConstraints(0, 2, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
-		container.add(new JButton(saveAs), new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		container.add(new JButton(new CancelAction()), new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JButton(saveAs),
+			new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JButton(new CancelAction()),
+			new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		_rnsTree.addTreeSelectionListener(new SelectionListener());
 		_rnsPath.addCaretListener(saveAs);

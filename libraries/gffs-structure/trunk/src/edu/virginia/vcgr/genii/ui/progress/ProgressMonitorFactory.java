@@ -24,9 +24,8 @@ public class ProgressMonitorFactory
 	public <ResultType> ProgressMonitor createMonitor(Component parentComponent, String dialogTitle, String dialogSubTitle, long dialogDelay,
 		Task<ResultType> task, TaskCompletionListener<ResultType> completionListener)
 	{
-		ProgressMonitorWorker<ResultType> worker =
-			new ProgressMonitorWorker<ResultType>(SwingUtilities.getWindowAncestor(parentComponent), dialogTitle, dialogSubTitle,
-				dialogDelay, task, completionListener);
+		ProgressMonitorWorker<ResultType> worker = new ProgressMonitorWorker<ResultType>(SwingUtilities.getWindowAncestor(parentComponent),
+			dialogTitle, dialogSubTitle, dialogDelay, task, completionListener);
 		return worker;
 	}
 

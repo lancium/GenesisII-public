@@ -217,9 +217,8 @@ public class GeniiFuseMount implements Filesystem
 
 		try {
 			if (rdev == 0) {
-				long fileHandle =
-					_fs.open(PATHREP.parse(null, path), new OpenFlags(true, false, false, true), OpenModes.READ_WRITE,
-						MetadataManager.permissionsFromMode(mode));
+				long fileHandle = _fs.open(PATHREP.parse(null, path), new OpenFlags(true, false, false, true), OpenModes.READ_WRITE,
+					MetadataManager.permissionsFromMode(mode));
 
 				// We don't close the file now because it's about to be opened
 				// and later released. Instead, we put it into a table of
@@ -252,8 +251,8 @@ public class GeniiFuseMount implements Filesystem
 		boolean writable = (flags & (FilesystemConstants.O_RDWR | FilesystemConstants.O_WRONLY)) > 0;
 
 		try {
-			return _fs.open(PATHREP.parse(null, path), new OpenFlags(false, false, false, false), writable ? OpenModes.READ_WRITE
-				: OpenModes.READ, null);
+			return _fs.open(PATHREP.parse(null, path), new OpenFlags(false, false, false, false),
+				writable ? OpenModes.READ_WRITE : OpenModes.READ, null);
 		} catch (Throwable cause) {
 			_logger.info("open exception:", cause);
 			throw FuseExceptions.translate("Unable to open files.", cause);

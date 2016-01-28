@@ -87,12 +87,12 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		add(SimplePanel.createVerticalPanel(GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			GUIUtils.addTitle("Read Permissions", new JScrollPane(_readList)),
 			GUIUtils.addTitle("Write Permissions", new JScrollPane(_writeList)),
-			GUIUtils.addTitle("Execute Permissions", new JScrollPane(_executeList))), new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+			GUIUtils.addTitle("Execute Permissions", new JScrollPane(_executeList))),
+			new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		add(SimplePanel.createVerticalPanel(GridBagConstraints.CENTER, GridBagConstraints.NONE,
 			GUIUtils.addTitle("Username/Password Token", new UsernamePasswordComponent(_uiContext)), new PatternComponent(_uiContext),
-			new EveryoneComponent(_uiContext)), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+			new EveryoneComponent(_uiContext)),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	ACLPanel(UIPluginContext context, RNSPath path)
@@ -169,10 +169,8 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		for (Pair<RNSTreeNode, RNSPath> path : paths)
 			targets.add(path.second());
 
-		_uiContext
-			.progressMonitorFactory()
-			.createMonitor(this, "Read Grid Identities", "Read grid identities.", 1000L, new RemoteIdentityLookupTask(targets),
-				new RemoteIdentityCompletionListener(target)).start();
+		_uiContext.progressMonitorFactory().createMonitor(this, "Read Grid Identities", "Read grid identities.", 1000L,
+			new RemoteIdentityLookupTask(targets), new RemoteIdentityCompletionListener(target)).start();
 	}
 
 	private X509Identity readIdentity(File file) throws CertificateException, FileNotFoundException
@@ -307,9 +305,8 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		@Override
 		public AuthZConfig execute(TaskProgressListener progressListener) throws Exception
 		{
-			GenesisIIBaseRP rp =
-				(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(_uiContext.callingContext(), _targetPath.getEndpoint(),
-					GenesisIIBaseRP.class);
+			GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(_uiContext.callingContext(),
+				_targetPath.getEndpoint(), GenesisIIBaseRP.class);
 			AuthZConfig config = null;
 			try {
 				config = rp.getAuthZConfig();
@@ -394,9 +391,8 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		@Override
 		public AuthZConfig execute(TaskProgressListener progressListener) throws Exception
 		{
-			GenesisIIBaseRP rp =
-				(GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(_uiContext.callingContext(), _targetPath.getEndpoint(),
-					GenesisIIBaseRP.class);
+			GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(_uiContext.callingContext(),
+				_targetPath.getEndpoint(), GenesisIIBaseRP.class);
 			AuthZConfig config = AxisAcl.encodeAcl(_newACL);
 			rp.setAuthZConfig(config);
 			return config;
@@ -558,9 +554,8 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 				if (wrappers == null || wrappers.size() == 0)
 					return;
 
-				int answer =
-					JOptionPane.showConfirmDialog(_list, "Are you sure you want to delete the selected entries?", "Delete Confirmation",
-						JOptionPane.YES_NO_OPTION);
+				int answer = JOptionPane.showConfirmDialog(_list, "Are you sure you want to delete the selected entries?",
+					"Delete Confirmation", JOptionPane.YES_NO_OPTION);
 				if (answer == JOptionPane.YES_OPTION)
 					remove(_list, wrappers);
 			} catch (Throwable cause) {

@@ -141,8 +141,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
 
@@ -506,8 +506,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetActivityStatusesResponseType getActivityStatuses(GetActivityStatusesType parameters) throws RemoteException,
-		UnknownActivityIdentifierFaultType
+	public GetActivityStatusesResponseType getActivityStatuses(GetActivityStatusesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
 		GetActivityStatusResponseType[] responses;
 		EndpointReferenceType[] activities = parameters.getActivityIdentifier();
@@ -538,8 +538,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public TerminateActivitiesResponseType terminateActivities(TerminateActivitiesType parameters) throws RemoteException,
-		UnknownActivityIdentifierFaultType
+	public TerminateActivitiesResponseType terminateActivities(TerminateActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
 		TerminateActivityResponseType[] responses;
 		EndpointReferenceType[] activities = parameters.getActivityIdentifier();
@@ -568,8 +568,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetActivityDocumentsResponseType getActivityDocuments(GetActivityDocumentsType parameters) throws RemoteException,
-		UnknownActivityIdentifierFaultType
+	public GetActivityDocumentsResponseType getActivityDocuments(GetActivityDocumentsType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
 		GetActivityDocumentResponseType[] responses;
 		EndpointReferenceType[] activities = parameters.getActivityIdentifier();
@@ -616,8 +616,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(StopAcceptingNewActivitiesType parameters)
-		throws RemoteException
+	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(StopAcceptingNewActivitiesType parameters) throws RemoteException
 	{
 		_resource.isAcceptingNewActivites(false);
 		return new StopAcceptingNewActivitiesResponseType();

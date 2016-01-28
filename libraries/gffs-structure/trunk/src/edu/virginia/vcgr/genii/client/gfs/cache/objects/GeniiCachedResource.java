@@ -65,9 +65,8 @@ public abstract class GeniiCachedResource
 
 	public synchronized void updateTimes(long accessTime, long modificationTime) throws FSException
 	{
-		_statStructure =
-			new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(),
-				_statStructure.getSize(), _statStructure.getCreated(), modificationTime, accessTime, _statStructure.getPermissions());
+		_statStructure = new FilesystemStatStructure(_statStructure.getINode(), _statStructure.getName(), _statStructure.getEntryType(),
+			_statStructure.getSize(), _statStructure.getCreated(), modificationTime, accessTime, _statStructure.getPermissions());
 		_fs.updateTimes(_path, accessTime, modificationTime);
 	}
 }

@@ -30,8 +30,7 @@ public class TransfererResolver
 	 * When a "read" request succeeds at the low-level but fails at the high-level, call this function. This function checks if the file has a
 	 * replica which might be able to service the read request.
 	 */
-	public static RandomByteIOPortType resolveClientStub(RandomByteIOPortType clientStub) throws ResourceException,
-		GenesisIISecurityException
+	public static RandomByteIOPortType resolveClientStub(RandomByteIOPortType clientStub) throws ResourceException, GenesisIISecurityException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("resolveClientStub: entered");

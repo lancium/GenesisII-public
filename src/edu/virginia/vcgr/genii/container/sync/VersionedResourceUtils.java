@@ -100,8 +100,8 @@ public class VersionedResourceUtils
 	 * Send a "getResourceProperty" request for a property that may or may not be defined. If the property is not defined, do not throw an
 	 * exception. Simply return null.
 	 */
-	static public MessageElement getResourceProperty(GeniiCommon common, QName property) throws RemoteException, ResourceUnknownFaultType,
-		ResourceUnavailableFaultType
+	static public MessageElement getResourceProperty(GeniiCommon common, QName property)
+		throws RemoteException, ResourceUnknownFaultType, ResourceUnavailableFaultType
 	{
 		GetResourcePropertyResponse rpResponse;
 		try {
@@ -237,8 +237,7 @@ public class VersionedResourceUtils
 	 * After processing an update message, update the local VersionVector with the new remote version number, and store the updated
 	 * VersionVector as a resource property.
 	 */
-	public static void updateVersionVector(IResource resource, VersionVector localVector, VersionVector remoteVector)
-		throws ResourceException
+	public static void updateVersionVector(IResource resource, VersionVector localVector, VersionVector remoteVector) throws ResourceException
 	{
 		if (localVector == null) {
 			localVector = new VersionVector();

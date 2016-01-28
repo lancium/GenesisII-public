@@ -47,8 +47,8 @@ public class GeniiCacheManager
 		if ((resource != null && (currentTime - resource.getTimeOfEntry()) > (cacheLifeTime * 1000))) {
 
 			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Refreshing cache item %s.  Old time is " + "%d, new time is %d", path,
-					resource.getTimeOfEntry(), currentTime));
+				_logger.debug(String.format("Refreshing cache item %s.  Old time is " + "%d, new time is %d", path, resource.getTimeOfEntry(),
+					currentTime));
 
 			// Only refresh if a file or told to refresh (for dir's)
 			if (doRefresh || !resource.isDirectory()) {

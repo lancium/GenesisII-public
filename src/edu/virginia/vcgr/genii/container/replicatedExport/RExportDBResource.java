@@ -60,8 +60,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 	static private final String _UPDATE_PATH = "UPDATE rexport SET path = ? WHERE dirid = ?";
 
-	static private final String _RETRIEVE_REXPORT_ENTRIES_STMT = "SELECT dirid, name, endpoint, entryid, type "
-		+ "FROM rexportentry WHERE dirid = ?";
+	static private final String _RETRIEVE_REXPORT_ENTRIES_STMT =
+		"SELECT dirid, name, endpoint, entryid, type " + "FROM rexportentry WHERE dirid = ?";
 
 	static private final String _DELETE_REXPORT_ENTRY_ATTRS_STMT = "DELETE FROM rexportentryattr WHERE entryid = ?";
 
@@ -72,8 +72,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	static private final String _ADD_DIR_ATTR_STMT = "INSERT INTO rexportentryattr VALUES(?, ?)";
 
 	// delete all entry attr entries that match dirid
-	static private final String _DELETE_EXPORT_ENTRY_ATTR = "DELETE FROM rexportentryattr WHERE entryid in "
-		+ "(SELECT entryid FROM rexportentry WHERE dirid = ?)";
+	static private final String _DELETE_EXPORT_ENTRY_ATTR =
+		"DELETE FROM rexportentryattr WHERE entryid in " + "(SELECT entryid FROM rexportentry WHERE dirid = ?)";
 
 	// delete all rexport entry entries that match dirid
 	static private final String _DELETE_EXPORT_ENTRIES_STMT = "DELETE FROM rexportentry WHERE dirid = ?";
@@ -95,8 +95,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	/* clear rexportentry entries */
 	// get all dirids that match parentId
 	// destroy all rexport entries that match these dirids
-	static private final String _DESTROY_ALL_ENTRIES_FOR_PARENT_STMT = "DELETE FROM rexportentry " + "WHERE dirid in "
-		+ "(SELECT dirid FROM rexport WHERE parentIds LIKE ?)";
+	static private final String _DESTROY_ALL_ENTRIES_FOR_PARENT_STMT =
+		"DELETE FROM rexportentry " + "WHERE dirid in " + "(SELECT dirid FROM rexport WHERE parentIds LIKE ?)";
 
 	/* clear rexport given parentIds */
 	static private final String _DESTROY_ALL_DIRS_FOR_PARENT_STMT = "DELETE FROM rexport WHERE parentIds LIKE ?";
@@ -128,8 +128,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 		loadDirInfo();
 		/*
-		 * do we care if dir does not exist? this should be handled by other means if (!dirExists()) {
-		 * _logger.error("Local file does not exist for RExportDir resource.");
+		 * do we care if dir does not exist? this should be handled by other means if (!dirExists()) { _logger.error(
+		 * "Local file does not exist for RExportDir resource.");
 		 * 
 		 * destroy(_connection, false); throw FaultManipulator.fillInFault(new ResourceUnknownFaultType()); }
 		 */
@@ -582,9 +582,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				RExportEntry entry =
-					new RExportEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4), rs.getString(5),
-						null);
+				RExportEntry entry = new RExportEntry(rs.getString(1), rs.getString(2), EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4),
+					rs.getString(5), null);
 				ret.add(entry);
 			}
 
@@ -654,12 +653,12 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 
 		try {
 			IRByteIOResource resource = (IRByteIOResource) (ResourceManager.getTargetResource(entry.getEntryReference()).dereference());
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME), resource
-				.getAccessTime()));
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME), resource
-				.getModTime()));
-			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME), resource
-				.getCreateTime()));
+			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME),
+				resource.getAccessTime()));
+			attrs.add(
+				new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME), resource.getModTime()));
+			attrs.add(new MessageElement(new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME),
+				resource.getCreateTime()));
 		} catch (ResourceUnknownFaultType ruft) {
 			// We couldn't find the resource, so we just skip it for now.
 		}

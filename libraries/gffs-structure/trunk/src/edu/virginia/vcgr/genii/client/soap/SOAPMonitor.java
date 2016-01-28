@@ -24,14 +24,14 @@ public class SOAPMonitor extends BasicHandler
 
 				if (inMsg != null) {
 					String formattedXml = XMLStringPrinter.format(inMsg.getSOAPPartAsString());
-					_logger.debug("\n\n============== SOAP Request ==============\n" + formattedXml
-						+ "==========================================");
+					_logger.debug(
+						"\n\n============== SOAP Request ==============\n" + formattedXml + "==========================================");
 				}
 
 				if (outMsg != null) {
 					String formattedXml = XMLStringPrinter.format(outMsg.getSOAPPartAsString());
-					_logger.debug("\n\n============== SOAP Response ==============\n" + formattedXml
-						+ "==========================================");
+					_logger.debug(
+						"\n\n============== SOAP Response ==============\n" + formattedXml + "==========================================");
 				}
 			}
 		}

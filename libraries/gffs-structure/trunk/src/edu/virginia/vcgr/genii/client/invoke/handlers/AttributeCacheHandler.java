@@ -49,8 +49,8 @@ public class AttributeCacheHandler
 	static private final int _MAX_CACHE_ELEMENTS = 4096;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 45;
 
-	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache = new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS,
-		_DEFAULT_TIMEOUT_MS);
+	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache =
+		new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
 
 	static private QName rxferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
 	static private QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
@@ -328,11 +328,10 @@ public class AttributeCacheHandler
 					ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
 					for (MessageElement elem : any) {
 						QName elemName = elem.getQName();
-						if (elemName.equals(rxferMechs) || elemName.equals(rsize) || elemName.equals(raccessTime)
-							|| elemName.equals(rmodTime) || elemName.equals(rcreatTime)
-							|| elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) || elemName.equals(sxferMechs)
-							|| elemName.equals(ssize) || elemName.equals(saccessTime) || elemName.equals(smodTime)
-							|| elemName.equals(screatTime)) {
+						if (elemName.equals(rxferMechs) || elemName.equals(rsize) || elemName.equals(raccessTime) || elemName.equals(rmodTime)
+							|| elemName.equals(rcreatTime) || elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME)
+							|| elemName.equals(sxferMechs) || elemName.equals(ssize) || elemName.equals(saccessTime)
+							|| elemName.equals(smodTime) || elemName.equals(screatTime)) {
 							if (_logger.isDebugEnabled())
 								_logger.debug("Adding " + elemName + " to " + name);
 							cachedAttrs.add(elem);

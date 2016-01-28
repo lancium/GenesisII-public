@@ -75,9 +75,8 @@ public class CopyMachine
 		_currentTarget = _target; // reset for this copy.
 		// we create paths in target on directory entry, and we copy files when
 		// we hit them.
-		GeniiPathRecurser cloner =
-			new GeniiPathRecurser(new EnterDirectoryGeniiPath(this), new ExitDirectoryGeniiPath(this, _logLocation), new CopyFileGeniiPath(
-				this, _logLocation), null);
+		GeniiPathRecurser cloner = new GeniiPathRecurser(new EnterDirectoryGeniiPath(this), new ExitDirectoryGeniiPath(this, _logLocation),
+			new CopyFileGeniiPath(this, _logLocation), null);
 		cloner.setMaximumRecursionDepth(MAX_COPY_DEPTH);
 		GeniiPath targetCheck = new GeniiPath(_target);
 		if (targetCheck.exists()) {

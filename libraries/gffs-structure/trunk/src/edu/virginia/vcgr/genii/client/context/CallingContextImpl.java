@@ -185,8 +185,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	public String dumpContext()
 	{
 		StringBuilder toReturn = new StringBuilder();
-		toReturn.append("====\ncontext has " + _properties.size() + " normal properties and " + _transientProperties.size()
-			+ " transient properties.\n");
+		toReturn.append(
+			"====\ncontext has " + _properties.size() + " normal properties and " + _transientProperties.size() + " transient properties.\n");
 		toReturn.append("normal property names:\n");
 		Set<String> propnames = _properties.keySet();
 		int indy = 0;

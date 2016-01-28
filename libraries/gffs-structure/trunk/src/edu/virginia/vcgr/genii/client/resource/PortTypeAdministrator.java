@@ -110,8 +110,8 @@ public class PortTypeAdministrator
 				else if (ce.getNodeName().equals("display-rank"))
 					rankString = ce.getTextContent();
 				else
-					throw new IOException("Unexpected node \"" + ce.getNodeName() + "\" found.\n"
-						+ "Expected \"description\" or \"display-rank\".");
+					throw new IOException(
+						"Unexpected node \"" + ce.getNodeName() + "\" found.\n" + "Expected \"description\" or \"display-rank\".");
 			}
 		}
 

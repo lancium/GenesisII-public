@@ -164,8 +164,8 @@ public class ByteIORPCache extends CommonAttributeCache
 			return (qName.equals(ByteIOConstants.rxferMechs) || qName.equals(ByteIOConstants.sxferMechs)
 				|| qName.equals(ByteIOConstants.rsize) || qName.equals(ByteIOConstants.ssize) || qName.equals(ByteIOConstants.rcreatTime)
 				|| qName.equals(ByteIOConstants.screatTime) || qName.equals(ByteIOConstants.rmodTime)
-				|| qName.equals(ByteIOConstants.smodTime) || qName.equals(ByteIOConstants.raccessTime) || qName
-					.equals(ByteIOConstants.saccessTime));
+				|| qName.equals(ByteIOConstants.smodTime) || qName.equals(ByteIOConstants.raccessTime)
+				|| qName.equals(ByteIOConstants.saccessTime));
 		}
 		return false;
 	}

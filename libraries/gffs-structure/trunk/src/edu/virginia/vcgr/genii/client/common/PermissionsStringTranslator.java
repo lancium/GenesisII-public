@@ -14,8 +14,8 @@ public class PermissionsStringTranslator implements SingleResourcePropertyTransl
 	public <Type> Type deserialize(Class<Type> clazz, MessageElement element) throws ResourcePropertyException
 	{
 		if (!clazz.equals(Permissions.class))
-			throw new ResourcePropertyException("The PermissionsStringTranslator can ONLY be used to translate "
-				+ "Permission string resource properties.");
+			throw new ResourcePropertyException(
+				"The PermissionsStringTranslator can ONLY be used to translate " + "Permission string resource properties.");
 
 		if (element == null)
 			return null;
@@ -32,8 +32,8 @@ public class PermissionsStringTranslator implements SingleResourcePropertyTransl
 	public MessageElement serialize(QName name, Object obj) throws ResourcePropertyException
 	{
 		if (!(obj instanceof Permissions))
-			throw new ResourcePropertyException("The PermissionsStringTranslator can ONLY be used to translate "
-				+ "Permissions resource properties.");
+			throw new ResourcePropertyException(
+				"The PermissionsStringTranslator can ONLY be used to translate " + "Permissions resource properties.");
 
 		Permissions perms = (Permissions) obj;
 		return new MessageElement(name, perms.toString());

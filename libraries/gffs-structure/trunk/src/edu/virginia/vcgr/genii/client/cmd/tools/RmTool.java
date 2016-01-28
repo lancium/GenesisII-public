@@ -107,7 +107,8 @@ public class RmTool extends BaseGridTool
 		if (!path.exists()) {
 			if (force)
 				return PathOutcome.OUTCOME_SUCCESS; // no error for this case with force enabled.
-			if (stderr!=null) stderr.println(path.getName() + " does not exist.");
+			if (stderr != null)
+				stderr.println(path.getName() + " does not exist.");
 			return PathOutcome.OUTCOME_NOTHING;
 		}
 		if (recursive)
@@ -157,7 +158,8 @@ public class RmTool extends BaseGridTool
 			return ret;
 		if (force) {
 			String msg = "Forcing removal via unlink after exception.";
-			if (stderr!=null) stderr.println(msg);
+			if (stderr != null)
+				stderr.println(msg);
 			_logger.warn(msg);
 			try {
 				path.unlink();

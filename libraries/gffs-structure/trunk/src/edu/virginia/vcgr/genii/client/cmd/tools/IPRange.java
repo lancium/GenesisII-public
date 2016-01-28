@@ -16,8 +16,8 @@ import org.morgan.util.io.StreamUtils;
 
 public class IPRange implements Iterable<String>
 {
-	static final private Pattern MASK_PATTERN = Pattern
-		.compile("^\\s*(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\s*$");
+	static final private Pattern MASK_PATTERN =
+		Pattern.compile("^\\s*(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\.(\\d{1,3}|\\*)\\s*$");
 
 	static private void generate(Collection<String> values, String[] groups, int start, Set<String> ignoreList)
 	{

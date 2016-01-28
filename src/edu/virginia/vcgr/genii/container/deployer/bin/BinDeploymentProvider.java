@@ -64,8 +64,8 @@ public class BinDeploymentProvider extends AbstractDeploymentProvider implements
 				if (relativeToComponent != null && relativeToComponent.booleanValue()) {
 					String componentName = source.getComponentName();
 					if (componentName == null)
-						throw new DeploymentException("Can't place a component relative to another "
-							+ "without giving the other component's name.");
+						throw new DeploymentException(
+							"Can't place a component relative to another " + "without giving the other component's name.");
 
 					File other = relativeMap.get(componentName);
 					if (other == null)

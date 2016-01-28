@@ -46,8 +46,8 @@ public class DefaultNotificationMultiplexer implements NotificationMultiplexer
 	}
 
 	@Override
-	final public <ContentsType extends NotificationMessageContents> NotificationRegistration registerNotificationHandler(
-		TopicQueryExpression topicFilter, NotificationHandler<ContentsType> handler)
+	final public <ContentsType extends NotificationMessageContents> NotificationRegistration
+		registerNotificationHandler(TopicQueryExpression topicFilter, NotificationHandler<ContentsType> handler)
 	{
 		NotificationHandlerWrapper<ContentsType> wrapper = new NotificationHandlerWrapper<ContentsType>(topicFilter, handler);
 

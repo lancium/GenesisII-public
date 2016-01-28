@@ -78,14 +78,15 @@ public class FredClientApplication extends UIFrame
 		this(new UIContext(new ApplicationContext()), launchShell);
 	}
 
-	public FredClientApplication(UIContext context, boolean launchShell) throws FileNotFoundException, IOException, RNSPathDoesNotExistException
+	public FredClientApplication(UIContext context, boolean launchShell)
+		throws FileNotFoundException, IOException, RNSPathDoesNotExistException
 	{
 		this(context, launchShell, null);
 	}
 
 	@SuppressWarnings("unchecked")
-	public FredClientApplication(UIContext context, boolean launchShell, String startPath) throws FileNotFoundException, IOException,
-		RNSPathDoesNotExistException
+	public FredClientApplication(UIContext context, boolean launchShell, String startPath)
+		throws FileNotFoundException, IOException, RNSPathDoesNotExistException
 	{
 		super(context, "XSEDE GFFS Browser");
 
@@ -154,25 +155,26 @@ public class FredClientApplication extends UIFrame
 
 		// set the file viewer in the right side of the pane.
 		_browserPane.setRightComponent(
-		// GUIUtils.addTitle("Browser",
-			new TearoffPanel(_fileScroller, _fileList.createTearoffHandler(getUIContext().applicationContext()), new IconBasedTearoffThumb()));
+			// GUIUtils.addTitle("Browser",
+			new TearoffPanel(_fileScroller, _fileList.createTearoffHandler(getUIContext().applicationContext()),
+				new IconBasedTearoffThumb()));
 
 		// now set up the lower parts of the panel, where the credentials button and trash can are, with the diagnostics below them.
 		Insets zeroInset = new Insets(0, 0, 0, 0);
 
 		JPanel utilsPanel = new JPanel(new GridBagLayout());
-		utilsPanel.add(new CredentialManagementButton(_uiContext), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.3, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(0, 5, 0, 0), 0, 0));
+		utilsPanel.add(new CredentialManagementButton(_uiContext),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 0.3, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 0, 0), 0, 0));
 
-		utilsPanel.add(new TrashCanWidget(getUIContext().applicationContext(), _uiContext), new GridBagConstraints(1, 0, 1, 1, 1.0, 0.3,
-			GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 5, 5), 0, 0));
+		utilsPanel.add(new TrashCanWidget(getUIContext().applicationContext(), _uiContext),
+			new GridBagConstraints(1, 0, 1, 1, 1.0, 0.3, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 5, 5), 0, 0));
 
 		// add a diagnostics logging view.
 		LoggingListModel listModel = new LoggingListModel();
 		_debugTarget = new JList(listModel);
 		JScrollPane debugScroller = new JScrollPane(_debugTarget);
-		utilsPanel.add(debugScroller, new GridBagConstraints(0, 1, 3, 1, 1.0, 0.7, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			zeroInset, 0, 0));
+		utilsPanel.add(debugScroller,
+			new GridBagConstraints(0, 1, 3, 1, 1.0, 0.7, GridBagConstraints.CENTER, GridBagConstraints.BOTH, zeroInset, 0, 0));
 
 		// make the lower split pane first...
 		JSplitPane utilsAndTabbedPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
@@ -184,8 +186,8 @@ public class FredClientApplication extends UIFrame
 		uberSplitter.setTopComponent(_browserPane);
 		uberSplitter.setBottomComponent(utilsAndTabbedPanel);
 
-		outerPane.add(uberSplitter, new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			zeroInset, 0, 0));
+		outerPane.add(uberSplitter,
+			new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, zeroInset, 0, 0));
 
 		_fileList.addTreeSelectionListener(new RNSFileSelectionListener(_filePlugins));
 		_fileList.addMouseListener(new RNSTreePopupListener(_filePlugins));

@@ -88,8 +88,8 @@ public class ServerAuthorizationManagement
 	/*
 	 * hmmm: HUGE CAVEAT: signature checking is now no longer done in the 'from soap' pathway. we absolutely need to ensure that each chain is
 	 * checked once and only once.
-
-not yet actually.
+	 * 
+	 * not yet actually.
 	 */
 
 	static private TimedOutLRUCache<X509Certificate, TimedOutCredentialsCachePerSession> _clientSessionCredentialsCache =
@@ -133,14 +133,14 @@ not yet actually.
 					// not yet in the cache, so add it.
 					sessionCredsCache.put(rootCred.getId(), rootCred);
 					if (_logger.isDebugEnabled())
-						_logger.debug("added new credential " + rootCred.getId() + " to creds cache: "
-							+ rootCred.describe(VerbosityLevel.LOW));
+						_logger
+							.debug("added new credential " + rootCred.getId() + " to creds cache: " + rootCred.describe(VerbosityLevel.LOW));
 				} else {
 					// already in the cache, so refresh it.
 					sessionCredsCache.refresh(rootCred.getId());
 					if (_logger.isDebugEnabled())
-						_logger.debug("refreshed credential " + rootCred.getId() + " in creds cache: "
-							+ rootCred.describe(VerbosityLevel.LOW));
+						_logger
+							.debug("refreshed credential " + rootCred.getId() + " in creds cache: " + rootCred.describe(VerbosityLevel.LOW));
 				}
 			}
 		}
@@ -152,7 +152,7 @@ not yet actually.
 	 */
 	public static Collection<NuCredential> authenticateBearerCredentials(ArrayList<NuCredential> bearerCredentials,
 		ArrayList<X509Certificate[]> authenticatedCertChains, X509Certificate[] callerTLSCert, ICallingContext callContext)
-		throws AuthZSecurityException, GeneralSecurityException
+			throws AuthZSecurityException, GeneralSecurityException
 	{
 		if (_logger.isTraceEnabled()) {
 			_logger.debug("entered authBearCred with caller: " + callerTLSCert[0].getSubjectDN());
@@ -221,9 +221,8 @@ not yet actually.
 
 				if (!match) {
 					if (_logger.isDebugEnabled()) {
-						String msg =
-							"WARN: dropping credential which did not match incoming message sender: '"
-								+ assertion.describe(VerbosityLevel.HIGH) + "'";
+						String msg = "WARN: dropping credential which did not match incoming message sender: '"
+							+ assertion.describe(VerbosityLevel.HIGH) + "'";
 						_logger.debug(msg);
 					}
 					// skip adding it.
@@ -355,7 +354,8 @@ not yet actually.
 					} else {
 						if (_logger.isDebugEnabled())
 							_logger.debug("startup: rejecting client at remote address: " + clientIP);
-						//hmmm: make this something they can handle by trying again, not the try again fault so much, but something like that.
+						// hmmm: make this something they can handle by trying again, not the try again fault so much, but something like
+						// that.
 						throw new AxisFault("container in startup mode; access temporarily denied for remote connections.");
 					}
 				}
@@ -461,9 +461,8 @@ not yet actually.
 			IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 
 			// Let the authZ handler make the decision.
-			accessOkay =
-				authZHandler.checkAccess(authenticatedCallerCreds, resource,
-					(jDesc == null) ? operation.getDeclaringClass() : jDesc.getImplClass(), operation);
+			accessOkay = authZHandler.checkAccess(authenticatedCallerCreds, resource,
+				(jDesc == null) ? operation.getDeclaringClass() : jDesc.getImplClass(), operation);
 
 			if (accessOkay) {
 				addCredentialsForClientSession(clientSslCertChain[0], transientCredentials.generateWallet());

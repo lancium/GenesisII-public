@@ -191,8 +191,8 @@ public class ChmodTool extends BaseGridTool
 			return 1;
 	}
 
-	static private void chmod(RNSPath pathRNS, String modeString, AclEntry newEntry, boolean isRecursive) throws RNSException,
-		ResourcePropertyException, AuthZSecurityException
+	static private void chmod(RNSPath pathRNS, String modeString, AclEntry newEntry, boolean isRecursive)
+		throws RNSException, ResourcePropertyException, AuthZSecurityException
 	{
 		TypeInformation currentType = new TypeInformation(pathRNS.getEndpoint());
 		if (isRecursive && currentType.isRNS()) {

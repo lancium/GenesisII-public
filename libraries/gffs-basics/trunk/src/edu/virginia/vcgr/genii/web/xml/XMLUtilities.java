@@ -22,7 +22,8 @@ public class XMLUtilities
 		String value = element.getAttribute(attrName);
 		if (value == null || value.length() == 0) {
 			if (defaultValue == null)
-				throw new SAXException("Unable to find required attribute \"" + attrName + "\" in element \"" + element.getNodeName() + "\".");
+				throw new SAXException(
+					"Unable to find required attribute \"" + attrName + "\" in element \"" + element.getNodeName() + "\".");
 
 			value = defaultValue;
 		}

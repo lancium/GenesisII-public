@@ -118,9 +118,8 @@ class VariableTableModel extends AbstractTableModel
 			VariableDefinitionType newType = (VariableDefinitionType) aValue;
 			VariableDefinition definition = history.getHistorical(newType);
 			if (definition == null) {
-				VariableDefinitionEditor<VariableDefinition> editor =
-					(VariableDefinitionEditor<VariableDefinition>) newType.editorFactory().createEditor(
-						SwingUtilities.getWindowAncestor(_owner));
+				VariableDefinitionEditor<VariableDefinition> editor = (VariableDefinitionEditor<VariableDefinition>) newType.editorFactory()
+					.createEditor(SwingUtilities.getWindowAncestor(_owner));
 				editor.pack();
 				editor.setModalityType(ModalityType.DOCUMENT_MODAL);
 				GuiUtils.centerComponent(editor);

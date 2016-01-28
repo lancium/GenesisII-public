@@ -34,8 +34,8 @@ public class GffsExportConfiguration
 	public static final int MAX_GRIDMAP_CACHE_ELEMENTS = 200;
 
 	// the cache for mapping between DN and grid map users.
-	private static TimedOutLRUCache<String, GridMapUserList> _dnCache = new TimedOutLRUCache<String, GridMapUserList>(
-		MAX_GRIDMAP_CACHE_ELEMENTS, GRIDMAP_CACHE_LIFETIME);
+	private static TimedOutLRUCache<String, GridMapUserList> _dnCache =
+		new TimedOutLRUCache<String, GridMapUserList>(MAX_GRIDMAP_CACHE_ELEMENTS, GRIDMAP_CACHE_LIFETIME);
 
 	// tracks last timestamp we saw on the gridmap file.
 	private static FileChangeTracker _GridmapChangeTracker = null;

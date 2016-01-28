@@ -80,20 +80,20 @@ public class SMBServer implements Runnable
 			while (inetAddresses.hasMoreElements()) {
 				String toAdd = inetAddresses.nextElement().toString();
 				if (_logger.isDebugEnabled())
-					_logger.debug("adding acceptable interface for this host: '" + toAdd + "'" );
+					_logger.debug("adding acceptable interface for this host: '" + toAdd + "'");
 				toReturn.add(toAdd);
 			}
 		}
 		return toReturn;
 	}
-	
+
 	static HashSet<String> allOurIPAddresses = getInterfaces(getNetworks());
 
 	public boolean okayIPAddress(String ipAddr)
 	{
 		_logger.debug("vetting host address: " + ipAddr);
-//		if (ipAddr.equals("/127.0.0.1"))
-//			return true;
+		// if (ipAddr.equals("/127.0.0.1"))
+		// return true;
 		// iterate through hosts we know about here.
 		if (allOurIPAddresses.contains(ipAddr)) {
 			_logger.debug("okaying ip address that is listed locally: " + ipAddr);
@@ -109,7 +109,7 @@ public class SMBServer implements Runnable
 			try {
 				SocketChannel socketChannel = this.serverChannel.accept();
 				InetSocketAddress remoteAddr = (InetSocketAddress) socketChannel.getRemoteAddress();
-				//String remoteIP = (remoteAddr == null) ? null : remoteAddr.getAddress().toString();
+				// String remoteIP = (remoteAddr == null) ? null : remoteAddr.getAddress().toString();
 				// only accept connections on localhost, not whole network.
 				if ((remoteAddr == null) || !okayIPAddress(remoteAddr.getAddress().toString())) {
 					_logger.info("dropping connection from actual remote host: " + remoteAddr);

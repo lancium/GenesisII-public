@@ -44,10 +44,9 @@ public class ContainerServices
 					String.format("Error loading container service %s from file %s.", serviceClass, configuration.configurationFile()),
 					e.getCause());
 			} catch (Throwable cause) {
-				_logger
-					.error(
-						String.format("Error loading container service %s from file %s.", serviceClass, configuration.configurationFile()),
-						cause);
+				_logger.error(
+					String.format("Error loading container service %s from file %s.", serviceClass, configuration.configurationFile()),
+					cause);
 			}
 		}
 

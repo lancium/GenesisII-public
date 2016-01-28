@@ -59,8 +59,8 @@ public interface IAuthZProvider
 	/**
 	 * Returns the minimum level of incoming message level security required for the specified resource
 	 */
-	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
-		ResourceException;
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource)
+		throws AuthZSecurityException, ResourceException;
 
 	/**
 	 * Returns the entire AuthZ configuration for the resource, by default sanitized
@@ -77,8 +77,8 @@ public interface IAuthZProvider
 	/**
 	 * Inform subscribers that the AuthZ configuration was changed.
 	 */
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource) throws AuthZSecurityException,
-		ResourceException;
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
+		throws AuthZSecurityException, ResourceException;
 
 	/**
 	 * Update the resource AuthZ configuration with the changes that were applied to a replica.

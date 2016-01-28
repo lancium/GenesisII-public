@@ -22,8 +22,8 @@ import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
  * 
  * @author mmm2a
  */
-public class DimeSByteIOTransferer extends AbstractByteIOTransferer<StreamableByteIOPortType> implements StreamableByteIOTransferer,
-	DimeByteIOTransferer
+public class DimeSByteIOTransferer extends AbstractByteIOTransferer<StreamableByteIOPortType>
+	implements StreamableByteIOTransferer, DimeByteIOTransferer
 {
 	/**
 	 * Create a new DIMESByteIO transferer.
@@ -51,9 +51,8 @@ public class DimeSByteIOTransferer extends AbstractByteIOTransferer<StreamableBy
 		else
 			seekOrigin = ByteIOConstants.SEEK_ORIGIN_END_URI;
 
-		SeekRead seekReadRequest =
-			new SeekRead(offset, seekOrigin, new UnsignedInt(numBytes), new TransferInformationType(null,
-				ByteIOConstants.TRANSFER_TYPE_DIME_URI));
+		SeekRead seekReadRequest = new SeekRead(offset, seekOrigin, new UnsignedInt(numBytes),
+			new TransferInformationType(null, ByteIOConstants.TRANSFER_TYPE_DIME_URI));
 		_clientStub.seekRead(seekReadRequest);
 
 		return receiveResponseAttachmentData(_clientStub);

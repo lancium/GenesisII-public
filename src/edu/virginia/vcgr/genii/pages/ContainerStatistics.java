@@ -26,7 +26,8 @@ public class ContainerStatistics extends GenesisIIStyledPage
 		ps.format("<H3>Method Statistics for Class %s</H3>",
 			String.format("<A HREF=\"class-method-stats.html?className=%s\">%s</A>", className, classShortName));
 		ps.println("<TABLE border=\"1\">");
-		ps.println("<TR bgcolor=\"#7FFFD4\"><TH>Interval</TH><TH>Calls Started</TH><TH>Calls Completed</TH><TH>Calls Succeeded</TH><TH>Calls Failed</TH><TH>Failure Rate</TH><TH>Average Call Duration (ms)</TH></TR>");
+		ps.println(
+			"<TR bgcolor=\"#7FFFD4\"><TH>Interval</TH><TH>Calls Started</TH><TH>Calls Completed</TH><TH>Calls Succeeded</TH><TH>Calls Failed</TH><TH>Failure Rate</TH><TH>Average Call Duration (ms)</TH></TR>");
 		for (TimeInterval ti : map.keySet()) {
 			MethodStatisticsReport mReport = map.get(ti);
 			MethodStatisticsReportPoint point = mReport.classTotals().get(className);
@@ -52,7 +53,8 @@ public class ContainerStatistics extends GenesisIIStyledPage
 
 		ps.format("<H2>Database Statistics (last rejuvenated:  %tc)</H2><BR>", dbStats.databaseStartTime());
 		ps.println("<TABLE BORDER=\"1\">");
-		ps.println("<tr bgcolor=\"#7FFFD4\"><th>Interval</th><th>Connections Opened</TH><TH>Connections Closed</TH><TH>Average Connection Time (ms)</TH></TR>");
+		ps.println(
+			"<tr bgcolor=\"#7FFFD4\"><th>Interval</th><th>Connections Opened</TH><TH>Connections Closed</TH><TH>Average Connection Time (ms)</TH></TR>");
 		Map<TimeInterval, DatabaseStatisticsReport> reports = dbStats.report();
 		for (TimeInterval ti : reports.keySet()) {
 			DatabaseStatisticsReport report = reports.get(ti);
@@ -69,7 +71,8 @@ public class ContainerStatistics extends GenesisIIStyledPage
 		ps.println("<H2>Method Statistics</H2>");
 		ps.println("<H3>Container-wide Method Statistics</H3>");
 		ps.println("<TABLE BORDER=\"1\">");
-		ps.println("<TR bgcolor=\"#7FFFD4\"><TH>Interval</TH><TH>Calls Started</TH><TH>Calls Completed</TH><TH>Calls Succeeded</TH><TH>Calls Failed</TH><TH>Failure Rate</TH><TH>Average Call Duration (ms)</TH></TR>");
+		ps.println(
+			"<TR bgcolor=\"#7FFFD4\"><TH>Interval</TH><TH>Calls Started</TH><TH>Calls Completed</TH><TH>Calls Succeeded</TH><TH>Calls Failed</TH><TH>Failure Rate</TH><TH>Average Call Duration (ms)</TH></TR>");
 		Map<TimeInterval, MethodStatisticsReport> mReports = mStats.report();
 		for (TimeInterval ti : mReports.keySet()) {
 			MethodStatisticsReport mReport = mReports.get(ti);

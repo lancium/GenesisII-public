@@ -36,8 +36,8 @@ public class SMBNegotiate implements SMBCommand
 	public static final int CAP_LARGE_READX = 0x4000;
 
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		int core = -1; // core protocol
 		int LM10 = -1; // extended 1.0 protocol

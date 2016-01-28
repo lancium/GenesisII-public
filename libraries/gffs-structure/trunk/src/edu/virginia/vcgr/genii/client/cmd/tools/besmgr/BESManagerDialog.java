@@ -27,8 +27,8 @@ public class BESManagerDialog extends JDialog
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		add(new BESManagerPanel(ContextManager.getExistingContext(), target), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(new BESManagerPanel(ContextManager.getExistingContext(), target),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}

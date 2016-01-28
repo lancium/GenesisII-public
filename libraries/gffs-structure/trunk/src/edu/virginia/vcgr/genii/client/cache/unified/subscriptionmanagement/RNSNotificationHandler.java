@@ -72,8 +72,8 @@ public class RNSNotificationHandler
 		CacheManager.putItemInCache(publisher, RNSConstants.ELEMENT_COUNT_QNAME, element);
 	}
 
-	private static void
-		handleEntryAddition(RNSContentChangeNotification notification, EndpointReferenceType publisher, RNSOperation operation)
+	private static void handleEntryAddition(RNSContentChangeNotification notification, EndpointReferenceType publisher,
+		RNSOperation operation)
 	{
 
 		EndpointReferenceType newEntry = notification.getEntry();

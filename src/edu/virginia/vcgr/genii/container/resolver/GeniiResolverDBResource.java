@@ -22,13 +22,13 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 public class GeniiResolverDBResource extends BasicDBResource implements IGeniiResolverResource
 {
 	static private final String _INSERT_RESOLVER_ENTRY_STMT = "INSERT INTO resolverentries VALUES (?, ?, ?, ?)";
-	static private final String _DELETE_RESOLVER_ENTRY_STMT = "DELETE FROM resolverentries "
-		+ "WHERE resourceid = ? and epi = ? and targetid = ?";
+	static private final String _DELETE_RESOLVER_ENTRY_STMT =
+		"DELETE FROM resolverentries " + "WHERE resourceid = ? and epi = ? and targetid = ?";
 	static private final String _GET_TARGETEPI_LIST_STMT = "SELECT DISTINCT epi FROM resolverentries " + "WHERE resourceid = ?";
-	static private final String _GET_TARGETEPR_STMT = "SELECT endpoint FROM resolverentries "
-		+ "WHERE resourceid = ? AND epi = ? AND targetid = ?";
-	static private final String _GET_TARGETID_LIST_STMT = "SELECT targetid FROM resolverentries " + "WHERE resourceid = ? AND epi = ? "
-		+ "ORDER BY targetid";
+	static private final String _GET_TARGETEPR_STMT =
+		"SELECT endpoint FROM resolverentries " + "WHERE resourceid = ? AND epi = ? AND targetid = ?";
+	static private final String _GET_TARGETID_LIST_STMT =
+		"SELECT targetid FROM resolverentries " + "WHERE resourceid = ? AND epi = ? " + "ORDER BY targetid";
 	static private final String _GET_ENTRY_COUNT_STMT = "SELECT COUNT(targetid) FROM resolverentries " + "WHERE resourceid = ?";
 	static private final String _LIST_RESOLVERS_STMT = "SELECT DISTINCT resourceid, epi FROM resolverentries";
 	static private final String _GET_ALL_ENTRIES_STMT = "SELECT epi, targetid, endpoint from resolverentries " + "WHERE resourceid = ?";

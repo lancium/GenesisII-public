@@ -23,6 +23,6 @@ public interface ResourceSyncRunner
 
 	/**
 	 * Return attributes that are used to the govern behavior of a replica EPR creation process.
-	 * */
+	 */
 	public Collection<MessageElement> getDefaultAttributes(EndpointReferenceType primaryEPR);
 }

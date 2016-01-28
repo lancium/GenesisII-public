@@ -73,8 +73,8 @@ class HistoryCategoryFilterDialog extends JDialog
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JScrollPane(table),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(ButtonPanel.createHorizontalPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 	}

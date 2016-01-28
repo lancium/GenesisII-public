@@ -94,8 +94,8 @@ public class XmlUtils
 	/**
 	 * Create a new document from the given URI, use the username and password if the URI requires authentication.
 	 */
-	public static Document newDocument(String uri, String username, String password) throws ParserConfigurationException, SAXException,
-		IOException
+	public static Document newDocument(String uri, String username, String password)
+		throws ParserConfigurationException, SAXException, IOException
 	{
 		InputSource ins = getInputSourceFromURI(uri, username, password);
 

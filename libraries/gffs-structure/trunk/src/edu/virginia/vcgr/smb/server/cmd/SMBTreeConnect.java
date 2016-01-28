@@ -19,10 +19,9 @@ public class SMBTreeConnect implements SMBCommand
 {
 	static private Log _logger = LogFactory.getLog(SMBTreeConnect.class);
 
-//hmmm: ARGH, this code is nearly identical to SMBTreeConnectAndX.  abstract the shared code!
-	//hmmm: ARGH ARGH ARGH, probably all of these AndX are similar copies of functionality.
-	
-	
+	// hmmm: ARGH, this code is nearly identical to SMBTreeConnectAndX. abstract the shared code!
+	// hmmm: ARGH ARGH ARGH, probably all of these AndX are similar copies of functionality.
+
 	@Override
 	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
 		throws SMBException, IOException
@@ -43,12 +42,11 @@ public class SMBTreeConnect implements SMBCommand
 			// this is a special path for interprocess communication. we don't actually know what to serve here.
 			_logger.debug("** seeing IPC$ path");
 			// hmmm: for now leave internal there at root.
-			
-			//hmmm: trying different approach: tell it we can't handle this.  does not make it better.
-			//throw new SMBException(NTStatus.NOT_IMPLEMENTED);
-			//hmmm: trying not found instead.
+
+			// hmmm: trying different approach: tell it we can't handle this. does not make it better.
+			// throw new SMBException(NTStatus.NOT_IMPLEMENTED);
+			// hmmm: trying not found instead.
 			throw new SMBException(NTStatus.OBJECT_PATH_NOT_FOUND);
-			
 
 		} else {
 

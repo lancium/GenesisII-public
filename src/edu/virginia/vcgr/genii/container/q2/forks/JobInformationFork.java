@@ -44,8 +44,8 @@ public class JobInformationFork extends AbstractStreamableByteIOFactoryResourceF
 {
 	static private final String _FORMAT = "%1$-36s   %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY   %3$-4d   %4$s";
 
-	static private Pattern JOB_FORK_PATH_PATTERN = Pattern
-		.compile("\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}");
+	static private Pattern JOB_FORK_PATH_PATTERN =
+		Pattern.compile("\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}");
 
 	static public String determineJobTicketFromForkPath(String forkPath) throws RemoteException
 	{
@@ -143,10 +143,9 @@ public class JobInformationFork extends AbstractStreamableByteIOFactoryResourceF
 						throw new RuntimeException("Unable to deserialize owner identities.", e);
 					}
 
-					jInfo =
-						new JobInformation(ticket, jit.getJobName(), identities, QueueStates.fromQueueStateType(jit.getJobStatus()),
-							(int) jit.getPriority(), jit.getSubmitTime(), jit.getStartTime(), jit.getFinishTime(), jit.getAttempts()
-								.intValue(), jit.getBesStatus(), jit.getScheduledOn());
+					jInfo = new JobInformation(ticket, jit.getJobName(), identities, QueueStates.fromQueueStateType(jit.getJobStatus()),
+						(int) jit.getPriority(), jit.getSubmitTime(), jit.getStartTime(), jit.getFinishTime(), jit.getAttempts().intValue(),
+						jit.getBesStatus(), jit.getScheduledOn());
 				}
 			} else {
 				for (ReducedJobInformationType rjit : mgr.listJobs(jobTicket)) {

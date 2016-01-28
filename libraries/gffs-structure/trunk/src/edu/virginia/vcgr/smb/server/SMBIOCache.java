@@ -26,7 +26,7 @@ public class SMBIOCache
 			if (_logger.isDebugEnabled())
 				_logger.debug("creating a new waiter thread");
 		}
-		
+
 		public void run()
 		{
 			try {
@@ -124,14 +124,13 @@ public class SMBIOCache
 
 	private void doFlushAsync() throws SMBException
 	{
-		_logger.info("mapping async flush to sync one as debugging test" );
+		_logger.info("mapping async flush to sync one as debugging test");
 		boolean doAsynch = false;
 		if (!doAsynch) {
-			 doFlushSync();
-			 return;
+			doFlushSync();
+			return;
 		}
-		
-		
+
 		byte[] data;
 		long off;
 
@@ -154,7 +153,7 @@ public class SMBIOCache
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("doLoadBlock loading block=" + block);
-		
+
 		synchronized (cached) {
 			// data must be flushed now
 			doFlushAsync();
@@ -239,14 +238,14 @@ public class SMBIOCache
 
 		SMBIOCache.this.doFlushSync();
 
-		//hmmm: turning off use of the waiter object.
-//		synchronized (cached) {
-//			if (!waiting) {
-//				waiting = true;
-//				Waiter w = new Waiter();
-//				w.start();
-//			}
-//		}
+		// hmmm: turning off use of the waiter object.
+		// synchronized (cached) {
+		// if (!waiting) {
+		// waiting = true;
+		// Waiter w = new Waiter();
+		// w.start();
+		// }
+		// }
 	}
 
 	public int read(ByteBuffer data, long off) throws SMBException
@@ -259,14 +258,14 @@ public class SMBIOCache
 
 		if (_logger.isDebugEnabled())
 			_logger.debug("smb data remaining in buff=" + size + " endOffset=" + endOff);
-		
+
 		if (size <= 0) {
 			// no data is left to read.
 			if (_logger.isDebugEnabled())
 				_logger.debug("bailing out of smb cache read since no data left");
 			return 0;
 		}
-		
+
 		while (true) {
 			if (startBlock == curBlock && endBlock == curBlock) {
 				// Fits completely
@@ -329,7 +328,8 @@ public class SMBIOCache
 	{
 		try {
 			transferer.truncAppend(size, new byte[0]);
-			// hmmm: this was jumping to curBlock, but that could be past end of the file after truncate, so we jump back to just after the write.
+			// hmmm: this was jumping to curBlock, but that could be past end of the file after truncate, so we jump back to just after the
+			// write.
 			curBlock = size >> XFER_LOG_SIZE;
 			doLoadBlock(curBlock);
 		} catch (RemoteException e) {

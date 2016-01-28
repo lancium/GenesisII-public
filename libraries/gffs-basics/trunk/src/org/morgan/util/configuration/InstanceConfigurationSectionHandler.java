@@ -70,8 +70,8 @@ public class InstanceConfigurationSectionHandler extends ClassConfigurationSecti
 		return ret;
 	}
 
-	static protected Object createInstance(Class<?> cl, Properties props) throws IllegalAccessException, InvocationTargetException,
-		InstantiationException, NoSuchMethodException
+	static protected Object createInstance(Class<?> cl, Properties props)
+		throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException
 	{
 		Constructor<?> cons = null;
 

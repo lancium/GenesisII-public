@@ -37,9 +37,8 @@ public class QueryBuilder
 		 * XQuery query is formed.
 		 */
 		if (!GUIStructure.getOSTypeValue().equals("")) {
-			OSTypeQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/"
-					+ "ns2:OperatingSystem/ns3:OperatingSystemType[ns3:OperatingSystemName = '" + GUIStructure.getOSTypeValue() + "'] ";
+			OSTypeQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/"
+				+ "ns2:OperatingSystem/ns3:OperatingSystemType[ns3:OperatingSystemName = '" + GUIStructure.getOSTypeValue() + "'] ";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(OSTypeQuery);
 			else
@@ -47,9 +46,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getOSVersionValue().equals("")) {
-			OSVersionQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/"
-					+ "ns2:OperatingSystem/ns3:OperatingSystemType[ns3:OperatingSystemVersion = '" + GUIStructure.getOSVersionValue() + "'] ";
+			OSVersionQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/"
+				+ "ns2:OperatingSystem/ns3:OperatingSystemType[ns3:OperatingSystemVersion = '" + GUIStructure.getOSVersionValue() + "'] ";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(OSVersionQuery);
 			else
@@ -57,9 +55,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getCPUArchitectureNameValue().equals("")) {
-			CPUArchitectureNameQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/" + "ns2:CPUArchitecture[ns4:CPUArchitectureName= '"
-					+ GUIStructure.getCPUArchitectureNameValue() + "'] ";
+			CPUArchitectureNameQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/"
+				+ "ns2:CPUArchitecture[ns4:CPUArchitectureName= '" + GUIStructure.getCPUArchitectureNameValue() + "'] ";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(CPUArchitectureNameQuery);
 			else
@@ -67,9 +64,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getCPUCountValue().equals("")) {
-			CPUCountQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:CPUCount >= '"
-					+ GUIStructure.getCPUCountValue() + "']";
+			CPUCountQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:CPUCount >= '"
+				+ GUIStructure.getCPUCountValue() + "']";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(CPUCountQuery);
 			else
@@ -77,9 +73,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getCPUSpeedValue().equals("")) {
-			CPUSpeedQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:CPUSpeed >= '"
-					+ GUIStructure.getCPUSpeedValue() + "']";
+			CPUSpeedQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:CPUSpeed >= '"
+				+ GUIStructure.getCPUSpeedValue() + "']";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(CPUSpeedQuery);
 			else
@@ -87,9 +82,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getPhysicalMemoryValue().equals("")) {
-			physicalMemoryQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:PhysicalMemory >= '"
-					+ GUIStructure.getPhysicalMemoryValue() + "']";
+			physicalMemoryQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:PhysicalMemory >= '"
+				+ GUIStructure.getPhysicalMemoryValue() + "']";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(physicalMemoryQuery);
 			else
@@ -97,9 +91,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getVirtualMemoryValue().equals("")) {
-			virtualMemoryQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:VirtualMemory >= '"
-					+ GUIStructure.getVirtualMemoryValue() + "']";
+			virtualMemoryQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:VirtualMemory >= '"
+				+ GUIStructure.getVirtualMemoryValue() + "']";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(virtualMemoryQuery);
 			else
@@ -107,9 +100,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getCommonNameValue().equals("")) {
-			commonNameQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:CommonName='"
-					+ GUIStructure.getCommonNameValue() + "']";
+			commonNameQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:CommonName='"
+				+ GUIStructure.getCommonNameValue() + "']";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(commonNameQuery);
 			else
@@ -117,9 +109,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getTotalNumberOfActivitiesValue().equals("")) {
-			totalNumberOfActivitiesQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:CommonName ='"
-					+ GUIStructure.getTotalNumberOfActivitiesValue() + "']";
+			totalNumberOfActivitiesQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:CommonName ='"
+				+ GUIStructure.getTotalNumberOfActivitiesValue() + "']";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(totalNumberOfActivitiesQuery);
 			else
@@ -127,9 +118,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getLocalResourcemanagerValue().equals("")) {
-			localResourceManagerQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:LocalResourceManagerType='"
-					+ GUIStructure.getLocalResourcemanagerValue() + "']";
+			localResourceManagerQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument"
+				+ "[ns2:LocalResourceManagerType='" + GUIStructure.getLocalResourcemanagerValue() + "']";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(localResourceManagerQuery);
 			else
@@ -137,9 +127,8 @@ public class QueryBuilder
 		}
 
 		if (!GUIStructure.getNamingProfilevalue().equals("")) {
-			namingProfileQuery =
-				"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:NamingProfile='"
-					+ GUIStructure.getNamingProfilevalue() + "']";
+			namingProfileQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:NamingProfile='"
+				+ GUIStructure.getNamingProfilevalue() + "']";
 			if (resultingQuery.equals(""))
 				resultingQuery = resultingQuery.concat(namingProfileQuery);
 			else
@@ -147,9 +136,8 @@ public class QueryBuilder
 		}
 
 		// if (!GUIStructure.getIsAcceptingNewActivitiesValue().equals(""))
-		isAcceptingNewActivitiesQuery =
-			"$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument" + "[ns2:IsAcceptingNewActivities='"
-				+ GUIStructure.getIsAcceptingNewActivitiesValue() + "']";
+		isAcceptingNewActivitiesQuery = "$i/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument"
+			+ "[ns2:IsAcceptingNewActivities='" + GUIStructure.getIsAcceptingNewActivitiesValue() + "']";
 		if (resultingQuery.equals(""))
 			resultingQuery = resultingQuery.concat(isAcceptingNewActivitiesQuery);
 		else

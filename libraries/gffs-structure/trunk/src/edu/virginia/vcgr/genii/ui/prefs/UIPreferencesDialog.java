@@ -46,8 +46,8 @@ class UIPreferencesDialog extends JDialog
 			tabbedPane.addTab(pSet.preferenceSetName(), editor);
 		}
 
-		add(tabbedPane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5,
-			5), 5, 5));
+		add(tabbedPane,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		add(ButtonPanel.createHorizontalButtonPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 

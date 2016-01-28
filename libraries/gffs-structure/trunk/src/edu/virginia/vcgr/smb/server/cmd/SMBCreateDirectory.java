@@ -14,8 +14,8 @@ import edu.virginia.vcgr.smb.server.SMBTree;
 public class SMBCreateDirectory implements SMBCommand
 {
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		String path = data.getSMBString(h.isUnicode());
 

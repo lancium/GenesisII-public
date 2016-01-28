@@ -45,9 +45,8 @@ class SPMDVariations
 	static SPMDVariations readVariations(File configurationDirectory) throws IOException, JAXBException
 	{
 		_logger.info("config dir for read variations is: " + configurationDirectory);
-		IOSource source =
-			new OverridenIOSource(new FileIOSource(new File(configurationDirectory, FILENAME)), new ClassRelativeIOSource(
-				SPMDVariations.class, FILENAME));
+		IOSource source = new OverridenIOSource(new FileIOSource(new File(configurationDirectory, FILENAME)),
+			new ClassRelativeIOSource(SPMDVariations.class, FILENAME));
 		InputStream in = null;
 
 		try {

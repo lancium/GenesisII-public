@@ -179,9 +179,8 @@ public abstract class AbstractLoginHandler implements CallbackHandler
 						passwordChars = _password;
 						_password = null;
 					} else {
-						passwordChars =
-							new String(getPassword("Key Password", "Enter key password for \"" + entry._certChain[0].getSubjectDN().getName()
-								+ "\"."));
+						passwordChars = new String(
+							getPassword("Key Password", "Enter key password for \"" + entry._certChain[0].getSubjectDN().getName() + "\"."));
 					}
 				}
 			}

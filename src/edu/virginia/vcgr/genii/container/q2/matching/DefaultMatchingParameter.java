@@ -114,7 +114,7 @@ public class DefaultMatchingParameter extends MatchingParameter
 	}
 
 	@Override
-	boolean matches(Collection<MatchingParameter> params)
+		boolean matches(Collection<MatchingParameter> params)
 	{
 		if (_property == null) {
 			_logger.warn("Found a matching parameter property with no name.");

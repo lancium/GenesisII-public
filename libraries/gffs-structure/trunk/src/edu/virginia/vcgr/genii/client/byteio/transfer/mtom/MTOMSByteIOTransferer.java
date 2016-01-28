@@ -22,8 +22,8 @@ import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
  * 
  * @author mmm2a
  */
-public class MTOMSByteIOTransferer extends AbstractByteIOTransferer<StreamableByteIOPortType> implements StreamableByteIOTransferer,
-	MTOMByteIOTransferer
+public class MTOMSByteIOTransferer extends AbstractByteIOTransferer<StreamableByteIOPortType>
+	implements StreamableByteIOTransferer, MTOMByteIOTransferer
 {
 	/**
 	 * Create a new MTOMSByteIO transferer.
@@ -51,9 +51,8 @@ public class MTOMSByteIOTransferer extends AbstractByteIOTransferer<StreamableBy
 		else
 			seekOrigin = ByteIOConstants.SEEK_ORIGIN_END_URI;
 
-		SeekRead seekReadRequest =
-			new SeekRead(offset, seekOrigin, new UnsignedInt(numBytes), new TransferInformationType(null,
-				ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+		SeekRead seekReadRequest = new SeekRead(offset, seekOrigin, new UnsignedInt(numBytes),
+			new TransferInformationType(null, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
 		_clientStub.seekRead(seekReadRequest);
 
 		return receiveResponseAttachmentData(_clientStub);

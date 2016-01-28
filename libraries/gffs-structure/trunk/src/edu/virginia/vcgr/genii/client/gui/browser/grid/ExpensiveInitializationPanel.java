@@ -33,8 +33,8 @@ public abstract class ExpensiveInitializationPanel extends JPanel
 	{
 		super(new GridBagLayout());
 
-		add(new JLabel("Initializating panel..."), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JLabel("Initializating panel..."),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		addComponentListener(new LazyResolver());
 	}
@@ -64,8 +64,8 @@ public abstract class ExpensiveInitializationPanel extends JPanel
 		 * Remove all previous components and add the new one instead
 		 */
 		removeAll();
-		add(newComponent, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5,
-			5, 5), 5, 5));
+		add(newComponent,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		/*
 		 * We have to revalidate the panel so that it will be re-drawn

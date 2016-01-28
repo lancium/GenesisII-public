@@ -24,7 +24,8 @@ public class SMBTransactionInfo
 		this.maxSetupCount = maxSetupCount;
 	}
 
-	public SMBTransactionInfo(int totalParamCount, int totalDataCount, int maxParamCount, int maxDataCount, SMBBuffer setup, int maxSetupCount)
+	public SMBTransactionInfo(int totalParamCount, int totalDataCount, int maxParamCount, int maxDataCount, SMBBuffer setup,
+		int maxSetupCount)
 	{
 		this.params = SMBBuffer.allocateBuffer(totalParamCount);
 		this.data = SMBBuffer.allocateBuffer(totalDataCount);

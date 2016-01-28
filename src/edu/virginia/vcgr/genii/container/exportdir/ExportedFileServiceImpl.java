@@ -47,9 +47,8 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements 
 			_logger.debug("Creating new ExportedFile Resource.");
 
 		if (constructionParameters == null) {
-			ResourceCreationFaultType rcft =
-				new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"Could not create ExportedFile resource without cerationProperties") }, null);
+			ResourceCreationFaultType rcft = new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+				new BaseFaultTypeDescription("Could not create ExportedFile resource without cerationProperties") }, null);
 			throw FaultManipulator.fillInFault(rcft);
 		}
 
@@ -76,8 +75,7 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl implements 
 	 */
 
 	@RWXMapping(RWXCategory.READ)
-	public OpenStreamResponse openStream(Object openStreamRequest) throws RemoteException, ResourceCreationFaultType,
-		ResourceUnknownFaultType
+	public OpenStreamResponse openStream(Object openStreamRequest) throws RemoteException, ResourceCreationFaultType, ResourceUnknownFaultType
 	{
 		SByteIOFactory factory = null;
 		InputStream inLocal = null;

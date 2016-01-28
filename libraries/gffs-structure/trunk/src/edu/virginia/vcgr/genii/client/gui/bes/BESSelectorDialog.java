@@ -45,22 +45,22 @@ public class BESSelectorDialog extends JDialog
 		content.setLayout(new GridBagLayout());
 
 		JPanel besPanel = new JPanel(new GridBagLayout());
-		besPanel.add(new JScrollPane(_besList), new GridBagConstraints(0, 0, 1, 2, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		besPanel.add(new JButton(new CreateBESAction()), new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		besPanel.add(new JButton(new RemoveBESAction()), new GridBagConstraints(1, 1, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		besPanel.add(new JScrollPane(_besList),
+			new GridBagConstraints(0, 0, 1, 2, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		besPanel.add(new JButton(new CreateBESAction()),
+			new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		besPanel.add(new JButton(new RemoveBESAction()),
+			new GridBagConstraints(1, 1, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		besPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), "Local BES Containers"));
 
-		content.add(new JLabel("Select a BES container to manage."), new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(besPanel, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
-			5, 5, 5), 5, 5));
-		content.add(new JButton(new OKAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new CancelAction()), new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Select a BES container to manage."),
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(besPanel,
+			new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new OKAction()),
+			new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new CancelAction()),
+			new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}

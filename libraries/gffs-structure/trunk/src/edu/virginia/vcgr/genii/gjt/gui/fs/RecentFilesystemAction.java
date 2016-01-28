@@ -28,10 +28,8 @@ class RecentFilesystemAction extends AbstractAction
 
 		_recent = recent.second();
 
-		putValue(
-			Action.SMALL_ICON,
-			Icons.createTextIcon(new Font(Font.DIALOG, Font.PLAIN, 10), Color.gray, new Dimension(150, 23),
-				String.format("%1$tD %1$tr", recent.first())));
+		putValue(Action.SMALL_ICON, Icons.createTextIcon(new Font(Font.DIALOG, Font.PLAIN, 10), Color.gray, new Dimension(150, 23),
+			String.format("%1$tD %1$tr", recent.first())));
 	}
 
 	@Override

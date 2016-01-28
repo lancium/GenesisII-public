@@ -38,8 +38,8 @@ class GridStageEditor extends StageEditor<GridStageData>
 		// Let's see if we can work out the prefix
 		String goodPath = path.getValidPrefix(pathString);
 		/*
-		 * System.out.println("Starting stage out processing "); System.out.println("pathString = " + pathString);
-		 * System.out.println("valid prefix is " + goodPath);
+		 * System.out.println("Starting stage out processing "); System.out.println("pathString = " + pathString); System.out.println(
+		 * "valid prefix is " + goodPath);
 		 */
 		try {
 			path = path.lookup(pathString, RNSPathQueryFlags.MUST_EXIST);
@@ -59,26 +59,22 @@ class GridStageEditor extends StageEditor<GridStageData>
 			String errString = "";
 			// Note it cannot _be_ a byteio and not exist.
 			if (!exists)
-				errString =
-					"WARNING!!\n Path " + pathString + " does not exist OR you do not have permission.\n The prefix [" + goodPath
-						+ "] exists.\nThis will likely cause your job to fail!";
+				errString = "WARNING!!\n Path " + pathString + " does not exist OR you do not have permission.\n The prefix [" + goodPath
+					+ "] exists.\nThis will likely cause your job to fail!";
 			JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 		} else {
 			// This is a stage out. Need to make sure the target directory exists and is a directory
 			String errString = "Generic Error";
 			if (exists) {
 				if (!path.isByteIO()) {
-					errString =
-						"WARNING!!\n Path " + pathString + " exists and is not a file.\nIf it exists it should be a file.\n"
-							+ "This will likely cause your job to fail!";
+					errString = "WARNING!!\n Path " + pathString + " exists and is not a file.\nIf it exists it should be a file.\n"
+						+ "This will likely cause your job to fail!";
 				} else
-					errString =
-						"WARNING!!\n Path " + pathString + " already exists and will be overwritten.\n"
-							+ "Make sure this is what you intend!";
+					errString = "WARNING!!\n Path " + pathString + " already exists and will be overwritten.\n"
+						+ "Make sure this is what you intend!";
 				if (path.isRNS()) {
-					errString =
-						"WARNING!!\n Path " + pathString
-							+ " is a DIRECTORY. Directories should not be targets.\nThis will likely cause your job to fail!";
+					errString = "WARNING!!\n Path " + pathString
+						+ " is a DIRECTORY. Directories should not be targets.\nThis will likely cause your job to fail!";
 				}
 				JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 			} else {
@@ -93,10 +89,9 @@ class GridStageEditor extends StageEditor<GridStageData>
 					 * System.out.println("parent path = " + parentPath); System.out.println("valid prefix is " + goodPath);
 					 */
 					if (parentPath.compareToIgnoreCase(goodPath) != 0) {
-						errString =
-							"WARNING!!\n Path " + pathString
-								+ " does not exist, its parent does not exist, OR you do not have permission.\n The prefix [" + goodPath
-								+ "] exists.\nThis will likely cause your job to fail!";
+						errString = "WARNING!!\n Path " + pathString
+							+ " does not exist, its parent does not exist, OR you do not have permission.\n The prefix [" + goodPath
+							+ "] exists.\nThis will likely cause your job to fail!";
 						JOptionPane.showMessageDialog(null, errString, "Click to continue", JOptionPane.WARNING_MESSAGE);
 					}
 				}
@@ -111,10 +106,10 @@ class GridStageEditor extends StageEditor<GridStageData>
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new JLabel("Grid Path"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+		content.add(new JLabel("Grid Path"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(_path, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
-		content.add(_path, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
-			5, 5, 5, 5), 5, 5));
 
 		// content.add(new BrowseRNSPathAction(container,"Path to file", _path, "Another Path"),new
 		// GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,

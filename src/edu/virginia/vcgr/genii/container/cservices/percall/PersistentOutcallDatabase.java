@@ -36,10 +36,10 @@ class PersistentOutcallDatabase
 {
 	static private Log _logger = LogFactory.getLog(PersistentOutcallDatabase.class);
 
-	static final private String CREATE_TABLE_STMT = "CREATE TABLE persistentoutcalls("
-		+ "id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "target BLOB(2G) NOT NULL," + "outcallhandler BLOB(2G) NOT NULL,"
-		+ "callingcontext BLOB(2G) NOT NULL," + "nextattempt TIMESTAMP NOT NULL," + "createtime TIMESTAMP NOT NULL,"
-		+ "attemptscheduler BLOB(2G) NOT NULL," + "numattempts INTEGER NOT NULL," + "attachment VARCHAR(512))";
+	static final private String CREATE_TABLE_STMT = "CREATE TABLE persistentoutcalls(" + "id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
+		+ "target BLOB(2G) NOT NULL," + "outcallhandler BLOB(2G) NOT NULL," + "callingcontext BLOB(2G) NOT NULL,"
+		+ "nextattempt TIMESTAMP NOT NULL," + "createtime TIMESTAMP NOT NULL," + "attemptscheduler BLOB(2G) NOT NULL,"
+		+ "numattempts INTEGER NOT NULL," + "attachment VARCHAR(512))";
 
 	static private Calendar convert(Timestamp ts)
 	{
@@ -149,10 +149,8 @@ class PersistentOutcallDatabase
 		}
 
 		try {
-			stmt =
-				connection.prepareStatement("INSERT INTO persistentoutcalls(target, outcallhandler, "
-					+ "callingcontext, nextattempt, createtime, attemptscheduler, "
-					+ "numattempts, attachment) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+			stmt = connection.prepareStatement("INSERT INTO persistentoutcalls(target, outcallhandler, "
+				+ "callingcontext, nextattempt, createtime, attemptscheduler, " + "numattempts, attachment) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setBlob(1, EPRUtils.toBlob(target, "persistentoutcalls", "target"));
 			stmt.setBlob(2, DBSerializer.toBlob(outcallActor, "persistentoutcalls", "outcallhandler"));
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "persistentoutcalls", "callingcontext"));
@@ -202,9 +200,8 @@ class PersistentOutcallDatabase
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			stmt =
-				connection.prepareStatement("SELECT target, callingcontext, outcallhandler, attachment "
-					+ "FROM persistentoutcalls WHERE id = ?");
+			stmt = connection
+				.prepareStatement("SELECT target, callingcontext, outcallhandler, attachment " + "FROM persistentoutcalls WHERE id = ?");
 			stmt.setLong(1, entry.entryID());
 			rs = stmt.executeQuery();
 			if (rs.next()) {

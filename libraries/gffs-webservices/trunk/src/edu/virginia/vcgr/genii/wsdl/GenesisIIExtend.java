@@ -13,9 +13,8 @@ public class GenesisIIExtend extends AbstractXMLComponent implements IXMLCompone
 	{
 		super(sourcePath, parent, wsdlExtendNode);
 
-		_extendedPortTypeName =
-			WsdlUtils.getQNameFromString(wsdlExtendNode,
-				WsdlUtils.getAttribute(wsdlExtendNode.getAttributes(), WsdlConstants.PORT_TYPE_ATTR, true));
+		_extendedPortTypeName = WsdlUtils.getQNameFromString(wsdlExtendNode,
+			WsdlUtils.getAttribute(wsdlExtendNode.getAttributes(), WsdlConstants.PORT_TYPE_ATTR, true));
 	}
 
 	public QName getExtendedPortTypeName()

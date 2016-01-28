@@ -34,8 +34,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 {
 	static private Log _logger = LogFactory.getLog(RNSDBResource.class);
 
-	static private final String _ADD_ENTRY_STATEMENT = "INSERT INTO entries (resourceid, name, endpoint, id, attrs, endpoint_id) "
-		+ "VALUES(?, ?, ?, ?, ?, ?)";
+	static private final String _ADD_ENTRY_STATEMENT =
+		"INSERT INTO entries (resourceid, name, endpoint, id, attrs, endpoint_id) " + "VALUES(?, ?, ?, ?, ?, ?)";
 	static private final String _SELECT_ENTRIES_STMT = "SELECT name FROM entries WHERE resourceid = ?";
 	static private final String _SELECT_SINGLETON_ENTRY_STMT = "SELECT name FROM entries WHERE resourceid = ? AND name = ?";
 	static private final String _RETRIEVE_ONE_STMT =
@@ -107,8 +107,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("listentries time is " + (System.currentTimeMillis()-startTime));
-		
+				_logger.debug("listentries time is " + (System.currentTimeMillis() - startTime));
 
 			while (rs.next()) {
 				ret.add(rs.getString(1));
@@ -167,8 +166,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			long startTime = System.currentTimeMillis();
 			rs1 = stmt1.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("retrievebyentrieds time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("retrievebyentrieds time is " + (System.currentTimeMillis() - startTime));
 
 			Map<String, EndpointReferenceType> entriesWithMissingResourceKeys = new HashMap<String, EndpointReferenceType>();
 
@@ -247,8 +245,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("retrieve count time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("retrieve count time is " + (System.currentTimeMillis() - startTime));
 
 			if (rs.next())
 				count = rs.getInt(1);
@@ -290,8 +287,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("retrieve id time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("retrieve id time is " + (System.currentTimeMillis() - startTime));
 
 			if (isBatch) {
 				while (rs.next()) {
@@ -347,8 +343,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("retrieve by index time is " + (System.currentTimeMillis()-startTime));
-			
+				_logger.debug("retrieve by index time is " + (System.currentTimeMillis() - startTime));
 
 			if (rs.next()) {
 

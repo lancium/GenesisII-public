@@ -48,8 +48,7 @@ public class TextStateTranslator implements StateTranslator
 
 	/** {@inheritDoc} */
 	@Override
-	public <StateType> void write(SimpleStateResourceFork<StateType> originatingFork, StateType state, OutputStream output)
-		throws IOException
+	public <StateType> void write(SimpleStateResourceFork<StateType> originatingFork, StateType state, OutputStream output) throws IOException
 	{
 		PrintStream ps = new PrintStream(output);
 		ps.println(state);

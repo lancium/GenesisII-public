@@ -85,10 +85,8 @@ public class RationalNumberField extends JTextField
 		JDialog diag = new JDialog();
 		diag.getContentPane().setLayout(new GridBagLayout());
 
-		diag.getContentPane().add(
-			new RationalNumberField(),
-			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5,
-				5));
+		diag.getContentPane().add(new RationalNumberField(), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		diag.pack();
 		diag.setVisible(true);
 	}

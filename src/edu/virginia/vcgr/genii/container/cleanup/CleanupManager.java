@@ -64,9 +64,8 @@ public class CleanupManager
 			boolean succeeded = false;
 
 			try {
-				boolean doEnact =
-					enactCleanup
-						&& enactCleanup(properties.getProperty(String.format("%s.%s", handler.getClass().getName(), PROPERTY_SUFFIX), "true"));
+				boolean doEnact = enactCleanup
+					&& enactCleanup(properties.getProperty(String.format("%s.%s", handler.getClass().getName(), PROPERTY_SUFFIX), "true"));
 				handler.doCleanup(connection, doEnact);
 
 				if (doEnact)

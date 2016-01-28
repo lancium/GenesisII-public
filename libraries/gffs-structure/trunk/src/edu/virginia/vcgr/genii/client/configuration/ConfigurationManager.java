@@ -126,9 +126,9 @@ public class ConfigurationManager
 			return _manager;
 		}
 	}
-	
+
 	protected ConfigurationManager(String userDir)
-	{		
+	{
 		_userDir = new File(userDir);
 
 		System.setProperty(_USER_DIR_PROPERTY, FileSystemHelper.sanitizeFilename(_userDir.getAbsolutePath()));

@@ -24,8 +24,8 @@ public class SMBTreeConnectAndX implements SMBCommand
 	public final static int SHARE_IS_IN_DFS = 0x0002;
 
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		SMBAndX chain = SMBAndX.decode(params);
 		int flags = params.getUShort();
@@ -38,7 +38,7 @@ public class SMBTreeConnectAndX implements SMBCommand
 		if (flags == 0 || password == null || service == null) {
 			// silence unused var warning.
 		}
-		
+
 		if (_logger.isDebugEnabled())
 			_logger.debug("processing a path: " + path);
 
@@ -49,22 +49,20 @@ public class SMBTreeConnectAndX implements SMBCommand
 			// this is a special path for interprocess communication. we don't actually know what to serve here.
 			_logger.debug("** seeing IPC$ path");
 			// hmmm: for now leave internal there at root.
-			
-			//hmmm: trying different approach: tell it we can't handle this.  doesn't make it any better, maybe even worse.
-			//throw new SMBException(NTStatus.NOT_IMPLEMENTED);
-			//hmmm: trying not found instead.
+
+			// hmmm: trying different approach: tell it we can't handle this. doesn't make it any better, maybe even worse.
+			// throw new SMBException(NTStatus.NOT_IMPLEMENTED);
+			// hmmm: trying not found instead.
 			throw new SMBException(NTStatus.OBJECT_PATH_NOT_FOUND);
 
-			
-
-		} else {			
+		} else {
 			// We only listen to \\stuff\grid[\path]
 			String[] chunks = path.split("\\\\", 5);// Thanks regex
 			if (chunks.length < 4 || !chunks[0].isEmpty() || !chunks[1].isEmpty() || !chunks[3].equalsIgnoreCase("grid")) {
 				_logger.error("wacky parsing of path has failed.  bombing out.");
 				throw new SMBException(NTStatus.OBJECT_PATH_NOT_FOUND);
 			}
-	
+
 			if (chunks.length == 5)
 				internal = FileSystemHelper.sanitizeFilename("/" + chunks[4]);
 		}

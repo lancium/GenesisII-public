@@ -258,8 +258,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	 */
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
@@ -375,8 +375,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 	 * Hence we added this override to remove the sensitive properties from a get resource property document response.
 	 */
 	@Override
-	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(GetResourcePropertyDocument request) throws RemoteException,
-		ResourceUnknownFaultType, ResourceUnavailableFaultType
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(GetResourcePropertyDocument request)
+		throws RemoteException, ResourceUnknownFaultType, ResourceUnavailableFaultType
 	{
 
 		GetResourcePropertyDocumentResponse originalResponse = super.getResourcePropertyDocument(request);
@@ -511,8 +511,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 
 	/********************************** RNS Operations ***********************************************/
 
-	protected RNSEntryResponseType[] addRNSEntries(RNSEntryType[] addRequest, IRNSResource resource) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType
+	protected RNSEntryResponseType[] addRNSEntries(RNSEntryType[] addRequest, IRNSResource resource)
+		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 
 		if (addRequest == null || addRequest.length == 0)
@@ -526,11 +526,10 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				response[index] = new RNSEntryResponseType(null, null, fault, addRequest[index].getEntryName());
 			} catch (Throwable cause) {
 				_logger.error("failure during add request", cause);
-				response[index] =
-					new RNSEntryResponseType(null, null,
-						FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: " + cause.getMessage()) },
-							null)), addRequest[index].getEntryName());
+				response[index] = new RNSEntryResponseType(null, null,
+					FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
+						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to add entry: " + cause.getMessage()) }, null)),
+					addRequest[index].getEntryName());
 			}
 		}
 		return response;
@@ -550,8 +549,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 
 		Collection<RNSEntryResponseType> response = new LinkedList<RNSEntryResponseType>();
 		for (InternalEntry entry : entries) {
-			response.add(new RNSEntryResponseType(entry.getEntryReference(), RNSUtilities.createMetadata(entry.getEntryReference(),
-				entry.getAttributes()), null, entry.getName()));
+			response.add(new RNSEntryResponseType(entry.getEntryReference(),
+				RNSUtilities.createMetadata(entry.getEntryReference(), entry.getAttributes()), null, entry.getName()));
 		}
 
 		return RNSContainerUtilities.translate(response, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()));
@@ -579,8 +578,8 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		return response;
 	}
 
-	private RNSEntryResponseType addAnEntry(RNSEntryType addRequest, IRNSResource resource) throws RemoteException, ResourceException,
-		RNSEntryExistsFaultType
+	private RNSEntryResponseType addAnEntry(RNSEntryType addRequest, IRNSResource resource)
+		throws RemoteException, ResourceException, RNSEntryExistsFaultType
 	{
 
 		EndpointReferenceType entryReference;
@@ -653,10 +652,9 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			String entryName = contents.entryName();
 			EndpointReferenceType entryReference = contents.entryReference();
 
-			if ((operation == null)
-				|| !((operation.equals(RNSOperations.Add) && entryName != null && entryReference != null)
-					|| (operation.equals(RNSOperations.Remove) && entryName != null) || operation.equals(RNSOperations.Destroy) || operation
-						.equals(RNSOperations.Unlink))) {
+			if ((operation == null) || !((operation.equals(RNSOperations.Add) && entryName != null && entryReference != null)
+				|| (operation.equals(RNSOperations.Remove) && entryName != null) || operation.equals(RNSOperations.Destroy)
+				|| operation.equals(RNSOperations.Unlink))) {
 
 				_logger.info("invalid notification message");
 				return NotificationConstants.FAIL;

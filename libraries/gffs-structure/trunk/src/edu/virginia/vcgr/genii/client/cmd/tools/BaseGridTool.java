@@ -116,8 +116,8 @@ public abstract class BaseGridTool implements ITool
 		return lookup(RNSPath.getCurrent(), path);
 	}
 
-	static protected RNSPath lookup(RNSPath parent, GeniiPath path, RNSPathQueryFlags queryFlags) throws InvalidToolUsageException,
-		RNSPathDoesNotExistException, RNSPathAlreadyExistsException
+	static protected RNSPath lookup(RNSPath parent, GeniiPath path, RNSPathQueryFlags queryFlags)
+		throws InvalidToolUsageException, RNSPathDoesNotExistException, RNSPathAlreadyExistsException
 	{
 		if (path.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException(String.format("%s is not a grid path!", path));
@@ -125,8 +125,8 @@ public abstract class BaseGridTool implements ITool
 		return parent.lookup(path.path(), queryFlags);
 	}
 
-	public static RNSPath lookup(GeniiPath path, RNSPathQueryFlags queryFlags) throws InvalidToolUsageException,
-		RNSPathDoesNotExistException, RNSPathAlreadyExistsException
+	public static RNSPath lookup(GeniiPath path, RNSPathQueryFlags queryFlags)
+		throws InvalidToolUsageException, RNSPathDoesNotExistException, RNSPathAlreadyExistsException
 	{
 		return lookup(RNSPath.getCurrent(), path, queryFlags);
 	}

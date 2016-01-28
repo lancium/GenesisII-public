@@ -159,22 +159,19 @@ public class RequestHandler implements Runnable
 				if (resp_size < offset + Constants.WRITE_ARGS_SIZE) {
 					return false;
 				}
-				long w_offset =
-					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
-						contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
+				long w_offset = Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
+					contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
 				args[0] = w_offset;
 			} else if (isReadReq) {
 				// 16 bytes = 2 longs!
 				if (resp_size < offset + Constants.READ_ARGS_SIZE) {
 					return false;
 				}
-				long r_offset =
-					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
-						contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
+				long r_offset = Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
+					contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
 
-				long r_numBytes =
-					Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
-						contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
+				long r_numBytes = Conversions.getLongFromBytes(contents[offset++], contents[offset++], contents[offset++], contents[offset++],
+					contents[offset++], contents[offset++], contents[offset++], contents[offset++]);
 
 				args[0] = r_offset;
 				args[1] = r_numBytes;

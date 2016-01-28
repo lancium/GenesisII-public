@@ -138,8 +138,8 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 			reAdd(connection, entry);
 			connection.commit();
 		} catch (Throwable cause) {
-			_logger
-				.warn("Persistent outcall service tried to make outcall, but " + "got an exception -- putting it back in the list.", cause);
+			_logger.warn("Persistent outcall service tried to make outcall, but " + "got an exception -- putting it back in the list.",
+				cause);
 			try {
 				reAdd(connection, entry);
 			} catch (Throwable inner_cause) {

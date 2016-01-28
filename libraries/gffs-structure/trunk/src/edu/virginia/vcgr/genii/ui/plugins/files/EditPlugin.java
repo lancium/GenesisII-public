@@ -234,8 +234,8 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 							if (!_edit) {
 								if (_ownerComponent.getTopLevelAncestor() instanceof ClientApplication) {
 									ClientApplication top = (ClientApplication) _ownerComponent.getTopLevelAncestor();
-									top.addStatusLine("Please note:  you are viewing " + _source.getName()
-										+ ", updates WILL NOT be propagated.",
+									top.addStatusLine(
+										"Please note:  you are viewing " + _source.getName() + ", updates WILL NOT be propagated.",
 										"Double clicking on a file invokes the viewer, not the editor. Changes made with the viewer WILL NOT be propagated back to the GFFS.");
 								}
 							} else {
@@ -255,11 +255,11 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 							if (result.lastModified() > lastModified) {
 								// The file was updated
 								// Now upload
-								_context
-									.progressMonitorFactory()
+								_context.progressMonitorFactory()
 									.createMonitor(_ownerComponent, "Uploading File", "Uploading edited file.", 1L,
 										new UploadTask(_context, result, _source),
-										new UploadCompletionListener(_context, _ownerComponent, result)).start();
+										new UploadCompletionListener(_context, _ownerComponent, result))
+									.start();
 							} else {
 								// We need to clean up and throw away the old files
 								result.delete();

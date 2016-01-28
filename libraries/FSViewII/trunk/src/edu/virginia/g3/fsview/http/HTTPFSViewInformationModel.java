@@ -56,11 +56,11 @@ final class HTTPFSViewInformationModel extends AbstractFSViewInformationModel<UR
 	{
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(new JLabel("HTTP(S) URL"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JLabel("HTTP(S) URL"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		JTextField field = new JTextField(32);
-		panel.add(field, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
-			5, 5, 5), 5, 5));
+		panel.add(field, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 		field.addCaretListener(new CaretListener()
 		{
 			@Override

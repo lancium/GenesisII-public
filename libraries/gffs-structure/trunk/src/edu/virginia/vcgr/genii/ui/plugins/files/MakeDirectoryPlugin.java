@@ -65,10 +65,9 @@ public class MakeDirectoryPlugin extends AbstractCombinedUIMenusPlugin
 
 				// Now see if they want on the same storage service as the parent directory, or
 				// somewhere else
-				int sameStorage =
-					JOptionPane.showConfirmDialog(null, "Store directory on same storage server as parent directory "
-						+ path.getParent().toString(), "Decide where to store the directory and things created in it",
-						JOptionPane.YES_NO_OPTION);
+				int sameStorage = JOptionPane.showConfirmDialog(null,
+					"Store directory on same storage server as parent directory " + path.getParent().toString(),
+					"Decide where to store the directory and things created in it", JOptionPane.YES_NO_OPTION);
 				// System.err.println("samestorage = " + sameStorage);
 				if (sameStorage == 0) {
 					// They said yes - go figure 0 is yes

@@ -40,9 +40,9 @@ public class MatchingParamsTool extends BaseGridTool
 			if (index > 0)
 				MatchingParamEnum.valueOf(name.substring(0, index));
 		} catch (IllegalArgumentException e) {
-			throw new InvalidToolUsageException(String.format(
-				"Matching parameter name %s is not valid (requirment indicator must be %s, or %s).", name, MatchingParamEnum.requires,
-				MatchingParamEnum.supports));
+			throw new InvalidToolUsageException(
+				String.format("Matching parameter name %s is not valid (requirment indicator must be %s, or %s).", name,
+					MatchingParamEnum.requires, MatchingParamEnum.supports));
 		}
 	}
 

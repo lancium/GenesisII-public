@@ -322,7 +322,7 @@ public class CacheManager
 			SubscriptionDirectory.clearDirectory();
 			// flush any subscriptions that are still pending.
 			Subscriber.getInstance().flushPendingSubscriptions();
-			
+
 			try {
 				// drop any connections that are established to avoid keeping session alive with wrong creds.
 				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();

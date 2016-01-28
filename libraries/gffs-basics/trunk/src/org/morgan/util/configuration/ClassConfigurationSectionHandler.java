@@ -78,8 +78,8 @@ public class ClassConfigurationSectionHandler implements IXMLConfigurationSectio
 			Class<?> target = loader.loadClass(className);
 
 			if (!base.isAssignableFrom(target))
-				throw new ConfigurationException("Target class \"" + className + "\" is not derived off of (or does not implement) \""
-					+ base.getName() + "\".");
+				throw new ConfigurationException(
+					"Target class \"" + className + "\" is not derived off of (or does not implement) \"" + base.getName() + "\".");
 			return target;
 		} catch (ClassNotFoundException cnfe) {
 			throw new ConfigurationException(cnfe);

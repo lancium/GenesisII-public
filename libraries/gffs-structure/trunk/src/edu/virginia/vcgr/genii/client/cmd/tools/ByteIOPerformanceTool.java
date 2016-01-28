@@ -66,8 +66,8 @@ public class ByteIOPerformanceTool extends BaseGridTool
 		private ByteBuffer _block;
 		private RandomByteIOTransferer _source;
 
-		private Worker(RandomByteIOTransferer source, int blockSize) throws ResourceException, GenesisIISecurityException, RemoteException,
-			IOException
+		private Worker(RandomByteIOTransferer source, int blockSize)
+			throws ResourceException, GenesisIISecurityException, RemoteException, IOException
 		{
 			_block = ByteBuffer.allocate(blockSize);
 			_source = source;
@@ -166,9 +166,8 @@ public class ByteIOPerformanceTool extends BaseGridTool
 		long bytesTransferred = 0;
 
 		for (int lcv = 0; lcv < numThreads; lcv++) {
-			RandomByteIOTransferer sourceT =
-				RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class,
-					source.getEndpoint()));
+			RandomByteIOTransferer sourceT = RandomByteIOTransfererFactory
+				.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class, source.getEndpoint()));
 			Thread th = new Thread(new Worker(sourceT, blockSize));
 			th.setDaemon(true);
 			th.start();

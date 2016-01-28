@@ -40,8 +40,8 @@ public class SMBOpen implements SMBCommand
 	public static final int WRITETHROUGH_ENABLED = 0x4000;
 
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		int reqAccessMode = params.getUShort();
 		// Not used by NT servers; so neither do we

@@ -112,19 +112,19 @@ public class KeystoreLoginTool extends BaseLoginTool
 
 		if (delegateeIdentity == null) {
 			// Delegate the identity assertion to the temporary client identity.
-			TrustCredential assertion =
-				new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, certEntry._certChain, IdentityType.USER,
-					new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset, _credentialValidMillis,
-						SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+			TrustCredential assertion = new TrustCredential(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION, certEntry._certChain,
+				IdentityType.USER, new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset,
+					_credentialValidMillis, SecurityConstants.MaxDelegationDepth),
+				RWXCategory.FULL_ACCESS);
 			assertion.signAssertion(certEntry._privateKey);
 			retval.add(assertion);
 
 		} else {
 			// create a static attribute delegated to the specified party
-			TrustCredential assertion =
-				new TrustCredential(delegateeIdentity, IdentityType.CONNECTION, certEntry._certChain, IdentityType.USER,
-					new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset, _credentialValidMillis,
-						SecurityConstants.MaxDelegationDepth), RWXCategory.FULL_ACCESS);
+			TrustCredential assertion = new TrustCredential(delegateeIdentity, IdentityType.CONNECTION, certEntry._certChain,
+				IdentityType.USER, new BasicConstraints(System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset,
+					_credentialValidMillis, SecurityConstants.MaxDelegationDepth),
+				RWXCategory.FULL_ACCESS);
 			assertion.signAssertion(certEntry._privateKey);
 			retval.add(assertion);
 		}

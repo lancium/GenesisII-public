@@ -33,9 +33,8 @@ public class BESManagerConfigurationTask implements ProgressTask<ManagementData>
 	{
 		notifier.updateNote("Communicating with target BES container.");
 
-		BESRP rp =
-			(BESRP) ResourcePropertyManager.createRPInterface(_callingContext, _target, new Class<?>[] { BESRP.class },
-				bconsts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, BESConstants.POLICY_RP, BESConstants.THRESHOLD_RP);
+		BESRP rp = (BESRP) ResourcePropertyManager.createRPInterface(_callingContext, _target, new Class<?>[] { BESRP.class },
+			bconsts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, BESConstants.POLICY_RP, BESConstants.THRESHOLD_RP);
 
 		rp.setPolicy(_data.policy());
 		rp.setThreshold(_data.threshold());

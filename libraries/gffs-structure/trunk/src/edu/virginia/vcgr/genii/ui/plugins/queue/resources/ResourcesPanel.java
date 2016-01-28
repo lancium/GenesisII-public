@@ -147,11 +147,8 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 			for (int row : _table.getSelectedRows())
 				besNames.add(_model.row(row).name());
 
-			_context
-				.uiContext()
-				.progressMonitorFactory()
-				.createMonitor(_table, "Forcing Resource Update", "Forcing BES Resource Update", 1000L, new BESUpdaterTask(besNames),
-					new BESUpdaterCompletionListener()).start();
+			_context.uiContext().progressMonitorFactory().createMonitor(_table, "Forcing Resource Update", "Forcing BES Resource Update",
+				1000L, new BESUpdaterTask(besNames), new BESUpdaterCompletionListener()).start();
 		}
 	}
 
@@ -227,10 +224,10 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 
 		JScrollPane pane = new JScrollPane(_table);
 
-		add(pane, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5,
-			5));
-		add(new JButton(new RefreshAction()), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		add(pane,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JButton(new RefreshAction()),
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		setPreferredSize(TABLE_SIZE);
 	}

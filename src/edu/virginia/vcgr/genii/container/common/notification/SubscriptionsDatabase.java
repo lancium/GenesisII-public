@@ -34,9 +34,9 @@ public class SubscriptionsDatabase
 	static private Log _logger = LogFactory.getLog(SubscriptionsDatabase.class);
 
 	static final private String[] TABLE_STMTS = new String[] {
-		"CREATE TABLE wsnsubscriptions(" + "subscriptionresourcekey VARCHAR(128) PRIMARY KEY,"
-			+ "publisherresourcekey VARCHAR(128) NOT NULL," + "subscriptionreference BLOB(2G) NOT NULL," + "consumerreference BLOB(2G),"
-			+ "topicquery BLOB(2G)," + "policies BLOB(2G)," + "additionaluserdata BLOB(2G)," + "paused SMALLINT NOT NULL WITH DEFAULT 0)",
+		"CREATE TABLE wsnsubscriptions(" + "subscriptionresourcekey VARCHAR(128) PRIMARY KEY," + "publisherresourcekey VARCHAR(128) NOT NULL,"
+			+ "subscriptionreference BLOB(2G) NOT NULL," + "consumerreference BLOB(2G)," + "topicquery BLOB(2G)," + "policies BLOB(2G),"
+			+ "additionaluserdata BLOB(2G)," + "paused SMALLINT NOT NULL WITH DEFAULT 0)",
 		"CREATE INDEX wsnsubscriptionspubreskeyidx ON wsnsubscriptions(publisherresourcekey)" };
 
 	static private void destroySubscription(Connection connection, String subscriptionkey) throws ResourceException
@@ -58,10 +58,9 @@ public class SubscriptionsDatabase
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("INSERT INTO wsnsubscriptions(subscriptionresourcekey,"
-					+ "publisherresourcekey, subscriptionreference," + "consumerreference, topicquery," + "policies, additionaluserdata) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?)");
+			stmt = connection
+				.prepareStatement("INSERT INTO wsnsubscriptions(subscriptionresourcekey," + "publisherresourcekey, subscriptionreference,"
+					+ "consumerreference, topicquery," + "policies, additionaluserdata) " + "VALUES (?, ?, ?, ?, ?, ?, ?)");
 
 			stmt.setString(1, subscriptionResourceKey);
 			stmt.setString(2, publisherResourceKey);
@@ -123,7 +122,7 @@ public class SubscriptionsDatabase
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("destroy subscriptions time is " + (System.currentTimeMillis()-startTime));
+				_logger.debug("destroy subscriptions time is " + (System.currentTimeMillis() - startTime));
 			while (rs.next()) {
 				String subKey = null;
 
@@ -140,8 +139,8 @@ public class SubscriptionsDatabase
 		}
 	}
 
-	static public Collection<WSNSubscriptionInformation>
-		subscriptionsForPublisher(Connection connection, String publisherKey, TopicPath topic) throws SQLException
+	static public Collection<WSNSubscriptionInformation> subscriptionsForPublisher(Connection connection, String publisherKey,
+		TopicPath topic) throws SQLException
 	{
 		Collection<WSNSubscriptionInformation> subscriptions = new LinkedList<WSNSubscriptionInformation>();
 
@@ -149,15 +148,13 @@ public class SubscriptionsDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt =
-				connection.prepareStatement("SELECT subscriptionreference, consumerreference, topicquery, "
-					+ "policies, additionaluserdata FROM wsnsubscriptions " + "WHERE publisherresourcekey = ? AND paused = 0");
+			stmt = connection.prepareStatement("SELECT subscriptionreference, consumerreference, topicquery, "
+				+ "policies, additionaluserdata FROM wsnsubscriptions " + "WHERE publisherresourcekey = ? AND paused = 0");
 			stmt.setString(1, publisherKey);
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("set subsubscriptions time is " + (System.currentTimeMillis()-startTime));
-	
+				_logger.debug("set subsubscriptions time is " + (System.currentTimeMillis() - startTime));
 
 			while (rs.next()) {
 				addSubscriptionFromResults(topic, subscriptions, rs);
@@ -191,7 +188,7 @@ public class SubscriptionsDatabase
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("get sub subscriptions time is " + (System.currentTimeMillis()-startTime));
+				_logger.debug("get sub subscriptions time is " + (System.currentTimeMillis() - startTime));
 
 			while (rs.next()) {
 				addSubscriptionFromResults(topic, subscriptions, rs);
@@ -233,7 +230,7 @@ public class SubscriptionsDatabase
 				_logger.debug("Subscription query is " + query);
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("getindirect subscriptions time is " + (System.currentTimeMillis()-startTime));
+				_logger.debug("getindirect subscriptions time is " + (System.currentTimeMillis() - startTime));
 			while (rs.next()) {
 				indirectPublishers.add(rs.getString(1));
 			}
@@ -261,8 +258,8 @@ public class SubscriptionsDatabase
 			AdditionalUserData additionalUserData = (AdditionalUserData) DBSerializer.fromBlob(rs.getBlob(5));
 
 			if (topic == null || topicFilter == null || topicFilter.matches(topic)) {
-				subscriptions.add(new WSNSubscriptionInformation(subscriptionReference, consumerReference, topicFilter, policies,
-					additionalUserData));
+				subscriptions
+					.add(new WSNSubscriptionInformation(subscriptionReference, consumerReference, topicFilter, policies, additionalUserData));
 			}
 		} catch (ResourceException e) {
 			_logger.warn("Error trying to load subscription from database.", e);

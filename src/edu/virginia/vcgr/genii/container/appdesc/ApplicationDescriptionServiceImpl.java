@@ -68,8 +68,8 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
-		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams) throws ResourceException, BaseFaultType,
-		RemoteException
+		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, myEPR, cParams, creationParameters, resolverCreationParams);
 
@@ -115,14 +115,13 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 
 		try {
 			CreateFileResponseType response = null;
-			response =
-				super.createFile(createFile, new MessageElement[] { new MessageElement(
-					ApplicationDescriptionConstants.SUPPORT_DOCUMENT_ATTR_QNAME, supportDoc) });
+			response = super.createFile(createFile,
+				new MessageElement[] { new MessageElement(ApplicationDescriptionConstants.SUPPORT_DOCUMENT_ATTR_QNAME, supportDoc) });
 			newFile = response.getEndpoint();
 			bos = ByteIOStreamFactory.createOutputStream(newFile);
 			writer = new OutputStreamWriter(bos);
-			ObjectSerializer.serialize(writer, deployDoc, new QName("http://vcgr.cs.virginia.edu/genii/application-description",
-				"deployment-description"));
+			ObjectSerializer.serialize(writer, deployDoc,
+				new QName("http://vcgr.cs.virginia.edu/genii/application-description", "deployment-description"));
 			writer.flush();
 
 			CreateDeploymentDocumentResponseType ret = new CreateDeploymentDocumentResponseType(newFile);
@@ -148,17 +147,15 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 	protected RNSEntryResponseType add(RNSEntryType entry) throws RemoteException
 	{
 		if (entry == null || entry.getEndpoint() == null || entry.getEntryName() == null) {
-			throw FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-					"The \"add\" operation is only limitedly supported for this service.") }, null));
+			throw FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+				new BaseFaultTypeDescription("The \"add\" operation is only limitedly supported for this service.") }, null));
 		}
 
 		return super.add(entry);
 	}
 
 	@RWXMapping(RWXCategory.READ)
-	public OpenStreamResponse openStream(Object openStreamRequest) throws RemoteException, ResourceCreationFaultType,
-		ResourceUnknownFaultType
+	public OpenStreamResponse openStream(Object openStreamRequest) throws RemoteException, ResourceCreationFaultType, ResourceUnknownFaultType
 	{
 		return null;
 	}

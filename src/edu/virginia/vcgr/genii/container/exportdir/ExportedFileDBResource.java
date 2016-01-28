@@ -131,8 +131,8 @@ public class ExportedFileDBResource extends RByteIOResource implements IExported
 
 		if ((isServiceResource == null) || !isServiceResource) {
 			if (_parentIds == null)
-				throw new ResourceException("\"" + IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM
-					+ "\" construction parameter MUST be set.");
+				throw new ResourceException(
+					"\"" + IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM + "\" construction parameter MUST be set.");
 			if (_filePath == null)
 				throw new ResourceException("\"" + IExportedFileResource.PATH_CONSTRUCTION_PARAM + "\" construction parameter MUST be set.");
 			if (_isReplicated == null)

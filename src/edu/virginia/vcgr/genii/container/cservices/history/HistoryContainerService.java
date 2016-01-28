@@ -167,9 +167,8 @@ public class HistoryContainerService extends AbstractContainerService
 		super(SERVICE_NAME);
 	}
 
-	final public HistoryEventToken addRecord(String resourceID, SequenceNumber number, HistoryEventCategory category,
-		HistoryEventLevel level, Map<String, String> properties, HistoryEventSource eventSource, HistoryEventData eventData,
-		Calendar expirationTime)
+	final public HistoryEventToken addRecord(String resourceID, SequenceNumber number, HistoryEventCategory category, HistoryEventLevel level,
+		Map<String, String> properties, HistoryEventSource eventSource, HistoryEventData eventData, Calendar expirationTime)
 	{
 		return addRecord(resourceID, number, null, category, level, properties, eventSource, eventData, expirationTime);
 	}
@@ -186,9 +185,8 @@ public class HistoryContainerService extends AbstractContainerService
 			if (number == null)
 				number = nextSequenceNumber(connection, resourceID);
 
-			long ret =
-				HistoryDatabase.addRecord(connection, resourceID, number, createTimestamp, category, level, properties, eventSource,
-					eventData, expirationTime);
+			long ret = HistoryDatabase.addRecord(connection, resourceID, number, createTimestamp, category, level, properties, eventSource,
+				eventData, expirationTime);
 			connection.commit();
 			return new HistoryEventTokenImpl(ret);
 		} catch (SQLException sqe) {

@@ -119,11 +119,10 @@ public class FilesystemManager
 				}
 
 				if (_logger.isTraceEnabled())
-					_logger.trace("constructor watching filesystem \"" + filesystemName + "\" with path "
-						+ filesystem.filesystemRoot().getPath());
-				FilesystemWatcher watcher =
-					new FilesystemWatcher((long) watcherConfig.checkPeriod().as(DurationUnits.Milliseconds), filesystemName, filesystem,
-						watcherConfig.filter(), callbacks);
+					_logger.trace(
+						"constructor watching filesystem \"" + filesystemName + "\" with path " + filesystem.filesystemRoot().getPath());
+				FilesystemWatcher watcher = new FilesystemWatcher((long) watcherConfig.checkPeriod().as(DurationUnits.Milliseconds),
+					filesystemName, filesystem, watcherConfig.filter(), callbacks);
 				_watchers.add(watcher);
 			} catch (Throwable cause) {
 				_logger.error(String.format("Unable to load filesystem watcher for filesystem %s.", watcherConfig.filesystemName()), cause);

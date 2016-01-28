@@ -48,12 +48,12 @@ public class ExportCreationDialog extends JDialog
 		 * container.add(_deployments = new DeploymentsWidget(), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1, 1.0, 0.0,
 		 * GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		 */
-		container.add(_standardExportService = new JRadioButton("Standard Export"), new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-		container.add(_lightweightExportService = new JRadioButton("Light-weight Export"), new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0,
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		container.add(_paths = new ResourcePathsWidget(true, true, ContainerPath, TargetPath), new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0,
-			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_standardExportService = new JRadioButton("Standard Export"),
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+		container.add(_lightweightExportService = new JRadioButton("Light-weight Export"),
+			new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_paths = new ResourcePathsWidget(true, true, ContainerPath, TargetPath),
+			new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		_lightweightExportService.setSelected(true);
 		_standardExportService.setSelected(false);
@@ -73,10 +73,10 @@ public class ExportCreationDialog extends JDialog
 	{
 		JPanel panel = new JPanel(new GridBagLayout());
 
-		panel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
-		panel.add(new JButton(new CancelAction()), new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JButton(action),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JButton(new CancelAction()),
+			new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		panel.add(new JButton(new GuiHelpAction(owner, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.EXPORT_CREATION_HELP))),
 			new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
@@ -116,9 +116,8 @@ public class ExportCreationDialog extends JDialog
 			try {
 				RNSPath rnsPath = RNSPath.getCurrent().lookup(_paths.getRNSPath(), RNSPathQueryFlags.MUST_NOT_EXIST);
 				ExportManipulator.validate(rnsPath);
-				_information =
-					new ExportCreationInformation(_paths.getContainerPath(), _paths.getLocalPath(), _paths.getRNSPath(),
-						_lightweightExportService.isSelected());
+				_information = new ExportCreationInformation(_paths.getContainerPath(), _paths.getLocalPath(), _paths.getRNSPath(),
+					_lightweightExportService.isSelected());
 				setVisible(false);
 			} catch (Throwable cause) {
 				GuiUtils.displayError((Component) e.getSource(), "Export Creation Error", cause);

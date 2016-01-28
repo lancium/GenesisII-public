@@ -14,7 +14,7 @@ class RecursiveInjectionPoint extends InjectionPoint
 	}
 
 	@Override
-	void inject(Object target, MInjectResolver resolver) throws InjectionException
+		void inject(Object target, MInjectResolver resolver) throws InjectionException
 	{
 		synchronized (_field) {
 			try {

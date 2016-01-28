@@ -55,12 +55,12 @@ public class AclAuthZClientTool
 	static private final int WRITE = 2;
 	static private final int EXECUTE = 1;
 
-	static public final String CHMOD_SYNTAX = "<change-command> <acl-entry>\n" + "\n" + "\t where <change-command> is one of:\n" + "\n"
-		+ "\t\t<[<+|->r][<+|->w][<+|->x]> \n" + "\n" + "\t\t<octal mode> \n" + "\n" + "\t and where <acl-entry> is one of:\n" + "\n"
-		+ "\t\t<[local:]cert-file> \n" + "\n" + "\t\t<[local:]ca-cert-file> --pattern=<DN-pattern> \n"
-		+ "\t\t\t where <DN-pattern> is a (possibly-empty) set of \n" + "\t\t\t comma-separated X.500 distinguished-name \n"
-		+ "\t\t\t <attribute>=<value> components \n" + "\n" + "\t\t--everyone \n" + "\n"
-		+ "\t\t--username=<username> --password=<password>\n";
+	static public final String CHMOD_SYNTAX =
+		"<change-command> <acl-entry>\n" + "\n" + "\t where <change-command> is one of:\n" + "\n" + "\t\t<[<+|->r][<+|->w][<+|->x]> \n" + "\n"
+			+ "\t\t<octal mode> \n" + "\n" + "\t and where <acl-entry> is one of:\n" + "\n" + "\t\t<[local:]cert-file> \n" + "\n"
+			+ "\t\t<[local:]ca-cert-file> --pattern=<DN-pattern> \n" + "\t\t\t where <DN-pattern> is a (possibly-empty) set of \n"
+			+ "\t\t\t comma-separated X.500 distinguished-name \n" + "\t\t\t <attribute>=<value> components \n" + "\n" + "\t\t--everyone \n"
+			+ "\n" + "\t\t--username=<username> --password=<password>\n";
 
 	/**
 	 * Create a new empty ACL.
@@ -187,8 +187,8 @@ public class AclAuthZClientTool
 	/**
 	 * Read a certificate from a local file or a grid file, or read the certificate from the metadata of a grid resource.
 	 */
-	public static X509Identity downloadIdentity(GeniiPath certificatePath) throws ConfigurationException, FileNotFoundException, IOException,
-		RNSException, GeneralSecurityException
+	public static X509Identity downloadIdentity(GeniiPath certificatePath)
+		throws ConfigurationException, FileNotFoundException, IOException, RNSException, GeneralSecurityException
 	{
 		RNSPath certificateRNS = certificatePath.lookupRNS();
 		if ((certificateRNS == null) || certificatePath.isFile()) {
@@ -213,8 +213,8 @@ public class AclAuthZClientTool
 	 * 
 	 * @return the modified ACL.
 	 */
-	public static AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintWriter out, PrintWriter err, BufferedReader in) throws IOException,
-		AuthZSecurityException
+	public static AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintWriter out, PrintWriter err, BufferedReader in)
+		throws IOException, AuthZSecurityException
 	{
 		boolean chosen = false;
 		while (!chosen) {

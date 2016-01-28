@@ -100,12 +100,12 @@ public class X509PatternAclEntry implements AclEntry
 
 		if (!trustOkay) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("client not trusted by pattern acl, user[1 of " + userCertChain.length + "] for "
-					+ userCertChain[0].getSubjectDN());
+				_logger.debug(
+					"client not trusted by pattern acl, user[1 of " + userCertChain.length + "] for " + userCertChain[0].getSubjectDN());
 		} else {
 			if (_logger.isDebugEnabled())
-				_logger.debug("trust established by pattern acl for user[1 of " + userCertChain.length + "] for "
-					+ userCertChain[0].getSubjectDN());
+				_logger.debug(
+					"trust established by pattern acl for user[1 of " + userCertChain.length + "] for " + userCertChain[0].getSubjectDN());
 		}
 		return trustOkay;
 	}

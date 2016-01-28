@@ -102,16 +102,17 @@ public class AxisClientHeaderHandler extends BasicHandler
 			isGenesisII.setMustUnderstand(false);
 			header.addChildElement(isGenesisII);
 
-			//hmmm: NOT ADDING CRED SHORTHAND HEADER YET
-//			/*
-//			 * add in the new header for credential shorthand notation, signifying that the server knows how to reassemble partial credentials
-//			 * from a client when the client has previously presented the whole credential chains.
-//			 */
-//			SOAPHeaderElement supportsShorthand =
-//				new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_QNAME, Boolean.TRUE);
-//			supportsShorthand.setActor(null);
-//			supportsShorthand.setMustUnderstand(false);
-//			header.addChildElement(supportsShorthand);
+			// hmmm: NOT ADDING CRED SHORTHAND HEADER YET
+			// /*
+			// * add in the new header for credential shorthand notation, signifying that the server knows how to reassemble partial
+			// credentials
+			// * from a client when the client has previously presented the whole credential chains.
+			// */
+			// SOAPHeaderElement supportsShorthand =
+			// new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_QNAME, Boolean.TRUE);
+			// supportsShorthand.setActor(null);
+			// supportsShorthand.setMustUnderstand(false);
+			// header.addChildElement(supportsShorthand);
 
 		} catch (SOAPException se) {
 			throw new AxisFault(se.getLocalizedMessage());
@@ -120,9 +121,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 	private void setMessageID(MessageContext msgContext) throws AxisFault
 	{
-		SOAPHeaderElement messageid =
-			new SOAPHeaderElement(new QName(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "MessageID"), "urn:uuid:"
-				+ new GUID());
+		SOAPHeaderElement messageid = new SOAPHeaderElement(
+			new QName(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "MessageID"), "urn:uuid:" + new GUID());
 		messageid.setActor(null);
 		messageid.setMustUnderstand(false);
 		try {
@@ -259,14 +259,13 @@ public class AxisClientHeaderHandler extends BasicHandler
 						CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
 						if (tlsKey != null) {
 							// first delegate from the credential's resource to our tls cert.
-							TrustCredential newCred =
-								walletForResource.getRealCreds().delegateTrust(tlsKey._certChain, IdentityType.CONNECTION,
-									clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
-									accessCategories, trustDelegation);
+							TrustCredential newCred = walletForResource.getRealCreds().delegateTrust(tlsKey._certChain,
+								IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
+								restrictions, accessCategories, trustDelegation);
 							if (newCred == null) {
 								if (_logger.isTraceEnabled()) {
-									_logger
-										.debug("failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
+									_logger.debug(
+										"failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
 											+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
 								}
 								continue;
@@ -286,14 +285,13 @@ public class AxisClientHeaderHandler extends BasicHandler
 					// if no delegation step performed at some point above, do it here.
 					if (!handledThisAlready) {
 						if (_logger.isTraceEnabled())
-							_logger.debug("outcall, normal trust delegation by: "
-								+ clientKeyAndCertificate._clientCertChain[0].getSubjectDN());
+							_logger
+								.debug("outcall, normal trust delegation by: " + clientKeyAndCertificate._clientCertChain[0].getSubjectDN());
 
 						// in the client role here, so just delegate to the resource.
-						TrustCredential newTC =
-							walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
-								clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
-								accessCategories, trustDelegation);
+						TrustCredential newTC = walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER,
+							clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
+							accessCategories, trustDelegation);
 
 						if (newTC != null) {
 							if (_logger.isTraceEnabled())
@@ -344,9 +342,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 					} else {
 						X509Certificate passOn[] = new X509Certificate[1];
 						passOn[0] = passThrough;
-						TrustCredential newerTC =
-							CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain, tlsKey._privateKey,
-								restrictions, RWXCategory.FULL_ACCESS);
+						TrustCredential newerTC = CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
+							tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
 						if (newerTC == null) {
 							_logger.error("failed to create credential for pass-through connection for: " + passOn[0].getSubjectDN());
 						} else {

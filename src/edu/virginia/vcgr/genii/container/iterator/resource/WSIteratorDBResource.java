@@ -150,9 +150,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 		if (isIndexed == false) {
 			try {
 
-				stmt =
-					getConnection().prepareStatement(
-						"SELECT elementindex, contents FROM iterators WHERE " + "iteratorid = ? AND elementindex >= ? AND elementindex < ?");
+				stmt = getConnection().prepareStatement(
+					"SELECT elementindex, contents FROM iterators WHERE " + "iteratorid = ? AND elementindex >= ? AND elementindex < ?");
 
 				stmt.setString(1, getKey());
 				stmt.setLong(2, firstElement);
@@ -207,9 +206,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 
 			try {
 				clazz = Class.forName(invokee);
-				meth =
-					clazz.getMethod("getIndexedContent", new Class[] { Connection.class, InMemoryIteratorEntry.class, Object[].class,
-						boolean.class });
+				meth = clazz.getMethod("getIndexedContent",
+					new Class[] { Connection.class, InMemoryIteratorEntry.class, Object[].class, boolean.class });
 			} catch (ClassNotFoundException e) {
 				throw new ResourceException("Unable to retrieve entries!", e);
 			} catch (NoSuchMethodException e) {

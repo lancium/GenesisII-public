@@ -74,8 +74,8 @@ public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements 
 	 * 
 	 */
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateResolverResponseType createResolver(CreateResolverRequestType createResolver) throws RemoteException, ResourceException,
-		InvalidWSNameFaultType
+	public CreateResolverResponseType createResolver(CreateResolverRequestType createResolver)
+		throws RemoteException, ResourceException, InvalidWSNameFaultType
 	{
 		// if no creation params for resolver, do not create resolver
 		if (createResolver.get_any() == null) {
@@ -96,10 +96,9 @@ public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements 
 
 		try {
 			// create proxy to resolver specifed by creation param
-			RExportResolverPortType resolverService =
-				ClientUtils.createProxy(RExportResolverPortType.class,
-					RExportResolverUtils.extractResolverServiceEPR(createResolver.get_any()));
-			// previously: EPRUtils.makeEPR(getResolverServiceURL()
+			RExportResolverPortType resolverService = ClientUtils.createProxy(RExportResolverPortType.class,
+				RExportResolverUtils.extractResolverServiceEPR(createResolver.get_any()));
+				// previously: EPRUtils.makeEPR(getResolverServiceURL()
 
 			// create resolver instance with params
 			VcgrCreateResponse resp = resolverService.vcgrCreate(new VcgrCreate(resolverCreationProperties));

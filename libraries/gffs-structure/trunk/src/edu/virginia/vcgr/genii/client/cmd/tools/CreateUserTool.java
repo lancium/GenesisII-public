@@ -190,8 +190,8 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @throws Throwable
 	 */
-	protected void enactCreation(String storeType, String sourcePath, String idpServicePath, String idpName) throws RNSException,
-		ToolException, ReloadShellException, AuthZSecurityException
+	protected void enactCreation(String storeType, String sourcePath, String idpServicePath, String idpName)
+		throws RNSException, ToolException, ReloadShellException, AuthZSecurityException
 	{
 		IdpTool idpTool = new IdpTool();
 		if (storeType != null)
@@ -271,9 +271,8 @@ public class CreateUserTool extends BaseGridTool
 				input.showDialog();
 				String answer = input.getAnswer();
 				NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
-				RNSPath idpService =
-					RNSUtilities.findService(nsd.getRootContainer(), "X509AuthnPortType",
-						new PortType[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE() }, answer);
+				RNSPath idpService = RNSUtilities.findService(nsd.getRootContainer(), "X509AuthnPortType",
+					new PortType[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE() }, answer);
 				return idpService;
 			} catch (UserCancelException uce) {
 				// they cancelled the entry.
@@ -341,8 +340,8 @@ public class CreateUserTool extends BaseGridTool
 	protected String getLoginNameFromUser(DialogProvider wp) throws DialogException, UserCancelException
 	{
 		InputDialog input = wp.createInputDialog("Login User Name", "Login user name?");
-		input.setHelp(new TextContent("The login user name is the user name used when authenticating to",
-			"the new IDP service to log in to it."));
+		input.setHelp(
+			new TextContent("The login user name is the user name used when authenticating to", "the new IDP service to log in to it."));
 		input.setInputValidator(new NonEmptyValidator("You must supply a non-empty login name."));
 
 		while (true) {
@@ -365,8 +364,8 @@ public class CreateUserTool extends BaseGridTool
 	protected String getLoginPasswordFromUser(DialogProvider wp) throws DialogException, UserCancelException
 	{
 		InputDialog input = wp.createHiddenInputDialog("Login Password", "Login password?");
-		input.setHelp(new TextContent("The login password is the password used when authenticating to",
-			"the new IDP service to log in to it."));
+		input.setHelp(
+			new TextContent("The login password is the password used when authenticating to", "the new IDP service to log in to it."));
 		input.setInputValidator(new NonEmptyValidator("You must supply a non-empty password."));
 
 		while (true) {

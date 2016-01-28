@@ -131,13 +131,12 @@ final class IDPLoginPanel extends LoginPanel
 		// add the drop down box with the types of proxies in it.
 		add(new JLabel("Proxy Setting"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5, 5,
-			5, 5), 5, 5));
+		add(_comboBox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		// crank up a config file for our settings.
-		_loginSettings =
-			new UserConfigurationFile(new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(),
-				USER_SECURITY_PROPERTIES_FILE).getAbsolutePath());
+		_loginSettings = new UserConfigurationFile(
+			new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), USER_SECURITY_PROPERTIES_FILE).getAbsolutePath());
 
 		String lastProxySetting = _loginSettings.getProperty(LOGIN_PROXY_SETTING);
 		if (lastProxySetting != null) {
@@ -174,17 +173,17 @@ final class IDPLoginPanel extends LoginPanel
 
 		add(new JLabel("Username"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(_username, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
-			5, 5), 5, 5));
+		add(_username, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 		add(new JLabel("Password"), new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(_password, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
-			5, 5), 5, 5));
+		add(_password, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 
 		add(new JLabel("Grid Path"), new GridBagConstraints(0, 3, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(_rnsPath, new GridBagConstraints(1, 3, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
-			5, 5), 5, 5));
+		add(_rnsPath, new GridBagConstraints(1, 3, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	@Override

@@ -68,8 +68,8 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
 @GeniiServiceConfiguration(resourceProvider = NotificationBrokerDBResourceProvider.class)
 @ConstructionParametersType(NotificationBrokerConstructionParams.class)
-public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase implements EnhancedNotificationBrokerPortType,
-	NotificationBrokerTopics
+public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase
+	implements EnhancedNotificationBrokerPortType, NotificationBrokerTopics
 {
 
 	public static final String PORT_NAME = "EnhancedNotificationBrokerPortType";
@@ -92,8 +92,8 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParameters);
@@ -171,10 +171,10 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			TopicQueryExpression topicFilter = RNSTopics.RNS_CONTENT_CHANGE_TOPIC.asConcreteQueryExpression();
 			Subscription subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			EndpointReferenceType subscriptionReference = subscription.subscriptionReference();
-			response[0] =
-				new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
-					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE, NotificationBrokerConstants.RNS_CONTENT_CHANGE_SUBSCRIPTION) },
-					subscriptionReference);
+			response[0] = new IndirectSubscriptionEntryType(
+				new MessageElement[] { new MessageElement(NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+					NotificationBrokerConstants.RNS_CONTENT_CHANGE_SUBSCRIPTION) },
+				subscriptionReference);
 
 			// Subscribe to attributes update on byteIOs that are children of the directory
 			// represented by the
@@ -183,10 +183,10 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			topicFilter = ByteIOTopics.BYTEIO_ATTRIBUTES_UPDATE_TOPIC.asConcreteQueryExpression();
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			subscriptionReference = subscription.subscriptionReference();
-			response[1] =
-				new IndirectSubscriptionEntryType(
-					new MessageElement[] { new MessageElement(NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
-						NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION) }, subscriptionReference);
+			response[1] = new IndirectSubscriptionEntryType(
+				new MessageElement[] { new MessageElement(NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+					NotificationBrokerConstants.BYTEIO_ATTRIBUTE_CHANGE_SUBSCRIPTION) },
+				subscriptionReference);
 
 			/*
 			 * Subscribe to authorization parameter update on the RNS resources and byteIOs that are children of the directory represented by
@@ -195,15 +195,14 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			topicFilter = GenesisIIBaseTopics.AUTHZ_CONFIG_UPDATE_TOPIC.asConcreteQueryExpression();
 			subscription = createSubscription(publisher, myEPR, topicFilter, terminationTime);
 			subscriptionReference = subscription.subscriptionReference();
-			response[2] =
-				new IndirectSubscriptionEntryType(new MessageElement[] { new MessageElement(
-					NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
-					NotificationBrokerConstants.RESOURCE_AUTHORIZATION_CHANGE_SUBSCRIPTION) }, subscriptionReference);
+			response[2] = new IndirectSubscriptionEntryType(
+				new MessageElement[] { new MessageElement(NotificationBrokerConstants.INDIRECT_SUBSCRIPTION_TYPE,
+					NotificationBrokerConstants.RESOURCE_AUTHORIZATION_CHANGE_SUBSCRIPTION) },
+				subscriptionReference);
 		} catch (Exception ex) {
 			_logger.info("Subscription request did not succeed", ex);
-			final SubscriptionFailedFaultType subscriptionFault =
-				new SubscriptionFailedFaultType(null, Calendar.getInstance(), publisher, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to create subscriptions.") }, null);
+			final SubscriptionFailedFaultType subscriptionFault = new SubscriptionFailedFaultType(null, Calendar.getInstance(), publisher,
+				null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unable to create subscriptions.") }, null);
 			throw subscriptionFault;
 		}
 
@@ -235,9 +234,8 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 			if (unsentMessages != null) {
 				manager.setMessageQueueOfBroker(resource.getKey(), unsentMessages);
 			}
-			final MessageMissedFaultType messageMissedFault =
-				new MessageMissedFaultType(null, Calendar.getInstance(), null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Messages are missing") }, null);
+			final MessageMissedFaultType messageMissedFault = new MessageMissedFaultType(null, Calendar.getInstance(), null, null,
+				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Messages are missing") }, null);
 			throw messageMissedFault;
 		}
 		GetMessagesResponse response = manager.getMessagesResponseFromHeldMessages(unsentMessages, messageIndex);
@@ -245,16 +243,16 @@ public class EnhancedNotificationBrokerServiceImpl extends GenesisIIBase impleme
 	}
 
 	@Override
-	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint destroyPullPointRequest) throws RemoteException,
-		UnableToDestroyPullPointFaultType, ResourceUnknownFaultType
+	public DestroyPullPointResponse destroyPullPoint(DestroyPullPoint destroyPullPointRequest)
+		throws RemoteException, UnableToDestroyPullPointFaultType, ResourceUnknownFaultType
 	{
 		return null;
 	}
 
 	@RWXMapping(RWXCategory.READ)
 	@Override
-	public GetMessagesResponse getMessages(GetMessages getMessagesRequest) throws RemoteException, UnableToGetMessagesFaultType,
-		ResourceUnknownFaultType
+	public GetMessagesResponse getMessages(GetMessages getMessagesRequest)
+		throws RemoteException, UnableToGetMessagesFaultType, ResourceUnknownFaultType
 	{
 
 		NotificationBrokerDBResource resource = (NotificationBrokerDBResource) ResourceManager.getCurrentResource().dereference();

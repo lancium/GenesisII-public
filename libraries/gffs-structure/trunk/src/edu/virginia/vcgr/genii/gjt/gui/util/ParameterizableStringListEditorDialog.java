@@ -54,11 +54,12 @@ class ParameterizableStringListEditorDialog extends JDialog
 
 		_list.addListSelectionListener(new ListSelectionListenerImpl());
 
-		content.add(scroller, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
-			5, 0, 5), 5, 5));
-		content.add(ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()), new SimpleIconButton(
-			ShapeIcons.Minus, _minus)), new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(0, 5, 5, 5), 5, 5));
+		content.add(scroller,
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 0, 5), 5, 5));
+		content.add(
+			ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()),
+				new SimpleIconButton(ShapeIcons.Minus, _minus)),
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 5, 5), 5, 5));
 		content.add(ButtonPanel.createHorizontalPanel(new OKAction(), new CancelAction()), new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 	}

@@ -247,9 +247,8 @@ class QueueAsBESFactoryAttributesUtilities
 		for (MatchingParameter parameter : allMatchingParameters())
 			any.add(new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, parameter.toAxisType()));
 
-		BasicResourceAttributesDocumentType basicResourceAttributesDocument =
-			new BasicResourceAttributesDocumentType(machineName, operatingSystem(), cpuArchitecture(), cpuCount(), cpuSpeed(),
-				physicalMemory(), virtualMemory(), Elementals.toArray(any));
+		BasicResourceAttributesDocumentType basicResourceAttributesDocument = new BasicResourceAttributesDocumentType(machineName,
+			operatingSystem(), cpuArchitecture(), cpuCount(), cpuSpeed(), physicalMemory(), virtualMemory(), Elementals.toArray(any));
 
 		return new FactoryResourceAttributesDocumentType(basicResourceAttributesDocument, isAcceptingNewActivities, machineName, machineName,
 			totalNumberOfActivities, null, _allBESInformation.size(), null, namingProfiles, besExtensions, localResourceManagerType,

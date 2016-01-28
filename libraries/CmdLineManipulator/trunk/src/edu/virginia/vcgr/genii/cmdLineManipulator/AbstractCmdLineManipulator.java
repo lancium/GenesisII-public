@@ -99,8 +99,8 @@ public abstract class AbstractCmdLineManipulator<ConfigType> implements CmdLineM
 				String manipulatorType = variation.variationType();
 
 				if (!manipulatorType.equals(_manipulatorType)) {
-					throw new CmdLineManipulatorException(String.format("Loaded manipulator type \"%s\" "
-						+ "does not match requested type \"%s\".", manipulatorType, _manipulatorType));
+					throw new CmdLineManipulatorException(String.format(
+						"Loaded manipulator type \"%s\" " + "does not match requested type \"%s\".", manipulatorType, _manipulatorType));
 				}
 
 				// extract configuration

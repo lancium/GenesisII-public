@@ -42,7 +42,8 @@ class SVNPathIdentifier
 	{
 		if (other instanceof SVNPathIdentifier) {
 			SVNPathIdentifier otherPath = (SVNPathIdentifier) other;
-			return (_svnRepositoryURL.equals(otherPath._svnRepositoryURL) && _relativePath.equals(otherPath._relativePath) && _revision == otherPath._revision);
+			return (_svnRepositoryURL.equals(otherPath._svnRepositoryURL) && _relativePath.equals(otherPath._relativePath)
+				&& _revision == otherPath._revision);
 		} else
 			return false;
 	}

@@ -35,9 +35,8 @@ public class ScratchFilesystem extends AbstractFilesystem implements Externaliza
 	@Override
 	protected boolean editImpl(Window owner)
 	{
-		String answer =
-			(String) JOptionPane.showInputDialog(owner, "Unique identifier for this scratch filesystem.", "Scratch Filesystem Configuration",
-				JOptionPane.QUESTION_MESSAGE, null, null, _uniqueIdentifier);
+		String answer = (String) JOptionPane.showInputDialog(owner, "Unique identifier for this scratch filesystem.",
+			"Scratch Filesystem Configuration", JOptionPane.QUESTION_MESSAGE, null, null, _uniqueIdentifier);
 		if (answer != null)
 			_uniqueIdentifier = answer;
 

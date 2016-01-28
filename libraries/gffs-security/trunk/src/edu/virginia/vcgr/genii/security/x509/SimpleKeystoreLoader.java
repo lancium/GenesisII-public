@@ -39,8 +39,8 @@ public class SimpleKeystoreLoader implements CallbackHandler
 	{
 	}
 
-	private void addEntriesFromFile(Collection<CertEntry> entries, InputStream storeInput, String storeType) throws GeneralSecurityException,
-		IOException
+	private void addEntriesFromFile(Collection<CertEntry> entries, InputStream storeInput, String storeType)
+		throws GeneralSecurityException, IOException
 	{
 		KeyStore specifiedKs = null;
 
@@ -84,8 +84,7 @@ public class SimpleKeystoreLoader implements CallbackHandler
 		}
 	}
 
-	protected Collection<CertEntry> retrieveCertEntries(InputStream storeInput, String storeType) throws GeneralSecurityException,
-		IOException
+	protected Collection<CertEntry> retrieveCertEntries(InputStream storeInput, String storeType) throws GeneralSecurityException, IOException
 	{
 		ArrayList<CertEntry> list = new ArrayList<CertEntry>();
 

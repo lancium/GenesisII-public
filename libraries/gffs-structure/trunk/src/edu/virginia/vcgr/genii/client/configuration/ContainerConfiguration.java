@@ -122,9 +122,8 @@ public class ContainerConfiguration
 	{
 		String sListenPort = InstallationProperties.getInstallationProperties().getContainerPort();
 		if (sListenPort == null)
-			sListenPort =
-				Installation.getDeployment(new DeploymentName()).webContainerProperties()
-					.getProperty(WebContainerConstants.LISTEN_PORT_PROP, _DEFAULT_LISTEN_PORT_VALUE);
+			sListenPort = Installation.getDeployment(new DeploymentName()).webContainerProperties()
+				.getProperty(WebContainerConstants.LISTEN_PORT_PROP, _DEFAULT_LISTEN_PORT_VALUE);
 		_listenPort = Integer.parseInt(sListenPort);
 
 		String dListenPort =
@@ -132,9 +131,8 @@ public class ContainerConfiguration
 		if (dListenPort != null)
 			_dpagesPort = Integer.valueOf(dListenPort);
 
-		String sMaxThreads =
-			Installation.getDeployment(new DeploymentName()).webContainerProperties()
-				.getProperty(WebContainerConstants.MAX_ACCEPT_THREADS_PROP, _DEFAULT_MAX_ACCEPT_THREADS);
+		String sMaxThreads = Installation.getDeployment(new DeploymentName()).webContainerProperties()
+			.getProperty(WebContainerConstants.MAX_ACCEPT_THREADS_PROP, _DEFAULT_MAX_ACCEPT_THREADS);
 		_maxThreads = Integer.parseInt(sMaxThreads);
 
 		String notSize = props.getProperty(_NOTIFICATION_POOL_SIZE, _NOTIFICATION_POOL_SIZE_DEFAULT);

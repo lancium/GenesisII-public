@@ -181,8 +181,8 @@ public class XScriptEngine implements ScriptEngine, Compilable, Invocable
 			if (!clasz.isInterface())
 				return null;
 
-			return clasz.cast(Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new Class<?>[] { clasz },
-				new ScriptFunctionInvoker(clasz)));
+			return clasz.cast(
+				Proxy.newProxyInstance(GenesisClassLoader.classLoaderFactory(), new Class<?>[] { clasz }, new ScriptFunctionInvoker(clasz)));
 		} catch (IllegalArgumentException e) {
 			_logger.warn("Error trying to match interface to script function.", e);
 			return null;

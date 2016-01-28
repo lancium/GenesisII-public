@@ -45,9 +45,9 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 			if (OperatingSystemType.isWindows()) {
 				cwd.setWritable(true, false);
 			} else {
-				FileSystemUtils.chmod(cwd.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
-					| FileSystemUtils.MODE_USER_EXECUTE | FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE
-					| FileSystemUtils.MODE_GROUP_EXECUTE);
+				FileSystemUtils.chmod(cwd.getAbsolutePath(),
+					FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE | FileSystemUtils.MODE_USER_EXECUTE
+						| FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE | FileSystemUtils.MODE_GROUP_EXECUTE);
 			}
 
 		} catch (Throwable cause) {

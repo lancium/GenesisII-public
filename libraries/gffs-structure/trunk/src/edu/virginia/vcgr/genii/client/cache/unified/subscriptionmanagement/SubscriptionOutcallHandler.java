@@ -121,27 +121,27 @@ public class SubscriptionOutcallHandler extends Thread
 		while (true) {
 			try {
 				// minimal sleep just to not get too hot here when there are lots of requests.
-//				int snoozicle = _snoozeTimeBeforeMoreSubscriptions;
+				// int snoozicle = _snoozeTimeBeforeMoreSubscriptions;
 				// don't snooze next time unless someone outside intervenes.
 				_snoozeTimeBeforeMoreSubscriptions = 0;
-				
-				//hmmm: feature disabled for snoozes right now.
-//				Thread.sleep(snoozicle);
-				
+
+				// hmmm: feature disabled for snoozes right now.
+				// Thread.sleep(snoozicle);
+
 				/*
 				 * let's see if the rpc mechanism is active. if it is, we would prefer not to interleave rpc calls unnecessarily. we also
 				 * prefer to give the main thread priority over the subscription process.
 				 */
-				//hmmm: client counting snooze is disabled right now.
-//				int clientCount = AxisClientInvocationHandler.getActiveClients();
-//				if (clientCount >= 1) {
-//					_snoozeTimeBeforeMoreSubscriptions = RPC_ACTIVE_SNOOZE_FOR_SUBSCRIPTIONS;
-//					if (_logger.isDebugEnabled())
-//						_logger.debug("will snooze subscription outcall due to other active rpc clients");
-//					// jump back to top of loop and snooze, since we know there is other stuff going on.
-//					continue;
-//				}
-				
+				// hmmm: client counting snooze is disabled right now.
+				// int clientCount = AxisClientInvocationHandler.getActiveClients();
+				// if (clientCount >= 1) {
+				// _snoozeTimeBeforeMoreSubscriptions = RPC_ACTIVE_SNOOZE_FOR_SUBSCRIPTIONS;
+				// if (_logger.isDebugEnabled())
+				// _logger.debug("will snooze subscription outcall due to other active rpc clients");
+				// // jump back to top of loop and snooze, since we know there is other stuff going on.
+				// continue;
+				// }
+
 				PendingSubscription subscriptionRequest = scheduledSubscriptionQueue.take();
 				createSubscription(subscriptionRequest);
 			} catch (InterruptedException e) {

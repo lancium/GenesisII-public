@@ -44,7 +44,7 @@ public class OnFaultTool extends BaseGridTool
 		stderr.println(errorMsg);
 		stderr.flush();
 		_logger.error(errorMsg);
-		
+
 		return getLastExit();
 	}
 

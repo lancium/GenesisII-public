@@ -54,8 +54,8 @@ class NewDirectoryDialog extends JDialog
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 
-		contentPane.add(new JLabel("New Directory Name?"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		contentPane.add(new JLabel("New Directory Name?"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		DefaultFormatter formatter = new DefaultFormatter();
 		formatter.setAllowsInvalid(false);
@@ -68,8 +68,8 @@ class NewDirectoryDialog extends JDialog
 		JPanel bottomPanel = new JPanel(new GridBagLayout());
 		OKAction action = new OKAction();
 		_input.addCaretListener(action);
-		bottomPanel.add(new JButton(action), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-			new Insets(5, 5, 5, 5), 5, 5));
+		bottomPanel.add(new JButton(action),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(new ActionListener()
 		{
@@ -79,8 +79,8 @@ class NewDirectoryDialog extends JDialog
 				setVisible(false);
 			}
 		});
-		bottomPanel.add(cancel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(
-			5, 5, 5, 5), 5, 5));
+		bottomPanel.add(cancel,
+			new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		contentPane.add(bottomPanel, new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 

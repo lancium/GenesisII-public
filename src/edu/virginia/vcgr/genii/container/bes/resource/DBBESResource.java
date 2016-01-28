@@ -115,9 +115,8 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		PreparedStatement stmt = null;
 
 		try {
-			stmt =
-				_connection.prepareStatement("UPDATE bespolicytable " + "SET userloggedinaction = ?, " + "screensaverinactiveaction = ? "
-					+ "WHERE besid = ?");
+			stmt = _connection.prepareStatement(
+				"UPDATE bespolicytable " + "SET userloggedinaction = ?, " + "screensaverinactiveaction = ? " + "WHERE besid = ?");
 			stmt.setString(1, policy.getUserLoggedInAction().name());
 			stmt.setString(2, policy.getScreenSaverInactiveAction().name());
 			stmt.setString(3, _resourceKey);

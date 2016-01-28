@@ -53,9 +53,8 @@ public class VariableDefinitionCellEditor extends AbstractCellEditor implements 
 			VariableDefinition current = _currentValue.current();
 			VariableDefinitionType type = current.type();
 
-			VariableDefinitionEditor<VariableDefinition> editor =
-				(VariableDefinitionEditor<VariableDefinition>) type.editorFactory().createEditor(
-					SwingUtilities.getWindowAncestor((JComponent) e.getSource()));
+			VariableDefinitionEditor<VariableDefinition> editor = (VariableDefinitionEditor<VariableDefinition>) type.editorFactory()
+				.createEditor(SwingUtilities.getWindowAncestor((JComponent) e.getSource()));
 			editor.setFromVariableDefinition(current);
 			editor.pack();
 			editor.setModalityType(ModalityType.DOCUMENT_MODAL);

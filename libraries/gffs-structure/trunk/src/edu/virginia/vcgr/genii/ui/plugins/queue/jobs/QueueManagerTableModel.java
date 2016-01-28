@@ -92,19 +92,15 @@ public class QueueManagerTableModel extends RowTableModel<JobInformation>
 
 	void refresh(Component parentComponent)
 	{
-		_uiContext
-			.uiContext()
-			.progressMonitorFactory()
-			.createMonitor(parentComponent, "Loading Queue Jobs", "Fetching job list from queue", 1000L, new QueueJobListFetcherTask(),
-				new QueueJobListCompletionListener(parentComponent)).start();
+		_uiContext.uiContext().progressMonitorFactory().createMonitor(parentComponent, "Loading Queue Jobs", "Fetching job list from queue",
+			1000L, new QueueJobListFetcherTask(), new QueueJobListCompletionListener(parentComponent)).start();
 	}
 
 	QueueManagerTableModel(UIPluginContext uiContext) throws ResourceException, GenesisIISecurityException, RNSPathDoesNotExistException
 	{
 		_uiContext = uiContext;
-		_queue =
-			ClientUtils.createProxy(QueuePortType.class, uiContext.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint(),
-				uiContext.uiContext().callingContext());
+		_queue = ClientUtils.createProxy(QueuePortType.class,
+			uiContext.endpointRetriever().getTargetEndpoints().iterator().next().getEndpoint(), uiContext.uiContext().callingContext());
 	}
 
 	@SuppressWarnings("unchecked")

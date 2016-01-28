@@ -88,10 +88,8 @@ public class PatternComponent extends DraggableImageComponent
 		Collection<RNSPath> targets = new Vector<RNSPath>(1);
 		targets.add(remotePath.second());
 
-		_context
-			.progressMonitorFactory()
-			.createMonitor(this, "Reading Grid Identity", "Reading grid identity", 1000L, new RemoteIdentityLookupTask(targets),
-				new RemoteLookupCompletionListener()).start();
+		_context.progressMonitorFactory().createMonitor(this, "Reading Grid Identity", "Reading grid identity", 1000L,
+			new RemoteIdentityLookupTask(targets), new RemoteLookupCompletionListener()).start();
 	}
 
 	private void doImport(File file)

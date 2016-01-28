@@ -43,15 +43,14 @@ public class ArgumentsPanel extends JPanel
 		_table = table;
 		_tableModel = model;
 
-		add(new JLabel("Arguments"), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-			new Insets(0, 0, 0, 0), 0, 0));
+		add(new JLabel("Arguments"),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 		JScrollPane scroller = new JScrollPane(table);
-		add(scroller, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
-		add(ButtonPanel
-			.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()), new SimpleIconButton(ShapeIcons.Minus,
-				_minusAction), null, new SimpleIconButton(ShapeIcons.UpArrow, _upAction), new SimpleIconButton(ShapeIcons.DownArrow,
-				_downAction)),
+		add(scroller,
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Plus, new PlusAction()),
+			new SimpleIconButton(ShapeIcons.Minus, _minusAction), null, new SimpleIconButton(ShapeIcons.UpArrow, _upAction),
+			new SimpleIconButton(ShapeIcons.DownArrow, _downAction)),
 			new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0,
 				0));
 

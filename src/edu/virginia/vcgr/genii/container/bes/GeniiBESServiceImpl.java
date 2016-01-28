@@ -259,13 +259,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
-		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters) throws ResourceException,
-		BaseFaultType, RemoteException
+		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
 	}
 
-//	static private EndpointReferenceType _localActivityServiceEPR = null;
+	// static private EndpointReferenceType _localActivityServiceEPR = null;
 
 	public GeniiBESServiceImpl() throws RemoteException
 	{
@@ -329,22 +329,21 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			throw new NotAcceptingNewActivitiesFaultType(null);
 		}
 
-//		if (_localActivityServiceEPR == null) {
-//			// only need to make this epr from scratch once (which involves
-//			// a get-attr rpc to the service to get its full epr)
-//			_localActivityServiceEPR = EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
-//		}
+		// if (_localActivityServiceEPR == null) {
+		// // only need to make this epr from scratch once (which involves
+		// // a get-attr rpc to the service to get its full epr)
+		// _localActivityServiceEPR = EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
+		// }
 
 		_logger.info(String.format("BES with resource key \"%s\" is creating an activity.", _resource.getKey()));
 
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		history.info("BES Creating Activity Instance");
 
-		EndpointReferenceType entryReference =
-			new BESActivityServiceImpl().CreateEPR(
-				BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
-					(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
-				Container.getServiceURL("BESActivityPortType"));
+		EndpointReferenceType entryReference = new BESActivityServiceImpl().CreateEPR(
+			BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
+				(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
+			Container.getServiceURL("BESActivityPortType"));
 
 		return new CreateActivityResponseType(entryReference, adt, historySink.eventMessages());
 
@@ -370,8 +369,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-	public GetActivityStatusesResponseType getActivityStatuses(GetActivityStatusesType parameters) throws RemoteException,
-		UnknownActivityIdentifierFaultType
+	public GetActivityStatusesResponseType getActivityStatuses(GetActivityStatusesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
 		Collection<GetActivityStatusResponseType> response = new LinkedList<GetActivityStatusResponseType>();
 
@@ -381,8 +380,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				activity.verifyOwner();
 				Collection<Throwable> faults = activity.getFaults();
 				response.add(new GetActivityStatusResponseType(target, activity.getState().toActivityStatusType(),
-					((faults == null) || (faults.size() == 0)) ? null : BESFaultManager.constructFault(faults.toArray(new Throwable[faults
-						.size()])), null));
+					((faults == null) || (faults.size() == 0)) ? null
+						: BESFaultManager.constructFault(faults.toArray(new Throwable[faults.size()])),
+					null));
 			} catch (Throwable cause) {
 				response.add(new GetActivityStatusResponseType(target, null, BESFaultManager.constructFault(cause), null));
 			}
@@ -467,8 +467,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 			return new GetFactoryAttributesDocumentResponseType(new FactoryResourceAttributesDocumentType(
 				new BasicResourceAttributesDocumentType(resourceName, BESAttributesHandler.getOperatingSystem(),
-					BESAttributesHandler.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()), new Double(
-						(double) BESAttributesHandler.getCPUSpeed()), new Double((double) BESAttributesHandler.getPhysicalMemory()),
+					BESAttributesHandler.getCPUArchitecture(), new Double((double) BESAttributesHandler.getCPUCount()),
+					new Double((double) BESAttributesHandler.getCPUSpeed()), new Double((double) BESAttributesHandler.getPhysicalMemory()),
 					new Double((double) BESAttributesHandler.getVirtualMemory()), Elementals.toArray(any)),
 				BESAttributesHandler.getIsAcceptingNewActivities(), BESAttributesHandler.getName(), BESAttributesHandler.getDescription(),
 				BESAttributesHandler.getTotalNumberOfActivities(), BESAttributesHandler.getActivityReferences(), 0, null, namingProfiles,
@@ -489,8 +489,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(StopAcceptingNewActivitiesType parameters)
-		throws RemoteException
+	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(StopAcceptingNewActivitiesType parameters) throws RemoteException
 	{
 		_resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES, Boolean.FALSE);
 		return new StopAcceptingNewActivitiesResponseType(null);
@@ -498,8 +497,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public TerminateActivitiesResponseType terminateActivities(TerminateActivitiesType parameters) throws RemoteException,
-		UnknownActivityIdentifierFaultType
+	public TerminateActivitiesResponseType terminateActivities(TerminateActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
 		Collection<TerminateActivityResponseType> responses = new LinkedList<TerminateActivityResponseType>();
 

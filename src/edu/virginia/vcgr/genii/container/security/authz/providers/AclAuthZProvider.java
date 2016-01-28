@@ -78,8 +78,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	 */
 	static public final String GENII_ACL_PROPERTY_NAME = "genii.container.security.authz.gaml-acl";
 
-	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec = new MessageLevelSecurityRequirements(
-		MessageLevelSecurityRequirements.NONE);
+	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec =
+		new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 
 	static protected HashMap<String, X509Certificate> _defaultCertCache = new HashMap<String, X509Certificate>();
 
@@ -350,8 +350,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						X509Identity ia = (X509Identity) sa.getRootIdentity();
 						if (checkAclAccess(ia, category, acl)) {
 							if (_logger.isDebugEnabled())
-								_logger.debug(messagePrefix + "granted to trust credential's root identity: "
-									+ sa.describe(VerbosityLevel.LOW));
+								_logger
+									.debug(messagePrefix + "granted to trust credential's root identity: " + sa.describe(VerbosityLevel.LOW));
 							return true;
 						}
 					}
@@ -382,8 +382,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		}
 	}
 
-	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource) throws AuthZSecurityException,
-		ResourceException
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(IResource resource)
+		throws AuthZSecurityException, ResourceException
 	{
 		try {
 			// get ACL
@@ -438,8 +438,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	/**
 	 * Inform subscribers that one or more entries has been added or removed from one or more ACLs.
 	 */
-	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource) throws AuthZSecurityException,
-		ResourceException
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig, IResource resource)
+		throws AuthZSecurityException, ResourceException
 	{
 		if (resource.isServiceResource())
 			return;

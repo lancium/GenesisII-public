@@ -181,8 +181,7 @@ public class DailyBackupFileAppender extends FileAppender
 	 * Instantiate a <code>DailyRollingFileAppender</code> and open the file designated by <code>filename</code>. The opened filename will
 	 * become the ouput destination for this appender.
 	 */
-	public DailyBackupFileAppender(Layout layout, String filename, String localPath, String remotePath, String datePattern)
-		throws IOException
+	public DailyBackupFileAppender(Layout layout, String filename, String localPath, String remotePath, String datePattern) throws IOException
 	{
 		super(layout, localPath + "/" + filename, true);
 
@@ -416,7 +415,7 @@ public class DailyBackupFileAppender extends FileAppender
 	 * <p>
 	 * Before actually logging, this method will check whether it is time to do a rollover. If it is, it will schedule the next rollover time
 	 * and then rollover.
-	 * */
+	 */
 	protected void subAppend(LoggingEvent event)
 	{
 		long n = System.currentTimeMillis();
@@ -436,7 +435,7 @@ public class DailyBackupFileAppender extends FileAppender
 /**
  * RollingCalendar is a helper class to DailyRollingFileAppender. Given a periodicity type and the current time, it computes the start of the
  * next interval.
- * */
+ */
 @SuppressWarnings("serial")
 class RollingCalendar extends GregorianCalendar
 {

@@ -62,8 +62,8 @@ public class GenesisIIConstants
 	static public final String GENESIS_DAIR_RESULTS = "dair-results";
 
 	static final public String COMMAND_FUNCTION_NAME = "function";
-	static final public QName COMMAND_FUNCTION_QNAME = new QName(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE().getQName().getNamespaceURI(),
-		COMMAND_FUNCTION_NAME);
+	static final public QName COMMAND_FUNCTION_QNAME =
+		new QName(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE().getQName().getNamespaceURI(), COMMAND_FUNCTION_NAME);
 
 	static public QName NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR = new QName(GENESISII_NS, "notification-message-attributes-separator");
 

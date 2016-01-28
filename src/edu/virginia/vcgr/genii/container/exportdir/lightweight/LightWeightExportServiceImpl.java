@@ -159,9 +159,8 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 				 */
 				modes = ModeAllowance.getReadWriteMode();
 				if (!ecl.checkCreationOkay(initInfo.getPath(), owningUnixUser, modes)) {
-					String msg =
-						"cannot create export; this path is blocked for user '" + owningUnixUser + "' by export controls: "
-							+ initInfo.getPath();
+					String msg = "cannot create export; this path is blocked for user '" + owningUnixUser + "' by export controls: "
+						+ initInfo.getPath();
 					_logger.error(msg);
 					throw new ResourceException(msg);
 				}
@@ -199,23 +198,25 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 					isCompatibleOS = true;
 				}
 				if (!isCompatibleOS) {
-					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Sudo export " + "unsupported on this OS ("
-							+ OperatingSystemType.getOpsysName() + ")") }, null));
+					throw FaultManipulator.fillInFault(
+						new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+							"Sudo export " + "unsupported on this OS (" + OperatingSystemType.getOpsysName() + ")") }, null));
 				}
 
 				if (!SudoExportUtils.dirReadable(initInfo.getPath(), key)) {
-					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
-							+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null,
+						null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory "
+							+ initInfo.getPath() + " does not exist or is not readable.  " + "Cannot create export from this path.") },
+						null));
 				}
 			} else if ((exportType == null) || exportType.equals(ExportMechanisms.EXPORT_MECH_ACL)
 				|| exportType.equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
 				// handle ACL and ACLANDCHOWN type exports.
 				if (!ExportedDirUtils.dirReadable(initInfo.getPath())) {
-					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory " + initInfo.getPath()
-							+ " does not exist or is not readable.  " + "Cannot create export from this path.") }, null));
+					throw FaultManipulator.fillInFault(new ResourceCreationFaultType(null,
+						null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Target directory "
+							+ initInfo.getPath() + " does not exist or is not readable.  " + "Cannot create export from this path.") },
+						null));
 				}
 			} else {
 				throw new ResourceException("unknown or unimplemented type of export mechanism: " + exportType);

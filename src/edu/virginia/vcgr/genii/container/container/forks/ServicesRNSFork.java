@@ -75,11 +75,9 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 			if (entryName == null || entryName.equals(serviceName)) {
 				ResourceKey targetKey = ResourceManager.getServiceResource(serviceName);
 
-				EndpointReferenceType targetEPR =
-					ResourceManager.createEPR(
-						targetKey,
-						String.format("%s%s?%s=%s", shortenedURL(), serviceName, EPRUtils.GENII_CONTAINER_ID_PARAMETER,
-							Container.getContainerID()), findImplementedPortTypes(desc.getImplClass()), serviceName);
+				EndpointReferenceType targetEPR = ResourceManager.createEPR(targetKey, String.format("%s%s?%s=%s", shortenedURL(),
+					serviceName, EPRUtils.GENII_CONTAINER_ID_PARAMETER, Container.getContainerID()),
+					findImplementedPortTypes(desc.getImplClass()), serviceName);
 				ret.add(new InternalEntry(serviceName, targetEPR));
 			}
 		}

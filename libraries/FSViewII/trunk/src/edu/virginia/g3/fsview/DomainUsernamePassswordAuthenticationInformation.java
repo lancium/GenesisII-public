@@ -32,9 +32,9 @@ public class DomainUsernamePassswordAuthenticationInformation extends AbstractFS
 			password = "";
 
 		if (domain == null) {
-			//hmmm: this code seems poorly done; it assumes the char after the slash is also a slash.
+			// hmmm: this code seems poorly done; it assumes the char after the slash is also a slash.
 			// it also doesn't handle forward slashes.
-			
+
 			int index = username.indexOf('\\');
 			if (index > 0) {
 				domain = username.substring(0, index);

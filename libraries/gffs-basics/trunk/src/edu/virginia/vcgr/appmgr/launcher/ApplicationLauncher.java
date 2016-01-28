@@ -27,8 +27,9 @@ public class ApplicationLauncher
 
 	static private void usage(int exitCode)
 	{
-		System.err.format("USAGE:  ApplicationLauncher [%sapplication-class]\n"
-			+ "	[-Dedu.virginia.vcgr.appwatch.application-description=]<application-description> " + "[application-args]\n",
+		System.err.format(
+			"USAGE:  ApplicationLauncher [%sapplication-class]\n"
+				+ "	[-Dedu.virginia.vcgr.appwatch.application-description=]<application-description> " + "[application-args]\n",
 			APPLICATION_CLASS_FLAG_PREFIX);
 		System.exit(exitCode);
 	}

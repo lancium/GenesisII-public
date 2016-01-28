@@ -72,10 +72,8 @@ public class ColorCodedTextField extends JTextField implements CaretListener
 		d.getContentPane().setLayout(new GridBagLayout());
 		d.getContentPane().add(new JLabel("Test"),
 			new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		d.getContentPane().add(
-			new ColorCodedTextField(Color.RED, Pattern.compile("[0-9]*")),
-			new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5,
-				5));
+		d.getContentPane().add(new ColorCodedTextField(Color.RED, Pattern.compile("[0-9]*")), new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 		d.pack();
 		d.setVisible(true);
 	}

@@ -57,8 +57,8 @@ class ShowAttrsPanel extends ExpensiveInitializationPanel
 		 * Go ahead and ask the target endpoint for it's attributes document.
 		 */
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, _target);
-		ObjectSerializer.serialize(writer, common.getResourcePropertyDocument(new GetResourcePropertyDocument()), new QName(
-			"http://tempuri.org", "object-attributes"));
+		ObjectSerializer.serialize(writer, common.getResourcePropertyDocument(new GetResourcePropertyDocument()),
+			new QName("http://tempuri.org", "object-attributes"));
 		writer.flush();
 
 		JTextArea area = new JTextArea(writer.toString());

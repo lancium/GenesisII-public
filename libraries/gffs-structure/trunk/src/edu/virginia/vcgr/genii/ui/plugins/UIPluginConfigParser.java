@@ -45,8 +45,8 @@ public class UIPluginConfigParser
 	{
 		String ret = element.getAttribute(attributeName);
 		if (ret == null)
-			throw new SAXException(String.format("Unable to get required attribute \"%s\" from element \"%s\".", attributeName,
-				element.getNodeName()));
+			throw new SAXException(
+				String.format("Unable to get required attribute \"%s\" from element \"%s\".", attributeName, element.getNodeName()));
 
 		return ret;
 	}
@@ -93,16 +93,14 @@ public class UIPluginConfigParser
 			if (name.equals(TOP_MENU_ELEMENT)) {
 				UITopMenuPlugin topPlugin = (UITopMenuPlugin) plugin;
 
-				topMenuDescription =
-					new UITopMenuFacetDescription(requiredAttribute(child, MENU_NAME_ATTR), requiredAttribute(child, GROUP_ATTR),
-						requiredAttribute(child, ITEM_NAME_ATTR), topPlugin);
+				topMenuDescription = new UITopMenuFacetDescription(requiredAttribute(child, MENU_NAME_ATTR),
+					requiredAttribute(child, GROUP_ATTR), requiredAttribute(child, ITEM_NAME_ATTR), topPlugin);
 				topPlugin.configureTopMenu(readProperties(child));
 			} else if (name.equals(POPUP_MENU_ELEMENT)) {
 				UIPopupMenuPlugin popupPlugin = (UIPopupMenuPlugin) plugin;
 
-				popupDescription =
-					new UIPopupMenuFacetDescription(requiredAttribute(child, GROUP_ATTR), requiredAttribute(child, ITEM_NAME_ATTR),
-						popupPlugin);
+				popupDescription = new UIPopupMenuFacetDescription(requiredAttribute(child, GROUP_ATTR),
+					requiredAttribute(child, ITEM_NAME_ATTR), popupPlugin);
 				popupPlugin.configurePopupMenu(readProperties(child));
 			} else if (name.equals(TAB_ELEMENT)) {
 				UITabPlugin tabPlugin = (UITabPlugin) plugin;
@@ -141,8 +139,8 @@ public class UIPluginConfigParser
 		return ret;
 	}
 
-	static public Collection<UIPluginDescription> parse(InputStream configStream) throws ParserConfigurationException, SAXException,
-		IOException, UIPluginException
+	static public Collection<UIPluginDescription> parse(InputStream configStream)
+		throws ParserConfigurationException, SAXException, IOException, UIPluginException
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setIgnoringComments(true);
@@ -154,8 +152,8 @@ public class UIPluginConfigParser
 		return parse(document);
 	}
 
-	static public Collection<UIPluginDescription> parse(File configFile) throws ParserConfigurationException, SAXException, IOException,
-		UIPluginException
+	static public Collection<UIPluginDescription> parse(File configFile)
+		throws ParserConfigurationException, SAXException, IOException, UIPluginException
 	{
 		FileInputStream fin = null;
 
@@ -167,8 +165,8 @@ public class UIPluginConfigParser
 		}
 	}
 
-	static public Collection<UIPluginDescription> parse(String resourcePath) throws ParserConfigurationException, SAXException, IOException,
-		UIPluginException
+	static public Collection<UIPluginDescription> parse(String resourcePath)
+		throws ParserConfigurationException, SAXException, IOException, UIPluginException
 	{
 		ClassLoader loader = GenesisClassLoader.classLoaderFactory();
 		InputStream in = null;

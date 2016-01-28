@@ -37,8 +37,8 @@ public class Deployment
 		_configurationDirectory = _deploymentDirectory.lookupDirectory(CONFIGURATION_DIRECTORY_NAME);
 
 		if (!_configurationDirectory.exists())
-			throw new InvalidDeploymentException(_deploymentDirectory.getName(), "Does not contain a " + CONFIGURATION_DIRECTORY_NAME
-				+ " directory.");
+			throw new InvalidDeploymentException(_deploymentDirectory.getName(),
+				"Does not contain a " + CONFIGURATION_DIRECTORY_NAME + " directory.");
 
 		_security = new Security(_deploymentDirectory, _configurationDirectory);
 
@@ -47,8 +47,8 @@ public class Deployment
 		_servicesDirectory = _deploymentDirectory.lookupDirectory(SERVICES_DIRECTORY_NAME);
 
 		if (!_servicesDirectory.exists())
-			throw new InvalidDeploymentException(_deploymentDirectory.getName(), "Does not contain a " + SERVICES_DIRECTORY_NAME
-				+ " directory.");
+			throw new InvalidDeploymentException(_deploymentDirectory.getName(),
+				"Does not contain a " + SERVICES_DIRECTORY_NAME + " directory.");
 
 		_dynamicPagesDirectory = _deploymentDirectory.lookupDirectory(DYNAMIC_PAGES_DIRECTORY_NAME);
 

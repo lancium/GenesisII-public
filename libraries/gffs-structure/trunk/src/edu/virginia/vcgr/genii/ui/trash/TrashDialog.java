@@ -100,12 +100,12 @@ public class TrashDialog extends UIFrame
 		setupDragAndDrop(_unlinkList);
 		setupDragAndDrop(_removeList);
 
-		add(GUIUtils.addTitle("Unsorted", new JScrollPane(_unsortedList)), new GridBagConstraints(0, 0, 1, 2, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		add(GUIUtils.addTitle("To Unlink", new JScrollPane(_unlinkList)), new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
-		add(GUIUtils.addTitle("To Delete", new JScrollPane(_removeList)), new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(GUIUtils.addTitle("Unsorted", new JScrollPane(_unsortedList)),
+			new GridBagConstraints(0, 0, 1, 2, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(GUIUtils.addTitle("To Unlink", new JScrollPane(_unlinkList)),
+			new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(GUIUtils.addTitle("To Delete", new JScrollPane(_removeList)),
+			new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		add(ButtonPanel.createHorizontalButtonPanel(_enactAction, _cancelAction), new GridBagConstraints(0, 2, 2, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
@@ -237,10 +237,8 @@ public class TrashDialog extends UIFrame
 				wrappers.add(wrapper);
 			}
 
-			_uiContext
-				.progressMonitorFactory()
-				.createMonitor(_unsortedList, "Undelete", "Undeleting entries.", 1000L, new UndeleteTask(wrappers),
-					new UndeleteTaskCompleter()).start();
+			_uiContext.progressMonitorFactory().createMonitor(_unsortedList, "Undelete", "Undeleting entries.", 1000L,
+				new UndeleteTask(wrappers), new UndeleteTaskCompleter()).start();
 		}
 
 		@SuppressWarnings("deprecation")

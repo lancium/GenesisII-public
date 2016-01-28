@@ -38,9 +38,8 @@ public class Application
 			REAL_APPLICATION_CLASS = Class.forName("com.apple.eawt.Application");
 
 			ADD_ABOUT_MENU_ITEM = REAL_APPLICATION_CLASS.getDeclaredMethod("addAboutMenuItem");
-			ADD_APPLICATION_LISTENER =
-				REAL_APPLICATION_CLASS
-					.getDeclaredMethod("addApplicationListener", ApplicationListenerWrapper.REAL_APPLICATION_LISTENER_CLASS);
+			ADD_APPLICATION_LISTENER = REAL_APPLICATION_CLASS.getDeclaredMethod("addApplicationListener",
+				ApplicationListenerWrapper.REAL_APPLICATION_LISTENER_CLASS);
 			ADD_PREFERENCES_MENU_ITEM = REAL_APPLICATION_CLASS.getDeclaredMethod("addPreferencesMenuItem");
 			GET_APPLICATION = REAL_APPLICATION_CLASS.getDeclaredMethod("getApplication");
 			GET_DOCK_ICON_IMAGE = REAL_APPLICATION_CLASS.getDeclaredMethod("getDockIconImage");
@@ -51,9 +50,8 @@ public class Application
 			IS_PREFERENCES_MENU_ITEM_PRESENT = REAL_APPLICATION_CLASS.getDeclaredMethod("isPreferencesMenuItemPresent");
 			OPEN_HELP_VIEWER = REAL_APPLICATION_CLASS.getDeclaredMethod("openHelpViewer");
 			REMOVE_ABOUT_MENU_ITEM = REAL_APPLICATION_CLASS.getDeclaredMethod("removeAboutMenuItem");
-			REMOVE_APPLICATION_LISTENER =
-				REAL_APPLICATION_CLASS.getDeclaredMethod("removeApplicationListener",
-					ApplicationListenerWrapper.REAL_APPLICATION_LISTENER_CLASS);
+			REMOVE_APPLICATION_LISTENER = REAL_APPLICATION_CLASS.getDeclaredMethod("removeApplicationListener",
+				ApplicationListenerWrapper.REAL_APPLICATION_LISTENER_CLASS);
 			SET_DOCK_ICON_BADGE = REAL_APPLICATION_CLASS.getDeclaredMethod("setDockIconBadge", String.class);
 			SET_DOCK_ICON_IMAGE = REAL_APPLICATION_CLASS.getDeclaredMethod("setDockIconImage", Image.class);
 			SET_DOCK_MENU = REAL_APPLICATION_CLASS.getDeclaredMethod("setDockMenu", PopupMenu.class);

@@ -35,9 +35,8 @@ public class RExportResolverFactoryProxy implements IResolverFactoryProxy
 	public EndpointReferenceType createResolver(EndpointReferenceType targetEPR, Properties params, MessageElement[] creationProps)
 		throws RemoteException, ResourceException, InvalidWSNameFaultType
 	{
-		RExportResolverFactoryPortType resolverFactoryService =
-			ClientUtils.createProxy(RExportResolverFactoryPortType.class,
-				EPRUtils.makeEPR(Container.getServiceURL("RExportResolverFactoryPortType")));
+		RExportResolverFactoryPortType resolverFactoryService = ClientUtils.createProxy(RExportResolverFactoryPortType.class,
+			EPRUtils.makeEPR(Container.getServiceURL("RExportResolverFactoryPortType")));
 		CreateResolverResponseType resp = resolverFactoryService.createResolver(new CreateResolverRequestType(targetEPR, creationProps));
 		if (resp == null)
 			return null;

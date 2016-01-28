@@ -15,8 +15,8 @@ public class DebugInvoker implements IAroundInvoker
 			"method " + invocationContext.getMethod().getName() + " on class " + invocationContext.getTarget().getClass().getName() + ".";
 
 		if (_logger.isTraceEnabled())
-			_logger.trace("Calling " + description + " from a " + (NamingUtils.isWSNamingAwareClient() ? "" : "non-")
-				+ "WS-Naming aware client.");
+			_logger.trace(
+				"Calling " + description + " from a " + (NamingUtils.isWSNamingAwareClient() ? "" : "non-") + "WS-Naming aware client.");
 
 		long start = System.currentTimeMillis();
 

@@ -110,8 +110,8 @@ public class InstallationProperties extends Properties
 		if (!propsFile.exists()) {
 			propsFile = new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_PROPERTIES_FILENAME);
 			if (!propsFile.exists()) {
-				_logger.error("could not find any " + ExportProperties.EXPORT_PROPERTIES_FILENAME
-					+ " file in state or installation directory.");
+				_logger
+					.error("could not find any " + ExportProperties.EXPORT_PROPERTIES_FILENAME + " file in state or installation directory.");
 				return null;
 			}
 		}
@@ -128,8 +128,8 @@ public class InstallationProperties extends Properties
 		if (!propsFile.exists()) {
 			propsFile = new File(ApplicationDescription.getInstallationDirectory() + "/lib/" + ExportProperties.EXPORT_RESTRICTIONS_FILENAME);
 			if (!propsFile.exists()) {
-				_logger.error("could not find any " + ExportProperties.EXPORT_RESTRICTIONS_FILENAME
-					+ " file in state or installation directory.");
+				_logger.error(
+					"could not find any " + ExportProperties.EXPORT_RESTRICTIONS_FILENAME + " file in state or installation directory.");
 				return null;
 			}
 		}
@@ -263,9 +263,8 @@ public class InstallationProperties extends Properties
 	 */
 	public static String getSimpleGridName()
 	{
-		UserConfigurationFile depProps =
-			new UserConfigurationFile(FileSystemHelper.sanitizeFilename(new File(ApplicationDescription.getInstallationDirectory(),
-				InstallationConstants.DEPLOYMENT_PROPERTIES_FILE).getAbsolutePath()));
+		UserConfigurationFile depProps = new UserConfigurationFile(FileSystemHelper.sanitizeFilename(
+			new File(ApplicationDescription.getInstallationDirectory(), InstallationConstants.DEPLOYMENT_PROPERTIES_FILE).getAbsolutePath()));
 		String gridName = depProps.getProperty(InstallationConstants.GRID_NAME_SETTING);
 		return gridName;
 	}

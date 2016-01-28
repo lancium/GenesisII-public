@@ -64,23 +64,23 @@ public class ExportDirDialog extends JDialog
 		container.setLayout(new GridBagLayout());
 
 		panel = createExportList();
-		container.add(panel, new GridBagConstraints(0, 0, 4, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,
-			5, 5, 5), 5, 5));
+		container.add(panel,
+			new GridBagConstraints(0, 0, 4, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		ExportDataAction action = new ExportDataAction(this, ContainerPath, TargetPath);
 		action.addExportChangeListener(_model);
 		button = new JButton(action);
-		container.add(button, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
+		container.add(button,
+			new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		QuitExportAction quitAction = new QuitExportAction(_table);
 		quitAction.addExportChangeListener(_model);
 		button = new JButton(quitAction);
-		container.add(button, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
+		container.add(button,
+			new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
-		container.add(new JButton(new QuitButton()), new GridBagConstraints(2, 1, 1, 1, 0.0, 1.0, GridBagConstraints.EAST,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		container.add(new JButton(new QuitButton()),
+			new GridBagConstraints(2, 1, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		container.add(new JButton(new GuiHelpAction(null, HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.GENERAL_EXPORT_HELP))),
 			new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
@@ -97,8 +97,8 @@ public class ExportDirDialog extends JDialog
 		_model = new ExportTableModel();
 		_table = new JTable(_model);
 		_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		panel.add(new JScrollPane(_table), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(5, 5, 5, 5), 5, 5));
+		panel.add(new JScrollPane(_table),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		return panel;
 	}
 }

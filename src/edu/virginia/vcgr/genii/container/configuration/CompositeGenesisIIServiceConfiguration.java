@@ -25,9 +25,10 @@ class CompositeGenesisIIServiceConfiguration implements GenesisIIServiceConfigur
 
 				if (!jaxbOverride.isInterface()) {
 					if ((lastJAXBClassOverride != null) && !jaxbOverride.isAssignableFrom(lastJAXBClassOverride)) {
-						throw new ConfigurationException(String.format("JAXBServiceConfigurationClass %s on %s is "
-							+ "not compatible with previous declaration %s " + "on service class %s.", jaxbOverride, newServiceClass,
-							lastJAXBClassOverride, lastJAXBClassOverrideService));
+						throw new ConfigurationException(String.format(
+							"JAXBServiceConfigurationClass %s on %s is " + "not compatible with previous declaration %s "
+								+ "on service class %s.",
+							jaxbOverride, newServiceClass, lastJAXBClassOverride, lastJAXBClassOverrideService));
 					}
 
 					lastJAXBClassOverride = jaxbOverride;

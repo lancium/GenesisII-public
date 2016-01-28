@@ -264,7 +264,7 @@ public class UpdateGridCertsTool
 
 		try {
 			// if we decide to call this, then we expect to actually update the trust store.
-			//hmmm: can we find a stderr to pass here instead of null?
+			// hmmm: can we find a stderr to pass here instead of null?
 			if (getCertPackAndInstall(certPack, null) != 0) {
 				return 1;
 			}

@@ -22,8 +22,8 @@ import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
  * 
  * @author mmm2a
  */
-public class MTOMRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIOPortType> implements RandomByteIOTransferer,
-	MTOMByteIOTransferer
+public class MTOMRByteIOTransferer extends AbstractByteIOTransferer<RandomByteIOPortType>
+	implements RandomByteIOTransferer, MTOMByteIOTransferer
 {
 	/**
 	 * Construct a new MTOMRByteIO transferer.

@@ -28,14 +28,14 @@ class OperatingSystemPanel extends TitledPanel
 		osCombo.setSelectedItem(context.jobDocument().operatingSystem());
 		osCombo.addItemListener(new OSSelectionListener(context.jobDocument()));
 
-		add(new JLabel("Type"), new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5,
-			5, 5, 5), 5, 5));
-		add(osCombo, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
-			5, 5), 5, 5));
+		add(new JLabel("Type"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(osCombo, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 		add(new JLabel("Version"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(osVersion, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(5, 5,
-			5, 5), 5, 5));
+		add(osVersion, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
 	}
 
 	private class OSSelectionListener implements ItemListener

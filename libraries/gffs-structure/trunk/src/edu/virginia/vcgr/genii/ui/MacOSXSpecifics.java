@@ -28,8 +28,8 @@ public class MacOSXSpecifics
 		return appClass.newInstance();
 	}
 
-	static private void callVoidMethod(Object instance, String methodName, Class<?>[] types, Object[] parameters) throws SecurityException,
-		NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException
+	static private void callVoidMethod(Object instance, String methodName, Class<?>[] types, Object[] parameters)
+		throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException
 	{
 		Class<?> cl = instance.getClass();
 		Method m = cl.getDeclaredMethod(methodName, types);
@@ -62,14 +62,14 @@ public class MacOSXSpecifics
 		private ApplicationContext _context;
 		private Object _applicationAdapter;
 
-		static private void setApplicationEventHandled(Object eventObject, boolean result) throws SecurityException,
-			IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException
+		static private void setApplicationEventHandled(Object eventObject, boolean result)
+			throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException
 		{
 			callVoidMethod(eventObject, "setHandled", new Class<?>[] { boolean.class }, new Object[] { result });
 		}
 
-		private ApplicationListenerInvoker(ApplicationContext context) throws ClassNotFoundException, InstantiationException,
-			IllegalAccessException
+		private ApplicationListenerInvoker(ApplicationContext context)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException
 		{
 			_context = context;
 			_applicationAdapter = getApplicationAdapterObject();

@@ -45,8 +45,8 @@ public class FileHandler
 	static public final int NOFOLLOW = 0400000;
 	static public final int NOATIME = 01000000;
 
-	static private EndpointReferenceType openSByteIOFromFactory(EndpointReferenceType factory) throws GenesisIISecurityException,
-		ResourceException, ResourceCreationFaultType, RemoteException
+	static private EndpointReferenceType openSByteIOFromFactory(EndpointReferenceType factory)
+		throws GenesisIISecurityException, ResourceException, ResourceCreationFaultType, RemoteException
 	{
 		StreamableByteIOFactory f = ClientUtils.createProxy(StreamableByteIOFactory.class, factory);
 		return f.openStream(null).getEndpoint();
@@ -95,8 +95,8 @@ public class FileHandler
 					key = "F" + (new GUID()).toString();
 				} while (_openFiles.containsKey(key));
 
-				_openFiles.put(key, new FileSession(new StreamableByteIOFileDescriptor(path.getEndpoint(),
-					((twobits == 0) || (twobits == 2)), ((twobits == 1) || (twobits == 2)), ((flags & APPEND) > 0))));
+				_openFiles.put(key, new FileSession(new StreamableByteIOFileDescriptor(path.getEndpoint(), ((twobits == 0) || (twobits == 2)),
+					((twobits == 1) || (twobits == 2)), ((flags & APPEND) > 0))));
 
 				return key;
 			} else if (typeInfo.isSByteIOFactory()) {

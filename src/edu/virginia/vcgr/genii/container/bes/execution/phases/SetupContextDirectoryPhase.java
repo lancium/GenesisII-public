@@ -34,7 +34,7 @@ public class SetupContextDirectoryPhase extends AbstractExecutionPhase
 
 		File dir = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), _contextDirectoryName);
 		dir.mkdirs();
-		ContextFileSystem.store(new File(dir, ClientContextResolver.USER_CONTEXT_FILENAME), new File(dir,
-			ClientContextResolver.USER_TRANSIENT_FILENAME), context.getCallingContext());
+		ContextFileSystem.store(new File(dir, ClientContextResolver.USER_CONTEXT_FILENAME),
+			new File(dir, ClientContextResolver.USER_TRANSIENT_FILENAME), context.getCallingContext());
 	}
 }

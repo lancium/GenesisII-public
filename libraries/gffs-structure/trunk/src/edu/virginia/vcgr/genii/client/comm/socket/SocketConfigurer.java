@@ -146,8 +146,8 @@ public class SocketConfigurer
 			if (_receiveBufferSize != null) {
 				socket.setReceiveBufferSize(_receiveBufferSize);
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Set receive buffer size to %d (now it's %d).", _receiveBufferSize,
-						socket.getReceiveBufferSize()));
+					_logger.debug(
+						String.format("Set receive buffer size to %d (now it's %d).", _receiveBufferSize, socket.getReceiveBufferSize()));
 			}
 
 			if (_reuseAddress != null) {

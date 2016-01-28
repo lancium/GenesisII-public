@@ -368,8 +368,8 @@ public class RunTool extends BaseGridTool
 		for (String stage : _stageIns) {
 			Matcher matcher = _STAGE_PATTERN.matcher(stage);
 			if (!matcher.matches())
-				throw new IllegalArgumentException("Data stage description \"" + stage + "\" does not match required pattern of "
-					+ "<filename>/<stage-uri>");
+				throw new IllegalArgumentException(
+					"Data stage description \"" + stage + "\" does not match required pattern of " + "<filename>/<stage-uri>");
 			stages.put(matcher.group(1), new URI(matcher.group(2)));
 		}
 
@@ -377,8 +377,8 @@ public class RunTool extends BaseGridTool
 		for (String stage : _stageOuts) {
 			Matcher matcher = _STAGE_PATTERN.matcher(stage);
 			if (!matcher.matches())
-				throw new IllegalArgumentException("Data stage description \"" + stage + "\" does not match required pattern of "
-					+ "<filename>/<stage-uri>");
+				throw new IllegalArgumentException(
+					"Data stage description \"" + stage + "\" does not match required pattern of " + "<filename>/<stage-uri>");
 			stages.put(matcher.group(1), new URI(matcher.group(2)));
 		}
 
@@ -400,8 +400,8 @@ public class RunTool extends BaseGridTool
 		return new ActivityState(new MessageElement((org.apache.axis.message.MessageElement) resp.get_any()[0].getChildElements().next()));
 	}
 
-	static public ActivityState checkStatus(EndpointReferenceType besContainer, EndpointReferenceType activity) throws ResourceException,
-		RemoteException, RNSPathDoesNotExistException
+	static public ActivityState checkStatus(EndpointReferenceType besContainer, EndpointReferenceType activity)
+		throws ResourceException, RemoteException, RNSPathDoesNotExistException
 	{
 		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, besContainer);
 		GetActivityStatusesResponseType resp =
@@ -469,8 +469,8 @@ public class RunTool extends BaseGridTool
 		return response.getActivityIdentifier();
 	}
 
-	static private EndpointReferenceType getBESContainer(RNSPath besOrSchedPath) throws RNSPathDoesNotExistException,
-		GenesisIISecurityException, ResourceException, RemoteException
+	static private EndpointReferenceType getBESContainer(RNSPath besOrSchedPath)
+		throws RNSPathDoesNotExistException, GenesisIISecurityException, ResourceException, RemoteException
 	{
 		EndpointReferenceType target = besOrSchedPath.getEndpoint();
 
@@ -481,8 +481,8 @@ public class RunTool extends BaseGridTool
 	static private QName _GENII_APP_PATH_ELEMENT = new QName(GENII_APP_NS, "ApplicationPath");
 	static private QName _GENII_APP_ENDPOINT_ELEMENT = new QName(GENII_APP_NS, "ApplicationEndpoint");
 
-	private JobDefinition_Type deployAndReify(GeniiBESPortType bes, JobDefinition_Type jobDef) throws RNSException, ResourceException,
-		RemoteException
+	private JobDefinition_Type deployAndReify(GeniiBESPortType bes, JobDefinition_Type jobDef)
+		throws RNSException, ResourceException, RemoteException
 	{
 		EndpointReferenceType applicationDescriptionEPR = null;
 
@@ -546,8 +546,8 @@ public class RunTool extends BaseGridTool
 		return ret;
 	}
 
-	static private EndpointReferenceType
-		createDeployment(EndpointReferenceType deployerService, EndpointReferenceType applicationDescription) throws RemoteException
+	static private EndpointReferenceType createDeployment(EndpointReferenceType deployerService, EndpointReferenceType applicationDescription)
+		throws RemoteException
 	{
 		ApplicationDeployerPortType deployer = ClientUtils.createProxy(ApplicationDeployerPortType.class, deployerService);
 
@@ -587,8 +587,8 @@ public class RunTool extends BaseGridTool
 		return _acceptableChoices.get(_generator.nextInt(_acceptableChoices.size())).getEndpoint();
 	}
 
-	static private SupportDocumentType[] determineSupport(ApplicationDeployerPortType deployer) throws ResourceUnknownFaultType,
-		RemoteException
+	static private SupportDocumentType[] determineSupport(ApplicationDeployerPortType deployer)
+		throws ResourceUnknownFaultType, RemoteException
 	{
 		GetResourcePropertyResponse resp = deployer.getResourceProperty(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME);
 

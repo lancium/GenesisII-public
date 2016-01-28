@@ -67,9 +67,10 @@ public class AlarmManager
 	private boolean createTableIfNecessary(Connection conn)
 	{
 		try {
-			DatabaseTableUtils.createTables(conn, false, "CREATE TABLE alarmtable ("
-				+ "alarmid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "nextoccurance TIMESTAMP NOT NULL," + "repeatinterval BIGINT,"
-				+ "callingcontext BLOB(2G)," + "target BLOB(2G)," + "methodname VARCHAR(256) NOT NULL," + "userdata BLOB(2G))");
+			DatabaseTableUtils.createTables(conn, false,
+				"CREATE TABLE alarmtable (" + "alarmid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," + "nextoccurance TIMESTAMP NOT NULL,"
+					+ "repeatinterval BIGINT," + "callingcontext BLOB(2G)," + "target BLOB(2G)," + "methodname VARCHAR(256) NOT NULL,"
+					+ "userdata BLOB(2G))");
 			conn.commit();
 			return true;
 		} catch (SQLException sqe) {
@@ -192,9 +193,8 @@ public class AlarmManager
 
 		try {
 			conn = _connectionPool.acquire(true);
-			addStmt =
-				conn.prepareStatement("INSERT INTO alarmtable(" + "nextoccurance, repeatinterval, callingcontext, "
-					+ "target, methodname, userdata) " + "VALUES (?, ?, ?, ?, ?, ?)");
+			addStmt = conn.prepareStatement("INSERT INTO alarmtable(" + "nextoccurance, repeatinterval, callingcontext, "
+				+ "target, methodname, userdata) " + "VALUES (?, ?, ?, ?, ?, ?)");
 			addStmt.setTimestamp(1, new Timestamp(nextOccurrence.getTime()));
 			addStmt.setLong(2, repeatIntervalMS);
 			addStmt.setBlob(3, DBSerializer.toBlob(callingContext, "alarmtable", "callingcontext"));
@@ -330,9 +330,8 @@ public class AlarmManager
 
 		try {
 			conn = _connectionPool.acquire(false);
-			getInfoStmt =
-				conn.prepareStatement("SELECT repeatinterval, callingcontext, target, " + "methodname, userdata "
-					+ "FROM alarmtable WHERE alarmid = ?");
+			getInfoStmt = conn.prepareStatement(
+				"SELECT repeatinterval, callingcontext, target, " + "methodname, userdata " + "FROM alarmtable WHERE alarmid = ?");
 			removeStmt = conn.prepareStatement("DELETE FROM alarmtable WHERE alarmid = ?");
 			updateStmt = conn.prepareStatement("UPDATE alarmtable SET nextoccurance = ? WHERE alarmid = ?");
 
@@ -342,10 +341,8 @@ public class AlarmManager
 					getInfoStmt.setLong(1, desc.getAlarmID());
 					rs = getInfoStmt.executeQuery();
 					if (rs.next()) {
-						aInfo =
-							new AlarmInformation(desc.getAlarmID(), rs.getLong(1), (ICallingContext) DBSerializer.fromBlob(rs.getBlob(2)),
-								(EndpointReferenceType) EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4), DBSerializer.fromBlob(rs
-									.getBlob(5)));
+						aInfo = new AlarmInformation(desc.getAlarmID(), rs.getLong(1), (ICallingContext) DBSerializer.fromBlob(rs.getBlob(2)),
+							(EndpointReferenceType) EPRUtils.fromBlob(rs.getBlob(3)), rs.getString(4), DBSerializer.fromBlob(rs.getBlob(5)));
 						StreamUtils.close(rs);
 						rs = null;
 

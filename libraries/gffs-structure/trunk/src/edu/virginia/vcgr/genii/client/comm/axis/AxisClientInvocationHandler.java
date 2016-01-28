@@ -151,8 +151,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	 * constructs a handler for rpc calls using the "locators" list of classes to create axis services connecting to the "epr" (host, port,
 	 * container id).
 	 */
-	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext) throws ResourceException,
-		GenesisIISecurityException
+	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext)
+		throws ResourceException, GenesisIISecurityException
 	{
 		AxisServiceAndStubTracking.recordHandlerCreationAndTakeOutTrashIfAppropriate();
 
@@ -210,8 +210,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		return __minClientMessageSec;
 	}
 
-	public synchronized void configureSecurity(Stub stubInstance) throws GenesisIISecurityException, GeneralSecurityException,
-		ResourceException
+	public synchronized void configureSecurity(Stub stubInstance)
+		throws GenesisIISecurityException, GeneralSecurityException, ResourceException
 	{
 		Object confProp = stubInstance._getProperty(AxisServiceAndStubTracking.STUB_CONFIGURED);
 		if ((confProp != null) && (confProp.toString() != "")) {
@@ -405,9 +405,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	synchronized static private InvocationInterceptorManager getManager()
 	{
 		if (_manager == null) {
-			_manager =
-				(InvocationInterceptorManager) ConfigurationManager.getCurrentConfiguration().getClientConfiguration()
-					.retrieveSection(new QName("http://vcgr.cs.virginia.edu/Genesis-II", "client-pipeline"));
+			_manager = (InvocationInterceptorManager) ConfigurationManager.getCurrentConfiguration().getClientConfiguration()
+				.retrieveSection(new QName("http://vcgr.cs.virginia.edu/Genesis-II", "client-pipeline"));
 		}
 
 		if (_manager == null) {
@@ -738,15 +737,15 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		 * Set calling context so that the socket factory has access to it.
 		 */
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("Starting an outcall for %s on thread [%x]%s.", calledMethod.getName(), Thread.currentThread()
-				.getId(), Thread.currentThread()));
+			_logger.trace(String.format("Starting an outcall for %s on thread [%x]%s.", calledMethod.getName(),
+				Thread.currentThread().getId(), Thread.currentThread()));
 		long start = System.currentTimeMillis();
 		VcgrSslSocketFactory.threadCallingContext.set(_callContext);
 		Object ret = calledMethod.invoke(stubInstance, arguments);
 		VcgrSslSocketFactory.threadCallingContext.set(null);
 		if (_logger.isTraceEnabled())
-			_logger.trace(String.format("Finished an outcall for %s on thread [%x]%s (duration %d ms).", calledMethod.getName(), Thread
-				.currentThread().getId(), Thread.currentThread(), System.currentTimeMillis() - start));
+			_logger.trace(String.format("Finished an outcall for %s on thread [%x]%s (duration %d ms).", calledMethod.getName(),
+				Thread.currentThread().getId(), Thread.currentThread(), System.currentTimeMillis() - start));
 		if (_logger.isDebugEnabled())
 			_logger.debug(String.format("Outcall for '%s' took %d ms.", calledMethod.getName(), System.currentTimeMillis() - start));
 
@@ -780,26 +779,26 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					}
 				}
 			} else if (name.equals(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_NAME)) {
-				//hmmm: TURNED OFF FOR NOW since this feature is not actually implemented yet.
-				
-//				// found our credential shorthand sentinel header. we will pedanticly check that it's set to true.
-//				org.w3c.dom.Node n = elem.getFirstChild();
-//				if (n != null) {
-//					String text = n.getNodeValue();
-//					if (text != null && text.equalsIgnoreCase("true")) {
-//						supportsShorthand = true;
-//					}
-//					// hmmm: lower this logging.
-//					if (_logger.isDebugEnabled()) {
-//						if (supportsShorthand)
-//							_logger.debug("saw that endpoint supports credential shorthand");
-//						else if (text == null)
-//							_logger
-//								.debug("endpoint says it does not support credential shorthand, although it is generating that soap header!?");
-//						else
-//							_logger.debug("endpoint does not support credential shorthand; it is from the before time.");
-//					}
-//				}
+				// hmmm: TURNED OFF FOR NOW since this feature is not actually implemented yet.
+
+				// // found our credential shorthand sentinel header. we will pedanticly check that it's set to true.
+				// org.w3c.dom.Node n = elem.getFirstChild();
+				// if (n != null) {
+				// String text = n.getNodeValue();
+				// if (text != null && text.equalsIgnoreCase("true")) {
+				// supportsShorthand = true;
+				// }
+				// // hmmm: lower this logging.
+				// if (_logger.isDebugEnabled()) {
+				// if (supportsShorthand)
+				// _logger.debug("saw that endpoint supports credential shorthand");
+				// else if (text == null)
+				// _logger
+				// .debug("endpoint says it does not support credential shorthand, although it is generating that soap header!?");
+				// else
+				// _logger.debug("endpoint does not support credential shorthand; it is from the before time.");
+				// }
+				// }
 			} else if (name.equals(NotificationBrokerConstants.MESSAGE_INDEX_QNAME)) {
 				EndpointReferenceType target = getTargetEPR();
 				int messageIndex = Integer.parseInt(elem.getValue());

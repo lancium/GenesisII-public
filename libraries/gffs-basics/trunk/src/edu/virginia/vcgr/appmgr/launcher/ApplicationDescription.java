@@ -173,8 +173,8 @@ public class ApplicationDescription
 		if (appPath.endsWith(".jar")) {
 			// we need to chop off the jar file part of the name.
 			int lastSlash = appPath.lastIndexOf("/");
-//			if (lastSlash < 0)
-//				lastSlash = appPath.lastIndexOf("\\");
+			// if (lastSlash < 0)
+			// lastSlash = appPath.lastIndexOf("\\");
 			if (lastSlash < 0) {
 				String msg = "could not find a slash character in the path: " + appPath;
 				_logger.error(msg);

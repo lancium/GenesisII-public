@@ -127,8 +127,8 @@ public class VariableManager implements ParameterizableListener
 					_logger.warn(String.format("Variable manager asked to decrement a variable " + "that doesn't exist (%s).", variableName));
 				} else {
 					if (counter.modify(delta) < 0) {
-						_logger.warn(String.format("Variable manager asked to decrement a variable " + "below a count of 0 (%s).",
-							variableName));
+						_logger.warn(
+							String.format("Variable manager asked to decrement a variable " + "below a count of 0 (%s).", variableName));
 						counter.set(0);
 					}
 

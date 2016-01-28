@@ -156,9 +156,8 @@ public class ContextFileSystem
 
 				if (transientFilename == null) {
 					if (_logger.isTraceEnabled()) {
-						_logger
-							.debug("This process is now *unable* to store current calling context credentials for the session statefile \""
-								+ contextFilename + "\".");
+						_logger.debug("This process is now *unable* to store current calling context credentials for the session statefile \""
+							+ contextFilename + "\".");
 					}
 				}
 

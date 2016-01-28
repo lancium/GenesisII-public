@@ -31,9 +31,8 @@ public class CompareExpression extends AbstractConditionExpression
 
 		if (!comparison.equals("lt") && !comparison.equals("le") && !comparison.equals("eq") && !comparison.equals("ge")
 			&& !comparison.equals("gt"))
-			throw new ScriptException(String.format(
-				"\"comparison\" attribute of <{%s}:%s> element must " + "be one of [lt, le, eq, ge, gt].", XScriptContext.XSCRIPT_NS,
-				"compare"));
+			throw new ScriptException(String.format("\"comparison\" attribute of <{%s}:%s> element must " + "be one of [lt, le, eq, ge, gt].",
+				XScriptContext.XSCRIPT_NS, "compare"));
 
 		int result;
 		if (isNumeric)

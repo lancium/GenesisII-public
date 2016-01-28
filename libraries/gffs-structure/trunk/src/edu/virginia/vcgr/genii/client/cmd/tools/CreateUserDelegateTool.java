@@ -130,9 +130,8 @@ public class CreateUserDelegateTool extends CreateUserTool
 				return 0;
 		} else {
 			NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
-			idpServiceRNS =
-				RNSUtilities.findService(nsd.getRootContainer(), "X509AuthnPortType",
-					new PortType[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE() }, idpServicePath);
+			idpServiceRNS = RNSUtilities.findService(nsd.getRootContainer(), "X509AuthnPortType",
+				new PortType[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE() }, idpServicePath);
 		}
 
 		if (idpName == null) {

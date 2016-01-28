@@ -50,7 +50,8 @@ public class ClassMethodStatistics extends GenesisIIStyledPage
 			ps.println("<BR>");
 			ps.format("<H2>Statistics for Method %s</H2><BR>", methodName);
 			ps.println("<TABLE BORDER=\"1\">");
-			ps.println("<TR bgcolor=\"#7FFFD4\"><TH>Interval</TH><TH>Calls Started</TH><TH>Calls Completed</TH><TH>Calls Succeeded</TH><TH>Calls Failed</TH><TH>Failure Rate</TH><TH>Average Call Duration (ms)</TH></TR>");
+			ps.println(
+				"<TR bgcolor=\"#7FFFD4\"><TH>Interval</TH><TH>Calls Started</TH><TH>Calls Completed</TH><TH>Calls Succeeded</TH><TH>Calls Failed</TH><TH>Failure Rate</TH><TH>Average Call Duration (ms)</TH></TR>");
 			for (TimeInterval ti : report.keySet()) {
 				msr = report.get(ti);
 				methodMap = msr.methodTotals().get(_className);

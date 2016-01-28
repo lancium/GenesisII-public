@@ -56,12 +56,12 @@ public class EPRUtils
 	static private Log _logger = LogFactory.getLog(EPRUtils.class);
 
 	static public final String GENII_CONTAINER_ID_PARAMETER = "genii-container-id";
-	static private final Pattern GENII_CONTAINER_ID_PATTERN = Pattern.compile(String.format("%s=([-a-fA-F0-9]+)",
-		Pattern.quote(GENII_CONTAINER_ID_PARAMETER)));
+	static private final Pattern GENII_CONTAINER_ID_PATTERN =
+		Pattern.compile(String.format("%s=([-a-fA-F0-9]+)", Pattern.quote(GENII_CONTAINER_ID_PARAMETER)));
 
 	static public final String GENII_SHORT_PARAMETER_NAME = "genii-short-parameter";
-	static private final Pattern GENII_SHORT_PARAMETER_PATTERN = Pattern.compile(String.format("%s=([-a-fA-F0-9:]+)",
-		Pattern.quote(GENII_SHORT_PARAMETER_NAME)));
+	static private final Pattern GENII_SHORT_PARAMETER_PATTERN =
+		Pattern.compile(String.format("%s=([-a-fA-F0-9:]+)", Pattern.quote(GENII_SHORT_PARAMETER_NAME)));
 
 	/**
 	 * Generates a temporary EPR to (hopefully) obtain the full (incl. porttypes, certs, etc.) EPR from the service's attributes. The full one
@@ -200,16 +200,16 @@ public class EPRUtils
 					}
 
 					for (MessageElement attachmentElement : policyElements) {
-						if (attachmentElement.getQName().equals(
-							new QName(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference"))) {
+						if (attachmentElement.getQName()
+							.equals(new QName(PolicyReference.getTypeDesc().getXmlType().getNamespaceURI(), "PolicyReference"))) {
 
 							PolicyReference policyReference = (PolicyReference) attachmentElement.getObjectValue(PolicyReference.class);
 							if (policyReference.getURI().equals(new org.apache.axis.types.URI(SecurityConstants.MUTUAL_X509_URI))) {
 								retval = retval.computeUnion(new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.SIGN));
 							}
 
-						} else if (attachmentElement.getQName().equals(
-							new QName(SePartsType.getTypeDesc().getXmlType().getNamespaceURI(), "EncryptedParts"))) {
+						} else if (attachmentElement.getQName()
+							.equals(new QName(SePartsType.getTypeDesc().getXmlType().getNamespaceURI(), "EncryptedParts"))) {
 
 							retval = retval.computeUnion(new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.ENCRYPT));
 						}
@@ -297,8 +297,9 @@ public class EPRUtils
 				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a " + "max length of %d bytes.",
 					blob.length(), tableName, columnName, maxLength));
 			if (blob.length() > maxLength) {
-				_logger.error(String.format("Error:  Blob was created with %d bytes for %s.%s, "
-					+ "but the maximum length for that column is %d bytes.", blob.length(), tableName, columnName, maxLength));
+				_logger.error(String.format(
+					"Error:  Blob was created with %d bytes for %s.%s, " + "but the maximum length for that column is %d bytes.",
+					blob.length(), tableName, columnName, maxLength));
 			}
 
 			return blob;
@@ -394,8 +395,8 @@ public class EPRUtils
 
 	static public boolean isUnboundEPR(EndpointReferenceType epr)
 	{
-		return ((epr.getAddress() == null) || (epr.getAddress().get_value() == null) || (epr.getAddress().get_value().toString()
-			.equals(WSName.UNBOUND_ADDRESS)));
+		return ((epr.getAddress() == null) || (epr.getAddress().get_value() == null)
+			|| (epr.getAddress().get_value().toString().equals(WSName.UNBOUND_ADDRESS)));
 	}
 
 	static public EndpointReferenceType makeUnboundEPR(EndpointReferenceType epr)

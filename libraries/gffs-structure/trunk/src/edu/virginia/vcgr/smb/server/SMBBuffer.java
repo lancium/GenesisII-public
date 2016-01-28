@@ -306,23 +306,23 @@ public class SMBBuffer
 	{
 		if (unicode) {
 			align(2);
-			
-			try {
-			
-			//hmmm: is this really the right translation process here?
-			//original version:
-			for (int i = 0; i < s.length(); i++) {
-				this.buffer.putChar(s.charAt(i));
-			}
-			
-			//hmmm: this seems to produce chinese characters!?
-				// newer version:
-//				byte[] utf16 = s.getBytes("UTF-16");
-//				buffer.put(utf16);
 
-			// always add a zero char at end.
+			try {
+
+				// hmmm: is this really the right translation process here?
+				// original version:
+				for (int i = 0; i < s.length(); i++) {
+					this.buffer.putChar(s.charAt(i));
+				}
+
+				// hmmm: this seems to produce chinese characters!?
+				// newer version:
+				// byte[] utf16 = s.getBytes("UTF-16");
+				// buffer.put(utf16);
+
+				// always add a zero char at end.
 				this.buffer.putChar('\0');
-				
+
 			} catch (Throwable e) {
 				throw new SMBException(NTStatus.NOT_IMPLEMENTED);
 			}
@@ -330,21 +330,18 @@ public class SMBBuffer
 		} else {
 			try {
 				// hmmm: we are trying something different here; always respond with unicode, since windows should be happy with that.
-				// ... no, it hates it.				
-//				align(2);				
-//				byte[] utf16 = s.getBytes("UTF-16");
-//				buffer.put(utf16);				
-//				// it still really wants a zero at the end?
-//				this.buffer.putChar('\0');
-
+				// ... no, it hates it.
+				// align(2);
+				// byte[] utf16 = s.getBytes("UTF-16");
+				// buffer.put(utf16);
+				// // it still really wants a zero at the end?
+				// this.buffer.putChar('\0');
 
 				// old approach with simple ascii.
 				byte[] ascii = s.getBytes("US-ASCII");
 				buffer.put(ascii);
 				buffer.put((byte) 0);// NUL terminator
 
-
-				
 			} catch (UnsupportedEncodingException e) {
 				throw new SMBException(NTStatus.NOT_IMPLEMENTED);
 			}

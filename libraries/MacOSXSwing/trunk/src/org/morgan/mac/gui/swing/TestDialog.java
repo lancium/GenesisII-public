@@ -31,8 +31,8 @@ public class TestDialog
 		menuBar.add(menu);
 		dialog.setJMenuBar(menuBar);
 
-		content.add(new JLabel("Hello, World!"), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel("Hello, World!"),
+			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		dialog.pack();
 
 		Application application = Application.getApplication();

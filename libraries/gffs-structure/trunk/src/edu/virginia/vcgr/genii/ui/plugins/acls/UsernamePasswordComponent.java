@@ -42,17 +42,17 @@ class UsernamePasswordComponent extends JPanel
 
 		_uiContext = context;
 
-		add(new JLabel("Username"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+		add(new JLabel("Username"),
+			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_username, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(_username, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
-			5, 5, 5), 5, 5));
-		add(new JLabel("Password"), new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+		add(new JLabel("Password"),
+			new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(_password, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
-		add(_password, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5,
-			5, 5, 5), 5, 5));
 
-		add(_person, new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5),
-			5, 5));
+		add(_person,
+			new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		CaretListenerImpl listener = new CaretListenerImpl();
 		_username.addCaretListener(listener);
@@ -85,8 +85,8 @@ class UsernamePasswordComponent extends JPanel
 		@Override
 		protected Transferable createTransferable(JComponent c)
 		{
-			return new ACLTransferable(new ACLEntryWrapperTransferData(null, new ACLEntryWrapper(_uiContext, new UsernamePasswordIdentity(
-				_username.getText(), new String(_password.getPassword()), true))));
+			return new ACLTransferable(new ACLEntryWrapperTransferData(null, new ACLEntryWrapper(_uiContext,
+				new UsernamePasswordIdentity(_username.getText(), new String(_password.getPassword()), true))));
 		}
 
 		@Override

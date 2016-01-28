@@ -59,9 +59,8 @@ public class UserPreferencesTool extends BaseGridTool
 		MenuItem changeShellPromptItem = new SimpleMenuItem("S", new ChangeShellPromptHandler());
 		MenuItem quitItem = new SimpleMenuItem("Q", "Quit Preferences Tool");
 
-		ComboBoxDialog menu =
-			provider.createSingleListSelectionDialog("User Preferences", "What would you like to do?", quitItem,
-				viewCurrentUserPreferencesItem, changeExceptionHandlerItem, changeGUIPreferencesItem, changeShellPromptItem, quitItem);
+		ComboBoxDialog menu = provider.createSingleListSelectionDialog("User Preferences", "What would you like to do?", quitItem,
+			viewCurrentUserPreferencesItem, changeExceptionHandlerItem, changeGUIPreferencesItem, changeShellPromptItem, quitItem);
 
 		while (true) {
 			menu.showDialog();
@@ -104,11 +103,10 @@ public class UserPreferencesTool extends BaseGridTool
 
 			ShellPrompt shellPrompt = UserPreferences.preferences().shellPrompt();
 
-			InformationDialog dialog =
-				provider.createInformationDialog(
-					"Current User Preferences",
-					new TextContent(String.format("Exception Handler:  %s", handlerString), String.format("Prefer GUI?  %s",
-						preferGUI ? "Yes" : "No"), String.format("Shell Prompt Template:  %s", shellPrompt.describe())));
+			InformationDialog dialog = provider.createInformationDialog("Current User Preferences",
+				new TextContent(String.format("Exception Handler:  %s", handlerString),
+					String.format("Prefer GUI?  %s", preferGUI ? "Yes" : "No"),
+					String.format("Shell Prompt Template:  %s", shellPrompt.describe())));
 			dialog.showDialog();
 		}
 
@@ -125,9 +123,8 @@ public class UserPreferencesTool extends BaseGridTool
 			MenuItem simple = new SimpleMenuItem("S", "Simple Exception Handler");
 			MenuItem debug = new SimpleMenuItem("D", "Debug Exception Handler");
 
-			ComboBoxDialog dialog =
-				provider.createSingleListSelectionDialog("New Exception Handler", "Please select the new exception handler to use:", null,
-					simple, debug);
+			ComboBoxDialog dialog = provider.createSingleListSelectionDialog("New Exception Handler",
+				"Please select the new exception handler to use:", null, simple, debug);
 			dialog.showDialog();
 			MenuItem selected = dialog.getSelectedItem();
 

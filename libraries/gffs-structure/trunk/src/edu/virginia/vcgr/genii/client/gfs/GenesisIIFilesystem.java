@@ -75,12 +75,11 @@ public class GenesisIIFilesystem implements FSFilesystem
 	public static String CREDENTIAL_ERROR_MESSAGE = "There are no credentials or they have expired.  Cannot operate on: ";
 
 	private FileHandleTable<GeniiOpenFile> _fileTable = new FileHandleTable<GeniiOpenFile>(FILE_TABLE_SIZE);
-	
+
 	static QName MODTIME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
 	static QName CREATTIME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
 	static QName ACCESSTIME = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
 	static QName SIZE = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
-
 
 	final static private long toNonNull(Long l)
 	{
@@ -475,26 +474,26 @@ public class GenesisIIFilesystem implements FSFilesystem
 				}
 
 				DirectoryManager.addNewDirEntry(target, this, true);
-				
-				CacheManager.putItemInCache(epr, ByteIOConstants.rsize, new  MessageElement(ByteIOConstants.rsize, 0));
-				CacheManager.putItemInCache(epr, ByteIOConstants.rxferMechs, new MessageElement(ByteIOConstants.rxferMechs, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
-				
+
+				CacheManager.putItemInCache(epr, ByteIOConstants.rsize, new MessageElement(ByteIOConstants.rsize, 0));
+				CacheManager.putItemInCache(epr, ByteIOConstants.rxferMechs,
+					new MessageElement(ByteIOConstants.rxferMechs, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+
 				Calendar c = Calendar.getInstance();
 				c.setTimeInMillis(System.currentTimeMillis());
-				
+
 				MessageElement modtime = new MessageElement(MODTIME, c);
 				CacheManager.putItemInCache(epr, ByteIOConstants.rmodTime, modtime);
-			
 
 				MessageElement createtime = new MessageElement(CREATTIME, c);
 				CacheManager.putItemInCache(epr, ByteIOConstants.rcreatTime, createtime);
 
 				MessageElement accesstime = new MessageElement(ACCESSTIME, c);
 				CacheManager.putItemInCache(epr, ByteIOConstants.raccessTime, accesstime);
-				
-				MessageElement perms = new MessageElement(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, "rw----"); 
+
+				MessageElement perms = new MessageElement(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, "rw----");
 				CacheManager.putItemInCache(epr, GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, perms);
-				
+
 				return open(path, true, target, epr, flags, mode);
 			}
 		} catch (Throwable cause) {
@@ -544,9 +543,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 		try {
 			TypeInformation info = new TypeInformation(target.getEndpoint());
 			if (info.isRByteIO()) {
-				RandomByteIOTransferer transferer =
-					RandomByteIOTransfererFactory.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class,
-						target.getEndpoint()));
+				RandomByteIOTransferer transferer = RandomByteIOTransfererFactory
+					.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class, target.getEndpoint()));
 				transferer.truncAppend(newSize, new byte[0]);
 
 			} else if (info.isSByteIO()) {

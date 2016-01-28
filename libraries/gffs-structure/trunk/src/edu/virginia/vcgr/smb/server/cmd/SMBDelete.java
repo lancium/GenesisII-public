@@ -16,8 +16,8 @@ import edu.virginia.vcgr.smb.server.SMBTree;
 public class SMBDelete implements SMBCommand
 {
 	@Override
-	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc) throws IOException,
-		SMBException
+	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)
+		throws IOException, SMBException
 	{
 		int searchAttr = params.getUShort();
 

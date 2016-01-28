@@ -18,10 +18,10 @@ public class BasicJobInformation extends JPanel
 
 		setName("Basic Job Information");
 
-		add(new JobIdentificationPanel(documentContext.jobDocument()), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		add(new JobIdentificationPanel(documentContext.jobDocument()), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
-		add(new POSIXPanel(documentContext.jobDocument()), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		add(new POSIXPanel(documentContext.jobDocument()),
+			new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 	}
 }

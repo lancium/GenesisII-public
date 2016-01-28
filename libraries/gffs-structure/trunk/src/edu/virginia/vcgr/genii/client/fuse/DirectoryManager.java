@@ -181,9 +181,8 @@ public class DirectoryManager
 		 * directory is certainly stale. On the other hand, when the element-count property is not in the cache it is safer to assume that the
 		 * cached directory is invalid. In both cases, an RPC will be issued to replenish the missing contents in the directory.
 		 */
-		MessageElement elementCountElement =
-			(MessageElement) CacheManager.getItemFromCache(directoryConfig.getWsIdentifier(), RNSConstants.ELEMENT_COUNT_QNAME,
-				MessageElement.class);
+		MessageElement elementCountElement = (MessageElement) CacheManager.getItemFromCache(directoryConfig.getWsIdentifier(),
+			RNSConstants.ELEMENT_COUNT_QNAME, MessageElement.class);
 		if (elementCountElement == null)
 			return false;
 		int elementCount = Integer.parseInt(elementCountElement.getValue());
@@ -203,9 +202,8 @@ public class DirectoryManager
 				 * Make a probabilistic judgment about the effectiveness of returning result from cache based on the availability of
 				 * permissions-string attribute. This attribute is chosen because it is needed for both RNS and ByteIO.
 				 */
-				Object permissionProperty =
-					CacheManager.getItemFromCache(entryConfig.getWsIdentifier(), GenesisIIBaseRP.PERMISSIONS_STRING_QNAME,
-						MessageElement.class);
+				Object permissionProperty = CacheManager.getItemFromCache(entryConfig.getWsIdentifier(),
+					GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, MessageElement.class);
 				if (permissionProperty == null) {
 					attributesMissingFromResourcesOfSameContainer = true;
 					break;

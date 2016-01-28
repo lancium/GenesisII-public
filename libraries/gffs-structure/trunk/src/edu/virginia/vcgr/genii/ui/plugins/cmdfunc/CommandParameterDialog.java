@@ -35,8 +35,8 @@ class CommandParameterDialog extends JDialog
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
 
-		content.add(new JLabel(String.format("Parameters for Command Function \"%s\":", function)), new GridBagConstraints(0, 0, 2, 1, 1.0,
-			0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JLabel(String.format("Parameters for Command Function \"%s\":", function)),
+			new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 
 		_answerComponents = new JComponent[function.parameters().length];
 		int count = 0;
@@ -49,8 +49,8 @@ class CommandParameterDialog extends JDialog
 			count++;
 
 			JLabel label = new JLabel(parameter.toString());
-			content.add(label, new GridBagConstraints(0, count, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(
-				5, 5, 5, 5), 5, 5));
+			content.add(label, new GridBagConstraints(0, count, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 
 			content.add(_answerComponents[count - 1], new GridBagConstraints(1, count, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 				GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));

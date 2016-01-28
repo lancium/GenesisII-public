@@ -114,9 +114,8 @@ public class GeniiBackend implements IBackend
 					ret[lcv] = new ListEntry(paths[lcv].getName(), new Date(), size, _username, "genii", rwx, 1, false);
 				} else {
 					RedirectFile rd = new RedirectFile(paths[lcv].getEndpoint());
-					ret[lcv] =
-						new ListEntry(paths[lcv].getName() + ".html", new Date(), rd.getSize(), _username, "genii", new FilePermissions(0x5,
-							0x5, 0x5), 1, false);
+					ret[lcv] = new ListEntry(paths[lcv].getName() + ".html", new Date(), rd.getSize(), _username, "genii",
+						new FilePermissions(0x5, 0x5, 0x5), 1, false);
 				}
 			}
 
@@ -192,9 +191,8 @@ public class GeniiBackend implements IBackend
 
 			if (!path.exists()) {
 				if (entry.endsWith(".html")) {
-					path =
-						_configuration.getCallingContext().getCurrentPath()
-							.lookup(entry.substring(0, entry.length() - 5), RNSPathQueryFlags.MUST_EXIST);
+					path = _configuration.getCallingContext().getCurrentPath().lookup(entry.substring(0, entry.length() - 5),
+						RNSPathQueryFlags.MUST_EXIST);
 				} else
 					throw new PathDoesNotExistException(entry);
 			}
@@ -222,9 +220,8 @@ public class GeniiBackend implements IBackend
 
 			if (!path.exists()) {
 				if (entry.endsWith(".html")) {
-					path =
-						_configuration.getCallingContext().getCurrentPath()
-							.lookup(entry.substring(0, entry.length() - 5), RNSPathQueryFlags.MUST_EXIST);
+					path = _configuration.getCallingContext().getCurrentPath().lookup(entry.substring(0, entry.length() - 5),
+						RNSPathQueryFlags.MUST_EXIST);
 				} else
 					throw new PathDoesNotExistException(entry);
 			}

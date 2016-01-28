@@ -124,8 +124,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		try {
 			ICallingContext callingContext = threadCallingContext.get();
 			if (callingContext == null) {
-				throw new RuntimeException("We got a null calling context which " + "means that client invocation handler "
-					+ "didn't set it up correctly.");
+				throw new RuntimeException(
+					"We got a null calling context which " + "means that client invocation handler " + "didn't set it up correctly.");
 			}
 
 			KeyAndCertMaterial clientKeyMaterial =
@@ -284,8 +284,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_POOL_TIMEOUT_KEY, "30000");
 
 		// Timeout to establish connection in milliseconds.
-		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_CONNECTION_TIMEOUT_KEY, ""
-			+ ClientProperties.getClientProperties().getClientTimeout());
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_CONNECTION_TIMEOUT_KEY,
+			"" + ClientProperties.getClientProperties().getClientTimeout());
 
 		// Timeout "waiting for data" (read timeout)
 		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_SO_TIMEOUT_KEY, "180000");

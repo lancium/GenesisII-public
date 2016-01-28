@@ -22,6 +22,7 @@ public class PollingFrequencyAdjuster extends Thread
 	// A step functions where millisecond polling interval times are plotted against the
 	// last usage time in minutes
 	private static final Map<Integer, Long> USAGE_TIME_TO_POLLING_INTERVAL_MATRIX;
+
 	static {
 		// This must be a linked hash map as the ordering of elements is important.
 		USAGE_TIME_TO_POLLING_INTERVAL_MATRIX = new LinkedHashMap<Integer, Long>();

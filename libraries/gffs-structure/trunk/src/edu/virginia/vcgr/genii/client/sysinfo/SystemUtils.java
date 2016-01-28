@@ -21,8 +21,8 @@ public class SystemUtils
 	static {
 		InputStream in = null;
 		try {
-			in =
-				GenesisClassLoader.classLoaderFactory().getResourceAsStream("edu/virginia/vcgr/genii/client/sysinfo/property-map.properties");
+			in = GenesisClassLoader.classLoaderFactory()
+				.getResourceAsStream("edu/virginia/vcgr/genii/client/sysinfo/property-map.properties");
 			_propertyMap = new Properties();
 			_propertyMap.load(in);
 		} catch (Exception e) {

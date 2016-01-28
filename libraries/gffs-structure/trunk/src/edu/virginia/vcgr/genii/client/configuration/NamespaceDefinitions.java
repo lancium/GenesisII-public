@@ -33,8 +33,8 @@ public class NamespaceDefinitions
 		_namespaceProperties = new Properties();
 
 		if (!_namespacePropertiesFile.exists())
-			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Couldn't find namespace properties file \""
-				+ NAMESPACE_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
+			throw new InvalidDeploymentException(deploymentDirectory.getName(),
+				"Couldn't find namespace properties file \"" + NAMESPACE_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
 
 		FileInputStream fin = null;
 		try {

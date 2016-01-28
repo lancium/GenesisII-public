@@ -69,11 +69,8 @@ public class SaveToDialog extends AbstractCombinedUIMenusPlugin
 			if (retPick == JFileChooser.APPROVE_OPTION) {
 				Collection<RNSPath> paths = context.endpointRetriever().getTargetEndpoints();
 				RNSPath path = paths.iterator().next();
-				context
-					.uiContext()
-					.progressMonitorFactory()
-					.createMonitor(context.ownerComponent(), "Saving to local filesystem...", "", 1000L,
-						new SaveToTask(path, _fileDialog.getSelectedFile().toString()), null).start();
+				context.uiContext().progressMonitorFactory().createMonitor(context.ownerComponent(), "Saving to local filesystem...", "",
+					1000L, new SaveToTask(path, _fileDialog.getSelectedFile().toString()), null).start();
 			}
 		} catch (Throwable cause) {
 			ErrorHandler.handleError(context.uiContext(), context.ownerComponent(), cause);
