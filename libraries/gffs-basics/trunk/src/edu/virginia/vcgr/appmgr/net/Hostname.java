@@ -110,7 +110,7 @@ public class Hostname
 			String alreadyKnown = _dnsCache.get(givenAddress);
 			if (alreadyKnown != null) {
 				// yep, we know this one, so return it.
-				_externalName = alreadyKnown;
+				_externalName = givenAddress;
 				_foundHostOkay = true;
 				if (_logger.isTraceEnabled())
 					_logger.debug("DNSCACHE: found address '" + givenAddress + "' in cache as '" + _externalName + "'");
