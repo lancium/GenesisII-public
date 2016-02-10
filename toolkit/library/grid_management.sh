@@ -261,6 +261,10 @@ function bootstrap_grid()
   # plug in the proper values in our config files.
   fill_in_bootstrapping_properties
 
+  # clear the connection line until we have some place to connect to.
+  replace_phrase_in_file "$GENII_INSTALL_DIR/lib/client.properties" "^edu.virginia.vcgr.genii.gridInitCommand=.*$" "#temp-edu.virginia.vcgr.genii.gridInitCommand=to be filled in"
+  check_if_failed "wiping grid connection information in client.properties"
+
   # start the container now that it's configuration should be ready.
   launch_container_if_not_running "$DEPLOYMENT_NAME"
 
@@ -278,7 +282,8 @@ function bootstrap_grid()
   check_if_failed "copying context file into deployment '$DEPLOYMENT_NAME'"
 
   # drop in the reconnection line so our grid canhaz simple reconnect.
-  echo "edu.virginia.vcgr.genii.gridInitCommand=\"local:$ACTUAL_DEPLOYMENT_FOLDER/context.xml\" \"$DEPLOYMENT_NAME\"" >>"$GENII_INSTALL_DIR/lib/client.properties"
+  replace_phrase_in_file "$GENII_INSTALL_DIR/lib/client.properties" "^#temp-edu.virginia.vcgr.genii.gridInitCommand=.*$" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$ACTUAL_DEPLOYMENT_FOLDER/context.xml\" \"$DEPLOYMENT_NAME\"" 
+#  old: echo "edu.virginia.vcgr.genii.gridInitCommand=\"local:$ACTUAL_DEPLOYMENT_FOLDER/context.xml\" \"$DEPLOYMENT_NAME\"" >>"$GENII_INSTALL_DIR/lib/client.properties"
   check_if_failed "adding grid connection information to client.properties"
 
   # copy up a bogus deployment information file to have a placeholder that makes sense.

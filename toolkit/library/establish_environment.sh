@@ -21,8 +21,12 @@ function create_work_area()
   if [ $(grep -ic "additional credentials" <$GRID_OUTPUT_FILE) -gt 0 ]; then
     # set up the RNSPATH folder, in case it doesn't already exist.
     echo Checking work area in $RNSPATH
-#hmmm: list parent to see if it's there, rather than blindly creating it; we don't want any extra error messages in the logs from this.
-    silent_grid mkdir --parents grid:$RNSPATH &>/dev/null
+    # check to see if the user's directory is there first, and if not, create it.
+    silent_grid ping --eatfaults grid:$RNSPATH &>/dev/null
+    if [ $? -ne 0 ]; then
+      silent_grid mkdir --parents grid:$RNSPATH &>/dev/null
+    fi
+    # always try to assert rights on that testing directory, since we need them.
     silent_grid chmod grid:$RNSPATH +rwx $USERPATH
     check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
   else

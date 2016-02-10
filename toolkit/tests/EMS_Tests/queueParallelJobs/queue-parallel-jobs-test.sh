@@ -17,7 +17,7 @@ oneTimeSetUp()
   fi
 
   # skip copies if we're not even going to test.
-  if [ -z "$SPMD_VARIATION" ]; then
+  if [ ! -z "$SPMD_VARIATION" ]; then
     echo "Copying necessary file to Grid namespace"
     grid cp local:./hostname.sh grid:$RNSPATH
     grid cp local:./simple-mpi.c grid:$RNSPATH
@@ -35,8 +35,8 @@ testQueueParallelJobsSubmission()
 
     grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/parameter-sweep-mpi.jsdl
     assertEquals "Submitting parameter sweep MPI job - stage-in and stage out files" 0 $?
-    echo `date`": job submitted"
   fi
+  echo `date`": jobs submitted"
 }
 
 testWaitingOnJobs()

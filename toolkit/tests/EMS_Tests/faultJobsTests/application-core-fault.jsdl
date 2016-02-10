@@ -51,7 +51,7 @@
             <CreationFlag>overwrite</CreationFlag>
             <DeleteOnTermination>true</DeleteOnTermination>
             <Target>
-                <URI>rns:PATH/seg-out.txt</URI>
+                <URI>rns:PATH/seg-err.txt</URI>
             </Target>
         </DataStaging>
     </JobDescription>

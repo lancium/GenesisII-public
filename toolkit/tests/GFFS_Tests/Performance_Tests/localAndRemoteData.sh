@@ -29,8 +29,8 @@ oneTimeSetUp()
   # due to restricted size of VMs and other machines we need this test to work
   # on, we have reduced the size from 5 gigabytes to 1 gigabyte.  this can be
   # adjusted with the variables below.
-  fileInMegs=5120
-  #fileInMegs=1024
+  #fileInMegs=5120
+  fileInMegs=1024
   HUGE_TEST_FILE=$TEST_TEMP/random5GB.dat
   if [ ! -f "$HUGE_TEST_FILE" ]; then
     # to speed up continuous integration builds, we will re-use the following

@@ -27,7 +27,7 @@ oneTimeSetUp()
   fi
 }
 
-testCleanups()
+testDirectoryCleanups()
 {
   # clean up our testing folder if it exists.
 echo RNSPATH here is $RNSPATH
@@ -100,7 +100,7 @@ testRunningSynchronousJobs()
   done
 }
 
-testCleaningUp()
+testCleaningUpFiles()
 {
   grid rm "$RNSPATH/cat.out" "$RNSPATH/cat.err"
   assertEquals "Removing staging files" 0 $?
@@ -109,6 +109,7 @@ testCleaningUp()
 oneTimeTearDown()
 {
   echo tearing down test.
+  testDirectoryCleanups
 }
 
 # load and run shUnit2

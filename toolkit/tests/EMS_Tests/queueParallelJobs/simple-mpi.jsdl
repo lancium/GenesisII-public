@@ -10,19 +10,19 @@
                 <ns2:Environment name="SOURCES">simple-mpi.c</ns2:Environment>
 		<ns2:Output>mpi-out</ns2:Output>
                 <ns2:Error>mpi-err</ns2:Error>
-                <ns4:NumberOfProcesses>4</ns4:NumberOfProcesses>
-                <ns4:ProcessesPerHost>1</ns4:ProcessesPerHost>
-                <ns4:ThreadsPerProcess xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+                <ns4:NumberOfProcesses>8</ns4:NumberOfProcesses>
+                <!-- ns4:ProcessesPerHost>1</ns4:ProcessesPerHost -->
+                <!-- ns4:ThreadsPerProcess xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/ -->
                 <ns4:SPMDVariation>SPMD_VARIATION</ns4:SPMDVariation>
             </ns4:SPMDApplication>
 
 	</Application>
        <Resources>
           <IndividualCPUCount>
-            <Exact>1.0</Exact>
+            <Exact>4.0</Exact>
           </IndividualCPUCount>
           <TotalResourceCount>
-            <Exact>4.0</Exact>
+            <Exact>2.0</Exact>
           </TotalResourceCount>
         </Resources> 
 

@@ -21,6 +21,8 @@ oneTimeSetUp()
   echo "Copying necessary file to Grid namespace"
   grid cp local:./hostname.sh grid:$RNSPATH
   grid cp local:./cat.sh grid:$RNSPATH
+  grid cp local:./seg-fault.c grid:$RNSPATH
+  grid cp local:./appl-seg-fault.sh grid:$RNSPATH
 
   grid rm -rf $RNSPATH/test-bes-async &>/dev/null
 }
@@ -44,9 +46,10 @@ testFaultyJobs()
 		grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-stageout-error.jsdl $i
 		assertNotEquals "Submitting  '/bin/cat' job with WRONG stageout on $i" 0 $?
 
-		grid run --jsdl=local:$GENERATED_JSDL_FOLDER/application-core-fault.jsdl $i
-		assertNotEquals "Submitting  '/bin/cat' job with apllication-core-fault on $i" 0 $?
-
+		if [ "$BES_TYPE" != "Unicore" ]; then
+			grid run --jsdl=local:$GENERATED_JSDL_FOLDER/application-core-fault.jsdl $i
+			assertNotEquals "Submitting  '/bin/cat' job with application-core-fault on $i" 0 $?
+		fi
 	done
 }
 

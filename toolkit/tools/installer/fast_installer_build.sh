@@ -90,6 +90,16 @@ ant -Dbuild.targetArch=64 build
 check_if_failed "ant build failed"
 popd
 
+echo Preparing property files for installer...
+rm -f $GENII_INSTALL_DIR/installer/data_files/*
+check_if_failed "cleaning out data_files folder failed"
+cp $GENII_INSTALL_DIR/lib/client.properties.template $GENII_INSTALL_DIR/installer/data_files/client.properties
+check_if_failed "copying client.properties.template"
+cp $GENII_INSTALL_DIR/lib/container.properties.template $GENII_INSTALL_DIR/installer/data_files/container.properties
+check_if_failed "copying container.properties.template"
+
+echo Building installers...
+
 build_installer 3416 "genesis2-gffs-linux-amd64-${simple_name}"
 build_installer 11295 "genesis2-gffs-linux-x86-32-${simple_name}"
 
