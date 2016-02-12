@@ -33,20 +33,19 @@ for i in ${genesis_java_pids[*]} ; do
     taskkill -F -pid $i
   else
     # we should not need a stronger type of signal than interrupt, or the
-    # container is hosed up.  we check now to see if it's really gone.
+    # container is hosed up.
     kill $i
   fi
 done 
 
-retval=0
-
-genesis_java_pids=()
-find_genesis_javas "$pattern"
-
-for i in ${genesis_java_pids[*]} ; do
-  echo FAILED to zap java process: $i
-  retval=1
-done
-
-exit $retval
+#retval=0
+## give a tiny snooze.
+#sleep 2
+#genesis_java_pids=()
+#find_genesis_javas "$pattern"
+#for i in ${genesis_java_pids[*]} ; do
+#  echo FAILED to zap java process: $i
+#  retval=1
+#done
+#exit $retval
 
