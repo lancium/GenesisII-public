@@ -12,12 +12,11 @@ eprfile="$1"
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 
-if [ -z "$GENII_INSTALL_DIR" ]; then
-  echo "export GENII_INSTALL_DIR before running the script."
-  exit 1
-fi
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
 echo "GENII_INSTALL_DIR is set to $GENII_INSTALL_DIR"
-#whoami=`"$GENII_INSTALL_DIR/bin/grid" whoami | grep gffs-admins`
+#whoami=`"$GENII_BINARY_DIR/grid" whoami | grep gffs-admins`
 #if [ $? -ne 0 ]; then
 #  echo "User must be member of gffs-admins group"
 #  exit 1
@@ -30,5 +29,5 @@ if [ -z "$eprfile"  ]; then
   exit 1
 fi
 
-"$GENII_INSTALL_DIR/bin/grid" script local:./link-grid-act126.xml "$1"
+"$GENII_BINARY_DIR/grid" script local:./link-grid-act126.xml "$1"
 

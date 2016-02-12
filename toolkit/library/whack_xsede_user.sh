@@ -1,5 +1,11 @@
 #!/bin/bash
 
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+cd "$WORKDIR"
+
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
 user=$1; shift
 
 if [ -z "$user" ]; then
@@ -16,7 +22,7 @@ fi
 
 echo dropping user $user
 
-"$GENII_INSTALL_DIR/grid" >$noisefile <<eof
+"$GENII_BINARY_DIR/grid" >$noisefile <<eof
   unlink /resources/xsede.org/containers/sts-1.xsede.org/Services/KerbAuthnPortType/$user
   onerror failed to remove kerberos port type entry for $user.
   unlink /users/xsede.org/$user

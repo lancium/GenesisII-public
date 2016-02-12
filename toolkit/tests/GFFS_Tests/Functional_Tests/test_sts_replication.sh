@@ -28,6 +28,7 @@ function oneTimeSetUp()
   sanity_test_and_init
 
   USER_SAVE_DIR="$(mktemp -d $TEST_TEMP/user-save.XXXXXX)"
+  echo "saving user state in $USER_SAVE_DIR"
   # back up user's login state for reverting later.
   \cp $GENII_USER_DIR/user* "$USER_SAVE_DIR"
 
@@ -93,6 +94,17 @@ function testX509AuthnPortTypeReplication()
 
   # shutdown the backup container
   bash "$GFFS_TOOLKIT_ROOT/library/zap_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
+  if [ $? -ne 0 ]; then
+    echo "shutting down the backup container failed!"
+    exit 1
+  fi
+
+echo ====
+echo listing all containers running...
+bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" 
+echo listing just backup to see if running...
+bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
+echo ====
 
   # wait a few moments to ensure that backup container shutdown did happen 
   sleep 5
@@ -105,7 +117,7 @@ function testX509AuthnPortTypeReplication()
   grid_chk logout --all
   grid_chk login --username=replicatedUser --password=test
   grid whoami
-  cat $GRID_OUTPUT_FILE 
+#  cat $GRID_OUTPUT_FILE 
  
   # write to each of the three home directories to ensure that the credentials are appropriate  
   grid_chk cd $HOMES_LOC/replicatedUser
@@ -137,10 +149,22 @@ function testX509AuthnPortTypeReplication()
 
   # remove the previously created directories inside /home
   grid_chk cd $HOMES_LOC/replicatedUser
+echo ====
+grid pwd
+grid ls 
+echo ====
   grid_chk rm -r sampleDir
   grid_chk cd $HOMES_LOC/replicatedGroup1
+echo ====
+grid pwd
+grid ls 
+echo ====
   grid_chk rm -r sampleDir
   grid_chk cd $HOMES_LOC/replicatedGroup2
+echo ====
+grid pwd
+grid ls 
+echo ====
   grid_chk rm -r sampleDir
   
   # logout from the user account and get back root privileges
@@ -155,6 +179,17 @@ function testX509AuthnPortTypeReplication()
 
   # again shutdown the backup container
   bash "$GFFS_TOOLKIT_ROOT/library/zap_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
+  if [ $? -ne 0 ]; then
+    echo "shutting down the backup container failed!"
+    exit 1
+  fi
+
+echo ====
+echo listing all containers running...
+bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" 
+echo listing just backup to see if running...
+bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
+echo ====
 
   # login again to the user; this time one group credential should be missing
   # do some parsing of whoami to ensure that certificate count is as expected (Not Done)
@@ -227,6 +262,17 @@ function testKerberosPortTypeReplication()
 
   # shutdown the backup container 
   bash "$GFFS_TOOLKIT_ROOT/library/zap_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
+  if [ $? -ne 0 ]; then
+    echo "shutting down the backup container failed!"
+    exit 1
+  fi
+
+echo ====
+echo listing all containers running...
+bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" 
+echo listing just backup to see if running...
+bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
+echo ====
 
   # login to the kerberos user
   grid_chk login --username=$userName --password=$kerberosPassword
@@ -272,9 +318,8 @@ oneTimeTearDown()
   \cp "$USER_SAVE_DIR"/* $GENII_USER_DIR
   \rm -rf "$USER_SAVE_DIR"
 
+  echo these are the user credentials after the test is finished...
   grid whoami
-echo whoaming:
-  cat $GRID_OUTPUT_FILE
 }
 
 # load and run shUnit2

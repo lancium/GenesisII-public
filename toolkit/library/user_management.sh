@@ -201,7 +201,7 @@ function give_create_perms()
 function listGroups()
 {
   local userpath=$1; shift
-  "$GENII_INSTALL_DIR/grid" ls $userpath | tail -n +2
+  "$GENII_BINARY_DIR/grid" ls $userpath | tail -n +2
 }
 
 # safely clean out any groups listed under a user path.

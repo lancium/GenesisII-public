@@ -7,7 +7,7 @@
         <Application>
             <ns4:SPMDApplication>
                 <ns2:Executable>a.out</ns2:Executable>
-                <ns2:Environment name="SOURCES">simple-mpi.c</ns2:Environment>
+                <ns2:Environment name="C_SOURCES">simple-mpi.c</ns2:Environment>
 		<ns2:Output>mpi-out</ns2:Output>
                 <ns2:Error>mpi-err</ns2:Error>
                 <ns4:NumberOfProcesses>8</ns4:NumberOfProcesses>

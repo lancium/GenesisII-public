@@ -14,6 +14,12 @@ int main(int argc, char **argv)
 	char *msg = "Hello";
 	char *rmsg = "";
 	int ret2=0;
+        char command[1000];
+
+        // snag the parameter from command line if we can.
+        char *outnum = "x";
+        if (argc > 1)
+            outnum = argv[1];
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
@@ -28,7 +34,8 @@ int main(int argc, char **argv)
 	{	
 		MPI_Recv(&rmsg, 15, MPI_CHAR, 0, 999, MPI_COMM_WORLD, &status);
 		printf("%s from %d\n", rmsg, id);
-		ret2= system(". ./hostname.sh >> mpi-hostname.txt");
+		sprintf(command, ". ./hostname.sh >> mpi-hostname-%s.txt", outnum);
+		ret2= system(command);
 		printf("Return code = %d\n",ret2);
 	}
 

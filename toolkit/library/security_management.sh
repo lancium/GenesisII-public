@@ -8,7 +8,7 @@
 
 # define the cert-tool appropriately for the platform.
 
-CERTO="bash \"$GENII_INSTALL_DIR/cert-tool\""
+CERTO="bash \"$GENII_BINARY_DIR/cert-tool\""
 if [ "$OS" == "Windows_NT" ]; then
   CERTO="cmd /c \"$(echo $GENII_INSTALL_DIR | tr / \\\\)\\cert-tool.bat\""
 fi

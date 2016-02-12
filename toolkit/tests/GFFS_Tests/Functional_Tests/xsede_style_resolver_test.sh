@@ -74,12 +74,12 @@ function createUserAndReplicate()
   check_if_failed "creating user $user"
   
   echo adding resolver for $user
-  "$GENII_INSTALL_DIR/bin/grid" resolver "/users/xsede.org/$user" /etc/resolvers/rootResolver
+  "$GENII_BINARY_DIR/grid" resolver "/users/xsede.org/$user" /etc/resolvers/rootResolver
 #-p -r 
   check_if_failed "adding resolver for $user"
 
   echo replicating $user
-  "$GENII_INSTALL_DIR/bin/grid" replicate "/users/xsede.org/$user" $MIRRORPATH
+  "$GENII_BINARY_DIR/grid" replicate "/users/xsede.org/$user" $MIRRORPATH
 #-p 
   check_if_failed "replicating $user"
 }
@@ -94,7 +94,7 @@ function testAddNewUser()
   check_if_failed "creating user and replicating it"
 
 #already done by above create step.
-#  "$GENII_INSTALL_DIR/bin/grid" script local:$GFFS_TOOLKIT_ROOT/tools/xsede_admin/link-user-to-group.xml /users/xsede.org grady /groups/xsede.org gffs-users
+#  "$GENII_BINARY_DIR/grid" script local:$GFFS_TOOLKIT_ROOT/tools/xsede_admin/link-user-to-group.xml /users/xsede.org grady /groups/xsede.org gffs-users
   #check_if_failed "linking user to gffs-users group"
 
 }

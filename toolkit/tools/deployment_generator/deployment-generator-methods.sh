@@ -37,7 +37,7 @@ function validate_configuration()
 #    echo The standard is for there to be a bin folder under that location.
 #    exit 1
 #  fi
-  if [ ! -f "$GENII_INSTALL_DIR/cert-tool" ]; then
+  if [ ! -f "$GENII_BINARY_DIR/cert-tool" ]; then
     echo "The GENII_INSTALL_DIR does not appear to have cert-tool available.  Is this"
     echo "the correct installation directory, or perhaps the code needs to be rebuilt?"
     exit 1
@@ -213,7 +213,7 @@ function generate_all_certificates()
 
   local DN_STRING="$(accumulate_DN "certificate-config.txt" "GenesisII Certificate Base")"
   echo "generating cert with DN as: $DN_STRING"
-  "$GENII_INSTALL_DIR/cert-tool" gen "-dn=$DN_STRING" -output-storetype=PKCS12 "-output-entry-pass=$CA_PASSWORD" -output-keystore=$SECURITY_DIR/$UBER_CA_PFX "-output-keystore-pass=$CA_PASSWORD" "-output-alias=$UBER_CA_ALIAS" -keysize=2048
+  "$GENII_BINARY_DIR/cert-tool" gen "-dn=$DN_STRING" -output-storetype=PKCS12 "-output-entry-pass=$CA_PASSWORD" -output-keystore=$SECURITY_DIR/$UBER_CA_PFX "-output-keystore-pass=$CA_PASSWORD" "-output-alias=$UBER_CA_ALIAS" -keysize=2048
   check_if_failed "generating base certificate PFX"
 
   create_pfx_using_CA "$SECURITY_DIR/$UBER_CA_PFX" "$CA_PASSWORD" "$UBER_CA_ALIAS" "$SECURITY_DIR/$CA_PFX" "$CA_PASSWORD" "$CA_ALIAS" "GenesisII Certificate Authority"
@@ -234,7 +234,7 @@ function generate_all_certificates()
     echo -e "\nAdding certificate '$CERT_FILE' to trust store.\n"
     OUTPUT_ALIAS=$(basename "$CERT_FILE" .cer)
     echo $OUTPUT_ALIAS
-    "$GENII_INSTALL_DIR/cert-tool" import -output-keystore="$SECURITY_DIR/$TRUSTSTORE_PFX" -output-keystore-pass="$TRUSTSTORE_PASSWORD" -base64-cert-file="$CERT_FILE" -output-alias="$OUTPUT_ALIAS"
+    "$GENII_BINARY_DIR/cert-tool" import -output-keystore="$SECURITY_DIR/$TRUSTSTORE_PFX" -output-keystore-pass="$TRUSTSTORE_PASSWORD" -base64-cert-file="$CERT_FILE" -output-alias="$OUTPUT_ALIAS"
     check_if_failed "running cert tool on $CERT_FILE"
   done
 

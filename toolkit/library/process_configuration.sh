@@ -52,26 +52,30 @@ define_and_export_variables()
 
   if [ -z "$FOLDERSPACE" ]; then
     echo "No FOLDERSPACE variable was defined; using 'xsede.org' as default."
-    FOLDERSPACE="xsede.org"
+    export FOLDERSPACE="xsede.org"
   fi
 
   # this switchboard sets up the variables we will want to use for storage locations.
-  BOOTSTRAP_LOC=/resources/$FOLDERSPACE/containers/BootstrapContainer
+  export BOOTSTRAP_LOC=/resources/$FOLDERSPACE/containers/BootstrapContainer
   if [ "$FOLDERSPACE" == "xsede.org" ]; then
-     STS_LOC=/resources/$FOLDERSPACE/containers/sts-1.xsede.org
+     export STS_LOC=/resources/$FOLDERSPACE/containers/sts-1.xsede.org
   else
-     STS_LOC=$BOOTSTRAP_LOC
+     export STS_LOC=$BOOTSTRAP_LOC
   fi
-  CONTAINERS_LOC=/resources/$FOLDERSPACE/containers
-  USERS_LOC=/users/$FOLDERSPACE
-  HOMES_LOC=/home/$FOLDERSPACE
-  BES_CONTAINERS_LOC=/resources/$FOLDERSPACE/containers
-  GROUPS_LOC=/groups/$FOLDERSPACE
-  QUEUES_LOC=/resources/$FOLDERSPACE/queues
+  export CONTAINERS_LOC=/resources/$FOLDERSPACE/containers
+  export USERS_LOC=/users/$FOLDERSPACE
+  export HOMES_LOC=/home/$FOLDERSPACE
+  export BES_CONTAINERS_LOC=/resources/$FOLDERSPACE/containers
+  export GROUPS_LOC=/groups/$FOLDERSPACE
+  export QUEUES_LOC=/resources/$FOLDERSPACE/queues
+
+  # define the location of our main binaries / scripts.  this formerly was the
+  # same as GENII_INSTALL_DIR but is now moved down into a bin directory.
+  export GENII_BINARY_DIR=$GENII_INSTALL_DIR
 
   if [ -z "$GENII_USER_DIR" ]; then
     export GENII_USER_DIR="$HOME/.genesisII-2.0"
-#    echo "GENII_USER_DIR was not defined; using default of: $GENII_USER_DIR"
+    echo "GENII_USER_DIR was not defined; using default of: $GENII_USER_DIR"
   fi
 
   # calculate the deployments directory if there's an override.
@@ -99,7 +103,7 @@ define_and_export_variables()
   # has not been built yet, and the caller knows this and tells us.
   if [ -z "$POSSIBLY_UNBUILT" ]; then
     # make sure we like the xsede install folder...
-    if [ ! -f "$GENII_INSTALL_DIR/grid" -a ! -f "$GENII_INSTALL_DIR/grid.exe" -a ! -f "$GENII_INSTALL_DIR/grid.bat" ]; then
+    if [ ! -f "$GENII_BINARY_DIR/grid" -a ! -f "$GENII_BINARY_DIR/grid.exe" -a ! -f "$GENII_BINARY_DIR/grid.bat" ]; then
       echo "The GenesisII client program ('grid') is missing in the directory specified"
       echo "by the GENII_INSTALL_DIR environment variable, which is currently defined as:"
       echo "  '$GENII_INSTALL_DIR'"

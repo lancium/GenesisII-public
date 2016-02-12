@@ -78,8 +78,10 @@ print "Expecting to find user scripts in: $XSEDE_ADMIN_SCRIPTS\n";
 
 #######
 
+$GENII_BINARY_DIR = "$GENII_INSTALL_DIR/bin";
+
 # Commands
-$GRIDCMD = "$GENII_INSTALL_DIR/bin/grid";
+$GRIDCMD = "$GENII_BINARY_DIR/grid";
 
 # Global namespace paths
 $XSEDE_NAMESPACE_BASE     = '';

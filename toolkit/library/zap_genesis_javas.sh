@@ -32,7 +32,21 @@ for i in ${genesis_java_pids[*]} ; do
   if [ "$OS" == "Windows_NT" ]; then
     taskkill -F -pid $i
   else
+    # we should not need a stronger type of signal than interrupt, or the
+    # container is hosed up.  we check now to see if it's really gone.
     kill $i
   fi
 done 
+
+retval=0
+
+genesis_java_pids=()
+find_genesis_javas "$pattern"
+
+for i in ${genesis_java_pids[*]} ; do
+  echo FAILED to zap java process: $i
+  retval=1
+done
+
+exit $retval
 

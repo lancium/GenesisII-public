@@ -1,5 +1,11 @@
 #!bin/bash
 
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+cd "$WORKDIR"
+
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
 sts1_host="$1"; shift
 sts1_port="$1"; shift
 sts2_host="$1"; shift
@@ -60,22 +66,22 @@ echo unlinking the placeholder for sts-1.
 
 # if for some reason the original sts-1 has already been unlinked,
 # then try adding the original link back in place with:
-# "$GENII_INSTALL_DIR/bin/grid" ln /resources/xsede.org/containers/gffs-1.xsede.org  /resources/xsede.org/containers/sts-1.xsede.org
-"$GENII_INSTALL_DIR/bin/grid" unlink $STS1PATH
+# "$GENII_BINARY_DIR/grid" ln /resources/xsede.org/containers/gffs-1.xsede.org  /resources/xsede.org/containers/sts-1.xsede.org
+"$GENII_BINARY_DIR/grid" unlink $STS1PATH
 check_if_failed "Failed to unlink the sts-1 path at: $STS1PATH"
 
 ####
 
 echo linking the primary sts into the grid.
 
-"$GENII_INSTALL_DIR/bin/grid" ln \
+"$GENII_BINARY_DIR/grid" ln \
   --service-url=https://$sts1_host:$sts1_port/axis/services/VCGRContainerPortType \
   $STS1PATH
 check_if_failed "Failed to link the sts-1 path to container: $sts1_host"
 
 # test the sts1 path to make sure it's a live container.
 STS_CHK_FILE="$(mktemp $TEST_TEMP/sts-container-listing.XXXXXX)"
-"$GENII_INSTALL_DIR/bin/grid" ls $STS1PATH >"$STS_CHK_FILE"
+"$GENII_BINARY_DIR/grid" ls $STS1PATH >"$STS_CHK_FILE"
 check_if_failed "Listing contents under $STS1PATH"
 grep -q "Services" "$STS_CHK_FILE"
 check_if_failed "Testing container at $STS1PATH; container does not seem to be running!"
@@ -83,14 +89,14 @@ rm "$STS_CHK_FILE"
 
 echo linking the secondary sts into the grid.
 
-"$GENII_INSTALL_DIR/bin/grid" ln \
+"$GENII_BINARY_DIR/grid" ln \
   --service-url=https://$sts2_host:$sts2_port/axis/services/VCGRContainerPortType \
   $STS2PATH
 check_if_failed "Failed to link the sts-2 path to container: $sts2_host"
 
 # test the sts2 path to make sure it's a live container.
 STS_CHK_FILE="$(mktemp $TEST_TEMP/sts-container-listing.XXXXXX)"
-"$GENII_INSTALL_DIR/bin/grid" ls $STS2PATH >"$STS_CHK_FILE"
+"$GENII_BINARY_DIR/grid" ls $STS2PATH >"$STS_CHK_FILE"
 check_if_failed "Listing contents under $STS2PATH"
 grep -q "Services" "$STS_CHK_FILE"
 check_if_failed "Testing container at $STS2PATH; container does not seem to be running!"
@@ -100,39 +106,39 @@ rm "$STS_CHK_FILE"
 
 echo setting permissions on primary sts.
 
-"$GENII_INSTALL_DIR/bin/grid" chmod $STS1PATH/Services/X509AuthnPortType \
+"$GENII_BINARY_DIR/grid" chmod $STS1PATH/Services/X509AuthnPortType \
   +rx --everyone
 check_if_failed "Failed to chmod X509AuthnPortType on $STS1PATH"
-"$GENII_INSTALL_DIR/bin/grid" chmod $STS1PATH/Services/KerbAuthnPortType \
+"$GENII_BINARY_DIR/grid" chmod $STS1PATH/Services/KerbAuthnPortType \
   +rx --everyone
 check_if_failed "Failed to chmod KerbAuthnPortType on $STS1PATH"
-"$GENII_INSTALL_DIR/bin/grid" chmod \
+"$GENII_BINARY_DIR/grid" chmod \
   $STS1PATH/Services/EnhancedNotificationBrokerFactoryPortType +rx --everyone
 check_if_failed "Failed to chmod notification broker on $STS1PATH"
 
 echo setting permissions on secondary sts.
 
 # Repeated for secondary STS container:
-"$GENII_INSTALL_DIR/bin/grid" chmod $STS2PATH/Services/X509AuthnPortType \
+"$GENII_BINARY_DIR/grid" chmod $STS2PATH/Services/X509AuthnPortType \
   +rx --everyone
 check_if_failed "Failed to chmod X509AuthnPortType on $STS2PATH"
-"$GENII_INSTALL_DIR/bin/grid" chmod $STS2PATH/Services/KerbAuthnPortType \
+"$GENII_BINARY_DIR/grid" chmod $STS2PATH/Services/KerbAuthnPortType \
   +rx --everyone
 check_if_failed "Failed to chmod KerbAuthnPortType on $STS2PATH"
-"$GENII_INSTALL_DIR/bin/grid" chmod \
+"$GENII_BINARY_DIR/grid" chmod \
   $STS2PATH/Services/EnhancedNotificationBrokerFactoryPortType +rx --everyone
 check_if_failed "Failed to chmod notification broker on $STS2PATH"
 
 echo creating resolver on secondary sts for primary to use.
 
 # create the resolver for STS entries on the secondary STS container.
-"$GENII_INSTALL_DIR/bin/grid" create-resource \
+"$GENII_BINARY_DIR/grid" create-resource \
   $STS2PATH/Services/GeniiResolverPortType \
   /etc/resolvers/stsResolver
 check_if_failed "Failed to create an STS resolver on $STS2PATH"
 
 # provide access to the resolver.
-"$GENII_INSTALL_DIR/bin/grid" chmod /etc/resolvers/stsResolver +rx --everyone
+"$GENII_BINARY_DIR/grid" chmod /etc/resolvers/stsResolver +rx --everyone
 check_if_failed "Failed to chmod the STS resolver for use by everyone"
 
 # seems like everything worked.

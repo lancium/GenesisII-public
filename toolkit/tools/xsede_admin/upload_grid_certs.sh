@@ -3,12 +3,18 @@
 # Uploads the in-grid copy of the certificates from the official XSEDE storage
 # location of /etc/grid-security/certificates.
 
-if [ -z "$GENII_INSTALL_DIR" ]; then
-  echo "This script uses the GENII_INSTALL_DIR variable to find the local Genesis II"
-  echo "installation.  Please ensure that the variable is set."
-  exit 1
-fi
-if [ ! -d "$GENII_INSTALL_DIR" -o ! -f "$GENII_INSTALL_DIR/bin/grid" ]; then
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+cd "$WORKDIR"
+
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
+#if [ -z "$GENII_INSTALL_DIR" ]; then
+#  echo "This script uses the GENII_INSTALL_DIR variable to find the local Genesis II"
+#  echo "installation.  Please ensure that the variable is set."
+#  exit 1
+#fi
+if [ ! -d "$GENII_INSTALL_DIR" -o ! -f "$GENII_BINARY_DIR/grid" ]; then
   echo "The folder pointed at by \$GENII_INSTALL_DIR does not seem to be a valid"
   echo "installation of Genesis II: '$GENII_INSTALL_DIR'"
   echo "Please install the Genesis II client and set the GENII_INSTALL_DIR variable"
@@ -42,7 +48,7 @@ fi
 gridcertsdir="/etc/grid-security/certificates"
 
 # first we get out of that directory if we were possibly there.
-"$GENII_INSTALL_DIR/bin/grid" cd /
+"$GENII_BINARY_DIR/grid" cd /
 if [ $? -ne 0 ]; then
   echo "There was a problem changing directories to the root.  Is the grid up?"
   exit 1
@@ -50,38 +56,38 @@ fi
 
 # test that the directory exists.
 tempoutfile="$(mktemp /tmp/lsgridcert.XXXXXX)"
-"$GENII_INSTALL_DIR/bin/grid" ls "$gridcertsdir" | sed -e '/^$/d' 2>/dev/null >"$tempoutfile"  
+"$GENII_BINARY_DIR/grid" ls "$gridcertsdir" | sed -e '/^$/d' 2>/dev/null >"$tempoutfile"  
    # sed removes any blank lines.
 if [ ${PIPESTATUS[0]} -ne 0 ]; then
   # the directory doesn't seem to exist yet so we'll create it.
   echo "The grid certificates directory does not exist; trying to create it."
-  "$GENII_INSTALL_DIR/bin/grid" mkdir -p "$gridcertsdir"
+  "$GENII_BINARY_DIR/grid" mkdir -p "$gridcertsdir"
   if [ $? -ne 0 ]; then
     permfail
     echo "There was a problem creating the in-grid certificates directory."
     exit 1
   fi
   # make the certificates hierarchy readable by everyone.
-  "$GENII_INSTALL_DIR/bin/grid" chmod /etc/grid-security +r --everyone
+  "$GENII_BINARY_DIR/grid" chmod /etc/grid-security +r --everyone
   if [ $? -ne 0 ]; then
     permfail
     echo "There was a problem chmodding the /etc/grid-security directory for everyone."
     exit 1
   fi
-  "$GENII_INSTALL_DIR/bin/grid" chmod /etc/grid-security/certificates +r --everyone
+  "$GENII_BINARY_DIR/grid" chmod /etc/grid-security/certificates +r --everyone
   if [ $? -ne 0 ]; then
     permfail
     echo "There was a problem chmodding the /etc/grid-security/certificates directory for everyone."
     exit 1
   fi
   # make the hierarchy writable by admins.
-  "$GENII_INSTALL_DIR/bin/grid" chmod /etc/grid-security +wx /groups/xsede.org/gffs-admins
+  "$GENII_BINARY_DIR/grid" chmod /etc/grid-security +wx /groups/xsede.org/gffs-admins
   if [ $? -ne 0 ]; then
     permfail
     echo "There was a problem chmodding the /etc/grid-security directory for gffs-admins."
     exit 1
   fi
-  "$GENII_INSTALL_DIR/bin/grid" chmod /etc/grid-security/certificates +wx /groups/xsede.org/gffs-admins
+  "$GENII_BINARY_DIR/grid" chmod /etc/grid-security/certificates +wx /groups/xsede.org/gffs-admins
   if [ $? -ne 0 ]; then
     permfail
     echo "There was a problem chmodding the /etc/grid-security/certificates directory for gffs-admins"
@@ -89,7 +95,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ]; then
   fi
 
   # get the lines again now that the directory exists, just to have consistent file.
-  "$GENII_INSTALL_DIR/bin/grid" ls "$gridcertsdir" | sed -e '/^$/d' 2>/dev/null >"$tempoutfile"  
+  "$GENII_BINARY_DIR/grid" ls "$gridcertsdir" | sed -e '/^$/d' 2>/dev/null >"$tempoutfile"  
   if [ ${PIPESTATUS[0]} -ne 0 ]; then
     permfail
     echo "Failed to list the in-grid certificates directory after creating it."
@@ -115,7 +121,7 @@ if [ $lines -ge 2 ]; then
   
   existingfile="$(tail -n 1 "$tempoutfile")"
   rm "$tempoutfile"
-  "$GENII_INSTALL_DIR/bin/grid" cp "$gridcertsdir/$existingfile" "local:$tempcertfile"
+  "$GENII_BINARY_DIR/grid" cp "$gridcertsdir/$existingfile" "local:$tempcertfile"
   if [ $? -ne 0 ]; then
     echo Failed to copy existing certificates package for comparison.
     exit 1
@@ -165,7 +171,7 @@ rm -rf "$certcopy"
 popd &>/dev/null
 
 if [ $lines -gt 1 ]; then
-  "$GENII_INSTALL_DIR/bin/grid" rm "$gridcertsdir/*"
+  "$GENII_BINARY_DIR/grid" rm "$gridcertsdir/*"
   if [ $? -ne 0 ]; then
     permfail
     echo "Failed to clear the grid certificates directory of existing content."
@@ -174,7 +180,7 @@ if [ $lines -gt 1 ]; then
 fi
 
 # copy new cert file into place in grid.
-"$GENII_INSTALL_DIR/bin/grid" cp local:"$newcertfile" "$gridcertsdir"
+"$GENII_BINARY_DIR/grid" cp local:"$newcertfile" "$gridcertsdir"
 if [ $? -ne 0 ]; then
   permfail
   echo "Failed to copy up the new grid certificates package."
@@ -182,14 +188,14 @@ if [ $? -ne 0 ]; then
 fi
 
 # make all the contents of the certs dir readable.
-"$GENII_INSTALL_DIR/bin/grid" chmod "/etc/grid-security/certificates/*" +r --everyone
+"$GENII_BINARY_DIR/grid" chmod "/etc/grid-security/certificates/*" +r --everyone
 if [ $? -ne 0 ]; then
   permfail
   echo "There was a problem chmodding the contents of the $gridcertsdir directory for everyone."
   exit 1
 fi
 # give admins full control over all of these files.
-"$GENII_INSTALL_DIR/bin/grid" chmod "/etc/grid-security/certificates/*" +wx /groups/xsede.org/gffs-admins
+"$GENII_BINARY_DIR/grid" chmod "/etc/grid-security/certificates/*" +wx /groups/xsede.org/gffs-admins
 if [ $? -ne 0 ]; then
   permfail
   echo "There was a problem chmodding the contents of the $gridcertsdir directory for gffs-admins."
@@ -197,7 +203,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "The new grid certificates package has been loaded into the grid..."
-"$GENII_INSTALL_DIR/bin/grid" ls "$gridcertsdir"
+"$GENII_BINARY_DIR/grid" ls "$gridcertsdir"
 
 # clean up the local copy of the certs package.
 \rm "$newcertfile"

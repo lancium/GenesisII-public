@@ -12,6 +12,11 @@ function date_string()
   date +"%Y_%b_%e_%H%M_%S" | sed -e 's/ //g'
 }
 
+# prints out the timestamp in a somewhat readable way.
+function readable_date_string()
+{
+  date +"%Y-%m-%d %T:%S"
+}
 
 ########
 # (donated by the feisty meow scripts at http://feistymeow.org)

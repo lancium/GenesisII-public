@@ -1,5 +1,11 @@
 #!/bin/bash
 
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+cd "$WORKDIR"
+
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
 if [ ! -d "$GENII_INSTALL_DIR" -o ! -d "$GENII_USER_DIR" ]; then
   echo "The GENII_INSTALL_DIR or GENII_USER_DIR directories do not exist."
   echo "They are required for this script to backup the GenesisII user state directory."
@@ -17,10 +23,10 @@ backup_file="$backup_dir/container-state-$(hostname)-backup-$(date +"%Y$sep%m$se
 
 # there's a possible conflict if an auto-start procedure will crank up the
 # container again, so we move the startup script out of the way.
-mv "$GENII_INSTALL_DIR/bin/GFFSContainer" "$GENII_INSTALL_DIR/bin/GFFSContainer.hold"
+mv "$GENII_BINARY_DIR/GFFSContainer" "$GENII_BINARY_DIR/GFFSContainer.hold"
 
 # stop the container.
-"$GENII_INSTALL_DIR/bin/GFFSContainer.hold" stop
+"$GENII_BINARY_DIR/GFFSContainer.hold" stop
 
 additional_pax=()
 if [ -f "$GENII_INSTALL_DIR/context.xml" ]; then 
@@ -32,12 +38,12 @@ tar -czf "$backup_file" "$GENII_USER_DIR" "$GENII_INSTALL_DIR/deployments" "$GEN
 
 if [ ! -z "$BACKUP_INTO_GRID" ]; then
   # copy the backup state to grid-namespace
-  "$GENII_INSTALL_DIR/bin/grid" cp local:$backup_file grid:/etc/backups/
+  "$GENII_BINARY_DIR/grid" cp local:$backup_file grid:/etc/backups/
 fi
 
 # move the starter script back into place.
-mv "$GENII_INSTALL_DIR/bin/GFFSContainer.hold" "$GENII_INSTALL_DIR/bin/GFFSContainer"
+mv "$GENII_BINARY_DIR/GFFSContainer.hold" "$GENII_BINARY_DIR/GFFSContainer"
 
 # start the container.
-"$GENII_INSTALL_DIR/bin/GFFSContainer" start
+"$GENII_BINARY_DIR/GFFSContainer" start
 

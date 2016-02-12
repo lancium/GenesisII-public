@@ -21,7 +21,7 @@ oneTimeSetUp()
     echo "Copying necessary file to Grid namespace"
     grid cp local:./hostname.sh grid:$RNSPATH
     grid cp local:./simple-mpi.c grid:$RNSPATH
-    grid cp local:./parameter-sweep-mpi.c grid:$RNSPATH
+    grid cp local:./mybcast.c grid:$RNSPATH
   fi
 }
 
@@ -33,8 +33,8 @@ testQueueParallelJobsSubmission()
     grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/simple-mpi.jsdl
     assertEquals "Submitting simple MPI job - stageout output files" 0 $?
 
-    grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/parameter-sweep-mpi.jsdl
-    assertEquals "Submitting parameter sweep MPI job - stage-in and stage out files" 0 $?
+    grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/mybcast.jsdl
+    assertEquals "Submitting simple MPI broadcast job - stage-in and stage out files" 0 $?    
   fi
   echo `date`": jobs submitted"
 }

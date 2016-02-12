@@ -132,11 +132,11 @@ function launch_container()
   extra_prefix=
   extra_suffix=
   use_shell=/bin/bash
-  runner="$GENII_INSTALL_DIR/runContainer.sh"
+  runner="$GENII_BINARY_DIR/runContainer.sh"
 #echo first runner is $runner
   if [ ! -f "$runner" ]; then
 #echo failed to find runner at: $runner
-    runner="$GENII_INSTALL_DIR/bin/GFFSContainer"
+    runner="$GENII_BINARY_DIR/GFFSContainer"
     extra_suffix="start"
   fi
   if [ ! -f "$runner" ]; then
@@ -148,7 +148,7 @@ function launch_container()
   fi
   if [ ! -f "$runner" ]; then
 #echo failed to find runner at: $runner
-    runner="$(echo "$GENII_INSTALL_DIR/runContainer.bat" | sed -e 's/\//\\\\/g')"
+    runner="$(echo "$GENII_BINARY_DIR/runContainer.bat" | sed -e 's/\//\\\\/g')"
     use_shell=cmd
     extra_suffix=
     if [ -f "$runner" ]; then

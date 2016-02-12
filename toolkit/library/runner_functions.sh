@@ -13,8 +13,8 @@ function pick_grid_app()
 {
   if [ "$OS" == "Windows_NT" ]; then
     dos_genii="$(echo "$GENII_INSTALL_DIR" | sed -e 's/\//\\/g')"
-    if [ -f "$GENII_INSTALL_DIR/grid.exe" ]; then
-      echo "$GENII_INSTALL_DIR/grid.exe"
+    if [ -f "$GENII_BINARY_DIR/grid.exe" ]; then
+      echo "$GENII_BINARY_DIR/grid.exe"
     elif [ ! -z "$(uname -a | grep "^MING" )" ]; then
       echo "cmd //c $dos_genii\\bin\\grid.bat"
     else
@@ -22,9 +22,9 @@ function pick_grid_app()
     fi
   else
     # linux and mac don't need to grope about for the file quite as badly.
-    echo "$GENII_INSTALL_DIR/grid"
+    echo "$GENII_BINARY_DIR/grid"
     # and they can now take advantage of the fastgrid script.
-#    echo "$GENII_INSTALL_DIR/fastgrid"
+#    echo "$GENII_BINARY_DIR/fastgrid"
   fi
 }
 
@@ -34,8 +34,8 @@ function pick_unaccelerated_grid_app()
 {
   if [ "$OS" == "Windows_NT" ]; then
     dos_genii="$(echo "$GENII_INSTALL_DIR" | sed -e 's/\//\\/g')"
-    if [ -f "$GENII_INSTALL_DIR/bin/grid.exe" ]; then
-      echo "$GENII_INSTALL_DIR/bin/grid.exe"
+    if [ -f "$GENII_BINARY_DIR/grid.exe" ]; then
+      echo "$GENII_BINARY_DIR/grid.exe"
     elif [ ! -z "$(uname -a | grep "^MING" )" ]; then
       echo "cmd //c $dos_genii\\bin\\grid.bat"
     else
@@ -43,7 +43,7 @@ function pick_unaccelerated_grid_app()
     fi
   else
     # linux and mac don't need to grope for the file as badly.
-    echo "$GENII_INSTALL_DIR/grid"
+    echo "$GENII_BINARY_DIR/grid"
   fi
 }
 
@@ -131,6 +131,7 @@ function grid_base()
   local my_output="$(mktemp $TEST_TEMP/grid_logs/out_grid_base_$(date_string).XXXXXX)"
   logged_grid $my_output "${@}"
   local retval=$?
+  echo "[$(readable_date_string)]"
   return $retval
 }
 
