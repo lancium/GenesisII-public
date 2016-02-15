@@ -15,8 +15,7 @@ source "$GFFS_TOOLKIT_ROOT/library/helper_methods.sh"
 function create_work_area()
 {
   echo -e "\nCurrently logged in to the grid as:"
-  silent_grid whoami
-  cat $GRID_OUTPUT_FILE
+  grid whoami
   echo
   if [ $(grep -ic "additional credentials" <$GRID_OUTPUT_FILE) -gt 0 ]; then
     # set up the RNSPATH folder, in case it doesn't already exist.
