@@ -19,6 +19,10 @@
    <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.security.ClientMessageSecurityReceiver"/>
   </responseFlow>
  </globalConfiguration>
+ <!--
+   Two http transports exist: CommonsHTTPSender and HTTPSender.  The former supports
+   connection pooling and the latter does not.  
+   -->
  <transport name="http" pivot="java:org.apache.axis.transport.http.CommonsHTTPSender"/>
  <transport name="local" pivot="java:org.apache.axis.transport.local.LocalSender"/>
  <transport name="java" pivot="java:org.apache.axis.transport.java.JavaSender"/>

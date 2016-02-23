@@ -33,7 +33,7 @@ public class BESManagementPlugin implements ITabPlugin
 					return PluginStatus.ACTIVTE;
 			}
 		} catch (RNSPathDoesNotExistException e) {
-			throw new PluginException("Unexpected RNSPath referring to non-existant directory \"" + selectedResources[0].pwd() + "\".", e);
+			throw new PluginException("Unexpected RNSPath referring to non-existent directory \"" + selectedResources[0].pwd() + "\".", e);
 		}
 
 		return PluginStatus.INACTIVE;

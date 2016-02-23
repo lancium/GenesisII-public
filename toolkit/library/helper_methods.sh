@@ -15,7 +15,7 @@ function date_string()
 # prints out the timestamp in a somewhat readable way.
 function readable_date_string()
 {
-  date +"%Y-%m-%d %T:%S"
+  date +"%Y-%m-%d %T"
 }
 
 ########

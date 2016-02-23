@@ -179,14 +179,14 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 		 */
 		switch (detail._type) {
 			case TAR_FILE:
-				UnpackTar.uncompressTar(compressedFile, detail._folder);
+				UnpackTar.uncompressTar(compressedFile, detail._folder, true);
 				break;
 			case ZIP_FILE:
-				UnpackTar.uncompressZip(compressedFile, detail._folder);
+				UnpackTar.uncompressZip(compressedFile, detail._folder, true);
 				break;
 			case TAR_GZ_FILE: // intentional fall-through to TGZ.
 			case TGZ_FILE:
-				UnpackTar.uncompressTarGZ(compressedFile, detail._folder);
+				UnpackTar.uncompressTarGZ(compressedFile, detail._folder, true);
 				break;
 			default:
 				throw new JSDLException("unanticipated file type when uncompressing for HandleAsArchive");

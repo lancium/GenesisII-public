@@ -8,13 +8,16 @@
 
 ##############
 
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+cd "$WORKDIR"
+
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
 # major variables for the script:
 
 # the property file we will supply with container configuration.
 export INSTALLER_FILE="$GENII_USER_DIR/installation.properties"
-
-# where we will hide the owner certificate for the container.
-export LOCAL_CERTS_DIR="$GENII_USER_DIR/certs"
 
 ##############
 
@@ -53,6 +56,8 @@ function print_instructions()
   echo "For this script, the GENII_INSTALL_DIR should point at the newer"
   echo "installation that has been installed (either interactive or RPM/DEB)."
   echo
+#this needs to change.  intuit the proper setting from the install dir's client.props?
+#don't make the user fill this out.
   echo "The script requires the name of the deployment folder and the name of the"
   echo "grid's context file as parameters.  The deployment name must exist under the"
   echo "folder at '\$GENII_DEPLOYMENT_DIR' or under '\$GENII_USER_DIR/deployments',"
@@ -72,15 +77,32 @@ function print_instructions()
 
 # validate the parameters we were given.
 
-if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" ]; then
+if [ -z "$GENII_USER_DIR" -o -z "$GENII_INSTALL_DIR" -o ! -d "$GENII_INSTALL_DIR" ]; then
   print_instructions
   echo
   if [ -z "$GENII_USER_DIR" ]; then
+    echo
     echo "GENII_USER_DIR was not defined."
   fi
-  if [ -z "$GENII_INSTALL_DIR" ]; then
-    echo "GENII_INSTALL_DIR was not defined."
+  if [ ! -d "$GENII_USER_DIR" ]; then
+    echo
+    echo "The GENII_USER_DIR does not exist yet!  There is no container configuration"
+    echo "that can be updated currently.  Is this the right directory?:"
+    echo "  $GENII_USER_DIR"
   fi
+  if [ -z "$GENII_INSTALL_DIR" -o ! -d "$GENII_INSTALL_DIR" ]; then
+    echo
+    echo "GENII_INSTALL_DIR was not defined or does not exist."
+  fi
+  exit 1
+fi
+
+JAVA_PATH=$(which java)
+if [ -z "$JAVA_PATH" ]; then
+  print_instructions
+  echo
+  echo The GFFS container requires that Java be installed and be findable in the
+  echo PATH.  The recommended JVM is the latest Java 8 available from Oracle.
   exit 1
 fi
 
@@ -106,23 +128,50 @@ if [ ! -f "$GENII_INSTALL_DIR/current.version" \
   exit 1
 fi
 
-new_dep="$1"; shift
-context_file="$1"; shift
-
-if [ -z "$new_dep" -o -z "$context_file" ]; then
+# calculate the new deployment and new context.xml file from the install folder.
+if [ ! -f "$GENII_INSTALL_DIR/lib/client.properties" ]; then
   print_instructions
   echo
-  echo The new deployment name or the context file was not passed on the
-  echo command line.
+  echo "There is no client.properties file to scrounge settings from in the"
+  echo "GENII_INSTALL_DIR/lib directory.  This appears to not be a compatible install."
   exit 1
 fi
 
-JAVA_PATH=$(which java)
-if [ -z "$JAVA_PATH" ]; then
-  print_instructions
+new_deployment_info="$(grep "^edu.virginia.vcgr.genii.gridInitCommand=" "$GENII_INSTALL_DIR/lib/client.properties")"
+if [ -z "$new_deployment_info" ]; then
+  echo "There was a failure reading the deployment information from the installation"
+  echo "directory.  The lib/client.properties file did not have the expected setting for"
+  echo "'edu.virginia.vcgr.genii.gridInitCommand'."
+  exit 1
+fi
+
+#echo "dep info for new install is: $new_deployment_info"
+
+new_context_file="$(echo "$new_deployment_info" | sed -e "s/.*=\"local:\([^\"]*\)\".*/\1/")"
+new_dep_dir="$(dirname "$new_context_file")"
+
+#echo "new context file is: $new_context_file"
+#echo "new dep dir is: $new_dep_dir"
+
+# grab the current info.
+old_deployment_info="$(grep "^edu.virginia.vcgr.genii.gridInitCommand=" "$INSTALLER_FILE")"
+if [ -z "$old_deployment_info" ]; then
+  echo "There was a failure reading the deployment information from the container"
+  echo "state directory.  The installation properties file '$INSTALLER_FILE' did not"
+  echo "have the expected setting for 'edu.virginia.vcgr.genii.gridInitCommand'."
+  exit 1
+fi
+our_context_file="$(echo "$old_deployment_info" | sed -e "s/.*=\"local:\([^\"]*\)\".*/\1/")"
+our_dep_dir="$(dirname "$our_context_file")"
+our_deployment_name="$(echo "$old_deployment_info" | sed -e "s/.*\" \"\([^\"]*\)\".*/\1/")"
+
+#echo "our context file is: $our_context_file"
+#echo "our deployment directory is: $our_dep_dir"
+
+if [ -z "$our_context_file" -o -z "$our_deployment_name" ]; then
   echo
-  echo The GFFS container requires that Java be installed and be findable in the
-  echo PATH.  The recommended JVM is the latest Java 7 available from Oracle.
+  echo "Could not successfully calculate the old deployment configuration for"
+  echo "the container."
   exit 1
 fi
 
@@ -144,31 +193,12 @@ source "$GENII_INSTALL_DIR/scripts/installation_helpers.sh"
 
 ##############
 
-# setup the config directories.
-
-if [ ! -d "$GENII_USER_DIR" ]; then
-  print_instructions
-  echo
-  echo "The GENII_USER_DIR does not exist yet!  There is no container configuration"
-  echo "that can be updated currently.  Is this the right directory?:"
-  echo "  $GENII_USER_DIR"
-  exit 1
-fi
-if [ ! -d "$LOCAL_CERTS_DIR" ]; then
-  print_instructions
-  echo
-  echo "The local certificates directory does not exist yet!  This is a bad"
-  echo "state for the container configuration.  Is this the right directory?:"
-  echo "  $LOCAL_CERTS_DIR"
-  exit 1
-fi
-
 # stop any running container to be sure we aren't changing config
 # items while it's running.
 echo "Stopping any existing container before configuration proceeds..."
 tried_stopping=
-if [ -f "$GENII_INSTALL_DIR/GFFSContainer" ]; then
-  "$GENII_INSTALL_DIR/GFFSContainer" stop
+if [ -f "$GENII_BINARY_DIR/GFFSContainer" ]; then
+  "$GENII_BINARY_DIR/GFFSContainer" stop
   tried_stopping=true
 fi
 
@@ -180,17 +210,39 @@ fi
 ##############
 
 # load some of the variables from our config file.
-user_path="$(retrieve_compiler_variable genii.user-path)"
+#user_path="$(retrieve_compiler_variable genii.user-path)"
 
 ##############
 
+# make the files available where we expect them.
+
+# try to avoid copying to same file, which would indicate that the install
+# is not using a specialized deployment and we're trying to copy in install dir.
+if [ "$new_context_file" != "$our_context_file" ]; then
+  cp "$new_context_file" "$our_context_file"
+fi
+
+# copy in the trusted certificates and other assets.
+if [ "$new_dep_dir" != "$our_dep_dir" ]; then
+  # make our target dirs just in case.  most will already exist.
+  mkdir -p "$our_dep_dir/security/myproxy-certs" "$our_dep_dir/security/grid-certificates" "$our_dep_dir/security/trusted-certificates" &>/dev/null
+  cp -f -r "$new_dep_dir/security/myproxy-certs"/* "$our_dep_dir/security/myproxy-certs"
+  cp -f -r "$new_dep_dir/security/grid-certificates"/* "$our_dep_dir/security/grid-certificates"
+  cp -f -r "$new_dep_dir/security/trusted-certificates"/* "$our_dep_dir/security/trusted-certificates"
+  # we always overwrite the base trust store.
+  cp -f "$new_dep_dir/security/trusted.pfx" "$our_dep_dir/security/trusted.pfx"
+fi
+
+# update the server config to the latest version.
+cp -f "$GENII_INSTALL_DIR/webapps/axis/WEB-INF/server-config.wsdd" "$GENII_USER_DIR/webapps/axis/WEB-INF/server-config.wsdd" 
+
 # write any updated config values we were given.
 
-echo Writing configuration to installer file: $INSTALLER_FILE
+#echo Writing configuration to installer file: $INSTALLER_FILE
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.gridInitCommand=.*" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file\" \"$new_dep\""
+#replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.gridInitCommand=.*" "edu.virginia.vcgr.genii.gridInitCommand=\"local:$GENII_DEPLOYMENT_DIR/$our_dep/$context_file\" \"$our_dep\""
 
-replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.deployment-name=.*" "edu.virginia.vcgr.genii.container.deployment-name=$new_dep"
+#replace_if_exists_or_add "$INSTALLER_FILE" "edu.virginia.vcgr.genii.container.deployment-name=.*" "edu.virginia.vcgr.genii.container.deployment-name=$our_dep"
 
 ##############
 
@@ -202,9 +254,9 @@ if [ -d "$GENII_USER_DIR/deployments" ]; then
     echo "Moving the old deployment's default folder out of the way failed."
     exit 1
   fi
-  ln -s "$GENII_INSTALL_DIR/deployments/default" "$GENII_USER_DIR/deployments/default"
+  cp -r "$GENII_INSTALL_DIR/deployments/default" "$GENII_USER_DIR/deployments/default"
   if [ $? -ne 0 ]; then
-    echo "Linking newer default deployment into place failed."
+    echo "Copying newer default deployment into place failed."
     exit 1
   fi
   echo "Updated the state directory's default deployment from the new version."
@@ -212,9 +264,14 @@ fi
 
 ##############
 
+# fix the java service wrapper to use the newest scheme.
+replace_phrase_in_file "$GENII_USER_DIR/wrapper/wrapper.conf" "ext\/gffs-basics\.jar" "ext\/gffs-basics\*.jar"
+
+##############
+
 # get connected to the grid using the new deployment.
 echo Connecting to the grid...
-"$GENII_INSTALL_DIR/grid" connect "local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file" "$new_dep"
+"$GENII_BINARY_DIR/grid" connect "local:$our_context_file" "$our_deployment_name"
 if [ $? -ne 0 ]; then
   echo "Failed to connect to the grid!"
   echo "There may be more information in: ~/.GenesisII/grid-client.log"
@@ -224,9 +281,9 @@ echo "Connection to grid succeeded."
 echo
 
 echo
-echo "Done updating your container's deployment to the one specified."
+echo "Done updating your container's deployment to the newest available."
 echo
 echo You can start the container service with:
-echo "$GENII_INSTALL_DIR/GFFSContainer start"
+echo "$GENII_BINARY_DIR/GFFSContainer start"
 echo
 

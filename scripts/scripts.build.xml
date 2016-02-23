@@ -3,40 +3,40 @@
 
 	<target name="build-script-win" if="windows.scripts">
 		<copy file="${win-script-src-dir}/${win-script-base-name}.bat"
-			tofile="${basedir}/${win-script-base-name}.bat"/>
-		<replace file="${basedir}/${win-script-base-name}.bat"
+			tofile="${basedir}/bin/${win-script-base-name}.bat"/>
+		<replace file="${basedir}/bin/${win-script-base-name}.bat"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
-		<replace file="${basedir}/${win-script-base-name}.bat"
+		<replace file="${basedir}/bin/${win-script-base-name}.bat"
 			token="$LOG4JCONFIG" value="build.container.log4j.properties"
 			summary="no"/>
-		<replace file="${basedir}/${win-script-base-name}.bat"
+		<replace file="${basedir}/bin/${win-script-base-name}.bat"
 			token="$CLIENT_LOG4JCONFIG" value="build.client.log4j.properties"
 			summary="no"/>
 		<antcall target="set-jni">
-			<param name="build-target-file" value="${basedir}/${win-script-base-name}.bat"/>
+			<param name="build-target-file" value="${basedir}/bin/${win-script-base-name}.bat"/>
 		</antcall>
 	</target>
 
 	<target name="build-script-unix" if="unix.scripts">
 		<copy file="${unix-script-src-dir}/${unix-script-base-name}"
-			tofile="${basedir}/${unix-script-base-name}"/>
-		<replace file="${basedir}/${unix-script-base-name}"
+			tofile="${basedir}/bin/${unix-script-base-name}"/>
+		<replace file="${basedir}/bin/${unix-script-base-name}"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
-		<replace file="${basedir}/${unix-script-base-name}"
+		<replace file="${basedir}/bin/${unix-script-base-name}"
 			token="%{LOG4JCONFIG}" value="build.container.log4j.properties"
 			summary="no"/>
-		<replace file="${basedir}/${unix-script-base-name}"
+		<replace file="${basedir}/bin/${unix-script-base-name}"
 			token="%{CLIENT_LOG4JCONFIG}" value="build.client.log4j.properties"
 			summary="no"/>
 		<antcall target="set-jni">
-			<param name="build-target-file" value="${basedir}/${unix-script-base-name}"/>
+			<param name="build-target-file" value="${basedir}/bin/${unix-script-base-name}"/>
 		</antcall>
 		
 		<antcall target="set-mac-java">
-                        <param name="build-target-file" value="${basedir}/${unix-script-base-name}"/>
+                        <param name="build-target-file" value="${basedir}/bin/${unix-script-base-name}"/>
         </antcall>
 		
-		<chmod file="${basedir}/${unix-script-base-name}" perm="755"/>
+		<chmod file="${basedir}/bin/${unix-script-base-name}" perm="755"/>
 	</target>
 	
 	<target name="set-mac-java" if="mac.scripts">
@@ -108,18 +108,21 @@
 	
 	<target name="clean-all-scripts">
 		<delete quiet="true">
+			<!-- includes old versions of scripts at top. -->
 			<fileset dir="${basedir}">
 				<include name="runContainer.*"/>
-				<include name="grid*"/>
 				<include name="cert-tool*"/>
-				<include name="initialize-new-net-security*"/>
-				<include name="connect-new-client*"/>
-				<include name="windows-start-wrapper.bat"/>
-				<include name="windows-cmd-runner.bat"/>
-				<include name="VCGRContainerDaemon"/>
 				<include name="gffschown"/>
 				<include name="proxyio.launcher"/>
 				<include name="set_gffs_vars"/>
+			</fileset>
+			<!-- new styley has binaries / scripts in bin. -->
+			<fileset dir="${basedir}/bin">
+				<include name="runContainer.*"/>
+				<include name="grid*"/>
+				<include name="cert-tool*"/>
+				<include name="gffschown"/>
+				<include name="proxyio.launcher"/>
 			</fileset>
 		</delete>
 	</target>
@@ -195,6 +198,28 @@
 			</and>
     		</condition>
 
+		<!-- simple copies where we don't have to change the file. -->
+		<copy file="${basedir}/toolkit/library/restore_container_state.sh"
+			tofile="${basedir}/bin/restore_container_state"/>
+		<chmod file="${basedir}/bin/restore_container_state" perm="ugo+rx"/>
+		<copy file="${basedir}/toolkit/library/zap_genesis_javas.sh"
+			tofile="${basedir}/bin/zap_genesis_javas"/>
+		<chmod file="${basedir}/bin/zap_genesis_javas" perm="ugo+rx"/>
+		<copy file="${basedir}/toolkit/library/backup_container_state.sh"
+			tofile="${basedir}/bin/backup_container_state"/>
+		<chmod file="${basedir}/bin/backup_container_state" perm="ugo+rx"/>
+		<copy file="${basedir}/toolkit/library/list_genesis_javas.sh"
+			tofile="${basedir}/bin/list_genesis_javas"/>
+		<chmod file="${basedir}/bin/list_genesis_javas" perm="ugo+rx"/>
+		<copy file="${basedir}/toolkit/library/maybe_restart_container.sh"
+			tofile="${basedir}/bin/maybe_restart_container"/>
+		<chmod file="${basedir}/bin/maybe_restart_container" perm="ugo+rx"/>
+		<copy file="${basedir}/toolkit/library/bootstrap_quick_start.sh"
+			tofile="${basedir}/bin/bootstrap_quick_start"/>
+		<chmod file="${basedir}/bin/bootstrap_quick_start" perm="ugo+rx"/>
+
+		<!-- we copy these files and then munge them afterwards. -->
+
 		<copy file="${scripts.dir}/jar-desc.xml"
 			tofile="${basedir}/jar-desc.xml"/>
 		<replace file="${basedir}/jar-desc.xml"
@@ -236,20 +261,20 @@
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/proxyio.launcher.template"
-			tofile="${basedir}/proxyio.launcher"/>
-		<replace file="${basedir}/proxyio.launcher"
+			tofile="${basedir}/bin/proxyio.launcher"/>
+		<replace file="${basedir}/bin/proxyio.launcher"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
-		<replace file="${basedir}/proxyio.launcher"
+		<replace file="${basedir}/bin/proxyio.launcher"
 			token="\" value="\\" summary="no"/>
-		<chmod file="${basedir}/proxyio.launcher" perm="ugo+rx"/>
+		<chmod file="${basedir}/bin/proxyio.launcher" perm="ugo+rx"/>
 
 		<copy file="${scripts.dir}/gffschown.template"
-			tofile="${basedir}/gffschown"/>
-		<replace file="${basedir}/gffschown"
+			tofile="${basedir}/bin/gffschown"/>
+		<replace file="${basedir}/bin/gffschown"
 			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
-		<replace file="${basedir}/gffschown"
+		<replace file="${basedir}/bin/gffschown"
 			token="\" value="\\" summary="no"/>
-		<chmod file="${basedir}/gffschown" perm="ugo+rx"/>
+		<chmod file="${basedir}/bin/gffschown" perm="ugo+rx"/>
 
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${scripts.dir}"/>

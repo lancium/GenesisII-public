@@ -11,14 +11,14 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 #export SHOWED_SETTINGS_ALREADY=true
-#if [ -z "$XSEDE_TEST_SENTINEL" ]; then
+#if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
 #  source ../../prepare_tools.sh ../../prepare_tools.sh 
 #fi
 #export POSSIBLY_UNBUILT=true
-#source "$XSEDE_TEST_ROOT/library/establish_environment.sh"
+#source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
 # additional functions for managing installer.
-source $WORKDIR/../../xsede_tools/tools/installer/installer_helper.sh
+source $WORKDIR/../../toolkit/tools/installer/installer_helper.sh
 
 ##############
 

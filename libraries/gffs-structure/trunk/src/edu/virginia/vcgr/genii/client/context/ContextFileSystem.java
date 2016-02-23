@@ -50,11 +50,6 @@ public class ContextFileSystem
 
 	static private Log _logger = LogFactory.getLog(ContextFileSystem.class);
 
-	/*
-	 * hmmm: it seems like we may want to use the thread and process synch class instead of simple file lock; otherwise we are not properly
-	 * protected if we have a multi-threaded client that is also messing with loading and storing the context.
-	 */
-
 	static private class FileContextPair
 	{
 		public boolean updating;

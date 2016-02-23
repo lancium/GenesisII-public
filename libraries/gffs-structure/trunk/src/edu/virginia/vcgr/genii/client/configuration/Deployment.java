@@ -32,6 +32,10 @@ public class Deployment
 
 	private Deployment(File deploymentDirectory)
 	{
+		if (_logger.isDebugEnabled()) {
+			_logger.debug("loading deployment from: " + deploymentDirectory);
+		}
+
 		_deploymentDirectory = HierarchicalDirectory.openRootHierarchicalDirectory(deploymentDirectory);
 
 		_configurationDirectory = _deploymentDirectory.lookupDirectory(CONFIGURATION_DIRECTORY_NAME);
@@ -43,6 +47,10 @@ public class Deployment
 		_security = new Security(_deploymentDirectory, _configurationDirectory);
 
 		_namespace = new NamespaceDefinitions(_deploymentDirectory, _configurationDirectory);
+		if (!_namespace.loadedOkay()) {
+			// signify that there was no namespace definition.
+			_namespace = null;
+		}
 
 		_servicesDirectory = _deploymentDirectory.lookupDirectory(SERVICES_DIRECTORY_NAME);
 
@@ -94,6 +102,9 @@ public class Deployment
 
 	public NamespaceDefinitions namespace()
 	{
+		if (_namespace == null) {
+			throw new RuntimeException("failed to access namespace definitions on this deployment");
+		}
 		return _namespace;
 	}
 

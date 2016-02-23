@@ -351,6 +351,8 @@
         <gsh:param>TestDir</gsh:param>
 </geniix:rm>
 
+<gsh:sleep value="30" units="SECONDS"/>
+
 <gsh:echo message="Testing second recursive 'mkdir TestDir' command"/>
 <gsh:for param-name="i" initial-value="0" inclusive-limit="4">
         <geniix:mkdir>

@@ -22,6 +22,7 @@ HOSTNAME=`hostname`
 # then nc may terminate before any server output has been generated.
 LOCKFILE="/tmp/grid.server.$USERNAME.$HOSTNAME"
 SOCKFILE="/tmp/grid.sockfile.$USERNAME.$HOSTNAME"
+PIDFILE="/tmp/pidfile.$USERNAME.$HOSTNAME"
 REDIRECTFILE="/tmp/grid.redirectfile.$USERNAME.$HOSTNAME"
 NC_COMMAND="nc -Ukl $SOCKFILE"
 CL_NC_COMMAND="nc -q -1 -U $SOCKFILE"
@@ -71,13 +72,14 @@ function nukem() {
 # of the pipes and files. On the next invocation they will all
 # be restarted.
 
-	GRIDCMD=`which grid`
-	GRIDPID=`pgrep -f "/bin/sh $GRIDCMD"`
+	#GRIDCMD=`which grid`
+	#GRIDPID=`pgrep -f "/bin/sh $GRIDCMD"`
+	GRIDPID=`cat $PIDFILE`
 	if [ ! -z "$GRIDPID" ] ;
 	then
 		pkill --signal 9 -P $GRIDPID
 	fi
-	pkill --signal 9 -f "/bin/sh $GRIDCMD"
+	#pkill --signal 9 -f "/bin/sh $GRIDCMD"
 	pkill -f "$NC_COMMAND"
 	pkill -f "$CL_NC_COMMAND"
 	pkill -f "cat $REDIRECTFILE"
@@ -92,26 +94,19 @@ function ctrl_c() {
 	rm -f $LOCKFILE
 }
 
-# Get exclusive access to eliminate race conditions on access to the "server"
-lockfile $LOCKFILE
+function helpScreen() {
+echo "fastgrid is a shell script that interacts with a grid client running in"
+echo "the background via named pipes. The goal is eliminate the time waiting"
+echo "for the grid client to start up. If there is no grid client running"
+echo "for the user fastgrid will start one. "
+echo "usage: fastgrid -q|--quitServer|-h|--help will quit the server or print this help screen."
+echo "usage: fastgrid -s|--stdin will cause fastgrid to read from stdin until eof "
+echo "usage: fastgrid <commands to the grid shell, e.g., ls, whoami, etc."
+
+}
 
 
-# if there is no SOCKFILE, create one mkfifo $SOCKFILE;chmod go-rwx $SOCKFILE;
-if [ -e "$SOCKFILE" ] ;
-then
-	# let's make sure it is ours, and rw only by me .. don't want anybody taking over
-	# the channnel and impersonating
-	PERM=`stat -c%A $SOCKFILE`
-	if [ "$PERM" != "srwx------" ] ;
-	then
-		echo "WARNING - PERMISSIONS HAVE BEEN MODIFIED ON $SOCKFILE"
-		chmod go-rwx $SOCKFILE
-	fi
-else
-	mkfifo $SOCKFILE
-	# Set permissions so only i can see it.
-	chmod go-rwx $SOCKFILE
-fi
+function startServer() {
 # Now, lets check if there is a server running. If there is not this will not work well :-)
 # Perhaps we could check if there is a process owned by us "nc -Ukl $SOCKFILE", "id -u"
 # ps l | grep "nc -Ukl $SOCKFILE" | grep `id -u` | awk '{ print $3 }'`
@@ -142,14 +137,36 @@ then
 	mkfifo $REDIRECTFILE
 	chmod go-rwx $REDIRECTFILE
 	cat $REDIRECTFILE | grid 2>&1 | $NC_COMMAND  > $REDIRECTFILE &
+	# collect pids
+	pids=(`jobs -l % | sed 's/^[^ ]* \+//' | cut -d\  -f1`)
+	# Find pid of grid in ${pids[1]}
+	echo ${pids[1]} > $PIDFILE
+
 	sleep 5
 fi
+}
 
+function createSockfile() {
+# if there is no SOCKFILE, create one mkfifo $SOCKFILE;chmod go-rwx $SOCKFILE;
+if [ -e "$SOCKFILE" ] ;
+then
+	# let's make sure it is ours, and rw only by me .. don't want anybody taking over
+	# the channnel and impersonating
+	PERM=`stat -c%A $SOCKFILE`
+	if [ "$PERM" != "srwx------" ] ;
+	then
+		echo "WARNING - PERMISSIONS HAVE BEEN MODIFIED ON $SOCKFILE"
+		chmod go-rwx $SOCKFILE
+	fi
+else
+	mkfifo $SOCKFILE
+	# Set permissions so only i can see it.
+	chmod go-rwx $SOCKFILE
+fi
+}
 
-# Now there server is up, or there is trouble in river city. 
-# Generate the input script to the server. The "echo" commands bracket the command, and are used to 
-# make sure we only read output for us, not an old partially finished command. The "stop" tells us
-# when we have reached the end.
+function callServer() {
+
 cat <<inp > "$INPFILE"
 echo [1234start$$4567]
 $*
@@ -157,10 +174,64 @@ onfault Error in subshell $$
 echo [1234stop.$$4567]
 inp
 
-exitCode=0
-# now start it up
-cat $INPFILE | $CL_NC_COMMAND | processOutput
-exitval=$?
+	exitCode=0
+	# now start it up
+	cat $INPFILE | $CL_NC_COMMAND | processOutput
+	exitval=$?
+
+}
+
+####################################################
+# main program
+####################################################
+# First check if there are any special parameters to fastgrid
+
+if [[ $# > 0 ]]
+then
+key="$1"
+case $key in
+    -q|--quitServer)
+    nukem
+    exit
+    shift # past argument
+    ;;
+    -h|--help)
+    helpScreen
+    exit
+    ;;
+    -s|--stdin)
+    STDINFLAG="TRUE"
+    ;;
+    *)
+    ;;
+esac
+fi
+# Get exclusive access to eliminate race conditions on access to the "server"
+lockfile $LOCKFILE
+
+createSockfile
+
+startServer
+
+# Now there server is up, or there is trouble in river city. 
+# Generate the input script to the server. The "echo" commands bracket the command, and are used to 
+
+# Now, there are two cases, the commands on the command line, or stdin has a series of commands
+
+# make sure we only read output for us, not an old partially finished command. The "stop" tells us
+# when we have reached the end.
+
+if [ ! -z "$STDINFLAG" ] ;
+then
+	dline=
+	while read dline ;
+	do
+		callServer $dline
+	done
+else
+	dline=`echo "$*"`
+	callServer $dline
+fi
 
 # now clean up
 rm -f $INPFILE

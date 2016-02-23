@@ -62,7 +62,7 @@ public class ContextManager
 	}
 
 	/*
-	 * hmmm: !!! context loading functions could be smarter! they could cache the context in memory, and if there is a change in the file,
+	 * future: !!! context loading functions could be smarter! they could cache the context in memory, and if there is a change in the file,
 	 * only then reload it.
 	 */
 

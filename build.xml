@@ -205,16 +205,21 @@
 
 		<delete dir="${basedir}/webapps/axis/WEB-INF/attachments"/>
 
-		<!-- whack assorted top-level files. -->
-		<delete file="${basedir}/cert-tool"/>
-		<delete file="${basedir}/cert-tool.bat"/>
+		<!-- whack assorted binaries, generated and top-level files. -->
+		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/context.xml.lock"/>
+
+		<!-- old locations were at top of build. -->
 		<delete file="${basedir}/grid"/>
 		<delete file="${basedir}/fastgrid"/>
 		<delete file="${basedir}/grid.bat"/>
-		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/runContainer.sh"/>
 		<delete file="${basedir}/runContainer.bat"/>
+		<delete file="${basedir}/cert-tool"/>
+		<delete file="${basedir}/cert-tool.bat"/>
+
+		<!-- new locations for scripts are all in bin directory. -->
+		<delete dir="${basedir}/bin"/>
 
 		<!-- clean out current jars that are generated. -->
 		<delete dir="${generated.jar.dir}" />

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.15" transformSequenceNumber="4">
-  <directoryPresets config="../lib/socket.properties" />
+  <directoryPresets config="../scripts/cert-tool" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -50,6 +50,7 @@
       <mountPoint id="7606" root="" location="ext" mode="755" />
       <mountPoint id="3944" root="" location="jre-addin" mode="755" />
       <mountPoint id="7211" root="" location="scripts" mode="755" />
+      <mountPoint id="11810" root="" location="bin" mode="755" />
       <mountPoint id="34" root="" location="" mode="755" />
       <mountPoint id="5994" root="5993" location="deployments" mode="755" />
       <mountPoint id="5995" root="5993" location="deployments/default" mode="755" />
@@ -57,7 +58,6 @@
       <mountPoint id="10165" root="5993" location="deployments/${compiler:genii.new-deployment}/configuration" mode="755" />
       <mountPoint id="10166" root="5993" location="deployments/${compiler:genii.new-deployment}/security" mode="755" />
       <mountPoint id="8168" root="8167" location="lib" mode="755" />
-      <mountPoint id="8169" root="8167" location="lib/META-INF" mode="755" />
       <mountPoint id="8740" root="8739" location="" mode="755" />
     </mountPoints>
     <entries>
@@ -76,53 +76,58 @@
       <fileEntry mountPoint="7211" file="./scripts/update_install_location.sh" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="../scripts/gffschown.template" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="7211" file="../scripts/proxyio.launcher.template" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
+      <fileEntry mountPoint="11810" file="../scripts/cert-tool" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="34" file=".." overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml, *.class, *.tmp, *.fred" dirMode="755" overrideDirMode="true">
         <exclude>
-          <entry location="cert-tool" fileType="regular" />
-          <entry location="JavaServiceWrapper/wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
-          <entry location="JavaServiceWrapper/wrapper/src" fileType="regular" />
-          <entry location="JavaServiceWrapper/wrapper/jdoc" fileType="regular" />
-          <entry location="JavaServiceWrapper/wrapper/doc" fileType="regular" />
-          <entry location="JavaServiceWrapper/wrapper/jdoc.tar.gz" fileType="regular" />
-          <entry location="proxyio.launcher" fileType="regular" />
-          <entry location="derby.log" fileType="regular" />
-          <entry location="BUILDME" fileType="regular" />
-          <entry location="bin.eclipse" fileType="regular" />
-          <entry location="lib" fileType="regular" />
-          <entry location="gffschown" fileType="regular" />
-          <entry location="Readme.txt" fileType="regular" />
-          <entry location=".settings" fileType="regular" />
-          <entry location=".svn" fileType="regular" />
-          <entry location="src" fileType="regular" />
-          <entry location=".project" fileType="regular" />
-          <entry location=".classpath" fileType="regular" />
-          <entry location="deployments" fileType="regular" />
-          <entry location="unit-test-reports" fileType="regular" />
-          <entry location="jar-desc.xml" fileType="regular" />
-          <entry location="scripts" fileType="regular" />
-          <entry location="runContainer.sh" fileType="regular" />
-          <entry location="retired" fileType="regular" />
-          <entry location="libraries" fileType="regular" />
           <entry location="tests" fileType="regular" />
-          <entry location="installer" fileType="regular" />
-          <entry location="grid" fileType="regular" />
-          <entry location="build.properties" fileType="regular" />
-          <entry location="build.xml" fileType="regular" />
           <entry location="bin.ant" fileType="regular" />
-          <entry location="context.xml" fileType="regular" />
+          <entry location="set_gffs_vars" fileType="regular" />
+          <entry location="bin" fileType="regular" />
+          <entry location="build.properties" fileType="regular" />
+          <entry location=".project" fileType="regular" />
+          <entry location="deployments" fileType="regular" />
+          <entry location="lib" fileType="regular" />
+          <entry location="bin.eclipse" fileType="regular" />
           <entry location="ext/genii-base-application.properties" fileType="regular" />
           <entry location="ext/genii-certtool-application.properties" fileType="regular" />
           <entry location="ext/genii-container-application.properties" fileType="regular" />
           <entry location="ext/genii-client-application.properties" fileType="regular" />
-          <entry location="set_gffs_vars" fileType="regular" />
-          <entry location="xsede_tools" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper/jdoc" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper/src" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper/jdoc.tar.gz" fileType="regular" />
+          <entry location="JavaServiceWrapper/wrapper/doc" fileType="regular" />
+          <entry location="toolkit" fileType="regular" />
+          <entry location="unit-test-reports" fileType="regular" />
+          <entry location="scripts" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location=".svn" fileType="regular" />
+          <entry location="installer" fileType="regular" />
+          <entry location="Readme.txt" fileType="regular" />
+          <entry location="context.xml" fileType="regular" />
+          <entry location=".settings" fileType="regular" />
+          <entry location="retired" fileType="regular" />
+          <entry location="src" fileType="regular" />
+          <entry location="generated" fileType="regular" />
+          <entry location="build.xml" fileType="regular" />
+          <entry location=".classpath" fileType="regular" />
+          <entry location="BUILDME" fileType="regular" />
+          <entry location="libraries" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="34" file="../scripts/cert-tool" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="34" file="../scripts/set_gffs_vars" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <dirEntry mountPoint="34" file="../generated" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" entryMode="subdir" subDirectory="ext" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude />
+      </dirEntry>
+      <dirEntry mountPoint="34" file="../bin" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" entryMode="subdir" subDirectory="bin" excludeSuffixes="" dirMode="755" overrideDirMode="false">
+        <exclude>
+          <entry location="cert-tool" fileType="regular" />
+          <entry location="proxyio.launcher" fileType="regular" />
+          <entry location="gffschown" fileType="regular" />
+          <entry location="runContainer.sh" fileType="regular" />
+          <entry location="fastgrid" fileType="regular" />
+        </exclude>
       </dirEntry>
       <dirEntry mountPoint="5995" file="../deployments/default" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude>
@@ -145,11 +150,9 @@
         <exclude />
       </dirEntry>
       <fileEntry mountPoint="7004" file="${compiler:genii.deployment-source}/${compiler:genii.deployment-context}" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="8169" file="../lib/META-INF/mime.types" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="8168" file="../lib" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" entryMode="direct" subDirectory="lib" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude>
           <entry location="shared.log4j.properties" fileType="regular" />
-          <entry location="socket.properties" fileType="regular" />
           <entry location="build.container.log4j.properties" fileType="regular" />
           <entry location="container.properties" fileType="regular" />
           <entry location="production.container.log4j.properties.template" fileType="regular" />
@@ -160,15 +163,12 @@
           <entry location="build.client.log4j.properties" fileType="regular" />
           <entry location="build.client.log4j.properties.template" fileType="regular" />
           <entry location="lib.build.xml" fileType="regular" />
-          <entry location="META-INF/mime.types" fileType="regular" />
           <entry location="production.client.log4j.properties.template" fileType="regular" />
         </exclude>
       </dirEntry>
-      <fileEntry mountPoint="8168" file="../lib/cache.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
-      <fileEntry mountPoint="8168" file="./data_files/client.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="8168" file="./data_files/container.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
-      <fileEntry mountPoint="8168" file="../lib/socket.properties" overwriteMode="0" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
-      <dirEntry mountPoint="8740" file="../xsede_tools" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="subdir" subDirectory="xsede_tools" excludeSuffixes="*.fred" dirMode="755" overrideDirMode="false">
+      <fileEntry mountPoint="8168" file="./data_files/client.properties" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="8168" file="./data_files/container.properties" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <dirEntry mountPoint="8740" file="../toolkit" overwriteMode="4" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="subdir" subDirectory="toolkit" excludeSuffixes="*.fred" dirMode="755" overrideDirMode="false">
         <exclude />
       </dirEntry>
     </entries>
@@ -178,7 +178,6 @@
         <include all="false">
           <entry location="jre-addin" fileType="regular" />
           <entry location="scripts" fileType="regular" />
-          <entry location="lib" fileType="regular" />
           <entry location="JavaServiceWrapper" fileType="regular" />
           <entry location="docs" fileType="regular" />
           <entry location="dpages" fileType="regular" />
@@ -191,14 +190,11 @@
           <entry location="License.txt" fileType="regular" />
           <entry location="current.version" fileType="regular" />
           <entry location="eclipse" fileType="regular" />
-          <entry location="fastgrid" fileType="regular" />
           <entry location="webapps" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
-          <entry location="cert-tool" fileType="regular" />
           <entry location="set_gffs_vars" fileType="regular" />
           <entry location="ext" fileType="regular" />
-          <entry location="grid" fileType="launcher" />
-          <entry location="client-ui" fileType="launcher" />
+          <entry location="bin" fileType="regular" />
           <entry location=".i4j_fileset_8166" fileType="regular" />
           <entry location=".i4j_fileset_8738" fileType="regular" />
         </include>
@@ -272,7 +268,7 @@
   <launchers>
     <launcher name="GFFSContainer" id="264" customizedId="" external="true" excludeFromMenu="true" unixMode="755" menuName="" externalFile="JavaServiceWrapper/wrapper/bin/GFFSContainer" />
     <launcher name="runContainer" id="1450" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="runContainer" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+      <executable name="runContainer" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -281,7 +277,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dlog4j.configuration=production.container.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-container-application.properties&quot; -Xmx1024m" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dlog4j.configuration=production.container.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-container-application.properties&quot; -Xmx1024m" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
         <classPath>
           <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
           <scanDirectory location="ext" failOnError="false" />
@@ -304,7 +300,7 @@
       <iconImageFiles />
     </launcher>
     <launcher name="grid" id="39" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -313,11 +309,11 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
-          <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
           <scanDirectory location="ext" failOnError="false" />
+          <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
@@ -337,7 +333,7 @@
       <iconImageFiles />
     </launcher>
     <launcher name="client-ui" id="1773" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -346,7 +342,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
@@ -370,7 +366,7 @@
       <iconImageFiles />
     </launcher>
     <launcher name="grid32" id="5619" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -379,7 +375,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
@@ -403,7 +399,7 @@
       <iconImageFiles />
     </launcher>
     <launcher name="client-ui32" id="5622" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
       <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
@@ -412,7 +408,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
@@ -997,6 +993,36 @@ return true;</string>
                       </void>
                       <void property="executable">
                         <object class="java.io.File">
+                          <string>bin/GFFSContainer</string>
+                        </object>
+                      </void>
+                      <void property="wait">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="workingDirectory">
+                        <object class="java.io.File">
+                          <string>.</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>context.getVariable("genii.platform").equals("linux32") || context.getVariable("genii.platform").equals("linux64") 
+</condition>
+              </action>
+              <action name="Stop older unix service" id="12041" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                      <void property="arguments">
+                        <array class="java.lang.String" length="1">
+                          <void index="0">
+                            <string>stop</string>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="executable">
+                        <object class="java.io.File">
                           <string>GFFSContainer</string>
                         </object>
                       </void>
@@ -1014,7 +1040,7 @@ return true;</string>
                 <condition>context.getVariable("genii.platform").equals("linux32") || context.getVariable("genii.platform").equals("linux64") 
 </condition>
               </action>
-              <action name="Stop older unix service" id="7996" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="Stop way older unix service" id="7996" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -1300,7 +1326,7 @@ return true;</string>
                         <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
                           <void property="destinationFile">
                             <object class="java.io.File">
-                              <string>gffschown</string>
+                              <string>bin/gffschown</string>
                             </object>
                           </void>
                           <void property="files">
@@ -1334,7 +1360,7 @@ return true;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>gffschown</string>
+                                  <string>bin/gffschown</string>
                                 </object>
                               </void>
                             </array>
@@ -1352,7 +1378,7 @@ return true;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>gffschown</string>
+                                  <string>bin/gffschown</string>
                                 </object>
                               </void>
                             </array>
@@ -1371,7 +1397,7 @@ return true;</string>
                         <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
                           <void property="destinationFile">
                             <object class="java.io.File">
-                              <string>proxyio.launcher</string>
+                              <string>bin/proxyio.launcher</string>
                             </object>
                           </void>
                           <void property="files">
@@ -1405,7 +1431,7 @@ return true;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>proxyio.launcher</string>
+                                  <string>bin/proxyio.launcher</string>
                                 </object>
                               </void>
                             </array>
@@ -1423,7 +1449,7 @@ return true;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>proxyio.launcher</string>
+                                  <string>bin/proxyio.launcher</string>
                                 </object>
                               </void>
                             </array>
@@ -1566,7 +1592,7 @@ return true;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>cert-tool</string>
+                                  <string>bin/cert-tool</string>
                                 </object>
                               </void>
                             </array>
@@ -1875,6 +1901,64 @@ return true;
                     <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
                       <void property="itemName">
                         <string>${compiler:sys.fullName} ${compiler:sys.version}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Clean up obsolete config files and launchers" id="12042" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="9">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>GFFSContainer</string>
+                            </object>
+                          </void>
+                          <void index="1">
+                            <object class="java.io.File">
+                              <string>cert-tool</string>
+                            </object>
+                          </void>
+                          <void index="2">
+                            <object class="java.io.File">
+                              <string>client-ui</string>
+                            </object>
+                          </void>
+                          <void index="3">
+                            <object class="java.io.File">
+                              <string>container.properties</string>
+                            </object>
+                          </void>
+                          <void index="4">
+                            <object class="java.io.File">
+                              <string>container.properties.example</string>
+                            </object>
+                          </void>
+                          <void index="5">
+                            <object class="java.io.File">
+                              <string>fastgrid</string>
+                            </object>
+                          </void>
+                          <void index="6">
+                            <object class="java.io.File">
+                              <string>grid</string>
+                            </object>
+                          </void>
+                          <void index="7">
+                            <object class="java.io.File">
+                              <string>gffschown</string>
+                            </object>
+                          </void>
+                          <void index="8">
+                            <object class="java.io.File">
+                              <string>proxyio.launcher</string>
+                            </object>
+                          </void>
+                        </array>
                       </void>
                     </object>
                   </java>
@@ -2219,7 +2303,7 @@ return true;</string>
                           </void>
                           <void property="executable">
                             <object class="java.io.File">
-                              <string>grid</string>
+                              <string>bin/grid</string>
                             </object>
                           </void>
                           <void property="wait">
@@ -2410,7 +2494,7 @@ return userDir;
                                   </void>
                                   <void property="executable">
                                     <object class="java.io.File">
-                                      <string>grid</string>
+                                      <string>bin/grid</string>
                                     </object>
                                   </void>
                                   <void property="wait">
@@ -2593,7 +2677,7 @@ return !signer.exists() || !tls.exists();
                                   </void>
                                   <void property="executable">
                                     <object class="java.io.File">
-                                      <string>grid</string>
+                                      <string>bin/grid</string>
                                     </object>
                                   </void>
                                   <void property="keepConsoleWindow">
@@ -2729,7 +2813,7 @@ return !signer.exists() || !tls.exists();
                                   </void>
                                   <void property="executable">
                                     <object class="java.io.File">
-                                      <string>grid</string>
+                                      <string>bin/grid</string>
                                     </object>
                                   </void>
                                   <void property="keepConsoleWindow">
@@ -3385,7 +3469,7 @@ return true;
                               </void>
                               <void property="linkFile">
                                 <object class="java.io.File">
-                                  <string>GFFSContainer</string>
+                                  <string>bin/GFFSContainer</string>
                                 </object>
                               </void>
                             </object>
@@ -3770,7 +3854,7 @@ return startService;</string>
                                   </void>
                                   <void property="executable">
                                     <object class="java.io.File">
-                                      <string>GFFSContainer</string>
+                                      <string>bin/GFFSContainer</string>
                                     </object>
                                   </void>
                                   <void property="wait">

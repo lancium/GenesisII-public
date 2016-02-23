@@ -37,6 +37,7 @@ public class DeploymentName
 		String deploymentName = null;
 
 		// jfk3w - added user config information - including user's deployment path
+		// cak: important note-- we are definitely using this variable now; it's helpful during bootstrap.
 		if (deploymentName == null)
 			deploymentName = System.getenv(DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE);
 

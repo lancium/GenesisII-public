@@ -48,7 +48,16 @@ testFaultyJobs()
 
 		if [ "$BES_TYPE" != "Unicore" ]; then
 			grid run --jsdl=local:$GENERATED_JSDL_FOLDER/application-core-fault.jsdl $i
-			assertNotEquals "Submitting  '/bin/cat' job with application-core-fault on $i" 0 $?
+			assertEquals "Submitting  '/bin/cat' job with application-core-fault on $i" 0 $?
+			# should work to run above job, but it also should produce an error file.
+                        grid cp $RNSPATH/seg-err.txt local:$TEST_TEMP/seg-err.txt
+			assertEquals "Copying expected failure file for application-core-fault on $i" 0 $?
+			if [ -s $TEST_TEMP/seg-err.txt ]; then
+				true
+			else
+				false
+			fi
+			assertEquals "Checking expected failure file for application-core-fault on $i" 0 $?
 		fi
 	done
 }

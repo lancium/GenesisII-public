@@ -18,6 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -43,6 +45,8 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class DBBESResource extends BasicDBResource implements IBESResource
 {
+	static private Log _logger = LogFactory.getLog(DBBESResource.class);
+
 	@Override
 	public void initialize(GenesisHashMap constructionParams) throws ResourceException
 	{
@@ -103,9 +107,16 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 
 	public BES getBES() throws RemoteException
 	{
-		BES bes = BES.getBES(_resourceKey);
-		if (bes == null)
+		BES bes = null;
+		try {
+			bes = BES.getBES(_resourceKey);
+		} catch (IllegalStateException e) {
+			return null;
+		}
+		if (bes == null) {
+			// this is a bit different than the bes instances not being ready. somehow we got a null result with no exception.
 			throw new RemoteException("Couldn't find active BES entity.");
+		}
 		return bes;
 	}
 
@@ -122,8 +133,12 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 			stmt.setString(3, _resourceKey);
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update bes policy.");
-
-			getBES().getPolicyEnactor().setPolicy(policy);
+			BES bes = getBES();
+			if (bes != null) {
+				bes.getPolicyEnactor().setPolicy(policy);
+			} else {
+				_logger.error("could not load BES instances to set policy!");
+			}
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to update bes policy in database.", sqe);
 		} finally {
@@ -134,14 +149,28 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	@Override
 	public Collection<BESActivity> getContainedActivities() throws RemoteException
 	{
-		BES bes = BES.getBES(_resourceKey);
+		BES bes = null;
+		String msg = "failed to locate BES";
+		try {
+			bes = BES.getBES(_resourceKey);
+		} catch (IllegalStateException e) {
+			msg = "caught illegal state exception trying to get BES information when looking up contained activities";
+			_logger.error(msg);
+		}
+		if (bes == null)
+			throw new RemoteException(msg);
 		return bes.getContainedActivities();
 	}
 
 	@Override
 	public BESActivity getActivity(String activityid) throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		BES bes = BES.getBES(_resourceKey);
+		BES bes = null;
+		try {
+			bes = BES.getBES(_resourceKey);
+		} catch (IllegalStateException e) {
+			_logger.error("caught illegal state exception trying to get BES information while looking up activity " + activityid);
+		}
 		BESActivity activity = bes.findActivity(activityid);
 		if (activity == null)
 			throw new UnknownActivityIdentifierFaultType("Unknown activity \"" + activityid + "\".", null);
@@ -164,7 +193,16 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 
 		Integer threshold = (Integer) getProperty(IBESResource.THRESHOLD_DB_PROPERTY_NAME);
 
-		return getBES().isAcceptingActivites(threshold);
+		try {
+			BES bes = getBES();
+			if (bes != null)
+				return bes.isAcceptingActivites(threshold);
+			else
+				return false;
+		} catch (IllegalStateException e) {
+			// squash the exception; the BES instances are not ready.
+			return false;
+		}
 	}
 
 	@Override

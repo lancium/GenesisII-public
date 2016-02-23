@@ -62,6 +62,8 @@ public class TypeInformation
 
 	public TypeInformation(EndpointReferenceType epr)
 	{
+		if (epr == null)
+			throw new RuntimeException("null EPR passed to TypeInformation constructor");
 		_epr = epr;
 		_implementedPortTypes = EPRUtils.getImplementedPortTypes(epr);
 

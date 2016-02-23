@@ -20,7 +20,7 @@ import javax.xml.namespace.QName;
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-public interface GenesisIIConstants
+public interface GenesisIIJsdlConstants
 {
 	static final public String GENESIS_II_JSDL_NS = "http://vcgr.cs.virginia.edu/genesisII/jsdl";
 

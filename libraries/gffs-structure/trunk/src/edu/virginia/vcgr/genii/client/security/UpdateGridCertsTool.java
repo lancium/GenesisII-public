@@ -61,7 +61,7 @@ public class UpdateGridCertsTool
 			newCertsDir.delete();
 
 			// unpack current file using new untar support.
-			UnpackTar.uncompressTarGZ(downloadLocation, newCertsDir);
+			UnpackTar.uncompressTarGZ(downloadLocation, newCertsDir, false);
 
 			// clean up any old certs dir.
 			File oldCertsDir = new File(InstallationProperties.getUserDir() + "/grid-certificates.old");

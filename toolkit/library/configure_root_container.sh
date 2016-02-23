@@ -156,7 +156,7 @@ prepare_container_configuration
 #hmmm: hopefully above doesn't redo any work???
 
 # new flag tells the populate method to copy admin cert as the owner.
-bash $DEPGEN_LOC/populate-deployment.sh "$DEPLOYMENT_NAME" $PORT localhost ADDOWNER
+bash $DEPGEN_LOC/populate-deployment.sh "$DEPLOYMENT_NAME" $PORT $MACHINE_NAME ADDOWNER
 check_if_failed "populating deployment for $DEPLOYMENT_NAME folder"
 
 echo After grid basic infrastructure created...

@@ -14,6 +14,9 @@ fi
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
+# we will do this many rounds of the create + remove dir test.
+MAX_ITERS_CREATE_REMOVE=6
+
 oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.
@@ -24,6 +27,73 @@ oneTimeSetUp()
   \rm $TEST_TEMP/zorba &>/dev/null
   \rm -rf $TEST_TEMP/petunia &>/dev/null
 }
+
+#hmmm: at top just to see this run first for now..
+
+testRecursiveMkdirAndRemove()
+{
+  silent_grid ping testdir --eatfaults
+  if [ $? -eq 0 ]; then
+    # directory already exists, so remove it before starting test.
+    silent_grid rm -r testdir
+    assertEquals "cleaning up existing testdir" 0 $?
+  fi
+
+  # we don't make all the dirs at once because the failure that caused an error
+  # was doing the dir create and then a cd afterwards.  so we are mimicking the
+  # same process here.
+  local cmds_list="\n\
+cd $RNSPATH\n\
+mkdir testdir\n\
+onerror failed to create new subdir\n\
+cd testdir\n\
+onerror failed to change to new subdir\n\
+mkdir testdir\n\
+onerror failed to create new subdir\n\
+cd testdir\n\
+onerror failed to change to new subdir\n\
+mkdir testdir\n\
+onerror failed to create new subdir\n\
+cd testdir\n\
+onerror failed to change to new subdir\n\
+mkdir testdir\n\
+onerror failed to create new subdir\n\
+cd testdir\n\
+onerror failed to change to new subdir\n\
+pwd\n\
+echo testing > testing.txt\n\
+onerror failed to create new file in the subdir\n\
+ls\n\
+cd $RNSPATH\n\
+rm -r testdir\n\
+onerror failed to remove new subdirs\n\
+"
+
+#echo cmds list is:
+#echo -e $cmds_list
+
+  local iter
+  for (( iter=0; $iter < $MAX_ITERS_CREATE_REMOVE; iter++ )); do
+    multi_grid <<eof
+echo doing first run of create and remove...
+$(echo -e $cmds_list)
+echo doing second run of create and remove...
+$(echo -e $cmds_list)
+echo doing third run of create and remove...
+$(echo -e $cmds_list)
+echo doing fourth run of create and remove...
+$(echo -e $cmds_list)
+eof
+    assertEquals "multi-grid command with multiple create and remove attempts" 0 $?
+
+echo here was output:
+cat $GRID_OUTPUT_FILE
+
+  done
+}
+
+
+
 
 testCopyEmptyDirectory()
 {
@@ -295,9 +365,6 @@ testRecursiveRnsDeleteWithLinks()
     assertNotEquals "failed removal--should be able to unlink top level a" 0 $retval
   fi
 }
-
-# need a recursive delete test with links for local dirs!
-# must implement support for checking for links though.
 
 oneTimeTearDown() {
   grid rm -rf $RNSPATH/a &>/dev/null

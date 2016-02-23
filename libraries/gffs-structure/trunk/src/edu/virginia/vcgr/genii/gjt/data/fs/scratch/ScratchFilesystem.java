@@ -13,7 +13,7 @@ import edu.virginia.vcgr.genii.gjt.data.fs.AbstractFilesystem;
 import edu.virginia.vcgr.genii.gjt.data.fs.FilesystemType;
 import edu.virginia.vcgr.jsdl.FileSystem;
 import edu.virginia.vcgr.jsdl.FileSystemType;
-import edu.virginia.vcgr.jsdl.GenesisIIConstants;
+import edu.virginia.vcgr.jsdl.GenesisIIJsdlConstants;
 
 public class ScratchFilesystem extends AbstractFilesystem implements Externalizable
 {
@@ -88,7 +88,7 @@ public class ScratchFilesystem extends AbstractFilesystem implements Externaliza
 	public FileSystem toJSDLFilesystem()
 	{
 		FileSystem ret = new FileSystem("SCRATCH", FileSystemType.spool);
-		ret.anyAttributes().put(GenesisIIConstants.SCRATCH_UNIQUE_ID_ATTRIBUTE, _uniqueIdentifier);
+		ret.anyAttributes().put(GenesisIIJsdlConstants.SCRATCH_UNIQUE_ID_ATTRIBUTE, _uniqueIdentifier);
 
 		return ret;
 

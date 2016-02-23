@@ -953,7 +953,13 @@ public class RNSPath implements Serializable, Cloneable
 			return _stringPortTypes.contains("-RNS-");
 		} else {
 			resolveOptional();
-			return new TypeInformation(_cachedEPR).isRNS();
+			if (_cachedEPR != null)
+				return new TypeInformation(_cachedEPR).isRNS();
+			else {
+				// we have no information, so we just have to claim false.
+				_logger.error("failed to resolve EPR for " + _nameFromParent);
+				return false;
+			}
 		}
 	}
 
@@ -966,7 +972,13 @@ public class RNSPath implements Serializable, Cloneable
 			return _stringPortTypes.contains("-ByteIO-");
 		} else {
 			resolveOptional();
-			return new TypeInformation(_cachedEPR).isByteIO();
+			if (_cachedEPR != null)
+				return new TypeInformation(_cachedEPR).isByteIO();
+			else {
+				// we have no information, so we just have to claim false.
+				_logger.error("failed to resolve EPR for " + _nameFromParent);
+				return false;
+			}
 		}
 	}
 

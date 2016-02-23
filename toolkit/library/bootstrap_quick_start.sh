@@ -32,7 +32,8 @@ function setup_key_bootstrapping_variables()
 
   export DEPLOYMENT_MEMORY_FILE=saved-deployment-info.txt
 
-  export MACHINE_NAME=localhost
+  # try to get the most correct name for the current host.
+  export MACHINE_NAME=$(hostname -f)
   export PORT=18080
 
   export NEW_DEPLOYMENT=$DEPLOYMENT_NAME

@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
@@ -200,12 +199,8 @@ public class ServiceDeployer extends Thread
 						Document element = XMLUtils.newDocument(in);
 						info._loader = GenesisClassLoader.classLoaderFactory();
 						className = attemptDeploy(element);
-					} catch (ParserConfigurationException pce) {
-						_logger.warn(pce);
-					} catch (SAXException se) {
-						_logger.warn(se);
-					} catch (IOException ioe) {
-						_logger.warn(ioe);
+					} catch (Throwable t) {
+						_logger.warn("failure during attempt to deploy class", t);
 					} finally {
 						StreamUtils.close(in);
 					}
@@ -216,32 +211,27 @@ public class ServiceDeployer extends Thread
 						Class<?> cl = info._loader.loadClass(className);
 						if (IServiceWithCleanupHook.class.isAssignableFrom(cl)) {
 							Constructor<?> cons = cl.getConstructor(new Class[0]);
-							_logger.debug("constructing new instance of " + cl.toString());
+							if (_logger.isTraceEnabled())
+								_logger.debug("constructing new instance of " + cl.toString());
 							IServiceWithCleanupHook base = (IServiceWithCleanupHook) cons.newInstance(new Object[0]);
 							// show how much time the service startup took.
 							long startedAt = TimeHelpers.millisSinceAppStart();
 							base.startup();
 							long finishedAt = TimeHelpers.millisSinceAppStart();
-							_logger.debug("deploying " + className + " took " + ((float) (finishedAt - startedAt)) / 1000.0 + " seconds.");
+							if (_logger.isDebugEnabled())
+								_logger
+									.debug("deploying " + className + " took " + ((float) (finishedAt - startedAt)) / 1000.0 + " seconds.");
 							_postStartupQueue.enqueue(base);
 						}
-					} catch (NoSuchMethodException nsme) {
-						_logger.error("Unable to deploy service.", nsme);
-					} catch (ClassNotFoundException cnfe) {
-						_logger.error("Unable to deploy service.", cnfe);
-					} catch (InstantiationException ia) {
-						_logger.error("Unable to deploy service.", ia);
-					} catch (IllegalAccessException iae) {
-						_logger.error("Unable to deploy service.", iae);
-					} catch (InvocationTargetException ite) {
-						_logger.error("Unable to deploy service.", ite);
+					} catch (Throwable t) {
+						_logger.error("Unable to deploy service.", t);
 					}
 				}
 			}
 			// lots of gauntlet to run to get to this point.
 			return true;
 		} catch (Throwable t) {
-			_logger.debug("deployment barfed exception: " + t.getMessage(), t);
+			_logger.debug("service deployment process barfed exception: " + t.getMessage(), t);
 			return false;
 		}
 	}

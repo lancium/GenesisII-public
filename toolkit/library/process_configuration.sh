@@ -71,7 +71,7 @@ define_and_export_variables()
 
   # define the location of our main binaries / scripts.  this formerly was the
   # same as GENII_INSTALL_DIR but is now moved down into a bin directory.
-  export GENII_BINARY_DIR=$GENII_INSTALL_DIR
+  export GENII_BINARY_DIR=$GENII_INSTALL_DIR/bin
 
   if [ -z "$GENII_USER_DIR" ]; then
     export GENII_USER_DIR="$HOME/.genesisII-2.0"

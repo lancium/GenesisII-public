@@ -6,6 +6,12 @@
 
 ##############
 
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+cd "$WORKDIR"
+
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
 # major variables for the script:
 
 # the property file we will supply with container configuration.
@@ -207,8 +213,8 @@ if [ -d "$WRAPPER_DIR" ]; then
   rm -rf "$WRAPPER_DIR"
 fi
 tried_stopping=
-if [ -f "$GENII_INSTALL_DIR/GFFSContainer" ]; then
-  "$GENII_INSTALL_DIR/GFFSContainer" stop
+if [ -f "$GENII_BINARY_DIR/GFFSContainer" ]; then
+  "$GENII_BINARY_DIR/GFFSContainer" stop
   tried_stopping=true
 fi
 if [ -f "$GENII_INSTALL_DIR/XCGContainer" ]; then
@@ -247,7 +253,7 @@ fi
 # now make sure we really think they're all stopped, and give the user the option
 # to force a shutdown of any containers we find running in their account.
 list_temp="$(mktemp $TMP/javaprocesses.XXXXXX)"
-bash "$GENII_INSTALL_DIR/xsede_tools/library/list_genesis_javas.sh" >"$list_temp"
+bash "$GENII_INSTALL_DIR/toolkit/library/list_genesis_javas.sh" >"$list_temp"
 if [ -s "$list_temp" ]; then
 
   if [ -z "$STOP_CONTAINER" ]; then
@@ -271,7 +277,7 @@ if [ -s "$list_temp" ]; then
   fi
   if [ ! -z "$stop_processes" ]; then
     echo "Stopping Genesis II Java processes..."
-    bash "$GENII_INSTALL_DIR/xsede_tools/library/zap_genesis_javas.sh" >"$list_temp"
+    bash "$GENII_INSTALL_DIR/toolkit/library/zap_genesis_javas.sh" >"$list_temp"
     echo "Processes have been stopped."
     echo
   fi
@@ -312,7 +318,7 @@ if [ -z "$CONTAINER_HOSTNAME_PROPERTY" ]; then
   echo "info: $var was missing in $file, trying alternate."
   file="$GENII_DEPLOYMENT_DIR/$new_dep/configuration/server-config.xml"
   CONTAINER_HOSTNAME_PROPERTY="$(seek_variable_in_xml "$var" "$file")"
-echo got value = $CONTAINER_HOSTNAME_PROPERTY
+echo got container host name = $CONTAINER_HOSTNAME_PROPERTY
   if [[ -z "$CONTAINER_HOSTNAME_PROPERTY" \
       || "$CONTAINER_HOSTNAME_PROPERTY" =~ .*installer:.* ]]; then
     # try again with the hostname command.
@@ -427,9 +433,9 @@ if [ ! -z "$copy_deployments_folder" ]; then
     echo "Moving the old deployment's default folder out of the way failed."
     exit 1
   fi
-  ln -s "$GENII_DEPLOYMENT_DIR/default" "$GENII_USER_DIR/deployments/default"
+  cp -r "$GENII_DEPLOYMENT_DIR/default" "$GENII_USER_DIR/deployments/default"
   if [ $? -ne 0 ]; then
-    echo "Linking newer default deployment into place failed."
+    echo "Copying newer default deployment into place failed."
     exit 1
   fi
 
@@ -641,7 +647,7 @@ echo Connecting to the grid...
 # clean up any prior context information.
 rm -f "$GENII_USER_DIR/user-config.xml"
 # get connected to the grid.
-"$GENII_INSTALL_DIR/grid" connect "local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file" "$new_dep"
+"$GENII_BINARY_DIR/grid" connect "local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file" "$new_dep"
 if [ $? -ne 0 ]; then
   echo "Failed to connect to the grid!"
   echo "There may be more information in: ~/.GenesisII/grid-client.log"
@@ -657,6 +663,6 @@ echo The service URL for your container is stored in:
 echo "$GENII_USER_DIR/service-url.txt"
 echo
 echo You can start the container service with:
-echo "$GENII_INSTALL_DIR/GFFSContainer start"
+echo "$GENII_BINARY_DIR/GFFSContainer start"
 echo
 

@@ -23,6 +23,7 @@ public class NamespaceDefinitions
 
 	private File _namespacePropertiesFile;
 	private Properties _namespaceProperties;
+	private boolean _loadedOkay = false;
 
 	/**
 	 * constructor wants the deployment root and the config directory within that root.
@@ -32,20 +33,36 @@ public class NamespaceDefinitions
 		_namespacePropertiesFile = configurationDirectory.lookupFile(NAMESPACE_PROPERTIES_FILE_NAME);
 		_namespaceProperties = new Properties();
 
-		if (!_namespacePropertiesFile.exists())
-			throw new InvalidDeploymentException(deploymentDirectory.getName(),
-				"Couldn't find namespace properties file \"" + NAMESPACE_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
+		if (!_namespacePropertiesFile.exists()) {
+			// throw new InvalidDeploymentException(deploymentDirectory.getName(), "Couldn't find namespace properties file \""
+			// + NAMESPACE_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
+			if (_logger.isDebugEnabled())
+				_logger.debug("did not find namespace configuration file for deployment called: " + deploymentDirectory.getName());
+			return;
+		}
 
 		FileInputStream fin = null;
 		try {
 			fin = new FileInputStream(_namespacePropertiesFile);
 			_namespaceProperties.load(fin);
+
+			// set our flag that things worked right.
+			_loadedOkay = true;
 		} catch (IOException ioe) {
 			_logger.fatal("Unable to load namespace properties from deployment.", ioe);
 			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Unable to load namespace properties from deployment.");
 		} finally {
 			StreamUtils.close(fin);
 		}
+	}
+
+	/**
+	 * reports whether the namespace definitions were loaded successfully or not. some deployment folders (especially 'default') will not have
+	 * any namespace definition.
+	 */
+	public boolean loadedOkay()
+	{
+		return _loadedOkay;
 	}
 
 	/**

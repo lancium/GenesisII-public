@@ -60,7 +60,7 @@ public class GenesisHashMap extends HashMap<QName, Object>
 		Object toReturn = get(which);
 		if (toReturn == null)
 			return null; // nothing there.
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("get: " + which + " has type " + toReturn.getClass().getCanonicalName());
 		if (toReturn instanceof String) {
 			return (String) toReturn;

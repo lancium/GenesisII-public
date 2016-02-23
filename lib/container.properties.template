@@ -41,3 +41,11 @@ edu.virginia.vcgr.genii.container.cleanup.CleanupManager.enact-cleanup=true
 
 #######
 
+# enables or disables the credential streamlining feature for the container,
+# which reduces the number of credentials sent over the wire by not sending
+# credentials that were transmitted previously.  valid values are true or
+# false.
+gffs.container.credential_streamlining=true
+
+#######
+

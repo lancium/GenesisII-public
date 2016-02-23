@@ -63,13 +63,20 @@ function fuse()
 {
   local fuse_out="$(mktemp "$TEST_TEMP/grid_logs/out_fuse_$(date_string).XXXXXX")"
   logged_grid "$fuse_out" "$(pick_unaccelerated_grid_app)" fuse $* &
+  local retval=$?
+  echo "[$(readable_date_string)]"
+  return $retval
 }
 
 # a function that behaves like the normal grid command, except that it times the
 # processing that occurs from the command.
 function timed_grid()
 {
+  echo "[$(readable_date_string)]"
   grid_base $(\which time) -p -o "$GRID_TIMING_FILE" "$(pick_grid_app)" $*
+  local retval=$?
+  echo "[$(readable_date_string)]"
+  return $retval
 }
 
 # this bails out if an error occurs.
@@ -78,6 +85,7 @@ function grid_chk()
   echo "[grid] $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
   silent_grid $*
   check_if_failed "'grid ${1}...' exited with exit code $?"
+  echo "[$(readable_date_string)]"
 }
 
 function noisy_grid()
@@ -87,6 +95,7 @@ function noisy_grid()
   local retval=$?
   # show the output from the silent_grid command above, regardless of success.
   cat "$GRID_OUTPUT_FILE"
+  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -106,8 +115,10 @@ function multi_grid()
     # we have to exit here since the command is operating as a sub-shell with the new
     # input stream that the caller provides.
     echo "multi_grid failing with exit code $retval"
+    echo "[$(readable_date_string)]"
     exit $retval    
   fi
+  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -131,7 +142,10 @@ function grid_base()
   local my_output="$(mktemp $TEST_TEMP/grid_logs/out_grid_base_$(date_string).XXXXXX)"
   logged_grid $my_output "${@}"
   local retval=$?
-  echo "[$(readable_date_string)]"
+  if [ $retval -ne 0 ]; then
+    # print a timestamp if there was an error.
+    echo "[$(readable_date_string)]"
+  fi
   return $retval
 }
 
@@ -140,7 +154,7 @@ function grid_base()
 function raw_grid()
 {
   # expects first parms to be the app/command to run.
-  "${@}" 2>&1 | grep -v "Checking for updates\|Updates Disabled\|YourKit Java Profiler\|Current version is\|untoward for mooch"
+  "${@}" 2>&1 | grep -v "Checking for updates\|^\[.*\]$\|Updates Disabled\|YourKit Java Profiler\|Current version is\|untoward for mooch"
   return ${PIPESTATUS[0]}
 }
 

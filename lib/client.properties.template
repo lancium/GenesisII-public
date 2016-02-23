@@ -33,12 +33,6 @@ edu.virginia.vcgr.genii.ui.error.report-target=http://vcgr.cs.virginia.edu/ui/re
 
 #######
 
-# This can be changed to the actual deployment name in use.  The deployment
-# name is held in the state directory's active records for the grid
-# connection otherwise.
-#gffs.deployment-name=example
-#gffs.deployment-name=${compiler:genii.new-deployment}
-
 # Absolute path of the deployments folder for this installation.  Default is
 # the $GENII_INSTALL_DIR/deployments folder.
 #gffs.deployment-directory=
@@ -97,9 +91,16 @@ edu.virginia.vcgr.genii.client.io.uri-manager.max-simultaneous-connections=4
 
 #######
 
+# enables or disables the client credential streamlining feature, which
+# reduces the number of credentials sent over the wire by not sending creds
+# that were transmitted previously.  valid values are true or false.
+gffs.client.credential_streamlining=true
+
+#######
+
 # Connection command for clients to find the installed grid deployment.
 # Example below is what might be used for XSEDE production grid.
 #edu.virginia.vcgr.genii.gridInitCommand="local:/home/fred/GenesisII/deployments/current_grid/context.xml" "current_grid"
 # install4j version that gets replaced by interactive installer.
-#edu.virginia.vcgr.genii.gridInitCommand="local:${installer:sys.installationDir}/deployments/${compiler:genii.new-deployment}/${compiler:genii.deployment-context}" "${compiler:genii.new-deployment}"
+edu.virginia.vcgr.genii.gridInitCommand="local:${installer:sys.installationDir}/deployments/${compiler:genii.new-deployment}/${compiler:genii.deployment-context}" "${compiler:genii.new-deployment}"
 

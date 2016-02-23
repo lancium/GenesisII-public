@@ -10,6 +10,12 @@
 
 ##############
 
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+cd "$WORKDIR"
+
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
 # major variables for the script:
 
 # if this is non-empty, then we will generate certificates rather than expecting
@@ -229,8 +235,8 @@ fi
 # items while it's running.
 echo "Stopping any existing container before configuration proceeds..."
 tried_stopping=
-if [ -f "$GENII_INSTALL_DIR/GFFSContainer" ]; then
-  "$GENII_INSTALL_DIR/GFFSContainer" stop
+if [ -f "$GENII_BINARY_DIR/GFFSContainer" ]; then
+  "$GENII_BINARY_DIR/GFFSContainer" stop
   tried_stopping=true
 fi
 if [ -f "$GENII_INSTALL_DIR/XCGContainer" ]; then
@@ -370,7 +376,7 @@ echo "https://$CONTAINER_HOSTNAME_PROPERTY:$CONTAINER_PORT_PROPERTY/axis/service
 
 # get connected to the grid.
 echo Connecting to the grid...
-"$GENII_INSTALL_DIR/grid" connect "local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file" "$new_dep"
+"$GENII_BINARY_DIR/grid" connect "local:$GENII_DEPLOYMENT_DIR/$new_dep/$context_file" "$new_dep"
 if [ $? -ne 0 ]; then
   echo "Failed to connect to the grid!"
   echo "There may be more information in: ~/.GenesisII/grid-client.log"
@@ -388,7 +394,7 @@ if [[ "$GRID_USER_NAME" =~ .*/.* ]]; then
   # owner path.
   target_path="$GRID_USER_NAME"
 fi
-"$GENII_INSTALL_DIR/grid" download-certificate "$target_path" "local:$LOCAL_CERTS_DIR/owner.cer"
+"$GENII_BINARY_DIR/grid" download-certificate "$target_path" "local:$LOCAL_CERTS_DIR/owner.cer"
 if [ $? -ne 0 ]; then
   echo "Failed to download the certificate for grid user $GRID_USER_NAME."
   echo "There may be more information in: ~/.GenesisII/grid-client.log"
@@ -435,6 +441,6 @@ echo The service URL for your container is stored in:
 echo "$GENII_USER_DIR/service-url.txt"
 echo
 echo You can start the container service with:
-echo "$GENII_INSTALL_DIR/GFFSContainer start"
+echo "$GENII_BINARY_DIR/GFFSContainer start"
 echo
 

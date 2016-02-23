@@ -2,5 +2,5 @@ login
 
 login [--validDuration=<duration-string>]
 	[--username=<username>] [--password=<password>] [--noPassword]
-	rns:<identity provider path>
+	[rns:<identity provider path>]
 

@@ -357,13 +357,16 @@ public class GeniiPath implements Serializable
 			}
 		}
 
-		if ((toReturn != null) && _logger.isDebugEnabled()) {
-			_logger.debug("returning path set:");
-			for (PathMixIn p : toReturn) {
-				_logger.debug(p.toString());
+		if (!toReturn.isEmpty()) {
+			if (_logger.isTraceEnabled()) {
+				_logger.debug("returning path set:");
+				for (PathMixIn p : toReturn) {
+					_logger.debug(p.toString());
+				}
 			}
 		} else {
-			_logger.debug("did not expand any paths from: " + path);
+			if (_logger.isDebugEnabled())
+				_logger.debug("did not expand any paths from: " + path);
 		}
 
 		return toReturn;

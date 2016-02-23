@@ -3,7 +3,7 @@
 
 To build the interactive and DEB installers for GenesisII, try:
 
-  bash "$GENII_INSTALL_DIR/xsede_tools/tools/installer/build_installer.sh" X.config
+  bash "$GENII_INSTALL_DIR/toolkit/tools/installer/build_installer.sh" X.config
 
 where X.config is the name of a GenesisII installer configuration file.  If
 you leave off 'X.config', then the script will list out all of the available

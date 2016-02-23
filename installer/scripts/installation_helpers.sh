@@ -187,7 +187,7 @@ function replace_installdir_variables()
   local dir="$1"; shift
   local fname
 
-  for fname in $(find "$dir/xsede_tools/tools/genesis_module" -type f) \
+  for fname in $(find "$dir/toolkit/tools/genesis_module" -type f) \
     $(find $dir -type f ! -iname "*.sh" -exec grep -l installer:sys.installationDir {} ';') \
     ; do
     local seeking="\${installer:sys.installationDir}"
@@ -203,7 +203,7 @@ function generate_cert()
   local file="$1"; shift
   local passwd="$1"; shift
 
-  "$GENII_INSTALL_DIR/grid" cert-generator --gen-cert --keysize=2048 "--ks-path=$file" "--ks-pword=$passwd" --ks-alias=Container --cn=$CONTAINER_HOSTNAME_PROPERTY --o=XSEDE --l=Nationwide --c=US --ou=GFFS /etc/ContainerGroupCertGenerator
+  "$GENII_BINARY_DIR/grid" cert-generator --gen-cert --keysize=2048 "--ks-path=$file" "--ks-pword=$passwd" --ks-alias=Container --cn=$CONTAINER_HOSTNAME_PROPERTY --o=XSEDE --l=Nationwide --c=US --ou=GFFS /etc/ContainerGroupCertGenerator
 
   if [ $? -ne 0 ]; then
     echo "Failed to generate a certificate in: $file"

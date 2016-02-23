@@ -43,9 +43,12 @@ public class DBSerializer
 				_logger.trace(String.format("Created a blob of length %d bytes for %s.%s which has a " + "max length of %d bytes.",
 					blob.length(), tableName, columnName, maxLength));
 			if (blob.length() > maxLength) {
-				_logger.error(String.format(
-					"Error:  Blob was created with %d bytes for %s.%s, " + "but the maximum length for that column is %d bytes.",
-					blob.length(), tableName, columnName, maxLength));
+				_logger
+					.info(
+						String.format(
+							"Implementation Note: Blob was created with %d bytes for %s.%s, "
+								+ "but the maximum length (soft) for that column is %d bytes.",
+							blob.length(), tableName, columnName, maxLength));
 			}
 
 			return blob;

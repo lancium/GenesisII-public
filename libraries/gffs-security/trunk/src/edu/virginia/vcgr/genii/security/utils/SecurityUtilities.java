@@ -49,11 +49,11 @@ import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.morgan.util.io.StreamUtils;
 
-import sun.misc.BASE64Encoder;
-import sun.security.provider.X509Factory;
 import edu.virginia.vcgr.genii.security.CertificateValidator;
 import edu.virginia.vcgr.genii.security.TrustStoreProvider;
 import edu.virginia.vcgr.genii.security.identity.Identity;
+import sun.misc.BASE64Encoder;
+import sun.security.provider.X509Factory;
 
 public class SecurityUtilities implements CertificateValidator
 {
@@ -70,7 +70,7 @@ public class SecurityUtilities implements CertificateValidator
 	}
 
 	/**
-	 * Set up our cryptography provider.
+	 * Set up our cryptography provider and other initial state items for security.
 	 */
 	public static void initializeSecurity()
 	{

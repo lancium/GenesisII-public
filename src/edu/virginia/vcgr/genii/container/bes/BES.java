@@ -162,11 +162,11 @@ public class BES implements Closeable
 		}
 	}
 
-	synchronized static public BES getBES(String besid)
+	synchronized static public BES getBES(String besid) throws IllegalStateException
 	{
-		if (_connectionPool == null)
+		if (_connectionPool == null) {
 			throw new IllegalStateException("BES instances not initialized.");
-
+		}
 		return _knownInstances.get(besid);
 	}
 

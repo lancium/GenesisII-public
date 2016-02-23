@@ -5,6 +5,8 @@
 # eliminate stripping of binaries.
 %global __os_install_post %{nil}
 
+%define debug_package %{nil}
+
 Summary: Genesis II is an open source, standards based grid platform designed to support both high-throughput computing and secure data sharing
 Name: genesis2-%GRID%
 Version: %VER%
@@ -66,12 +68,15 @@ cp -rf $GEN2_SOURCE_LOC/INSTALL \
   $GEN2_SOURCE_LOC/installer/scripts \
   $GEN2_SOURCE_LOC/lib \
   $GEN2_SOURCE_LOC/webapps \
-  $GEN2_SOURCE_LOC/xsede_tools \
+  $GEN2_SOURCE_LOC/toolkit \
   $GEN2_BUILDOUT
 
 # copy in the generated jar files.
 cp -rf $GEN2_SOURCE_LOC/generated/* \
   $GEN2_BUILDOUT/ext/
+
+# set up the bin directory.
+mkdir -p $GEN2_BUILDOUT/bin
 
 # set up the application property files.
 cp -Rf $GEN2_SOURCE_LOC/scripts/genii-* $GEN2_BUILDOUT/ext
@@ -96,27 +101,48 @@ chmod a+rx $GEN2_BUILDOUT/jni-lib/* $GEN2_BUILDOUT/JavaServiceWrapper/wrapper/bi
 # fix pattern for jni and write grid script.
 sed -e 's/%{GENII_JNI_PATH}/jni-lib/' \
   -e 's/%{CLIENT_LOG4JCONFIG}/production.client.log4j.properties/' \
-  < $GEN2_SOURCE_LOC/scripts/grid >$GEN2_BUILDOUT/grid
-chmod 755 $GEN2_BUILDOUT/grid
+  < $GEN2_SOURCE_LOC/scripts/grid >$GEN2_BUILDOUT/bin/grid
+chmod 755 $GEN2_BUILDOUT/bin/grid
 
 # copy the simple scripts and config files that are already ready.
-cp $GEN2_SOURCE_LOC/scripts/client-ui \
-  $GEN2_SOURCE_LOC/scripts/jar-desc.xml \
+cp $GEN2_SOURCE_LOC/scripts/jar-desc.xml \
   $GEN2_SOURCE_LOC/scripts/set_gffs_vars \
   $GEN2_BUILDOUT
-chmod 755 $GEN2_BUILDOUT/client-ui
+cp $GEN2_SOURCE_LOC/scripts/client-ui \
+  $GEN2_BUILDOUT/bin
+chmod 755 $GEN2_BUILDOUT/bin/client-ui
+cp $GEN2_SOURCE_LOC/scripts/fastgrid \
+  $GEN2_BUILDOUT/bin
+chmod 755 $GEN2_BUILDOUT/bin/fastgrid
+
+# some new copies of library scripts where they can be found in path.
+cp $GEN2_SOURCE_LOC/toolkit/library/backup_container_state.sh \
+  $GEN2_BUILDOUT/bin/backup_container_state
+chmod 755 $GEN2_BUILDOUT/bin/backup_container_state
+cp $GEN2_SOURCE_LOC/toolkit/library/restore_container_state.sh \
+  $GEN2_BUILDOUT/bin/restore_container_state
+chmod 755 $GEN2_BUILDOUT/bin/restore_container_state
+cp $GEN2_SOURCE_LOC/toolkit/library/list_genesis_javas.sh \
+  $GEN2_BUILDOUT/bin/list_genesis_javas
+chmod 755 $GEN2_BUILDOUT/bin/list_genesis_javas
+cp $GEN2_SOURCE_LOC/toolkit/library/zap_genesis_javas.sh \
+  $GEN2_BUILDOUT/bin/zap_genesis_javas
+chmod 755 $GEN2_BUILDOUT/bin/zap_genesis_javas
+cp $GEN2_SOURCE_LOC/toolkit/library/maybe_restart_container.sh \
+  $GEN2_BUILDOUT/bin/maybe_restart_container
+chmod 755 $GEN2_BUILDOUT/bin/maybe_restart_container
 
 # copy some others that require renaming.
 cp $GEN2_SOURCE_LOC/lib/gffs.exports.template $GEN2_BUILDOUT/lib/gffs.exports
 cp $GEN2_SOURCE_LOC/lib/export.properties.template $GEN2_BUILDOUT/lib/export.properties
-cp $GEN2_SOURCE_LOC/scripts/gffschown.template $GEN2_BUILDOUT/gffschown
-chmod 755 $GEN2_BUILDOUT/gffschown
-cp $GEN2_SOURCE_LOC/scripts/proxyio.launcher.template $GEN2_BUILDOUT/proxyio.launcher
-chmod 755 $GEN2_BUILDOUT/proxyio.launcher
+cp $GEN2_SOURCE_LOC/scripts/gffschown.template $GEN2_BUILDOUT/bin/gffschown
+chmod 755 $GEN2_BUILDOUT/bin/gffschown
+cp $GEN2_SOURCE_LOC/scripts/proxyio.launcher.template $GEN2_BUILDOUT/bin/proxyio.launcher
+chmod 755 $GEN2_BUILDOUT/bin/proxyio.launcher
 cp $GEN2_SOURCE_LOC/installer/data_files/container.properties $GEN2_BUILDOUT/lib/container.properties
 cp $GEN2_SOURCE_LOC/installer/data_files/client.properties $GEN2_BUILDOUT/lib/client.properties
-cp $GEN2_SOURCE_LOC/scripts/cert-tool $GEN2_BUILDOUT/cert-tool
-chmod 755 $GEN2_BUILDOUT/cert-tool
+cp $GEN2_SOURCE_LOC/scripts/cert-tool $GEN2_BUILDOUT/bin/cert-tool
+chmod 755 $GEN2_BUILDOUT/bin/cert-tool
 
 # copy the right deployment into place.
 mkdir $GEN2_BUILDOUT/deployments
@@ -132,13 +158,13 @@ rm -f $GEN2_BUILDOUT/deployments/default/configuration/bootstrap.xml \
 #ls -al $GEN2_BUILDOUT/deployments/default/security
 
 # toss some xsede tools denizens that shouldn't be conveyed.
-rm -rf $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/generated_certs \
-  $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/gridwide_certs \
-  $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/certificate-config.txt \
-  $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/passwords.txt \
-  $GEN2_BUILDOUT/xsede_tools/tools/deployment_generator/saved_deployment_info.txt \
-  $GEN2_BUILDOUT/xsede_tools/inputfile.txt \
-  $GEN2_BUILDOUT/xsede_tools/xsede_tools.cfg
+rm -rf $GEN2_BUILDOUT/toolkit/tools/deployment_generator/generated_certs \
+  $GEN2_BUILDOUT/toolkit/tools/deployment_generator/gridwide_certs \
+  $GEN2_BUILDOUT/toolkit/tools/deployment_generator/certificate-config.txt \
+  $GEN2_BUILDOUT/toolkit/tools/deployment_generator/passwords.txt \
+  $GEN2_BUILDOUT/toolkit/tools/deployment_generator/saved_deployment_info.txt \
+  $GEN2_BUILDOUT/toolkit/inputfile.txt \
+  $GEN2_BUILDOUT/toolkit/gffs_toolkit.config
 
 echo done with RPM install step.
 
@@ -164,17 +190,23 @@ bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 /opt/genesis2-%GRID%/lib
 /opt/genesis2-%GRID%/scripts
 /opt/genesis2-%GRID%/webapps
-/opt/genesis2-%GRID%/xsede_tools
+/opt/genesis2-%GRID%/toolkit
 
-/opt/genesis2-%GRID%/cert-tool
-/opt/genesis2-%GRID%/client-ui
+/opt/genesis2-%GRID%/bin/cert-tool
+/opt/genesis2-%GRID%/bin/client-ui
 /opt/genesis2-%GRID%/current.version
 /opt/genesis2-%GRID%/current.deployment
-/opt/genesis2-%GRID%/gffschown
-/opt/genesis2-%GRID%/grid
+/opt/genesis2-%GRID%/bin/gffschown
+/opt/genesis2-%GRID%/bin/grid
+/opt/genesis2-%GRID%/bin/fastgrid
 /opt/genesis2-%GRID%/jar-desc.xml
 /opt/genesis2-%GRID%/set_gffs_vars
-/opt/genesis2-%GRID%/proxyio.launcher
+/opt/genesis2-%GRID%/bin/proxyio.launcher
+/opt/genesis2-%GRID%/bin/backup_container_state
+/opt/genesis2-%GRID%/bin/restore_container_state
+/opt/genesis2-%GRID%/bin/list_genesis_javas
+/opt/genesis2-%GRID%/bin/zap_genesis_javas
+/opt/genesis2-%GRID%/bin/maybe_restart_container
 
 %changelog
 * Wed Jul 23 2014 Chris Koeritz <koeritz@virginia.edu> 

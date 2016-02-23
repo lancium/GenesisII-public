@@ -1,8 +1,10 @@
 package edu.virginia.vcgr.genii.algorithm.structures.cache;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -45,6 +47,14 @@ public class TimedOutLRUCache<KeyType, DataType>
 		_timeoutList = new TimeoutList<KeyType, DataType>();
 	}
 
+	/**
+	 * returns the number of elements held in the cache currently.
+	 */
+	public int size()
+	{
+		return _map.size();
+	}
+
 	public void activelyTimeoutElements(boolean activelyTimeout)
 	{
 		synchronized (_map) {
@@ -75,6 +85,8 @@ public class TimedOutLRUCache<KeyType, DataType>
 
 			while (_map.size() >= _maxElements) {
 				RoleBasedCacheNode<KeyType, DataType> node = _lruList.removeFirst();
+				if (_logger.isDebugEnabled())
+					_logger.debug("overloaded cache: removing cached item with key: " + node.getKey());
 				_timeoutList.remove(node);
 				_map.remove(node.getKey());
 			}
@@ -111,6 +123,9 @@ public class TimedOutLRUCache<KeyType, DataType>
 			node.setInvalidationDate(_defaultTimeoutMS);
 			// move the node to the end of the LRU list, since we just accessed it.
 			_lruList.insert(node);
+			// also fix its position in the timeout list.
+			_timeoutList.remove(node);
+			_timeoutList.insert(node);
 			return true;
 		}
 	}
@@ -125,6 +140,8 @@ public class TimedOutLRUCache<KeyType, DataType>
 			_lruList.remove(node);
 			if (node.getInvalidationDate().before(now)) {
 				// this entry has become stale.
+				if (_logger.isDebugEnabled())
+					_logger.debug("timed-out entry in get: removing cached item with key: " + node.getKey());
 				_map.remove(key);
 				_timeoutList.remove(node);
 				return null;
@@ -133,6 +150,33 @@ public class TimedOutLRUCache<KeyType, DataType>
 			_lruList.insert(node);
 			return node.getData();
 		}
+	}
+
+	public List<DataType> getAll()
+	{
+		ArrayList<DataType> toReturn = new ArrayList<DataType>();
+		synchronized (_map) {
+			for (KeyType key : _map.keySet()) {
+				toReturn.add(_map.get(key).getData());
+			}
+		}
+		return toReturn;
+	}
+
+	public List<DataType> getAllReferenced(List<KeyType> references)
+	{
+		ArrayList<DataType> toReturn = new ArrayList<DataType>();
+		synchronized (_map) {
+			for (KeyType key : references) {
+				//// for (KeyType key : _map.keySet()) {
+				if (_map.containsKey(key)) {
+					toReturn.add(_map.get(key).getData());
+				} else {
+					_logger.error("failed to locate referenced object in cache: " + key);
+				}
+			}
+		}
+		return toReturn;
 	}
 
 	public void clearStale()
