@@ -19,20 +19,15 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig;
-import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.LightweightNotificationServer;
 import edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPortType;
 import edu.virginia.vcgr.genii.notification.broker.IndirectSubscriptionEntryType;
 import edu.virginia.vcgr.genii.notification.broker.IndirectSubscriptionType;
 import edu.virginia.vcgr.genii.notification.broker.SubscriptionFailedFaultType;
-import edu.virginia.vcgr.genii.security.TransientCredentials;
-import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
 
 /*
  * This is the class for creating subscriptions for cache management. This works by running two cooperating threads. The first is responsible
@@ -41,7 +36,7 @@ import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
  */
 public class SubscriptionOutcallHandler extends Thread
 {
-	private static Log _logger = LogFactory.getLog(SubscriptionOutcallHandler.class);
+	public static Log _logger = LogFactory.getLog(SubscriptionOutcallHandler.class);
 
 	// This is not the correct solution. We have to adjust the sampling frequency based on
 	// the expected round-trip time for an RPC.
@@ -153,24 +148,6 @@ public class SubscriptionOutcallHandler extends Thread
 		}
 	}
 
-	// hmmm: !!! move this to a nice location lower than here!
-	public static boolean areCredentialsOkay(ICallingContext callingContext)
-	{
-		KeyAndCertMaterial clientKeyMaterial;
-		try {
-			clientKeyMaterial =
-				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
-		} catch (AuthZSecurityException e) {
-			_logger.error("got an exception when trying to load calling context", e);
-			return false;
-		}
-		if (clientKeyMaterial == null) {
-			throw new RuntimeException("failed to retrieve a valid TLS certificate for the client");
-		}
-		TransientCredentials tranCreds = TransientCredentials.getTransientCredentials(callingContext);
-		return (tranCreds != null) && !tranCreds.isEmpty();
-	}
-
 	private void createSubscription(PendingSubscription subscriptionRequest)
 	{
 		Closeable assumedContextToken = null;
@@ -181,7 +158,7 @@ public class SubscriptionOutcallHandler extends Thread
 
 				assumedContextToken = ContextManager.temporarilyAssumeContext(callingContext);
 
-				if (!areCredentialsOkay(callingContext)) {
+				if (!ClientUtils.areCredentialsOkay(callingContext)) {
 					_logger.debug("bailing out of subscription creation since we have no credentials: req=" + subscriptionRequest);
 					return;
 				}

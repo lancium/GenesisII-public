@@ -114,15 +114,15 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						// and skip directories, since they are not files...
 						if (ownerFile.isDirectory())
 							continue;
-						if (_logger.isDebugEnabled())
-							_logger.debug("adding " + ownerFile + " as container owner certificate file.");
+						// try to lookup that certificate in our cache.
 						X509Certificate ownerCert = _defaultCertCache.get(ownerFile.getName());
 						if (ownerCert == null) {
+							// we didn't have it yet, so load it now.
 							try {
 								CertificateFactory cf = CertificateFactory.getInstance("X.509");
 								FileInputStream fin = null;
-								// strange extra exception block eliminates stream close complaints.
 								try {
+									// load the cert from the file, if possible, and stash it in the cache.
 									ownerCert = (X509Certificate) cf.generateCertificate(fin = new FileInputStream(ownerFile));
 									_defaultCertCache.put(ownerFile.getName(), ownerCert);
 								} finally {
@@ -134,13 +134,17 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 						}
 						ownerCerts.add(ownerCert);
 						if (_logger.isDebugEnabled())
-							_logger.debug("setting up administrator access for " + ownerCert.getSubjectDN());
+							_logger
+								.debug("default resource owner certificate in " + ownerFile + " added with DN: " + ownerCert.getSubjectDN());
 					}
 
 					_defaultInitialResourceOwners = ownerCerts.toArray(new X509Certificate[ownerCerts.size()]);
 				}
 			} else {
 				_defaultInitialResourceOwners = new X509Certificate[] { Container.getContainerCertChain()[0] };
+				if (_logger.isDebugEnabled())
+					_logger.warn("no owner certificate was found for the container");
+
 			}
 		}
 	}
@@ -202,7 +206,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			context = ContextManager.getCurrentContext();
 			mask = (String) context.getSingleValueProperty(GenesisIIConstants.CREATION_MASK);
 		} catch (Exception e) {
-			_logger.debug("Could not acquire calling context to retrieve creation mask");
+			if (_logger.isTraceEnabled())
+				_logger.debug("setDefaultAccess could not acquire calling context to retrieve creation mask");
 		}
 		if (mask == null)
 			mask = "rwx";

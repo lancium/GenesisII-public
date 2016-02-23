@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
+import edu.virginia.vcgr.genii.security.credentials.CredentialCache;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 public class ApplicationBase
@@ -80,6 +81,21 @@ public class ApplicationBase
 			System.exit(1);
 		}
 		SecurityUtilities.initializeSecurity();
+
+		//
+
+		// hmmm: weirdo inits for streamlining; may want to move to their own bag.
+		CredentialCache.CLIENT_CREDENTIAL_STREAMLINING_ENABLED =
+			ClientProperties.getClientProperties().getClientCredentialStreamliningEnabled();
+		CredentialCache.SERVER_CREDENTIAL_STREAMLINING_ENABLED =
+			ContainerProperties.getContainerProperties().getContainerCredentialStreamliningEnabled();
+
+		if (_logger.isDebugEnabled()) {
+			_logger.debug("container streamlining state: support as client=" + CredentialCache.CLIENT_CREDENTIAL_STREAMLINING_ENABLED
+				+ ", support as server=" + CredentialCache.SERVER_CREDENTIAL_STREAMLINING_ENABLED);
+		}
+
+		//
 
 		_containerLinkage = new TrustStoreLinkage();
 

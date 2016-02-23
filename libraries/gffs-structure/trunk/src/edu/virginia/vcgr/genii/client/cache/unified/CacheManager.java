@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierT
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.NotificationBrokerDirectory;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subscriber;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.SubscriptionDirectory;
+import edu.virginia.vcgr.genii.security.credentials.ClientCredentialTracker;
 
 /*
  * This is the facet that mediates all cache related operation issued from other places of the code. Additionally, when different caches want
@@ -322,13 +323,16 @@ public class CacheManager
 			SubscriptionDirectory.clearDirectory();
 			// flush any subscriptions that are still pending.
 			Subscriber.getInstance().flushPendingSubscriptions();
+			// flush all tracking information on credentials.
+			ClientCredentialTracker.flushEntireTracker();
 
 			try {
 				// drop any connections that are established to avoid keeping session alive with wrong creds.
 				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+				// we close idle with an idle timeout of 0, which should mean everyone, even active connections.
 				connMgr.closeIdleConnections(0);
 			} catch (Throwable t) {
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("screwup from closing idle connections", t);
 			}
 		} catch (Exception ex) {

@@ -357,7 +357,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 		elements[0] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"), xup.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
-		org.apache.axis.message.MessageElement wseTokenRef = creds.convertToSOAPElement();
+		org.apache.axis.message.MessageElement wseTokenRef = creds.convertToSOAPElement(null, null);
 
 		elements[1] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "RequestedSecurityToken"),
 			new RequestedSecurityTokenType(Elementals.unitaryArray(wseTokenRef)));

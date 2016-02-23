@@ -128,7 +128,9 @@ public class RNSCacheLookupHandler
 			} catch (Exception e) {
 				_logger.trace("could not get information about the short form");
 			}
-			_logger.debug("short form: " + shortForm + " for lookup on " + resourceConfig.getRnsPath());
+			// this has been quieted since it is showing up constantly in the logs.
+			if (_logger.isTraceEnabled())
+				_logger.debug("short form: " + shortForm + " for lookup on " + resourceConfig.getRnsPath());
 
 			// for any call from FUSE we will need to ensure that some attributes are there for the
 			// entries of RNS-Lookup-Response list

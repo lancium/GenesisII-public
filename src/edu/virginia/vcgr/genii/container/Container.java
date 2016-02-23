@@ -100,6 +100,12 @@ public class Container extends ApplicationBase
 
 	static private CrlInvigoratorThread _crlInvigorator = null;
 
+	/*
+	 * controls whether the container is allowed to cache things and whether it's allowed to subscribe to notifications.
+	 */
+	static private boolean allowContainersToCache = true;
+	static private boolean allowContainersToSubscribe = true;
+
 	// Default to 1 year certificate lifespan.
 	static private long _defaultCertificateLifetime = 1000L * 60L * 60L * 24L * 365L;
 
@@ -299,8 +305,6 @@ public class Container extends ApplicationBase
 		 * if caching is to be disabled for containers, this is where it's done. we've had some good success with allowing full caching for
 		 * the container though.
 		 */
-		boolean allowContainersToCache = false;
-		boolean allowContainersToSubscribe = false;
 		if (!allowContainersToSubscribe)
 			CacheConfigurer.disableSubscriptionBasedCaching();
 		if (!allowContainersToCache)

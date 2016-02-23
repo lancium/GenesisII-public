@@ -30,6 +30,7 @@ import edu.virginia.vcgr.genii.client.security.TrustStoreLinkage;
 import edu.virginia.vcgr.genii.client.security.UpdateGridCertsTool;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
+import edu.virginia.vcgr.genii.security.credentials.CredentialCache;
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
 public class Driver extends ApplicationBase
@@ -62,6 +63,13 @@ public class Driver extends ApplicationBase
 		}
 
 		SecurityUtilities.initializeSecurity();
+
+		// weirdo inits; may want to move to their own bag.
+		CredentialCache.CLIENT_CREDENTIAL_STREAMLINING_ENABLED =
+			ClientProperties.getClientProperties().getClientCredentialStreamliningEnabled();
+		if (_logger.isTraceEnabled())
+			_logger.debug("cred streamlining is " + (CredentialCache.CLIENT_CREDENTIAL_STREAMLINING_ENABLED ? "enabled" : "disabled")
+				+ " for this client.");
 
 		try {
 			// container key not used on client side.
@@ -177,8 +185,10 @@ public class Driver extends ApplicationBase
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-		// we need to load the keystore before we update the certs, or we will have a deadlock.
-		KeystoreManager.getTlsTrustStore();
+		if ((gridOkay == GridStates.CONNECTION_ALREADY_GOOD ) || (gridOkay == GridStates.CONNECTION_GOOD_NOW) ) {
+			// we need to load the keystore before we update the certs, or we will have a deadlock.
+			KeystoreManager.getTlsTrustStore();
+		}
 
 		if (args.length == 0 || (args.length == 1 && args[0].equals("shell"))) {
 			while (true) {

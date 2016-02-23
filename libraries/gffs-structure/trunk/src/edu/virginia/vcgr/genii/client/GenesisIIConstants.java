@@ -76,8 +76,22 @@ public class GenesisIIConstants
 
 	static public final QName CLIENT_ID_QNAME = new QName(GENESISII_NS, CLIENT_ID_ATTRIBUTE_NAME);
 
+	// this section name surrounds all the delegated saml assertions in the soap header.
 	static public final String DELEGATED_SAML_ASSERTIONS_NAME = "delegated-saml-credentials";
 	static public final QName DELEGATED_SAML_ASSERTIONS_QNAME = new QName(GENESISII_NS, DELEGATED_SAML_ASSERTIONS_NAME);
+
+	// this section name surrounds the references to previously sent credentials for credential streamlining.
+	static public final String REFERENCED_SAML_CREDENTIALS_NAME = "credential-references";
+	static public final QName REFERENCED_SAML_CREDENTIALS_QNAME = new QName(GENESISII_NS, REFERENCED_SAML_CREDENTIALS_NAME);
+
+	/*
+	 * this phrase is sent in faults where the resource access attempt fails.
+	 */
+	static public final String ACCESS_DENIED_SENTINEL = "Access denied";
+
+	// these are used for individual cred references inside the references section.
+	static public final String ONE_CREDENTIAL_REFERENCE_NAME = "cred-ref";
+	static public final QName ONE_CREDENTIAL_REFERENCE_QNAME = new QName(GENESISII_NS, ONE_CREDENTIAL_REFERENCE_NAME);
 
 	static public final QName MYPROXY_QNAME = new QName(UNICORE_NS, MYPROXY_ATTRIBUTE_NAME);
 	static public final String myproxyFilenameSuffix = "teragrid_x509.pem";

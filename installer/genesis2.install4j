@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.15" transformSequenceNumber="4">
-  <directoryPresets config="../scripts/cert-tool" />
+  <directoryPresets config="../grid" />
   <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -39,7 +39,7 @@
     <filesets>
       <fileset name="Deployment Files" id="5992" customizedId="" />
       <fileset name="Careful lib folder" id="8166" customizedId="" />
-      <fileset name="xsede tools" id="8738" customizedId="" />
+      <fileset name="toolkit" id="8738" customizedId="" />
     </filesets>
     <roots>
       <root id="5993" fileset="5992" location="" />
@@ -86,6 +86,7 @@
           <entry location="build.properties" fileType="regular" />
           <entry location=".project" fileType="regular" />
           <entry location="deployments" fileType="regular" />
+          <entry location="grid" fileType="regular" />
           <entry location="lib" fileType="regular" />
           <entry location="bin.eclipse" fileType="regular" />
           <entry location="ext/genii-base-application.properties" fileType="regular" />
@@ -97,7 +98,6 @@
           <entry location="JavaServiceWrapper/wrapper/src" fileType="regular" />
           <entry location="JavaServiceWrapper/wrapper/jdoc.tar.gz" fileType="regular" />
           <entry location="JavaServiceWrapper/wrapper/doc" fileType="regular" />
-          <entry location="toolkit" fileType="regular" />
           <entry location="unit-test-reports" fileType="regular" />
           <entry location="scripts" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
@@ -113,6 +113,7 @@
           <entry location=".classpath" fileType="regular" />
           <entry location="BUILDME" fileType="regular" />
           <entry location="libraries" fileType="regular" />
+          <entry location="toolkit" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../scripts/jar-desc.xml" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
@@ -129,6 +130,7 @@
           <entry location="fastgrid" fileType="regular" />
         </exclude>
       </dirEntry>
+      <fileEntry mountPoint="34" file="../grid" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="5995" file="../deployments/default" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude>
           <entry location="configuration/bootstrap.xml" fileType="regular" />
@@ -178,19 +180,19 @@
         <include all="false">
           <entry location="jre-addin" fileType="regular" />
           <entry location="scripts" fileType="regular" />
-          <entry location="JavaServiceWrapper" fileType="regular" />
-          <entry location="docs" fileType="regular" />
+          <entry location="webapps" fileType="regular" />
           <entry location="dpages" fileType="regular" />
-          <entry location="RELEASE" fileType="regular" />
-          <entry location="generated" fileType="regular" />
-          <entry location="bundles" fileType="regular" />
           <entry location="jni-libs" fileType="regular" />
+          <entry location="grid" fileType="regular" />
+          <entry location="current.version" fileType="regular" />
+          <entry location="JavaServiceWrapper" fileType="regular" />
           <entry location="INSTALL" fileType="regular" />
           <entry location="current.deployment" fileType="regular" />
-          <entry location="License.txt" fileType="regular" />
-          <entry location="current.version" fileType="regular" />
           <entry location="eclipse" fileType="regular" />
-          <entry location="webapps" fileType="regular" />
+          <entry location="RELEASE" fileType="regular" />
+          <entry location="docs" fileType="regular" />
+          <entry location="License.txt" fileType="regular" />
+          <entry location="bundles" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
           <entry location="set_gffs_vars" fileType="regular" />
           <entry location="ext" fileType="regular" />
@@ -1912,7 +1914,7 @@ return true;
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
                       <void property="files">
-                        <array class="java.io.File" length="9">
+                        <array class="java.io.File" length="8">
                           <void index="0">
                             <object class="java.io.File">
                               <string>GFFSContainer</string>
@@ -1945,15 +1947,10 @@ return true;
                           </void>
                           <void index="6">
                             <object class="java.io.File">
-                              <string>grid</string>
-                            </object>
-                          </void>
-                          <void index="7">
-                            <object class="java.io.File">
                               <string>gffschown</string>
                             </object>
                           </void>
-                          <void index="8">
+                          <void index="7">
                             <object class="java.io.File">
                               <string>proxyio.launcher</string>
                             </object>

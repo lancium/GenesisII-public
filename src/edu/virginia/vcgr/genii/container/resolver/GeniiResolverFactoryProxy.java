@@ -34,7 +34,7 @@ public class GeniiResolverFactoryProxy implements IResolverFactoryProxy
 	 * Register the given EPR with a resolver. Return an EPR with targetEPR's address and resource-key, and with a resolver element.
 	 * 
 	 * @param confProperties
-	 *            The properties from server-config.xml.
+	 *            The properties from server configuration file.
 	 * @param resolverProperties
 	 *            The properties from postCreate().
 	 */

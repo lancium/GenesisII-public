@@ -84,6 +84,9 @@ public class ClientProperties extends Properties
 	static private final String MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY =
 		"edu.virginia.vcgr.genii.client.io.uri-manager.max-simultaneous-connections";
 
+	// flag that can be set to true / false for credential streamlining.
+	static final public String CLIENT_CREDENTIAL_STREAMLINING_ENABLED = "gffs.client.credential_streamlining";
+
 	/* ... */
 
 	// our singular instance of this class.
@@ -189,6 +192,33 @@ public class ClientProperties extends Properties
 		if (toReturn == null)
 			toReturn = getProperty(CLIENT_REQUEST_TIMEOUT_PROPERTY);
 		return Integer.parseInt(toReturn == null ? "" + DEFAULT_CLIENT_REQUEST_TIMEOUT : toReturn);
+	}
+
+	/**
+	 * reports whether the client has the credential streamlining enabled or not. the default is for it to be enabled.
+	 */
+	public boolean getClientCredentialStreamliningEnabled()
+	{
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(CLIENT_CREDENTIAL_STREAMLINING_ENABLED);
+
+		if (_logger.isTraceEnabled())
+			_logger.debug("first, got the cred streamline flag from install props as: " + toReturn);
+
+		if (toReturn == null) {
+			toReturn = getProperty(CLIENT_CREDENTIAL_STREAMLINING_ENABLED);
+			if (_logger.isTraceEnabled())
+				_logger.debug("second, got the cred streamline flag from client props as: " + toReturn);
+		}
+
+		if (toReturn == null)
+			return true; // default case.
+		if (toReturn.equalsIgnoreCase("false"))
+			return false;
+		if (toReturn.equals("0"))
+			return false;
+		if (toReturn.equals("no"))
+			return false;
+		return true;
 	}
 
 	/**

@@ -29,8 +29,8 @@ public class ConfigurationManager
 	private File _userDir;
 
 	// Client and Container configuration files
-	private XMLConfiguration _clientConf;
-	private XMLConfiguration _serverConf;
+	private XMLConfiguration _clientConf = null;
+	private XMLConfiguration _serverConf = null;
 
 	// denotes type of configuration for this process
 	private Boolean _isClient = null;
@@ -137,7 +137,9 @@ public class ConfigurationManager
 			Deployment deployment = Installation.getDeployment(new DeploymentName());
 
 			_clientConf = new XMLConfiguration(deployment.getConfigurationFile(_CLIENT_CONF_FILENAME));
-			_serverConf = new XMLConfiguration(deployment.getConfigurationFile(_SERVER_CONF_FILENAME));
+			File servConf = deployment.getConfigurationFile(_SERVER_CONF_FILENAME);
+			if (servConf.exists())
+				_serverConf = new XMLConfiguration(servConf);
 
 			File fsConf = deployment.getConfigurationFile("filesystems.xml");
 			if (fsConf.exists())
@@ -151,6 +153,9 @@ public class ConfigurationManager
 
 	public XMLConfiguration getContainerConfiguration()
 	{
+		if (_serverConf == null)
+			throw new RuntimeException("failed to load server configuration on this deployment");
+
 		return _serverConf;
 	}
 
@@ -200,9 +205,9 @@ public class ConfigurationManager
 			throw new RuntimeException("Role not set.");
 
 		if (_isClient.booleanValue())
-			return _clientConf;
+			return getClientConfiguration();
 		else
-			return _serverConf;
+			return getContainerConfiguration();
 	}
 
 	synchronized public boolean isClientRole()

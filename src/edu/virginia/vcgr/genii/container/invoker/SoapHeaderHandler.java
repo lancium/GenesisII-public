@@ -21,6 +21,7 @@ import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.container.axis.WSAddressingExtractor;
+import edu.virginia.vcgr.genii.security.credentials.CredentialCache;
 
 public class SoapHeaderHandler implements IAroundInvoker
 {
@@ -36,9 +37,10 @@ public class SoapHeaderHandler implements IAroundInvoker
 	static private QName _WS_ADDR_REPLY_TO_QNAME = new QName(_WS_ADDR_NS, _WS_ADDR_REPLY_TO);
 	static private QName _WS_ADDR_ACTION_QNAME = new QName(_WS_ADDR_NS, _WS_ADDR_ACTION);
 
-	static private QName IS_GENII_ELEMENT_NAME = GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME;
-	static private QName GENII_VERSION_ELEMENT_NAME = GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION;
-
+	/**
+	 * this handler seems to be the container's main interface for both receiving and sending soap. the first portion plucks out things that
+	 * were seen in the request header and the second portion adds things for the outgoing header. this can get confusing.
+	 */
 	public Object invoke(InvocationContext invocationContext) throws Exception
 	{
 		MessageContext msgCtxt = invocationContext.getMessageContext();
@@ -55,10 +57,8 @@ public class SoapHeaderHandler implements IAroundInvoker
 		String action = null;
 		Version clientVersion = null;
 		boolean isGeniiClient = false;
-		boolean supportsShorthand = false;
 
-		// hmmm: !!!! use the value for shorthand someplace!!!
-
+		// request handling portion starts here...
 		Message msg = msgCtxt.getRequestMessage();
 		SOAPHeader header = msg.getSOAPHeader();
 		NodeList list = header.getChildNodes();
@@ -88,23 +88,14 @@ public class SoapHeaderHandler implements IAroundInvoker
 					}
 				} else if (nodeName.equals(_WS_ADDR_ACTION_QNAME)) {
 					action = node.getFirstChild().getNodeValue();
-				} else if (nodeName.equals(IS_GENII_ELEMENT_NAME)) {
+				} else if (nodeName.equals(GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME)) {
 					Node child = node.getFirstChild();
 					if (child != null) {
 						String value = child.getNodeValue();
 						if (value != null && value.equalsIgnoreCase("true"))
 							isGeniiClient = true;
 					}
-				} else if (nodeName.equals(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_NAME)) {
-					// hmmm: THIS IS TURNED OFF FOR NOW until feature is implemented.
-
-					// Node child = node.getFirstChild();
-					// if (child != null) {
-					// String value = child.getNodeValue();
-					// if (value != null && value.equalsIgnoreCase("true"))
-					// supportsShorthand = true;
-					// }
-				} else if (nodeName.equals(GENII_VERSION_ELEMENT_NAME)) {
+				} else if (nodeName.equals(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION_QNAME)) {
 					Node child = node.getFirstChild();
 					if (child != null) {
 						String value = child.getNodeValue();
@@ -127,13 +118,15 @@ public class SoapHeaderHandler implements IAroundInvoker
 
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
 
-		// hmmm: these values that get set in the working context don't ever seem to be used.
+		// hmmm: these two values that get set in the working context don't ever seem to be used.
 		ctxt.setProperty(GeniiSOAPHeaderConstants.GENII_ENDPOINT_NAME, isGeniiClient);
-		if (clientVersion != null)
+		if (clientVersion != null) {
 			ctxt.setProperty(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION_NAME, clientVersion);
-		ctxt.setProperty(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_NAME, supportsShorthand);
+		}
 
 		Object obj = invocationContext.proceed();
+
+		// now see if we have a response header we're about to generate. we will add some stuff.
 		msg = msgCtxt.getResponseMessage();
 		if (msg == null) {
 			// It's a one way message
@@ -141,8 +134,6 @@ public class SoapHeaderHandler implements IAroundInvoker
 		}
 
 		header = msg.getSOAPHeader();
-
-		// hmmm: !!! are we actually adding the version and endpoint qname twice?? these are done in the axis header handler too.
 
 		// Add the genii-endpoint element
 		SOAPHeaderElement geniiEndpoint = new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME, Boolean.TRUE);
@@ -156,22 +147,19 @@ public class SoapHeaderHandler implements IAroundInvoker
 			Version serverVersion = console.currentVersion();
 			if (serverVersion != null && !(serverVersion.equals(Version.EMPTY_VERSION))) {
 				SOAPHeaderElement versionElement =
-					new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION, serverVersion.toString());
+					new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION_QNAME, serverVersion.toString());
 				versionElement.setActor(null);
 				versionElement.setMustUnderstand(false);
 				header.addChildElement(versionElement);
 			}
 		}
 
-		// hmmm: NOT ADDING CRED SHORTHAND HEADER YET
-
-		// // add in the credential shorthand flag here too. again.
-		// // hmmm: really? adding these all twice?
-		// SOAPHeaderElement shorthand =
-		// new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_QNAME, Boolean.TRUE);
-		// shorthand.setActor(null);
-		// shorthand.setMustUnderstand(false);
-		// header.addChildElement(shorthand);
+		// add in the credential streamlining flag here too, for server side response generation, we think.
+		SOAPHeaderElement streamlining = new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_SUPPORTS_CREDENTIAL_STREAMLINING_QNAME,
+			CredentialCache.SERVER_CREDENTIAL_STREAMLINING_ENABLED ? "true" : "false");
+		streamlining.setActor(null);
+		streamlining.setMustUnderstand(false);
+		header.addChildElement(streamlining);
 
 		// Add the relates to
 		if (messageID != null) {

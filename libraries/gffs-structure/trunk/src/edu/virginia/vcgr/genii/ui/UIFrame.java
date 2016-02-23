@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
+import java.util.ArrayList;
 
 import javax.swing.JMenuBar;
 
@@ -74,6 +75,38 @@ public class UIFrame extends BasicFrameWindow
 		}
 	}
 
+	/**
+	 * handles sending any pending UI events for all known windows.
+	 */
+	public static void pumpEventsToWindows()
+	{
+		while (true) {
+			ArrayList<BasicFrameWindow> frames = UIFrame.getFrameList();
+			for (BasicFrameWindow fram : frames) {
+
+				try {
+					if (fram instanceof ClientApplication)
+						((ClientApplication) fram).pulseActivities();
+				} catch (Exception e) {
+					_logger.error("failed to pulse activities on UI frame", e);
+				}
+			}
+
+			if (BasicFrameWindow.activeFrames() <= 0) {
+				/*
+				 * we have found that it's time to leave since there are no frames left (although we really only think we'll see this as zero
+				 * and not negative).
+				 */
+				break;
+			}
+			try {
+				Thread.sleep(42);
+			} catch (InterruptedException e) {
+				// ignored.
+			}
+		}
+	}
+
 	public UIContext getUIContext()
 	{
 		return _uiContext;
@@ -92,5 +125,13 @@ public class UIFrame extends BasicFrameWindow
 		{
 			actuateDispose();
 		}
+	}
+
+	/**
+	 * adds a new activity for the UI to take once the main thread calls the pulseActivity method. this method can be implemented by derived
+	 * classes but is empty here.
+	 */
+	public void addActivity(String toAdd)
+	{
 	}
 }

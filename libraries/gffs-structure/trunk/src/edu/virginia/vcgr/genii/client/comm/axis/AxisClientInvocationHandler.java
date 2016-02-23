@@ -44,6 +44,7 @@ import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
@@ -91,6 +92,9 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.credentials.ClientCredentialTracker;
+import edu.virginia.vcgr.genii.security.credentials.CredentialCache;
+import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 
 /**
  * manages RPC calls using our defined axis services. handles resolution and replication issues also.
@@ -110,6 +114,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		 */
 		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
 	}
+
+	// how many times will we allow the credentials to be re-sent before we fail the operation?
+	public static int MAXIMUM_CREDENTIAL_RESENDING_ATTEMPTS = 4;
 
 	public static class ConfigUnloadListener implements ConfigurationUnloadedListener
 	{
@@ -504,7 +511,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	}
 
 	/**
-	 * added resolution code - 1/07 - jfk3w revamped resolution code 4/11/07 - jfk3w.
+	 * added resolution code - 1/07 - jfk3w, revamped resolution code 4/11/07 - jfk3w.
 	 */
 	public Object finalInvoke(Object obj, Method calledMethod, Object[] arguments) throws Throwable
 	{
@@ -576,6 +583,142 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	}
 
 	/**
+	 * if an exception occurs during invocation, this checks the exception to see if it's an omitted credentials message. if the operation
+	 * should be retried after this method corrects the credential records, then true is returned and the handler should continue the big loop
+	 * in resolveAndInvoke. if false is returned, then normal exception handling should take over.
+	 */
+	boolean testForCredentialStreamliningIssues(Throwable throwable, int missingCredsAttemptCounter, AxisClientInvocationHandler handler)
+		throws AxisFault
+	{
+		boolean credOmittedMessage =
+			(throwable.getMessage() != null) && throwable.getMessage().contains(CredentialWallet.OMMITTED_CREDENTIAL_SENTINEL);
+		boolean accessDeniedMessage =
+			(throwable.getMessage() != null) && throwable.getMessage().contains(GenesisIIConstants.ACCESS_DENIED_SENTINEL);
+
+		/*
+		 * so we may have missed tracking something properly. now what? we need to retry the request, but without thinking that the container
+		 * saw the missing creds. we will figure out if we know enough to do that.
+		 */
+		GUID containerGUID = EPRUtils.getGeniiContainerID(handler.getTargetEPR());
+		String guidString = null; // records the guid of the container we're talking to, if we can find that out.
+		if (containerGUID != null) {
+			guidString = containerGUID.toString(true);
+		}
+
+		// we allow up to the max attempts to get the credentials right before we completely fail out.
+		if (missingCredsAttemptCounter >= MAXIMUM_CREDENTIAL_RESENDING_ATTEMPTS) {
+			_logger.warn("have already exhausted credential retry attempts; not trying again.  attempts at " + missingCredsAttemptCounter);
+			return false;
+		}
+		if (!credOmittedMessage && !accessDeniedMessage) {
+			// bail out, since we don't see either message we could work on.
+			return false;
+		}
+
+		if (_logger.isDebugEnabled())
+			_logger.debug("allowing credentials to be re-sent with " + missingCredsAttemptCounter + " previous attempts");
+
+		if (guidString == null) {
+			// if we can't get the guid, we can't fix the records. probably we're hosed?
+			throw new AxisFault("failed to locate container GUID for target; cannot re-send credentials to it");
+		}
+
+		/*
+		 * check a condition here, which is that we only react to access denied problems by retrying iff we guessed that the container
+		 * supported credential streamlining but it probably does not. we don't just retry every access denied fault, since most are real, but
+		 * if we are getting this when we guessed streamlining was supported, then it's very likely because this is an older container. so, if
+		 * we did not guess, or it doesn't even claim to have cred streamlining support, then we don't treat this as a missing credential
+		 * retryable situation. real missing creds should either be due to starting up with an unknown container, or due to problems with
+		 * legitimately streamlining containers who have forgotten a credential.
+		 */
+		boolean okayToRetryCredSending = false;
+		// if we see a streamlining failure message, we know it knows what streamlining is...
+		if (credOmittedMessage) {
+			okayToRetryCredSending = true;
+		} else if (accessDeniedMessage && ClientCredentialTracker.doesContainerSupportStreamlining(guidString)
+			&& !ClientCredentialTracker.didContainerActuallyAnswerStreamliningQuestion(guidString)) {
+			/*
+			 * we got the old access denied message... and we had said this supports streamlining... but the container hadn't confirmed
+			 * this...
+			 */
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("we may have guessed wrong for container " + guidString
+					+ " supporting streamlining and now will retry with this feature disabled");
+			}
+			ClientCredentialTracker.setContainerStreamliningSupport(guidString, false, false);
+			okayToRetryCredSending = true;
+		}
+
+		if (okayToRetryCredSending) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("container did not have a credential we referenced so will try sending again: " + throwable.getMessage());
+
+			// don't allow credentials to be remembered for the retry, if at all possible.
+			// hmmm: can other threads come in an hose this state? this did seem possible and was dealt with by locking code.
+			ClientCredentialTracker.setContainerStreamliningSupport(guidString, false, false);
+
+			boolean failedParsingRefs = false;
+
+			if (credOmittedMessage) {
+				if (missingCredsAttemptCounter == MAXIMUM_CREDENTIAL_RESENDING_ATTEMPTS) {
+					/*
+					 * this is our last try, so we just drop any memory of what the container thinks, since it keeps claiming missing creds.
+					 */
+					_logger.warn("up to maximum attempts to re-send missing creds; wiping memory of container history on client.");
+					failedParsingRefs = true;
+				} else {
+					// try to parse out the credentials that were a problem.
+					String justRefs = throwable.getMessage();
+					int lastColon = justRefs.lastIndexOf(": ");
+					if (lastColon < 0) {
+						failedParsingRefs = true;
+					}
+					// truncate to just the portion we care about.
+					justRefs = justRefs.substring(lastColon + 2);
+					// parse out the credential references now that we have a simpler string.
+					String[] refs = null;
+					if (!failedParsingRefs) {
+						refs = justRefs.split(" ");
+						if ((refs == null) || (refs.length == 0)) {
+							failedParsingRefs = true;
+						}
+					}
+
+					if (!failedParsingRefs) {
+						// hey, we made it, so now we can forget just those individual references.
+						for (String ref : refs) {
+							// hmmm: quiet this one.
+							if (_logger.isDebugEnabled())
+								_logger.debug("forgetting reference '" + ref + "' on container '" + guidString + "'");
+							ClientCredentialTracker.forgetCredentialForContainer(guidString, ref);
+						}
+					}
+
+					if (failedParsingRefs) {
+						_logger.error(
+							"failed to parse references out of credential omission message; will just dump container's entire history.");
+					}
+				}
+			}
+
+			// we only have to put our foot down if we didn't get a list of references, or if this container is old school.
+			if (accessDeniedMessage || failedParsingRefs) {
+				// toss out tracking info for this container.
+				ClientCredentialTracker.flushContainerTracker(guidString);
+			}
+
+			// give it another try with same server etc.
+			if (_logger.isDebugEnabled())
+				_logger.debug("will retry RPC after updating credential tracker for container '" + guidString + "'");
+
+			return true;
+		}
+
+		// if we felt able to re-send, we would have returned true before here. so we cannot re-send.
+		return false;
+	}
+
+	/**
 	 * Send the message. If it fails, then resolve a replica and try again.
 	 * 
 	 * Possible sequence of events: 1. Send message to first instance. Catch exception. 2. Ask resolver for second instance. 3. Send message
@@ -589,6 +732,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		boolean tryAgain = false; // if this flag is true, then at least one failure happened and we will retry with same handler.
 		Throwable firstException = null; // the first exception that occurred during invocation.
+		int missingCredsAttemptCounter = 0; // how many times have we had to retry sending more credentials?
 
 		// keep looping until something good happens or something very bad happens.
 		while (true) {
@@ -597,7 +741,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				 * if try again flag is true, it means we're giving the current handler another chance. if try again is false, then either
 				 * we're here for the first time or we gave up on the last handler, but we will create a new handler.
 				 */
-				if (!tryAgain) {
+				if (!tryAgain && (missingCredsAttemptCounter == 0)) {
 					// come up with a client invocation handler for this context using the resolver.
 					handler = resolve(context);
 				} else {
@@ -640,21 +784,34 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				return toReturn;
 			} catch (Throwable throwable) {
 				long duration = System.currentTimeMillis() - startTime;
-
-				_logger.error("resolveAndInvoke saw exception on method " + calledMethod.getName(), throwable);
 				if (throwable instanceof InvocationTargetException) {
 					if (throwable.getCause() != null)
 						throwable = throwable.getCause();
 				}
-				if ((throwable instanceof TryAgainFaultType) && (!tryAgain)) {
-					tryAgain = true;
+
+				if (testForCredentialStreamliningIssues(throwable, missingCredsAttemptCounter, handler)) {
+					// credential streamlining checking told us to try again. record that we are trying a re-sending here.
+					missingCredsAttemptCounter++;
+					if (_logger.isDebugEnabled())
+						_logger.debug("will retry sending credentials with attempts now at " + missingCredsAttemptCounter);
+					continue;
 				} else {
+					_logger.info(
+						"was told it's not a missing credential problem or we exhausted retries (at " + missingCredsAttemptCounter + " now)");
+					// have to reset the counter, since now we are saying we cannot try again and should re-resolve the handler and all that.
+					missingCredsAttemptCounter = 0;
+				}
+
+				if ((throwable instanceof TryAgainFaultType) && !tryAgain) {
+					tryAgain = true;
+					_logger.warn("trying operation again, since we received a try again fault, on method " + calledMethod.getName());
+				} else {
+					// report the error once we're sure we'll handle it here.
+					_logger.error("resolveAndInvoke saw exception on method " + calledMethod.getName(), throwable);
+
 					if (firstException == null)
 						firstException = throwable;
 					tryAgain = false;
-
-					if (_logger.isDebugEnabled())
-						_logger.debug("faulting method: " + calledMethod.getName());
 
 					/*
 					 * Resetting the client cache as the original EPR holding container might be down, which will invalidate existing
@@ -662,7 +819,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					 */
 					String methodName = calledMethod.getName();
 					String throwmsg = throwable.getMessage() == null ? "Null message" : throwable.getMessage();
-					Boolean securityException = throwmsg.contains("Access denied");
+					Boolean securityException = throwmsg.contains(GenesisIIConstants.ACCESS_DENIED_SENTINEL);
 					Boolean connectionProblem = throwmsg.contains("ConnectException");
 					// Boolean SSLProblem = throwmsg.contains("SSLHandshakeException");
 
@@ -681,7 +838,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						throw new ConnectException(msg);
 					} else {
 						/*
-						 * hmmm: why are we automatically considering the host is okay here? have we definitely enumerated all connection
+						 * hmmm: why are we automatically considering the host is okay here? have we definitively enumerated all connection
 						 * related exceptions above?
 						 */
 						DeadHostChecker.removeHostFromDeadPool(host, port);
@@ -741,6 +898,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				Thread.currentThread().getId(), Thread.currentThread()));
 		long start = System.currentTimeMillis();
 		VcgrSslSocketFactory.threadCallingContext.set(_callContext);
+		// perform the actual method invocation over RPC.
 		Object ret = calledMethod.invoke(stubInstance, arguments);
 		VcgrSslSocketFactory.threadCallingContext.set(null);
 		if (_logger.isTraceEnabled())
@@ -754,8 +912,13 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			setInAttachments(inAttachments);
 
 		boolean isGeniiEndpoint = false;
-		boolean supportsShorthand = false;
+		boolean supportsStreamlining = false;
 		Version endpointVersion = null;
+
+		GUID containerGUID = EPRUtils.getGeniiContainerID(_epr);
+		String guidString = "UNKNOWN";
+		if (containerGUID != null)
+			guidString = containerGUID.toString(true);
 
 		for (SOAPHeaderElement elem : stubInstance.getResponseHeaders()) {
 			QName name = elem.getQName();
@@ -766,7 +929,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					if (text != null && text.equalsIgnoreCase("true"))
 						isGeniiEndpoint = true;
 				}
-			} else if (name.equals(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION)) {
+			} else if (name.equals(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION_QNAME)) {
 				org.w3c.dom.Node n = elem.getFirstChild();
 				if (n != null) {
 					String text = n.getNodeValue();
@@ -778,27 +941,15 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						}
 					}
 				}
-			} else if (name.equals(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_NAME)) {
-				// hmmm: TURNED OFF FOR NOW since this feature is not actually implemented yet.
-
-				// // found our credential shorthand sentinel header. we will pedanticly check that it's set to true.
-				// org.w3c.dom.Node n = elem.getFirstChild();
-				// if (n != null) {
-				// String text = n.getNodeValue();
-				// if (text != null && text.equalsIgnoreCase("true")) {
-				// supportsShorthand = true;
-				// }
-				// // hmmm: lower this logging.
-				// if (_logger.isDebugEnabled()) {
-				// if (supportsShorthand)
-				// _logger.debug("saw that endpoint supports credential shorthand");
-				// else if (text == null)
-				// _logger
-				// .debug("endpoint says it does not support credential shorthand, although it is generating that soap header!?");
-				// else
-				// _logger.debug("endpoint does not support credential shorthand; it is from the before time.");
-				// }
-				// }
+			} else if (name.equals(GeniiSOAPHeaderConstants.GENII_SUPPORTS_CREDENTIAL_STREAMLINING_QNAME)) {
+				// found our credential streamlining sentinel header. check whether it's set to true or not.
+				org.w3c.dom.Node n = elem.getFirstChild();
+				if (n != null) {
+					String text = n.getNodeValue();
+					if (text != null && text.equalsIgnoreCase("true")) {
+						supportsStreamlining = true;
+					}
+				}
 			} else if (name.equals(NotificationBrokerConstants.MESSAGE_INDEX_QNAME)) {
 				EndpointReferenceType target = getTargetEPR();
 				int messageIndex = Integer.parseInt(elem.getValue());
@@ -806,7 +957,23 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		}
 
-		_lastEndpointInfo = new GenesisIIEndpointInformation(isGeniiEndpoint, endpointVersion, supportsShorthand);
+		if (supportsStreamlining) {
+			// hmmm: reduce noise here.
+			if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())
+				_logger.debug("container supports credential streamlining: " + guidString);
+			if (containerGUID != null) {
+				ClientCredentialTracker.setContainerStreamliningSupport(guidString, true, true);
+			}
+		} else {
+			// hmmm: reduce noise here.
+			if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())
+				_logger.debug("container does not support credential streamlining: " + guidString);
+			if (containerGUID != null) {
+				ClientCredentialTracker.setContainerStreamliningSupport(guidString, false, true);
+			}
+		}
+
+		_lastEndpointInfo = new GenesisIIEndpointInformation(isGeniiEndpoint, endpointVersion, supportsStreamlining);
 		return ret;
 	}
 

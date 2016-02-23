@@ -14,6 +14,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
 import edu.virginia.vcgr.genii.ui.UIContext;
+import edu.virginia.vcgr.genii.ui.UIFrame;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
 import edu.virginia.vcgr.genii.ui.progress.Task;
@@ -181,7 +182,7 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 
 			model.reload(RNSTreeNode.this);
 
-			ClientApplication top = (ClientApplication) _tree.getTopLevelAncestor();
+			UIFrame top = (UIFrame) _tree.getTopLevelAncestor();
 			if (top != null) {
 				top.addActivity(ClientApplication.SELECT_FILEBROWSER_TOP);
 			}

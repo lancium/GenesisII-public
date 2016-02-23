@@ -236,16 +236,17 @@ public class SMBIOCache
 			}
 		}
 
-		SMBIOCache.this.doFlushSync();
+		// hmmm: turned off use of the waiter object, but it didn't help the reliability with word running and explorer exploring.
+		synchronized (cached) {
+			if (!waiting) {
+				waiting = true;
+				Waiter w = new Waiter();
+				w.start();
+			}
+		}
+		// hmmm: this was the alternate implementation for the waiter-less version.
+		// SMBIOCache.this.doFlushSync();
 
-		// hmmm: turning off use of the waiter object.
-		// synchronized (cached) {
-		// if (!waiting) {
-		// waiting = true;
-		// Waiter w = new Waiter();
-		// w.start();
-		// }
-		// }
 	}
 
 	public int read(ByteBuffer data, long off) throws SMBException

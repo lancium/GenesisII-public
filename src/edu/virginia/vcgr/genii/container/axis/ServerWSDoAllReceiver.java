@@ -180,7 +180,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			if (e instanceof PermissionDeniedException) {
 				// print a much calmer report of this fault, since we know exactly what happened.
 				PermissionDeniedException pde = (PermissionDeniedException) e;
-				_logger.info("access denied for method '" + PermissionDeniedException.extractMethodName(pde.getMessage()) + "' on asset: "
+				_logger.info(GenesisIIConstants.ACCESS_DENIED_SENTINEL + " for method '"
+					+ PermissionDeniedException.extractMethodName(pde.getMessage()) + "' on asset: "
 					+ PermissionDeniedException.extractAssetDenied(pde.getMessage()));
 			} else {
 				// re-throw and also hit the finally clause to decrement concurrency counter.
@@ -336,8 +337,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			throw new WSSecurityException(e.getMessage(), e);
 		}
 	}
-
-	// hmmm: !!!!!! move the authentication stuff to a more stable place. this class is way too big!
 
 	/**
 	 * Evaluate whether a given certificate should be trusted. Hook to allow subclasses to implement custom validation methods however they

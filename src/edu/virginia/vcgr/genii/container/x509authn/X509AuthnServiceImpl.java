@@ -371,7 +371,13 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				if (_logger.isDebugEnabled())
 					_logger.debug("building credential wallet from element.");
 
-				AxisCredentialWallet wallet = new AxisCredentialWallet(encodedCredential);
+				AxisCredentialWallet wallet = null;
+				try {
+					wallet = new AxisCredentialWallet(encodedCredential, null, null, null);
+				} catch (Throwable t) {
+					_logger.error("caught unexpected problem when decoding response from auth request", t);
+					throw new RemoteException(t.getLocalizedMessage(), t);
+				}
 
 				if (wallet.getRealCreds().isEmpty()) {
 					_logger.error("found no credentials in encoded chunk.");
@@ -414,8 +420,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 				}
 
 			} else {
-				// we're not an authentication proxy, so just store our
-				// identity.
+				// we're not an authentication proxy, so just store our identity.
 				IdentityType type = IdentityType.OTHER;
 				// Get Identity type from type name if we can.
 				String typeString = (String) constructionParameters.get(SecurityConstants.NEW_IDP_TYPE_QNAME);
@@ -548,7 +553,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 		elements[0] = new MessageElement(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"), xup.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema", "anyURI"));
 
-		SOAPHeaderElement elemConvert = creds.convertToSOAPElement();
+		SOAPHeaderElement elemConvert = creds.convertToSOAPElement(null, null);
 
 		/*
 		 * CAK: this is where the second problem dives into problematic conversion process (landing in xerces with DOM error). it turns out we

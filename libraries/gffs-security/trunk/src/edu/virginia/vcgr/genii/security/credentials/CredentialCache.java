@@ -24,25 +24,57 @@ public class CredentialCache
 {
 	static private Log _logger = LogFactory.getLog(CredentialCache.class);
 
-	static public final int CACHE_SIZE = 64;
-	static public final long TIMEOUT_MS = 1000L * 60L * 2L; // 2 minute lifetime in cache
+	static public final int CRED_CACHE_SIZE = 200;
+	static public final long CRED_CACHE_TIMEOUT_MS = 1000L * 60L * 10L; // 10 minute lifetime in cache
+
+	// hmmm: move these selector booleans out to a better place, maybe even genesis ii constants? ugh, no, but someplace else.
+
+	/*
+	 * this flag must be CHANGED at startup time if the client supports credential streamlining. the security code is lower level than the
+	 * client properties file, so we need to track the feature like this.
+	 * 
+	 * note that the default should stay false here! it will automatically be updated from configuration files.
+	 */
+	public static boolean CLIENT_CREDENTIAL_STREAMLINING_ENABLED = false; // default should be left as false.
+
+	/*
+	 * this flag also must be changed at startup time to reflect the configured value. the default is to be disabled, and this default should
+	 * be left defined as false. the configuration for whether it's enabled or not is read at container startup time.
+	 */
+	public static boolean SERVER_CREDENTIAL_STREAMLINING_ENABLED = false; // default should be left as false.
+
+	/*
+	 * if this flag is enabled, then the container will process everything normally for credential streamlining, but it will never look up
+	 * anything in the side cache, nor will it resolve any of the credential references passed in the soap header. this has the effect of
+	 * making the container cause the client to fault on every request where the client thought streamlining was enabled. it is for debugging
+	 * only!
+	 */
+	public static boolean BEHAVE_IRRATIONALLY_WITH_STREAMLINING = false;
+
+	/*
+	 * if true, turns on the more comprehensive logging for credential streamlining actions, but still at debug level.
+	 */
+	public static boolean SHOW_CREDENTIAL_STREAMLINING_ACTIONS = false;
+
+	// hmmm: these two are client side caches, and legitimately belong here, it seems.
+	// the question remains: do we still need both? are the keys different enough that we can't use just one cache?
 
 	static private TimedOutLRUCache<ChainsCacheKey, TrustCredential> credentialChains =
-		new TimedOutLRUCache<ChainsCacheKey, TrustCredential>(CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
+		new TimedOutLRUCache<ChainsCacheKey, TrustCredential>(CRED_CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
 
 	static private TimedOutLRUCache<SingletonCacheKey, TrustCredential> isolatedCreds =
-		new TimedOutLRUCache<SingletonCacheKey, TrustCredential>(CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
+		new TimedOutLRUCache<SingletonCacheKey, TrustCredential>(CRED_CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
 
 	/**
 	 * the key to the cache for delegation chains is a 2-tuple with the guid of the base credential and the delegatee's x509 certificate. this
 	 * sloppily assumes that the restrictions and access would be the same for any credential chain based on the same guid, because currently
 	 * they always are.
 	 */
-	public static class ChainsCacheKey extends Pair<String, X509Certificate>
+	public static class ChainsCacheKey extends Pair<String, String>
 	{
 		private static final long serialVersionUID = 1L;
 
-		ChainsCacheKey(String s, X509Certificate c)
+		ChainsCacheKey(String s, String c)
 		{
 			super(s, c);
 		}
@@ -53,11 +85,11 @@ public class CredentialCache
 	 * that the restrictions and access would be the same for any credential created for the delegatee and issuer, because currently they
 	 * always are.
 	 */
-	public static class SingletonCacheKey extends Pair<X509Certificate, X509Certificate>
+	public static class SingletonCacheKey extends Pair<String, String>
 	{
 		private static final long serialVersionUID = 1L;
 
-		SingletonCacheKey(X509Certificate delegatee, X509Certificate issuer)
+		SingletonCacheKey(String delegatee, String issuer)
 		{
 			super(delegatee, issuer);
 		}
@@ -71,11 +103,13 @@ public class CredentialCache
 	{
 		// check the cache to see if the credential we would create exists already.
 		synchronized (credentialChains) {
-			ChainsCacheKey seek = new ChainsCacheKey(cred.getId(), delegatee[0]);
+			ChainsCacheKey seek = new ChainsCacheKey(cred.getId(), delegatee[0].getSubjectDN().toString());
 			TrustCredential delegation = credentialChains.get(seek);
 			if (delegation != null) {
 				if (_logger.isTraceEnabled())
 					_logger.trace("credential chain cache hit--found existing delegation.");
+				// refresh the credential since we are using it just now.
+				credentialChains.refresh(seek);
 			} else {
 				// not in cache: create a new linked trust credential.
 				delegation = new TrustCredential(delegatee, delegateeType, issuer, cred.getDelegateeType(), restrictions, accessCategories);
@@ -106,11 +140,15 @@ public class CredentialCache
 	{
 		// check the cache to see if the credential we would create exists already.
 		synchronized (isolatedCreds) {
-			SingletonCacheKey seek = new SingletonCacheKey(delegatee[0], issuer[0]);
+			SingletonCacheKey seek = new SingletonCacheKey(delegatee[0].getSubjectDN().toString(), issuer[0].getSubjectDN().toString());
 			TrustCredential delegation = isolatedCreds.get(seek);
 			if (delegation != null) {
 				if (_logger.isTraceEnabled())
 					_logger.trace("singleton credential cache hit--found existing delegation.");
+				if (delegation.isValid()) {
+					// a good delegation deserves to be kept around, especially if in use.
+					isolatedCreds.refresh(seek);
+				}
 			} else {
 				// not in cache: create a new isolated trust credential.
 				delegation =

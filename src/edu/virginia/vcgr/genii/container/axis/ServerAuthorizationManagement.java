@@ -3,15 +3,11 @@ package edu.virginia.vcgr.genii.container.axis;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSession;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
@@ -21,13 +17,9 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
-import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.io.nio.SelectChannelEndPoint;
-import org.eclipse.jetty.io.nio.SslConnection;
-import org.eclipse.jetty.io.nio.SslConnection.SslEndPoint;
 import org.eclipse.jetty.server.Request;
 
-import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -45,6 +37,7 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.axis.CredentialsWalletRetriever;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
@@ -54,97 +47,6 @@ import edu.virginia.vcgr.genii.security.identity.IdentityType;
 public class ServerAuthorizationManagement
 {
 	static Log _logger = LogFactory.getLog(ServerAuthorizationManagement.class);
-
-	/*
-	 * the most client sessions that we will try to cache. the set of credentials could be pretty big, but hopefully by storing just the roots
-	 * of each chain we are not taking up too much memory.
-	 */
-	static public int MAXIMUM_SESSIONS_CACHED = 200;
-
-	static public long SESSION_LIFETIME = 1000 * 60 * 10; // 10 minutes.
-
-	/*
-	 * a fairly high limit for the number of credentials the user can have. this really will support about 100 user and group credentials.
-	 * even if they just changed logins, the old set will get flushed out by the new items.
-	 */
-	static public int MAXIMUM_CREDENTIALS_CACHED = 100;
-
-	// how long each credential is kept around before timing out of the cache.
-	static public long CREDENTIAL_LIFETIME = 1000 * 60 * 10; // 10 minutes.
-
-	/**
-	 * tracks our credentials similarly to a credential wallet, but can time out the individual items and remove them. this is important for
-	 * handling a client's credential changes when they're still using the same tls session; any new credentials they have will get added to
-	 * the list but the old ones will time out and be removed. the list is indexed by the GUID of the trust credential object.
-	 */
-	static public class TimedOutCredentialsCachePerSession extends TimedOutLRUCache<String, TrustCredential>
-	{
-		public TimedOutCredentialsCachePerSession()
-		{
-			super(MAXIMUM_CREDENTIALS_CACHED, CREDENTIAL_LIFETIME);
-		}
-	}
-
-	/*
-	 * hmmm: HUGE CAVEAT: signature checking is now no longer done in the 'from soap' pathway. we absolutely need to ensure that each chain is
-	 * checked once and only once.
-	 * 
-	 * not yet actually.
-	 */
-
-	static private TimedOutLRUCache<X509Certificate, TimedOutCredentialsCachePerSession> _clientSessionCredentialsCache =
-		new TimedOutLRUCache<X509Certificate, TimedOutCredentialsCachePerSession>(MAXIMUM_SESSIONS_CACHED, SESSION_LIFETIME);
-
-	// hmmm: WILL THIS BE TOO SLOW because of using such a fat has key?
-	// hmmm: test with hundreds of clients and see how it holds up for speed and for memory use.
-	// hmmm: try just adding some timing around the lookup and set operations for now while in debug land!?!
-
-	// hmmm: maybe separate a new object for the creds cache out of this.
-	/**
-	 * adds any root trust credentials in "newCreds" that are not previously known for this client and refreshes any existing ones that are
-	 * still in "newCreds".
-	 */
-	public static void addCredentialsForClientSession(X509Certificate x509ForSession, CredentialWallet newCreds)
-	{
-		if (_logger.isDebugEnabled())
-			_logger.debug("adding credentials for session cert: " + x509ForSession.getSubjectDN());
-
-		synchronized (_clientSessionCredentialsCache) {
-			TimedOutCredentialsCachePerSession sessionCredsCache = _clientSessionCredentialsCache.get(x509ForSession);
-			if (sessionCredsCache == null) {
-				// add a new wallet in for this unknown client.
-				_clientSessionCredentialsCache.put(x509ForSession, new TimedOutCredentialsCachePerSession());
-				sessionCredsCache = _clientSessionCredentialsCache.get(x509ForSession);
-				if (sessionCredsCache == null) {
-					_logger.error("serious error in client credential cache's timed-out LRU cache; newly added creds cache is missing");
-					return; // hosed.
-				}
-				// refresh this cache since the client is using the tls cert still.
-				_clientSessionCredentialsCache.refresh(x509ForSession);
-
-				// hmmm: lower the logging levels in this method once code is proven out.
-				if (_logger.isDebugEnabled())
-					_logger.debug("added new creds cache for tls cert for: " + x509ForSession.getSubjectDN());
-			}
-			// add these new credentials in, but only the root trust credential of each chain.
-			for (TrustCredential tc : newCreds.getCredentials()) {
-				TrustCredential rootCred = tc.getRootOfTrust();
-				if (sessionCredsCache.get(rootCred.getId()) == null) {
-					// not yet in the cache, so add it.
-					sessionCredsCache.put(rootCred.getId(), rootCred);
-					if (_logger.isDebugEnabled())
-						_logger
-							.debug("added new credential " + rootCred.getId() + " to creds cache: " + rootCred.describe(VerbosityLevel.LOW));
-				} else {
-					// already in the cache, so refresh it.
-					sessionCredsCache.refresh(rootCred.getId());
-					if (_logger.isDebugEnabled())
-						_logger
-							.debug("refreshed credential " + rootCred.getId() + " in creds cache: " + rootCred.describe(VerbosityLevel.LOW));
-				}
-			}
-		}
-	}
 
 	/**
 	 * Authenticate any holder-of-key (i.e., signed) bearer credentials using the given authenticated certificate-chains. Returns a cumulative
@@ -328,82 +230,54 @@ public class ServerAuthorizationManagement
 			 */
 			callContext.removeProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT);
 
-			// Grab the client-hello authenticated SSL cert-chain (if there was one)
-			org.eclipse.jetty.server.Request req = (Request) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+			/*
+			 * hmmm: this starting up check is good, in that it prevents calls from occurring that will hose us up while we're still not
+			 * started up as a container.
+			 * 
+			 * but it's bad in that the calls NEVER come from localhost seemingly? we need to evaluate if the same ip thing every returns
+			 * true; but even if it's the same IP, that's not any guarantee that THIS CONTAINER is the one asking. so, perhaps this whole
+			 * allowance portion is just busted.
+			 * 
+			 * => fail all requests during startup instead.
+			 */
 
-			// req.getConnection().
+			boolean stillStarting;
+			synchronized (ServerWSDoAllReceiver._inStartupMode) {
+				stillStarting = ServerWSDoAllReceiver._inStartupMode;
+			}
+			if (stillStarting == true) {
+				org.eclipse.jetty.server.Request req = (Request) messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
 
-			Object transport = req.getConnection().getEndPoint().getTransport();
-			X509Certificate[] clientSslCertChain = null;
-			if (transport instanceof SelectChannelEndPoint) {
-				boolean stillStarting;
-				synchronized (ServerWSDoAllReceiver._inStartupMode) {
-					stillStarting = ServerWSDoAllReceiver._inStartupMode;
+				Object transport = req.getConnection().getEndPoint().getTransport();
+
+				Collection<String> ips = NetworkConfigTools.getIPAddresses();
+				String clientIP = ((SelectChannelEndPoint) transport).getRemoteAddr();
+
+				if (ips.contains(clientIP) == true) {
+					/*
+					 * future: do we ever see this logging happen? outcalls from self might still have non-localhost IP. or we skip making an
+					 * outcall at all, which supposedly exists in the codebase somewhere.
+					 */
+					if (_logger.isDebugEnabled())
+						_logger.debug("startup: allowing client on local address: " + clientIP);
+				} else {
+					if (_logger.isDebugEnabled())
+						_logger.debug("startup: rejecting client at remote address: " + clientIP);
+					// hmmm: make this something they can handle by trying again, not the try again fault so much, but something like that.
+					throw new AxisFault("container in startup mode; access temporarily denied for remote connections.");
 				}
-				if (stillStarting == true) {
-					Collection<String> ips = NetworkConfigTools.getIPAddresses();
-					String clientIP = ((SelectChannelEndPoint) transport).getRemoteAddr();
+			}
 
-					if (ips.contains(clientIP) == true) {
-						/*
-						 * future: do we ever see this logging happen? outcalls from self might still have non-localhost IP. or we skip making
-						 * an outcall at all, which supposedly exists in the codebase somewhere.
-						 */
-						if (_logger.isDebugEnabled())
-							_logger.debug("startup: allowing client on local address: " + clientIP);
-					} else {
-						if (_logger.isDebugEnabled())
-							_logger.debug("startup: rejecting client at remote address: " + clientIP);
-						// hmmm: make this something they can handle by trying again, not the try again fault so much, but something like
-						// that.
-						throw new AxisFault("container in startup mode; access temporarily denied for remote connections.");
-					}
-				}
+			X509Certificate[] clientSslCertChain = CredentialsWalletRetriever.getClientTLSCert(messageContext);
+			if (clientSslCertChain != null) {
+				authenticatedCertChains.add(clientSslCertChain);
 
-				try {
-					if (((SelectChannelEndPoint) transport).getConnection() instanceof SslConnection) {
-						if (req.getConnection().getEndPoint() instanceof EndPoint) {
-							EndPoint ep = req.getConnection().getEndPoint();
-							SSLSession session = ((SslEndPoint) ep).getSslEngine().getSession();
-							if (session != null) {
-								Certificate[] peerCerts = null;
-								try {
-									peerCerts = session.getPeerCertificates();
-								} catch (SSLPeerUnverifiedException e) {
-									_logger.error("Peer unverified while attempting to extract peer certificates.", e);
-								}
+				// remember last TLS certificate from this client, so we can compare later.
+				callContext.setSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT, clientSslCertChain[0]);
 
-								clientSslCertChain = new X509Certificate[peerCerts.length];
-								int i = 0;
-								for (Certificate c : peerCerts) {
-									if (c instanceof X509Certificate) {
-										clientSslCertChain[i++] = (X509Certificate) c;
-									} else {
-										throw new AxisFault("found wrong type of certificates for peer!");
-									}
-								}
-							}
-
-							if (_logger.isTraceEnabled())
-								_logger.debug("incoming client ssl cert chain is: " + clientSslCertChain[0].getSubjectDN());
-						}
-
-						if (clientSslCertChain != null) {
-							authenticatedCertChains.add(clientSslCertChain);
-
-							// remember last TLS certificate from this client, so we can compare later.
-							callContext.setSingleValueProperty(GenesisIIConstants.LAST_TLS_CERT_FROM_CLIENT, clientSslCertChain[0]);
-
-							if (_logger.isTraceEnabled()) {
-								X509Identity id = new X509Identity(clientSslCertChain);
-								_logger.debug("decided that the client's peer certificate is this: " + id.toString());
-							}
-						} else {
-							// hmmm: TEMPORARY!!!! remove this!!!! what to do instead though? we failed to find certificate.
-							throw new SSLPeerUnverifiedException("argh!");
-						}
-					}
-				} catch (SSLPeerUnverifiedException unverified) {
+				if (_logger.isTraceEnabled()) {
+					X509Identity id = new X509Identity(clientSslCertChain);
+					_logger.debug("decided that the client's peer certificate is this: " + id.toString());
 				}
 			}
 
@@ -442,9 +316,10 @@ public class ServerAuthorizationManagement
 			// Grab the operation method from the message context
 			org.apache.axis.description.OperationDesc desc = messageContext.getOperation();
 			if (desc == null) {
-				// pretend security doesn't exist -- axis will do what it does
-				// when it can't figure out how to dispatch to a non-existent
-				// method.
+				/*
+				 * pretend security doesn't exist -- axis will do what it does when it can't figure out how to dispatch to a non-existent
+				 * method.
+				 */
 				_logger.debug("deferring to axis for null operation description.");
 				return;
 			}
@@ -465,7 +340,6 @@ public class ServerAuthorizationManagement
 				(jDesc == null) ? operation.getDeclaringClass() : jDesc.getImplClass(), operation);
 
 			if (accessOkay) {
-				addCredentialsForClientSession(clientSslCertChain[0], transientCredentials.generateWallet());
 				resource.commit();
 			}
 		} catch (IOException e) {

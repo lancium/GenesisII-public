@@ -31,6 +31,7 @@ public class Security
 	private HierarchicalDirectory _securityDirectory;
 	private File _securityPropertiesFile;
 	private Properties _securityProperties;
+	private boolean _loadedOkay = false;
 
 	Security(HierarchicalDirectory deploymentDirectory, HierarchicalDirectory configurationDirectory)
 	{
@@ -40,20 +41,35 @@ public class Security
 
 		if (!_securityDirectory.exists())
 			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Couldn't find security directory in deployment.");
-		if (!_securityPropertiesFile.exists())
-			throw new InvalidDeploymentException(deploymentDirectory.getName(),
-				"Couldn't find security properties file \"" + SECURITY_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
+		if (!_securityPropertiesFile.exists()) {
+			//throw new InvalidDeploymentException(deploymentDirectory.getName(),
+				//"Couldn't find security properties file \"" + SECURITY_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
+			if (_logger.isDebugEnabled())
+				_logger.debug("did not find security configuration file for deployment called: " + deploymentDirectory.getName());
+			return;
+		}
 
 		FileInputStream fin = null;
 		try {
 			fin = new FileInputStream(_securityPropertiesFile);
 			_securityProperties.load(fin);
+			// record that things looked good.
+			_loadedOkay = true;
 		} catch (IOException ioe) {
 			_logger.fatal("Unable to load security properties from deployment.", ioe);
 			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Unable to load security properties from deployment.");
 		} finally {
 			StreamUtils.close(fin);
 		}
+	}
+
+	/**
+	 * reports whether the security configuration was loaded successfully or not. some deployment folders (especially 'default') will not have
+	 * any security configuration.
+	 */
+	public boolean loadedOkay()
+	{
+		return _loadedOkay;
 	}
 
 	public HierarchicalDirectory getSecurityDirectory()
@@ -111,6 +127,10 @@ public class Security
 					} catch (Throwable cause) {
 						_logger.warn("Unable to load administrator certificate.", cause);
 					}
+				} else {
+					if (_logger.isDebugEnabled())
+						_logger.debug("no admin cert file was found for container.");
+
 				}
 			}
 

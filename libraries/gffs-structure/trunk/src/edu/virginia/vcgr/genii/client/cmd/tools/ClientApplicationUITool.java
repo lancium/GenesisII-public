@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,7 +15,6 @@ import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
-import edu.virginia.vcgr.genii.ui.BasicFrameWindow;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
 import edu.virginia.vcgr.genii.ui.UIFrame;
 
@@ -67,33 +65,8 @@ public class ClientApplicationUITool extends BaseGridTool
 			ca.dispose();
 		}
 
-		// hmmm: abstract this to a method on basic frame window!
-		while (true) {
-			ArrayList<BasicFrameWindow> frames = UIFrame.getFrameList();
-			for (BasicFrameWindow fram : frames) {
-
-				try {
-					if (fram instanceof ClientApplication)
-						((ClientApplication) fram).pulseActivities();
-				} catch (Exception e) {
-					_logger.error("failed to pulse activities on UI frame", e);
-				}
-			}
-
-			if (BasicFrameWindow.activeFrames() <= 0) {
-				/*
-				 * we have found that it's time to leave since there are no frames left (although we really only think we'll see this as zero
-				 * and not negative).
-				 */
-				break;
-			}
-			try {
-				Thread.sleep(42);
-			} catch (InterruptedException e) {
-				// ignored.
-			}
-		}
-
+		// get any pending events processed.
+		UIFrame.pumpEventsToWindows();
 		return 0;
 	}
 

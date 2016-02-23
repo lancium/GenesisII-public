@@ -3,17 +3,19 @@ package edu.virginia.vcgr.genii.client.security;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class PermissionDeniedException extends AuthZSecurityException
 {
 	static final long serialVersionUID = 0L;
 
-	static final private String PERMISSION_DENIED_MESSAGE_FORMAT = "Access denied on %s (in method %s).";
+	static final private String PERMISSION_DENIED_MESSAGE_FORMAT = GenesisIIConstants.ACCESS_DENIED_SENTINEL + " on %s (in method %s).";
 
-	static final private Pattern METHOD_EXTRACTOR_PATTERN =
-		Pattern.compile("^.*Access denied on .*.in method ([^ )]+).\\..*$", Pattern.DOTALL);
-	static final private Pattern ASSET_EXTRACTOR_PATTERN = Pattern.compile("^.*Access denied on (.+) .in method .*\\..*$", Pattern.DOTALL);
+	static final private Pattern METHOD_EXTRACTOR_PATTERN = Pattern.compile(
+		"^.*" + GenesisIIConstants.ACCESS_DENIED_SENTINEL + " on .*.in method ([^ )]+).\\..*$", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+	static final private Pattern ASSET_EXTRACTOR_PATTERN = Pattern.compile(
+		"^.*" + GenesisIIConstants.ACCESS_DENIED_SENTINEL + " on (.+) .in method .*\\..*$", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
 	public PermissionDeniedException(String methodName, String assetDenied)
 	{

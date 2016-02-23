@@ -23,6 +23,9 @@ public class ContainerProperties extends Properties
 	// specifies which service types do not need to include X509 certificates in response EPRs.
 	static final public String NO_X509_CLASS_LIST = "NO_X509_CLASS_LIST";
 
+	// flag that can be set to true / false for credential streamlining for container.
+	static final public String CONTAINER_CREDENTIAL_STREAMLINING_ENABLED = "gffs.container.credential_streamlining";
+
 	// this is the single active copy of the object we hang onto per jvm.
 	static private ContainerProperties _realContainerProperties = null;
 
@@ -43,14 +46,6 @@ public class ContainerProperties extends Properties
 		}
 		return _realContainerProperties;
 	}
-
-	/**
-	 * reports if the container properties file was found or not.
-	 */
-	// public boolean existed()
-	// {
-	// return _existed;
-	// }
 
 	static private File getContainerPropertiesFile()
 	{
@@ -115,6 +110,33 @@ public class ContainerProperties extends Properties
 		if (toReturn == null)
 			toReturn = getProperty(NO_X509_CLASS_LIST);
 		return toReturn;
+	}
+
+	/**
+	 * reports whether the client has the credential streamlining enabled or not. the default is for it to be enabled.
+	 */
+	public boolean getContainerCredentialStreamliningEnabled()
+	{
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(CONTAINER_CREDENTIAL_STREAMLINING_ENABLED);
+
+		if (_logger.isTraceEnabled())
+			_logger.debug("first, got the cred streamline flag from install props as: " + toReturn);
+
+		if (toReturn == null) {
+			toReturn = getProperty(CONTAINER_CREDENTIAL_STREAMLINING_ENABLED);
+			if (_logger.isTraceEnabled())
+				_logger.debug("second, got the cred streamline flag from container props as: " + toReturn);
+		}
+
+		if (toReturn == null)
+			return true; // default case.
+		if (toReturn.equalsIgnoreCase("false"))
+			return false;
+		if (toReturn.equals("0"))
+			return false;
+		if (toReturn.equals("no"))
+			return false;
+		return true;
 	}
 
 	/* ... */

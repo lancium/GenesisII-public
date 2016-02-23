@@ -162,20 +162,20 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, fsManager);
 
-			BES bes = BES.getBES(initInfo.getContainerID());
-			if (bes == null)
-				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
-					null));
-
+			BES bes = null;
 			try {
+				bes = BES.getBES(initInfo.getContainerID());
 				WSName wsname = new WSName(activityEPR);
 				if (wsname.isValidWSName())
 					_logger
 						.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(), _resource.getKey()));
-			} catch (Throwable cause) {
-				// This shouldn't fail, but I can't test it now and it's just
-				// for a print statement.
+			} catch (IllegalStateException e) {
+				_logger.error("caught illegal state exception trying to get BES information on container " + initInfo.getContainerID());
+			}
+			if (bes == null) {
+				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
+					null));
 			}
 
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),

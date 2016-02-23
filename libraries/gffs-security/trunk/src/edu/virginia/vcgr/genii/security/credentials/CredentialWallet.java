@@ -18,14 +18,15 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import xmlbeans.org.oasis.saml2.assertion.AssertionDocument;
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.security.Describable;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.X500PrincipalUtilities;
+import edu.virginia.vcgr.genii.security.faults.CredentialOmittedException;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 import eu.unicore.security.etd.TrustDelegation;
+import xmlbeans.org.oasis.saml2.assertion.AssertionDocument;
 
 /**
  * This class holds the credentials wallet for a grid session. Individual trust delegations in the assertionChains member below are either:
@@ -42,6 +43,11 @@ public class CredentialWallet implements Externalizable, Describable
 	 * this.*
 	 */
 	static public final long serialVersionUID = 2636486491170348968L;
+
+	/*
+	 * this phrase will start any fault message that we generate when the container doesn't know a credential referenced by the client.
+	 */
+	static public final String OMMITTED_CREDENTIAL_SENTINEL = "MISSING STREAMLINING CREDENTIAL";
 
 	private static Log _logger = LogFactory.getLog(CredentialWallet.class);
 
@@ -71,7 +77,11 @@ public class CredentialWallet implements Externalizable, Describable
 				assertionChains.put(tc.getId(), tc);
 			}
 		}
-		flexReattachDelegations(true);
+		try {
+			flexReattachDelegations(true, null);
+		} catch (Throwable t) {
+			_logger.error("failure to create credential wallet from list of creds; probably missing links!");
+		}
 		if (_logger.isDebugEnabled())
 			_logger.debug("added " + assertionChains.size() + " credentials into list");
 	}
@@ -82,6 +92,40 @@ public class CredentialWallet implements Externalizable, Describable
 	public Map<String, TrustCredential> getAssertionChains()
 	{
 		return assertionChains;
+	}
+
+	/**
+	 * returns the credential in the wallet with the id specified or returns null.
+	 */
+	public TrustCredential getCredential(String credId)
+	{
+		synchronized (assertionChains) {
+			// search for top-level first.
+			TrustCredential simple = assertionChains.get(credId);
+			if (simple != null) {
+				if (_logger.isTraceEnabled())
+					_logger.debug("found as most delegated top-level credential: " + credId);
+				return simple;
+			}
+			// well, now we need to search any prior delegations also.
+			for (String curr : assertionChains.keySet()) {
+				TrustCredential isThisIt = assertionChains.get(curr);
+				while (isThisIt != null) {
+					if (isThisIt.getId().equals(credId)) {
+						if (_logger.isTraceEnabled())
+							_logger.debug("found as previously delegated credential: " + credId);
+						return isThisIt;
+					}
+					// walk back along the chain. at some point this must be null.
+					isThisIt = isThisIt.getPriorDelegation();
+					if (isThisIt != null) {
+						if (_logger.isTraceEnabled())
+							_logger.debug("walking back in chain to see if prior cred is right one.");
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -132,7 +176,7 @@ public class CredentialWallet implements Externalizable, Describable
 	public void addCredential(TrustCredential assertion)
 	{
 		if (assertionChains.containsKey(assertion.getId())) {
-			_logger.debug("attempt to add identical assertion to the wallet; ignoring.");
+			_logger.debug("attempt to add identical assertion to the wallet; ignoring: " + assertion.describe(VerbosityLevel.LOW));
 			return;
 		}
 		if (assertion.getPriorDelegationId() != null) {
@@ -243,18 +287,21 @@ public class CredentialWallet implements Externalizable, Describable
 	 * important: this old method name is preserved for unicore usage; does not remove invalid delegations, so reassembly works as expected
 	 * even with expired credentials.
 	 */
-	public void reattachDelegations()
+	public void reattachDelegations() throws CredentialOmittedException
 	{
-		flexReattachDelegations(false);
+		flexReattachDelegations(false, null);
 	}
 
 	/**
 	 * if credentials have been added willy nilly, possibly without their being linked together, this will find and relink all of them
 	 * properly. the only thing remaining in the wallet will be isolated assertions or an assertion chain's most recent element. if
 	 * "removeInvalid" is true, then any expired or invalid delegations will be trashed. it is important not to clear those out during
-	 * deserialization though or one will not get back any credential, which leads to unanticipated exceptions.
+	 * deserialization though or one will not get back any credential, which leads to unanticipated exceptions. a recent enhancement is the
+	 * "sideCache" that is passed in, which provides additional credentials that may have been previously received by the container from this
+	 * client. this can be used to locate any missing elements in credential chains, as long as the client had already sent the full chains
+	 * previously.
 	 */
-	public void flexReattachDelegations(boolean removeInvalid)
+	public void flexReattachDelegations(boolean removeInvalid, TimedOutCredentialsCachePerSession sideCache) throws CredentialOmittedException
 	{
 		Map<String, TrustCredential> credentialsToConsume = new HashMap<String, TrustCredential>();
 		credentialsToConsume.putAll(assertionChains);
@@ -310,11 +357,31 @@ public class CredentialWallet implements Externalizable, Describable
 						 */
 						if (assertionChains.containsKey(priorDelegationId)) {
 							TrustCredential priorDelegation = assertionChains.get(priorDelegationId);
-							/*
-							 * we used to remove that prior guy right away, but that breaks some credential wallets. instead we choose to wait
-							 * until the end before removing the consumed prior delegations.
-							 */
-							idsToWhack.add(priorDelegationId);
+							if (priorDelegation != null) {
+								/*
+								 * we used to remove that prior guy right away, but that breaks some credential wallets. instead we choose to
+								 * wait until the end before removing the consumed prior delegations.
+								 */
+								idsToWhack.add(priorDelegationId);
+							} else if ((CredentialCache.SERVER_CREDENTIAL_STREAMLINING_ENABLED) && (sideCache != null)) {
+								/*
+								 * we can also try to retrieve the missing element from the side cache. this allows the container to sing
+								 * along with the client, even if the client didn't include all the verses... ah, or to fill out the
+								 * credential chains from things that the client previously said. we actually do need this code, even though
+								 * we pre-add referenced credentials, because sometimes the credentials aren't actually known yet; they are
+								 * referenced but still not pulled in from the header.
+								 */
+								priorDelegation = sideCache.get(priorDelegationId);
+								if (_logger.isTraceEnabled()) {
+									if (priorDelegation != null)
+										_logger.debug("located prior delegation " + priorDelegationId + " in side cache");
+								}
+							}
+							if (priorDelegation == null) {
+								// no progress being made in finding that. maybe it's not off wire yet.
+								continue;
+							}
+
 							try {
 								delegation.extendTrustChain(priorDelegation);
 								if (_logger.isTraceEnabled()) {
@@ -331,17 +398,35 @@ public class CredentialWallet implements Externalizable, Describable
 					}
 				}
 			}
-			if (!progressMade) {
+			/*
+			 * hmmm: cak: had to add the check to see if the bag was empty already, in which case we must have made progress since everything
+			 * is reattached. not sure what is allowing it to get here yet, if this is truly the problem.
+			 */
+			if (!progressMade
+				// hmmm: incorrect somehow? can't bootstrap???
+				&& !credentialsToConsume.isEmpty()) {
 				if (_logger.isDebugEnabled()) {
-					_logger.debug("this is what remains in FAILURE case:");
+					_logger.debug("this is what remains in problematic reattachment:");
 					_logger.debug(describeCredentialMap(credentialsToConsume, VerbosityLevel.HIGH));
-					_logger.debug("these are ids involved for FAILURE case:");
+					_logger.debug("these are ids involved in problematic reattachment:");
 					_logger.debug(showIdChains(credentialsToConsume, VerbosityLevel.HIGH));
 				}
 
-				String msg = "failure; there are missing links in the encoded SAML credentials!";
-				_logger.error(msg);
-				throw new SecurityException(msg);
+				/*
+				 * here we have to also make the list of missing creds, which should be exactly the list of prior delegations from the
+				 * remaining to consume.
+				 */
+				StringBuilder missingList = new StringBuilder();
+				for (TrustCredential hosed : credentialsToConsume.values()) {
+					missingList.append(hosed.getPriorDelegationId());
+					missingList.append(" ");
+				}
+
+				// we were supposed to find an already known credential, so fault out.
+				String msg = OMMITTED_CREDENTIAL_SENTINEL + ": could not locate credentials with ids: " + missingList.toString();
+				if (_logger.isDebugEnabled())
+					_logger.debug(msg);
+				throw new CredentialOmittedException(msg);
 			}
 		}
 
@@ -450,13 +535,8 @@ public class CredentialWallet implements Externalizable, Describable
 					out.writeObject(xmlDump);
 
 					/*
-					 * we no longer write the string like this:
-					 * 
-					 * out.writeUTF(xmlDump);
-					 * 
-					 * because it has been shown to be unreliable.
+					 * we no longer write the string like this: out.writeUTF(xmlDump); because it has been shown to be unreliable.
 					 */
-
 					if (_logger.isTraceEnabled())
 						_logger.debug("writing assertion #" + addedAny + ": wrote " + xmlDump.length() + " byte string");
 
@@ -569,6 +649,12 @@ public class CredentialWallet implements Externalizable, Describable
 
 		}
 
-		flexReattachDelegations(false);
+		try {
+			flexReattachDelegations(false, null);
+		} catch (Throwable t) {
+			String msg = "error during reattachment of delegations; probably missing links!";
+			_logger.error(msg, t);
+			throw new IOException(msg, t);
+		}
 	}
 }

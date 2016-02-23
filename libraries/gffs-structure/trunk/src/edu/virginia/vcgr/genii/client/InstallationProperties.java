@@ -210,7 +210,7 @@ public class InstallationProperties extends Properties
 					_containerOwnerCertificate = AclAuthZClientTool.downloadIdentity(filePath);
 					return _containerOwnerCertificate;
 				} catch (Throwable cause) {
-					_logger.warn("Unable to get administrator certificate.", cause);
+					_logger.warn("Unable to get owner certificate.", cause);
 				}
 			}
 		}

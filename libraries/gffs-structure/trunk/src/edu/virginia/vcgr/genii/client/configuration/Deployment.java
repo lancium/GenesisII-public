@@ -45,6 +45,10 @@ public class Deployment
 				"Does not contain a " + CONFIGURATION_DIRECTORY_NAME + " directory.");
 
 		_security = new Security(_deploymentDirectory, _configurationDirectory);
+		if (!_security.loadedOkay()) {
+			// signify that there was no security configuration.
+			_security = null;
+		}
 
 		_namespace = new NamespaceDefinitions(_deploymentDirectory, _configurationDirectory);
 		if (!_namespace.loadedOkay()) {
@@ -73,8 +77,9 @@ public class Deployment
 			ret.load(fin);
 			return ret;
 		} catch (IOException ioe) {
-			_logger.fatal("Unable to load web container properties from deployment.", ioe);
-			throw new InvalidDeploymentException(deploymentName, "Unable to load web container properties from deployment.");
+			_logger.debug("Unable to load web container properties from deployment: " + deploymentName);
+//			throw new InvalidDeploymentException(deploymentName, "Unable to load web container properties from deployment.");
+			return null;
 		} finally {
 			StreamUtils.close(fin);
 		}
@@ -97,6 +102,9 @@ public class Deployment
 
 	public Security security()
 	{
+		if (_security == null) {
+			throw new RuntimeException("failed to access security definitions on this deployment");
+		}		
 		return _security;
 	}
 
@@ -120,6 +128,9 @@ public class Deployment
 
 	public Properties webContainerProperties()
 	{
+		if (_webContainerProperties == null) {
+			throw new RuntimeException("failed to access web container properties on this deployment");
+		}
 		return _webContainerProperties;
 	}
 

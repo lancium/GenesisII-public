@@ -77,8 +77,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 	static public InheritableThreadLocal<ICallingContext> threadCallingContext = new InheritableThreadLocal<ICallingContext>();
 
-	// hmmm: fix this naming; this is a factory cache, not a session cache.
-	static private LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory> _sslSessionCache =
+	// caches socket factories to avoid continually reconstructing.
+	static private LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory> _sslSocketFactoryCache =
 		new LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory>(ClientProperties.getClientProperties().getMaxSocketCacheElements());
 
 	protected TrustManager[] _trustManagers;
@@ -93,8 +93,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	@Override
 	public void notifyUnloaded()
 	{
-		synchronized (_sslSessionCache) {
-			_sslSessionCache.clear();
+		synchronized (_sslSocketFactoryCache) {
+			_sslSocketFactoryCache.clear();
 		}
 	}
 
@@ -104,14 +104,14 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			// we install a trust manager here that understands CRL checking.
 			KeyStore trustStore = KeystoreManager.getTlsTrustStore();
 			if (trustStore != null) {
-				synchronized (_sslSessionCache) {
+				synchronized (_sslSocketFactoryCache) {
 					_trustManagers = new TrustManager[1];
 					// container key not used at this level.
 					_trustManagers[0] = new RevocationAwareTrustManager(new TrustStoreLinkage());
 				}
 			}
 		} catch (Exception ex) {
-			_logger.info("exception occurred in loadTrustManager", ex);
+			_logger.warn("exception occurred in loadTrustManager", ex);
 		}
 	}
 
@@ -145,8 +145,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			}
 
 			cacheKey = new KeyAndCertMaterialCacheKey(clientKeyMaterial);
-			synchronized (_sslSessionCache) {
-				factory = _sslSessionCache.get(cacheKey);
+			synchronized (_sslSocketFactoryCache) {
+				factory = _sslSocketFactoryCache.get(cacheKey);
 				if (factory != null) {
 					return factory;
 				}
@@ -156,33 +156,31 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			kms[0] = new SingleSSLX509KeyManager(clientKeyMaterial);
 
 			SSLContext sslcontext = SSLContext.getInstance("TLS");
-			_logger.debug("ssl context claims protocol is: " + sslcontext.getProtocol() + " protocol.");
+			// _logger.debug("ssl context claims protocol is: " + sslcontext.getProtocol() + " protocol.");
 
 			// we set the client and server session cache sizes to allow session reuse (hopefully).
 
 			SSLSessionContext serverSessionContext = sslcontext.getServerSessionContext();
 			if (serverSessionContext == null) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Couldn't get a server session context on which to set the cache size.");
+				_logger.warn("Couldn't get a server session context on which to set the cache size.");
 			} else {
 				serverSessionContext.setSessionCacheSize(DEFAULT_SESSION_CACHE_SIZE);
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("Set server ssl session context cache size to: " + serverSessionContext.getSessionCacheSize());
 			}
 
 			SSLSessionContext clientSessionContext = sslcontext.getClientSessionContext();
 			if (clientSessionContext == null) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("Couldn't get a client session context on which to set the cache size.");
+				_logger.warn("Couldn't get a client session context on which to set the cache size.");
 			} else {
 				clientSessionContext.setSessionCacheSize(DEFAULT_SESSION_CACHE_SIZE);
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("Set client ssl session context cache size to: " + clientSessionContext.getSessionCacheSize());
 			}
 
 			TrustManager[] mgrs = null;
 			// ensure we get a stable version of this.
-			synchronized (_sslSessionCache) {
+			synchronized (_sslSocketFactoryCache) {
 				mgrs = _trustManagers;
 			}
 			sslcontext.init(kms, mgrs, null);
@@ -197,8 +195,9 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			}
 
 			factory = (SSLSocketFactory) sslcontext.getSocketFactory();
-			synchronized (_sslSessionCache) {
-				_sslSessionCache.put(cacheKey, factory);
+
+			synchronized (_sslSocketFactoryCache) {
+				_sslSocketFactoryCache.put(cacheKey, factory);
 			}
 			return factory;
 
@@ -274,11 +273,11 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		// hmmm: make these into symbolic constants not hardcoded numbers!
 
 		// "Total Connections" Pool size
-		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.MAXIMUM_TOTAL_CONNECTIONS_PROPERTY_KEY, "500");
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.MAXIMUM_TOTAL_CONNECTIONS_PROPERTY_KEY, "1000");
 		// huge! was set to like 150.
 
 		// "Connections per host" pool size
-		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.MAXIMUM_CONNECTIONS_PER_HOST_PROPERTY_KEY, "20");
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.MAXIMUM_CONNECTIONS_PER_HOST_PROPERTY_KEY, "200");
 
 		// max duration to wait for a connection from the pool.
 		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_POOL_TIMEOUT_KEY, "30000");

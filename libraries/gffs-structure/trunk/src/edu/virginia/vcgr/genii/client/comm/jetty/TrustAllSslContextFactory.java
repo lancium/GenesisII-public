@@ -41,7 +41,7 @@ public class TrustAllSslContextFactory extends SslContextFactory
 
 			setSessionCachingEnabled(true);
 			setSslSessionCacheSize(VcgrSslSocketFactory.DEFAULT_SESSION_CACHE_SIZE);
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("ssl session cache size now set to " + getSslSessionCacheSize());
 
 		} catch (Exception e) {

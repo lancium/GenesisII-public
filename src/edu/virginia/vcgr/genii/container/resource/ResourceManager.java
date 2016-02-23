@@ -411,7 +411,6 @@ public class ResourceManager
 			IResource resource = resourceKey.dereference();
 
 			Object prop = resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME);
-			// hmmm: this could have been where we were getting a null exception
 			if (prop == null) {
 				String msg = "received empty property for EPI name";
 				_logger.error(msg);
@@ -421,8 +420,9 @@ public class ResourceManager
 			// add epi
 			any.add(new MessageElement(WSName.ENDPOINT_IDENTIFIER_QNAME, prop.toString()));
 
-			// add security metadata (Use OGSA Secure Addressing depending on
-			// config setting)
+			/*
+			 * add security metadata (Use OGSA Secure Addressing depending on config setting)
+			 */
 			try {
 				String useEap = Installation.getDeployment(new DeploymentName()).security().getProperty(
 					edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);

@@ -100,7 +100,7 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	transient private TrustDelegation delegation;
 
 	/**
-	 * constructor that recreates a trust delegation from a serialized stream
+	 * constructor used when recreating a trust delegation from a serialized stream.
 	 */
 	public TrustCredential()
 	{
@@ -315,16 +315,44 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	 * This method recursively traverses the trust delegation chain and construct a list of AssertionDocuments in appropriate order. This list
 	 * of AssertionDocuments can be converted to XML DOM nodes to send over the wire.
 	 */
-	public void getXMLChain(List<AssertionDocument> chain)
+	public void getXMLChain(List<AssertionDocument> chain, List<String> references, List<String> newlySent, String containerGUID)
 	{
-		if (!signed) {
+		if (!signed)
 			throw new SecurityException("failure: an attempt to create a trust delegation chain without signed content.");
+
+		boolean sawCred = false;
+		boolean streamliningOkay = false;
+		// check if we can skip adding this trust delegation.
+		if (CredentialCache.CLIENT_CREDENTIAL_STREAMLINING_ENABLED && (containerGUID != null)) {
+			streamliningOkay = ClientCredentialTracker.doesContainerSupportStreamlining(containerGUID);
+			if (streamliningOkay) {
+				// lookup this credential under this container's EPI.
+				sawCred = ClientCredentialTracker.hasContainerSeenCred(containerGUID, getId());
+				if ((references != null) && sawCred) {
+					/*
+					 * we only add a reference here if we think the container had already seen this. otherwise we are referring to things
+					 * we're actually shipping, which is bogus.
+					 */
+					references.add(getId());
+				}
+				if ((newlySent != null) && !sawCred) {
+					/*
+					 * we have to record that we are going to actually send this, so the tracking can be updated. it is not a reference now,
+					 * but can be in the future for a new sending.
+					 */
+					newlySent.add(getId());
+				}
+			}
 		}
-		synchronized (delegation) {
-			chain.add(delegation.getXMLBeanDoc());
+		if (!sawCred) {
+			// had not seen this one yet, or credential streamlining is disabled.
+			synchronized (delegation) {
+				chain.add(delegation.getXMLBeanDoc());
+			}
 		}
+		// include the prior delegations for this trust credential also.
 		if (priorDelegation != null) {
-			priorDelegation.getXMLChain(chain);
+			priorDelegation.getXMLChain(chain, references, newlySent, containerGUID);
 		}
 	}
 
@@ -581,20 +609,20 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	@SuppressWarnings("deprecation")
 	private void constructFromTrustDelegation(TrustDelegation delegation)
 	{
+		boolean signatureWasVerified = false;
 		try {
 			synchronized (delegation) {
-				// PublicKey publicKeyOfIssuer =
-				// delegation.getIssuerFromSignature()[0].getPublicKey();
 				SimpleTrustChecker stc = new SimpleTrustChecker(delegation.getIssuerFromSignature()[0], false);
 				stc.checkTrust(delegation.getXMLBeanDoc());
 			}
+			signatureWasVerified = true;
 		} catch (Exception e) {
 			throw new SecurityException("failure: an invalid trust delegation was found!  delegation has subject " + delegation.getSubjectDN()
 				+ ", custodian " + delegation.getCustodianDN() + ", and issuer " + delegation.getIssuerDN(), e);
 		}
 		this.delegation = delegation;
 		this.signed = true;
-		this.properlySigned = true;
+		this.properlySigned = signatureWasVerified;
 		this.delegatee = delegation.getSubjectFromConfirmation();
 		this.issuer = delegation.getIssuerFromSignature();
 		this.restrictions =

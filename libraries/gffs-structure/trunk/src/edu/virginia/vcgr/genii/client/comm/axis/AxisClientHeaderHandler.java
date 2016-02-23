@@ -51,6 +51,7 @@ import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
@@ -77,7 +78,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 	private void setGenesisIIHeaders(MessageContext msgContext) throws AxisFault
 	{
-		SOAPHeader header;
+		SOAPHeader header = null;
 
 		try {
 			header = (SOAPHeader) msgContext.getMessage().getSOAPHeader();
@@ -89,7 +90,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 
 				if (currentVersion != null && !currentVersion.equals(Version.EMPTY_VERSION)) {
 					SOAPHeaderElement geniiVersion =
-						new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION, currentVersion.toString());
+						new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION_QNAME, currentVersion.toString());
 					geniiVersion.setActor(null);
 					geniiVersion.setMustUnderstand(false);
 					header.addChildElement(geniiVersion);
@@ -102,19 +103,20 @@ public class AxisClientHeaderHandler extends BasicHandler
 			isGenesisII.setMustUnderstand(false);
 			header.addChildElement(isGenesisII);
 
-			// hmmm: NOT ADDING CRED SHORTHAND HEADER YET
-			// /*
-			// * add in the new header for credential shorthand notation, signifying that the server knows how to reassemble partial
-			// credentials
-			// * from a client when the client has previously presented the whole credential chains.
-			// */
-			// SOAPHeaderElement supportsShorthand =
-			// new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_CREDENTIAL_SHORTHAND_SUPPORTED_QNAME, Boolean.TRUE);
-			// supportsShorthand.setActor(null);
-			// supportsShorthand.setMustUnderstand(false);
-			// header.addChildElement(supportsShorthand);
+			/*
+			 * add in the new header for credential streamlining notation, signifying that the server knows how to reassemble partial
+			 * credentials from a client when the client has previously presented the whole credential chains.
+			 */
+			SOAPHeaderElement supportsStreamlining =
+				new SOAPHeaderElement(GeniiSOAPHeaderConstants.GENII_SUPPORTS_CREDENTIAL_STREAMLINING_QNAME,
+					CredentialCache.SERVER_CREDENTIAL_STREAMLINING_ENABLED ? "true" : "false");
+			supportsStreamlining.setActor(null);
+			supportsStreamlining.setMustUnderstand(false);
+			header.addChildElement(supportsStreamlining);
 
 		} catch (SOAPException se) {
+			_logger.error("saw failure during soap header creation", se);
+
 			throw new AxisFault(se.getLocalizedMessage());
 		}
 	}
@@ -222,6 +224,14 @@ public class AxisClientHeaderHandler extends BasicHandler
 		if (clientKeyAndCertificate == null) {
 			_logger.error("no active key and cert material available: not performing delegation");
 			return;
+		}
+
+		EndpointReferenceType target = (EndpointReferenceType) messageContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
+		GUID containerGUID = null;
+		if (target == null) {
+			_logger.warn("could not find EPR target in message context; cannot use this for container id.");
+		} else {
+			containerGUID = EPRUtils.getGeniiContainerID(target);
 		}
 
 		long beginTime = System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset;
@@ -361,7 +371,12 @@ public class AxisClientHeaderHandler extends BasicHandler
 			_logger.debug("Found zero credentials to delegate for soap header.");
 		}
 		final javax.xml.soap.SOAPHeader soapHeader = messageContext.getMessage().getSOAPHeader();
-		soapHeader.addChildElement(walletForResource.convertToSOAPElement());
+		ArrayList<String> credRefs = new ArrayList<>();
+		soapHeader
+			.addChildElement(walletForResource.convertToSOAPElement((containerGUID != null) ? containerGUID.toString(true) : null, credRefs));
+		SOAPHeaderElement refsElem = walletForResource.emitReferencesAsSoap(credRefs);
+		if (refsElem != null)
+			soapHeader.addChildElement(refsElem);
 	}
 
 	@SuppressWarnings("unchecked")

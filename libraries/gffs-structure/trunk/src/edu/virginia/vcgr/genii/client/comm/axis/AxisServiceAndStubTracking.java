@@ -37,7 +37,10 @@ public class AxisServiceAndStubTracking
 
 	public static boolean enableExtraLogging = false; // code produces more noise if this is enabled.
 
-	// if this is not set to true, then the stub caching machinery will not be used.
+	/*
+	 * if this is not set to true, then the stub caching machinery will not be used. this needs to be enabled for the connection re-use to be
+	 * efficient.
+	 */
 	public static boolean enableStubCaching = true;
 
 	// ................
@@ -56,15 +59,15 @@ public class AxisServiceAndStubTracking
 	// ten minutes currently. is that long enough? too long?
 
 	// maximum number of stubs to remember (for each EPR, within each service).
-	static public final int STUB_POOL_LIMIT_PER_EPR = 20;
+	static public final int STUB_POOL_LIMIT_PER_EPR = 50;
 
 	// we'll actively track this many urls for each service.
-	static public final int MAXIMUM_URLS_PER_SERVICE = 100;
+	static public final int MAXIMUM_URLS_PER_SERVICE = 200;
 
 	// ................
 
 	// how many x509 certificates we will remember for the containers we intend to talk to.
-	static int VALIDATED_CERT_CACHE_SIZE = 32;
+	static int VALIDATED_CERT_CACHE_SIZE = 48;
 
 	// ................
 

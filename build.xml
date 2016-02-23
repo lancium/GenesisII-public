@@ -210,7 +210,6 @@
 		<delete file="${basedir}/context.xml.lock"/>
 
 		<!-- old locations were at top of build. -->
-		<delete file="${basedir}/grid"/>
 		<delete file="${basedir}/fastgrid"/>
 		<delete file="${basedir}/grid.bat"/>
 		<delete file="${basedir}/runContainer.sh"/>

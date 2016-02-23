@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
@@ -454,5 +455,25 @@ public class ClientUtils
 	static public void setTimeout(Object clientProxy, int timeoutMillis) throws ResourceException
 	{
 		getProxyFactory().setTimeout(clientProxy, timeoutMillis);
+	}
+
+	/**
+	 * validates all of the credentials in the calling context. returns true if there are any valid credentials still listed, after possible
+	 * cleaning of old / broken ones.
+	 */
+	public static boolean areCredentialsOkay(ICallingContext callingContext)
+	{
+		KeyAndCertMaterial clientKeyMaterial;
+		try {
+			clientKeyMaterial = checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+		} catch (AuthZSecurityException e) {
+			_logger.error("got an exception when trying to load calling context", e);
+			return false;
+		}
+		if (clientKeyMaterial == null) {
+			throw new RuntimeException("failed to retrieve a valid TLS certificate for the client");
+		}
+		TransientCredentials tranCreds = TransientCredentials.getTransientCredentials(callingContext);
+		return (tranCreds != null) && !tranCreds.isEmpty();
 	}
 }

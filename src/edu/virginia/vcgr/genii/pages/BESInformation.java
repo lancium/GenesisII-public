@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.pages;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.dpage.InjectParameter;
 
 import edu.virginia.vcgr.genii.container.bes.BES;
@@ -11,6 +13,8 @@ import edu.virginia.vcgr.genii.container.dynpages.templates.GenesisIIStyledPage;
 
 public class BESInformation extends GenesisIIStyledPage
 {
+	static private Log _logger = LogFactory.getLog(BESInformation.class);
+
 	static final private String PAGE_TITLE = "BES Information";
 
 	@InjectParameter("besID")
@@ -39,7 +43,15 @@ public class BESInformation extends GenesisIIStyledPage
 	{
 		ps.format("<H2>Information for BES Container %s</H2>", besID);
 
-		BES bes = BES.getBES(besID);
+		BES bes = null;
+		try {
+			bes = BES.getBES(besID);
+		} catch (IllegalStateException e) {
+			String msg = "caught illegal state exception trying to get BES information when generating BES page";
+			_logger.error(msg);
+			throw new IOException(msg);
+		}
+
 		if (bes == null) {
 			ps.println("<BOLD>None Available</BOLD>");
 			return;

@@ -8,6 +8,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -95,7 +96,7 @@ public class Subscriber
 			return;
 		}
 
-		if (!SubscriptionOutcallHandler.areCredentialsOkay(callingContext)) {
+		if (!ClientUtils.areCredentialsOkay(callingContext)) {
 			_logger.debug("dropping requested subscription since we have no credentials: req=" + request);
 			return;
 		}

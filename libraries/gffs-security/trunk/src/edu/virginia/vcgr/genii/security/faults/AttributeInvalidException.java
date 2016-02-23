@@ -4,7 +4,6 @@ import java.security.GeneralSecurityException;
 
 public class AttributeInvalidException extends GeneralSecurityException
 {
-
 	static public final long serialVersionUID = 0L;
 
 	/**
