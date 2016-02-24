@@ -63,6 +63,7 @@ testNewFileInGridShowsUp()
 {
   if ! fuse_supported; then return 0; fi
   local newfile=new-file-testing-fuse-yo
+#hmmm: would be good to try the test from fuse perspective also, since below is changing only in grid.
   for ((i=0; i < $FUSE_COPY_COUNT; i++)); do
     local currfile=$newfile-$i
     grid echo this is a new file in the grid. \\\> $RNSPATH/$currfile

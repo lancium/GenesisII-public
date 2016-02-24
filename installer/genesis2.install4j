@@ -133,16 +133,9 @@
       <fileEntry mountPoint="34" file="../grid" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
       <dirEntry mountPoint="5995" file="../deployments/default" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude>
-          <entry location="configuration/bootstrap.xml" fileType="regular" />
-          <entry location="security/tls-cert.cer" fileType="regular" />
-          <entry location="security/signing-cert.cer" fileType="regular" />
-          <entry location="security/default-owners/admin.cer" fileType="regular" />
-          <entry location="security/admin.cer" fileType="regular" />
-          <entry location="security/admin.pfx" fileType="regular" />
-          <entry location="security/signing-cert.pfx" fileType="regular" />
-          <entry location="security/signing-cert.pfx-base.pfx" fileType="regular" />
-          <entry location="security/tls-cert.pfx" fileType="regular" />
-          <entry location="security/trusted.pfx" fileType="regular" />
+          <entry location="configuration/web-container.properties" fileType="regular" />
+          <entry location="configuration/security.properties" fileType="regular" />
+          <entry location="configuration/server-config.xml" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="10165" file="${compiler:genii.deployment-source}/configuration/myproxy.properties" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="true" />

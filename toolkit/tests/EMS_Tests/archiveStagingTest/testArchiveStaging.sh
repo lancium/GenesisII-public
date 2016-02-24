@@ -99,7 +99,7 @@ oneTimeTearDown()
   cleanLocalTestFiles
 
   # clean-up any prior run's grid files.
-  silent_grid rm $RNSPATH/gorp.zip $RNSPATH/snarfle.zip $RNSPATH/snarfle-from-gorp.sh &>/dev/null
+  silent_grid rm $RNSPATH/gorp.zip $RNSPATH/snarfle.zip $RNSPATH/snarfle-from-gorp.sh $RNSPATH/gorp-returns.* &>/dev/null
 }
 
 ##############

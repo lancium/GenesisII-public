@@ -93,6 +93,7 @@ oneTimeTearDown()
 {
   grid rm -rf dir1 &>/dev/null
   grid unlink dir2 &>/dev/null
+  grid unlink ufile.txt &>/dev/null
 }
 
 # load and run shUnit2

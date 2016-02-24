@@ -21,7 +21,7 @@ cd $REGRESSION_DIR
 
 TIME_START="$(date +"%s")"
 
-source ../../../prepare_tools.sh ../../../prepare_tools.sh
+source ../prepare_tools.sh ../prepare_tools.sh
 
 # if that didn't work, complain.
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi

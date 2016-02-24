@@ -46,8 +46,8 @@ public class UnpackTar
 		ArchiveEntry tarEntry = tarIn.getNextEntry();
 		while (tarEntry != null) {
 			// New code by ASG 2016-02-21. Added extracting user permission bits and OR ing them with group permissions
-			// Boolean executable = false;
 			int mode = 0;
+			int defaultMode = 0750;  // assume somewhat standard executable permissions if we cannot get the mode.
 			switch (archType) {
 				case TAR:
 				case TGZ:
@@ -57,12 +57,20 @@ public class UnpackTar
 					mode = ((ZipArchiveEntry) tarEntry).getUnixMode();
 					break;
 			}
-			// System.out.println("The mode on file " + tarEntry.getName() + " is " + Integer.toOctalString(mode));
-			int temp = mode & 0700;
-			temp = temp / 8; // Shift it right 3 bit positions
-			mode = mode | temp;
-			// System.out.println("The mode on file " + tarEntry.getName() + " is " + Integer.toOctalString(mode));
+			if (mode==0) {
+				mode = defaultMode;
+			}
+			if (_logger.isDebugEnabled())
+				_logger.debug("The mode on '" + tarEntry.getName() + "' is " + Integer.toOctalString(mode));
+			if (grantUserPermsToGroup) {				
+				int temp = mode & 0700;
+				temp = temp / 8; // Shift it right 3 bit positions
+				mode = mode | temp;
+				if (_logger.isDebugEnabled())
+					_logger.debug("Now mode on '" + tarEntry.getName() + "' is " + Integer.toOctalString(mode));
+			}
 			// End of extracting and Or ing the permission bits.
+			
 			// create a file with the same name as the tarEntry
 			File destPath = new File(dest, tarEntry.getName());
 			if (_logger.isTraceEnabled())
@@ -92,27 +100,12 @@ public class UnpackTar
 			// using PosixFilePermission to set file permissions that we extracted earlier.
 			HashSet<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
 			// add owners permission
-			if ((mode & 0400) != 0) {
+			if ((mode & 0400) != 0)
 				perms.add(PosixFilePermission.OWNER_READ);
-				if (grantUserPermsToGroup) {
-					// additional code for sudo BES to enable group perm.
-					perms.add(PosixFilePermission.GROUP_READ);
-				}
-			}
-			if ((mode & 0200) != 0) {
+			if ((mode & 0200) != 0)
 				perms.add(PosixFilePermission.OWNER_WRITE);
-				if (grantUserPermsToGroup) {
-					// additional code for sudo BES to enable group perm.
-					perms.add(PosixFilePermission.GROUP_WRITE);
-				}
-			}
-			if ((mode & 0100) != 0) {
+			if ((mode & 0100) != 0)
 				perms.add(PosixFilePermission.OWNER_EXECUTE);
-				if (grantUserPermsToGroup) {
-					// additional code for sudo BES to enable group perm.
-					perms.add(PosixFilePermission.GROUP_EXECUTE);
-				}
-			}
 			// add group permissions
 			if ((mode & 0040) != 0)
 				perms.add(PosixFilePermission.GROUP_READ);
@@ -123,9 +116,9 @@ public class UnpackTar
 			// add others permissions
 			if ((mode & 0004) != 0)
 				perms.add(PosixFilePermission.OTHERS_READ);
-			if ((mode & 0004) != 0)
+			if ((mode & 0002) != 0)
 				perms.add(PosixFilePermission.OTHERS_WRITE);
-			if ((mode & 0004) != 0)
+			if ((mode & 0001) != 0)
 				perms.add(PosixFilePermission.OTHERS_EXECUTE);
 
 			Files.setPosixFilePermissions(Paths.get(destPath.getCanonicalPath()), perms);
