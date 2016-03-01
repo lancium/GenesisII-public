@@ -1,0 +1,5 @@
+#!/bin/bash
+export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+# run the real grid command.
+"$WORKDIR/bin/grid" $*
+
