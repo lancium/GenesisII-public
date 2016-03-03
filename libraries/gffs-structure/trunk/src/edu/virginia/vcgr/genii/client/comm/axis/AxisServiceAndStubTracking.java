@@ -495,9 +495,10 @@ public class AxisServiceAndStubTracking
 			if (enforcedRunBecauseTooSlack || createdEnoughHandlers) {
 				// yes, collect the trash, finally, joy joy...
 				LowMemoryWarning.performGarbageCollection();
+				//hmmm: this code seems to be deadly.  we get a container that no longer can be connected to somehow!?
 				// try dropping any connections that have been closed or idle too long.
-				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
-				connMgr.closeIdleConnections(CONNECTION_IDLE_TIMEOUT_ms);
+//				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+//				connMgr.closeIdleConnections(CONNECTION_IDLE_TIMEOUT_ms);
 				// reset how many handlers were created; the handler our caller is about to create (or just created) is already counted.
 				_handlersCreatedSinceLastGC = 0;
 				// currently we always log this; it shows up only as frequently as the shortest time between collections.
