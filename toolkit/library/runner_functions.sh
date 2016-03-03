@@ -132,6 +132,14 @@ function logged_grid()
   # make the external version of the log file available.  if we're multiplexing users,
   # this will be meaningless, which is why we used unique names above.
   \cp -f "$my_output" "$GRID_OUTPUT_FILE"
+  # then add the logging results to our huge mongo log of all actions.
+  echo >> "$CONGLOMERATED_GRID_OUTPUT"
+  echo "$(readable_date_string) log from: $my_output" >> "$CONGLOMERATED_GRID_OUTPUT"
+  echo "=======" >> "$CONGLOMERATED_GRID_OUTPUT"
+  cat "$my_output" >> "$CONGLOMERATED_GRID_OUTPUT"
+  echo "=======" >> "$CONGLOMERATED_GRID_OUTPUT"
+  # and now remove the tiny individual log file so we don't litter.
+  \rm -f "$my_output"
   return $retval
 }
 
@@ -159,6 +167,13 @@ function raw_grid()
 }
 
 ##############
+
+# uses the grid timing file to determine how long the last activity took in
+# seconds and then prints out the value.
+calculateTimeTaken()
+{
+  head -n 1 $GRID_TIMING_FILE | awk '{print $2}'
+}
 
 # calculates the bandwidth for a transfer.  this takes the elapsed time as
 # the first parameter and the size transferred as second parameter.

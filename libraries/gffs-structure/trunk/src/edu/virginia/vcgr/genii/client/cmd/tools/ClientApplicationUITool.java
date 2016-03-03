@@ -73,7 +73,9 @@ public class ClientApplicationUITool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (numArguments() > 0)
+		if (numArguments() > 0) {
+			_logger.warn("too many arguments for client UI");
 			throw new InvalidToolUsageException();
+		}
 	}
 }

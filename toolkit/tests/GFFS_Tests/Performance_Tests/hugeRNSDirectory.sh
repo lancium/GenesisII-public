@@ -84,18 +84,18 @@ testScanningLargeDirectory()
 
   timed_grid ls $RNSPATH/$BIGDIRNAME
   assertEquals "Run ls on new directory" 0 $?
-  real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to list $BIGDIRNAME: $real_time s"
 
   timed_grid ls $RNSPATH/$BIGDIRNAME
   assertEquals "Run ls on new directory again" 0 $?
-  real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to list $BIGDIRNAME after cached: $real_time s"
 
 ## ls doesn't support patterns??
 #  timed_grid ls $RNSPATH/$BIGDIRNAME/*5*
 #  assertEquals "Run ls on new directory with pattern" 0 $?
-#  real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
+#  real_time=$(calculateTimeTaken)
 #  echo "Time taken to scan $BIGDIRNAME for files with pattern: $real_time s"
 
 }
@@ -106,7 +106,7 @@ testCleaningOutBigDir()
 
   oneTimeTearDown  # leverage cleanup again.
   assertEquals "Clean up directory with $MAX_FILES entries" 0 $?
-  real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to clean up $BIGDIRNAME: $real_time s"
 }
 

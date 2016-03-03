@@ -14,25 +14,22 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.io.URIManager;
+import edu.virginia.vcgr.genii.client.jsdl.ContainerDataStage;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.client.jsdl.ContainerDataStage;
-import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
-import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public class StageDataTool extends BaseGridTool
@@ -69,12 +66,8 @@ public class StageDataTool extends BaseGridTool
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
 		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException
 	{
-
 		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
-		}
+		ContextManager.getCurrentOrMakeNewContext();
 
 		InputStream in = null;
 

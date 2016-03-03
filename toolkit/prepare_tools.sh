@@ -74,6 +74,7 @@ fi
 # this variable points to the last output from a grid command.
 export GRID_OUTPUT_FILE="$TEST_TEMP/grid_output.log"
 export GRID_TIMING_FILE="$TEST_TEMP/grid_times.log"
+export CONGLOMERATED_GRID_OUTPUT="$TEST_TEMP/full_grid_output.log"
 
 # the location where our munged jsdl files will reside.
 export GENERATED_JSDL_FOLDER="$TEST_TEMP/patched_jsdl"

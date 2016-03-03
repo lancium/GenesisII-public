@@ -10,7 +10,9 @@ import java.util.HashMap;
 import org.apache.axis.client.Service;
 import org.apache.axis.client.Stub;
 import org.apache.axis.configuration.FileProvider;
+import org.apache.axis.transport.http.CommonsHTTPSender;
 import org.apache.axis.types.URI;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
@@ -35,6 +37,8 @@ public class AxisServiceAndStubTracking
 {
 	static Log _logger = LogFactory.getLog(AxisServiceAndStubTracking.class);
 
+	public static int CONNECTION_IDLE_TIMEOUT_ms = 60 * 1000;
+	
 	public static boolean enableExtraLogging = false; // code produces more noise if this is enabled.
 
 	/*
@@ -491,6 +495,9 @@ public class AxisServiceAndStubTracking
 			if (enforcedRunBecauseTooSlack || createdEnoughHandlers) {
 				// yes, collect the trash, finally, joy joy...
 				LowMemoryWarning.performGarbageCollection();
+				// try dropping any connections that have been closed or idle too long.
+				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+				connMgr.closeIdleConnections(CONNECTION_IDLE_TIMEOUT_ms);
 				// reset how many handlers were created; the handler our caller is about to create (or just created) is already counted.
 				_handlersCreatedSinceLastGC = 0;
 				// currently we always log this; it shows up only as frequently as the shortest time between collections.

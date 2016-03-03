@@ -26,8 +26,9 @@ import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
  */
 public class EPIResolutionCache
 {
+	// hmmm: perhaps this cache size should be configurable in a config file.
 	static private TimedOutLRUCache<URI, EndpointReferenceType> _cache =
-		new TimedOutLRUCache<URI, EndpointReferenceType>(1024, 1000 * 60 * 60 * 24);
+		new TimedOutLRUCache<URI, EndpointReferenceType>(10000, 1000 * 60 * 60 * 24);
 
 	static public synchronized EndpointReferenceType get(URI epi)
 	{

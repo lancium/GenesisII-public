@@ -14,7 +14,7 @@ public class ClientCredentialTracker
 	static private Log _logger = LogFactory.getLog(ClientCredentialTracker.class);
 
 	// hmmm: these values below should come from config file!
-	
+
 	// how many containers we will track overall for the client.
 	public static final int MAX_CONTAINERS_TRACKED = 100;
 
@@ -263,11 +263,11 @@ public class ClientCredentialTracker
 		synchronized (_streamliningContainerList) {
 			ContainerSupportLevel memory = _streamliningContainerList.get(containerGUID);
 			if (memory != null) {
-					if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())
-						_logger.debug("updating existing memory record for container " + containerGUID + " setting <" + doesSupport + ", "
-							+ containerSaidSo + ">");
-					memory._supportsStreamlining = doesSupport;
-					memory._containerSaidSo = containerSaidSo;
+				if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())
+					_logger.debug("updating existing memory record for container " + containerGUID + " setting <" + doesSupport + ", "
+						+ containerSaidSo + ">");
+				memory._supportsStreamlining = doesSupport;
+				memory._containerSaidSo = containerSaidSo;
 			} else {
 				if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())
 					_logger.debug("adding new memory record for container " + containerGUID + " setting <" + doesSupport + ", "

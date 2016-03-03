@@ -36,7 +36,7 @@ testTimeCopyingGridFileToLocal()
   assertEquals "Copying file $LARGE_DATA_FILE ($readable_size MB) to local file" 0 $?
   # clean up the huge file now.
   \rm $fat_junk
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer $readable_size MB file : $real_time s"
   showBandwidth $real_time $actual_size
 }

@@ -57,8 +57,8 @@ public class TimedOutCredentialsCachePerSession extends TimedOutLRUCache<String,
 				if (isThisIt != null) {
 					mostDelegatedId = isThisIt.getId();
 				} else {
-					// hmmm: clean up language here.
-					_logger.warn("BAD NEWS somehow the key we were told to look up was missing!  key was: " + curr);
+					if (_logger.isDebugEnabled())
+						_logger.debug("credential missing now: " + curr);
 				}
 				while (isThisIt != null) {
 					if (isThisIt.getId().equals(credId)) {

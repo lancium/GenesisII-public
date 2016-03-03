@@ -126,8 +126,16 @@ function run_any_command()
   logged_command "$my_output" "${@}"
   local retval=$?
   # make the external version of the log file available.  if we're multiplexing users,
-  # this will be meaningless, which is why we used unique names above.
+  # this will be clobbered constantly, which is why we used unique names above.
   \cp -f "$my_output" "$GRID_OUTPUT_FILE"
+  # then add the logging results to our huge mongo log of all actions.
+  echo >> "$CONGLOMERATED_GRID_OUTPUT"
+  echo "$(readable_date_string) log from: $my_output" >> "$CONGLOMERATED_GRID_OUTPUT"
+  echo "=======" >> "$CONGLOMERATED_GRID_OUTPUT"
+  cat "$my_output" >> "$CONGLOMERATED_GRID_OUTPUT"
+  echo "=======" >> "$CONGLOMERATED_GRID_OUTPUT"
+  # and now remove the tiny individual log file so we don't litter.
+  \rm -f "$my_output"
   return $retval
 }
 

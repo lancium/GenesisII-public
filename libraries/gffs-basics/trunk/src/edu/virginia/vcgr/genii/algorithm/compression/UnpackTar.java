@@ -47,7 +47,7 @@ public class UnpackTar
 		while (tarEntry != null) {
 			// New code by ASG 2016-02-21. Added extracting user permission bits and OR ing them with group permissions
 			int mode = 0;
-			int defaultMode = 0750;  // assume somewhat standard executable permissions if we cannot get the mode.
+			int defaultMode = 0750; // assume somewhat standard executable permissions if we cannot get the mode.
 			switch (archType) {
 				case TAR:
 				case TGZ:
@@ -57,20 +57,20 @@ public class UnpackTar
 					mode = ((ZipArchiveEntry) tarEntry).getUnixMode();
 					break;
 			}
-			if (mode==0) {
+			if (mode == 0) {
 				mode = defaultMode;
 			}
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 				_logger.debug("The mode on '" + tarEntry.getName() + "' is " + Integer.toOctalString(mode));
-			if (grantUserPermsToGroup) {				
+			if (grantUserPermsToGroup) {
 				int temp = mode & 0700;
 				temp = temp / 8; // Shift it right 3 bit positions
 				mode = mode | temp;
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug("Now mode on '" + tarEntry.getName() + "' is " + Integer.toOctalString(mode));
 			}
 			// End of extracting and Or ing the permission bits.
-			
+
 			// create a file with the same name as the tarEntry
 			File destPath = new File(dest, tarEntry.getName());
 			if (_logger.isTraceEnabled())

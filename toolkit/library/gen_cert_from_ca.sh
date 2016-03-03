@@ -21,11 +21,6 @@ source "$GFFS_TOOLKIT_ROOT/library/helper_methods.sh"
 #source "$GFFS_TOOLKIT_ROOT/library/runner_functions.sh"
 source "$GFFS_TOOLKIT_ROOT/library/security_management.sh"
 
-# if this wasn't set due to older version of other xsede tools, then set it.
-if [ -z "$GRID_OUTPUT_FILE" ]; then
-  export GRID_OUTPUT_FILE="$TEST_TEMP/grid_output.log"
-fi
-
 ####
 
 if [ $# -lt 7 ]; then

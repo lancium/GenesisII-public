@@ -74,7 +74,7 @@ testLocalClientLocalData()
   timed_grid cp local:$TEST_TEMP/random5KB.dat $RNSPATH/new-dir-local
   assertEquals "Timing - Transferring 5KB local file to $RNSPATH/new-dir-local on local container $LOCAL_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE | awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer 5KB file : $real_time s"
   actual_size=$(\ls -l $TEST_TEMP/random5KB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
@@ -83,7 +83,7 @@ testLocalClientLocalData()
   timed_grid cp local:$TEST_TEMP/random5MB.dat $RNSPATH/new-dir-local
   assertEquals "Timing - Transferring 5MB local file to $RNSPATH/new-dir-local on local container $LOCAL_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer 5MB file : $real_time s"
   actual_size=$(\ls -l $TEST_TEMP/random5MB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
@@ -92,7 +92,7 @@ testLocalClientLocalData()
   timed_grid cp local:$HUGE_TEST_FILE $RNSPATH/new-dir-local/random5GB.dat 
   assertEquals "Timing - Transferring huge local file to $RNSPATH/new-dir-local on local container $LOCAL_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer huge file : $real_time s"
   actual_size=$(\ls -l $HUGE_TEST_FILE | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
@@ -104,7 +104,7 @@ testLocalClientRemoteData()
   timed_grid cp local:$TEST_TEMP/random5KB.dat $RNSPATH/new-dir-remote
   assertEquals "Timing - Transferring 5KB local file to $RNSPATH/new-dir-remote on remote container $REMOTE_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer 5KB file : $real_time s"
   actual_size=$(\ls -l $TEST_TEMP/random5KB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
@@ -113,7 +113,7 @@ testLocalClientRemoteData()
   timed_grid cp local:$TEST_TEMP/random5MB.dat $RNSPATH/new-dir-remote
   assertEquals "Timing - Transferring 5MB local file to $RNSPATH/new-dir-remote on remote container $REMOTE_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer 5MB file : $real_time s"
   actual_size=$(\ls -l $TEST_TEMP/random5MB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
@@ -122,7 +122,7 @@ testLocalClientRemoteData()
   timed_grid cp local:$HUGE_TEST_FILE $RNSPATH/new-dir-remote/random5GB.dat
   assertEquals "Timing - Transferring huge local file to $RNSPATH/new-dir-remote on remote container $REMOTE_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer huge file : $real_time s"
   actual_size=$(\ls -l $HUGE_TEST_FILE | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
@@ -135,7 +135,7 @@ testRemoteSrcAndDest()
   echo $time
   assertEquals "Timing - Transferring 5KB local file to $RNSPATH/new-dir from local container $LOCAL_CONTAINER to remote container $REMOTE_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer 5KB file : $real_time s"
   actual_size=$(\ls -l $TEST_TEMP/random5KB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
@@ -144,7 +144,7 @@ testRemoteSrcAndDest()
   timed_grid cp $RNSPATH/new-dir-local/random5MB.dat $RNSPATH/new-dir
   assertEquals "Timing - Transferring 5MB local file to $RNSPATH/new-dir from local container $LOCAL_CONTAINER to remote container $REMOTE_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer 5MB file : $real_time s"
   actual_size=$(\ls -l $TEST_TEMP/random5MB.dat | awk '{print $5}')
   showBandwidth "$real_time" $actual_size
@@ -153,7 +153,7 @@ testRemoteSrcAndDest()
   timed_grid cp $RNSPATH/new-dir-local/random5GB.dat $RNSPATH/new-dir
   assertEquals "Timing - Transferring huge local file to $RNSPATH/new-dir from local container $LOCAL_CONTAINER to remote container $REMOTE_CONTAINER" 0 $?
   sync
-  real_time=$(head -n 1 $GRID_TIMING_FILE |awk '{print $2}')
+  real_time=$(calculateTimeTaken)
   echo "Time taken to tranfer huge file : $real_time s"
   actual_size=$(\ls -l $HUGE_TEST_FILE | awk '{print $5}')
   showBandwidth "$real_time" $actual_size

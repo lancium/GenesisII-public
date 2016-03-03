@@ -41,13 +41,21 @@ testReplication()
   sleep 1
 
   grid unlink dir2 &>/dev/null
-  grid resolver -q dir1 --link=dir2 &> /dev/null
+  grid resolver -q dir1 --link=dir2 
+#&> /dev/null
   assertEquals "query resolver" 0 $?
 
   grid echo "This is file 1" "'>'" dir1/file1.txt
-  assertEquals "create replicated file" 0 $?
+  assertEquals "create first replicated file" 0 $?
   grid echo "File 2 is this" "'>'" dir1/file2.txt
+  assertEquals "create second replicated file" 0 $?
   grid echo "Is this file 3" "'>'" dir1/file3.txt
+  assertEquals "create third replicated file" 0 $?
+
+echo dir2 after mods on dir1
+grid ls dir2
+
+
   grid rm dir1/file2.txt
   assertEquals "remove replicated file" 0 $?
   grid mkdir dir1/subdirectory

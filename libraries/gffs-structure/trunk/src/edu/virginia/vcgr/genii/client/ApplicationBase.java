@@ -17,14 +17,12 @@ import edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.TrustStoreLinkage;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.osgi.OSGiSupport;
 import edu.virginia.vcgr.genii.security.CertificateValidatorFactory;
 import edu.virginia.vcgr.genii.security.credentials.CredentialCache;
@@ -145,9 +143,9 @@ public class ApplicationBase
 	{
 		ICallingContext callContext = null;
 		try {
-			callContext = ContextManager.getCurrentContext();
-			if (callContext == null)
-				callContext = new CallingContextImpl(new ContextType());
+			callContext = ContextManager.getCurrentOrMakeNewContext();
+//			if (callContext == null)
+//				callContext = new CallingContextImpl(new ContextType());
 		} catch (Throwable e) {
 			_logger.error("could not load or create calling context.");
 		}
@@ -168,9 +166,9 @@ public class ApplicationBase
 	{
 		ICallingContext callContext = null;
 		try {
-			callContext = ContextManager.getCurrentContext();
-			if (callContext == null)
-				callContext = new CallingContextImpl(new ContextType());
+			callContext = ContextManager.getCurrentOrMakeNewContext();
+//			if (callContext == null)
+//				callContext = new CallingContextImpl(new ContextType());
 		} catch (Throwable e) {
 			_logger.error("could not load or create calling context.");
 		}

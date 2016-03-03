@@ -328,9 +328,8 @@ public class AxisCredentialWallet
 	}
 
 	/**
-	 * supports credential streamlining by grabbing the list of referenced credentials out of the soap header.
-	 * all that this does is to create a list of the referenced credentials; they should be added
-	 * at a later point if they were not included in soap.
+	 * supports credential streamlining by grabbing the list of referenced credentials out of the soap header. all that this does is to create
+	 * a list of the referenced credentials; they should be added at a later point if they were not included in soap.
 	 */
 	private void addInCredentialReferencesFromSOAPHeaderElement(MessageElement encodedReferences) throws CredentialOmittedException
 	{

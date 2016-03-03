@@ -7,8 +7,6 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.context.WorkingContext;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
@@ -61,11 +59,11 @@ final public class CallingContextUtilities
 	public static void updateCallingContext(TrustCredential assertion) throws Exception
 	{
 		// get the calling context (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
-			ContextManager.storeCurrentContext(callContext);
-		}
+		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
+//		if (callContext == null) {
+//			callContext = new CallingContextImpl(new ContextType());
+//			ContextManager.storeCurrentContext(callContext);
+//		}
 
 		// retrieve the credentials wallet from the context and update it
 		CredentialWallet wallet = (CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);

@@ -75,7 +75,6 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListene
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.KeystoreSecurityConstants;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
@@ -89,7 +88,6 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.credentials.ClientCredentialTracker;
@@ -167,7 +165,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			_epr = epr;
 
 			if (callContext == null) {
-				callContext = new CallingContextImpl(new ContextType());
+				throw new ResourceException("calling context passed in as null");
+//				callContext = new CallingContextImpl(new ContextType());
 			}
 			_callContext = callContext.deriveNewContext();
 			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");

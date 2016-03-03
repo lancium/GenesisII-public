@@ -146,7 +146,8 @@ public class RNSUtilities
 				supportType = RNSSupportType.value2;
 		}
 		SupportsRNSType supportsRNS = new SupportsRNSType(supportType);
+		RNSMetadataType retval = new RNSMetadataType(supportsRNS, any);
 
-		return new RNSMetadataType(supportsRNS, any);
+		return retval;
 	}
 }

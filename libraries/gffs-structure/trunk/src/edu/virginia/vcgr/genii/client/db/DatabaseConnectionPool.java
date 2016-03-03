@@ -25,9 +25,9 @@ public class DatabaseConnectionPool
 	static protected final int _DB_POOL_SIZE_DEFAULT = 16;
 
 	// how long should the database user wait for a connection from the pool?
-	static public final int MAX_SNOOZE_AWAITING_POOL = 30 * 1000; // in milliseconds.
+	static public final int MAX_SNOOZE_AWAITING_POOL = 2 * 60 * 1000; // in milliseconds.
 	// hmmm: ridiculously large delay allowed now; was 4 seconds originally!
-	// currently set to 30 secs before the db attempt will fail.
+	// currently set to 2 minutes before the db attempt will fail.
 
 	/*
 	 * number of milliseconds to snooze between lock attempts. it doesn't seem to help to try super frequently, almost seems worse.

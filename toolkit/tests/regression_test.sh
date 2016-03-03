@@ -79,6 +79,11 @@ fi
 
 ##############
 
+# clean up any conglomerated log file.
+\rm -f "$CONGLOMERATED_GRID_OUTPUT"
+
+##############
+
 # begin defining the sets of tests we'd like to run.  currently there are
 # two major types: gffs and ems.
 

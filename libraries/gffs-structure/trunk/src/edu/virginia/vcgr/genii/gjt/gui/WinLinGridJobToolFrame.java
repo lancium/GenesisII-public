@@ -8,6 +8,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+import edu.virginia.vcgr.genii.client.gui.GuiHelpAction;
+import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
 import edu.virginia.vcgr.genii.gjt.JobDocumentContext;
 
 class WinLinGridJobToolFrame extends GridJobToolFrame
@@ -78,13 +80,15 @@ class WinLinGridJobToolFrame extends GridJobToolFrame
 
 		private AboutAction()
 		{
-			super("About");
+			super("Help");
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			_documentContext.applicationContext().showAbout();
+			// Changed 2/10/2016 by ASG to go to the web page and not a local hard-wired text.
+			GuiHelpAction.DisplayUrlHelp(HelpLinkConfiguration.get_help_url(HelpLinkConfiguration.JOB_CREATE_HELP));
+			// _documentContext.applicationContext().showAbout();
 		}
 	}
 }

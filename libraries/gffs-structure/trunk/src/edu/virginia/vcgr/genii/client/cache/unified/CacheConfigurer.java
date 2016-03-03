@@ -40,9 +40,10 @@ public class CacheConfigurer
 	 * changes from slow to rapid polling mode as soon as any activity from the client is detected.
 	 */
 	public static long DEFAULT_VALIDITY_PERIOD_FOR_CACHED_CONTENT = 30 * 1000L;
-	public static int DEFAULT_ATTRIBUTE_CACHE_SIZE = 4096;
+	// Cache sizes increased by grimshaw 1/28/2016
+	public static int DEFAULT_ATTRIBUTE_CACHE_SIZE = 20000;
 	public static int DEFAULT_EPR_CACHE_SIZE = 4096;
-	// caching disabled by default, to avoid UNICORE code trying to cache.
+	// caching disabled by default, to avoid UNICORE code trying to cache. it will be enabled based on configuration files below.
 	private static boolean CACHING_ENABLED = false;
 	private static boolean SUBSCRIPTION_BASED_CACHING_ENABLED = false;
 

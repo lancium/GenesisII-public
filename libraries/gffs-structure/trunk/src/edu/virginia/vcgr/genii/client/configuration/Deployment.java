@@ -78,7 +78,7 @@ public class Deployment
 			return ret;
 		} catch (IOException ioe) {
 			_logger.debug("Unable to load web container properties from deployment: " + deploymentName);
-//			throw new InvalidDeploymentException(deploymentName, "Unable to load web container properties from deployment.");
+			// throw new InvalidDeploymentException(deploymentName, "Unable to load web container properties from deployment.");
 			return null;
 		} finally {
 			StreamUtils.close(fin);
@@ -104,7 +104,7 @@ public class Deployment
 	{
 		if (_security == null) {
 			throw new RuntimeException("failed to access security definitions on this deployment");
-		}		
+		}
 		return _security;
 	}
 

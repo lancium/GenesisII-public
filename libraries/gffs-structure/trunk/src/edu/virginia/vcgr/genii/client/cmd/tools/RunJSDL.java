@@ -19,14 +19,17 @@ import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelative;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
@@ -35,11 +38,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelative;
-import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
-import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
-import edu.virginia.vcgr.genii.context.ContextType;
 
 public class RunJSDL extends BaseGridTool
 {
@@ -68,10 +66,10 @@ public class RunJSDL extends BaseGridTool
 		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
-		}
+		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
+//		if (callContext == null) {
+//			callContext = new CallingContextImpl(new ContextType());
+//		}
 
 		InputStream in = null;
 

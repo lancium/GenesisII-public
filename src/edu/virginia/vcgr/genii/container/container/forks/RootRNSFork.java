@@ -20,5 +20,7 @@ public class RootRNSFork extends StaticRNSResourceFork
 		addDefaultEntry("resources", ResourcesRNSFork.class);
 		addDefaultEntry("container.log", ContainerLogFork.class);
 		addDefaultEntry("filesystem-summary.txt", FilesystemUsageFork.class);
+		addDefaultEntry("storage-container-properties.txt", StorageContainerPropertiesFork.class);
+
 	}
 }

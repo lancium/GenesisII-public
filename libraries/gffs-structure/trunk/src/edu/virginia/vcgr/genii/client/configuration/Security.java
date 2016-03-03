@@ -42,8 +42,8 @@ public class Security
 		if (!_securityDirectory.exists())
 			throw new InvalidDeploymentException(deploymentDirectory.getName(), "Couldn't find security directory in deployment.");
 		if (!_securityPropertiesFile.exists()) {
-			//throw new InvalidDeploymentException(deploymentDirectory.getName(),
-				//"Couldn't find security properties file \"" + SECURITY_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
+			// throw new InvalidDeploymentException(deploymentDirectory.getName(),
+			// "Couldn't find security properties file \"" + SECURITY_PROPERTIES_FILE_NAME + " in deployment's configuration directory.");
 			if (_logger.isDebugEnabled())
 				_logger.debug("did not find security configuration file for deployment called: " + deploymentDirectory.getName());
 			return;

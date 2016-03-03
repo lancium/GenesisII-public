@@ -48,14 +48,12 @@ import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurity;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ContainerConfiguration;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
@@ -388,11 +386,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 
 		if (callContext == null) {
-			try {
-				callContext = new CallingContextImpl(new ContextType());
-			} catch (IOException e) {
-				throw new AxisFault(e.getLocalizedMessage(), e);
-			}
+			// should always have a calling context by here.
+			throw new AxisFault("failure to find a calling context in the message context");
 		} else {
 			// update any stale creds
 			try {

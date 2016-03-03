@@ -52,7 +52,7 @@ public class ContextManager
 	static private ResolverThreadLocal _resolver = new ResolverThreadLocal();
 
 	// this function requires that the context has already been established.
-	static public ICallingContext getExistingContext() throws FileNotFoundException, IOException
+	synchronized static public ICallingContext getExistingContext() throws FileNotFoundException, IOException
 	{
 		ICallingContext ctxt = getCurrentContext();
 		if (ctxt == null) {
@@ -67,14 +67,27 @@ public class ContextManager
 	 */
 
 	// this function locates the current calling context, which could actually be null.
-	static public ICallingContext getCurrentContext() throws FileNotFoundException, IOException
+	synchronized static public ICallingContext getCurrentContext() throws FileNotFoundException, IOException
 	{
 		IContextResolver res = getResolver();
 		// _logger.debug("type of resolver here is: " + res.getClass().getCanonicalName());
 		return res.resolveContext();
 	}
 
-	static public void storeCurrentContext(ICallingContext context) throws FileNotFoundException, IOException
+	// this version guarantees that there will be a usable calling context if there is not already one.
+	synchronized static public ICallingContext getCurrentOrMakeNewContext() throws FileNotFoundException, IOException
+	{
+		IContextResolver res = getResolver();
+		// _logger.debug("type of resolver here is: " + res.getClass().getCanonicalName());
+		ICallingContext toReturn = res.resolveContext();
+		if (toReturn == null) {
+			toReturn = new CallingContextImpl(new ContextType());
+			ContextManager.storeCurrentContext(toReturn);
+		}
+		return toReturn;
+	}
+
+	synchronized static public void storeCurrentContext(ICallingContext context) throws FileNotFoundException, IOException
 	{
 		if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 			_logger

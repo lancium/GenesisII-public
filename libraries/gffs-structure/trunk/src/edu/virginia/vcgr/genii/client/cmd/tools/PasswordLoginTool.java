@@ -9,7 +9,6 @@ import edu.virginia.vcgr.genii.client.cmd.tools.login.AbstractLoginHandler;
 import edu.virginia.vcgr.genii.client.cmd.tools.login.GuiLoginHandler;
 import edu.virginia.vcgr.genii.client.cmd.tools.login.TextLoginHandler;
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
@@ -18,7 +17,6 @@ import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
@@ -71,10 +69,10 @@ public class PasswordLoginTool extends BaseLoginTool
 		IOException, ResourcePropertyException
 	{
 		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
-		}
+		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
+//		if (callContext == null) {
+//			callContext = new CallingContextImpl(new ContextType());
+//		}
 
 		// handle username/token login
 		UsernamePasswordIdentity utCredential = doPasswordLogin(_username, _password);

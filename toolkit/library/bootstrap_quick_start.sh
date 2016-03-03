@@ -78,6 +78,9 @@ var GENII_INSTALL_DIR GENII_USER_DIR NAMESPACE_FILE
 # clean up any old logging or logging dbs.
 \rm -rf $HOME/.GenesisII
 
+# clean up any conglomerated log file.
+\rm -f "$CONGLOMERATED_GRID_OUTPUT"
+
 ##############
 
 # load vars for the deployment generator.

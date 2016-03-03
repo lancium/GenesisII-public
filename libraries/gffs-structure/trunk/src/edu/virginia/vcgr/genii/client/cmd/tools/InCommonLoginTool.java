@@ -43,7 +43,6 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.dialog.ComboBoxDialog;
@@ -63,7 +62,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
@@ -153,10 +151,10 @@ public class InCommonLoginTool extends BaseLoginTool
 		String targetPath = null;
 		try {
 			// get the local identity's key material (or create one if necessary)
-			callContext = ContextManager.getCurrentContext();
-			if (callContext == null) {
-				callContext = new CallingContextImpl(new ContextType());
-			}
+			callContext = ContextManager.getCurrentOrMakeNewContext();
+//			if (callContext == null) {
+//				callContext = new CallingContextImpl(new ContextType());
+//			}
 
 			// Call CILogon for an InCommon certificate
 			cert = callCILogon(_params);

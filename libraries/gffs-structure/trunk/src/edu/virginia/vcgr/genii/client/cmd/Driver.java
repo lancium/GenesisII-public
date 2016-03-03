@@ -185,7 +185,7 @@ public class Driver extends ApplicationBase
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-		if ((gridOkay == GridStates.CONNECTION_ALREADY_GOOD ) || (gridOkay == GridStates.CONNECTION_GOOD_NOW) ) {
+		if ((gridOkay == GridStates.CONNECTION_ALREADY_GOOD) || (gridOkay == GridStates.CONNECTION_GOOD_NOW)) {
 			// we need to load the keystore before we update the certs, or we will have a deadlock.
 			KeystoreManager.getTlsTrustStore();
 		}

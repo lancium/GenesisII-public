@@ -35,7 +35,6 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.CallingContextUtilities;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -49,7 +48,6 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
@@ -129,11 +127,11 @@ public class IDPLoginTool extends BaseLoginTool
 	{
 
 		// get the calling context (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
-			ContextManager.storeCurrentContext(callContext);
-		}
+		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
+//		if (callContext == null) {
+//			callContext = new CallingContextImpl(new ContextType());
+//			ContextManager.storeCurrentContext(callContext);
+//		}
 
 		// assemble the request message
 		RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -236,10 +234,10 @@ public class IDPLoginTool extends BaseLoginTool
 		}
 
 		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
-		}
+		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
+//		if (callContext == null) {
+//			callContext = new CallingContextImpl(new ContextType());
+//		}
 
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 

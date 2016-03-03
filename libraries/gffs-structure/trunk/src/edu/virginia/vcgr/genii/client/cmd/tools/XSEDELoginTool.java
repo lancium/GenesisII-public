@@ -10,7 +10,6 @@ import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
@@ -20,11 +19,10 @@ import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
-import edu.virginia.vcgr.genii.context.ContextType;
 
 /*
- * Command to automate logging in to XSEDE infrastructure this is the equivalent of the following multistep login: myproxyLogin passwordLogin
- * IDPLogin logout (username-password token)
+ * Command to automate logging in to XSEDE infrastructure this is the equivalent of the following multistep login: myproxyLogin passwordLogin and then
+ * IDPLogin login (username-password token)
  */
 public class XSEDELoginTool extends BaseLoginTool
 {
@@ -57,10 +55,7 @@ public class XSEDELoginTool extends BaseLoginTool
 		IOException, ResourcePropertyException, CreationException, InvalidToolUsageException, ClassNotFoundException, DialogException
 	{
 		// get the local identity's key material (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext();
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
-		}
+		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
 
 		// Make sure we have username/password set if they were not passed in
 		aquireUsername();
@@ -82,7 +77,7 @@ public class XSEDELoginTool extends BaseLoginTool
 		retVal = lTool.run(stdout, stderr, stdin);
 
 		/*
-		 * reload current context. this seems to be the crucial fix for the grid shell logging in to work and be kept in context.
+		 * reload current context. this seems to be the crucial fix for the grid shell login to work and be kept in context.
 		 */
 		callContext = ContextManager.getCurrentContext();
 
