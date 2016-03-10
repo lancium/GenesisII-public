@@ -16,7 +16,7 @@
 # deployment name.
 #DEPLOYMENT_NAME=current_grid
 # For a bootstrapped test grid, the deployment can be anything other than "default".
-#DEPLOYMENT_NAME=bootstrapped_grid
+DEPLOYMENT_NAME=bootstrapped_grid
 
 # The base user name is used for any paths below that refer to the user who
 # will be running the tools and tests.  This should be changed to the grid
