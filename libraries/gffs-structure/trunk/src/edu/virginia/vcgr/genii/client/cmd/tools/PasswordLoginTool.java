@@ -70,9 +70,6 @@ public class PasswordLoginTool extends BaseLoginTool
 	{
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
-//		if (callContext == null) {
-//			callContext = new CallingContextImpl(new ContextType());
-//		}
 
 		// handle username/token login
 		UsernamePasswordIdentity utCredential = doPasswordLogin(_username, _password);

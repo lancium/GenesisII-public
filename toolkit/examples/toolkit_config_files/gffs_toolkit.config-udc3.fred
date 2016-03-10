@@ -3,7 +3,8 @@
 # tests section:
 # http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
 
-# This file uses the official xsede.org namespace as per SD&I Activity 126.
+# This file uses the official xsede.org namespace, but targets our test grid
+# on UDC3 (the third machine in UVa UDC).
 
 ##############
 
@@ -14,8 +15,8 @@
 # the name "current_grid" for this.  Other installers may provide a different
 # deployment name.
 DEPLOYMENT_NAME=current_grid
-# For a bootstrapped test grid, the deployment should be "default".
-#DEPLOYMENT_NAME=default
+# For a bootstrapped test grid, the deployment can be anything other than "default".
+#DEPLOYMENT_NAME=bootstrapped_grid
 
 # The base user name is used for any paths below that refer to the user who
 # will be running the tools and tests.  This should be changed to the grid
@@ -33,6 +34,9 @@ EMAIL=koeritz@virginia.edu
 # grid.  This should be just the queue's short name rather than a full path.
 # This should be changed to the specific queue that is under test.
 QUEUE_NAME=grid-queue
+
+# How many default slots to configure when setting up a BES on a queue.
+QUEUE_SLOTS=10
 
 # Used for windows testing; provides the path to the binaries directory of cygwin.
 #CYGWIN_BIN_PATH=c:/cygwin/bin
@@ -83,8 +87,6 @@ LOCAL_CONTAINER=/resources/$FOLDERSPACE/containers/BootstrapContainer
 # on that path for the container-running user id must match the desired export
 # permissions (e.g., container's unix user should have write access to the
 # export path if the export path would ever be written to *from* the grid).
-#EXPORTPATH=/home/xcg3root/export-path
-#EXPORTPATH=$HOME/fred-export-keep
 EXPORTPATH=/home/gffs1/export-path
 
 ##############
@@ -100,8 +102,8 @@ SUBMIT_GROUP=/groups/$FOLDERSPACE/gffs-users
 
 # This specifies what type of BES to test.  the options are either "Genesis"
 # or "Unicore" currently.
-BES_TYPE=Unicore
-#BES_TYPE=Genesis
+#BES_TYPE=Unicore
+BES_TYPE=Genesis
 
 # The SPMD type needs to reflect the type of MPI in use on the BES or queue.
 # This depends on knowing the external configuration for the BES.  If this is

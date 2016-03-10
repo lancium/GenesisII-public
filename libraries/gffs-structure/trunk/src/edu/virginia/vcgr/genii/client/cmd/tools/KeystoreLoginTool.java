@@ -145,8 +145,6 @@ public class KeystoreLoginTool extends BaseLoginTool
 
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
-//		if (callContext == null)
-//			callContext = new CallingContextImpl(new ContextType());
 
 		ArrayList<NuCredential> creds = null;
 

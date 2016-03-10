@@ -3,8 +3,8 @@
 # tests section:
 # http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
 
-# This file uses the new namespace design (as per SD&I Activity 126) but with
-# the XCG3 grid (the Cross-Campus Grid residing at UVa).
+# This file uses the new XSEDE namespace scheme, but supports the names used
+# on the XCG3 grid (the Cross-Campus Grid residing at UVa).
 
 ##############
 
@@ -15,8 +15,8 @@
 # the name "current_grid" for this.  Other installers may provide a different
 # deployment name.
 DEPLOYMENT_NAME=current_grid
-# For a bootstrapped test grid, the deployment should be "default".
-#DEPLOYMENT_NAME=default
+# For a bootstrapped test grid, the deployment can be anything other than "default".
+#DEPLOYMENT_NAME=bootstrapped_grid
 
 # The base user name is used for any paths below that refer to the user who
 # will be running the tools and tests.  This should be changed to the grid
@@ -34,6 +34,9 @@ EMAIL=userX@emailsomewhere.com
 # grid.  This should be just the queue's short name rather than a full path.
 # This should be changed to the specific queue that is under test.
 QUEUE_NAME=grid-queue
+
+# How many default slots to configure when setting up a BES on a queue.
+QUEUE_SLOTS=10
 
 # Used for windows testing; provides the path to the binaries directory of cygwin.
 #CYGWIN_BIN_PATH=c:/cygwin/bin

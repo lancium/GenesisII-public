@@ -1,4 +1,5 @@
 
+Create simple grid user identity:
 idp
 		+ [--storetype=<PKCS12|JKS|WIN>] 
 		+ [--password=<keystore-password>]  
@@ -9,6 +10,7 @@ idp
 		+ <IDP service path> 
 		+ <new IDP name>
 		
+Create Kerberos-based user identity:
 idp
 		+ [--kerbRealm=<Kerberos realm>] 
 		+ [--kerbKdc=<Kerberos KDC>]  

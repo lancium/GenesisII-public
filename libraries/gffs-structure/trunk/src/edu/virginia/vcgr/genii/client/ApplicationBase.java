@@ -144,8 +144,6 @@ public class ApplicationBase
 		ICallingContext callContext = null;
 		try {
 			callContext = ContextManager.getCurrentOrMakeNewContext();
-//			if (callContext == null)
-//				callContext = new CallingContextImpl(new ContextType());
 		} catch (Throwable e) {
 			_logger.error("could not load or create calling context.");
 		}
@@ -167,8 +165,6 @@ public class ApplicationBase
 		ICallingContext callContext = null;
 		try {
 			callContext = ContextManager.getCurrentOrMakeNewContext();
-//			if (callContext == null)
-//				callContext = new CallingContextImpl(new ContextType());
 		} catch (Throwable e) {
 			_logger.error("could not load or create calling context.");
 		}

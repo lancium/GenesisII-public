@@ -152,9 +152,6 @@ public class InCommonLoginTool extends BaseLoginTool
 		try {
 			// get the local identity's key material (or create one if necessary)
 			callContext = ContextManager.getCurrentOrMakeNewContext();
-//			if (callContext == null) {
-//				callContext = new CallingContextImpl(new ContextType());
-//			}
 
 			// Call CILogon for an InCommon certificate
 			cert = callCILogon(_params);

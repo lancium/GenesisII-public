@@ -10,11 +10,10 @@ import java.util.HashMap;
 import org.apache.axis.client.Service;
 import org.apache.axis.client.Stub;
 import org.apache.axis.configuration.FileProvider;
-import org.apache.axis.transport.http.CommonsHTTPSender;
 import org.apache.axis.types.URI;
-import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.feistymeow.process.ethread;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
@@ -37,7 +36,8 @@ public class AxisServiceAndStubTracking
 {
 	static Log _logger = LogFactory.getLog(AxisServiceAndStubTracking.class);
 
-	public static int CONNECTION_IDLE_TIMEOUT_ms = 60 * 1000;
+	// currently not used, but could be used to close idle connections.
+	public static int CONNECTION_IDLE_TIMEOUT_ms = 10 * 60 * 1000;
 	
 	public static boolean enableExtraLogging = false; // code produces more noise if this is enabled.
 
@@ -122,9 +122,8 @@ public class AxisServiceAndStubTracking
 	private static StubCache _stubsCachedByLocator = new StubCache();
 
 	// ................
+	
 	// now some class methods and classes...
-	// these could probably be better organized.
-	// ................
 
 	// ................
 
@@ -458,10 +457,12 @@ public class AxisServiceAndStubTracking
 
 	// ................
 
+	//hmmm: if the garbage collection on a thread shows any promise in improving reliability, then we could drop this method entirely.
+	
 	/**
 	 * perform a garbage collection if we have created several clients; this will prime the reuse pump. it would be better for us to
 	 * programmatically release the handlers when they're done being used, but that is quite difficult due to the way we create proxies (which
-	 * depend on the handler) and then use them sometime later. the resolution code in this class also makes a big mess out of this.
+	 * depend on the handler) and then use them sometime later. the resolution code in AxisClientInvocationHandler also confuses the issue.
 	 */
 	public static void recordHandlerCreationAndTakeOutTrashIfAppropriate()
 	{
@@ -495,10 +496,14 @@ public class AxisServiceAndStubTracking
 			if (enforcedRunBecauseTooSlack || createdEnoughHandlers) {
 				// yes, collect the trash, finally, joy joy...
 				LowMemoryWarning.performGarbageCollection();
+				
+				//HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+				//connMgr.show connections?  can't do it!
+
 				//hmmm: this code seems to be deadly.  we get a container that no longer can be connected to somehow!?
 				// try dropping any connections that have been closed or idle too long.
-//				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
 //				connMgr.closeIdleConnections(CONNECTION_IDLE_TIMEOUT_ms);
+
 				// reset how many handlers were created; the handler our caller is about to create (or just created) is already counted.
 				_handlersCreatedSinceLastGC = 0;
 				// currently we always log this; it shows up only as frequently as the shortest time between collections.
@@ -521,4 +526,36 @@ public class AxisServiceAndStubTracking
 	// sleep 10
 	// done
 
+	public static class GarbageManThread extends ethread
+	{
+		public static final int THREAD_INTERVAL_ms = 1000 * 60;
+		
+		public GarbageManThread()
+		{
+			// run periodically at the interval we've picked above.
+			super(THREAD_INTERVAL_ms);
+			start();
+		}
+		
+		@Override
+		public boolean performActivity()
+		{
+			//hmmm: DEFINITELY remove this debug.
+			_logger.debug("*** running garbage collection from thread");
+			
+			Date startTime = new Date();
+			LowMemoryWarning.performGarbageCollection();
+			
+			long duration = (new Date()).getTime() - startTime.getTime();
+			if (duration > 200) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("GC took " + duration + " ms");
+			}
+
+			return true;  // keep going.
+		}		
+	}
+	
+	// set up the GC thread to run periodically.
+	static GarbageManThread _cleaner = new GarbageManThread();
 }

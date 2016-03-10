@@ -56,9 +56,6 @@ public class GffsEuLoginTool extends BaseLoginTool
 	{
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
-//		if (callContext == null) {
-//			callContext = new CallingContextImpl(new ContextType());
-//		}
 
 		// Make sure we have username/password set if they were not passed in
 		aquireUsername();

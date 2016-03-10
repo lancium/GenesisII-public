@@ -277,7 +277,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		// huge! was set to like 150.
 
 		// "Connections per host" pool size
-		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.MAXIMUM_CONNECTIONS_PER_HOST_PROPERTY_KEY, "200");
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.MAXIMUM_CONNECTIONS_PER_HOST_PROPERTY_KEY, "50");
 
 		// max duration to wait for a connection from the pool.
 		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_POOL_TIMEOUT_KEY, "30000");
@@ -287,7 +287,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			"" + ClientProperties.getClientProperties().getClientTimeout());
 
 		// Timeout "waiting for data" (read timeout)
-		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_SO_TIMEOUT_KEY, "180000");
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_SO_TIMEOUT_KEY, "" + 1000 * 30);
 	}
 
 	static public class KeyAndCertMaterialCacheKey

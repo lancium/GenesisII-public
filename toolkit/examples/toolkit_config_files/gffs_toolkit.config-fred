@@ -10,12 +10,11 @@
 # This section defines variables that are used throughout the tests.
 # Many of these need to change to suit your particular configuration.
 
-# DEPLOYMENT_NAME is the name of the deployment to use for the gffs grid
-# configuration.  The modern XSEDE and XCG installers use 'current_grid' for
-# this.  Other installers may provide a different deployment name.
-# For a bootstrapped test grid, the deployment name can be anything of your
-# choosing.
+# The name of the deployment to use.  The modern XSEDE and XCG installers use
+# the name "current_grid" for this.  Other installers may provide a different
+# deployment name.
 #DEPLOYMENT_NAME=current_grid
+# For a bootstrapped test grid, the deployment can be anything other than "default".
 DEPLOYMENT_NAME=bootstrapped_grid
 
 # The base user name is used for any paths below that refer to the user who

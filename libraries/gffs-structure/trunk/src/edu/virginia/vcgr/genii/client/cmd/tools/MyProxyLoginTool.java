@@ -229,8 +229,6 @@ public class MyProxyLoginTool extends BaseLoginTool
 		aquirePassword();
 
 		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
-//		if (callContext == null)
-//			callContext = new CallingContextImpl(new ContextType());
 
 		int toReturn = doMyproxyLogin(callContext);
 

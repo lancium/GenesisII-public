@@ -124,10 +124,6 @@ public class LoginTool extends BaseLoginTool
 
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext realCallingContext = ContextManager.getCurrentOrMakeNewContext();
-//		if (realCallingContext == null) {
-//			realCallingContext = new CallingContextImpl(new ContextType());
-//			ContextManager.storeCurrentContext(realCallingContext);
-//		}
 
 		aquireUsername();
 

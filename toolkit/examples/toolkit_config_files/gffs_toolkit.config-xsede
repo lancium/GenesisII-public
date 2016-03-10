@@ -3,7 +3,7 @@
 # tests section:
 # http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
 
-# This file uses the official xsede.org namespace as per SD&I Activity 126.
+# This file uses the official xsede.org namespace.
 
 ##############
 
@@ -33,6 +33,9 @@ EMAIL=userX@emailsomewhere.com
 # grid.  This should be just the queue's short name rather than a full path.
 # This should be changed to the specific queue that is under test.
 QUEUE_NAME=grid-queue
+
+# How many default slots to configure when setting up a BES on a queue.
+QUEUE_SLOTS=10
 
 # Used for windows testing; provides the path to the binaries directory of cygwin.
 #CYGWIN_BIN_PATH=c:/cygwin/bin
@@ -98,8 +101,8 @@ SUBMIT_GROUP=/groups/$FOLDERSPACE/gffs-users
 
 # This specifies what type of BES to test.  the options are either "Genesis"
 # or "Unicore" currently.
-#BES_TYPE=Unicore
-BES_TYPE=Genesis
+BES_TYPE=Unicore
+#BES_TYPE=Genesis
 
 # The SPMD type needs to reflect the type of MPI in use on the BES or queue.
 # This depends on knowing the external configuration for the BES.  If this is

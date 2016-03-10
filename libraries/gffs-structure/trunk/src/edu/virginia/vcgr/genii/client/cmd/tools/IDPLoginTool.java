@@ -125,13 +125,8 @@ public class IDPLoginTool extends BaseLoginTool
 	public static ArrayList<NuCredential> doIdpLogin(EndpointReferenceType idpEpr, long validMillis, X509Certificate[] delegateeIdentity)
 		throws AuthZSecurityException, IOException, ToolException
 	{
-
 		// get the calling context (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
-//		if (callContext == null) {
-//			callContext = new CallingContextImpl(new ContextType());
-//			ContextManager.storeCurrentContext(callContext);
-//		}
 
 		// assemble the request message
 		RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -235,9 +230,6 @@ public class IDPLoginTool extends BaseLoginTool
 
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
-//		if (callContext == null) {
-//			callContext = new CallingContextImpl(new ContextType());
-//		}
 
 		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 

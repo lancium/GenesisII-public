@@ -60,10 +60,6 @@ final public class CallingContextUtilities
 	{
 		// get the calling context (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentOrMakeNewContext();
-//		if (callContext == null) {
-//			callContext = new CallingContextImpl(new ContextType());
-//			ContextManager.storeCurrentContext(callContext);
-//		}
 
 		// retrieve the credentials wallet from the context and update it
 		CredentialWallet wallet = (CredentialWallet) callContext.getTransientProperty(SAMLConstants.SAML_CREDENTIALS_WALLET_PROPERTY_NAME);
