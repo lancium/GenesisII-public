@@ -105,9 +105,8 @@ if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
   GFFS_TESTS+=( \
     GFFS_Tests/Scalability_Tests/multiuser-gffs-submit.sh \
-
+    GFFS_Tests/Functional_Tests/test_sts_replication.sh \
   )
-#temp off:    GFFS_Tests/Functional_Tests/test_sts_replication.sh \
 fi
 
 # the standard tests for the execution management services.
