@@ -46,6 +46,7 @@ public class AttributeCacheHandler
 {
 	static private Log _logger = LogFactory.getLog(AttributeCacheHandler.class);
 
+	// hmmm: evaluate if this is too high a cache size.
 	static private final int _MAX_CACHE_ELEMENTS = 20000;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 45;
 

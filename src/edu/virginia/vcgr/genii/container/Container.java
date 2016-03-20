@@ -230,14 +230,13 @@ public class Container extends ApplicationBase
 		}
 
 		int maxAcceptors = _containerConfiguration.getMaxAcceptorThreads();
-		//hmmm: TURN THIS BACK ON IF IT IS NOT SUCCESSFUL in making things work better.
-//		if (maxAcceptors > 2 * Runtime.getRuntime().availableProcessors()) {
-//			// limit the number of acceptors as expected by jetty.
-//			maxAcceptors = 2 * Runtime.getRuntime().availableProcessors();
-//			if (_logger.isDebugEnabled())
-//				_logger.debug("reducing number of acceptors from " + _containerConfiguration.getMaxAcceptorThreads() + " to " + maxAcceptors
-//					+ " to meet jetty requirements (<=2*cpus)");
-//		}
+		if (maxAcceptors > 2 * Runtime.getRuntime().availableProcessors()) {
+			// limit the number of acceptors as expected by jetty.
+			maxAcceptors = 2 * Runtime.getRuntime().availableProcessors();
+			if (_logger.isDebugEnabled())
+				_logger.debug("reducing number of acceptors from " + _containerConfiguration.getMaxAcceptorThreads() + " to " + maxAcceptors
+					+ " to meet jetty requirements (<=2*cpus)");
+		}
 		if (_logger.isDebugEnabled())
 			_logger.debug(String.format("Setting max acceptor threads to %d\n", maxAcceptors));
 		connector.setAcceptors(maxAcceptors);

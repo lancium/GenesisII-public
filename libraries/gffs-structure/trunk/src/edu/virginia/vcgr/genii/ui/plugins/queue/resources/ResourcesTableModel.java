@@ -18,6 +18,7 @@ import org.morgan.util.gui.table.RowTableModel;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.cs.vcgr.genii.job_management.ConfigureRequestType;
+
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;

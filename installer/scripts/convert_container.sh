@@ -9,6 +9,7 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 
+source "../set_gffs_vars"
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
@@ -79,8 +80,8 @@ function print_instructions()
   echo "(and that install can be either interactive or RPM/DEB based)."
   echo
   echo "The script requires the older installation directory as a parameter."
-  echo "It is alright for this directory to be the same as the new GENII_INSTALL_DIR"
-  echo "but both must be provided.  For example:"
+  echo "It is fine for this directory to be the same as the new GENII_INSTALL_DIR"
+  echo "location, but the old path is needed on the command line.  For example:"
   echo
   local scriptname="$(basename $0)"
   echo "$scriptname $HOME/GenesisII"
@@ -306,6 +307,14 @@ if [ -z "$old_dep" ]; then
   # try again in old location for file.
   file="$OLD_INSTALL/container.properties"
   old_dep="$(seek_variable "$var" "$file")"
+
+  if [ -z "$old_dep" ]; then
+    # try once more with the newest form, which is only listed in the
+    # informational files provided by the installer, apparently.
+    var="genii.new-deployment"
+    file="$OLD_INSTALL/current.deployment"
+    old_dep="$(seek_variable "$var" "$file")"
+  fi
 fi
 if [ -z "$old_dep" ]; then complain_re_missing_deployment_variable; fi
 

@@ -155,7 +155,7 @@ public class JobDocument implements PostUnmarshallListener
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "stage-out")
 	private StageList _stageOuts;
 
-	private JobIdentification generateJobIdentification(XPathBuilder builder, Map<String, List<SweepParameter>> variables)
+	public JobIdentification generateJobIdentification(XPathBuilder builder, Map<String, List<SweepParameter>> variables)
 	{
 		String value;
 		List<String> values;
@@ -206,7 +206,7 @@ public class JobDocument implements PostUnmarshallListener
 		return null;
 	}
 
-	private Application generateApplication(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
+	public Application generateApplication(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
 		Set<FilesystemType> filesystemSet)
 	{
 		ApplicationBase app = null;
@@ -226,7 +226,7 @@ public class JobDocument implements PostUnmarshallListener
 		return null;
 	}
 
-	private Resources generateResources(XPathBuilder builder, Map<String, List<SweepParameter>> variables, Set<FilesystemType> filesystemSet)
+	public Resources generateResources(XPathBuilder builder, Map<String, List<SweepParameter>> variables, Set<FilesystemType> filesystemSet)
 	{
 		Resources resources = null;
 
@@ -707,7 +707,7 @@ public class JobDocument implements PostUnmarshallListener
 		return staging;
 	}
 
-	private Collection<DataStaging> generateDataStaging(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
+	public Collection<DataStaging> generateDataStaging(XPathBuilder builder, Map<String, List<SweepParameter>> variables,
 		Set<FilesystemType> filesystemSet)
 	{
 		Collection<DataStaging> ret = new LinkedList<DataStaging>();

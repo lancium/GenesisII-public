@@ -78,7 +78,7 @@ public class JobDocumentContext
 		return _frame;
 	}
 
-	private void setFrameTitle()
+	public void setFrameTitle()
 	{
 		String filename = (_file == null) ? "New Job Document" : _file.getAbsolutePath();
 		_frame.setTitle(String.format("Grid Job Tool - %s%s", filename, _modified ? "*" : ""));

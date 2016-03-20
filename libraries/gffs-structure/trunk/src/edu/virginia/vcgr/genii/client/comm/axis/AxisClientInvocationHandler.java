@@ -166,7 +166,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 			if (callContext == null) {
 				throw new ResourceException("calling context passed in as null");
-//				callContext = new CallingContextImpl(new ContextType());
 			}
 			_callContext = callContext.deriveNewContext();
 			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");

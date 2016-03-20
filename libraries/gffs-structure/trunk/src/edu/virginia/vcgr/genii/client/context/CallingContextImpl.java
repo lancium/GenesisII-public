@@ -249,7 +249,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	@Override
-	public ContextType getSerialized() throws IOException
+	synchronized public ContextType getSerialized() throws IOException
 	{
 		ContextType ct = new ContextType();
 
@@ -320,6 +320,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 
 		if (_parent != null) {
+			// _logger.debug("after writing self, recursing into parent for serialization");
 			out.writeBoolean(true);
 			_parent.serializeTransientProperties(out);
 		} else {
@@ -336,6 +337,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 			_transientProperties.putAll((HashMap<String, Serializable>) in.readObject());
 			if (in.readBoolean()) {
 				// read in another set from the parent.
+				// _logger.debug("recursing a level to read nested transient properties for context.");
 				deserializeTransientProperties(in);
 			}
 		} catch (InvalidClassException e) {
@@ -355,6 +357,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	private void collapseTransient(HashMap<String, Serializable> target)
 	{
 		if (_parent != null) {
+			// _logger.debug("recursing back on parent to collapse its properties first.");
 			_parent.collapseTransient(target);
 		}
 

@@ -38,7 +38,7 @@ public class AxisServiceAndStubTracking
 
 	// currently not used, but could be used to close idle connections.
 	public static int CONNECTION_IDLE_TIMEOUT_ms = 10 * 60 * 1000;
-	
+
 	public static boolean enableExtraLogging = false; // code produces more noise if this is enabled.
 
 	/*
@@ -122,7 +122,7 @@ public class AxisServiceAndStubTracking
 	private static StubCache _stubsCachedByLocator = new StubCache();
 
 	// ................
-	
+
 	// now some class methods and classes...
 
 	// ................
@@ -457,8 +457,8 @@ public class AxisServiceAndStubTracking
 
 	// ................
 
-	//hmmm: if the garbage collection on a thread shows any promise in improving reliability, then we could drop this method entirely.
-	
+	// hmmm: if the garbage collection on a thread shows any promise in improving reliability, then we could drop this method entirely.
+
 	/**
 	 * perform a garbage collection if we have created several clients; this will prime the reuse pump. it would be better for us to
 	 * programmatically release the handlers when they're done being used, but that is quite difficult due to the way we create proxies (which
@@ -496,13 +496,13 @@ public class AxisServiceAndStubTracking
 			if (enforcedRunBecauseTooSlack || createdEnoughHandlers) {
 				// yes, collect the trash, finally, joy joy...
 				LowMemoryWarning.performGarbageCollection();
-				
-				//HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
-				//connMgr.show connections?  can't do it!
 
-				//hmmm: this code seems to be deadly.  we get a container that no longer can be connected to somehow!?
+				// HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+				// connMgr.show connections? can't do it!
+
+				// hmmm: this code seems to be deadly. we get a container that no longer can be connected to somehow!?
 				// try dropping any connections that have been closed or idle too long.
-//				connMgr.closeIdleConnections(CONNECTION_IDLE_TIMEOUT_ms);
+				// connMgr.closeIdleConnections(CONNECTION_IDLE_TIMEOUT_ms);
 
 				// reset how many handlers were created; the handler our caller is about to create (or just created) is already counted.
 				_handlersCreatedSinceLastGC = 0;
@@ -529,33 +529,33 @@ public class AxisServiceAndStubTracking
 	public static class GarbageManThread extends ethread
 	{
 		public static final int THREAD_INTERVAL_ms = 1000 * 60;
-		
+
 		public GarbageManThread()
 		{
 			// run periodically at the interval we've picked above.
 			super(THREAD_INTERVAL_ms);
 			start();
 		}
-		
+
 		@Override
 		public boolean performActivity()
 		{
-			//hmmm: DEFINITELY remove this debug.
+			// hmmm: DEFINITELY remove this debug.
 			_logger.debug("*** running garbage collection from thread");
-			
+
 			Date startTime = new Date();
 			LowMemoryWarning.performGarbageCollection();
-			
+
 			long duration = (new Date()).getTime() - startTime.getTime();
 			if (duration > 200) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("GC took " + duration + " ms");
 			}
 
-			return true;  // keep going.
-		}		
+			return true; // keep going.
+		}
 	}
-	
+
 	// set up the GC thread to run periodically.
 	static GarbageManThread _cleaner = new GarbageManThread();
 }

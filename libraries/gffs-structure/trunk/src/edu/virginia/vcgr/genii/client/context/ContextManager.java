@@ -97,7 +97,7 @@ public class ContextManager
 		getResolver().storeCurrentContext(context);
 	}
 
-	static public ICallingContext bootstrap(RNSPath root) throws IOException
+	synchronized static public ICallingContext bootstrap(RNSPath root) throws IOException
 	{
 		ICallingContext bootContext = new CallingContextImpl(root);
 
@@ -126,12 +126,12 @@ public class ContextManager
 		return resolver;
 	}
 
-	static public void setResolver(IContextResolver resolver)
+	synchronized static public void setResolver(IContextResolver resolver)
 	{
 		_resolver.set(resolver);
 	}
 
-	static public Closeable temporarilyAssumeContext(ICallingContext context)
+	synchronized static public Closeable temporarilyAssumeContext(ICallingContext context)
 	{
 		IContextResolver oldResolver = ContextManager.getResolver();
 		ContextManager.setResolver(new MemoryBasedContextResolver(context));
@@ -155,7 +155,7 @@ public class ContextManager
 		}
 	}
 
-	static public boolean isGood(ICallingContext ctxt)
+	synchronized static public boolean isGood(ICallingContext ctxt)
 	{
 		try {
 			SecurityUpdateResults secResults = new SecurityUpdateResults();

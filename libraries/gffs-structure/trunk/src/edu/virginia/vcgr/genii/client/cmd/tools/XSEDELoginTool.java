@@ -21,8 +21,8 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 /*
- * Command to automate logging in to XSEDE infrastructure this is the equivalent of the following multistep login: myproxyLogin passwordLogin and then
- * IDPLogin login (username-password token)
+ * Command to automate logging in to XSEDE infrastructure this is the equivalent of the following multistep login: myproxyLogin passwordLogin
+ * and then IDPLogin login (username-password token)
  */
 public class XSEDELoginTool extends BaseLoginTool
 {

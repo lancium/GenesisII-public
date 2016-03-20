@@ -53,7 +53,6 @@ import edu.virginia.vcgr.genii.security.CertificateValidator;
 import edu.virginia.vcgr.genii.security.TrustStoreProvider;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 import sun.misc.BASE64Encoder;
-import sun.security.provider.X509Factory;
 
 public class SecurityUtilities implements CertificateValidator
 {
@@ -711,17 +710,25 @@ public class SecurityUtilities implements CertificateValidator
 	/**
 	 * returns a standard PEM representation for the certificate.
 	 */
-	public static String convertX509ToPem(X509Certificate toConvert)
+	/*
+	 * Grimshaw put these in in January 2016 because using this fields from Sun security, X509Factory. was sucking in the Sun libraries, which
+	 * we cannot get for this version, they are deprecated.
+	 */
+	static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
+	public static final String END_CERT = "-----END CERTIFICATE-----";
+
+	static String convertX509ToPem(X509Certificate toConvert)
 	{
 		BASE64Encoder encoder = new BASE64Encoder();
 		StringBuilder s = new StringBuilder();
-		s.append(X509Factory.BEGIN_CERT + "\n");
+		s.append(BEGIN_CERT + "\n");
+
 		try {
 			s.append(encoder.encodeBuffer(toConvert.getEncoded()));
 		} catch (CertificateEncodingException e) {
 			s.append("Failed to encode certificate as bytes");
 		}
-		s.append(X509Factory.END_CERT + "\n");
+		s.append(END_CERT + "\n");
 		return s.toString();
 	}
 

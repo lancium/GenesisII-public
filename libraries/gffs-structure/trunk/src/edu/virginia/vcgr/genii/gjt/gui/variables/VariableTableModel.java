@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.gjt.data.variables.VariableListener;
 import edu.virginia.vcgr.genii.gjt.data.variables.VariableManager;
 import edu.virginia.vcgr.genii.gjt.data.variables.undef.UndefinedVariableDefinition;
 
-class VariableTableModel extends AbstractTableModel
+public class VariableTableModel extends AbstractTableModel
 {
 	static final long serialVersionUID = 0L;
 
@@ -33,7 +33,7 @@ class VariableTableModel extends AbstractTableModel
 
 	private JComponent _owner = null;
 
-	VariableTableModel(JobDocumentContext context)
+	public VariableTableModel(JobDocumentContext context)
 	{
 		_mBroker = context.getModificationBroker();
 
