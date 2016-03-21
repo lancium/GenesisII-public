@@ -526,36 +526,4 @@ public class AxisServiceAndStubTracking
 	// sleep 10
 	// done
 
-	public static class GarbageManThread extends ethread
-	{
-		public static final int THREAD_INTERVAL_ms = 1000 * 60;
-
-		public GarbageManThread()
-		{
-			// run periodically at the interval we've picked above.
-			super(THREAD_INTERVAL_ms);
-			start();
-		}
-
-		@Override
-		public boolean performActivity()
-		{
-			// hmmm: DEFINITELY remove this debug.
-			_logger.debug("*** running garbage collection from thread");
-
-			Date startTime = new Date();
-			LowMemoryWarning.performGarbageCollection();
-
-			long duration = (new Date()).getTime() - startTime.getTime();
-			if (duration > 200) {
-				if (_logger.isDebugEnabled())
-					_logger.debug("GC took " + duration + " ms");
-			}
-
-			return true; // keep going.
-		}
-	}
-
-	// set up the GC thread to run periodically.
-	static GarbageManThread _cleaner = new GarbageManThread();
 }
