@@ -96,7 +96,7 @@ if [ ! -z "$DEBUGGING" -a -z "$SHOWED_SETTINGS_ALREADY" \
     -a -z "$BADNESS" -a -z "$SILENT_RUNNING" -a "${TERM}" != "dumb" \
     -a -z "$PBS_ENVIRONMENT" ]; then
   echo "==========================================================="
-  echo "Genesis II Tools and Tests are loaded."
+  echo "Genesis II and GFFS Toolkit environment loaded."
   var GENII_INSTALL_DIR GENII_USER_DIR GFFS_TOOLKIT_ROOT GFFS_TOOLKIT_CONFIG_FILE TMP TEST_TEMP
   echo "==========================================================="
 fi

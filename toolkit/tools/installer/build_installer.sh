@@ -132,6 +132,10 @@ chmod 755 "$OUTPUT_DIRECTORY"/*.deb "$OUTPUT_DIRECTORY"/*.script "$OUTPUT_DIRECT
 # toss temporary files.
 rm "$generated_installer_name"
 
+echo Cleaning generated property files for installer...
+rm -f $GENII_INSTALL_DIR/installer/data_files/*
+#also remove default deployment files if we added any
+
 echo Done building installers.
 
 ##############

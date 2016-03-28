@@ -3,8 +3,11 @@
 # tests section:
 # http://genesis2.virginia.edu/wiki/uploads/Main/GenesisII_omnibus_reference_manual.htm
 
-# This file uses the new XSEDE namespace scheme, but supports the names used
-# on the XCG3 grid (the Cross-Campus Grid residing at UVa).
+# This file uses the official xsede.org namespace.
+
+################################################################
+# This configuration file is specific for SDIACT-220 testing. ##
+################################################################
 
 ##############
 
@@ -33,7 +36,7 @@ EMAIL=userX@emailsomewhere.com
 # The queue name is expected to be found under the queue storage area in the
 # grid.  This should be just the queue's short name rather than a full path.
 # This should be changed to the specific queue that is under test.
-QUEUE_NAME=grid-queue
+QUEUE_NAME=sdiact220-queue
 
 # How many default slots to configure when setting up a BES on a queue.
 QUEUE_SLOTS=10
@@ -49,7 +52,7 @@ QUEUE_SLOTS=10
 # For example, in the xsede grid, the main users directory is /users/xsede.org
 # and the resources directory is /resources/xsede.org.  This is where all
 # resources that are owned by the grid's central containers can be found.
-FOLDERSPACE=xcg.virginia.edu
+FOLDERSPACE=xsede.org
 
 # The area in which to test.  Many junk files and directories are created
 # under this path, so it should be a directory without a lot of other
@@ -87,7 +90,8 @@ LOCAL_CONTAINER=/resources/$FOLDERSPACE/containers/BootstrapContainer
 # on that path for the container-running user id must match the desired export
 # permissions (e.g., container's unix user should have write access to the
 # export path if the export path would ever be written to *from* the grid).
-EXPORTPATH=/home/xcg3root/export-path
+EXPORTPATH=/home/xsede-gffs1/export-testing-sdiact220/
+#path on xsede gffs-1 container.
 
 ##############
 
@@ -102,8 +106,8 @@ SUBMIT_GROUP=/groups/$FOLDERSPACE/gffs-users
 
 # This specifies what type of BES to test.  the options are either "Genesis"
 # or "Unicore" currently.
-#BES_TYPE=Unicore
-BES_TYPE=Genesis
+BES_TYPE=Unicore
+#BES_TYPE=Genesis
 
 # The SPMD type needs to reflect the type of MPI in use on the BES or queue.
 # This depends on knowing the external configuration for the BES.  If this is

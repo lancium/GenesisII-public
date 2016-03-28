@@ -175,3 +175,10 @@ BACKUP_USER_DIR=$HOME/.backup-genesisII-2.0
 
 ##############
 
+# debugging settings.
+
+#PRIMARY_DEBUG_PORT=27010
+#MIRROR_DEBUG_PORT=27020
+
+##############
+

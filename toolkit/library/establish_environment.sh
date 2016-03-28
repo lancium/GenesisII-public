@@ -69,8 +69,10 @@ if [ ! -f "$GFFS_TOOLKIT_CONFIG_FILE" -a -z "$BADNESS" ]; then
   echo "----"
   echo "This script requires that you prepare a customized file in:"
   echo "    $GFFS_TOOLKIT_CONFIG_FILE"
+  echo "    (above is current value of GFFS_TOOLKIT_CONFIG_FILE variable)"
   echo "with the details of your grid installation.  There are some example"
-  echo "config files in the folder '$GFFS_TOOLKIT_ROOT/examples'."
+  echo "config files in the folder:"
+  echo "    $GFFS_TOOLKIT_ROOT/examples/toolkit_config_files"
   BADNESS=true
 fi
 

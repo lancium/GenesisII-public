@@ -176,3 +176,10 @@ BACKUP_USER_DIR=replace
 
 ##############
 
+# debugging settings.
+
+#PRIMARY_DEBUG_PORT=27010
+#MIRROR_DEBUG_PORT=27020
+
+##############
+

@@ -126,6 +126,12 @@ function launch_container()
 
   pushd "$GENII_INSTALL_DIR" &>/dev/null
 
+  if [ "$DEP_NAME" == "$BACKUP_DEPLOYMENT_NAME" ]; then
+    export JAVA_DEBUG_PORT=$MIRROR_DEBUG_PORT
+  else
+    export JAVA_DEBUG_PORT=$PRIMARY_DEBUG_PORT
+  fi
+
   echo "Launching Genesis II container for deployment \"$DEP_NAME\"..."
   CONTAINERLOGFILE="$(get_container_logfile "$DEP_NAME")"
   echo "$DEP_NAME container log stored at: $CONTAINERLOGFILE"
@@ -182,6 +188,9 @@ function launch_container()
   done
   echo "$DEP_NAME container has started."
   popd &>/dev/null
+
+  # clean up the variable we perhaps set above.
+  unset JAVA_DEBUG_PORT
 }
 
 ##############
