@@ -2,10 +2,14 @@ package edu.virginia.vcgr.genii.client.byteio.parallelByteIO;
 
 import java.rmi.RemoteException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 
 public class FastRead implements Runnable
 {
+	static Log _logger = LogFactory.getLog(FastRead.class);
 
 	private long startOffset; // starting offset in the file for this thread
 
@@ -35,12 +39,16 @@ public class FastRead implements Runnable
 	public void run()
 	{
 		try {
+			if (_logger.isDebugEnabled())
+				_logger.debug("about to read at offset " + startOffset + " with block size " + block_read_size);
 			byte[] temp_buffer = transferer.read(startOffset, block_read_size, 1, 0);
 			fac.copyFetch(temp_buffer, threadId, subBufferSize);
-		}
-
-		catch (RemoteException re) {
+		} catch (RemoteException re) {
+			_logger.error("caught RemoteException in run", re);
 			fac.setErrorFlag(re);
+		} catch (Throwable t) {
+			_logger.error("caught exception in run", t);
+			throw t;
 		}
 
 		fac.completed();
