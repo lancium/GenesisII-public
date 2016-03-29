@@ -100,7 +100,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new StreamableByteIO Resource.");

@@ -58,7 +58,7 @@ public class RExportUtils
 	 */
 	static public EndpointReferenceType createReplica(EndpointReferenceType primaryEPR, String commonEPI, EndpointReferenceType resolverEPR,
 		String primaryLocalPath, String replicaName, String entryType, EndpointReferenceType dataStreamEPR)
-			throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
+		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 
 		/* create creation params for replica */

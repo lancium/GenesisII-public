@@ -121,14 +121,14 @@ public class CreateResourceTool extends BaseGridTool
 
 	static public EndpointReferenceType createFromURLService(String url, GeniiPath optTargetName, ConstructionParameters cParams,
 		String shortDescription)
-			throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, InvalidToolUsageException
+		throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, InvalidToolUsageException
 	{
 		return createInstance(EPRUtils.makeEPR(url), optTargetName, cParams, shortDescription);
 	}
 
 	static public EndpointReferenceType createInstance(EndpointReferenceType service, GeniiPath optTargetName,
 		MessageElement[] createProperties)
-			throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, InvalidToolUsageException
+		throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, InvalidToolUsageException
 	{
 		EndpointReferenceType epr = ResourceCreator.createNewResource(service, createProperties, null);
 
@@ -146,7 +146,7 @@ public class CreateResourceTool extends BaseGridTool
 
 	static public EndpointReferenceType createInstance(EndpointReferenceType service, GeniiPath optTargetName, ConstructionParameters cParams,
 		String shortDescription)
-			throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, InvalidToolUsageException
+		throws ResourceException, ResourceCreationFaultType, RemoteException, RNSException, CreationException, InvalidToolUsageException
 	{
 		if (shortDescription != null)
 			cParams.humanName(shortDescription);

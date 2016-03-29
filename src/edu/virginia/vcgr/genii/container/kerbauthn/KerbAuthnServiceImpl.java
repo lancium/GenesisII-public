@@ -123,7 +123,7 @@ public class KerbAuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		_logger.debug("entering postCreate");
 		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {

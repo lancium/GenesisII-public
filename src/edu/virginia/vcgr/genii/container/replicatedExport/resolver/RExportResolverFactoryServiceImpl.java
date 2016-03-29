@@ -98,7 +98,7 @@ public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements 
 			// create proxy to resolver specifed by creation param
 			RExportResolverPortType resolverService = ClientUtils.createProxy(RExportResolverPortType.class,
 				RExportResolverUtils.extractResolverServiceEPR(createResolver.get_any()));
-				// previously: EPRUtils.makeEPR(getResolverServiceURL()
+			// previously: EPRUtils.makeEPR(getResolverServiceURL()
 
 			// create resolver instance with params
 			VcgrCreateResponse resp = resolverService.vcgrCreate(new VcgrCreate(resolverCreationProperties));

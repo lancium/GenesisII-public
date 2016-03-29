@@ -109,17 +109,17 @@ public class TellConfigTool extends BaseGridTool
 					}
 					break;
 				}
-					// makes no sense since tools are always in client role.
-					// case ARG_ROLE: {
-					// String role;
-					// if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
-					// role = "Server";
-					// } else {
-					// role = "Client";
-					// }
-					// stdout.println("Installation is in a " + role + " role.");
-					// break;
-					// }
+				// makes no sense since tools are always in client role.
+				// case ARG_ROLE: {
+				// String role;
+				// if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
+				// role = "Server";
+				// } else {
+				// role = "Client";
+				// }
+				// stdout.println("Installation is in a " + role + " role.");
+				// break;
+				// }
 				default: {
 					stdout.println("Unknown argument for tell-config: '" + arg + "'");
 					toReturn = 1;

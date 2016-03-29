@@ -243,7 +243,7 @@ public class CertGeneratorTool extends BaseGridTool
 
 	public EndpointReferenceType createGenerator(String service, boolean url, String optTargetName, String issuerCertKSPath,
 		String issuerCertKSPassword, String issuerCertAlias, String issuerCertEntryPassword, Long defaultValidity)
-			throws IOException, RNSException, CreationException, KeyStoreException, GeneralSecurityException, InvalidToolUsageException
+		throws IOException, RNSException, CreationException, KeyStoreException, GeneralSecurityException, InvalidToolUsageException
 	{
 		EndpointReferenceType epr;
 		PrivateKey issuerPrivateKey = null;

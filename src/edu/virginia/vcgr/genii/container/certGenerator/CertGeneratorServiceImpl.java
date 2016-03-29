@@ -147,7 +147,7 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		if (_logger.isDebugEnabled())
 			_logger.debug("Creating new certGenerator Resource.");

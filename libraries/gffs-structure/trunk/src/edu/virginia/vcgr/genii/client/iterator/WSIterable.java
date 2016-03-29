@@ -76,7 +76,7 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 
 	private WSIterable(Class<Type> elementType, Unmarshaller jaxbUnmarshaller, Type[] initialElementOverride,
 		IteratorInitializationType initializer, ICallingContext callingContext, int blockSize)
-			throws ResourceException, GenesisIISecurityException
+		throws ResourceException, GenesisIISecurityException
 	{
 		_elementType = elementType;
 		_jaxbUnmarshaller = jaxbUnmarshaller;
@@ -245,7 +245,7 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 
 	static public <Type> WSIterable<Type> jaxbIterable(Class<Type> elementType, IteratorInitializationType iteratorInitializer,
 		ICallingContext callContext, int blockSize)
-			throws JAXBException, ResourceUnknownFaultType, ResourceNotDestroyedFaultType, ResourceUnavailableFaultType, RemoteException
+		throws JAXBException, ResourceUnknownFaultType, ResourceNotDestroyedFaultType, ResourceUnavailableFaultType, RemoteException
 	{
 		try {
 			WSIterable<Type> ret =
@@ -295,7 +295,7 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 
 	static public <Type> WSIterable<Type> axisIterable(Class<Type> elementType, Type[] initialElementOverride,
 		IteratorInitializationType iteratorInitializationType, ICallingContext callContext, int blockSize)
-			throws ResourceException, GenesisIISecurityException
+		throws ResourceException, GenesisIISecurityException
 	{
 		return new WSIterable<Type>(elementType, null, initialElementOverride, iteratorInitializationType, callContext, blockSize);
 	}

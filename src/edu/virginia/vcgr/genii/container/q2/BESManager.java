@@ -101,7 +101,7 @@ public class BESManager implements Closeable
 
 	public BESManager(QueueDatabase database, SchedulingEvent schedulingEvent, Connection connection,
 		InformationPortal<BESInformation> informationPortal, ServerDatabaseConnectionPool connectionPool)
-			throws SQLException, ResourceException, GenesisIISecurityException
+		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		_besInformation = new HashMap<Long, BESInformation>();
 

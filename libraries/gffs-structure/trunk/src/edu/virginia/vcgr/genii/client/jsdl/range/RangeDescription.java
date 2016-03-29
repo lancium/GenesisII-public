@@ -17,18 +17,18 @@ public class RangeDescription
 		if (_lowerBound != null)
 			// if current is NaN, replace with added
 			if (_lowerBound.equals(Double.NaN))
-				_lowerBound = desc.getLowerBound();
+			_lowerBound = desc.getLowerBound();
 			// if new is not NaN, then compare
 			else if ((!desc.getLowerBound().equals(Double.NaN)) && (desc.getLowerBound() < _lowerBound))
-				_lowerBound = desc.getLowerBound();
+			_lowerBound = desc.getLowerBound();
 
 		if (_upperBound != null)
 			// if current is NaN, replace with added
 			if (_upperBound.equals(Double.NaN))
-				_upperBound = desc.getUpperBound();
+			_upperBound = desc.getUpperBound();
 			// if new is not NaN, then compare
 			else if ((desc.getUpperBound().equals(Double.NaN)) && (desc.getUpperBound() > _lowerBound))
-				_upperBound = desc.getUpperBound();
+			_upperBound = desc.getUpperBound();
 	}
 
 	public RangeDescription()

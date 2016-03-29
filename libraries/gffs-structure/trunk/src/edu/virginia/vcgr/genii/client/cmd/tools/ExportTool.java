@@ -308,7 +308,7 @@ public class ExportTool extends BaseGridTool
 
 	static public EndpointReferenceType createExportedRoot(String humanName, EndpointReferenceType exportServiceEPR, String localPath,
 		String svnUser, String svnPass, Long svnRevision, String RNSPath, boolean isReplicated, String owner) throws ResourceException,
-			ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
+		ResourceCreationFaultType, RemoteException, RNSException, CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 
@@ -372,7 +372,7 @@ public class ExportTool extends BaseGridTool
 
 	static public EndpointReferenceType createReplicatedExportedRoot(EndpointReferenceType exportServiceEPR, String localPath, String RNSPath,
 		boolean isReplicated, EndpointReferenceType replicationService) throws ResourceException, ResourceCreationFaultType, RemoteException,
-			RNSException, CreationException, IOException, InvalidToolUsageException
+		RNSException, CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 		String replicationIndicator = "false";

@@ -260,7 +260,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
 	}

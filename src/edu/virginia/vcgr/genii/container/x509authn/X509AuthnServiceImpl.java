@@ -335,7 +335,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	 */
 	public static void sharedPostCreate(BaseAuthenticationServiceImpl theThis, ResourceKey rKey, EndpointReferenceType newEPR,
 		ConstructionParameters cParams, GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		// determine the credential the idp will front.
 		NuCredential credential = null;
@@ -447,7 +447,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		if (skipPortTypeSpecificPostProcessing(constructionParameters)) {
 			super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
@@ -462,7 +462,7 @@ public class X509AuthnServiceImpl extends BaseAuthenticationServiceImpl implemen
 	 */
 	public static TrustCredential delegateCredential(BaseAuthenticationServiceImpl theThis, IRNSResource resource,
 		X509Certificate[] delegateToChain, Date created, Date expiry)
-			throws AuthZSecurityException, SOAPException, ConfigurationException, RemoteException
+		throws AuthZSecurityException, SOAPException, ConfigurationException, RemoteException
 	{
 		TrustCredential newTC = null;
 

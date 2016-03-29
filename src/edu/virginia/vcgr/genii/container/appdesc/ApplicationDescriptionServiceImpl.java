@@ -69,7 +69,7 @@ public class ApplicationDescriptionServiceImpl extends EnhancedRNSServiceImpl im
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType myEPR, ConstructionParameters cParams,
 		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, myEPR, cParams, creationParameters, resolverCreationParams);
 

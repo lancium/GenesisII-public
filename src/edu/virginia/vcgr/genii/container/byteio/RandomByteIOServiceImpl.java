@@ -131,7 +131,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase implements RandomByte
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap creationParameters, Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 

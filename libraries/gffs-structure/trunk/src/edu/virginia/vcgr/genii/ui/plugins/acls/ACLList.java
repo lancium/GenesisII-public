@@ -68,7 +68,7 @@ class ACLList extends JList
 	}
 
 	@SuppressWarnings("unchecked")
-		void cancel()
+	void cancel()
 	{
 		DefaultListModel model = (DefaultListModel) getModel();
 		model.removeAllElements();
@@ -76,7 +76,7 @@ class ACLList extends JList
 	}
 
 	@SuppressWarnings("unchecked")
-		void error()
+	void error()
 	{
 		DefaultListModel model = (DefaultListModel) getModel();
 		model.removeAllElements();
@@ -89,7 +89,7 @@ class ACLList extends JList
 	}
 
 	@SuppressWarnings("unchecked")
-		void set(UIContext context, Collection<AclEntry> entries)
+	void set(UIContext context, Collection<AclEntry> entries)
 	{
 		DefaultListModel model = (DefaultListModel) getModel();
 		model.removeAllElements();

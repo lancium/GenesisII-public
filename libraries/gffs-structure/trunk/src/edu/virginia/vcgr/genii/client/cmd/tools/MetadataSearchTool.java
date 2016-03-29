@@ -433,7 +433,7 @@ public class MetadataSearchTool extends BaseGridTool
 
 	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll, boolean isexistence,
 		boolean isMultiline, boolean isCompare, boolean isRecursive, boolean isAttributes, boolean isDisplay, String xpathq)
-			throws RNSException, ResourceException
+		throws RNSException, ResourceException
 	{
 		String name = path.getName();
 		if (name == null)

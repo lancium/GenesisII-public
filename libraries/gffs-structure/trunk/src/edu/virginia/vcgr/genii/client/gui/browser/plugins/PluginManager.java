@@ -117,7 +117,7 @@ public class PluginManager
 	 */
 	static private void parsePlugin(Element pluginElement, HashMap<String, HashMap<String, Collection<MainMenuDescriptor>>> mainMenuPlugins,
 		HashMap<String, Collection<ContextMenuDescriptor>> contextMenuPlugins, TreeSet<TabPluginDescriptor> tabs)
-			throws PluginException, SAXException
+		throws PluginException, SAXException
 	{
 		/* First, get attributes from the element that describe the plugin */
 		String name = XMLUtilities.getRequiredAttribute(pluginElement, PLUGIN_NAME_ATTR, null);

@@ -98,7 +98,7 @@ public interface JSDLEventReceiver
 
 	public void handleTotalResourceRanges(XMLDocumentPath path, RangeValue totalCPUTime, RangeValue totalCPUCount,
 		RangeValue totalPhysicalMemory, RangeValue totalVirtualMemory, RangeValue totalDiskSpace, RangeValue totalResourceCount)
-			throws JSDLValidationException;
+		throws JSDLValidationException;
 
 	public void startSource(XMLDocumentPath path, String uri) throws JSDLValidationException;
 

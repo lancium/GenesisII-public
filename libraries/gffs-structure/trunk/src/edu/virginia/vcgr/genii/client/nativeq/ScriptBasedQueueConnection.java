@@ -45,7 +45,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 	protected ScriptBasedQueueConnection(File workingDirectory, ResourceOverrides resourceOverrides,
 		CmdLineManipulatorConfiguration cmdLineManipulatorConf, NativeQueueConfiguration queueConfig, ProviderConfigType providerConfig)
-			throws NativeQueueException
+		throws NativeQueueException
 	{
 		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, queueConfig, providerConfig);
 	}
