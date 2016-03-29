@@ -545,8 +545,9 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		EndpointReferenceType[] activities = parameters.getActivityIdentifier();
 		responses = new TerminateActivityResponseType[activities.length];
 
-		for (int lcv = 0; lcv < activities.length; lcv++)
+		for (int lcv = 0; lcv < activities.length; lcv++) {
 			responses[lcv] = terminateActivity(activities[lcv]);
+		}
 
 		return new TerminateActivitiesResponseType(responses, null);
 	}

@@ -99,6 +99,7 @@ public enum OperatingSystemNames {
 	Windows_XP("Windows XP"),
 	Windows_7("Windows 7"),
 	Windows_8("Windows 8"),
+	Windows_10("Windows 10"),
 	Windows_VISTA("Windows_VISTA"),
 	z_OS("z OS"),
 	other;

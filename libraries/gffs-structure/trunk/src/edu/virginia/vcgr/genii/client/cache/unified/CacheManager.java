@@ -329,8 +329,11 @@ public class CacheManager
 			try {
 				// drop any connections that are established to avoid keeping session alive with wrong creds.
 				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
-				// we close idle with an idle timeout of 0, which should mean everyone, even active connections.
-				connMgr.closeIdleConnections(0);
+				if (connMgr != null) {
+					// we close idle with an idle timeout of 0, which should mean everyone, even active connections.
+					connMgr.closeIdleConnections(0);
+				}
+
 			} catch (Throwable t) {
 				if (_logger.isTraceEnabled())
 					_logger.debug("screwup from closing idle connections", t);

@@ -85,7 +85,7 @@ public class JobUpdateWorker implements OutcallHandler
 		HistoryContext history = _data.history(HistoryEventCategory.Checking);
 		try {
 
-			ActivityState oldState = null;
+			// ActivityState oldState = null;
 
 			if (_logger.isDebugEnabled())
 				_logger.debug("Checking status of job " + _data);
@@ -166,9 +166,9 @@ public class JobUpdateWorker implements OutcallHandler
 					_logger.debug(String.format("Successfully got status of job %s.", _data));
 				List<String> faults = null;
 
-				oldState = new ActivityState(_data.getBESActivityStatus());
-				if (_logger.isDebugEnabled())
-					_logger.debug("do we need this oldState object due to side effects?  contains: " + oldState);
+				// oldState = new ActivityState(_data.getBESActivityStatus());
+				// if (_logger.isDebugEnabled())
+				// _logger.debug("do we need this oldState object due to side effects? contains: " + oldState);
 
 				_data.setBESActivityStatus(activityStatuses[0].getActivityStatus());
 				try {

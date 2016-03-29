@@ -185,9 +185,9 @@ public class EPRUtils
 
 					MessageLevelSecurityRequirements retval = new MessageLevelSecurityRequirements();
 
-					// Duane Merrill: assume it applies to everything. We will want to
-					// get
-					// more specific at some point of SecAddr takes off
+					/*
+					 * Duane Merrill: assume it applies to everything. We will want to get more specific at some point of SecAddr takes off.
+					 */
 					Policy metaPolicy = policyAttachment.getPolicy();
 
 					// Added by ak3ka: Confirmed with Duane to be correct.

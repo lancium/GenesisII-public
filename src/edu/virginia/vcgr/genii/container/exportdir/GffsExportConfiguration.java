@@ -196,7 +196,7 @@ public class GffsExportConfiguration
 			_logger.error("failed to determine the calling client's TLS certificate");
 		}
 
-		if (_logger.isDebugEnabled()) {
+		if (_logger.isTraceEnabled()) {
 			_logger.debug("got a credential set to search of:\n" + TrustCredential.showCredentialList(credSet, VerbosityLevel.HIGH));
 			_logger.debug("searching for owner as: " + ownerDN);
 		}

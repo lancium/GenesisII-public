@@ -44,8 +44,6 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements IRes
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		// super.createTables();
-
 		try {
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_ENTRY_TABLE_STMT);

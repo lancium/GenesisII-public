@@ -99,10 +99,10 @@ echo "fastgrid is a shell script that interacts with a grid client running in"
 echo "the background via named pipes. The goal is eliminate the time waiting"
 echo "for the grid client to start up. If there is no grid client running"
 echo "for the user fastgrid will start one. "
-echo "usage: fastgrid -q|--quitServer|-h|--help will quit the server or print this help screen."
-echo "usage: fastgrid -s|--stdin will cause fastgrid to read from stdin until eof "
-echo "usage: fastgrid <commands to the grid shell, e.g., ls, whoami, etc."
-
+echo "Usage:"
+echo "fastgrid -q|--quitServer   Quits the grid 'server' process."
+echo "fastgrid -h|--help         Prints this help screen."
+echo "fastgrid -s|--stdin        Read commands from standard input until EOF."
 }
 
 

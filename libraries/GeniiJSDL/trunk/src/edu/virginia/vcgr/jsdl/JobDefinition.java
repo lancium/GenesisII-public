@@ -48,8 +48,7 @@ public class JobDefinition extends CommonJSDLElement implements Serializable
 	/**
 	 * For use only with XML Unmarshalling.
 	 */
-	@SuppressWarnings("unused")
-	private JobDefinition()
+	public JobDefinition()
 	{
 	}
 

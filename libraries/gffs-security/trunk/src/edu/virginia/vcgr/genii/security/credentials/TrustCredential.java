@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -861,6 +862,15 @@ public class TrustCredential implements NuCredential, RWXAccessible
 	 * formats a list of credentials in a nice manner.
 	 */
 	public static String showCredentialList(List<NuCredential> toShow, VerbosityLevel verbosity)
+	{
+		StringBuilder buffer = new StringBuilder();
+		for (NuCredential assertion : toShow) {
+			buffer.append(assertion.describe(verbosity)).append("\n");
+		}
+		return buffer.toString();
+	}
+
+	public static String showCredentialList(Collection<NuCredential> toShow, VerbosityLevel verbosity)
 	{
 		StringBuilder buffer = new StringBuilder();
 		for (NuCredential assertion : toShow) {

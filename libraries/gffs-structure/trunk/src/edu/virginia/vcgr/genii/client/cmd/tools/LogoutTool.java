@@ -90,6 +90,10 @@ public class LogoutTool extends BaseGridTool
 		if (callContext == null) {
 			throw new IOException("There was no calling context to log out of.");
 		}
+
+		// destroy notification brokers before we lose permission on them.
+		CacheManager.resetCachingSystem();
+
 		if (_all) {
 			// toss out all credentials, including TLS cert.
 			ClientUtils.invalidateCredentials(callContext);

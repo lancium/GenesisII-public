@@ -532,6 +532,18 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			try {
 				return resolveAndInvoke(context, calledMethod, arguments, timeout);
 			} catch (Throwable cause) {
+				long duration = System.currentTimeMillis() - startAttempt;
+				if (_logger.isDebugEnabled()) {
+					Throwable peeled = cause;
+					while (peeled instanceof AxisFault) {
+						if (peeled.getCause() != null) {
+							peeled = peeled.getCause();
+						} else {
+							break;
+						}
+					}
+					_logger.debug("resolveAndInvoke took " + duration + "ms before exception " + peeled.getClass().getCanonicalName());
+				}
 				if (!isConnectionException(cause)) {
 					if (_logger.isDebugEnabled())
 						_logger.debug("Unable to communicate with endpoint (not a retryable-exception).");
@@ -586,7 +598,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	 * in resolveAndInvoke. if false is returned, then normal exception handling should take over.
 	 */
 	boolean testForCredentialStreamliningIssues(Throwable throwable, int missingCredsAttemptCounter, AxisClientInvocationHandler handler)
-		throws AxisFault
 	{
 		boolean credOmittedMessage =
 			(throwable.getMessage() != null) && throwable.getMessage().contains(CredentialWallet.OMMITTED_CREDENTIAL_SENTINEL);
@@ -613,12 +624,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			return false;
 		}
 
-		if (_logger.isDebugEnabled())
-			_logger.debug("allowing credentials to be re-sent with " + missingCredsAttemptCounter + " previous attempts");
-
 		if (guidString == null) {
 			// if we can't get the guid, we can't fix the records. probably we're hosed?
-			throw new AxisFault("failed to locate container GUID for target; cannot re-send credentials to it");
+			_logger.error("failed to locate container GUID for target; cannot re-send credentials to it");
+			return false; // fail out.
 		}
 
 		/*
@@ -649,7 +658,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		if (okayToRetryCredSending) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("container did not have a credential we referenced so will try sending again: " + throwable.getMessage());
+				_logger.debug("container did not have a credential we referenced so will try sending again");
 
 			// don't allow credentials to be remembered for the retry, if at all possible.
 			// hmmm: can other threads come in an hose this state? this did seem possible and was dealt with by locking code.
@@ -734,6 +743,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		// keep looping until something good happens or something very bad happens.
 		while (true) {
+			long startTime = System.currentTimeMillis(); // invocation start time.
 			try {
 				/*
 				 * if try again flag is true, it means we're giving the current handler another chance. if try again is false, then either
@@ -750,6 +760,18 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					}
 				}
 			} catch (Throwable throwable) {
+				long duration = System.currentTimeMillis() - startTime;
+				Throwable peeled = throwable;
+				while (peeled instanceof AxisFault) {
+					if (peeled.getCause() != null) {
+						peeled = peeled.getCause();
+					} else {
+						break;
+					}
+				}
+				_logger.error(
+					"exception seen in resolution process after " + duration + "ms with exception " + peeled.getClass().getCanonicalName());
+
 				if (firstException == null) {
 					firstException = throwable;
 				}
@@ -773,7 +795,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				throw new ConnectException(msg);
 			}
 
-			long startTime = System.currentTimeMillis(); // invocation start time.
+			startTime = System.currentTimeMillis(); // invocation start time.
 			try {
 				Object toReturn = null;
 				toReturn = handler.doInvoke(calledMethod, arguments, timeout);
@@ -794,10 +816,26 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						_logger.debug("will retry sending credentials with attempts now at " + missingCredsAttemptCounter);
 					continue;
 				} else {
-					_logger.info(
-						"was told it's not a missing credential problem or we exhausted retries (at " + missingCredsAttemptCounter + " now)");
 					// have to reset the counter, since now we are saying we cannot try again and should re-resolve the handler and all that.
 					missingCredsAttemptCounter = 0;
+				}
+
+				/*
+				 * we failed to remedy the exception for our first two somewhat expected screw-ups. now we have to get serious and assume we
+				 * actually had something bad happen. we want at least one breadcrumb in the log that shows the actual exception and how long
+				 * the call took before the exception happened.
+				 */
+				if (_logger.isDebugEnabled()) {
+					Throwable peeled = throwable;
+					while (peeled instanceof AxisFault) {
+						if (peeled.getCause() != null) {
+							peeled = peeled.getCause();
+						} else {
+							break;
+						}
+					}
+					_logger.debug("exception seen in invocation after " + duration + "ms of RPC call for " + calledMethod.getName()
+						+ " with exception " + peeled.getClass().getCanonicalName());
 				}
 
 				if ((throwable instanceof TryAgainFaultType) && !tryAgain) {

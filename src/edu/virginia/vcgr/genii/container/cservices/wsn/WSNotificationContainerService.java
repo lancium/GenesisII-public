@@ -144,8 +144,7 @@ public class WSNotificationContainerService extends AbstractContainerService
 		} catch (IOException e) {
 			_logger.warn("Unable to load subscriptions for publisher.", e);
 		} finally {
-			if (conn != null)
-				pool.release(conn);
+			pool.release(conn);
 		}
 	}
 
@@ -162,8 +161,7 @@ public class WSNotificationContainerService extends AbstractContainerService
 				return null;
 			}
 		} finally {
-			if (conn != null)
-				pool.release(conn);
+			pool.release(conn);
 		}
 	}
 

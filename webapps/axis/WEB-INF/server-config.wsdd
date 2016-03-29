@@ -4,8 +4,19 @@
   <parameter name="sendMultiRefs" value="true"/>
   <parameter name="disablePrettyXML" value="true"/>
   <parameter name="adminPassword" value="admin"/>
+  <!--
+   The attachments.Directory parameter can be set if you want Apache Axis 1.4
+   to store its temporary web attachment files into a different location than
+   the default.  For installations not using a unified configuration, the
+   default location is "$GENII_INSTALL_DIR/webapps/axis/WEB-INF/attachments".
+   For unified configuration, the default attachments directory is in
+   "$GENII_USER_DIR/webapps"...
+Hold on, the above claim needs to be verified.
+Note written...  will continue after finding out where that directory went.
+-->
+       
 <!--
-  <parameter name="attachments.Directory" value="/home/fred/attachments-crud"/>
+  <parameter name="attachments.Directory" value="/home/fred/axis-attachments"/>
 -->
   <parameter name="dotNetSoapEncFix" value="true"/>
   <parameter name="enableNamespacePrefixOptimization" value="false"/>

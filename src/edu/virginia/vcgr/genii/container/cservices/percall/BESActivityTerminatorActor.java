@@ -70,7 +70,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 
 			GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, target, callingContext);
 
-			// First, attmept to get the history log
+			// First, attempt to get the history log
 			if (_historyToken != null && _historyKey != null) {
 				WSIterable<HistoryEventBundleType> iter = null;
 				SequenceNumber parentNumber;
@@ -104,7 +104,8 @@ public class BESActivityTerminatorActor implements OutcallActor
 			}
 
 			// Now, go ahead and kill it.
-			ClientUtils.setTimeout(bes, 8 * 1000);
+			// hmmmm: ARGHHHH!!!! have been searching for this stupid timeout for ever!!!! 8 seconds is NOT enough.
+			// ClientUtils.setTimeout(bes, 8 * 1000);
 			TerminateActivitiesResponseType resp =
 				bes.terminateActivities(new TerminateActivitiesType(new EndpointReferenceType[] { _activityEPR }, null));
 			if (resp != null) {

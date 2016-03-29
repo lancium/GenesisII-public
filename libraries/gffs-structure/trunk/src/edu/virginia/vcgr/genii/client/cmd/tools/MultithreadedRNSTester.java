@@ -152,6 +152,95 @@ public class MultithreadedRNSTester extends BaseGridTool
 	{
 	}
 
+	public static boolean probeRNS()
+	{
+
+		String chosenName = null;
+		// pick a directory to do a lookup on.
+		synchronized (_storedDirectories) {
+			// find how many names there are currently.
+			Set<String> nameslist = _storedDirectories.keySet();
+			boolean likeTheIndex = false; // not true until we're happy with our choice.
+			while (!likeTheIndex) {
+				int index = SimpleRandomizer.randomInteger(0, nameslist.size());
+				Iterator<String> iter = nameslist.iterator();
+				int i = 0;
+				while (i++ <= index && iter.hasNext()) {
+					chosenName = iter.next();
+				}
+				if (chosenName == null) {
+					// jump-start the array by using root for our lookup.
+					chosenName = "/";
+				}
+				DirectoryStatus status = _storedDirectories.get(chosenName);
+				if ((status == null) || (status == DirectoryStatus.LOOKUP_OKAY) || (status == DirectoryStatus.LOOKUP_NOT_DONE)) {
+					// it's not a failure code here, so say we're happy.
+					likeTheIndex = true;
+				}
+			}
+		}
+		_logger.debug("chosen name for thread lookup is " + chosenName);
+
+		GeniiPath gpath = new GeniiPath(chosenName);
+		RNSPath rpath = null;
+		try {
+			rpath = gpath.lookupRNS();
+			Collection<RNSPath> contents = rpath.listContents(true);
+			String[] names = new String[contents.size()];
+			ArrayList<String> newNames = new ArrayList<String>();
+			int i = 0;
+			// make a simple list of the full names of the contents.
+			for (RNSPath name : contents) {
+				names[i++] = name.pwd();
+				// also record if we see a subdir in this dir. we will add it later if new.
+				if (name.isRNS()) {
+					newNames.add(name.pwd());
+				}
+			}
+			synchronized (_storedDirectories) {
+				// see if we found a new directory to record.
+				if (!_storedDirectories.containsKey(rpath.pwd())
+					|| (_storedDirectories.get(rpath.pwd()) == DirectoryStatus.LOOKUP_NOT_DONE)) {
+					// this directory hadn't been seen yet (or wasn't read yet), so add it.
+					_storedDirectories.put(rpath.pwd(), DirectoryStatus.LOOKUP_OKAY);
+				}
+				// now add any subdirs that were new for future lookup. we will fill them in later.
+				for (String name : newNames) {
+					if (!_storedDirectories.containsKey(name)) {
+						_logger.debug("thread adding new dir " + name);
+						_storedDirectories.put(name, DirectoryStatus.LOOKUP_NOT_DONE);
+					}
+				}
+			}
+		} catch (Throwable e) {
+			_logger.info("could not successfully lookup contents of: " + rpath.pwd() + ", exception was: " + e.getClass().getCanonicalName());
+			synchronized (_storedDirectories) {
+				// we only want to mark it as bad if this is an access problem! temporary screwup problems should be tried again.
+				if (e instanceof PermissionDeniedException || e instanceof RNSPathDoesNotExistException) {
+					// we will never mark the root as bad, since then we are hosed for any further lookups.
+					if (!rpath.isRoot()) {
+						if (_storedDirectories.get(rpath.pwd()) == DirectoryStatus.LOOKUP_NOT_DONE) {
+							// we only blacklist the item if it didn't have any existing status.
+							_logger.info("removing path permanently from consideration: " + rpath.pwd());
+							_storedDirectories.put(rpath.pwd(), (e instanceof PermissionDeniedException)
+								? DirectoryStatus.LOOKUP_FAILED_PERMISSION : DirectoryStatus.LOOKUP_FAILED_NON_EXISTENT);
+						} else {
+							// this one had already been looked up in some way, so just mention this if it used to be good.
+							if (_storedDirectories.get(rpath.pwd()) == DirectoryStatus.LOOKUP_OKAY) {
+								_logger.error("had a bad directory lookup on a previously okay dir: " + rpath.pwd(), e);
+							}
+						}
+					} else {
+						_logger.error("crazy permission error when looking up root!", e);
+					}
+				}
+			}
+			return false;
+		}
+		// the exception handler returns false for us; if we got to here things looked good.
+		return true;
+	}
+
 	public static class TesterListingThread extends ethread
 	{
 		public TesterListingThread()
@@ -167,86 +256,11 @@ public class MultithreadedRNSTester extends BaseGridTool
 				return false;
 			}
 
-			String chosenName = null;
-			// pick a directory to do a lookup on.
-			synchronized (_storedDirectories) {
-				// find how many names there are currently.
-				Set<String> nameslist = _storedDirectories.keySet();
-				boolean likeTheIndex = false; // not true until we're happy with our choice.
-				while (!likeTheIndex) {
-					int index = SimpleRandomizer.randomInteger(0, nameslist.size());
-					Iterator<String> iter = nameslist.iterator();
-					int i = 0;
-					while (i++ <= index && iter.hasNext()) {
-						chosenName = iter.next();
-					}
-					if (chosenName == null) {
-						// jump-start the array by using root for our lookup.
-						chosenName = "/";
-					}
-					DirectoryStatus status = _storedDirectories.get(chosenName);
-					if ((status == null) || (status == DirectoryStatus.LOOKUP_OKAY) || (status == DirectoryStatus.LOOKUP_NOT_DONE)) {
-						// it's not a failure code here, so say we're happy.
-						likeTheIndex = true;
-					}
-				}
-			}
-			_logger.debug("chosen name for thread lookup is " + chosenName);
-
-			GeniiPath gpath = new GeniiPath(chosenName);
-			RNSPath rpath = gpath.lookupRNS();
-			try {
-				Collection<RNSPath> contents = rpath.listContents(true);
-				String[] names = new String[contents.size()];
-				ArrayList<String> newNames = new ArrayList<String>();
-				int i = 0;
-				// make a simple list of the full names of the contents.
-				for (RNSPath name : contents) {
-					names[i++] = name.pwd();
-					// also record if we see a subdir in this dir. we will add it later if new.
-					if (name.isRNS()) {
-						newNames.add(name.pwd());
-					}
-				}
-				synchronized (_storedDirectories) {
-					// see if we found a new directory to record.
-					if (!_storedDirectories.containsKey(rpath.pwd())
-						|| (_storedDirectories.get(rpath.pwd()) == DirectoryStatus.LOOKUP_NOT_DONE)) {
-						// this directory hadn't been seen yet (or wasn't read yet), so add it.
-						_storedDirectories.put(rpath.pwd(), DirectoryStatus.LOOKUP_OKAY);
-					}
-					// now add any subdirs that were new for future lookup. we will fill them in later.
-					for (String name : newNames) {
-						if (!_storedDirectories.containsKey(name)) {
-							_logger.debug("thread adding new dir " + name);
-							_storedDirectories.put(name, DirectoryStatus.LOOKUP_NOT_DONE);
-						}
-					}
-				}
-			} catch (Throwable e) {
-				_logger.info(
-					"could not successfully lookup contents of: " + rpath.pwd() + ", exception was: " + e.getClass().getCanonicalName());
-				synchronized (_storedDirectories) {
-					// we only want to mark it as bad if this is an access problem! temporary screwup problems should be tried again.
-					if (e instanceof PermissionDeniedException || e instanceof RNSPathDoesNotExistException) {
-						// we will never mark the root as bad, since then we are hosed for any further lookups.
-						if (!rpath.isRoot()) {
-							if (_storedDirectories.get(rpath.pwd()) == DirectoryStatus.LOOKUP_NOT_DONE) {
-								// we only whack the item if it didn't have any existing contents.
-								_logger.info("removing path permanently from consideration: " + rpath.pwd());
-								_storedDirectories.put(rpath.pwd(), (e instanceof PermissionDeniedException)
-									? DirectoryStatus.LOOKUP_FAILED_PERMISSION : DirectoryStatus.LOOKUP_FAILED_NON_EXISTENT);
-							} else {
-								// this one had already been looked up in some way, so just mention this if it used to be good.
-								if (_storedDirectories.get(rpath.pwd()) == DirectoryStatus.LOOKUP_OKAY) {
-									_logger.error("had a bad directory lookup on a previously okay dir: " + rpath.pwd(), e);
-								}
-							}
-						} else {
-							_logger.error("crazy permission error when looking up root!", e);
-						}
-					}
-				}
+			boolean worked = probeRNS();
+			if (!worked) {
+				_logger.info("RNS probe failed");
+			} else {
+				_logger.info("RNS probe succeeded");
 			}
 
 			return true;

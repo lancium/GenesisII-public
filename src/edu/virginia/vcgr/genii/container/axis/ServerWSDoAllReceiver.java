@@ -116,9 +116,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		try {
 			resource = ResourceManager.getCurrentResource().dereference();
 		} catch (Throwable e) {
-			String msg = "failure to dereference resource: " + e.getMessage();
-			_logger.error(msg, e);
-			throw new AxisFault(msg);
+			/*
+			 * hmmm: we throw this error rather than a more recognizable error like RESOURCE NOT FOUND or some such. that's not so good.
+			 */
+			String msg = "could not dereference resource in invoke";
+			_logger.debug(msg, e);
+			throw new AxisFault(msg, e);
 		}
 
 		int concurrencyLevel; // snapshot for logging the client count.
@@ -134,8 +137,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		try {
 			authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
 		} catch (ResourceException e) {
-			String msg =
-				"failure to get authorization provider for resource " + ResourceManager.getResourceName(resource) + ": " + e.getMessage();
+			String msg = "failure to get authorization provider for resource " + ResourceManager.getResourceName(resource);
 			_logger.error(msg, e);
 			synchronized (_concurrentCalls) {
 				_concurrentCalls--;
@@ -143,7 +145,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			}
 			if (_logger.isTraceEnabled())
 				_logger.trace("after authz failure, rpc clients down to " + concurrencyLevel);
-			throw new AxisFault(msg);
+			throw new AxisFault(msg, e);
 		}
 
 		try {

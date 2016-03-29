@@ -45,18 +45,17 @@ public class GuaranteedDirectory extends File
 				throw new IOException("Unable to create directory \"" + getAbsolutePath() + "\".");
 			if (_ownerOnly) {
 				// if we were asked to give only the owner permission, we do it here.
-
-				/*
-				 * for now, since we need to keep supporting java 6, we're going with the ugly but working approach.
-				 */
-				/*
-				 * CAK: note, we no longer support java 6. this could be updated if there were better ways in java 7.
-				 */
-				OperatingSystemTypes osType = OperatingSystemType.getCurrent();
-				if (!((osType == OperatingSystemTypes.Windows_XP) || (osType == OperatingSystemTypes.Windows_VISTA)
-					|| (osType == OperatingSystemTypes.Windows_7) || (osType == OperatingSystemTypes.Windows_8))) {
+				if (!OperatingSystemType.isWindows()) {
 					// we think we're good to try this; this doesn't seem to be a windows variant.
 					Runtime r = Runtime.getRuntime();
+
+					/*
+					 * for now, since we need to keep supporting java 6, we're going with the ugly but working approach.
+					 */
+					/*
+					 * hmmm: note, we no longer support java 6. the below code could be updated to use the PosixFilePermissions.
+					 */
+
 					String[] cmds = { "chmod", "u+rwx,g-rwx,o-rwx", getAbsolutePath() };
 					Process p = r.exec(cmds);
 					int retval = -1;
@@ -71,11 +70,6 @@ public class GuaranteedDirectory extends File
 
 				}
 
-				// a note about the above kludge: we cannot currently use PosixFilePermission since
-				// that is java 7 only.
-				// we also have found that the setExecutable(true, true); style methods have no
-				// effect on group or user
-				// permissions whatsoever. that's why we've gone to ground with a process call. ugh.
 			}
 		}
 	}

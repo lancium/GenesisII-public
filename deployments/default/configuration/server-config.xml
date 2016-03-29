@@ -48,7 +48,7 @@
 			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-password"
 				value=""/>
 			<mconf:property name="edu.virginia.vcgr.genii.container.db.pool-size"
-				value="8"/>
+				value="128"/>
 		</mconf:instance>
 		
 		<!-- ============= AuthZ Provider Instances ============= -->

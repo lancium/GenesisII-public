@@ -84,7 +84,7 @@ public class POSIXApplicationReifier
 
 	static private boolean isWindows()
 	{
-		return OperatingSystemType.getCurrent() == OperatingSystemTypes.Windows_XP;
+		return OperatingSystemType.isWindows();
 	}
 
 	static private String modifyPath(String original, String[] newPaths)

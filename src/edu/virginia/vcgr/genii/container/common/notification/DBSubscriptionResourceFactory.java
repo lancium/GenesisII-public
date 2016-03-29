@@ -15,8 +15,6 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		// no. super.createTables();
-
 		try {
 			conn = _pool.acquire(false);
 			SubscriptionsDatabase.createTables(conn);

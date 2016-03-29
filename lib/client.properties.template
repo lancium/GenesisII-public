@@ -70,7 +70,8 @@ gffs.byteio.transferers=4
 # this is the longest that the client will wait for a request to be answered
 # by a container.  the default timeout is one minute, which may not be
 # sufficient for some very long-running operations.
-gffs.client_timeout=90000
+gffs.client_timeout=180000
+#beefed up to 3 minutes to check build reliability with longer timeout.
 
 # we'll wait this long for a connection failure before it's considered TOO
 # long for the exponential back-off retry.  this should be larger than the

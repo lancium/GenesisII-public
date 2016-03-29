@@ -230,7 +230,10 @@ public class SubscriptionOutcallHandler extends Thread
 		if (branchesCount > TOLERABLE_BRANCHING_THERESHOLD || requests.size() > TOLERABLE_REQUEST_COUNT_THRESHOLD) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("too many subscription requests.");
-			requests.clear();
+			// CAK: scrape off the requests that are too profusive, but don't clear the whole batch.
+			for (int i = requests.size() - 1; i >= TOLERABLE_REQUEST_COUNT_THRESHOLD; i--) {
+				requests.remove(i);
+			}
 		}
 		return requests;
 	}

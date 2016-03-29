@@ -103,8 +103,8 @@ public class Container extends ApplicationBase
 	/*
 	 * controls whether the container is allowed to cache things and whether it's allowed to subscribe to notifications.
 	 */
-	static private boolean allowContainersToCache = true;
-	static private boolean allowContainersToSubscribe = true;
+	static private boolean allowContainersToCache = false;
+	static private boolean allowContainersToSubscribe = false;
 
 	// Default to 1 year certificate lifespan.
 	static private long _defaultCertificateLifetime = 1000L * 60L * 60L * 24L * 365L;

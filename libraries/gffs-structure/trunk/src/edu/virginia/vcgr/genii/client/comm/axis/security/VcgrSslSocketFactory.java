@@ -287,7 +287,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			"" + ClientProperties.getClientProperties().getClientTimeout());
 
 		// Timeout "waiting for data" (read timeout)
-		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_SO_TIMEOUT_KEY, "" + 1000 * 30);
+		AxisProperties.setProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_SO_TIMEOUT_KEY,
+			"" + SocketConfigurer.DEFAULT_SOCKET_READ_TIMEOUT);
 	}
 
 	static public class KeyAndCertMaterialCacheKey

@@ -619,8 +619,7 @@ public class QueueManager implements Closeable
 			_logger.warn("Unable to acquire total job finished count.", sqe);
 			return 0L;
 		} finally {
-			if (connection != null)
-				_connectionPool.release(connection);
+			_connectionPool.release(connection);
 		}
 	}
 
@@ -677,4 +676,5 @@ public class QueueManager implements Closeable
 	{
 		return _jobManager;
 	}
+
 }

@@ -34,6 +34,8 @@ public class SocketConfigurer
 
 	static final public String TRAFFIC_CLASS_PROPERTY = PROPERTY_BASE + "traffic-class";
 
+	static public int DEFAULT_SOCKET_READ_TIMEOUT = 30 * 1000; // in milliseconds.
+
 	private Boolean _keepAlive;
 	private IntegerTuple _performancePreferences;
 	private Integer _sendBufferSize;
@@ -124,8 +126,13 @@ public class SocketConfigurer
 	{
 		try {
 			if (_keepAlive != null) {
-				if (_logger.isDebugEnabled())
+				if (_logger.isTraceEnabled())
 					_logger.debug(String.format("Setting SO_KEEPALIVE to %s.", _keepAlive));
+				socket.setKeepAlive(_keepAlive);
+			} else {
+				_keepAlive = new Boolean(true);
+				if (_logger.isTraceEnabled())
+					_logger.debug(String.format("Setting SO_KEEPALIVE to default of %s.", _keepAlive));
 				socket.setKeepAlive(_keepAlive);
 			}
 
@@ -166,6 +173,10 @@ public class SocketConfigurer
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Setting SO_TIMEOUT to %d.", _timeout));
 				socket.setSoTimeout(_timeout);
+			} else {
+				if (_logger.isTraceEnabled())
+					_logger.debug(String.format("Setting SO_TIMEOUT to default of %d.", DEFAULT_SOCKET_READ_TIMEOUT));
+				socket.setSoTimeout(DEFAULT_SOCKET_READ_TIMEOUT);
 			}
 
 			if (_noDelay != null) {

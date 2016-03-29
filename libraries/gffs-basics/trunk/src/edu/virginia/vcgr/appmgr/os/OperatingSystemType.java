@@ -74,6 +74,7 @@ public class OperatingSystemType
 		Windows_VISTA(),
 		Windows_7(),
 		Windows_8(),
+		Windows_10(),
 		MSDOS(),
 		ASERIES(),
 		IxWorks(),

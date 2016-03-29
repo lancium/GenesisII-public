@@ -45,18 +45,18 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/GeniiProcessMgmt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MacOSXSwing"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MNaming"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-servlet-7.6.17.v20150415.jar" sourcepath="/home/fred/gffs/code/library_source/org.eclipse.jetty.project-jetty-7"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-util-7.6.17.v20150415.jar"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-http-7.6.17.v20150415.jar" sourcepath="/home/fred/gffs/code/library_source/org.eclipse.jetty.project-jetty-7"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-server-7.6.17.v20150415.jar" sourcepath="/home/fred/gffs/code/library_source/org.eclipse.jetty.project-jetty-7"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-security-7.6.17.v20150415.jar"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-io-7.6.17.v20150415.jar" sourcepath="/home/fred/gffs/code/library_source/org.eclipse.jetty.project-jetty-7"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-webapp-7.6.17.v20150415.jar" sourcepath="/home/fred/gffs/code/org.eclipse.jetty.project-jetty-7"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-xml-7.6.17.v20150415.jar"/>
-	<classpathentry kind="lib" path="ext/jetty7/jetty-continuation-7.6.17.v20150415.jar"/>
 	<classpathentry kind="lib" path="ext/com.springsource.org.apache.ws.security-1.5.8.jar"/>
 	<classpathentry kind="lib" path="bundles/org.apache.commons.httpclient_3.1.0.v201012070820.jar" sourcepath="/home/fred/gffs/code/library_source/commons-httpclient-3.1/src"/>
-	<classpathentry kind="lib" path="ext/jetty7/servlet-api-2.5.jar"/>
 	<classpathentry kind="lib" path="ext/derby-10.11.1.1.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.continuation_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.http_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.io_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.security_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.server_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.servlet_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.util_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.webapp_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.xml_8.1.18.v20150929.jar"/>
+	<classpathentry kind="lib" path="ext/jetty8/javax.servlet-api-3.0.1.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

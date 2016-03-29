@@ -34,6 +34,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 	private int _maxElements;
 	private long _defaultTimeoutMS;
 	private Thread _activeTimeoutThread = null;
+	private boolean _logCacheEjection = false;
 
 	public TimedOutLRUCache(int maxElements, long defaultTimeoutMS)
 	{
@@ -53,6 +54,14 @@ public class TimedOutLRUCache<KeyType, DataType>
 	public int size()
 	{
 		return _map.size();
+	}
+
+	/**
+	 * allows this cache to log when items are removed due to overloading or timing out.
+	 */
+	public void setCacheEjectionLogging(boolean logRemovals)
+	{
+		_logCacheEjection = logRemovals;
 	}
 
 	public void activelyTimeoutElements(boolean activelyTimeout)
@@ -85,7 +94,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 
 			while (_map.size() >= _maxElements) {
 				RoleBasedCacheNode<KeyType, DataType> node = _lruList.removeFirst();
-				if (_logger.isDebugEnabled())
+				if (_logCacheEjection && _logger.isDebugEnabled())
 					_logger.debug("overloaded cache: removing cached item with key: " + node.getKey());
 				_timeoutList.remove(node);
 				_map.remove(node.getKey());
@@ -140,7 +149,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 			_lruList.remove(node);
 			if (node.getInvalidationDate().before(now)) {
 				// this entry has become stale.
-				if (_logger.isDebugEnabled())
+				if (_logCacheEjection && _logger.isDebugEnabled())
 					_logger.debug("timed-out entry in get: removing cached item with key: " + node.getKey());
 				_map.remove(key);
 				_timeoutList.remove(node);
@@ -190,7 +199,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 					break;
 
 				if (node.getInvalidationDate().compareTo(now) <= 0) {
-					if (_logger.isDebugEnabled())
+					if (_logCacheEjection && _logger.isDebugEnabled())
 						_logger.debug("removing timed-out node: " + node.getKey());
 					_map.remove(node.getKey());
 					_timeoutList.removeFirst();

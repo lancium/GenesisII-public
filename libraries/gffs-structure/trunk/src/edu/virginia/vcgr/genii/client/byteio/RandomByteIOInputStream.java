@@ -146,9 +146,20 @@ public class RandomByteIOInputStream extends InputStream
 				thread[i] = new Thread(fr[i]);
 			}
 
-			// Handles the case when length is not a perfect multiple of the number of threads
-			fr[numThreads - 1] = new FastRead(transferer[numThreads - 1], _offset + subLength, threadBlkReadSize + (length % numThreads), fac,
-				numThreads - 1, threadBlkReadSize);
+			/*
+			 * hmmm: CAK: a count of threadBlkReadSize + (length % numThreads) seems wrong; i think this should be reading just (length %
+			 * numThreads) bytes in the final read, unless the size is evenly divisible.
+			 */
+			// fr[numThreads - 1] = new FastRead(transferer[numThreads - 1], _offset + subLength, threadBlkReadSize + (length % numThreads),
+			// fac,
+			// numThreads - 1, threadBlkReadSize);
+			
+			// compute last block size for the final read operation.
+			int lastBlock = length % numThreads;
+			if (lastBlock == 0)
+				lastBlock = threadBlkReadSize;
+			fr[numThreads - 1] =
+				new FastRead(transferer[numThreads - 1], _offset + subLength, lastBlock, fac, numThreads - 1, threadBlkReadSize);
 
 			thread[numThreads - 1] = new Thread(fr[numThreads - 1]);
 
