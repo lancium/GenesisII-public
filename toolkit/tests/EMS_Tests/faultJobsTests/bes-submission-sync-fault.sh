@@ -1,6 +1,7 @@
 #!/bin/bash
 
-##Author: Vanamala Venkataswamy
+#Author: Vanamala Venkataswamy
+#mods: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"

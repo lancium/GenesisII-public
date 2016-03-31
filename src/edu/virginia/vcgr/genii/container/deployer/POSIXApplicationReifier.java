@@ -11,7 +11,6 @@ import org.ggf.jsdl.posix.FileName_Type;
 import org.ggf.jsdl.posix.POSIXApplication_Type;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
-import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 public class POSIXApplicationReifier
 {

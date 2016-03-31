@@ -60,8 +60,11 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 import edu.virginia.vcgr.genii.security.SAMLConstants;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.credentials.NuCredential;
+import edu.virginia.vcgr.genii.security.credentials.TrustCredential;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 @SuppressWarnings("deprecation")
@@ -185,6 +188,17 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				_logger.info(GenesisIIConstants.ACCESS_DENIED_SENTINEL + " for method '"
 					+ PermissionDeniedException.extractMethodName(pde.getMessage()) + "' on asset: "
 					+ PermissionDeniedException.extractAssetDenied(pde.getMessage()));
+
+				// hmmm: temporary logging block! although this thing is often handy.
+				try {
+					ICallingContext context = ContextManager.getCurrentContext();
+					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
+					_logger.debug("failed access attempt had these credentials: "
+						+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
+				} catch (Throwable t) {
+					_logger.error("failed to get calling context or show credentials", t);
+				}
+
 			} else {
 				// re-throw and also hit the finally clause to decrement concurrency counter.
 				String msg = "An AxisFault occurred during authorization: " + e.getMessage();

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-##Author: Vanamala Venkataswamy
+#Author: Vanamala Venkataswamy
+#mods: Chris Koeritz
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
@@ -32,9 +33,9 @@ testQueueResourcesExist()
 testHTTP()
 {
   for i in $available_resources; do
-  	grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-http.jsdl $i
-  	assertEquals "Submitting single cat job with file staging using HTTP protocol" 0 $?
-  	grep -i "Job Submitted" $GRID_OUTPUT_FILE
+    grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-http.jsdl $i
+    assertEquals "Submitting single cat job with file staging using HTTP protocol" 0 $?
+    grep -i "Job Submitted" $GRID_OUTPUT_FILE
   done
   wait_for_all_pending_jobs $QUEUE_PATH whack
   assertEquals "Pending http jobs should complete without errors." 0 $?
@@ -92,14 +93,13 @@ testSFTP()
 
 testMailTo()
 {
-    for i in $available_resources; do
-      grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-mailto.jsdl $i
-      assertEquals "Submitting single cat job with file staging using the MAILTO protocol" 0 $?
-      grep -i "Job Submitted" $GRID_OUTPUT_FILE
-    done
-    wait_for_all_pending_jobs $QUEUE_PATH whack
-    assertEquals "Pending mailto jobs should complete without errors." 0 $?
-
+  for i in $available_resources; do
+    grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-mailto.jsdl $i
+    assertEquals "Submitting single cat job with file staging using the MAILTO protocol" 0 $?
+    grep -i "Job Submitted" $GRID_OUTPUT_FILE
+  done
+  wait_for_all_pending_jobs $QUEUE_PATH whack
+  assertEquals "Pending mailto jobs should complete without errors." 0 $?
 }
 
 oneTimeTearDown()

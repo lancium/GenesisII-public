@@ -12,8 +12,8 @@ if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
 fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
-#this seems to not be used.
-export TIMEFORMAT='%R'
+# where we hook in the fuse mount.
+MOUNT_POINT="$TEST_TEMP/mount-testRandomTransfers"
 
 function decide_on_filenames_and_sizes()
 {
@@ -70,11 +70,11 @@ function copyOneFileUp()
   local size="$1"; shift
 
   local base="$(basename "$filename")"
-  local gridPath="$RNSPATH/$base"
+  local fusePath="$MOUNT_POINT/$base"
 
-#echo "filename=$filename size=$size base=$base gridPath=$gridPath"
+#echo "filename=$filename size=$size base=$base fusePath=$fusePath"
 
-  timed_grid cp "local:$filename" "$gridPath"
+  timed_command cp "$filename" "$fusePath"
   retval=$?
   assertEquals "Copying local file $filename" 0 $retval
   if [ $retval -eq 0 ]; then
@@ -91,17 +91,17 @@ function copyOneFileDown()
   local size="$1"; shift
 
   local base="$(basename "$filename")"
-  local gridPath="$RNSPATH/$base"
+  local fusePath="$MOUNT_POINT/$base"
   local newLocal="${filename}.new"
 
-#echo "filename=$filename size=$size base=$base gridPath=$gridPath newLocal=$newLocal"
+#echo "filename=$filename size=$size base=$base fusePath=$fusePath newLocal=$newLocal"
 
-  timed_grid cp "$gridPath" "local:$newLocal"
+  timed_command cp "$fusePath" "$newLocal"
   retval=$?
-  assertEquals "Copying remote file $gridPath" 0 $retval
+  assertEquals "Copying remote file $fusePath" 0 $retval
   if [ $retval -eq 0 ]; then
     real_time=$(calculateTimeTaken)
-    echo "Time taken to copy $gridPath with $size bytes is $real_time s"
+    echo "Time taken to copy $fusePath with $size bytes is $real_time s"
     actual_size=$(\ls -l $filename | awk '{print $5}')
     showBandwidth "$real_time" $size
   fi
@@ -148,6 +148,28 @@ oneTimeSetUp()
 
   # pick some file names and sizes for testing.
   decide_on_filenames_and_sizes
+
+  if ! fuse_supported; then return 0; fi
+  # need to just go for it and try to unmount; the directory left for a dead mount
+  # is still present but is not seen by checks.
+  fusermount -u "$MOUNT_POINT" &>/dev/null
+  sync ; sleep 2
+  if [ -d "$MOUNT_POINT" ]; then
+    rmdir "$MOUNT_POINT"
+  fi
+  mkdir "$MOUNT_POINT"
+}
+
+testFuseMounting()
+{
+  if ! fuse_supported; then return 0; fi
+
+  echo "Mounting grid with fuse filesystem at: $MOUNT_POINT"
+  fuse --mount local:"$MOUNT_POINT"
+  sleep 30
+
+  test_fuse_mount "$MOUNT_POINT"
+  check_if_failed "Mounting grid to local directory"
 }
 
 testCreateFiles()
@@ -179,6 +201,18 @@ testFilesCameOutOkay()
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     compareBeforeAndAfter "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"
   done
+}
+
+testUnmountingFuse()
+{
+  if ! fuse_supported; then return 0; fi
+  cd "$WORKDIR"  # change dir off fuse mount.
+  grid fuse --unmount local:"$MOUNT_POINT"
+  retval=$?
+  sleep 30
+  assertEquals "Unmounting fuse grid mount" 0 $retval
+  rmdir "$MOUNT_POINT"
+  assertEquals "Checking that directory is no longer mounted" 0 $?
 }
 
 oneTimeTearDown()

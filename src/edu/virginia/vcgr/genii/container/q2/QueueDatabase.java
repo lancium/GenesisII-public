@@ -77,12 +77,15 @@ public class QueueDatabase
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT resourceid, resourcename, totalslots " + "FROM q2resources WHERE queueid = ?");
+			stmt = connection
+				.prepareStatement("SELECT resourceid, resourcename, totalslots, totalcores " + "FROM q2resources WHERE queueid = ?");
+			// stmt = connection.prepareStatement("SELECT resourceid, resourcename, totalslots " + "FROM q2resources WHERE queueid = ?");
 			stmt.setString(1, _queueID);
 			rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				ret.add(new BESData(rs.getLong(1), rs.getString(2), rs.getInt(3)));
+				ret.add(new BESData(rs.getLong(1), rs.getString(2), rs.getInt(3), rs.getInt(4)));
+				// ret.add(new BESData(rs.getLong(1), rs.getString(2), rs.getInt(3), 64));
 			}
 
 			return ret;
@@ -114,7 +117,12 @@ public class QueueDatabase
 
 		try {
 			stmt = connection.prepareStatement(
-				"INSERT INTO q2resources " + "(queueid, resourcename, resourceendpoint, totalslots) " + "VALUES (?, ?, ?, 1)");
+				"INSERT INTO q2resources " + "(queueid, resourcename, resourceendpoint, totalslots, totalcores) " + "VALUES (?, ?, ?, 1, 8)");
+			/*
+			 * stmt = connection.prepareStatement("INSERT INTO q2resources " + "(queueid, resourcename, resourceendpoint, totalslots) " +
+			 * "VALUES (?, ?, ?, 1)");
+			 */
+
 			stmt.setString(1, _queueID);
 			stmt.setString(2, name);
 			stmt.setBlob(3, EPRUtils.toBlob(epr, "q2resources", "resourceendpoint"));
@@ -149,14 +157,16 @@ public class QueueDatabase
 	 * 
 	 * @throws SQLException
 	 */
-	public void configureResource(Connection connection, long id, int totalSlots) throws SQLException
+	public void configureResource(Connection connection, long id, int totalSlots, int totalCores) throws SQLException
 	{
 		PreparedStatement stmt = null;
 
 		try {
-			stmt = connection.prepareStatement("UPDATE q2resources SET totalslots = ? " + "WHERE resourceid = ?");
+			_logger.info("Updating total slots to *" + totalSlots + "* and updating total cores to *" + totalCores + "*");
+			stmt = connection.prepareStatement("UPDATE q2resources SET totalslots = ?, totalcores = ? " + "WHERE resourceid = ?");
 			stmt.setInt(1, totalSlots);
-			stmt.setLong(2, id);
+			stmt.setInt(2, totalCores);
+			stmt.setLong(3, id);
 
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update resource's slot count.");
@@ -333,13 +343,13 @@ public class QueueDatabase
 
 					data = new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket,
 						rs.getShort(3), state, new Date(rs.getTimestamp(5).getTime()), rs.getShort(6),
-						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)));
+						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)), 1);
 
 				} else {
 
 					data = new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
 						new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
-						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)));
+						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)), 1);
 				}
 
 				Blob blob = rs.getBlob(8);
@@ -483,14 +493,14 @@ public class QueueDatabase
 	 * @throws IOException
 	 */
 	public long submitJob(Connection connection, String ticket, short priority, JobDefinition_Type jsdl, ICallingContext callingContext,
-		Collection<Identity> identities, QueueStates state, Date submitTime) throws SQLException, IOException
+		Collection<Identity> identities, QueueStates state, Date submitTime, int numOfCores) throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 
 		try {
 			stmt = connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
-				+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
+				+ "jsdl, owners, priority, state, runattempts, submittime, rpcid, numcores) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));
@@ -500,6 +510,7 @@ public class QueueDatabase
 			stmt.setString(7, state.name());
 			stmt.setTimestamp(8, new Timestamp(submitTime.getTime()));
 			stmt.setString(9, "n");
+			stmt.setInt(10, numOfCores);
 
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to add job to the queue database.");
@@ -530,7 +541,8 @@ public class QueueDatabase
 	}
 
 	public long submitJob(SweepingJob sweep, Connection connection, String ticket, short priority, JobDefinition_Type jsdl,
-		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime) throws SQLException, IOException
+		ICallingContext callingContext, Collection<Identity> identities, QueueStates state, Date submitTime, int numOfCores)
+		throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -545,7 +557,7 @@ public class QueueDatabase
 				_logger.debug("loaded sweep job state of: " + sweepState);
 
 			stmt = connection.prepareStatement("INSERT INTO q2jobs (jobticket, queueid, callingcontext, "
-				+ "jsdl, owners, priority, state, runattempts, submittime, rpcid) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
+				+ "jsdl, owners, priority, state, runattempts, submittime, rpcid, numcores) " + "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext, "q2jobs", "callingcontext"));
@@ -555,6 +567,7 @@ public class QueueDatabase
 			stmt.setString(7, state.name());
 			stmt.setTimestamp(8, new Timestamp(submitTime.getTime()));
 			stmt.setString(9, "n");
+			stmt.setInt(10, numOfCores);
 
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to add job to the queue database.");
@@ -756,6 +769,36 @@ public class QueueDatabase
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
+	}
+
+	public void updateJSDL(Connection connection, JobDefinition_Type jsdl, long jobID) throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		try {
+			stmt = connection.prepareStatement("UPDATE q2jobs SET jsdl = ? " + "WHERE jobid = ?");
+			stmt.setBlob(1, DBSerializer.xmlToBlob(jsdl, "q2jobs", "jsdl"));
+			stmt.setLong(2, jobID);
+			if (stmt.executeUpdate() != 1)
+				throw new ResourceException("Unable to update JSDL in database with job id " + jobID);
+		} finally {
+			StreamUtils.close(stmt);
+		}
+
+	}
+
+	public void updateJSDL(Connection connection, JobDefinition_Type jsdl, String jobID) throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		try {
+			stmt = connection.prepareStatement("UPDATE q2jobs SET jsdl = ? " + "WHERE jobid = ?");
+			stmt.setBlob(1, DBSerializer.xmlToBlob(jsdl, "q2jobs", "jsdl"));
+			stmt.setString(2, jobID);
+			if (stmt.executeUpdate() != 1)
+				throw new ResourceException("Unable to update JSDL in database with job id " + jobID);
+		} finally {
+			StreamUtils.close(stmt);
+		}
+
 	}
 
 	public EndpointReferenceType getLogEPR(Connection connection, long jobID) throws ResourceException, SQLException

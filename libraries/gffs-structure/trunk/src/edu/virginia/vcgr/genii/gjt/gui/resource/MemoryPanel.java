@@ -16,11 +16,11 @@ class MemoryPanel extends TitledPanel
 {
 	static final long serialVersionUID = 0L;
 
-	MemoryPanel(JobDocumentContext context)
+	MemoryPanel(JobDocumentContext context, int index)
 	{
 		super("Memory Restrictions", new GridBagLayout());
 
-		SizeValue currentMem = context.jobDocument().memoryUpperBound();
+		SizeValue currentMem = context.jobRoot().jobDocument().get(index).memoryUpperBound();
 		JSpinner upperBound = new UnitValueSpinner(new UnitValueSpinnerModel<SizeUnit>(currentMem, 1, Long.MAX_VALUE, 1));
 		SizeUnitValueComboBox upperBoundUnit = new SizeUnitValueComboBox(currentMem);
 

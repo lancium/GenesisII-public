@@ -230,10 +230,11 @@ public class QueueManager implements Closeable
 		Date nextUpdate = (updateInfo == null) ? null : updateInfo.nextUpdate();
 
 		HashMap<Long, SlotSummary> slots = new HashMap<Long, SlotSummary>();
-		slots.put(new Long(data.getID()), new SlotSummary(data.getTotalSlots(), 0));
+		slots.put(new Long(data.getID()), new SlotSummary(data.getTotalSlots(), 0, data.getTotalCores(), 0));
 		_jobManager.recordUsedSlots(slots);
 		return new CurrentResourceInformation(data.getTotalSlots(), (int) (slots.get(data.getID()).slotsUsed()), isAccepting, arch, osName,
-			osVersion, physicalMemory, mgrType, isAvailable, lastUpdated, nextUpdate);
+			osVersion, physicalMemory, mgrType, isAvailable, lastUpdated, nextUpdate, data.getTotalCores(),
+			(int) (slots.get(data.getID()).coresUsed()));
 	}
 
 	private Collection<LegacyEntryType> addInCurrentResourceInformation(Collection<LegacyEntryType> entries) throws JAXBException
@@ -349,13 +350,13 @@ public class QueueManager implements Closeable
 		}
 	}
 
-	public void configureBES(String name, int newSlots) throws SQLException, ResourceException
+	public void configureBES(String name, int newSlots, int newCores) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 
 		try {
 			connection = _connectionPool.acquire(false);
-			_besManager.configureBES(connection, name, newSlots);
+			_besManager.configureBES(connection, name, newSlots, newCores);
 		} finally {
 			_connectionPool.release(connection);
 		}
@@ -647,7 +648,7 @@ public class QueueManager implements Closeable
 			 * Now we go through the list and get rid of all resources that had no slots allocated.
 			 */
 			for (BESData data : allResources)
-				hostSlotSummary.put(data.getID(), new SlotSummary(data.getTotalSlots(), 0L));
+				hostSlotSummary.put(data.getID(), new SlotSummary(data.getTotalSlots(), 0L, data.getTotalCores(), 0L));
 		}
 
 		synchronized (_jobManager) {

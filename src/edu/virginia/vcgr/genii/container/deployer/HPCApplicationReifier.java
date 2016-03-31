@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.axis.types.NCName;
-import org.ggf.jsdl.hpcp.HPCProfileApplication_Type;
 import org.ggf.jsdl.hpcp.DirectoryName_Type;
 import org.ggf.jsdl.hpcp.Environment_Type;
 import org.ggf.jsdl.hpcp.FileName_Type;
+import org.ggf.jsdl.hpcp.HPCProfileApplication_Type;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
-import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 public class HPCApplicationReifier
 {

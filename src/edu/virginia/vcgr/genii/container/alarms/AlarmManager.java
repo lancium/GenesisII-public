@@ -209,12 +209,17 @@ public class AlarmManager
 			if (!rs.next())
 				throw new RuntimeException("Unable to add alarm to database.");
 
+			// CAK: moved the commit and db connection release to before we start waking up alarms; we don't want to be blocked with the db
+			// conn held.
+			conn.commit();
+			_connectionPool.release(conn);
+			conn = null; // set to null to avoid releasing again.
+
 			long alarmid = rs.getLong(1);
 			synchronized (_alarms) {
 				_alarms.put(alarmid, nextOccurrence);
 				_alarms.notify();
 			}
-			conn.commit();
 
 			return new AlarmIdentifier(alarmid);
 		} catch (SQLException sqe) {
@@ -334,6 +339,12 @@ public class AlarmManager
 				"SELECT repeatinterval, callingcontext, target, " + "methodname, userdata " + "FROM alarmtable WHERE alarmid = ?");
 			removeStmt = conn.prepareStatement("DELETE FROM alarmtable WHERE alarmid = ?");
 			updateStmt = conn.prepareStatement("UPDATE alarmtable SET nextoccurance = ? WHERE alarmid = ?");
+
+			/*
+			 * hmmm: this code keeps the db connection open a really long time while it tries to do alarms, and the alarms themselves could
+			 * cause outcalls. this seems really bad, since we are keeping that db conn held until all this stuff occurs, and in the process
+			 * of performing the alarms, we could also be needing a db connection.
+			 */
 
 			for (AlarmDescriptor desc : dueAlarms) {
 				try {

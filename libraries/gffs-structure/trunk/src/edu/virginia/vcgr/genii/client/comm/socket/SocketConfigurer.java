@@ -34,7 +34,7 @@ public class SocketConfigurer
 
 	static final public String TRAFFIC_CLASS_PROPERTY = PROPERTY_BASE + "traffic-class";
 
-	static public int DEFAULT_SOCKET_READ_TIMEOUT = 30 * 1000; // in milliseconds.
+	static public int DEFAULT_SOCKET_READ_TIMEOUT = 2 * 60 * 1000; // in milliseconds.
 
 	private Boolean _keepAlive;
 	private IntegerTuple _performancePreferences;

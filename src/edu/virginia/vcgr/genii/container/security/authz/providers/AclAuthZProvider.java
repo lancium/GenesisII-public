@@ -296,6 +296,11 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			String asset = ResourceManager.getResourceName(resource);
 			msg = msg.concat(" on '" + asset + "' at " + ProgramTools.showLastFewOnStack(7));
 			_logger.info(msg);
+
+			// hmmm: temporary added logging; was not seeing creds in other location in server wsdoall recvr.
+			_logger.debug("failed access attempt had these credentials: "
+				+ TrustCredential.showCredentialList(authenticatedCallerCredentials, VerbosityLevel.HIGH));
+
 			return false;
 		}
 		return true;

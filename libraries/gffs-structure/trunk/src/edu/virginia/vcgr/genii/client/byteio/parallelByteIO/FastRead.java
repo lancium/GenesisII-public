@@ -38,17 +38,23 @@ public class FastRead implements Runnable
 	@Override
 	public void run()
 	{
+		byte[] temp_buffer = null;
 		try {
 			if (_logger.isDebugEnabled())
 				_logger.debug("about to read at offset " + startOffset + " with block size " + block_read_size);
-			byte[] temp_buffer = transferer.read(startOffset, block_read_size, 1, 0);
+			temp_buffer = transferer.read(startOffset, block_read_size, 1, 0);
 			fac.copyFetch(temp_buffer, threadId, subBufferSize);
-		} catch (RemoteException re) {
-			_logger.error("caught RemoteException in run", re);
-			fac.setErrorFlag(re);
+		} catch (RemoteException e) {
+			if (e.getMessage().contains("Stream closed")) {
+				//hmmm: make sure this assertion is true and that this is a harmless exception!!!!
+				_logger.debug("ignoring stream closed, which can happen after reading to eof.");
+			} else {
+				_logger.error("caught RemoteException in run", e);
+				fac.setErrorFlag(e);
+			}
 		} catch (Throwable t) {
-			_logger.error("caught exception in run", t);
-			throw t;
+			_logger.error("caught exception in run; recording as failure", t);
+			fac.setErrorFlag(t);
 		}
 
 		fac.completed();

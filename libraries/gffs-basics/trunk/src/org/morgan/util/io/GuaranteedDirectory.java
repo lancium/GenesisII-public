@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
-import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 
 /**
  * A utility class which acts like a file, but upon successful creation guarantees that the names path is an existing directory.

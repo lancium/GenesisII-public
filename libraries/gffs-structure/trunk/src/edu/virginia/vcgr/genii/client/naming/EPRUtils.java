@@ -166,13 +166,17 @@ public class EPRUtils
 
 	static public MessageLevelSecurityRequirements extractMinMessageSecurity(EndpointReferenceType epr) throws AuthZSecurityException
 	{
+		// prepare our answer for the most common case.
+		MessageLevelSecurityRequirements retval = new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.WARN);
 
 		MetadataType mdt = epr.getMetadata();
-		if (mdt == null)
-			return null;
+		if (mdt == null) {
+			return retval;
+		}
 		MessageElement[] elements = mdt.get_any();
-		if (elements == null || elements.length == 0)
-			return null;
+		if (elements == null || elements.length == 0) {
+			return retval;
+		}
 
 		for (MessageElement element : elements) {
 
@@ -183,7 +187,6 @@ public class EPRUtils
 
 					PolicyAttachment policyAttachment = (PolicyAttachment) element.getObjectValue(PolicyAttachment.class);
 
-					MessageLevelSecurityRequirements retval = new MessageLevelSecurityRequirements();
 
 					/*
 					 * Duane Merrill: assume it applies to everything. We will want to get more specific at some point of SecAddr takes off.
@@ -191,12 +194,13 @@ public class EPRUtils
 					Policy metaPolicy = policyAttachment.getPolicy();
 
 					// Added by ak3ka: Confirmed with Duane to be correct.
-					if (metaPolicy == null)
-						return null;
+					if (metaPolicy == null) {
+						return retval;
+					}
 
 					MessageElement[] policyElements = metaPolicy.get_any();
 					if (policyElements == null || policyElements.length == 0) {
-						return null;
+						return retval;
 					}
 
 					for (MessageElement attachmentElement : policyElements) {
@@ -219,12 +223,12 @@ public class EPRUtils
 
 				} catch (Exception e) {
 					_logger.info("exception occurred in extractMinMessageSecurity", e);
-					return null;
+					return retval;
 				}
 			}
 		}
 
-		return null;
+		return retval;
 	}
 
 	static private Pattern _SERVICE_NAME_PATTERN = Pattern.compile("^.*/axis/services/([^/]+)$");

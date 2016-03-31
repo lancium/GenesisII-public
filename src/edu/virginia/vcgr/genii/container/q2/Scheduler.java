@@ -4,18 +4,24 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.jsdl.JobDefinition_Type;
+import org.ggf.jsdl.JobDescription_Type;
 import org.morgan.util.Counter;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLTransformer;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
@@ -98,6 +104,7 @@ public class Scheduler implements Closeable
 	private void scheduleJobs() throws ResourceException
 	{
 
+		_logger.debug("Starting Job Scheduler");
 		if (!_isSchedulingJobs) {
 			_logger.info("Skipping a scheduling loop because the \"" + "isScheduling\" property of the queue is turned off.");
 			return;
@@ -105,6 +112,8 @@ public class Scheduler implements Closeable
 
 		HashMap<Long, ResourceSlots> slots = new HashMap<Long, ResourceSlots>();
 		HashMap<JobResourceRequirements, Counter> jobCounts = new HashMap<JobResourceRequirements, Counter>();
+		Random rand = new Random();
+		int selectedMatch;
 
 		try {
 			/*
@@ -127,7 +136,7 @@ public class Scheduler implements Closeable
 				 */
 				for (BESData data : availableResources) {
 					ResourceSlots rs = new ResourceSlots(data);
-					if (rs.slotsAvailable() > 0)
+					if (rs.slotsAvailable() > 0 && rs.coresAvailable() > 0)
 						slots.put(new Long(data.getID()), rs);
 				}
 			}
@@ -161,8 +170,11 @@ public class Scheduler implements Closeable
 				ResourceMatcher matcher = new ResourceMatcher();
 				Collection<ResourceMatch> matches = new LinkedList<ResourceMatch>();
 				Iterator<ResourceSlots> slotIter = null;
-				ResourceMatch match;
-
+				ResourceMatch[] match;
+				// Stores all non-null matches (i.e. all valid matches)
+				List<ResourceMatch> temp = new ArrayList<ResourceMatch>();
+				// Stores the correct job description index of the matches
+				List<Integer> selectedMatchIndices = new ArrayList<Integer>();
 				/*
 				 * We are now going to match as many jobs to as many slots as possible. To make this as efficient as possible, we keep track
 				 * of the iterator and continually re-iterate until we go through all the jobs waiting for a slot, or we run out of resources
@@ -172,6 +184,8 @@ public class Scheduler implements Closeable
 				Date now = new Date();
 				Date nextScheduledEvent = null;
 				for (JobData queuedJob : _jobManager.getQueuedJobs()) {
+					_logger.debug("Starting the queued job");
+
 					match = null;
 					if (!queuedJob.canRun(now)) {
 						Date nextRun = queuedJob.getNextCanRun();
@@ -187,61 +201,116 @@ public class Scheduler implements Closeable
 						continue;
 					}
 
-					JobResourceRequirements requirements = null;
+					Long jobId = queuedJob.getJobID();// Get job id
+					// Get JSDL document using job id
+					_logger.debug("Getting the JSDL for the job");
+					JobDefinition_Type jsdl = _jobManager.getJSDL(jobId);
 
-					try {
-						requirements = queuedJob.getResourceRequirements(_jobManager);
-					} catch (Throwable cause) {
-						_logger.warn("Error trying to get job resource requirements for matching.", cause);
-						requirements = new JobResourceRequirements();
+					// Extract the common block information, put it into all job descriptions and
+					// update the JSDL document in the database
+					if (jsdl.getCommon() != null) {
+						System.out.println("old jsdl =" + jsdl.toString());
+						jsdl = JSDLTransformer.extractCommon(jsdl);
+						System.out.println("transformed jsdl =" + jsdl.toString());
+						_jobManager.updateJSDL(jsdl, jobId);
+					} else {
+						// System.out.println(jsdl.toString());
 					}
 
-					/* If we haven't created an iterator yet, do so now. */
-					if (slotIter == null) {
-						/* If there aren't any slots, we're done */
-						if (slots.isEmpty())
-							break;
+					// Get all the job descriptions in the JSDL document.
+					JobDescription_Type[] jobDescs = jsdl.getJobDescription();
+					// Contains all Resource Requirements.
+					JobResourceRequirements[] requirements = new JobResourceRequirements[jobDescs.length];
+					// Contains all matches, including null ones.
+					match = new ResourceMatch[requirements.length];
 
-						slotIter = slots.values().iterator();
+					try {
+						// Gets all of the job resource requirements in a single JSDL file
+						for (int i = 0; i < requirements.length; i++) {
+							requirements[i] = queuedJob.getResourceRequirements(_jobManager, i);
+						}
 
-						/* Try to find a match */
-						match = findSlot(matcher, queuedJob, requirements, slotIter);
-					} else {
-						/*
-						 * If we got here, then we already had an iterator from before. Try to find a match with it.
-						 */
-						match = findSlot(matcher, queuedJob, requirements, slotIter);
-
-						/*
-						 * If we couldn't find a match, it may have been the case that we simply had already passed a potential match with the
-						 * iterator before getting here, so give the iterator a new chance from the begining.
-						 */
-						if (match == null) {
-							/* If there are no slots available, we're done. */
+					} catch (Throwable cause) {
+						_logger.warn("Error trying to get job resource requirements for matching.", cause);
+						requirements[0] = new JobResourceRequirements();
+					}
+					for (int i = 0; i < requirements.length; i++) {
+						/* If we haven't created an iterator yet, do so now. */
+						if (slotIter == null) {
+							/* If there aren't any slots, we're done */
 							if (slots.isEmpty())
 								break;
 
-							/*
-							 * Create a new iterator and try to find a match again.
-							 */
 							slotIter = slots.values().iterator();
-							match = findSlot(matcher, queuedJob, requirements, slotIter);
+
+							/* Try to find a match */
+							match[i] = findSlot(matcher, queuedJob, requirements[i], slotIter);
+						} else {
+							/*
+							 * If we got here, then we already had an iterator from before. Try to find a match with it.
+							 */
+							match[i] = findSlot(matcher, queuedJob, requirements[i], slotIter);
+
+							/*
+							 * If we couldn't find a match, it may have been the case that we simply had already passed a potential match with
+							 * the iterator before getting here, so give the iterator a new chance from the beginning.
+							 */
+							if (match[i] == null) {
+								/* If there are no slots available, we're done. */
+								if (slots.isEmpty())
+									break;
+
+								/*
+								 * Create a new iterator and try to find a match again.
+								 */
+								slotIter = slots.values().iterator();
+								match[i] = findSlot(matcher, queuedJob, requirements[i], slotIter);
+							}
 						}
+
+						/*
+						 * * If we found a match, then denote it. The match will be added to a separate list later. Note that although the
+						 * debug writer may say that the job was matched to several execution services, only one of them will actually run the
+						 * job.
+						 */
+
+						if (match[i] != null) {
+							HistoryContext history = queuedJob.history(HistoryEventCategory.Scheduling);
+							history.createDebugWriter("Job Matched to Resource")
+								.format("Job matched to resource %s.", _besManager.getBESName(match[i].getBESID())).close();
+							// matches.add(match[i]);
+						} else {
+							Counter c = jobCounts.get(requirements);
+							if (c == null)
+								jobCounts.put(requirements[i], c = new Counter());
+							c.modify(1);
+						}
+					}
+					// Transfer all non-null entries in the match array to the temp ArrayList.
+					for (int i = 0; i < match.length; i++) {
+						if (match[i] != null)
+							temp.add(match[i]);
 					}
 
 					/*
-					 * If we found a match, then go ahead and add it to our list.
+					 * If there is at least one non-null match, pick one of them arbitrarily and add it to the matches ArrayList
 					 */
-					if (match != null) {
-						HistoryContext history = queuedJob.history(HistoryEventCategory.Scheduling);
-						history.createDebugWriter("Job Matched to Resource")
-							.format("Job matched to resource %s.", _besManager.getBESName(match.getBESID())).close();
-						matches.add(match);
-					} else {
-						Counter c = jobCounts.get(requirements);
-						if (c == null)
-							jobCounts.put(requirements, c = new Counter());
-						c.modify(1);
+					if (!temp.isEmpty()) {
+						selectedMatch = rand.nextInt(temp.size());
+						matches.add(temp.get(selectedMatch));
+
+						// Gets the index of the job description in the JSDL file whose resource
+						// requirements matched with a BES.
+						// This is equal to the match's position in the match array.
+						for (int i = 0; i < match.length; i++) {
+							if (match[i] != null && match[i].equals(temp.get(selectedMatch))) {
+								selectedMatchIndices.add(i);
+								queuedJob.jobName(jsdl.getJobDescription(i).getJobIdentification().getJobName());
+							}
+						}
+
+						temp.clear();// Clears the temp ArrayList for the next job
+
 					}
 				}
 
@@ -256,13 +325,15 @@ public class Scheduler implements Closeable
 					connection = _connectionPool.acquire(false);
 
 					/* And start the jobs. */
-					_jobManager.startJobs(connection, matches);
+					_jobManager.startJobs(connection, matches, selectedMatchIndices);
 				} catch (Throwable cause) {
 					_logger.warn("Unable to schedule jobs.", cause);
 				} finally {
 					_connectionPool.release(connection);
 				}
 			}
+		} catch (SQLException e) {
+			_logger.debug("sql exception caught in scheduleJobs", e);
 		} finally {
 			for (Map.Entry<JobResourceRequirements, Counter> entry : jobCounts.entrySet()) {
 				if (_logger.isDebugEnabled())
@@ -292,15 +363,18 @@ public class Scheduler implements Closeable
 				ResourceSlots rSlots = slots.next();
 
 				try {
-					if (matcher.matches(requirements, _besManager.getBESInformation(rSlots.getBESID()))) {
+					if (matcher.matches(requirements, _besManager.getBESInformation(rSlots.getBESID()))
+						&& rSlots.coresAvailable() >= queuedJob.getNumOfCores()) {
 						/* If there was a match, reserve the slot */
 						rSlots.reserveSlot();
+						rSlots.reserveCores(queuedJob.getNumOfCores());
 
 						/*
 						 * If we just reserved the last available slot, take it out of the list.
 						 */
-						if (rSlots.slotsAvailable() <= 0)
+						if (rSlots.slotsAvailable() <= 0 || rSlots.coresAvailable() <= 0)
 							slots.remove();
+
 						return new ResourceMatch(queuedJob.getJobID(), rSlots.getBESID());
 					}
 				} catch (Throwable cause) {

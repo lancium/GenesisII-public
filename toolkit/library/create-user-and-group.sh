@@ -6,7 +6,6 @@
 # grid queues, home folders, and so forth.
 #
 # Author: Chris Koeritz
-# Author: Vanamala Venkataswamy
 
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"

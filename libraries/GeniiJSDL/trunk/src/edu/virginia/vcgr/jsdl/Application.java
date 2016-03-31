@@ -109,4 +109,10 @@ public class Application extends CommonJSDLElement implements Serializable
 	{
 		return _description;
 	}
+
+	@Override
+	public String toString()
+	{
+		return _applicationName + ", " + _applicationVersion + ", " + _description;
+	}
 }

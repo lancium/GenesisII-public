@@ -8,11 +8,18 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.gjt.data.JobDocument;
+import edu.virginia.vcgr.genii.gjt.data.JobRoot;
 import edu.virginia.vcgr.genii.gjt.data.ModificationBroker;
 import edu.virginia.vcgr.genii.gjt.data.ModificationListener;
 import edu.virginia.vcgr.genii.gjt.data.analyze.Analysis;
@@ -40,6 +47,8 @@ public class JobDocumentContext
 
 	private GridJobToolFrame _frame;
 
+	private JobRoot _masterDocument;
+
 	JobDocumentContext(JobApplicationContext applicationContext, File initialFile) throws IOException
 	{
 		_applicationContext = applicationContext;
@@ -52,13 +61,61 @@ public class JobDocumentContext
 		_pBroker = pBroker;
 		_mBroker = mBroker;
 
-		pBroker.addParameterizableListener(_variableManager);
+		_pBroker.addParameterizableListener(_variableManager);
 
-		if (_file != null && _file.length() > 0)
-			_document = JobDocument.load(_file, pBroker, mBroker);
-		else {
-			_document = new JobDocument();
-			_document.postUnmarshall(pBroker, mBroker);
+		if (_file != null && _file.length() > 0) {
+			try {
+				// Get the name of the root node in the .gjp XML file
+				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+				Document doc = docBuilder.parse(_file.getAbsolutePath());
+				Node root = doc.getFirstChild();
+				String rootName = root.getNodeName();
+
+				// This is used for backwards compatibility. The second case refers to the old
+				// root node and the first one refers to the new root node
+				if (rootName.equals("grid-job:master-job-project")) {
+					_masterDocument = JobRoot.load(_file, _pBroker, _mBroker);
+					// if(_masterDocument.jobDocument().size() > 1){
+					_document = _masterDocument.jobDocument().get(0);
+					// }
+
+				} else if (rootName.equals("grid-job:job-project")) {
+					_masterDocument = new JobRoot();
+
+					// Create empty Job Document for Common Block
+					JobDocument commonDocument = JobDocument.load(_file, _pBroker, _mBroker);
+					commonDocument.postUnmarshall(_pBroker, _mBroker);
+					_masterDocument.jobDocument().add(commonDocument);
+
+					// Load Job Document for first job description
+
+					// _masterDocument.jobDocument().add(_document);
+					System.out.println("MasterDocument size =" + _masterDocument.jobDocument().size());
+					// System.out.println("JobDocument Feature =" + _document.;
+					_document = _masterDocument.jobDocument().get(0);
+				}
+				// System.out.println("****************************************************");
+			} catch (ParserConfigurationException pce) {
+				pce.printStackTrace();
+			} catch (SAXException sae) {
+				sae.printStackTrace();
+			}
+
+		} else {
+			_masterDocument = new JobRoot();
+
+			// Create empty Job Document for common block
+			JobDocument commonDocument = new JobDocument();
+			commonDocument.postUnmarshall(_pBroker, _mBroker);
+			_masterDocument.jobDocument().add(commonDocument);
+
+			// Create empty Job Document for first job description
+			// _document = new JobDocument();
+			_document = _masterDocument.jobDocument().get(0);
+			// _document.postUnmarshall(_pBroker, _mBroker);
+			// _masterDocument.jobDocument().add(_document);
+
 		}
 		_document.stageIns().setStageIn();
 		if (_file != null && _file.length() == 0)
@@ -70,7 +127,7 @@ public class JobDocumentContext
 
 		setFrameTitle();
 
-		mBroker.addModificationListener(new ModificationListenerImpl());
+		_mBroker.addModificationListener(new ModificationListenerImpl());
 	}
 
 	public GridJobToolFrame getFrame()
@@ -101,14 +158,14 @@ public class JobDocumentContext
 		_frame.setVisible(true);
 	}
 
-	final public JobApplicationContext applicationContext()
-	{
-		return _applicationContext;
-	}
-
 	final public ParameterizableBroker getParameterizableBroker()
 	{
 		return _pBroker;
+	}
+
+	final public JobApplicationContext applicationContext()
+	{
+		return _applicationContext;
 	}
 
 	final public ModificationBroker getModificationBroker()
@@ -129,6 +186,11 @@ public class JobDocumentContext
 	final public boolean isModified()
 	{
 		return _modified;
+	}
+
+	final public JobRoot jobRoot()
+	{
+		return _masterDocument;
 	}
 
 	final public void saveAs()
@@ -164,7 +226,12 @@ public class JobDocumentContext
 				}
 
 				try {
-					JobDocument.store(_document, target);
+					// JobDocument.store(_document, target);
+					if (_masterDocument.jobDocument().size() > 1) {
+						JobRoot.store(_masterDocument, target);
+					} else {
+						JobDocument.store(_document, target);
+					}
 					_file = target;
 					_modified = false;
 					setFrameTitle();
@@ -200,7 +267,12 @@ public class JobDocumentContext
 				});
 				return;
 			}
-			JobDocument.store(_document, _file);
+			// JobDocument.store(_document, _file);
+			if (_masterDocument.jobDocument().size() > 1) {
+				JobRoot.store(_masterDocument, _file);
+			} else {
+				JobDocument.store(_document, _file);
+			}
 			_modified = false;
 			setFrameTitle();
 		} catch (IOException ioe) {
@@ -230,7 +302,12 @@ public class JobDocumentContext
 		}
 
 		if (((Boolean) (_applicationContext.preferences().preference(ToolPreference.PopupForWarnings))).booleanValue()) {
-			Analysis analysis = jobDocument().analyze();
+			Analysis analysis;
+			if (jobRoot().jobDocument().size() > 1) {
+				analysis = jobRoot().jobDocument().get(1).analyze();
+			} else {
+				analysis = jobRoot().jobDocument().get(0).analyze();
+			}
 			if (analysis.hasWarnings()) {
 				int result = JOptionPane.showConfirmDialog(_frame, "There are still warnings!  Do you still want to generate JSDL?",
 					"JSDL Generation Confirmation", JOptionPane.YES_NO_OPTION);
@@ -240,7 +317,13 @@ public class JobDocumentContext
 			}
 		}
 
-		JobDefinition jobDef = _document.generate();
+		JobDefinition jobDef = _masterDocument.generate();
+
+		// Observation: Data structures like JobAnnotations and JobProjects in JobIdentification are
+		// not null but are of size 0.
+		// Data staging is also the same if we put nothing in it but Application and Resources will
+		// be null if we put nothing in them.
+		// Solution: Put code in JSDLTransformer.java to check for size 0 data structures.
 
 		List<Sweep> sweeps = jobDef.parameterSweeps();
 		int count = 0;

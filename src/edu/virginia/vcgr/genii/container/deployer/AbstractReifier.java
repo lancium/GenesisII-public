@@ -24,15 +24,27 @@ public abstract class AbstractReifier implements IJSDLReifier
 {
 	public JobDefinition_Type reifyJSDL(File deployDirectory, JobDefinition_Type jobDef) throws DeploymentException
 	{
-		JobDescription_Type description = jobDef.getJobDescription();
-		Application_Type application = description.getApplication();
-		if (application == null) {
-			application = new Application_Type("Auto Generated", null, null, null);
-			description.setApplication(application);
-		}
+		// Old code for a single Job Description (and Application)
+		/*
+		 * JobDescription_Type description = jobDef.getJobDescription(); Application_Type application = description.getApplication(); if
+		 * (application == null) { application = new Application_Type("Auto Generated", null, null, null);
+		 * description.setApplication(application); }
+		 * 
+		 * application = reifyApplication(deployDirectory, application); description.setApplication(application);
+		 */
 
-		application = reifyApplication(deployDirectory, application);
-		description.setApplication(application);
+		// New code for multiple Job Descriptions (and Applications)
+		JobDescription_Type[] descriptions = jobDef.getJobDescription();
+		Application_Type[] applications = new Application_Type[descriptions.length];
+		for (int i = 0; i < descriptions.length; i++) {
+			applications[i] = descriptions[i].getApplication();
+			if (applications[i] == null) {
+				applications[i] = new Application_Type("Auto Generated", null, null, null);
+				descriptions[i].setApplication(applications[i]);
+			}
+			applications[i] = reifyApplication(deployDirectory, applications[i]);
+			descriptions[i].setApplication(applications[i]);
+		}
 
 		// Mark Morgan we should really reify the resources as well
 

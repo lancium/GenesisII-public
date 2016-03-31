@@ -94,7 +94,7 @@ public class ByteIOConstants
 
 	static public QName SBYTEIO_DESTROY_ON_CLOSE_FLAG = new QName(STREAMABLE_BYTEIO_NS, "DestroyOnClose");
 
-	static public int numThreads = 4;
+	static public int NUMBER_OF_THREADS_FOR_BYTEIO_PARALLEL_READS = 5;
 
 	static public QName rxferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
 	static public QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);

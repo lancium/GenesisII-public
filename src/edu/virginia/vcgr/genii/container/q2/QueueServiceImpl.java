@@ -184,7 +184,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	public Object configureResource(ConfigureRequestType configureRequest) throws RemoteException
 	{
 		try {
-			_queueMgr.configureBES(configureRequest.getQueueResource(), configureRequest.getNumSlots().intValue());
+			_queueMgr.configureBES(configureRequest.getQueueResource(), configureRequest.getNumSlots().intValue(),
+				configureRequest.getNumCores().intValue());
 			return null;
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to add bes container.", sqe);
@@ -545,9 +546,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		EndpointReferenceType[] activities = parameters.getActivityIdentifier();
 		responses = new TerminateActivityResponseType[activities.length];
 
-		for (int lcv = 0; lcv < activities.length; lcv++) {
+		for (int lcv = 0; lcv < activities.length; lcv++)
 			responses[lcv] = terminateActivity(activities[lcv]);
-		}
 
 		return new TerminateActivitiesResponseType(responses, null);
 	}

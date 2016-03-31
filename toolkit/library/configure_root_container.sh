@@ -4,7 +4,6 @@
 # administrative account that should have god-like powers over the grid.
 #
 # Author: Chris Koeritz
-# Author: Vanamala Venkataswamy
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"

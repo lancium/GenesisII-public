@@ -526,4 +526,55 @@ public class AxisServiceAndStubTracking
 	// sleep 10
 	// done
 
+	public static class GarbageManThread extends ethread
+	{
+		public static final int THREAD_INTERVAL_ms = 1000 * 60;
+
+		public GarbageManThread()
+		{
+			// run periodically at the interval we've picked above.
+			super(THREAD_INTERVAL_ms);
+			start();
+		}
+
+		@Override
+		public boolean performActivity()
+		{
+			// hmmm: neither the idle connection closing nor the garbage collection seems to help at all.
+
+			// we don't want to timeout a connection until the read timeout period has at least elapsed.
+			// hmmm: this may actually be irrelevant, since a "checked out" connection will not automatically get closed,
+			// and an "owned" connection shouldn't have any reads occurring on it.
+			// Integer readTimeout =
+			// Integer.parseInt(AxisProperties.getProperty(DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_SO_TIMEOUT_KEY))
+			// + 1000 * 5;
+			//
+			// // hmmm: DEFINITELY remove this debug.
+			// _logger.debug("*** closing connections idle for " + readTimeout + "ms...");
+			//
+			// List<HttpConnectionManager> connMgrs = CommonsHTTPSender.getConnectionManagers();
+			// for (HttpConnectionManager connMgr : connMgrs) {
+			// if (connMgr != null) {
+			// connMgr.closeIdleConnections(readTimeout);
+			// }
+			// }
+
+			// // hmmm: DEFINITELY remove this debug.
+			// _logger.debug("*** running garbage collection from thread...");
+			//
+			// Date startTime = new Date();
+			// LowMemoryWarning.performGarbageCollection();
+			//
+			// long duration = (new Date()).getTime() - startTime.getTime();
+			// if (duration > 200) {
+			// if (_logger.isDebugEnabled())
+			// _logger.debug("GC took " + duration + " ms");
+			// }
+
+			return true; // keep going.
+		}
+	}
+
+	// set up the GC thread to run periodically.
+	// static GarbageManThread _cleaner = new GarbageManThread();
 }

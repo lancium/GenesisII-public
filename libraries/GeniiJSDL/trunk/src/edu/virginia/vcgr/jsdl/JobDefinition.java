@@ -39,8 +39,11 @@ public class JobDefinition extends CommonJSDLElement implements Serializable
 	@XmlAttribute(name = "id", required = false)
 	private String _id;
 
+	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "Common", required = false)
+	private Common _commonBlock;
+
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "JobDescription", required = true)
-	private JobDescription _jobDescription;
+	private List<JobDescription> _jobDescriptionList = new LinkedList<JobDescription>();
 
 	@XmlElement(namespace = SweepConstants.SWEEP_NS, name = SweepConstants.SWEEP_NAME, required = false)
 	private List<Sweep> _parameterSweeps = new LinkedList<Sweep>();
@@ -52,25 +55,14 @@ public class JobDefinition extends CommonJSDLElement implements Serializable
 	{
 	}
 
-	public JobDefinition(String id, JobDescription jobDescription)
+	public JobDefinition(String id)
 	{
 		_id = id;
-		_jobDescription = jobDescription;
 	}
 
-	public JobDefinition(JobDescription jobDescription)
+	final public List<JobDescription> jobDescription()
 	{
-		this(null, jobDescription);
-	}
-
-	final public void jobDescription(JobDescription jobDescription)
-	{
-		_jobDescription = jobDescription;
-	}
-
-	final public JobDescription jobDescription()
-	{
-		return _jobDescription;
+		return _jobDescriptionList;
 	}
 
 	final public List<Sweep> parameterSweeps()
@@ -87,4 +79,22 @@ public class JobDefinition extends CommonJSDLElement implements Serializable
 	{
 		_id = id;
 	}
+
+	final public Common common()
+	{
+		return _commonBlock;
+	}
+
+	final public void common(Common commonBlock)
+	{
+		_commonBlock = commonBlock;
+	}
+
+	@Override
+	public String toString()
+	{
+		// return _commonBlock.toString() + " Number of Job Descriptions: " + _jobDescriptionList.size();
+		return "Number of Job Descriptions: " + _jobDescriptionList.size();
+	}
+
 }

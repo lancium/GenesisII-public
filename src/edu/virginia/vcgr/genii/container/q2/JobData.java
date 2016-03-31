@@ -3,7 +3,9 @@ package edu.virginia.vcgr.genii.container.q2;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -95,15 +97,17 @@ public class JobData
 	 */
 	private Date _nextValidRunTime = null;
 
-	private JobResourceRequirements _resourceRequirements = null;
+	private List<JobResourceRequirements> _resourceRequirements = null;
 
 	private ActivityStatusType _besActivityStatus = null;
 
 	// _sweepState is only set if this is a sweeping job rather than a normal bes-submitted job.
 	private String _sweepState = null;
 
+	private int _numOfCores;
+
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		Long besID, HistoryContext history)
+		Long besID, HistoryContext history, int numOfCores)
 	{
 		_jobName = jobName;
 		_killed = false;
@@ -115,18 +119,20 @@ public class JobData
 		_besID = besID;
 		_runAttempts = runAttempts;
 		_history = history;
+		_resourceRequirements = new ArrayList<JobResourceRequirements>();
+		_numOfCores = numOfCores;
 	}
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		HistoryContext history)
+		HistoryContext history, int numOfCores)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores);
 	}
 
 	public JobData(SweepingJob sweep, long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, HistoryContext history)
+		short runAttempts, HistoryContext history, int numOfCores)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores);
 		if (sweep == null) {
 			_logger.error("not adding sweep job since sweep object is null!");
 			/* important to keep the state non-null, since this is supposedly a sweep even if broken. we don't want this sent to a BES. */
@@ -144,6 +150,11 @@ public class JobData
 	final public String jobName()
 	{
 		return _jobName;
+	}
+
+	final public void jobName(String jobName)
+	{
+		_jobName = jobName;
 	}
 
 	final public HistoryContext history(HistoryEventCategory category)
@@ -208,6 +219,11 @@ public class JobData
 		_besID = new Long(besID);
 	}
 
+	public int getNumOfCores()
+	{
+		return _numOfCores;
+	}
+
 	public void setBESActivityStatus(ActivityStatusType ast)
 	{
 		// We go through all this rigamoral because we want to keep the status
@@ -262,14 +278,15 @@ public class JobData
 		incrementRunAttempts(1);
 	}
 
-	synchronized public JobResourceRequirements getResourceRequirements(JobManager _jobManager) throws ResourceException, SQLException
+	synchronized public JobResourceRequirements getResourceRequirements(JobManager _jobManager, int jobDescIndex)
+		throws ResourceException, SQLException
 	{
-		if (_resourceRequirements == null) {
+		int listSize = _resourceRequirements.size();
+		if (jobDescIndex >= listSize) {
 			JobDefinition_Type jsdl = _jobManager.getJSDL(_jobID);
-			_resourceRequirements = new JobResourceRequirements(jsdl);
+			_resourceRequirements.add(jobDescIndex, new JobResourceRequirements(jsdl, jobDescIndex));
 		}
-
-		return _resourceRequirements;
+		return _resourceRequirements.get(jobDescIndex);
 	}
 
 	public String currentJobAction()

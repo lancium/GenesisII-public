@@ -88,17 +88,17 @@ public class JobResourceRequirements
 
 	public JobResourceRequirements()
 	{
-		this(null);
+		this(null, 0);
 	}
 
-	public JobResourceRequirements(JobDefinition_Type jsdl)
+	public JobResourceRequirements(JobDefinition_Type jsdl, int jobDescIndex)
 	{
 		_matchingParameters = new MatchingParameters();
 
 		if (jsdl == null)
 			return;
 
-		JobDescription_Type desc = jsdl.getJobDescription();
+		JobDescription_Type desc = jsdl.getJobDescription(jobDescIndex);
 		if (desc == null)
 			return;
 

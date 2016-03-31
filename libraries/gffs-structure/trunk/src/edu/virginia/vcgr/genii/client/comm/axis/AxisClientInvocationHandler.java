@@ -232,10 +232,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		// determine the level of message security we need
 		MessageLevelSecurityRequirements minClientMessageSec = getMinClientMessageSec();
-		MessageLevelSecurityRequirements minResourceSec = null;
-
-		minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
-
+		MessageLevelSecurityRequirements minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
 		MessageLevelSecurityRequirements neededMsgSec = minClientMessageSec.computeUnion(minResourceSec);
 
 		// perform resource-AuthN as specified in the client config file

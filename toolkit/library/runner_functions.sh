@@ -79,6 +79,17 @@ function timed_grid()
   return $retval
 }
 
+# similar to timed_grid, but for arbitrary commands, and fits in with the timing
+# calculators.
+function timed_command()
+{
+  echo "[$(readable_date_string)]"
+  $(\which time) -p -o "$GRID_TIMING_FILE" $*
+  local retval=$?
+  echo "[$(readable_date_string)]"
+  return $retval
+}
+
 # this bails out if an error occurs.
 function grid_chk()
 {

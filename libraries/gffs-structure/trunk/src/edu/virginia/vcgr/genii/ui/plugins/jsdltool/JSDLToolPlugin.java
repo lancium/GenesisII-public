@@ -47,7 +47,15 @@ public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 	{
 		try {
 			QueueManipulator manip = new QueueManipulator(targetEPR);
+			_logger.debug("Submitting job to QUEUE");
+			/*
+			 * if(jobDefinition.jobDescription().size() == 1){ System.out.println("Converting to old JSDL"); JobDefinition_Type jsdl =
+			 * JSDLUtils.convert(jobDefinition); jsdl = JSDLTransformer.extractCommon(jsdl); JobDefinition_Type newJSDL =
+			 * JSDLTransformer.transform(jsdl, 0); manip.submit(jsdl, 0); } else{
+			 */
+
 			manip.submit(JSDLUtils.convert(jobDefinition), 0);
+			// }
 		} catch (JAXBException e) {
 			throw new IOException("Unable to convert from JAXB Type to Axis type.", e);
 		}

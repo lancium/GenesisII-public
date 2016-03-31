@@ -3,7 +3,6 @@
 # Functions for managing jobs in a grid queue.
 #
 # Author: Chris Koeritz
-# Author: Vanamala Venkataswamy
 
 ############################
 

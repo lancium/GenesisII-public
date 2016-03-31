@@ -1,7 +1,8 @@
 #!/bin/bash
 
-##Author: Vanamala Venkataswamy
-#mods: Sal Valente
+#Author: Sal Valente
+#mods: Chris Koeritz
+#mods: Vanamala Venkataswamy
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
@@ -52,9 +53,8 @@ testReplication()
   grid echo "Is this file 3" "'>'" dir1/file3.txt
   assertEquals "create third replicated file" 0 $?
 
-echo dir2 after mods on dir1
-grid ls dir2
-
+  echo showing dir2 after mods on dir1:
+  grid ls dir2
 
   grid rm dir1/file2.txt
   assertEquals "remove replicated file" 0 $?
@@ -69,11 +69,18 @@ grid ls dir2
   grid ln ufile.txt dir1/ufile-link.txt
   assertEquals "link unreplicated file in replicated dir" 0 $?
 
+  # dir1 must contain 4 entries with the same address as each other: # file1.txt, file3.txt, ufile.txt, and subdirectory grid ls -m dir1 
+#echo AA first piece:
+#grep '^address: ' $GRID_OUTPUT_FILE 
+#echo AA second piece:
+#grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 
+#echo AA third piece:
+#grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort 
+#echo AA fourth piece:
+#grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort | uniq -c
 
-  # dir1 must contain 4 entries with the same address as each other:
-  # file1.txt, file3.txt, ufile.txt, and subdirectory
-  grid ls -m dir1
-  count=(`grep '^address: ' $GRID_OUTPUT_FILE | cut -d/ -f3 | sort | uniq -c`)
+#old:  count=(`grep '^address: ' $GRID_OUTPUT_FILE | cut -d/ -f3 | sort | uniq -c`)
+  count=(`grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort | uniq -c`)
   assertEquals "replicated directory contents" 4 "${count[0]}"
 
   # dir2 must contain 3 entries with the same address as each other:
@@ -81,8 +88,21 @@ grid ls dir2
   # and it must contain ufile.txt with a different address.
   sync
   grid ls -m dir2
-  count=( $(grep '^address: ' $GRID_OUTPUT_FILE | cut -d/ -f3 | sort |
-          uniq -c | sort -nr) )
+
+#echo AB first piece:
+#grep '^address: ' $GRID_OUTPUT_FILE 
+#echo AB second piece:
+#grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 
+#echo AB third piece:
+#grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort 
+#echo AB fourth piece:
+#grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort | uniq -c
+#echo AB fifth piece:
+#grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort | uniq -c | sort -nr
+
+#old:  count=( $(grep '^address: ' $GRID_OUTPUT_FILE | cut -d/ -f3 | sort |
+#          uniq -c | sort -nr) )
+  count=(`grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort | uniq -c`)
   assertEquals "replica directory content count" 3 "${count[0]}"
   assertEquals "replica directory link count" 1 "${count[2]}"
 
