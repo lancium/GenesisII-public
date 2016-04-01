@@ -14,12 +14,13 @@ source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
 # where we hook in the fuse mount.
 MOUNT_POINT="$TEST_TEMP/mount-testRandomTransfers"
+HOME_PATH_ON_MOUNT="$MOUNT_POINT/$RNSPATH"
 
 function decide_on_filenames_and_sizes()
 {
   # constants constraining our test files.
-#  MAX_TEST_FILES=28
-  MAX_TEST_FILES=3
+  MAX_TEST_FILES=28
+#  MAX_TEST_FILES=3
 #hmmm: above just for getting script right.
 
   # the maximum file we will try to transfer.
@@ -57,6 +58,10 @@ function decide_on_filenames_and_sizes()
 #EXAMPLE_SIZES=()  #reset the chosen values
 #EXAMPLE_SIZES+=(67108860 67108880 67109005)
 
+#another fakeout, just to crank up test fast with minimal files.
+#EXAMPLE_SIZES=()  #reset the chosen values
+#EXAMPLE_SIZES+=(5 20 38)
+
   echo -n noisy debug of the file sizes:
   for ((i = 0; i < ${#EXAMPLE_SIZES[@]}; i++)); do
     echo -n " ${EXAMPLE_SIZES[$i]}"
@@ -70,7 +75,7 @@ function copyOneFileUp()
   local size="$1"; shift
 
   local base="$(basename "$filename")"
-  local fusePath="$MOUNT_POINT/$base"
+  local fusePath="$HOME_PATH_ON_MOUNT/$base"
 
 #echo "filename=$filename size=$size base=$base fusePath=$fusePath"
 
@@ -91,7 +96,7 @@ function copyOneFileDown()
   local size="$1"; shift
 
   local base="$(basename "$filename")"
-  local fusePath="$MOUNT_POINT/$base"
+  local fusePath="$HOME_PATH_ON_MOUNT/$base"
   local newLocal="${filename}.new"
 
 #echo "filename=$filename size=$size base=$base fusePath=$fusePath newLocal=$newLocal"
@@ -182,14 +187,14 @@ testCreateFiles()
   done
 }
 
-testFileCopyUp()
+testCopyFilesUp()
 {
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     copyOneFileUp "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"
   done
 }
 
-testFileCopyDown()
+testCopyFilesDown()
 {
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     copyOneFileDown "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"

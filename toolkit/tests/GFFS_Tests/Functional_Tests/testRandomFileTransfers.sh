@@ -12,14 +12,11 @@ if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
 fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
-#this seems to not be used.
-export TIMEFORMAT='%R'
-
 function decide_on_filenames_and_sizes()
 {
   # constants constraining our test files.
-#  MAX_TEST_FILES=28
-  MAX_TEST_FILES=3
+  MAX_TEST_FILES=28
+#  MAX_TEST_FILES=3
 #hmmm: above just for getting script right.
 
   # the maximum file we will try to transfer.
@@ -56,6 +53,10 @@ function decide_on_filenames_and_sizes()
 #echo "faking the sizes to be divisible by 5 and about 64mb!"
 #EXAMPLE_SIZES=()  #reset the chosen values
 #EXAMPLE_SIZES+=(67108860 67108880 67109005)
+
+#another fakeout, just to crank up test fast with minimal files.
+#EXAMPLE_SIZES=()  #reset the chosen values
+#EXAMPLE_SIZES+=(5 20 38)
 
   echo -n noisy debug of the file sizes:
   for ((i = 0; i < ${#EXAMPLE_SIZES[@]}; i++)); do
@@ -160,14 +161,14 @@ testCreateFiles()
   done
 }
 
-testFileCopyUp()
+testCopyFilesUp()
 {
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     copyOneFileUp "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"
   done
 }
 
-testFileCopyDown()
+testCopyFilesDown()
 {
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     copyOneFileDown "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"

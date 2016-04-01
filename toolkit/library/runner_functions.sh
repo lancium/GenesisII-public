@@ -64,7 +64,7 @@ function fuse()
   local fuse_out="$(mktemp "$TEST_TEMP/grid_logs/out_fuse_$(date_string).XXXXXX")"
   logged_grid "$fuse_out" "$(pick_unaccelerated_grid_app)" fuse $* &
   local retval=$?
-  echo "[$(readable_date_string)]"
+#  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -72,10 +72,12 @@ function fuse()
 # processing that occurs from the command.
 function timed_grid()
 {
-  echo "[$(readable_date_string)]"
+  echo "[started timer $(readable_date_string)]"
+  # set a prefix for the date printout that happens after the command runs.
+  date_stamp_prefix="stopped timer "
   grid_base $(\which time) -p -o "$GRID_TIMING_FILE" "$(pick_grid_app)" $*
   local retval=$?
-  echo "[$(readable_date_string)]"
+#  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -83,10 +85,10 @@ function timed_grid()
 # calculators.
 function timed_command()
 {
-  echo "[$(readable_date_string)]"
+  echo "[started timer $(readable_date_string)]"
   $(\which time) -p -o "$GRID_TIMING_FILE" $*
   local retval=$?
-  echo "[$(readable_date_string)]"
+  echo "[stopped timer $(readable_date_string)]"
   return $retval
 }
 
@@ -96,7 +98,7 @@ function grid_chk()
   echo "[grid] $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
   silent_grid $*
   check_if_failed "'grid ${1}...' exited with exit code $?"
-  echo "[$(readable_date_string)]"
+#  echo "[$(readable_date_string)]"
 }
 
 function noisy_grid()
@@ -106,7 +108,7 @@ function noisy_grid()
   local retval=$?
   # show the output from the silent_grid command above, regardless of success.
   cat "$GRID_OUTPUT_FILE"
-  echo "[$(readable_date_string)]"
+#  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -126,10 +128,10 @@ function multi_grid()
     # we have to exit here since the command is operating as a sub-shell with the new
     # input stream that the caller provides.
     echo "multi_grid failing with exit code $retval"
-    echo "[$(readable_date_string)]"
+#    echo "[$(readable_date_string)]"
     exit $retval    
   fi
-  echo "[$(readable_date_string)]"
+#  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -151,6 +153,9 @@ function logged_grid()
   echo "=======" >> "$CONGLOMERATED_GRID_OUTPUT"
   # and now remove the tiny individual log file so we don't litter.
   \rm -f "$my_output"
+  echo "[${date_stamp_prefix}$(readable_date_string)]"
+  # we always reset the prefix after using it.
+  unset date_stamp_prefix
   return $retval
 }
 
@@ -161,10 +166,10 @@ function grid_base()
   local my_output="$(mktemp $TEST_TEMP/grid_logs/out_grid_base_$(date_string).XXXXXX)"
   logged_grid $my_output "${@}"
   local retval=$?
-  if [ $retval -ne 0 ]; then
-    # print a timestamp if there was an error.
-    echo "[$(readable_date_string)]"
-  fi
+#  if [ $retval -ne 0 ]; then
+#    # print a timestamp if there was an error.
+#    echo "[$(readable_date_string)]"
+#  fi
   return $retval
 }
 

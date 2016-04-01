@@ -24,7 +24,8 @@ compute_remaining_jobs()
   local queue_path=$1
   local grid_app="$(pick_grid_app)"
   outfile="$(mktemp "$TEST_TEMP/job_stats.XXXXXX")"
-  raw_grid "$grid_app" $STATOP $queue_path | tail -n +2 | grep "$SEEK_USER_PATTERN" | sed -e '/^$/d' | sed -e '/^\[.*\]$/d'  >$outfile
+  raw_grid "$grid_app" $STATOP $queue_path | tail -n +2 | grep "$SEEK_USER_PATTERN" | sed -e '/^$/d' >$outfile
+#no. | sed -e '/^\[.*\]$/d'  >$outfile
   local retval=${PIPESTATUS[0]}
   if [ $retval -ne 0 ]; then
     # the queue status call failed, and we want to send back an error signal.
@@ -73,8 +74,9 @@ function cancel_all_in_queue()
   holding="$GRID_OUTPUT_FILE"
   GRID_OUTPUT_FILE="$(mktemp $TEST_TEMP/job_processing/cancellation_list.XXXXXX)"
   silent_grid $STATOP $queue_path
-  # strip out any timestamps and find the tickets.
-  tickets=($(sed -e '/^\[.*\]$/d' $GRID_OUTPUT_FILE | gawk '{ print $1 }' ))
+  # find the tickets.
+#hmmm: removed sed timestamp whacker from below.
+  tickets=($(cat $GRID_OUTPUT_FILE | gawk '{ print $1 }' ))
   # show what we're going to whack.
   echo "Cancelling $(expr ${#tickets[*]} - 1) queue jobs:"
   # we kill in batches because otherwise qkill seems to choke (from too long a command line?).
@@ -242,8 +244,8 @@ function poll_job_dirs_until_finished()
         echo -e "\n------------------------------\n" 2>&1 >>$JOB_OUTPUT_FILE
         echo "$jobname..." 2>&1 >>$JOB_OUTPUT_FILE
         silent_grid cat $jobname/status
-        # strip out timestamps.
-        sed -i "/^\[.*\]$/d" "$GRID_OUTPUT_FILE"
+#        # strip out timestamps.
+#        sed -i "/^\[.*\]$/d" "$GRID_OUTPUT_FILE"
         \mv -f "$GRID_OUTPUT_FILE" "$my_output"
         cat "$my_output" 2>&1 >>$JOB_OUTPUT_FILE
         sleep 3  # no point in crushing the machine.
@@ -278,12 +280,15 @@ SUBMISSION_POINT_JOB_LIST=()
 # retrieves all the jobs that the queue is holding for us.
 function get_job_list_from_queue()
 {
+  # clean any prior set.
+  SUBMISSION_POINT_JOB_LIST=()
   # this path will show all our submitted tickets.  we want to get that list as
   # a set of job tickets to use.
   silent_grid ls $QUEUE_PATH/jobs/mine/all
   assertEquals "Getting list of my tickets in queue." 0 $?
   # scarf up the job ids we found.
-  SUBMISSION_POINT_JOB_LIST=($(cat $GRID_OUTPUT_FILE | sed "/^\[.*\]$/d" | tail -n +2))
+  SUBMISSION_POINT_JOB_LIST=($(cat $GRID_OUTPUT_FILE | tail -n +2))
+#no sed "/^\[.*\]$/d" | tail -n +2))
 }
 
 # attempts to wait for all pending jobs that are listed under the queue as mine.
@@ -399,18 +404,18 @@ get_BES_resources()
     return 0
   fi
   local RESRC_FILE="$(mktemp "$TEST_TEMP/job_processing/queue_resources.XXXXXX")"
-  silent_grid ls $QUEUE_PATH/resources 
+  # we throw out all output here, because otherwise it gets included in the BES list.
+  silent_grid ls $QUEUE_PATH/resources &>/dev/null
   # check for a failure of the resource check.
   if [ $? -ne 0 ]; then echo ""; return 1; fi
   \cp -f $GRID_OUTPUT_FILE "$RESRC_FILE"
   # looks like we got a file successfully, so process it by stripping the
   # resources header off of it.
   sed -i "/resources:/d" "$RESRC_FILE"
-#  # strip out timestamps.
-#  sed -i "/^\[.*\]$/d" "$RESRC_FILE"
+#no  # strip out timestamps.
+#no  sed -i "/^\[.*\]$/d" "$RESRC_FILE"
   # loop across the bes names.
   for besnam in $(cat "$RESRC_FILE"); do
-#echo bes name here is $besnam >>$HOME/temp_bes_output.txt
     local shorty="$(basename $besnam)"
     # if the BES has no path attached, we'll assume it lives under the queue.
     if [ "$besnam" == "$shorty" ]; then

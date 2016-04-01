@@ -38,18 +38,16 @@ testBesResourcesExist()
   assertEquals "Listing $QUEUE_PATH/resources" 0 $?
 }
 
-
 testGetBesAttributes()
 {
-    for i in $available_resources; do
-        grid get-bes-attributes $i
-        assertEquals "Get BES activities for factory $i" 0 $?
-    done
+  for i in $available_resources; do
+    silent_grid get-bes-attributes $i
+    assertEquals "Get BES activities for factory $i" 0 $?
+  done
 }
 
 #testGetBesActivities()
 #{
-#    
 #    for i in $available_resources; do
 #        grid get-bes-activities $i
 #        assertEquals "Get BES activities for factory $i" 0 $?
@@ -69,7 +67,7 @@ testGetActivityAttributes()
 {
   for i in $available_resources; do
     local shortbes="$(basename $i)"
-    grid get-attributes $RNSPATH/test-bes-attr/$shortbes-hostname-sleep-60s
+    silent_grid get-attributes $RNSPATH/test-bes-attr/$shortbes-hostname-sleep-60s
     assertEquals "Checking activity attributes on $i" 0 $?
   done
 }
