@@ -95,7 +95,7 @@ edu.virginia.vcgr.genii.client.io.uri-manager.max-simultaneous-connections=4
 # enables or disables the client credential streamlining feature, which
 # reduces the number of credentials sent over the wire by not sending creds
 # that were transmitted previously.  valid values are true or false.
-gffs.client.credential_streamlining=true
+gffs.client.credential_streamlining=false
 
 #######
 
