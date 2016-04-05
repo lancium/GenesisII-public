@@ -16,12 +16,11 @@ public class WallclockPanel extends TitledPanel
 {
 	static final long serialVersionUID = 0L;
 
-	WallclockPanel(JobDocumentContext context, int index)
+	WallclockPanel(JobDocumentContext context)
 	{
 		super("Wallclock Time Restrictions", new GridBagLayout());
 
-		TimeValue currentLimit = context.jobRoot().jobDocument().get(index).wallclockUpperBound();
-
+		TimeValue currentLimit = context.jobDocument().wallclockUpperBound();
 		JSpinner upperBound = new UnitValueSpinner(new UnitValueSpinnerModel<FriendlyTimeUnit>(currentLimit, 1, Long.MAX_VALUE, 1));
 		TimeUnitComboBox upperBoundUnit = new TimeUnitComboBox(currentLimit);
 

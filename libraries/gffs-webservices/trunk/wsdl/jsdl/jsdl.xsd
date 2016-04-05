@@ -157,8 +157,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 	<!--=====================================================================-->
 	<xsd:complexType name="JobDefinition_Type">
 		<xsd:sequence>
-			<xsd:element ref="jsdl:Common" minOccurs="0"/>
-			<xsd:element ref="jsdl:JobDescription" maxOccurs="unbounded"/>
+			<xsd:element ref="jsdl:JobDescription"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:ID" use="optional"/>
@@ -352,15 +351,4 @@ This document and the information contained herein is provided on an "AS IS" bas
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
 	<xsd:element name="JobMultiDefinition" type="JobMultiDefinition_Type"/>
-	
-	<!-- Ruslan Added -->
-	<xsd:complexType name="Common_Type">
-	  <xsd:sequence>
-	     <xsd:element ref="jsdl:JobIdentification" minOccurs="0"/>
-	     <xsd:element ref="jsdl:Application" minOccurs="0"/>
-	     <xsd:element ref="jsdl:Resources" minOccurs="0"/>
-         <xsd:element ref="jsdl:DataStaging" minOccurs="0" maxOccurs="unbounded"/>
-	  </xsd:sequence>
-	</xsd:complexType>
-	<xsd:element name="Common" type="jsdl:Common_Type"/>
 </xsd:schema>

@@ -99,7 +99,7 @@ public class ResourceManagementCmdFork extends AbstractStreamableByteIOFactoryRe
 	}
 
 	@CommandHandler("SLOTS")
-	public void setSlots(@CommandParameter("slotCount") int slots, @CommandParameter("coreCount") int cores) throws SQLException, IOException
+	public void setSlots(@CommandParameter("slotCount") int slots) throws SQLException, IOException
 	{
 		ResourceKey rKey = getService().getResourceKey();
 
@@ -107,17 +107,8 @@ public class ResourceManagementCmdFork extends AbstractStreamableByteIOFactoryRe
 			throw new IOException("Can't configure BES to have negative slots.");
 
 		QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
-		mgr.configureBES(getForkName(), slots, cores);
+		mgr.configureBES(getForkName(), slots);
 	}
-
-	/*
-	 * @CommandHandler("CORES") public void setCores(@CommandParameter("coreCount") int cores) throws SQLException, IOException { ResourceKey
-	 * rKey = getService().getResourceKey();
-	 * 
-	 * if (cores < 0) throw new IOException("Can't configure BES to have negative slots.");
-	 * 
-	 * QueueManager mgr = QueueManager.getManager(rKey.getResourceKey()); mgr.configureBES(getForkName(), cores); }
-	 */
 
 	@CommandHandler("UPDATE")
 	public void update() throws ResourceUnknownFaultType, ResourceException, SQLException, GenesisIISecurityException

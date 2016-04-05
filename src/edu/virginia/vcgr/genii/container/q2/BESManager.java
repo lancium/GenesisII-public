@@ -223,8 +223,7 @@ public class BESManager implements Closeable
 			/*
 			 * Go ahead and put the "in-memory" information into the correct lists.
 			 */
-			BESData data = new BESData(id, name, 1, 64);
-			// BESData data = new BESData(id, name, 1);
+			BESData data = new BESData(id, name, 1);
 			_containersByID.put(new Long(id), data);
 			_containersByName.put(name, data);
 			_updateInformation.put(new Long(id), updateInfo = new BESUpdateInformation(id, _BES_UPDATE_CYCLE, _MISS_CAP));
@@ -385,11 +384,10 @@ public class BESManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void configureBES(Connection connection, String name, int newSlots, int newCores)
-		throws SQLException, ResourceException
+	synchronized public void configureBES(Connection connection, String name, int newSlots) throws SQLException, ResourceException
 	{
 		/* Check the pre-conditions on the number of slots */
-		if (newSlots < 0 || newCores < 0)
+		if (newSlots < 0)
 			throw new IllegalArgumentException("Not allowed to configure a container to " + "have LESS than 0 slots.");
 
 		/* Find the container we are altering. */
@@ -400,7 +398,7 @@ public class BESManager implements Closeable
 		}
 
 		/* Update the information in the database */
-		_database.configureResource(connection, data.getID(), newSlots, newCores);
+		_database.configureResource(connection, data.getID(), newSlots);
 		connection.commit();
 
 		/*
@@ -412,10 +410,9 @@ public class BESManager implements Closeable
 		 */
 		int oldSlots = data.getTotalSlots();
 		data.setTotalSlots(newSlots);
-		data.setTotalCores(newCores);
 
 		if (_logger.isDebugEnabled())
-			_logger.debug("BES resource " + data.getID() + " configured to have " + newSlots + " slots and " + newCores + " cores.");
+			_logger.debug("BES resource " + data.getID() + " configured to have " + newSlots + " slots.");
 
 		/*
 		 * If we increased the number of slots, we have a scheduling opportunity here

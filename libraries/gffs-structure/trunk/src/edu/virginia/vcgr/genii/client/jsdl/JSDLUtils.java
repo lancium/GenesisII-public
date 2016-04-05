@@ -203,15 +203,9 @@ public class JSDLUtils extends JNIContainerBaseClass
 
 	static public JobDefinition_Type convert(JobDefinition jaxbType) throws JAXBException, IOException
 	{
-		/*
-		 * if(jaxbType != null){ System.out.println(jaxbType.toString()); }else{ System.out.println("jaxbType is Null"); }
-		 */
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		JSDLUtility.JSDLContext.createMarshaller().marshal(jaxbType, baos);
-		// String readBaos = new String (baos.toByteArray(), Charset.defaultCharset());
-		// System.out.println("Reading baos \n" + readBaos);
-		// baos.close();
-		// jaxbType.toString();
+		baos.close();
 		return ObjectDeserializer.fromBytes(JobDefinition_Type.class, baos.toByteArray());
 	}
 }

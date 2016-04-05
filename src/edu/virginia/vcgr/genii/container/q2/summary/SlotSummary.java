@@ -5,10 +5,7 @@ public class SlotSummary
 	private long _slotsAvailable;
 	private long _slotsUsed;
 
-	private long _coresAvailable;
-	private long _coresUsed;
-
-	public SlotSummary(long slotsAvailable, long slotsUsed, long coresAvailable, long coresUsed)
+	public SlotSummary(long slotsAvailable, long slotsUsed)
 	{
 		_slotsAvailable = slotsAvailable;
 		_slotsUsed = slotsUsed;
@@ -16,7 +13,7 @@ public class SlotSummary
 
 	public SlotSummary()
 	{
-		this(0L, 0L, 0L, 0l);
+		this(0L, 0L);
 	}
 
 	final public void addAvailableSlots(int numAvailable)
@@ -39,8 +36,6 @@ public class SlotSummary
 	{
 		_slotsAvailable += summary._slotsAvailable;
 		_slotsUsed += summary._slotsUsed;
-		_coresAvailable += summary._coresAvailable;
-		_coresUsed += summary._coresUsed;
 	}
 
 	final public long slotsAvailable()
@@ -56,38 +51,5 @@ public class SlotSummary
 	final public long totalSlots()
 	{
 		return slotsAvailable() + slotsUsed();
-	}
-
-	/* Update the core information */
-
-	final public void addAvailableCores(int numAvailable)
-	{
-		_coresAvailable += numAvailable;
-	}
-
-	final public void addUsedCores(int numUsed)
-	{
-		_coresUsed += numUsed;
-	}
-
-	final public void addCores(int numAvailable, int numUsed)
-	{
-		addAvailableCores(numAvailable);
-		addUsedCores(numUsed);
-	}
-
-	final public long coresAvailable()
-	{
-		return _coresAvailable;
-	}
-
-	final public long coresUsed()
-	{
-		return _coresUsed;
-	}
-
-	final public long totalCores()
-	{
-		return coresAvailable() + coresUsed();
 	}
 }

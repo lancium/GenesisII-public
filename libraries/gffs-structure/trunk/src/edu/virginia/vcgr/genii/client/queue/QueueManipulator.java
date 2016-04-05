@@ -142,10 +142,10 @@ public class QueueManipulator
 		queue.completeJobs(null);
 	}
 
-	public void configure(String resourceName, int numSlots, int numCores) throws RemoteException
+	public void configure(String resourceName, int numSlots) throws RemoteException
 	{
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
-		queue.configureResource(new ConfigureRequestType(resourceName, new UnsignedInt((long) numSlots), new UnsignedInt((long) numCores)));
+		queue.configureResource(new ConfigureRequestType(resourceName, new UnsignedInt((long) numSlots)));
 	}
 
 	public List<Collection<String>> queryErrorInformation(JobTicket ticket) throws RemoteException

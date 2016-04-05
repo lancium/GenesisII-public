@@ -13,32 +13,31 @@ public class DataTab extends JPanel
 {
 	static final long serialVersionUID = 0L;
 
-	private JPanel createDataStagingPanel(JobDocumentContext documentContext, int index)
+	private JPanel createDataStagingPanel(JobDocumentContext documentContext)
 	{
 		TitledPanel stagingPanel = new TitledPanel("Data Staging", new GridBagLayout());
 
 		stagingPanel.add(
-			new DataStagePanel(documentContext.jobRoot().jobDocument().get(index).filesystemMap(), "Input Stages",
-				documentContext.jobRoot().jobDocument().get(index).stageIns(), true),
+			new DataStagePanel(documentContext.jobDocument().filesystemMap(), "Input Stages", documentContext.jobDocument().stageIns(), true),
 			new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		stagingPanel.add(
-			new DataStagePanel(documentContext.jobRoot().jobDocument().get(index).filesystemMap(), "Output Stages",
-				documentContext.jobRoot().jobDocument().get(index).stageOuts(), false),
+			new DataStagePanel(documentContext.jobDocument().filesystemMap(), "Output Stages", documentContext.jobDocument().stageOuts(),
+				false),
 			new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 
 		return stagingPanel;
 	}
 
-	public DataTab(JobDocumentContext documentContext, int index)
+	public DataTab(JobDocumentContext documentContext)
 	{
 		super(new GridBagLayout());
 
 		setName("Data");
 
-		add(new RedirectionPanel(documentContext.jobRoot().jobDocument().get(index)), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		add(createDataStagingPanel(documentContext, index),
+		add(new RedirectionPanel(documentContext.jobDocument()), new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		add(createDataStagingPanel(documentContext),
 			new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 	}
 }

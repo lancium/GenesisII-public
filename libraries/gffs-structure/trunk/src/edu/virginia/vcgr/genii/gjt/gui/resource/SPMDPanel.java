@@ -18,20 +18,20 @@ class SPMDPanel extends TitledPanel
 {
 	static final long serialVersionUID = 0L;
 
-	SPMDPanel(JobDocumentContext context, int index)
+	SPMDPanel(JobDocumentContext context)
 	{
 		super("Parallel Job Information", new GridBagLayout());
 
 		SPMDVariationComboBox variation = new SPMDVariationComboBox();
-		variation.setSelectedItem(context.jobRoot().jobDocument().get(index).spmdVariation());
-		variation.addItemListener(new SPMDValueListener(context.jobRoot().jobDocument().get(index)));
+		variation.setSelectedItem(context.jobDocument().spmdVariation());
+		variation.addItemListener(new SPMDValueListener(context.jobDocument()));
 
-		JSpinner numProcesses = new NullableNumberSpinner(
-			new NullableNumberSpinnerModel(context.jobRoot().jobDocument().get(index).numberOfProcesses(), 1, Long.MAX_VALUE, 1));
-		JSpinner processesPerHost = new NullableNumberSpinner(
-			new NullableNumberSpinnerModel(context.jobRoot().jobDocument().get(index).processesPerHost(), 1, Long.MAX_VALUE, 1));
-		JSpinner threadsPerProcess = new NullableNumberSpinner(
-			new NullableNumberSpinnerModel(context.jobRoot().jobDocument().get(index).threadsPerProcess(), 1, Long.MAX_VALUE, 1));
+		JSpinner numProces =
+			new NullableNumberSpinner(new NullableNumberSpinnerModel(context.jobDocument().numberOfProcesses(), 1, Long.MAX_VALUE, 1));
+		JSpinner procesPerHost =
+			new NullableNumberSpinner(new NullableNumberSpinnerModel(context.jobDocument().processesPerHost(), 1, Long.MAX_VALUE, 1));
+		JSpinner threadsPerProcess =
+			new NullableNumberSpinner(new NullableNumberSpinnerModel(context.jobDocument().threadsPerProcess(), 1, Long.MAX_VALUE, 1));
 
 		add(new JLabel("Parallel Environment"),
 			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
@@ -39,11 +39,11 @@ class SPMDPanel extends TitledPanel
 			new Insets(5, 5, 5, 5), 5, 5));
 		add(new JLabel("Number of Processes"),
 			new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(numProcesses, new GridBagConstraints(3, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+		add(numProces, new GridBagConstraints(3, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 		add(new JLabel("Processes per Host"),
 			new GridBagConstraints(4, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(processesPerHost, new GridBagConstraints(5, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+		add(procesPerHost, new GridBagConstraints(5, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 			new Insets(5, 5, 5, 5), 5, 5));
 
 		add(new JLabel("Threads per Process"),

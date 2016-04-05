@@ -118,11 +118,13 @@ public class AxisCredentialWallet
 			}
 		}
 		// now it should be safe to add the references as "seen", since we've generated the set for all the chains.
+		// if (credReferences != null) {
 		for (String ref : newlySent) {
 			if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())
 				_logger.debug("recording that container saw cred: " + ref);
 			ClientCredentialTracker.recordContainerSawCred(containerGUID, ref);
 		}
+		// }
 
 		if (_logger.isTraceEnabled())
 			_logger.trace("encoded " + addedAny + " credentials for soap header.");

@@ -147,11 +147,7 @@ public class JSDLInterpreter
 
 		understandAny(facet, understanding, def.get_any());
 
-		// Used for multiple Job Descriptions
-		JobDescription_Type[] jobDescs = def.getJobDescription();
-		for (JobDescription_Type jobDesc : jobDescs)
-			understand(provider, understanding, jobDesc);
-
+		understand(provider, understanding, def.getJobDescription());
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 

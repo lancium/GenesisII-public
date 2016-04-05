@@ -17,14 +17,14 @@ class ProcessorArchitecturePanel extends TitledPanel
 {
 	static final long serialVersionUID = 0L;
 
-	ProcessorArchitecturePanel(JobDocumentContext context, int index)
+	ProcessorArchitecturePanel(JobDocumentContext context)
 	{
 		super("Processor Architecture", new GridBagLayout());
 
 		ProcessorArchitectureComboBox arch = new ProcessorArchitectureComboBox(context.applicationContext().preferences());
 
-		arch.setSelectedItem(context.jobRoot().jobDocument().get(index).processorArchitecture());
-		arch.addItemListener(new ArchListener(context.jobRoot().jobDocument().get(index)));
+		arch.setSelectedItem(context.jobDocument().processorArchitecture());
+		arch.addItemListener(new ArchListener(context.jobDocument()));
 
 		add(new JLabel("Architecture"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));

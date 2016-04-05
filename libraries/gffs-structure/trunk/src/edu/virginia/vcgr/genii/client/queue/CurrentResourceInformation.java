@@ -50,19 +50,11 @@ public class CurrentResourceInformation
 	@XmlElement(namespace = QueueConstants.QUEUE_NS, name = "next-update", nillable = true, required = false)
 	private Calendar _nextUpdate = null;
 
-	@XmlAttribute(name = "max-cores", required = true)
-	private int _maxCores;
-
-	@XmlAttribute(name = "current-cores-used", required = true)
-	private int _currentCoresUsed;
-
 	protected CurrentResourceInformation()
 	{
 		// This is for JAXB Only
 		this(-1, -1, false, ProcessorArchitecture.other, OperatingSystemNames.other, "<unknown>", null, ResourceManagerType.Unknown, false,
-			null, null, -1, -1);
-		// this(-1, -1, false, ProcessorArchitecture.other, OperatingSystemNames.other, "<unknown>", null, ResourceManagerType.Unknown, false,
-		// null, null);
+			null, null);
 	}
 
 	public CurrentResourceInformation(int maxSlots, int currentSlotsUsed, boolean isAcceptingActivities,
@@ -89,40 +81,9 @@ public class CurrentResourceInformation
 		}
 	}
 
-	public CurrentResourceInformation(int maxSlots, int currentSlotsUsed, boolean isAcceptingActivities,
-		ProcessorArchitecture processorArchitecture, OperatingSystemNames osType, String osVersion, Double physicalMemory,
-		ResourceManagerType resourceManagerType, boolean available, Date lastUpdated, Date nextUpdate, int maxCores, int currentCoresUsed)
-	{
-		_maxSlots = maxSlots;
-		_currentSlotsUsed = currentSlotsUsed;
-		_isAcceptingActivities = isAcceptingActivities;
-		_processorArchitecture = processorArchitecture;
-		_operatingSystemType = osType;
-		_operatingSystemVerison = osVersion;
-		_physicalMemory = physicalMemory;
-		_resourceManagerType = resourceManagerType;
-		_maxCores = maxCores;
-		_currentCoresUsed = currentCoresUsed;
-
-		_available = available;
-		if (lastUpdated != null) {
-			_lastUpdated = Calendar.getInstance();
-			_lastUpdated.setTime(lastUpdated);
-		}
-		if (nextUpdate != null) {
-			_nextUpdate = Calendar.getInstance();
-			_nextUpdate.setTime(nextUpdate);
-		}
-	}
-
 	final public int maxSlots()
 	{
 		return _maxSlots;
-	}
-
-	final public int maxCores()
-	{
-		return _maxCores;
 	}
 
 	final public int currentSlotsUsed()

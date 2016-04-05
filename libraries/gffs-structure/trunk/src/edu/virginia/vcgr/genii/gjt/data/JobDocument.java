@@ -155,24 +155,6 @@ public class JobDocument implements PostUnmarshallListener
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "stage-out")
 	private StageList _stageOuts;
 
-	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "tabName")
-	private String _tabName;
-
-	public JobDocument(String tabName)
-	{
-		_tabName = tabName;
-	}
-
-	public JobDocument()
-	{
-		_tabName = "Job Description";
-	}
-
-	public String tabName()
-	{
-		return _tabName;
-	}
-
 	public JobIdentification generateJobIdentification(XPathBuilder builder, Map<String, List<SweepParameter>> variables)
 	{
 		String value;
@@ -1041,9 +1023,7 @@ public class JobDocument implements PostUnmarshallListener
 
 		XPathBuilder builder = new XPathBuilder();
 		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobDefinition"));
-		JobDefinition jobDef = new JobDefinition();
-		DefaultXPathIterableNode node = new DefaultXPathIterableNode(JSDLConstants.JSDL_NS, "JobDescription");
-		builder.push(node);
+		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "JobDescription"));
 
 		JobIdentification jobIdent = generateJobIdentification(builder, variables);
 		Application application = generateApplication(builder, variables, filesystemSet);
@@ -1056,11 +1036,9 @@ public class JobDocument implements PostUnmarshallListener
 
 		jobDesc.staging().addAll(cds);
 
-		jobDef.jobDescription().add(jobDesc);
-
 		builder.pop();
 
-		// JobDefinition jobDef = new JobDefinition(jobDesc);
+		JobDefinition jobDef = new JobDefinition(jobDesc);
 
 		builder.pop();
 

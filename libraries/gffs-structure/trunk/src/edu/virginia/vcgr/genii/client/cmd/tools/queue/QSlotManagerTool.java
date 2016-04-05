@@ -114,23 +114,16 @@ public class QSlotManagerTool extends BaseGridTool
 	 */
 	private class BESStats
 	{
-		public BESStats(Integer current, Integer max, Integer currentCores, Integer maxCores)
+		public BESStats(Integer current, Integer max)
 		{
 			this.current = current;
 			this.max = max;
-			this.currentCores = currentCores;
-			this.maxCores = maxCores;
 		}
 
 		// Slots
 		public int current;
 		public int max;
 		public boolean reduced;
-
-		// Cores
-		public int currentCores;
-		public int maxCores;
-		public int reducedCores;
 
 		// Jobs
 		public int scheduled;
@@ -216,7 +209,7 @@ public class QSlotManagerTool extends BaseGridTool
 			for (RNSPath entry : entries) {
 				Integer currentSlots = getCurrentBESSlots(entry);
 				if (currentSlots != null) {
-					statTable.put(entry.getName(), new BESStats(currentSlots, -1, -1, -1));
+					statTable.put(entry.getName(), new BESStats(currentSlots, -1));
 				}
 			}
 			populateMaxBESSlots();
@@ -401,7 +394,7 @@ public class QSlotManagerTool extends BaseGridTool
 				BESStats besStats = statTable.get(bes);
 				if (besStats.reduced) {
 					// Only make one call to change slots for each BES
-					manipulator.configure(bes, besStats.scheduled, -1);
+					manipulator.configure(bes, besStats.scheduled);
 					besStats.current = besStats.scheduled;
 				}
 			}
@@ -463,7 +456,7 @@ public class QSlotManagerTool extends BaseGridTool
 				stdout.println("      this BES slot count was reduced this time");
 			} else if (bes.current < bes.max && bes.scheduled >= bes.current && bes.waiting == 0) {
 				int newSlots = bes.current + 1;
-				manipulator.configure(key, newSlots, -1);
+				manipulator.configure(key, newSlots);
 				bes.current = newSlots;
 				stdout.println("      increasing slot count to " + newSlots);
 			}

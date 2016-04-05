@@ -70,48 +70,17 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 	{
 		private QueueResourceInformation _row;
 		private int _newSlots;
-		private int _newCores;
 
-		private SlotChangerTask(QueueResourceInformation row, int newSlots, int newCores)
+		private SlotChangerTask(QueueResourceInformation row, int newSlots)
 		{
 			_row = row;
 			_newSlots = newSlots;
-			_newCores = newCores;
 		}
 
 		@Override
 		final public Boolean execute(TaskProgressListener progressListener) throws Exception
 		{
-			if(_row.resourceInformation().maxCores() == -1){
-				_queue.configureResource(
-						new ConfigureRequestType(_row.name(), new UnsignedInt(_newSlots), new UnsignedInt(_newSlots)));
-			}
-			else{
-				_queue.configureResource(
-						new ConfigureRequestType(_row.name(), new UnsignedInt(_newSlots), new UnsignedInt(_row.resourceInformation().maxCores())));
-			}
-			return Boolean.TRUE;
-		}
-	}
-
-	private class CoreChangerTask extends AbstractTask<Boolean>
-	{
-		private QueueResourceInformation _row;
-		private int _newCores;
-		private int _newSlots;
-
-		private CoreChangerTask(QueueResourceInformation row, int newSlots, int newCores)
-		{
-			_row = row;
-			_newSlots = newSlots;
-			_newCores = newCores;
-		}
-
-		@Override
-		final public Boolean execute(TaskProgressListener progressListener) throws Exception
-		{
-			_queue.configureResource(
-				new ConfigureRequestType(_row.name(), new UnsignedInt(_row.resourceInformation().maxSlots()), new UnsignedInt(_newCores)));
+			_queue.configureResource(new ConfigureRequestType(_row.name(), new UnsignedInt(_newSlots)));
 			return Boolean.TRUE;
 		}
 	}
@@ -126,7 +95,7 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 			if (answer == JOptionPane.YES_OPTION) {
 				_uiContext.uiContext().progressMonitorFactory()
 					.createMonitor(row.parent(), "Modifying Slot Count", String.format("Changing %s's slots to %d", row.name(), column), 100L,
-						new SlotChangerTask(row, column, row.resourceInformation().maxCores()), new RefreshCompletionListener(row.parent()))
+						new SlotChangerTask(row, column), new RefreshCompletionListener(row.parent()))
 					.start();
 			}
 		}
@@ -149,42 +118,9 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 		}
 	}
 
-	private class ResourceCoresColumn extends AbstractRowTableColumnDefinition<QueueResourceInformation, Integer>
-	{
-		@Override
-		protected void modifyImpl(QueueResourceInformation row, Integer column)
-		{
-			int answer = JOptionPane.showConfirmDialog(row.parent(), String.format("Change Max cores for %s to %d?", row.name(), column),
-				"Confirm Core Change", JOptionPane.YES_NO_OPTION);
-			if (answer == JOptionPane.YES_OPTION) {
-				_uiContext.uiContext().progressMonitorFactory()
-					.createMonitor(row.parent(), "Modifying core Count", String.format("Changing %s's cores to %d", row.name(), column), 100L,
-						new CoreChangerTask(row, row.resourceInformation().maxSlots(), column), new RefreshCompletionListener(row.parent()))
-					.start();
-			}
-		}
-
-		ResourceCoresColumn()
-		{
-			super("Max cores", Integer.class, 32);
-		}
-
-		@Override
-		final public Integer extract(QueueResourceInformation row)
-		{
-			return row.resourceInformation().maxCores();
-		}
-
-		@Override
-		final public boolean canModify()
-		{
-			return true;
-		}
-	}
-
 	private RowTableColumnDefinition<?, ?>[] COLUMNS = { new ResourceNameColumn(), new ResourceTypeColumn(), new OperatingSystemTypeColumn(),
 		new ProcessorArchitectureTypeColumn(), new AcceptingActivitiesColumn(), new AvailabilityColumn(), new LastUpdatedColumn(),
-		new NextUpdateColumn(), new ResourceSlotsColumn(), new ResourceCoresColumn() };
+		new NextUpdateColumn(), new ResourceSlotsColumn() };
 
 	private class QueueResourcesFetcherTask extends AbstractTask<Collection<QueueResourceInformation>>
 	{

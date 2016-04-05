@@ -33,19 +33,10 @@ public class QueueUtils
 		return c;
 	}
 
-	/*
-	 * This returns the job name of the JobDefinition_Type object passed in. Since the job name should be universal across multiple Job
-	 * Descriptions, it is easiest to return the first one.
-	 * 
-	 * @param jobDefinition_Type The JobDefinition_Type object
-	 * 
-	 * @return The name of the job as a String
-	 */
 	static public String getJobName(JobDefinition_Type jsdl)
 	{
 		if (jsdl != null) {
-
-			JobDescription_Type desc = jsdl.getJobDescription(0);
+			JobDescription_Type desc = jsdl.getJobDescription();
 			if (desc != null) {
 				JobIdentification_Type id = desc.getJobIdentification();
 				if (id != null)

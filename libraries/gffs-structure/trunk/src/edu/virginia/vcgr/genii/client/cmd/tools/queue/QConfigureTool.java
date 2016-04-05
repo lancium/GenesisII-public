@@ -35,11 +35,7 @@ public class QConfigureTool extends BaseGridTool
 		if (gPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("<queue-path> must be a grid path. ");
 		QueueManipulator manipulator = new QueueManipulator(gPath.path());
-		if (_arguments.size() > 3) {
-			manipulator.configure(getArgument(1), Integer.parseInt(getArgument(2)), Integer.parseInt(getArgument(3)));
-		} else {
-			manipulator.configure(getArgument(1), Integer.parseInt(getArgument(2)), 1);
-		}
+		manipulator.configure(getArgument(1), Integer.parseInt(getArgument(2)));
 
 		return 0;
 	}
@@ -47,7 +43,7 @@ public class QConfigureTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (!(numArguments() == 3 || numArguments() == 4))
+		if (numArguments() != 3)
 			throw new InvalidToolUsageException();
 	}
 }

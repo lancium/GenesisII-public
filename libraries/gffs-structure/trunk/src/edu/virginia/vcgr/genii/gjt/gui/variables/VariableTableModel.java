@@ -33,15 +33,11 @@ public class VariableTableModel extends AbstractTableModel
 
 	private JComponent _owner = null;
 
-	public VariableTableModel(JobDocumentContext context, int tabIndex)
+	public VariableTableModel(JobDocumentContext context)
 	{
 		_mBroker = context.getModificationBroker();
-		JobDocument document;
-		if (context.jobRoot().jobDocument().size() > 1) {
-			document = context.jobRoot().jobDocument().get(1);
-		} else {
-			document = context.jobRoot().jobDocument().get(0);
-		}
+
+		JobDocument document = context.jobDocument();
 		_documentVariables = document.variables();
 
 		_variableHistory = new HashMap<String, VariableHistory>();

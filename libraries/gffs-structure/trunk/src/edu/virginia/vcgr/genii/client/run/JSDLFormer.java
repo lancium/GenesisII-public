@@ -113,14 +113,7 @@ public class JSDLFormer
 
 		dataStages = createDataStages();
 
-		ArrayList<JobDescription_Type> jobList = new ArrayList<JobDescription_Type>();
-		JobDescription_Type jobDesc = new JobDescription_Type(jobIdentification, application, null, dataStages, null);
-		jobList.add(jobDesc);
-		JobDescription_Type[] jobDescArray = jobList.toArray(new JobDescription_Type[0]);
-		/*
-		 * return new JobDefinition_Type(null,new JobDescription_Type(jobIdentification, application, null, dataStages, null), null, null);
-		 */
-		return new JobDefinition_Type(null, jobDescArray, null, null);
+		return new JobDefinition_Type(new JobDescription_Type(jobIdentification, application, null, dataStages, null), null, null);
 	}
 
 	public void writeJSDL(OutputStream out) throws IOException

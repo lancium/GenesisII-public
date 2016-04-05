@@ -13,9 +13,9 @@ public class VariableTable extends JTable
 {
 	static final long serialVersionUID = 0L;
 
-	public VariableTable(JobDocumentContext context, int tabIndex, VariableTableModel varTableModel)
+	public VariableTable(JobDocumentContext context)
 	{
-		super(varTableModel);
+		super(new VariableTableModel(context));
 
 		VariableTableModel model = (VariableTableModel) getModel();
 		model.setOwner(this);
@@ -45,5 +45,4 @@ public class VariableTable extends JTable
 
 		putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 	}
-
 }

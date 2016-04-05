@@ -92,10 +92,4 @@ public class Common extends CommonJSDLElement implements Serializable
 	{
 		return _staging;
 	}
-
-	@Override
-	public String toString()
-	{
-		return this._application.toString();
-	}
 }
