@@ -131,7 +131,8 @@ source "$GFFS_TOOLKIT_ROOT/library/user_management.sh"
 source "$GFFS_TOOLKIT_ROOT/library/job_processing.sh"
 source "$GFFS_TOOLKIT_ROOT/library/grid_management.sh"
 source "$GFFS_TOOLKIT_ROOT/library/security_management.sh"
-#source $GFFS_TOOLKIT_ROOT/library/random_ids_manager.sh
+#source "$GFFS_TOOLKIT_ROOT/library/random_ids_manager.sh"
+source "$GFFS_TOOLKIT_ROOT/library/file_management.sh"
 
 ##############
 

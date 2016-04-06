@@ -23,6 +23,7 @@ public class DatabaseConnectionPool
 
 	// the minimum number of connections that we need for known peak db use.
 	// the actual minimum is probably about 66, but we need breathing room.
+	// and actually, that's just at startup or bootstrap time, but during run time the code will use an arbitrary number of db connections.
 	static public final int MINIMUM_POOL_SIZE = 70;
 
 	// how many connections to the database should be pooled?
@@ -33,6 +34,8 @@ public class DatabaseConnectionPool
 	// hmmm: ridiculously large delay allowed now; was 4 seconds originally!
 	// currently set to 2 minutes before the db attempt will fail.
 
+	static public Integer extantDbConnections = 0;
+	
 	/*
 	 * number of milliseconds to snooze between lock attempts. it doesn't seem to help to retry very frequently, kind of seems worse.
 	 */
@@ -63,13 +66,14 @@ public class DatabaseConnectionPool
 		if (getConnectString() == null)
 			throw new IllegalArgumentException("Connect string cannot be null for database connection.");
 
-		for (int i = 0; i < getPoolSize(); i++) {
-			try {
-				getConnPool().add(createConnection());
-			} catch (SQLException e) {
-				_logger.error("failed to create initial DB connection", e);
-			}
-		}
+		// we only need this chunk of code if we're actually doing pooling, and we've found we cannot.
+//		for (int i = 0; i < getPoolSize(); i++) {
+//			try {
+//				getConnPool().add(createConnection());
+//			} catch (SQLException e) {
+//				_logger.error("failed to create initial DB connection", e);
+//			}
+//		}
 	}
 
 	public static class DBPropertyNames
@@ -169,10 +173,10 @@ public class DatabaseConnectionPool
 	{
 		Throwable lastException = null;
 		Connection connection = null;
-		if (_logger.isDebugEnabled()) {
+		if (_logger.isTraceEnabled()) {
 			_logger.debug("Acquiring DB connection with " + getConnPool().size() + " held in pool.");
 			// hmmm: remove the below one, too noisy.
-//			_logger.debug("dbconn acquire by:" + ProgramTools.showLastFewOnStack(20));
+			// _logger.debug("dbconn acquire by:" + ProgramTools.showLastFewOnStack(20));
 		}
 
 		int attempts = (int) ((double) MAX_SNOOZE_AWAITING_POOL / (double) TIME_TAKEN_PER_SNOOZE + 1);
@@ -183,17 +187,30 @@ public class DatabaseConnectionPool
 						connection = getConnPool().removeFirst();
 					}
 				}
-				// hmmm: this always creates a connection! we need to pause instead if we can't get one, since this is supposed to be a pool.
-				// if (connection == null) {
-				// connection = createConnection();
-				// }
+				/*
+				 * hmmm: this always creates a connection! we need to pause instead if we can't get one, since this is supposed to be a pool.
+				 * 
+				 * what we have found though is that connections are unbounded in use; a listing of a large rns directory uses up as many db
+				 * connections as there are files in the directory, and they're all kept until it's done traversing the directory!
+				 */
+				if (connection == null) {
+					_logger.debug("handing out a new connection since none are in pool.");
+					connection = createConnection();
+				}
 				if (connection != null) {
 					// reset any previous auto-commit value; if they want that enabled, they can call the other acquire.
 					connection.setAutoCommit(false);
 
 					((DatabaseConnectionInterceptor) Proxy.getInvocationHandler(connection)).setAcquired();
-					if (_logger.isDebugEnabled())
+					if (_logger.isTraceEnabled())
 						_logger.debug((lcv + 1) + " tries needed to get lock on db.");
+					int extant;
+					synchronized (extantDbConnections) {
+						extantDbConnections++;
+						extant = extantDbConnections;
+					}
+					if (_logger.isDebugEnabled())
+						_logger.debug("upon acquire, db connections in existence: " + extant);
 					return connection;
 				}
 
@@ -232,9 +249,17 @@ public class DatabaseConnectionPool
 			return;
 		}
 
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("Releasing DB connection with " + getConnPool().size() + " held in pool.");
 
+		int extant;
+		synchronized (extantDbConnections) {
+			extantDbConnections--;
+			extant = extantDbConnections;
+		}
+		if (_logger.isDebugEnabled())
+			_logger.debug("upon release, db connections in existence: " + extant);
+		
 		synchronized (getConnPool()) {
 			try {
 				try {
@@ -243,7 +268,8 @@ public class DatabaseConnectionPool
 						getConnPool().addLast(conn);
 						return;
 					} else {
-						_logger.error("tried to release more db connections than should be in pool!");
+						//only an error for real pooling implementation.
+//						_logger.error("tried to release more db connections than should be in pool!");
 					}
 				} catch (SQLException sqe) {
 					_logger.error("Exception releasing connection.", sqe);

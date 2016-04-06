@@ -103,6 +103,16 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ServerWSDoAllReceiver.ServerPWCallback.class.getName());
 		setOption(WSHandlerConstants.USER, GenesisIIConstants.CRYPTO_ALIAS);
 	}
+	
+	/**
+	 * returns true if the container has finished starting up.
+	 */
+	public static boolean startedNormalRuntime()
+	{
+		synchronized (_inStartupMode) {
+			return !_inStartupMode;
+		}
+	}
 
 	public static void beginNormalRuntime()
 	{

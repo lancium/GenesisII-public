@@ -23,10 +23,12 @@ oneTimeSetUp()
   fi
 
   echo "creating 5KB file..."
-  dd if=/dev/urandom of=$TEST_TEMP/random5KB.dat bs=1 count=5120
+#  dd if=/dev/urandom of=$TEST_TEMP/random5KB.dat bs=1 count=5120
+  createRandomFile "$TEST_TEMP/random5KB.dat" 5120
 
   echo "creating large file for staging, this may take a couple minutes..."
-  dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=512
+#  dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=512
+  createRandomFile "$HUGE_TEST_FILE" $((1048576 * 512))
 }
 
 testCopyFilesToGFFS()

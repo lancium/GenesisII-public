@@ -71,31 +71,29 @@ public class RandomByteIOInputStream extends InputStream
 
 		// ASG: Then figure out how big the file is.
 		_fileSize = typeInfo.getByteIOSize();
+		if (_logger.isDebugEnabled())
+			_logger.debug("being told that file size is " + _fileSize);
 
 		// ASG: Then if the file is smaller than a single read, don't bother doing anything in parallel.
-		if ((numThreads <= 1) || (_fileSize < _protocolReadBlockSize)) {
+		/*
+		 * CAK: we have to divide below by the number of threads, since the block sizes are already magnified by that much; otherwise, we are
+		 * saying we only want to multi-thread the reads if the size is some multiple number of blocks, but i believe the intent was not to
+		 * bother unless it was at least one block or buffer's worth on the server side without factoring in the number of read threads.
+		 */
+		if ((numThreads <= 1) || (_fileSize <= _protocolReadBlockSize / ByteIOConstants.NUMBER_OF_THREADS_FOR_BYTEIO_PARALLEL_READS)) {
 			isMultiThreaded = false;
 			numThreads = 1;
 		}
 
-//		if (!isMultiThreaded) {
-//			RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, source);
-//			RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
-//			transferer = new RandomByteIOTransferer[1];
-//			transferer[0] = factory.createRandomByteIOTransferer(desiredTransferProtocol);
-//		} else {
-//			// The number of threads is >=2 (i.e) we will have parallelism
+		RandomByteIOPortType[] clientStub = new RandomByteIOPortType[numThreads];
+		RandomByteIOTransfererFactory[] factory = new RandomByteIOTransfererFactory[numThreads];
+		transferer = new RandomByteIOTransferer[numThreads];
 
-			RandomByteIOPortType[] clientStub = new RandomByteIOPortType[numThreads];
-			RandomByteIOTransfererFactory[] factory = new RandomByteIOTransfererFactory[numThreads];
-			transferer = new RandomByteIOTransferer[numThreads];
-
-			for (int lcv = 0; lcv < numThreads; lcv++) {
-				clientStub[lcv] = ClientUtils.createProxy(RandomByteIOPortType.class, source);
-				factory[lcv] = new RandomByteIOTransfererFactory(clientStub[lcv]);
-				transferer[lcv] = factory[lcv].createRandomByteIOTransferer(desiredTransferProtocol);
-			}
-//		}
+		for (int lcv = 0; lcv < numThreads; lcv++) {
+			clientStub[lcv] = ClientUtils.createProxy(RandomByteIOPortType.class, source);
+			factory[lcv] = new RandomByteIOTransfererFactory(clientStub[lcv]);
+			transferer[lcv] = factory[lcv].createRandomByteIOTransferer(desiredTransferProtocol);
+		}
 	}
 
 	/**
@@ -134,17 +132,22 @@ public class RandomByteIOInputStream extends InputStream
 			}
 			_logger.debug("shortening read length to " + length + " due to file being too short.");
 		}
-		
-		if (!isMultiThreaded || (numThreads <= 1) || (length <= _protocolReadBlockSize)) {
+
+		// we don't want to do a multithreaded read if (1) we previously decided this or (2) the remaining length to read doesn't warrant it.
+		if (!isMultiThreaded || (numThreads <= 1)
+			|| (length <= _protocolReadBlockSize / ByteIOConstants.NUMBER_OF_THREADS_FOR_BYTEIO_PARALLEL_READS)) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("reading single-threaded chunk of length " + length + " at offset " + _offset);
 			byte[] data = transferer[0].read(_offset, length, 1, 0);
 			_offset += data.length;
 			return data;
 		} else {
 			/*
-			 * denotes block-size which each thread reads. the last thread may not read this exact amount. we bias the calculation by the
-			 * number of threads to ensure we never read too little due to round off errors.
+			 * denotes block-size which each thread reads. the last thread may not read this exact amount. the division should never be less
+			 * than at least a byte for each thread, since we check the length above. of course the number of threads is expected to be much
+			 * less than the preferred size to read per thread.
 			 */
-			int perThreadReadBlockSize = ((length + numThreads) / numThreads);
+			int perThreadReadBlockSize = length / numThreads;
 
 			Thread[] threads = new Thread[numThreads];
 			FastRead[] readers = new FastRead[numThreads];
@@ -158,12 +161,18 @@ public class RandomByteIOInputStream extends InputStream
 			int whichThread = 0;
 			while (remainingToRead > 0) {
 				int currentBlockSize = perThreadReadBlockSize;
-				if (remainingToRead <= perThreadReadBlockSize) {
+				if (remainingToRead < perThreadReadBlockSize) {
+					currentBlockSize = (int) remainingToRead;
+				}
+				if (whichThread >= numThreads - 1) {
+					// last thread gets all the remaining length for its read.
+					if (_logger.isDebugEnabled())
+						_logger.debug("setting last thread's read length to: " + remainingToRead);
 					currentBlockSize = (int) remainingToRead;
 				}
 
-				readers[whichThread] =
-					new FastRead(transferer[whichThread], _offset + thisThreadsOffset, currentBlockSize, readAssembler, whichThread, perThreadReadBlockSize);
+				readers[whichThread] = new FastRead(transferer[whichThread], _offset + thisThreadsOffset, currentBlockSize, readAssembler,
+					whichThread, thisThreadsOffset);
 				threads[whichThread] = new Thread(readers[whichThread]);
 				remainingToRead -= currentBlockSize;
 				thisThreadsOffset += currentBlockSize;
@@ -182,7 +191,8 @@ public class RandomByteIOInputStream extends InputStream
 				String msg = "logic error in RandomByteIOInputStream parallel reads: did not use all threads for parallel read";
 				throw new IOException(msg);
 			} else if (remainingToRead != 0) {
-				String msg = "logic error in RandomByteIOInputStream parallel reads: there was remaining data to read that no thread is handling";
+				String msg =
+					"logic error in RandomByteIOInputStream parallel reads: there was remaining data to read that no thread is handling";
 				throw new IOException(msg);
 			}
 
@@ -202,23 +212,24 @@ public class RandomByteIOInputStream extends InputStream
 			int lastFilledBufferIndex = readAssembler.getLastFilledBufferIndex();
 			if (lastFilledBufferIndex != -1) {
 				// I have fetched some data
-				//hmmm: clean logging levels.
-				_logger.debug("rbyteio read: i fetched some data");
 				if (lastFilledBufferIndex != (length - 1)) {
 					// I have fetched only a subset of the requested amount!
-					_logger.debug("rbyteio read: the read only fetched a subset of what was requested; index is " + lastFilledBufferIndex);
+					// hmmm: clean logging levels.
+					_logger.debug("rbyteio read: read fetched a subset of request, last index is " + lastFilledBufferIndex);
 					byte[] temp_data = new byte[lastFilledBufferIndex + 1];
 					System.arraycopy(readAssembler.getData(), 0, temp_data, 0, lastFilledBufferIndex + 1);
 					_offset += temp_data.length;
 					return temp_data;
 				} else {
 					// I have fetched the requested amount !
-					_logger.debug("rbyteio read: the read fetched the entire length requested, last index at " + lastFilledBufferIndex);
+					// hmmm: clean logging levels.
+					_logger.debug("rbyteio read: read fetched entire length requested, last index at " + lastFilledBufferIndex);
 					_offset += readAssembler.getData().length;
 					return readAssembler.getData();
 				}
 			} else {
 				// Attempt to read 0 bytes.
+				// or a failure of some sort...
 				return new byte[0];
 			}
 		}

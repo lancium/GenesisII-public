@@ -13,7 +13,7 @@ import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import org.apache.axis.message.MessageElement;
 
 /**
- * An abstract base class that implements much of the common functionallity of a ByteIO transferer.
+ * An abstract base class that implements much of the common functionality of a ByteIO transferer.
  * 
  * @author mmm2a
  * 
@@ -61,6 +61,8 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	{
 		return _maximumWriteSize;
 	}
+	
+	public static final String NO_ATTACHMENTS_FAILURE = "No attachments were received!";
 
 	/**
 	 * A base class method which takes a client proxy object and retrieves the attachment data that came back in with the call (obviously,
@@ -78,7 +80,7 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	{
 		Collection<GeniiAttachment> attachments = ClientUtils.getAttachments(clientProxy);
 		if (attachments == null)
-			throw new RemoteException("No attachments were received!");
+			throw new RemoteException(NO_ATTACHMENTS_FAILURE);
 		if (attachments.size() != 1)
 			throw new RemoteException(String.format("%d attachments were received.", attachments.size()));
 

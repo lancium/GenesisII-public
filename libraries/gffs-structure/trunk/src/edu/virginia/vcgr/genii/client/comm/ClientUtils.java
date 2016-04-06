@@ -344,13 +344,11 @@ public class ClientUtils
 	{
 		try {
 			ICallingContext context = null;
-
 			try {
 				context = ContextManager.getExistingContext();
 			} catch (Throwable t) {
 				_logger.warn("Unknown exception occurred trying to create a client proxy.", t);
 			}
-
 			return createProxy(iface, epr, context);
 		} catch (IOException ioe) {
 			throw new ResourceException(ioe.getMessage(), ioe);
@@ -416,11 +414,13 @@ public class ClientUtils
 	{
 		// this is the root createProxy (within this class) which all the others depend on.
 		IProxyFactory factory = getProxyFactory();
-		IFace face = factory.createProxy(loader, iface, epr, callContext);
-		Long timeout = _TIMEOUTS.get();
-		if (timeout != null)
-			factory.setTimeout(face, timeout.intValue());
-		return face;
+		synchronized (epr) {
+			IFace face = factory.createProxy(loader, iface, epr, callContext);
+			Long timeout = _TIMEOUTS.get();
+			if (timeout != null)
+				factory.setTimeout(face, timeout.intValue());
+			return face;
+		}
 	}
 
 	/**

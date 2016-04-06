@@ -22,7 +22,7 @@
 # require an X.509 in their EPR because they will never make out calls, and
 # hence do not need to be the target of a delegation.
 # By default, nothing is in the list.  Exports need x509 certs for staging.
-NO_X509_CLASS_LIST=
+NO_X509_CLASS_LIST=LightWeightExportPortType
 
 # We need to be able to delegate to random byte IO still for replication.
 # But if the container is not involved with replication, this setting can be
@@ -45,7 +45,7 @@ edu.virginia.vcgr.genii.container.cleanup.CleanupManager.enact-cleanup=true
 # which reduces the number of credentials sent over the wire by not sending
 # credentials that were transmitted previously.  valid values are true or
 # false.
-gffs.container.credential_streamlining=true
+gffs.container.credential_streamlining=false
 
 #######
 

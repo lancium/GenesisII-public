@@ -38,7 +38,8 @@ oneTimeSetUp()
   else
     echo Need to create a stage-in file...
     echo "Generating largish payload"
-    dd if=/dev/urandom of=large-chunk.dat bs=1048576 count=$STAGE_IN_SIZE
+#    dd if=/dev/urandom of=large-chunk.dat bs=1048576 count=$STAGE_IN_SIZE
+    createRandomFile "large-chunk.dat" $((1048576 * $STAGE_IN_SIZE))
     echo Copying large stage-in file to grid...
     grid cp local:./large-chunk.dat grid:$RNSPATH
   fi

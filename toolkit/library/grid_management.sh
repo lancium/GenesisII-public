@@ -397,6 +397,8 @@ declare -a genesis_java_pids=()
 function find_genesis_javas()
 {
   pattern="$1"; shift
+  # reset any prior contents.
+  genesis_java_pids=()
   # now a cascade of attempts to find some processes.
   user=$USER
   if [ "$OS" == "Windows_NT" ]; then

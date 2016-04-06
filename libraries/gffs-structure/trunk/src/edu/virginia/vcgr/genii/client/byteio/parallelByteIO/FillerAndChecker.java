@@ -29,14 +29,18 @@ public class FillerAndChecker
 
 	// Each thread copies the sub-fetch into the global buffer
 
-	public void copyFetch(byte[] temp_buffer, int threadID, int subBufferSize) throws IOException
+	public void copyFetch(byte[] temp_buffer, long offset)
+	//		, int length)
+		//int threadID, int subBufferSize)
+	throws IOException
 	{
 		if ((temp_buffer == null) || (temp_buffer.length == 0)) {
 			//hmmm: clean out logging.
 			_logger.debug("ignoring empty buffer");
 			return;
 		}
-		int index = threadID * subBufferSize;
+		//int index = threadID * subBufferSize;
+		int index = (int)offset;  // hmmm, better not be past 2gig.
 		
 		if (index >= data.length) {
 			String msg = "computed index is past main buffer end: index is " + index + " but buffer is only " + data.length + " bytes";
@@ -49,9 +53,11 @@ public class FillerAndChecker
 		}
 
 		//hmmm: denoise this.
-		_logger.debug("copying buffer of " + temp_buffer.length + " bytes into index " + index + " of parent buffer with subsize of " + subBufferSize);
+		_logger.debug("copying buffer of " + temp_buffer.length + " bytes into index " + index + " of parent buffer");
 
-		System.arraycopy(temp_buffer, 0, data, index, temp_buffer.length);
+		synchronized (data) {
+			System.arraycopy(temp_buffer, 0, data, index, temp_buffer.length);
+		}
 		setLastFilledBufferIndex(index + temp_buffer.length - 1);
 	}
 

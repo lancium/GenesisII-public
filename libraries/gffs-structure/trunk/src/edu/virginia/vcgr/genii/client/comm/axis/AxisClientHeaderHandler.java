@@ -21,6 +21,7 @@ import java.util.EnumSet;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
@@ -255,6 +256,29 @@ public class AxisClientHeaderHandler extends BasicHandler
 			if (resourceCertChain == null) {
 				if (_logger.isTraceEnabled())
 					_logger.trace("no resource cert chain; using bare credentials.");
+				
+				if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
+					/*
+					 * in the server role, we still want to delegate to the TLS certificate so that any credentials
+					 * will mention the true sender (at the TLS level) of the credentials.
+					 */
+					CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
+					if (tlsKey != null) {
+						// delegate from the credential's resource to our tls cert.
+						TrustCredential newCred = walletForResource.getRealCreds().delegateTrust(tlsKey._certChain,
+							IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
+							restrictions, accessCategories, trustDelegation);
+						if (newCred == null) {
+							if (_logger.isTraceEnabled()) {
+								_logger.debug(
+									"failure in trust delegation to tls cert.  dropping this credential on floor:\n"
+										+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+							}
+							continue;
+						}
+					}
+				}	
+
 			} else {
 
 				try {
@@ -368,13 +392,17 @@ public class AxisClientHeaderHandler extends BasicHandler
 		if (!foundAny) {
 			_logger.debug("Found zero credentials to delegate for soap header.");
 		}
-		final javax.xml.soap.SOAPHeader soapHeader = messageContext.getMessage().getSOAPHeader();
-		ArrayList<String> credRefs = new ArrayList<>();
-		soapHeader
-			.addChildElement(walletForResource.convertToSOAPElement((containerGUID != null) ? containerGUID.toString(true) : null, credRefs));
-		SOAPHeaderElement refsElem = walletForResource.emitReferencesAsSoap(credRefs);
-		if (refsElem != null)
-			soapHeader.addChildElement(refsElem);
+		// hmmm: CAK: craziness here to synchronize on this, but it was indicted in a recent thread-safety crash...
+		SOAPMessage msg = messageContext.getMessage();
+		synchronized (msg) {
+			final javax.xml.soap.SOAPHeader soapHeader = msg.getSOAPHeader();
+			ArrayList<String> credRefs = new ArrayList<>();
+			soapHeader.addChildElement(
+				walletForResource.convertToSOAPElement((containerGUID != null) ? containerGUID.toString(true) : null, credRefs));
+			SOAPHeaderElement refsElem = walletForResource.emitReferencesAsSoap(credRefs);
+			if (refsElem != null)
+				soapHeader.addChildElement(refsElem);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

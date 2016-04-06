@@ -305,6 +305,16 @@ echo dir has:
 
 # also borrowed from feisty meow scripts...  by consent of author (chris koeritz).
 
+  # is this the Mac OS X operating system?
+  function isMacOSX()
+  {
+    if [ ! -z "$(echo $OSTYPE | grep -i darwin)" ]; then
+      true
+    else
+      false
+    fi
+  }
+
   # switches from a /X/path form to an X:/ form.  this also processes cygwin paths.
   function unix_to_dos_path() {
     # we usually remove dos slashes in favor of forward slashes.

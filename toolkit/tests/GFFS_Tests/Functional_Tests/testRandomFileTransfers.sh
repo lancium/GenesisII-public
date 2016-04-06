@@ -12,11 +12,14 @@ if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
 fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
+# we are tracking errors manually here so we can avoid cleaning up if a failure occurred.
+error_count=0
+
 function decide_on_filenames_and_sizes()
 {
   # constants constraining our test files.
   MAX_TEST_FILES=28
-#  MAX_TEST_FILES=3
+  MAX_TEST_FILES=3
 #hmmm: above just for getting script right.
 
   # the maximum file we will try to transfer.
@@ -27,6 +30,7 @@ function decide_on_filenames_and_sizes()
   # recreate our storage directory if it's not there.
   mkdir $TEST_TEMP/transfer_test 2>/dev/null
   EXAMPLE_FILES=()
+  local i
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     EXAMPLE_FILES+=("$(mktemp ${TESTING_DIR}/test_file.XXXXXX)")
   done
@@ -50,13 +54,9 @@ function decide_on_filenames_and_sizes()
     EXAMPLE_SIZES+=($tmpsize)
   done
 
-#echo "faking the sizes to be divisible by 5 and about 64mb!"
+#echo "faking the sizes to be quite large"
 #EXAMPLE_SIZES=()  #reset the chosen values
-#EXAMPLE_SIZES+=(67108860 67108880 67109005)
-
-#another fakeout, just to crank up test fast with minimal files.
-#EXAMPLE_SIZES=()  #reset the chosen values
-#EXAMPLE_SIZES+=(5 20 38)
+#EXAMPLE_SIZES+=(167108860 87108880 127109005)
 
   echo -n noisy debug of the file sizes:
   for ((i = 0; i < ${#EXAMPLE_SIZES[@]}; i++)); do
@@ -78,6 +78,7 @@ function copyOneFileUp()
   timed_grid cp "local:$filename" "$gridPath"
   retval=$?
   assertEquals "Copying local file $filename" 0 $retval
+  if [ $? -ne 0 ]; then ((error_count++)); fi
   if [ $retval -eq 0 ]; then
     real_time=$(calculateTimeTaken)
     echo "Time taken to copy $filename with $size bytes is $real_time s"
@@ -100,6 +101,7 @@ function copyOneFileDown()
   timed_grid cp "$gridPath" "local:$newLocal"
   retval=$?
   assertEquals "Copying remote file $gridPath" 0 $retval
+  if [ $? -ne 0 ]; then ((error_count++)); fi
   if [ $retval -eq 0 ]; then
     real_time=$(calculateTimeTaken)
     echo "Time taken to copy $gridPath with $size bytes is $real_time s"
@@ -117,25 +119,33 @@ function compareBeforeAndAfter()
 
   local md5Orig="$(md5sum "$filename" | awk '{print $1}')"
   assertEquals "Computing md5sum for $filename" 0 $?
+  if [ $? -ne 0 ]; then ((error_count++)); fi
   local md5New="$(md5sum "$newLocal" | awk '{print $1}')"
   assertEquals "Computing md5sum for $newLocal" 0 $?
+  if [ $? -ne 0 ]; then ((error_count++)); fi
   local sizeOrig="$(stat -c "%s" "$filename")"
   assertEquals "Computing size for $filename" 0 $?
+  if [ $? -ne 0 ]; then ((error_count++)); fi
   local sizeNew="$(stat -c "%s" "$newLocal")"
   assertEquals "Computing size for $newLocal" 0 $?
+  if [ $? -ne 0 ]; then ((error_count++)); fi
 
 echo "md5Orig=$md5Orig md5New=$md5New sizeOrig=$sizeOrig sizeNew=$sizeNew"
 
   test "$md5Orig" == "$md5New"
   assertEquals "Agreement of md5sums for before and after" 0 $?
+  if [ $? -ne 0 ]; then ((error_count++)); fi
 
   test "$sizeOrig" -eq "$sizeNew"
   assertEquals "Agreement of size for before and after" 0 $?
+  if [ $? -ne 0 ]; then ((error_count++)); fi
 
   test "$sizeOrig" -eq "$size"
   assertEquals "Size correct for before file" 0 $?
+  if [ $? -ne 0 ]; then ((error_count++)); fi
   test "$sizeNew" -eq "$size"
   assertEquals "Size correct for after file" 0 $?
+  if [ $? -ne 0 ]; then ((error_count++)); fi
 }
 
 ##############
@@ -153,16 +163,17 @@ oneTimeSetUp()
 
 testCreateFiles()
 {
+  local i
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     local file="${EXAMPLE_FILES[$i]}"
     local size="${EXAMPLE_SIZES[$i]}"
-    dd if=/dev/urandom of=$file bs=1 count=$size
-    echo "created $size byte file in $file"
+    createRandomFile "$file" $size
   done
 }
 
 testCopyFilesUp()
 {
+  local i
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     copyOneFileUp "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"
   done
@@ -170,6 +181,7 @@ testCopyFilesUp()
 
 testCopyFilesDown()
 {
+  local i
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     copyOneFileDown "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"
   done
@@ -177,6 +189,7 @@ testCopyFilesDown()
 
 testFilesCameOutOkay()
 {
+  local i
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
     compareBeforeAndAfter "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"
   done
@@ -184,19 +197,23 @@ testFilesCameOutOkay()
 
 oneTimeTearDown()
 {
-#hmmm: maybe don't clean up if there were errors?
-#if fail count -eq then do cleanup?
-  echo cleaning up after test.
-  if [ ${#EXAMPLE_FILES[@]} -gt 0 ]; then
-    gridnames=()
-    for ((i = 0; i < ${#EXAMPLE_FILES[@]}; i++)); do
-      gridnames+=("$RNSPATH/$(basename "${EXAMPLE_FILES[$i]}")")
-    done
-##echo "cleaning grid names list: ${gridnames[@]}"
-#    grid rm "${gridnames[@]}"
+  # check our error count to see if it was ever incremented.
+  if [[ $error_count == 0 ]]; then
+    # no errors, so clean up.
+    if [ ${#EXAMPLE_FILES[@]} -gt 0 ]; then
+      gridnames=()
+      for ((i = 0; i < ${#EXAMPLE_FILES[@]}; i++)); do
+        gridnames+=("$RNSPATH/$(basename "${EXAMPLE_FILES[$i]}")")
+      done
+      echo "cleaning grid files: ${gridnames[@]}"
+      grid rm "${gridnames[@]}"
+    fi
+    echo "cleaning local transfer directory $TESTING_DIR"
+    rm -rf "$TESTING_DIR"
+  else 
+    # something failed, so leave the wreckage visible.
+    echo "*** cleaning turned off due to $error_count errors during test run!"
   fi
-echo "*** cleaning turned off currently."
-#  rm -rf "$TESTING_DIR"
 }
 
 # load and run shUnit2

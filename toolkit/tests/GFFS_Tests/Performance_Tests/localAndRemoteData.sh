@@ -18,12 +18,14 @@ oneTimeSetUp()
 
   if [ ! -f $TEST_TEMP/random5KB.dat ]; then
     echo "creating 5KB file..."
-    dd if=/dev/urandom of=$TEST_TEMP/random5KB.dat bs=1 count=5120
+#    dd if=/dev/urandom of=$TEST_TEMP/random5KB.dat bs=1 count=5120
+    createRandomFile "$TEST_TEMP/random5KB.dat" 5120
   fi
  
   if [ ! -f $TEST_TEMP/random5MB.dat ]; then
     echo "creating 5MB file..."
-    dd if=/dev/urandom of=$TEST_TEMP/random5MB.dat bs=1048576 count=5
+#    dd if=/dev/urandom of=$TEST_TEMP/random5MB.dat bs=1048576 count=5
+    createRandomFile "$TEST_TEMP/random5MB.dat" 1048576 
   fi
 
   # due to restricted size of VMs and other machines we need this test to work
@@ -42,7 +44,8 @@ oneTimeSetUp()
       HUGE_TEST_FILE="$PREMADE_FILE"
     else
       echo "creating huge file, this may take a few minutes..."
-      dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=$fileInMegs
+#      dd if=/dev/urandom of=$HUGE_TEST_FILE bs=1048576 count=$fileInMegs
+      createRandomFile "$HUGE_TEST_FILE" $((1048576 * $fileInMegs))
     fi
   fi
 
