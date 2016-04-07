@@ -14,9 +14,7 @@ public interface SimpleByteIOTransferer
 {
 	static final public URI TRANSFER_PROTOCOL = ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI;
 
-	//hmmm: looking at byteio leaser, this should be a preferred size of 8 megs, but previously it was set to 3.	
-	static final public int PREFERRED_READ_SIZE = 1024 * 1024 * 8 * ByteIOConstants.NUMBER_OF_THREADS_FOR_BYTEIO_PARALLEL_READS;
-	
+	static final public int PREFERRED_READ_SIZE = 1024 * 1024 * 3 * ByteIOConstants.numThreads;
 	static final public int MAXIMUM_READ_SIZE = -1;
 	static final public int PREFERRED_WRITE_SIZE = PREFERRED_READ_SIZE;
 	static final public int MAXIMUM_WRITE_SIZE = MAXIMUM_READ_SIZE;
