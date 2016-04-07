@@ -19,7 +19,7 @@ function decide_on_filenames_and_sizes()
 {
   # constants constraining our test files.
   MAX_TEST_FILES=28
-  MAX_TEST_FILES=3
+#  MAX_TEST_FILES=3
 #hmmm: above just for getting script right.
 
   # the maximum file we will try to transfer.

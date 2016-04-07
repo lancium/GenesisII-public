@@ -52,6 +52,9 @@ function createRandomFile()
 
   local stampBefore=$(getTimeStamp)
 
+  # truncate any existing stuff.
+  echo -n >"$file"
+
   while [ $(getFileSize "$file") -lt $size ]; do
     which_chunker=$(expr $(echo $RANDOM) % ${#RANDOM_CHUNK_FILES[@]})
 #echo choosing chunk file $which_chunker

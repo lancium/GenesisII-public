@@ -259,22 +259,22 @@ public class AlarmManager
 	private void updateDatabase(PreparedStatement removeStmt, PreparedStatement updateStmt, long alarmid, long repeatInterval, Date now)
 		throws Throwable
 	{
-		Timestamp nextOccurance = null;
+		Timestamp nextOccurence = null;
 
 		try {
 			if (repeatInterval <= 0) {
 				removeStmt.setLong(1, alarmid);
 				removeStmt.executeUpdate();
 			} else {
-				nextOccurance = new Timestamp(now.getTime() + repeatInterval);
-				updateStmt.setTimestamp(1, nextOccurance);
+				nextOccurence = new Timestamp(now.getTime() + repeatInterval);
+				updateStmt.setTimestamp(1, nextOccurence);
 				updateStmt.setLong(2, alarmid);
 				updateStmt.executeUpdate();
 			}
 		} finally {
-			if (nextOccurance != null) {
+			if (nextOccurence != null) {
 				synchronized (_alarms) {
-					_alarms.put(alarmid, nextOccurance);
+					_alarms.put(alarmid, nextOccurence);
 				}
 			}
 		}
@@ -337,14 +337,11 @@ public class AlarmManager
 			conn = _connectionPool.acquire(false);
 			getInfoStmt = conn.prepareStatement(
 				"SELECT repeatinterval, callingcontext, target, " + "methodname, userdata " + "FROM alarmtable WHERE alarmid = ?");
+_logger.debug("current timeout for get info: " +			getInfoStmt.getQueryTimeout());
 			removeStmt = conn.prepareStatement("DELETE FROM alarmtable WHERE alarmid = ?");
+_logger.debug("current timeout for remove: " +			removeStmt.getQueryTimeout());
 			updateStmt = conn.prepareStatement("UPDATE alarmtable SET nextoccurance = ? WHERE alarmid = ?");
-
-			/*
-			 * hmmm: this code keeps the db connection open a really long time while it tries to do alarms, and the alarms themselves could
-			 * cause outcalls. this seems really bad, since we are keeping that db conn held until all this stuff occurs, and in the process
-			 * of performing the alarms, we could also be needing a db connection.
-			 */
+_logger.debug("current timeout for update: " +			updateStmt.getQueryTimeout());
 
 			for (AlarmDescriptor desc : dueAlarms) {
 				try {
