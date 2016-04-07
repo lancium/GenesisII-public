@@ -69,7 +69,8 @@ testReplication()
   grid ln ufile.txt dir1/ufile-link.txt
   assertEquals "link unreplicated file in replicated dir" 0 $?
 
-  # dir1 must contain 4 entries with the same address as each other: # file1.txt, file3.txt, ufile.txt, and subdirectory grid ls -m dir1 
+  # dir1 must contain 4 entries with the same address as each other:
+  # file1.txt, file3.txt, ufile.txt, and subdirectory
   grid ls -m dir1
 
 echo AA first piece:
