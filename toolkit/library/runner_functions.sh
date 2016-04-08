@@ -208,11 +208,11 @@ calculateBandwidth()
     echo "FAILURE: Test run failed in some way; setting total seconds to very large number."
     total_sec="99999999"
   fi
-  if [ $total_sec -ne 0 ]; then
-    bandwidth="$(echo "scale=3; $size / $total_sec" | $(\which bc) -l)"
-  else
-    bandwidth="infinite"
+  if [ $total_sec -eq 0 ]; then
+    # fake it when we get a math issue where something took less than a second.
+    total_sec=1
   fi
+  bandwidth="$(echo "scale=3; $size / $total_sec" | $(\which bc) -l)"
   echo "$bandwidth"
 }
 

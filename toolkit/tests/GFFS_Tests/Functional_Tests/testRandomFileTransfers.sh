@@ -23,7 +23,7 @@ function decide_on_filenames_and_sizes()
 #hmmm: above just for getting script right.
 
   # the maximum file we will try to transfer.
-  MAX_TEST_SIZE=148897792 # fairly arbitrary 142 mb.
+  MAX_TEST_SIZE=202749282 # fairly arbitrary size close to 200 mb.
 
   # set up the filenames we'll use as source material.
   export TESTING_DIR="$TEST_TEMP/transfer_test"
@@ -191,6 +191,7 @@ testFilesCameOutOkay()
 {
   local i
   for ((i = 0; i < $MAX_TEST_FILES; i++)); do
+    echo -e "\nchecking file ${EXAMPLE_FILES[$i]}..."
     compareBeforeAndAfter "${EXAMPLE_FILES[$i]}" "${EXAMPLE_SIZES[$i]}"
   done
 }

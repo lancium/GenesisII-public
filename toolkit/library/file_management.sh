@@ -30,9 +30,13 @@ function prepareRandomChunks()
     # make the chunk files if they don't exist.
     local currfile="${RANDOM_CHUNK_FILES[$i]}"
     if [ ! -f "$currfile" ]; then
-      # currently just using a fixed size.
-#echo creating chunk file $currfile
-      dd if=/dev/urandom of=$currfile bs=1 count=$MAX_CHUNK_FILE &>/dev/null
+      local filesize=$MAX_CHUNK_FILE
+      # pick a value to add or subtract from the constant sized chunk, so we won't always be
+      # using files at the same boundaries or with a power of 2 size.
+      local moddy=$(( ($(echo $RANDOM) % 128) - 64 ))
+      ((filesize -= $moddy))
+#echo creating chunk file $currfile of size $filesize
+      dd if=/dev/urandom of=$currfile bs=1 count=$filesize &>/dev/null
       assertEquals "creating random chunk file $currfile" 0 $?
     fi
   done
@@ -81,8 +85,6 @@ function createRandomFile()
   local kbs=$(( $size / $secs / 1024))
   
   local fsizenow="$(getFileSize "$file")"
-  assertEquals "Creating random file of $size bytes" $size $fsizenow
-
-  echo "Created random file of $size bytes ($kbs kbps) in: $file"
+  assertEquals "Creating random file of $size bytes in: $file" $size $fsizenow
 }
 
