@@ -37,7 +37,7 @@ public class AxisServiceAndStubTracking
 	static Log _logger = LogFactory.getLog(AxisServiceAndStubTracking.class);
 
 	// currently not used, but could be used to close idle connections.
-	public static int CONNECTION_IDLE_TIMEOUT_ms = 10 * 60 * 1000;
+//	public static int CONNECTION_IDLE_TIMEOUT_ms = 10 * 60 * 1000;
 
 	public static boolean enableExtraLogging = false; // code produces more noise if this is enabled.
 
@@ -45,7 +45,8 @@ public class AxisServiceAndStubTracking
 	 * if this is not set to true, then the stub caching machinery will not be used. this needs to be enabled for the connection re-use to be
 	 * efficient.
 	 */
-	public static boolean enableStubCaching = true;
+//	public static boolean enableStubCaching = false;
+	//hmmm: STUB CACHING IS DISABLED!!!!
 
 	// ................
 	// first some constants...
@@ -59,14 +60,14 @@ public class AxisServiceAndStubTracking
 
 	// ................
 
-	final static int STUB_CACHE_TIMEOUT = 1000 * 60 * 10; // how long we'll keep around a stub pool for a URL.
+//	final static int STUB_CACHE_TIMEOUT = 1000 * 60 * 10; // how long we'll keep around a stub pool for a URL.
 	// ten minutes currently. is that long enough? too long?
 
 	// maximum number of stubs to remember (for each EPR, within each service).
-	static public final int STUB_POOL_LIMIT_PER_EPR = 50;
+//	static public final int STUB_POOL_LIMIT_PER_EPR = 50;
 
 	// we'll actively track this many urls for each service.
-	static public final int MAXIMUM_URLS_PER_SERVICE = 200;
+//	static public final int MAXIMUM_URLS_PER_SERVICE = 200;
 
 	// ................
 
@@ -76,13 +77,13 @@ public class AxisServiceAndStubTracking
 	// ................
 
 	// magic bogus numbers; right now just a metric we need to pick a good value for.
-	static final public int HANDLERS_CREATED_BEFORE_GARBAGE_COLLECTION = 32;
+//	static final public int HANDLERS_CREATED_BEFORE_GARBAGE_COLLECTION = 32;
 
 	// how long we'll go without a garbage collection being invoked, regardless of how many handlers were created.
-	static final public long GC_LONGEST_TIME_SLACK_BEFORE_MANDATORY_COLLECTION = 1000 * 30;
+//	static final public long GC_LONGEST_TIME_SLACK_BEFORE_MANDATORY_COLLECTION = 1000 * 30;
 
 	// this is the most frequently we'll garbage collect, even if a bunch of handlers were just created.
-	static final public long GC_SHORTEST_TIME_BETWEEN_COLLECTIONS_TO_REDUCE_FRENETICISM = 1000 * 3;
+//	static final public long GC_SHORTEST_TIME_BETWEEN_COLLECTIONS_TO_REDUCE_FRENETICISM = 1000 * 3;
 
 	// ................
 
@@ -97,7 +98,7 @@ public class AxisServiceAndStubTracking
 	// ................
 
 	// static list of all locators for our services.
-	private static HashMap<Class<?>, ServiceRecord> _serviceCache = new HashMap<Class<?>, ServiceRecord>();
+//	private static HashMap<Class<?>, ServiceRecord> _serviceCache = new HashMap<Class<?>, ServiceRecord>();
 
 	// ................
 
@@ -108,10 +109,10 @@ public class AxisServiceAndStubTracking
 	// ................
 
 	// new gc approach; track how many objects have been instantiated since last collection.
-	static volatile Integer _handlersCreatedSinceLastGC = 0;
+//	static volatile Integer _handlersCreatedSinceLastGC = 0;
 
 	// timestamp for last garbage collection.
-	static volatile Date _lastGarbageCollect = new Date();
+//	static volatile Date _lastGarbageCollect = new Date();
 
 	// ................
 
@@ -119,7 +120,7 @@ public class AxisServiceAndStubTracking
 	 * a cache of stubs that have been previously instantiated, which we track per service instance because they are relevant only to its
 	 * operation. additionally, we have to track stubs per URL, since each stub might be connected to a different host.
 	 */
-	private static StubCache _stubsCachedByLocator = new StubCache();
+//	private static StubCache _stubsCachedByLocator = new StubCache();
 
 	// ................
 
@@ -130,10 +131,10 @@ public class AxisServiceAndStubTracking
 	/**
 	 * provides access to the stub pooling mechanism.
 	 */
-	public static StubCache getStubCache()
-	{
-		return _stubsCachedByLocator;
-	}
+//	public static StubCache getStubCache()
+//	{
+//		return _stubsCachedByLocator;
+//	}
 
 	// ................
 
@@ -201,26 +202,26 @@ public class AxisServiceAndStubTracking
 	/**
 	 * a pool of stubs that are associated with a particular URL (which is a host + port + container id for us).
 	 */
-	public static class StubPool extends ArrayList<Stub>
-	{
-		private static final long serialVersionUID = 1L;
-	}
+//	public static class StubPool extends ArrayList<Stub>
+//	{
+//		private static final long serialVersionUID = 1L;
+//	}
 
 	// ................
 
 	/**
 	 * keeps around some stub instances per URL so they can be re-used. this has to be done on a per service-locator basis.
 	 */
-	public static class InstantiatedStubCache extends TimedOutLRUCache<URL, StubPool>
-	{
-		ServiceRecord _reco;
-
-		public InstantiatedStubCache(ServiceRecord reco, long defaultTimeoutMS)
-		{
-			super(MAXIMUM_URLS_PER_SERVICE, defaultTimeoutMS);
-			_reco = reco;
-		}
-	}
+//	public static class InstantiatedStubCache extends TimedOutLRUCache<URL, StubPool>
+//	{
+//		ServiceRecord _reco;
+//
+//		public InstantiatedStubCache(ServiceRecord reco, long defaultTimeoutMS)
+//		{
+//			super(MAXIMUM_URLS_PER_SERVICE, defaultTimeoutMS);
+//			_reco = reco;
+//		}
+//	}
 
 	// ................
 
@@ -231,70 +232,70 @@ public class AxisServiceAndStubTracking
 	 * particular service and for a particular URL, we will cache up to a certain number of stubs. the stubs are checked out of the pool when
 	 * they're used and must be checked back in again. the AcquiredStubRecord code can help with this.
 	 */
-	public static class StubCache extends HashMap<Service, InstantiatedStubCache>
-	{
-		private static final long serialVersionUID = 1L;
-
-		public StubCache()
-		{
-		}
-
-		synchronized void rememberService(ServiceRecord reco)
-		{
-			// set up a repository for stubs to be re-used.
-			put(reco._service, new InstantiatedStubCache(reco, STUB_CACHE_TIMEOUT));
-		}
-
-		synchronized Stub getStub(Service service, URL url)
-		{
-			Stub stubInstance = null;
-			if (!enableStubCaching)
-				return null; // stub caching is not enabled.
-
-			// we track ServiceRecords, but that object should have compatible equals operation for Service.
-			InstantiatedStubCache cache = get(service);
-			if (cache == null) {
-				throw new RuntimeException("failure to create a stub cache when the service " + service + " was created!");
-			}
-			StubPool pool = cache.get(url);
-			if ((pool != null) && (pool.size() > 0)) {
-				stubInstance = pool.remove(0);
-			} else if (pool == null) {
-				pool = new StubPool();
-				cache.put(url, pool);
-			}
-			// a tweak to keep recently used stubs around; we don't want to recreate them if the epr is still getting hit.
-			cache.refresh(url);
-			return stubInstance;
-		}
-
-		synchronized public void addStub(Stub s, ServiceRecord reco, URL url)
-		{
-			if (!enableStubCaching)
-				return; // stub caching is not enabled.
-
-			InstantiatedStubCache cache = get(reco._service);
-			if (cache == null) {
-				throw new RuntimeException("failure to create a stub cache when the service " + reco._service + " was created!");
-			}
-			StubPool pool = cache.get(url);
-			if (pool == null) {
-				// create a new stub pool since that url hadn't been seen before.
-				pool = new StubPool();
-				cache.put(url, pool);
-			}
-			if (pool.size() < STUB_POOL_LIMIT_PER_EPR) {
-				if (enableExtraLogging && _logger.isDebugEnabled())
-					_logger.debug("adding stub " + s + " in pool for service " + reco._service + " at url " + url);
-				pool.add(s);
-			} else {
-				if (enableExtraLogging && _logger.isDebugEnabled())
-					_logger.debug("dropping stub " + s + " on floor; pool too full for service " + reco._service + " at url " + url);
-			}
-			// a tweak to keep recently used stubs around; we don't want to recreate them if the epr is still getting hit.
-			cache.refresh(url);
-		}
-	}
+//	public static class StubCache extends HashMap<Service, InstantiatedStubCache>
+//	{
+//		private static final long serialVersionUID = 1L;
+//
+//		public StubCache()
+//		{
+//		}
+//
+//		synchronized void rememberService(ServiceRecord reco)
+//		{
+//			// set up a repository for stubs to be re-used.
+//			put(reco._service, new InstantiatedStubCache(reco, STUB_CACHE_TIMEOUT));
+//		}
+//
+//		synchronized Stub getStub(Service service, URL url)
+//		{
+//			Stub stubInstance = null;
+//			if (!enableStubCaching)
+//				return null; // stub caching is not enabled.
+//
+//			// we track ServiceRecords, but that object should have compatible equals operation for Service.
+//			InstantiatedStubCache cache = get(service);
+//			if (cache == null) {
+//				throw new RuntimeException("failure to create a stub cache when the service " + service + " was created!");
+//			}
+//			StubPool pool = cache.get(url);
+//			if ((pool != null) && (pool.size() > 0)) {
+//				stubInstance = pool.remove(0);
+//			} else if (pool == null) {
+//				pool = new StubPool();
+//				cache.put(url, pool);
+//			}
+//			// a tweak to keep recently used stubs around; we don't want to recreate them if the epr is still getting hit.
+//			cache.refresh(url);
+//			return stubInstance;
+//		}
+//
+//		synchronized public void addStub(Stub s, ServiceRecord reco, URL url)
+//		{
+//			if (!enableStubCaching)
+//				return; // stub caching is not enabled.
+//
+//			InstantiatedStubCache cache = get(reco._service);
+//			if (cache == null) {
+//				throw new RuntimeException("failure to create a stub cache when the service " + reco._service + " was created!");
+//			}
+//			StubPool pool = cache.get(url);
+//			if (pool == null) {
+//				// create a new stub pool since that url hadn't been seen before.
+//				pool = new StubPool();
+//				cache.put(url, pool);
+//			}
+//			if (pool.size() < STUB_POOL_LIMIT_PER_EPR) {
+//				if (enableExtraLogging && _logger.isDebugEnabled())
+//					_logger.debug("adding stub " + s + " in pool for service " + reco._service + " at url " + url);
+//				pool.add(s);
+//			} else {
+//				if (enableExtraLogging && _logger.isDebugEnabled())
+//					_logger.debug("dropping stub " + s + " on floor; pool too full for service " + reco._service + " at url " + url);
+//			}
+//			// a tweak to keep recently used stubs around; we don't want to recreate them if the epr is still getting hit.
+//			cache.refresh(url);
+//		}
+//	}
 
 	// ................
 
@@ -342,7 +343,7 @@ public class AxisServiceAndStubTracking
 					 */
 					r._stub._setProperty(STUB_CONFIGURED, "");
 					// drop the thing back into the cache.
-					AxisServiceAndStubTracking.getStubCache().addStub(r._stub, r._service, r._url);
+//					AxisServiceAndStubTracking.getStubCache().addStub(r._stub, r._service, r._url);
 				} catch (Throwable t) {
 					_logger.error("failure when returning stub to pool", t);
 				}
@@ -365,15 +366,15 @@ public class AxisServiceAndStubTracking
 			 * we will check the cache to see if we already created that type of service, since we want to re-use the connection pooling
 			 * mechanism associated with the locator.
 			 */
-			synchronized (_serviceCache) {
-				reco = _serviceCache.get(locatorClass);
-				if (reco != null) {
-					instantiatedService = reco._service;
-					if (_logger.isTraceEnabled())
-						_logger.debug("looked up service using " + locatorClass + " and got this guy: " + instantiatedService);
-					return reco;
-				}
-			}
+//			synchronized (_serviceCache) {
+//				reco = _serviceCache.get(locatorClass);
+//				if (reco != null) {
+//					instantiatedService = reco._service;
+//					if (_logger.isTraceEnabled())
+//						_logger.debug("looked up service using " + locatorClass + " and got this guy: " + instantiatedService);
+//					return reco;
+//				}
+//			}
 
 			/*
 			 * we need to make up a new service and file provider now. painful axis knowledge here! the file provider cannot be shared
@@ -388,12 +389,14 @@ public class AxisServiceAndStubTracking
 			// remember the service in our record now that it exists.
 			reco._service = instantiatedService;
 
-			synchronized (_serviceCache) {
-				// stash the service in our cache.
-				_serviceCache.put(locatorClass, reco);
-			}
-			// set up a repository for stubs to be re-used.
-			getStubCache().rememberService(reco);
+//			synchronized (_serviceCache) {
+//				// stash the service in our cache.
+//				//_serviceCache.put(locatorClass, reco);
+//				
+//				_logger.info("NOT CACHING SERVICE THIS IS DISABLED YO HELLO!!!!");
+//			}
+//			// set up a repository for stubs to be re-used.
+//			getStubCache().rememberService(reco);
 
 			if (_logger.isTraceEnabled())
 				_logger.debug("created service using " + locatorClass + " and got this guy: " + instantiatedService.toString());
@@ -464,56 +467,56 @@ public class AxisServiceAndStubTracking
 	 * programmatically release the handlers when they're done being used, but that is quite difficult due to the way we create proxies (which
 	 * depend on the handler) and then use them sometime later. the resolution code in AxisClientInvocationHandler also confuses the issue.
 	 */
-	public static void recordHandlerCreationAndTakeOutTrashIfAppropriate()
-	{
-		synchronized (_handlersCreatedSinceLastGC) {
-			_handlersCreatedSinceLastGC++;
-			int saveHandlers = _handlersCreatedSinceLastGC;
-			Date startGC = new Date();
-
-			long millisecondsSinceLastGC = startGC.getTime() - _lastGarbageCollect.getTime();
-
-			/*
-			 * is it too soon to garbage collect? the client is generally very frenetic and makes large numbers of outcalls, so if we only
-			 * track how many outcalls were created, the client will be collecting garbage every second (or multiple times a second). so this
-			 * code institutes an interval we'll call... must not collect trash more frequently than this.
-			 */
-			if (millisecondsSinceLastGC < GC_SHORTEST_TIME_BETWEEN_COLLECTIONS_TO_REDUCE_FRENETICISM) {
-				return;
-			}
-
-			// did we create enough handlers to justify collecting?
-			boolean createdEnoughHandlers = _handlersCreatedSinceLastGC >= HANDLERS_CREATED_BEFORE_GARBAGE_COLLECTION;
-
-			/*
-			 * we check if it's been too long since cleaning out the garbage, since the container is usually too lax hardly ever empties out
-			 * the trash (because it doesn't create very many outcalls). so this code institutes an interval we'll call... must collect trash
-			 * at least this often.
-			 */
-			boolean enforcedRunBecauseTooSlack = millisecondsSinceLastGC >= GC_LONGEST_TIME_SLACK_BEFORE_MANDATORY_COLLECTION;
-
-			// now decide if it's appropriate to clean out the trash.
-			if (enforcedRunBecauseTooSlack || createdEnoughHandlers) {
-				// yes, collect the trash, finally, joy joy...
-				LowMemoryWarning.performGarbageCollection();
-
-				// HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
-				// connMgr.show connections? can't do it!
-
-				// hmmm: this code seems to be deadly. we get a container that no longer can be connected to somehow!?
-				// try dropping any connections that have been closed or idle too long.
-				// connMgr.closeIdleConnections(CONNECTION_IDLE_TIMEOUT_ms);
-
-				// reset how many handlers were created; the handler our caller is about to create (or just created) is already counted.
-				_handlersCreatedSinceLastGC = 0;
-				// currently we always log this; it shows up only as frequently as the shortest time between collections.
-				_logger.info("GC (last ran " + (millisecondsSinceLastGC / 100) / 10.0 + " sec ago) cleaned " + saveHandlers
-					+ " handlers and took " + ((new Date()).getTime() - startGC.getTime()) + " ms");
-				// update our last recorded collection time.
-				_lastGarbageCollect = new Date();
-			}
-		}
-	}
+//	public static void recordHandlerCreationAndTakeOutTrashIfAppropriate()
+//	{
+//		synchronized (_handlersCreatedSinceLastGC) {
+//			_handlersCreatedSinceLastGC++;
+//			int saveHandlers = _handlersCreatedSinceLastGC;
+//			Date startGC = new Date();
+//
+//			long millisecondsSinceLastGC = startGC.getTime() - _lastGarbageCollect.getTime();
+//
+//			/*
+//			 * is it too soon to garbage collect? the client is generally very frenetic and makes large numbers of outcalls, so if we only
+//			 * track how many outcalls were created, the client will be collecting garbage every second (or multiple times a second). so this
+//			 * code institutes an interval we'll call... must not collect trash more frequently than this.
+//			 */
+//			if (millisecondsSinceLastGC < GC_SHORTEST_TIME_BETWEEN_COLLECTIONS_TO_REDUCE_FRENETICISM) {
+//				return;
+//			}
+//
+//			// did we create enough handlers to justify collecting?
+//			boolean createdEnoughHandlers = _handlersCreatedSinceLastGC >= HANDLERS_CREATED_BEFORE_GARBAGE_COLLECTION;
+//
+//			/*
+//			 * we check if it's been too long since cleaning out the garbage, since the container is usually too lax hardly ever empties out
+//			 * the trash (because it doesn't create very many outcalls). so this code institutes an interval we'll call... must collect trash
+//			 * at least this often.
+//			 */
+//			boolean enforcedRunBecauseTooSlack = millisecondsSinceLastGC >= GC_LONGEST_TIME_SLACK_BEFORE_MANDATORY_COLLECTION;
+//
+//			// now decide if it's appropriate to clean out the trash.
+//			if (enforcedRunBecauseTooSlack || createdEnoughHandlers) {
+//				// yes, collect the trash, finally, joy joy...
+//				LowMemoryWarning.performGarbageCollection();
+//
+//				// HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+//				// connMgr.show connections? can't do it!
+//
+//				// hmmm: this code seems to be deadly. we get a container that no longer can be connected to somehow!?
+//				// try dropping any connections that have been closed or idle too long.
+//				// connMgr.closeIdleConnections(CONNECTION_IDLE_TIMEOUT_ms);
+//
+//				// reset how many handlers were created; the handler our caller is about to create (or just created) is already counted.
+//				_handlersCreatedSinceLastGC = 0;
+//				// currently we always log this; it shows up only as frequently as the shortest time between collections.
+//				_logger.info("GC (last ran " + (millisecondsSinceLastGC / 100) / 10.0 + " sec ago) cleaned " + saveHandlers
+//					+ " handlers and took " + ((new Date()).getTime() - startGC.getTime()) + " ms");
+//				// update our last recorded collection time.
+//				_lastGarbageCollect = new Date();
+//			}
+//		}
+//	}
 
 	/*
 	 * this handy bash script shows the number of new stubs created vs. stubs reused when the stub debugging is enabled:

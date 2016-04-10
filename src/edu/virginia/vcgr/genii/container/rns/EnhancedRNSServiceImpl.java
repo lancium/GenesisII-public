@@ -543,7 +543,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 
 			for (String request : removeRequest) {
 				// 2014-11-05 ASG - adding logging
-				StatsLogger.logStats("EnhancedRNSPortType: Dir Remove  " + "\"" + request + "\"" + "  from " + caller);
+				StatsLogger.logStats("EnhancedRNSPortType: Dir Remove " + "\"" + request + "\"" + " from " + caller);
 				// End logging
 				tmp = _resource.removeEntries(request);
 				if (tmp != null)

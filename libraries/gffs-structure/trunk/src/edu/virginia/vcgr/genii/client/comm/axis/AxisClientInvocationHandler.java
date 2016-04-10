@@ -159,7 +159,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext)
 		throws ResourceException, GenesisIISecurityException
 	{
-		AxisServiceAndStubTracking.recordHandlerCreationAndTakeOutTrashIfAppropriate();
+//		AxisServiceAndStubTracking.recordHandlerCreationAndTakeOutTrashIfAppropriate();
 
 		try {
 			_epr = epr;
@@ -354,14 +354,14 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			Stub stubInstance = null;
 
 			Date startStubbing = new Date();
-			stubInstance = AxisServiceAndStubTracking.getStubCache().getStub(reco._service, _serviceURL);
+//			stubInstance = AxisServiceAndStubTracking.getStubCache().getStub(reco._service, _serviceURL);
 
-			if (stubInstance != null) {
-				long duration = (new Date()).getTime() - startStubbing.getTime();
-				_acquiredStubs.add(new AcquiredStubRecord(stubInstance, _serviceURL, reco));
-				if (AxisServiceAndStubTracking.enableExtraLogging && _logger.isDebugEnabled())
-					_logger.debug("reusing stub instance " + stubInstance + " for url " + _serviceURL + " took " + duration + " ms");
-			}
+//			if (stubInstance != null) {
+//				long duration = (new Date()).getTime() - startStubbing.getTime();
+//				_acquiredStubs.add(new AcquiredStubRecord(stubInstance, _serviceURL, reco));
+//				if (AxisServiceAndStubTracking.enableExtraLogging && _logger.isDebugEnabled())
+//					_logger.debug("reusing stub instance " + stubInstance + " for url " + _serviceURL + " took " + duration + " ms");
+//			}
 
 			Method locatorPortTypeMethod = ClientUtils.getLocatorPortTypeMethod(reco._service.getClass());
 			if (stubInstance == null) {

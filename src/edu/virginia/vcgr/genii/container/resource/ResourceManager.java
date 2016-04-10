@@ -230,7 +230,6 @@ public class ResourceManager
 
 	static private void addSecureAddressingElements(ArrayList<MessageElement> metaDataAny, IResource resource) throws ResourceException
 	{
-
 		MetaDataSecurityToken(metaDataAny, resource);
 
 		try {

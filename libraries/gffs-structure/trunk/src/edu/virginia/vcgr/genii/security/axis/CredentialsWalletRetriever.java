@@ -159,6 +159,7 @@ public class CredentialsWalletRetriever extends BasicHandler
 
 		// make sure we don't give them a dead wallet.
 		if (wallet == null) {
+			_logger.warn("there were no SAML assertions found in the soap headers");
 			wallet = new AxisCredentialWallet();
 		}
 

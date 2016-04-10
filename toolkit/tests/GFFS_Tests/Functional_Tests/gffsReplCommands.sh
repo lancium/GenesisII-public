@@ -42,8 +42,7 @@ testReplication()
   sleep 1
 
   grid unlink dir2 &>/dev/null
-  grid resolver -q dir1 --link=dir2 
-#&> /dev/null
+  grid resolver -q dir1 --link=dir2 &> /dev/null
   assertEquals "query resolver" 0 $?
 
   grid echo "This is file 1" "'>'" dir1/file1.txt
@@ -83,6 +82,7 @@ testReplication()
 #grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort | uniq -c
 
 #old:  count=(`grep '^address: ' $GRID_OUTPUT_FILE | cut -d/ -f3 | sort | uniq -c`)
+  # Changed to use container ID by ASG.
   count=(`grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort | uniq -c`)
   assertEquals "replicated directory contents" 4 "${count[0]}"
 
@@ -105,6 +105,7 @@ testReplication()
 
 #old:  count=( $(grep '^address: ' $GRID_OUTPUT_FILE | cut -d/ -f3 | sort |
 #          uniq -c | sort -nr) )
+  # Changed to use container ID by ASG.
   count=(`grep '^address: ' $GRID_OUTPUT_FILE | cut -d= -f2 | sort | uniq -c | sort -nr`)
   assertEquals "replica directory content count" 3 "${count[0]}"
   assertEquals "replica directory link count" 1 "${count[2]}"
@@ -139,4 +140,3 @@ oneTimeTearDown()
 
 # load and run shUnit2
 source "$SHUNIT_DIR/shunit2"
-

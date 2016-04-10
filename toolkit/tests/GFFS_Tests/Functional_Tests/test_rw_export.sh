@@ -73,7 +73,6 @@ temp_file="$(mktemp "$TEST_TEMP/export-test-data-file.XXXXXX")"
 check_if_failed "creating temporary file"
 
 # write random data to the temp file.  this will just put 5K into it.
-#dd if=/dev/urandom of=$temp_file bs=1 count=5120
 createRandomFile "$temp_file" 5120
 check_if_failed "writing random data into temporary file"
 

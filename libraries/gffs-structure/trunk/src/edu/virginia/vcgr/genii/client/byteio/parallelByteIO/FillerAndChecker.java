@@ -1,15 +1,20 @@
 package edu.virginia.vcgr.genii.client.byteio.parallelByteIO;
 
-import java.rmi.RemoteException;
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class FillerAndChecker
 {
+	static Log _logger = LogFactory.getLog(FillerAndChecker.class);
+
 	private CountDownLatch cdl; // Latch waiting for all threads to finish
 	private byte[] data; // contains contents of read
 	private int lastFilledBufferIndex = -1;
 	private boolean errorFlag = false; // flag denoting if any thread failed in its read
-	private RemoteException threadFailCause; // cause of thread-failure
+	private Throwable threadFailCause; // cause of thread-failure
 
 	public FillerAndChecker(CountDownLatch cdl, int length)
 	{
@@ -24,12 +29,36 @@ public class FillerAndChecker
 
 	// Each thread copies the sub-fetch into the global buffer
 
-	public void copyFetch(byte[] temp_buffer, int threadID, int subBufferSize)
+	public void copyFetch(byte[] temp_buffer, long offset)
+	//		, int length)
+		//int threadID, int subBufferSize)
+	throws IOException
 	{
-		int index = threadID * subBufferSize;
-		System.arraycopy(temp_buffer, 0, data, index, temp_buffer.length);
-		if (temp_buffer.length != 0)
-			setLastFilledBufferIndex(index + temp_buffer.length - 1);
+		if ((temp_buffer == null) || (temp_buffer.length == 0)) {
+			//hmmm: clean out logging.
+			_logger.debug("ignoring empty buffer");
+			return;
+		}
+		//int index = threadID * subBufferSize;
+		int index = (int)offset;  // hmmm, better not be past 2gig.
+		
+		if (index >= data.length) {
+			String msg = "computed index is past main buffer end: index is " + index + " but buffer is only " + data.length + " bytes";
+			_logger.error(msg);
+			throw new IOException(msg);
+		} else if (index + temp_buffer.length > data.length) {
+			String msg = "chunk will overwrite main buffer end: index is " + index + " and temp buffer is " + temp_buffer.length + " bytes but buffer is only " + data.length + " bytes";
+			_logger.error(msg);
+			throw new IOException(msg);			
+		}
+
+		//hmmm: denoise this.
+		_logger.debug("copying buffer of " + temp_buffer.length + " bytes into index " + index + " of parent buffer");
+
+		synchronized (data) {
+			System.arraycopy(temp_buffer, 0, data, index, temp_buffer.length);
+		}
+		setLastFilledBufferIndex(index + temp_buffer.length - 1);
 	}
 
 	/*
@@ -47,7 +76,7 @@ public class FillerAndChecker
 		cdl.countDown();
 	}
 
-	public void setErrorFlag(RemoteException cause)
+	public void setErrorFlag(Throwable cause)
 	{
 		errorFlag = true; // read has failed
 		setThreadFailCause(cause); // the reason why the read failed.
@@ -58,12 +87,12 @@ public class FillerAndChecker
 		return errorFlag;
 	}
 
-	public void setThreadFailCause(RemoteException threadFailCause)
+	public void setThreadFailCause(Throwable threadFailCause)
 	{
 		this.threadFailCause = threadFailCause;
 	}
 
-	public RemoteException getThreadFailCause()
+	public Throwable getThreadFailCause()
 	{
 		return threadFailCause;
 	}

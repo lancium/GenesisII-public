@@ -64,7 +64,6 @@ function fuse()
   local fuse_out="$(mktemp "$TEST_TEMP/grid_logs/out_fuse_$(date_string).XXXXXX")"
   logged_grid "$fuse_out" "$(pick_unaccelerated_grid_app)" fuse $* &
   local retval=$?
-#  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -76,9 +75,6 @@ function timed_grid()
   # set a prefix for the date printout that happens after the command runs.
   date_stamp_prefix="stopped timer "
   grid_base $(\which time) -p -o "$GRID_TIMING_FILE" "$(pick_grid_app)" $*
-  local retval=$?
-#  echo "[$(readable_date_string)]"
-  return $retval
 }
 
 # similar to timed_grid, but for arbitrary commands, and fits in with the timing
@@ -98,7 +94,6 @@ function grid_chk()
   echo "[grid] $*" | sed -e 's/password=[^ ]* /password=XXXX /g'
   silent_grid $*
   check_if_failed "'grid ${1}...' exited with exit code $?"
-#  echo "[$(readable_date_string)]"
 }
 
 function noisy_grid()
@@ -108,7 +103,6 @@ function noisy_grid()
   local retval=$?
   # show the output from the silent_grid command above, regardless of success.
   cat "$GRID_OUTPUT_FILE"
-#  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -128,10 +122,8 @@ function multi_grid()
     # we have to exit here since the command is operating as a sub-shell with the new
     # input stream that the caller provides.
     echo "multi_grid failing with exit code $retval"
-#    echo "[$(readable_date_string)]"
     exit $retval    
   fi
-#  echo "[$(readable_date_string)]"
   return $retval
 }
 
@@ -166,10 +158,6 @@ function grid_base()
   local my_output="$(mktemp $TEST_TEMP/grid_logs/out_grid_base_$(date_string).XXXXXX)"
   logged_grid $my_output "${@}"
   local retval=$?
-#  if [ $retval -ne 0 ]; then
-#    # print a timestamp if there was an error.
-#    echo "[$(readable_date_string)]"
-#  fi
   return $retval
 }
 
