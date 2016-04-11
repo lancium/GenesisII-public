@@ -21,10 +21,8 @@ HOME_PATH_ON_MOUNT="$MOUNT_POINT/$RNSPATH"
 
 function decide_on_filenames_and_sizes()
 {
-  # constants constraining our test files.
-  MAX_TEST_FILES=28
-#  MAX_TEST_FILES=3
-#hmmm: above just for getting script right.
+  # constraint on test files, controls how many we test.
+  MAX_TEST_FILES=5
 
   # the maximum file we will try to transfer.
   MAX_TEST_SIZE=202749282 # fairly arbitrary size close to 200 mb.

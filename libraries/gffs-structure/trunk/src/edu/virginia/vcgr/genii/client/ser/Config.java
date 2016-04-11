@@ -28,24 +28,47 @@ public class Config
 		return _client;
 	}
 
-	// static private MessageContext _cached = null;
-
-	static public MessageContext getContext()
+	private static ThreadLocal<MessageContext> _heldContext = new ThreadLocal<MessageContext>()
 	{
-
-		// hmmm: super speculative but who thinks that it's okay to stash a static context once and then reuse it a bunch? not this guy.
-		MessageContext toReturn = MessageContext.getCurrentContext();
-		if (toReturn == null) {
+		@Override
+		protected MessageContext initialValue()
+		{
+			MessageContext toReturn;
 			toReturn = new MessageContext(getClientEngine());
 			toReturn.setEncodingStyle("");
 			toReturn.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE);
+			return toReturn;
+		}
+	};
+
+	/**
+	 * swaps in a "newContext" for the thread local message context to enable the config function below to return the right object if we're
+	 * actually in an axis call. the returned context must be swapped back in after the call, to avoid polluting other serialization attempts
+	 * with the transient message context for a call.
+	 */
+//	static public MessageContext rehookLocalContext(MessageContext newContext)
+//	{
+//		MessageContext toReturn = _heldContext.get();
+//		_heldContext.set(newContext);
+//		return toReturn;
+//	}
+
+	static public MessageContext getContext()
+	{
+		/*
+		 * hands out the current context, if one exists (indicating that axis is probably working on a call). otherwise it makes a
+		 * new one that's still thread local, to avoid concurrency issues when deserializing things.
+		 */		
+		MessageContext toReturn = MessageContext.getCurrentContext();
+		if (toReturn == null) {
+//			 toReturn = new MessageContext(getClientEngine());
+//			 toReturn.setEncodingStyle("");
+//			 toReturn.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE);
+
+			// hmmm: newest scheme attempts to get rid of thread unsafety by using a different context per thread.
+			toReturn = _heldContext.get();
 		}
 
 		return toReturn;
-
-		/*
-		 * synchronized (Config.class) { if (_cached == null) { _cached = new MessageContext(getClientEngine()); _cached.setEncodingStyle("");
-		 * _cached.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE); } } return _cached;
-		 */
 	}
 }
