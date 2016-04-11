@@ -95,11 +95,11 @@ if [ ! -d "$TEST_TEMP/job_processing" ]; then mkdir -p "$TEST_TEMP/job_processin
 
 if [ ! -z "$DEBUGGING" -a -z "$SHOWED_SETTINGS_ALREADY" ]; then
   echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  echo Grid install located at $GENII_INSTALL_DIR
+#  echo Grid install located at $GENII_INSTALL_DIR
   echo User state directory at $GENII_USER_DIR
-  echo Main container will be $CONTAINERPATH
   echo User path is $USERPATH and group is $SUBMIT_GROUP
   echo RNS testing path is $RNSPATH
+  echo Main container will be $CONTAINERPATH
   echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 fi
 # try to not blast out the above block of info again during this run.
