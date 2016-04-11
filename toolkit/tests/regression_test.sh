@@ -99,8 +99,8 @@ GFFS_TESTS=( \
   GFFS_Tests/Performance_Tests/gnuMake.sh \
   GFFS_Tests/Performance_Tests/largeRNSDirectory.sh \
   GFFS_Tests/Performance_Tests/localAndRemoteData.sh \
-  GFFS_Tests/Performance_Tests/testRandomFileTransfers.sh \
-  GFFS_Tests/Performance_Tests/testRandomFileTransfersOnFuse.sh \
+  GFFS_Tests/Functional_Tests/testRandomFileTransfers.sh \
+  GFFS_Tests/Functional_Tests/testRandomFileTransfersOnFuse.sh \
 )
 
 if [ ! -z "$AUTOBUILD_RUNNING" ]; then
