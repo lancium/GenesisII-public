@@ -16,6 +16,9 @@ export MOUNT_POINT="$TEST_TEMP/mount-directoryTree"
 # the place in the grid where the exported directory will appear.
 export FULL_EXPORT_PATH="$RNSPATH/export-local"
 
+# this is non-empty if the directory is expected to be local.
+local_export=yes
+
 oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.
@@ -55,6 +58,8 @@ testCleanupPriorTestRuns()
       echo "did not exist at $EXPORTPATH.  This configuration will have problems if this"
       echo "is a bootstrapped test!  A real export test against a remote container could"
       echo "still work if the path exists locally there."
+      # remove the thought that we might have a local export we can look at.
+      unset local_export
     fi
   else
     # test area already existed, so make sure nothing was left behind.
@@ -85,12 +90,15 @@ testRecursiveCopyAndDeleteOnExport()
   assertEquals "copy directory recursively to export path" 0 $?
   grid ls $FULL_EXPORT_PATH/EMS_Tests/besFunctionality &>/dev/null
   assertEquals "directory is present on export path afterwards" 0 $?
-  if [ -d $TEST_AREA/EMS_Tests/besFunctionality -a -d $TEST_AREA/EMS_Tests/faultJobsTests ]; then
-    true
-  else
-    false
+
+  if [ ! -z "$local_export" ]; then
+    if [ -d $TEST_AREA/EMS_Tests/besFunctionality -a -d $TEST_AREA/EMS_Tests/faultJobsTests ]; then
+      true
+    else
+      false
+    fi
+    assertEquals "certain directories are present on real filesystem of export" 0 $?
   fi
-  assertEquals "certain directories are present on real filesystem of export" 0 $?
 
   grid rm -r $FULL_EXPORT_PATH/EMS_Tests
   assertEquals "remove copied directory from export path" 0 $?
