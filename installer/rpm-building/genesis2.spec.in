@@ -140,8 +140,8 @@ cp $GEN2_SOURCE_LOC/scripts/gffschown.template $GEN2_BUILDOUT/bin/gffschown
 chmod 755 $GEN2_BUILDOUT/bin/gffschown
 cp $GEN2_SOURCE_LOC/scripts/proxyio.launcher.template $GEN2_BUILDOUT/bin/proxyio.launcher
 chmod 755 $GEN2_BUILDOUT/bin/proxyio.launcher
-cp $GEN2_SOURCE_LOC/installer/data_files/container.properties $GEN2_BUILDOUT/lib/container.properties
-cp $GEN2_SOURCE_LOC/installer/data_files/client.properties $GEN2_BUILDOUT/lib/client.properties
+cp $GEN2_SOURCE_LOC/lib/container.properties.template $GEN2_BUILDOUT/lib/container.properties
+cp $GEN2_SOURCE_LOC/lib/client.properties.template $GEN2_BUILDOUT/lib/client.properties
 cp $GEN2_SOURCE_LOC/scripts/cert-tool $GEN2_BUILDOUT/bin/cert-tool
 chmod 755 $GEN2_BUILDOUT/bin/cert-tool
 
