@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.FileSystem_Type;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
@@ -14,13 +16,16 @@ import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 
 public class ConfigurationManager
-{
+{	
+	static private Log _logger = LogFactory.getLog(ConfigurationManager.class);
+
 	static public final String _USER_DIR_PROPERTY = "edu.virginia.vcgr.genii.client.configuration.user-dir";
 
 	static private final String _CLIENT_CONF_FILENAME = "client-config.xml";
 	static private final String _SERVER_CONF_FILENAME = "server-config.xml";
 
-	// initialized configuration manager (cannot be re-initialized)
+	// initialized configuration manager.
+	//(old: "cannot be re-initialized"; now it is allowed to be reinitialized)
 	static private ConfigurationManager _manager = null;
 
 	static private ArrayList<ConfigurationUnloadedListener> _unloadListeners = new ArrayList<ConfigurationUnloadedListener>();
@@ -84,10 +89,11 @@ public class ConfigurationManager
 	{
 		synchronized (ConfigurationManager.class) {
 			if (_manager != null) {
-				throw new RuntimeException("A configuration manager has already been initialized");
+				_logger.info("Dropping current ConfigurationManager and recreating.");
+				reloadConfiguration();
+			} else {
+				_manager = new ConfigurationManager(userDir);
 			}
-
-			_manager = new ConfigurationManager(userDir);
 
 			return _manager;
 		}

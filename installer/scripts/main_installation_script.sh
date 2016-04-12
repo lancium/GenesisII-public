@@ -27,29 +27,24 @@ replace_compiler_variables "$GENII_INSTALL_DIR/RELEASE"
 replace_compiler_variables "$GENII_INSTALL_DIR/lib/container.properties"
 replace_compiler_variables "$GENII_INSTALL_DIR/lib/client.properties"
 
+# new files for bin directory need to be copied from scripts.
+if [ ! -f "$GENII_BINARY_DIR/gffschown" ]; then
+  cp "$GENII_INSTALL_DIR/scripts/gffschown.template" "$GENII_BINARY_DIR/gffschown"
+  chmod 755 "$GENII_BINARY_DIR/gffschown"
+fi
+if [ ! -f "$GENII_BINARY_DIR/proxyio.launcher" ]; then
+  cp "$GENII_INSTALL_DIR/scripts/proxyio.launcher.template" "$GENII_BINARY_DIR/proxyio.launcher"
+  chmod 755 "$GENII_BINARY_DIR/proxyio.launcher"
+fi
+
 replace_installdir_variables "$GENII_INSTALL_DIR"
 
 # make a link for the Container startup script.
 rm -f "$GENII_BINARY_DIR/GFFSContainer"
 ln -s "$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer" "$GENII_BINARY_DIR/GFFSContainer"
 
-# cannot package multiple binary formats in rpm, so this code won't work.
-# create the JNI directory for this platform.
-#if [ ! -d $GENII_INSTALL_DIR/jni-lib ]; then
-#  mkdir $GENII_INSTALL_DIR/jni-lib
-#fi
-#hostarch=$(arch)
-#if [ "$hostarch" == x86_64 ]; then
-#  cp -f $GENII_INSTALL_DIR/jni-libs/lin64/* $GENII_INSTALL_DIR/jni-lib/
-#elif [ "$hostarch" == x86_32 \
-#      -o "$hostarch" == i686 \
-#      -o "$hostarch" == i586 ]; then
-#  cp -f $GENII_INSTALL_DIR/jni-libs/lin32/* $GENII_INSTALL_DIR/jni-lib/
-#fi
-
 # clean up some older files and directories.
-\rm -rf "$GENII_INSTALL_DIR/ApplicationWatcher" "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/lib/gffs-container.jar" "$GENII_INSTALL_DIR/GFFSContainer" "$GENII_INSTALL_DIR/grid" "$GENII_INSTALL_DIR/cert-tool" "$GENII_INSTALL_DIR/client-ui"
-#don't remove; sdiact-175 users could be relying on these locations: "$GENII_INSTALL_DIR/gffschown" "$GENII_INSTALL_DIR/proxyio.launcher" 
+\rm -rf "$GENII_INSTALL_DIR/ApplicationWatcher" "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/lib/gffs-container.jar" "$GENII_INSTALL_DIR/GFFSContainer" "$GENII_INSTALL_DIR/cert-tool" "$GENII_INSTALL_DIR/client-ui"
 
 # set the permissions on our files properly.
 find "$GENII_INSTALL_DIR" -type d -exec chmod -c a+rx "{}" ';' &>/dev/null

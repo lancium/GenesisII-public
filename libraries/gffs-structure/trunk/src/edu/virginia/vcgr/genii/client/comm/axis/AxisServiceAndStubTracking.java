@@ -4,8 +4,6 @@ import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 import org.apache.axis.client.Service;
 import org.apache.axis.client.Stub;
@@ -16,9 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.feistymeow.process.ethread;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
-import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;

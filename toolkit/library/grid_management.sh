@@ -77,11 +77,14 @@ function get_container_logfile()
     extra="_${DEP_NAME}"
   fi
   # log file for normal deployments.
-  local logfile="$GENII_INSTALL_DIR/lib/build.container.log4j.properties"
+  local logprops="$GENII_INSTALL_DIR/lib/build.container.log4j.properties"
+  if [ ! -f "$logprops" ]; then
+    logprops="$GENII_INSTALL_DIR/lib/production.container.log4j.properties"
+  fi
   if [ "$DEP_NAME" == "$BACKUP_DEPLOYMENT_NAME" ]; then
     # trying to be somewhat clever and use the state directory if it has log4j properties.
     if [ -f "$BACKUP_USER_DIR/build.container.log4j.properties" ]; then
-      logfile="$BACKUP_USER_DIR/build.container.log4j.properties"
+      logprops="$BACKUP_USER_DIR/build.container.log4j.properties"
     else
       # if we cannot find the actual log4j props, don't return a name that would be
       # the same as the main container log.
@@ -90,17 +93,21 @@ function get_container_logfile()
     fi
   elif [ "$DEP_NAME" == "default" ]; then
     if [ -f "$GENII_USER_DIR/build.container.log4j.properties" ]; then
-      logfile="$GENII_USER_DIR/build.container.log4j.properties"
+      logprops="$GENII_USER_DIR/build.container.log4j.properties"
     fi
   fi
-  to_return="$(grep log4j.appender.LOGFILE.File "$logfile" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
+  to_return="$(grep log4j.appender.LOGFILE.File "$logprops" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
   echo "$to_return"
 }
 
 # returns the standard location for the client log file.
 function get_client_logfile()
 {
-  to_return="$(grep log4j.appender.LOGFILE.File "$GENII_INSTALL_DIR/lib/build.client.log4j.properties" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
+  local logprops="$GENII_INSTALL_DIR/lib/build.client.log4j.properties"
+  if [ ! -f "$logprops" ]; then
+    logprops="$GENII_INSTALL_DIR/lib/production.client.log4j.properties"
+  fi
+  to_return="$(grep log4j.appender.LOGFILE.File "$logprops" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
   echo "$to_return"
 }
 

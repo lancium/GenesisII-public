@@ -101,7 +101,7 @@ public class ContextManager
 	{
 		ICallingContext bootContext = new CallingContextImpl(root);
 
-		// we may have a dummy context that contains login information necesary to boot
+		// we may have a dummy context that contains login information necessary to boot
 		ICallingContext current = getCurrentContext();
 		if (current != null) {
 			ContextType t = bootContext.getSerialized();

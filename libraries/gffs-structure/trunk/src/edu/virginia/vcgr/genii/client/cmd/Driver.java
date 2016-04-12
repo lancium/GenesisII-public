@@ -23,6 +23,9 @@ import edu.virginia.vcgr.genii.client.configuration.NoSuchDeploymentException;
 import edu.virginia.vcgr.genii.client.configuration.ShellPrompt;
 import edu.virginia.vcgr.genii.client.configuration.UserConfigUtils;
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
+import edu.virginia.vcgr.genii.client.context.ClientContextResolver;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
@@ -45,21 +48,14 @@ public class Driver extends ApplicationBase
 		System.out.println("Driver");
 	}
 
-	static public void loadClientState(String[] args)
+	/**
+	 * loads the parts of the state that we never should be reinitializing.
+	 */
+	static public void loadClientImmutableState(String[] args)
 	{
 		if (!OSGiSupport.setUpFramework()) {
 			System.err.println("Exiting due to OSGi startup failure.");
 			System.exit(1);
-		}
-
-		if ((args.length > 1) && (args[0].equals("connect") || args[0].equals("reconnect"))) {
-			_logger.info("adjusting deployment loading process since this is a connect command.");
-			String stateDir = InstallationProperties.getUserDir();
-			try {
-				new File(stateDir, UserConfigUtils._USER_CONFIG_FILE_NAME).delete();
-			} catch (Throwable t) {
-				_logger.debug("could not clean out user config xml file during driver startup.");
-			}
 		}
 
 		SecurityUtilities.initializeSecurity();
@@ -72,7 +68,6 @@ public class Driver extends ApplicationBase
 				+ " for this client.");
 
 		try {
-			// container key not used on client side.
 			CertificateValidatorFactory.setValidator(new SecurityUtilities(new TrustStoreLinkage()));
 		} catch (Throwable t) {
 			System.err.println("Security validation setup failure: " + t.getMessage());
@@ -84,10 +79,33 @@ public class Driver extends ApplicationBase
 
 		GridEnvironment.loadGridEnvironment();
 
+		// Set Trust Store Provider
+		java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
+
+		if (((args.length > 1) && (args[0].equals("connect") || args[0].equals("reconnect")))) {
+			_logger.info("adjusting deployment loading process since this is a connect command.");
+			String stateDir = InstallationProperties.getUserDir();
+			try {
+				new File(stateDir, UserConfigUtils._USER_CONFIG_FILE_NAME).delete();
+			} catch (Throwable t) {
+				_logger.debug("could not clean out user config xml file during driver startup.");
+			}
+		}
+
+		_logger.debug("done with immutable portion of client loading");
+	}
+
+	/**
+	 * this method can be used to reload the client state and can be called multiple times.
+	 */
+	static public void loadClientRepeatableState(String[] args)
+	{
 		String deploymentName = DeploymentName.figureOutDefaultDeploymentName();
+
 		DeploymentName depname = new DeploymentName(deploymentName);
 
 		try {
+			_logger.debug("loading deployment '" + deploymentName + "'");
 			Deployment.getDeployment(new File(ContainerProperties.getContainerProperties().getDeploymentsDirectory()), depname);
 		} catch (Throwable t) {
 			_logger.warn("failed to load deployment '" + deploymentName + "'; trying default deployment.");
@@ -100,19 +118,19 @@ public class Driver extends ApplicationBase
 			}
 		}
 
-		/*
-		 * } else { deploymentName = System.getProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY); if ((deploymentName == null) ||
-		 * deploymentName.isEmpty()) deploymentName = "default"; }
-		 */
-
 		System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName);
 		if (_logger.isDebugEnabled())
 			_logger.debug("Using Deployment \"" + deploymentName + "\".");
 
 		prepareClientApplication();
+	}
 
-		// Set Trust Store Provider
-		java.security.Security.setProperty("ssl.SocketFactory.provider", VcgrSslSocketFactory.class.getName());
+	static public void loadClientState(String[] args)
+	{
+		// load this part only once.
+		loadClientImmutableState(args);
+		// these inits can be repeated.
+		loadClientRepeatableState(args);
 	}
 
 	/*
@@ -120,6 +138,22 @@ public class Driver extends ApplicationBase
 	 */
 	static private void checkCertUpdateTime(ApplicationBase.GridStates gridOkay)
 	{
+		ICallingContext context;
+		try {
+			context = ContextManager.getCurrentContext();
+			if (context != null) {
+				// if unicore created the context, there won't be any state yet and we would continually reload certs.
+				Object unicoreFound = context.getSingleValueProperty(ClientContextResolver.UNICORE_COMBINED_CONTEXT_LOADED);
+				if (unicoreFound != null) {
+					_logger.debug("skipping certificate update check since this is a unicore launched gffs client");
+					_nextCertUpdateCheck = new Date().getTime() + UpdateGridCertsTool.UPDATER_SNOOZE_DURATION;
+					return;
+				}
+			}
+		} catch (IOException e1) {
+			_logger.error("could not retrieve calling context in checkCertUpdateTime");
+		}
+		
 		if (new Date().getTime() >= _nextCertUpdateCheck) {
 			// time to update certificates if we have a valid connection.
 			if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {
@@ -178,6 +212,10 @@ public class Driver extends ApplicationBase
 					// so we were not connected before, but we are now.
 					_logger.info("grid connection automatically created with: grid connect "
 						+ ClientProperties.getClientProperties().getConnectionCommand());
+
+					_logger.debug("trying to reload client state here...");
+					loadClientRepeatableState(args);
+
 					break;
 				}
 			}

@@ -194,6 +194,7 @@ public class DatabaseConnectionPool
 				 * connections as there are files in the directory, and they're all kept until it's done traversing the directory!
 				 */
 				if (connection == null) {
+					if (_logger.isTraceEnabled())
 					_logger.debug("handing out a new connection since none are in pool.");
 					connection = createConnection();
 				}

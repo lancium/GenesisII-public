@@ -46,6 +46,8 @@ public class ClientContextResolver implements IContextResolver
 		return new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(), COMBINED_FILENAME);
 	}
 
+	public static final String UNICORE_COMBINED_CONTEXT_LOADED = "edu.virginia.vcgr.unicore-context";
+
 	@Override
 	public ICallingContext resolveContext() throws FileNotFoundException, IOException
 	{
@@ -69,6 +71,21 @@ public class ClientContextResolver implements IContextResolver
 				StreamUtils.close(fl);
 				// now load the combined context.
 				toReturn = ContextFileSystem.load(combinedFile);
+
+				/*
+				 * hmmm: we are never seeing this message be printed for the unicore usage of the grid. as a result, we're never setting this
+				 * unicore flag in the context, so for any unicore job that uses the grid, the first time the job does anything it will always
+				 * incur a 7 second or so penalty while updating certs. it would be nice to figure out where the unicore context actually gets
+				 * loaded and fix this.
+				 */
+//				_logger.debug("loaded combined context for unicore...");
+				/*
+				 * this should only be set in a context using the old combined method, which has only one current client: unicore. note that
+				 * we never set this property in the context unless it's unicore, so no one had better check for 'false'. if there's anything
+				 * in the context listed with this key, then it's a combined-style unicore context.
+				 */
+//				toReturn.setSingleValueProperty(UNICORE_COMBINED_CONTEXT_LOADED, "true");
+
 			} else {
 				// we must unlock the file again before letting the context load occur (since it also locks).
 				StreamUtils.close(fl);
