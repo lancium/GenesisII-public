@@ -175,6 +175,8 @@
 				minOccurs="1" maxOccurs="1" nillable="false"/>
 			<xsd:element name="num-slots" type="xsd:unsignedInt"
 				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="num-cores" type="xsd:unsignedInt"
+				minOccurs="0" maxOccurs="1" nillable="true"/>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="ConfigureRequestType"

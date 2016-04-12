@@ -18,6 +18,8 @@ public class VariablePanel extends JPanel
 
 	private JTabbedPane _parent;
 
+	private VariableListenerImpl _varListener = new VariableListenerImpl();
+
 	private void handleTabEnabling(VariableManager mgr)
 	{
 		int index = _parent.indexOfComponent(this);
@@ -26,16 +28,16 @@ public class VariablePanel extends JPanel
 			_parent.setEnabledAt(index, isEnabled());
 	}
 
-	public VariablePanel(JTabbedPane parent, JobDocumentContext context)
+	public VariablePanel(JTabbedPane parent, JobDocumentContext context, int tabIndex, VariableTableModel vtm)
 	{
 		super(new GridBagLayout());
 
 		_parent = parent;
 		setName("Grid Job Variables");
 
-		context.variableManager().addVariableListener(new VariableListenerImpl());
+		context.variableManager().addVariableListener(_varListener);
 
-		add(new JScrollPane(new VariableTable(context)), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH,
+		add(new JScrollPane(new VariableTable(context, tabIndex, vtm)), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
 
 		handleTabEnabling(context.variableManager());

@@ -11,12 +11,14 @@ public class ResourceSlots
 	private BESData _besData;
 	private long _besID;
 	private int _slotsAvailable;
+	private int _coresAvailable;
 
 	public ResourceSlots(BESData besData)
 	{
 		_besData = besData;
 		_besID = besData.getID();
 		_slotsAvailable = besData.getTotalSlots();
+		_coresAvailable = besData.getTotalCores();
 	}
 
 	public BESData getBESData()
@@ -35,6 +37,11 @@ public class ResourceSlots
 		return _slotsAvailable;
 	}
 
+	public int coresAvailable()
+	{
+		return _coresAvailable;
+	}
+
 	/**
 	 * Reserve one of the remaining slots for a new job.
 	 */
@@ -44,5 +51,16 @@ public class ResourceSlots
 			throw new RuntimeException("Slot underflow exception.");
 
 		_slotsAvailable--;
+	}
+
+	/**
+	 * Reserve the requested cores from the remaining cores for a new job.
+	 */
+	public void reserveCores(int cores)
+	{
+		if (_coresAvailable < cores)
+			throw new RuntimeException("Core underflow exception.");
+
+		_coresAvailable -= cores;
 	}
 }

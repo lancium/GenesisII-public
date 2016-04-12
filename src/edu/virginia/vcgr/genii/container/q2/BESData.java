@@ -24,11 +24,26 @@ public class BESData
 	 */
 	private int _totalSlots;
 
+	/**
+	 * The total number of cores this container has allocated to it (not the number available for use right now as some may be allocated to
+	 * jobs).
+	 */
+
+	private int _totalCores;
+
 	public BESData(long besID, String besName, int totalSlots)
 	{
 		_besID = besID;
 		_besName = besName;
 		_totalSlots = totalSlots;
+	}
+
+	public BESData(long besID, String besName, int totalSlots, int totalCores)
+	{
+		_besID = besID;
+		_besName = besName;
+		_totalSlots = totalSlots;
+		_totalCores = totalCores;
 	}
 
 	public long getID()
@@ -49,5 +64,15 @@ public class BESData
 	public void setTotalSlots(int totalSlots)
 	{
 		_totalSlots = totalSlots;
+	}
+
+	public int getTotalCores()
+	{
+		return _totalCores;
+	}
+
+	public void setTotalCores(int totalCores)
+	{
+		_totalCores = totalCores;
 	}
 }

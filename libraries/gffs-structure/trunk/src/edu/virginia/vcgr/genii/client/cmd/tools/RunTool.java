@@ -25,6 +25,7 @@ import org.ggf.bes.factory.GetActivityStatusesResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.jsdl.Application_Type;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.ggf.jsdl.JobDescription_Type;
 import org.ggf.jsdl.JobIdentification_Type;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSMetadataType;
@@ -422,12 +423,25 @@ public class RunTool extends BaseGridTool
 				fin = new FileInputStream(gPath.path());
 			JobDefinition_Type jobDef = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(fin), JobDefinition_Type.class);
 
-			if (optJobName != null) {
-				JobIdentification_Type ident = jobDef.getJobDescription().getJobIdentification();
-				if (ident != null) {
-					ident.setJobName(optJobName);
+			// Old code that only works with a single Job Description
+			// if (optJobName != null) {
+			// JobIdentification_Type ident = jobDef.getJobDescription().getJobIdentification();
+			// if (ident != null) {
+			// ident.setJobName(optJobName);
+			// } else {
+			// jobDef.getJobDescription().setJobIdentification(new JobIdentification_Type(optJobName, null, null, null, null));
+			// }
+			// }
+
+			// New code that works with multiple Job Descriptions
+			JobDescription_Type[] jobDescList = jobDef.getJobDescription();
+			JobIdentification_Type[] idents = new JobIdentification_Type[jobDescList.length];
+			for (int i = 0; i < jobDescList.length; i++) {
+				idents[i] = jobDescList[i].getJobIdentification();
+				if (idents[i] != null) {
+					idents[i].setJobName(optJobName);
 				} else {
-					jobDef.getJobDescription().setJobIdentification(new JobIdentification_Type(optJobName, null, null, null, null));
+					jobDescList[i].setJobIdentification(new JobIdentification_Type(optJobName, null, null, null, null));
 				}
 			}
 
@@ -486,18 +500,32 @@ public class RunTool extends BaseGridTool
 	{
 		EndpointReferenceType applicationDescriptionEPR = null;
 
-		Application_Type application = jobDef.getJobDescription().getApplication();
-		if (application != null) {
-			MessageElement[] any = application.get_any();
-			if (any != null) {
-				for (MessageElement element : any) {
-					QName name = element.getQName();
-					if (name.equals(_GENII_APP_PATH_ELEMENT)) {
-						applicationDescriptionEPR = getApplicationDescriptionEndpoint(element.getAttribute("path"));
-						break;
-					} else if (name.equals(_GENII_APP_ENDPOINT_ELEMENT)) {
-						applicationDescriptionEPR = ObjectDeserializer.toObject(element, EndpointReferenceType.class);
-						break;
+		// Old code that works with only one Job Description
+		/*
+		 * Application_Type application = jobDef.getJobDescription().getApplication(); if (application != null) { MessageElement[] any =
+		 * application.get_any(); if (any != null) { for (MessageElement element : any) { QName name = element.getQName(); if
+		 * (name.equals(_GENII_APP_PATH_ELEMENT)) { applicationDescriptionEPR =
+		 * getApplicationDescriptionEndpoint(element.getAttribute("path")); break; } else if (name.equals(_GENII_APP_ENDPOINT_ELEMENT)) {
+		 * applicationDescriptionEPR = ObjectDeserializer.toObject(element, EndpointReferenceType.class); break; } } } }
+		 */
+
+		// New code that works with multiple Job Descriptions
+		JobDescription_Type[] jobDescs = jobDef.getJobDescription();
+		Application_Type[] applications = new Application_Type[jobDescs.length];
+		for (int i = 0; i < jobDescs.length; i++) {
+			applications[i] = jobDescs[i].getApplication();
+			if (applications[i] != null) {
+				MessageElement[] any = applications[i].get_any();
+				if (any != null) {
+					for (MessageElement element : any) {
+						QName name = element.getQName();
+						if (name.equals(_GENII_APP_PATH_ELEMENT)) {
+							applicationDescriptionEPR = getApplicationDescriptionEndpoint(element.getAttribute("path"));
+							break;
+						} else if (name.equals(_GENII_APP_ENDPOINT_ELEMENT)) {
+							applicationDescriptionEPR = ObjectDeserializer.toObject(element, EndpointReferenceType.class);
+							break;
+						}
 					}
 				}
 			}

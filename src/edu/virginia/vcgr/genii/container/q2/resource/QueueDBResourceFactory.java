@@ -43,6 +43,8 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 
 	// a command that will add newer rpcid field to the queue jobs table structure.
 	static private final String _ADD_RPC_ID_COLUMN = "ALTER TABLE q2jobs ADD COLUMN rpcid VARCHAR(256)";
+	static private final String _ADD_NUM_OF_CORES = "ALTER TABLE q2jobs ADD COLUMN numcores INTEGER DEFAULT 1";
+	static private final String _ADD_TOTAL_CORES_COLUMN = "ALTER TABLE q2resources ADD COLUMN totalcores INTEGER DEFAULT 8";
 
 	public QueueDBResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
@@ -67,6 +69,8 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_STMTS);
 			DatabaseTableUtils.addColumns(conn, false, _ADD_RPC_ID_COLUMN);
+			DatabaseTableUtils.addColumns(conn, false, _ADD_NUM_OF_CORES);
+			DatabaseTableUtils.addColumns(conn, false, _ADD_TOTAL_CORES_COLUMN);
 			conn.commit();
 		} finally {
 			_pool.release(conn);

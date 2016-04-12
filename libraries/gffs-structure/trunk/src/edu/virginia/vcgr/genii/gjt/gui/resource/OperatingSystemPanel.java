@@ -18,15 +18,16 @@ class OperatingSystemPanel extends TitledPanel
 {
 	static final long serialVersionUID = 0L;
 
-	OperatingSystemPanel(JobDocumentContext context)
+	OperatingSystemPanel(JobDocumentContext context, int index)
 	{
 		super("Operating System", new GridBagLayout());
 
 		OperatingSystemComboBox osCombo = new OperatingSystemComboBox(context.applicationContext().preferences());
-		ParameterizableStringField osVersion = new ParameterizableStringField(context.jobDocument().operatingSystemVersion(), 8);
+		ParameterizableStringField osVersion =
+			new ParameterizableStringField(context.jobRoot().jobDocument().get(index).operatingSystemVersion(), 8);
 
-		osCombo.setSelectedItem(context.jobDocument().operatingSystem());
-		osCombo.addItemListener(new OSSelectionListener(context.jobDocument()));
+		osCombo.setSelectedItem(context.jobRoot().jobDocument().get(index).operatingSystem());
+		osCombo.addItemListener(new OSSelectionListener(context.jobRoot().jobDocument().get(index)));
 
 		add(new JLabel("Type"),
 			new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));

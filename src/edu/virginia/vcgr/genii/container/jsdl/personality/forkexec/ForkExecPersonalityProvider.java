@@ -4,8 +4,10 @@ import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.HPCApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.POSIXApplicationFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.SPMDApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.jsdl.personality.common.CommonPersonalityProvider;
+import edu.virginia.vcgr.genii.container.jsdl.personality.qsub.QSubSPMDApplicationFacet;
 
 public class ForkExecPersonalityProvider extends CommonPersonalityProvider
 {
@@ -30,5 +32,11 @@ public class ForkExecPersonalityProvider extends CommonPersonalityProvider
 	public HPCApplicationFacet getHPCApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new ForkExecHPCApplicationFacet(_fsManager, _workingDirectory);
+	}
+	
+	@Override
+	public SPMDApplicationFacet getSPMDApplicationFacet(Object currentUnderstanding) throws JSDLException
+	{
+		return new ForkExecSPMDApplicationFacet(_fsManager, _workingDirectory);
 	}
 }

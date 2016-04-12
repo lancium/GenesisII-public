@@ -55,6 +55,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.history.SequenceNumber;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLTransformer;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -117,12 +118,12 @@ public class JobManager implements Closeable
 	private BESManager _besManager;
 	private String _lastUserScheduled;
 
-	private volatile ArrayList<Long> _pendingChecks; // pending job status checks, performed during
-														// slack time.
-	private volatile Calendar _whenToProcessNotifications; // the time when we should check all the
-															// pending status notifications.
-	private final int NOTIFICATION_CHECKING_DELAY = 5 * 1000; // how frequently to check for
-																// notifications.
+	// pending job status checks, performed during slack time.
+	private volatile ArrayList<Long> _pendingChecks;
+	// the time when we should check all the pending status notifications.
+	private volatile Calendar _whenToProcessNotifications;
+	// how frequently to check for notifications.
+	private final int NOTIFICATION_CHECKING_DELAY = 5 * 1000;
 
 	/**
 	 * A map of all jobs in the queue based off of the job's key in the database.
@@ -615,7 +616,21 @@ public class JobManager implements Closeable
 			/*
 			 * Submit the job information into the queue (and get a new jobID from the database for it).
 			 */
-			long jobID = _database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime);
+
+			int numOfCores = 1;
+//			JobRequest jobRequest = null;
+//			try {
+//				jobRequest = JobRequestParser.parse(jsdl);
+//				if ((jobRequest != null) && (jobRequest.getSPMDInformation() != null)) {
+//					numOfCores = jobRequest.getSPMDInformation().getNumberOfProcesses();
+//				}
+//			} catch (JSDLException e) {
+//				_logger.error("caught jsdl exception in submitJob", e);
+//			} catch (Exception ex) {
+//				_logger.error("caught exception in submitJob", ex);
+//			}
+
+			long jobID = _database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime, numOfCores);
 			if (MyProxyCertificate.isAvailable())
 				_database.setSecurityHeader(connection, jobID, MyProxyCertificate.getPEMString());
 
@@ -634,9 +649,12 @@ public class JobManager implements Closeable
 				_logger.debug("Submitted job \"" + ticket + "\" as job number " + jobID);
 
 			/*
-			 * Create a new data structure for the job's in memory information and put it into the in-memory lists.
+			 * Create a new data structure for the job's in memory information and put it into the in-memory lists. Get the SMPD information
+			 * for the job
 			 */
-			JobData job = new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history);
+
+			JobData job =
+				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history, numOfCores);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -719,7 +737,22 @@ public class JobManager implements Closeable
 			/*
 			 * Submit the job information into the queue (and get a new jobID from the database for it).
 			 */
-			long jobID = _database.submitJob(sweep, connection, tickynum, priority, jsdl, callingContext, identities, state, submitTime);
+
+			int numOfCores = 1;
+//			try {
+//				JobRequest jobRequest = null;
+//				jobRequest = JobRequestParser.parse(jsdl);
+//				if ((jobRequest != null) && (jobRequest.getSPMDInformation() != null)) {
+//					numOfCores = jobRequest.getSPMDInformation().getNumberOfProcesses();
+//				}
+//			} catch (JSDLException e) {
+//				_logger.error("caught jsdl exception in submitJob", e);
+//			} catch (Exception ex) {
+//				_logger.error("caught exception in submitJob", ex);
+//			}
+
+			long jobID =
+				_database.submitJob(sweep, connection, tickynum, priority, jsdl, callingContext, identities, state, submitTime, numOfCores);
 			sweep.setJobId(jobID);
 
 			if (MyProxyCertificate.isAvailable())
@@ -744,7 +777,7 @@ public class JobManager implements Closeable
 			 * Create a new data structure for the job's in memory information and put it into the in-memory lists.
 			 */
 			JobData job = new JobData(sweep, jobID, PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), tickynum, priority, state,
-				submitTime, (short) 0, history);
+				submitTime, (short) 0, history, numOfCores);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -866,6 +899,30 @@ public class JobManager implements Closeable
 		try {
 			connection = _connectionPool.acquire(true);
 			return _database.getJSDL(connection, jobID);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+
+	synchronized public void updateJSDL(JobDefinition_Type jsdl, long jobID) throws SQLException, ResourceException
+	{
+		Connection connection = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			_database.updateJSDL(connection, jsdl, jobID);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+
+	synchronized public void updateJSDL(JobDefinition_Type jsdl, String jobID) throws SQLException, ResourceException
+	{
+		Connection connection = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			_database.updateJSDL(connection, jsdl, jobID);
 		} finally {
 			_connectionPool.release(connection);
 		}
@@ -1961,10 +2018,17 @@ public class JobManager implements Closeable
 				rs.reserveSlot();
 
 				/*
+				 * Update the available cores of the BES container.
+				 */
+
+				rs.reserveCores(job.getNumOfCores());
+
+				/*
 				 * If the resource now has no slots available, remove it complete from the list.
 				 */
-				if (rs.slotsAvailable() <= 0)
+				if ((rs.slotsAvailable() <= 0) || (rs.coresAvailable() <= 0))
 					slots.remove(besID);
+
 			}
 		}
 	}
@@ -1981,8 +2045,10 @@ public class JobManager implements Closeable
 				continue;
 
 			SlotSummary summary = slots.get(besID);
-			if (summary != null)
+			if (summary != null) {
 				summary.add(-1, 1);
+				summary.addCores(-1, 1);
+			}
 		}
 	}
 
@@ -2064,14 +2130,34 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void startJobs(Connection connection, Collection<ResourceMatch> matches) throws SQLException, ResourceException
+	synchronized public void startJobs(Connection connection, Collection<ResourceMatch> matches, List<Integer> selectedMatchIndices)
+		throws SQLException, ResourceException
 	{
 		HashSet<ResourceMatch> badMatches = new HashSet<ResourceMatch>();
+
+		int matchIndex = 0;
 
 		/*
 		 * Iterate through the matches and enqueue a worker to start the jobs indicated there.
 		 */
+
+		//System.out.println("Starting the job");
+
 		for (ResourceMatch match : matches) {
+			/*
+			 * Retrieves the old JSDL with (possibly) multiple job descriptions
+			 */
+			JobDefinition_Type oldJSDL = getJSDL(match.getJobID());
+			JobDefinition_Type newJSDL = JSDLTransformer.transform(oldJSDL, selectedMatchIndices.get(matchIndex));
+			/*
+			 * Transforms it into a JSDL with only one job description
+			 */
+			matchIndex++;
+
+			// Updates the row with the old JSDL to hold the new one
+			if (newJSDL != null)
+				updateJSDL(newJSDL, match.getJobID());
+
 			/* Find the job data for the match */
 			JobData data = _jobsByID.get(new Long(match.getJobID()));
 
@@ -2335,6 +2421,10 @@ public class JobManager implements Closeable
 					}
 				}
 
+				////////////////////////////////////////////////////////////////////
+				_logger.debug("Inside run ... Creating the job now");
+				////////////////////////////////////////////////////////////////////
+
 				history = data.history(HistoryEventCategory.CreatingJob);
 
 				SecurityUpdateResults checkResults = new SecurityUpdateResults();
@@ -2418,6 +2508,10 @@ public class JobManager implements Closeable
 							AbstractSubscriptionFactory.createRequest(queueEPR,
 								BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(), null,
 								new JobCompletedAdditionUserData(_jobID)));
+
+					////////////////////////////////////////////////////////////////////
+					_logger.debug("Creating Activity");
+					////////////////////////////////////////////////////////////////////
 
 					HistoryEventWriter hWriter =
 						history.createDebugWriter("Making CreateActivity Outcall on %s", _besManager.getBESName(_besID));
