@@ -115,6 +115,8 @@ chmod 755 $GEN2_BUILDOUT/bin/client-ui
 cp $GEN2_SOURCE_LOC/scripts/fastgrid \
   $GEN2_BUILDOUT/bin
 chmod 755 $GEN2_BUILDOUT/bin/fastgrid
+cp $GEN2_SOURCE_LOC/grid $GEN2_BUILDOUT/grid
+chmod 755 $GEN2_BUILDOUT/grid
 
 # some new copies of library scripts where they can be found in path.
 cp $GEN2_SOURCE_LOC/toolkit/library/backup_container_state.sh \
@@ -200,6 +202,7 @@ bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 /opt/genesis2-%GRID%/bin/gffschown
 /opt/genesis2-%GRID%/bin/grid
 /opt/genesis2-%GRID%/bin/fastgrid
+/opt/genesis2-%GRID%/grid
 /opt/genesis2-%GRID%/jar-desc.xml
 /opt/genesis2-%GRID%/set_gffs_vars
 /opt/genesis2-%GRID%/bin/proxyio.launcher

@@ -8,6 +8,7 @@ import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -276,6 +277,24 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 		} catch (InvalidNameException e) {
 			_logger.error("got invalid name exception for " + toShow, e);
 			return null;
+		}
+	}
+
+	public static boolean safeCompareX509(X509Certificate first, X509Certificate second)
+	{
+		if (first == null && second == null)
+			return true;
+		if (first != null && second == null)
+			return false;
+		if (first == null && second != null)
+			return false;
+		try {
+			byte[] firstBytes = first.getEncoded();
+			byte[] secondBytes = second.getEncoded();
+			return Arrays.equals(firstBytes, secondBytes);
+		} catch (Exception e) {
+			_logger.error("failed to generate byte representation for a cert");
+			return false;
 		}
 	}
 

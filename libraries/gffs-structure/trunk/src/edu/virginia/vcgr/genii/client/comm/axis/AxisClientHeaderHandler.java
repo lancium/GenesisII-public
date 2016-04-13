@@ -349,7 +349,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 				 */
 				// this credential says that the resource trusts the tls connection cert.
 				TrustCredential newTC =
-					CredentialCache.getCachedCredential(tlsKey._certChain, IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain,
+					CredentialCache.generateCredential(tlsKey._certChain, IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain,
 						clientKeyAndCertificate._clientPrivateKey, restrictions, RWXCategory.FULL_ACCESS);
 				walletForResource.getRealCreds().addCredential(newTC);
 				if (_logger.isTraceEnabled())
@@ -374,7 +374,14 @@ public class AxisClientHeaderHandler extends BasicHandler
 					} else {
 						X509Certificate passOn[] = new X509Certificate[1];
 						passOn[0] = passThrough;
-						TrustCredential newerTC = CredentialCache.getCachedCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
+						
+						// crucial cache flush so we don't bring up an old version of this cred.
+//						CredentialCache.flushForCredential(passOn[0].getSubjectDN().toString(), tlsKey._certChain[0].getSubjectDN().toString());
+						//hmmm: above flush followed by cache usage is bogus.  it turns out the below line is the only one that uses this cache at all,
+						//and now we're saying this cache is a bad idea.  so instead, we should just call this delegateCred or something
+						// and do no caching in it!
+						
+						TrustCredential newerTC = CredentialCache.generateCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
 							tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
 						if (newerTC == null) {
 							_logger.error("failed to create credential for pass-through connection for: " + passOn[0].getSubjectDN());

@@ -62,8 +62,8 @@ public class CredentialCache
 	static private TimedOutLRUCache<ChainsCacheKey, TrustCredential> credentialChains =
 		new TimedOutLRUCache<ChainsCacheKey, TrustCredential>(CRED_CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
 
-	static private TimedOutLRUCache<SingletonCacheKey, TrustCredential> isolatedCreds =
-		new TimedOutLRUCache<SingletonCacheKey, TrustCredential>(CRED_CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
+//	static private TimedOutLRUCache<SingletonCacheKey, TrustCredential> isolatedCreds =
+//		new TimedOutLRUCache<SingletonCacheKey, TrustCredential>(CRED_CACHE_SIZE, SecurityConstants.CredentialCacheTimeout);
 
 	/**
 	 * the key to the cache for delegation chains is a 2-tuple with the guid of the base credential and the delegatee's x509 certificate. this
@@ -79,6 +79,31 @@ public class CredentialCache
 			super(s, c);
 		}
 	};
+	
+	/**
+	 * clears all memory of any credentials we had seen to this point.
+	 */
+	public static void flushCredentialCaches()
+	{
+		synchronized (credentialChains) {
+			credentialChains.clear();
+		}
+//		synchronized (isolatedCreds) {
+//			isolatedCreds.clear();
+//		}
+		ClientCredentialTracker.flushEntireTracker();
+	}
+	
+	/**
+	 * flushes the records for a particular certificate in the singleton delegation cache.
+	 */
+//	public static void flushForCredential(String delegateeDN, String subjectDN)
+//	{
+//		synchronized (isolatedCreds) {
+//			SingletonCacheKey seek = new SingletonCacheKey(delegateeDN, subjectDN);
+//			isolatedCreds.remove(seek);
+//		}
+//	}
 
 	/**
 	 * the key for the cache of isolated trust credentials is the x509 of the delegatee and the issuer certificates. this sloppily assumes
@@ -133,32 +158,32 @@ public class CredentialCache
 	}
 
 	/**
-	 * this returns a cached credential that matches the requested trust delegation, or it creates a new delegation.
+	 * this creates a new delegated credential for the delegatee and issuer.
 	 */
-	public static TrustCredential getCachedCredential(X509Certificate[] delegatee, IdentityType delegateeType, X509Certificate[] issuer,
+	public static TrustCredential generateCredential(X509Certificate[] delegatee, IdentityType delegateeType, X509Certificate[] issuer,
 		PrivateKey issuerPrivateKey, BasicConstraints restrictions, EnumSet<RWXCategory> accessCategories)
 	{
 		// check the cache to see if the credential we would create exists already.
-		synchronized (isolatedCreds) {
-			SingletonCacheKey seek = new SingletonCacheKey(delegatee[0].getSubjectDN().toString(), issuer[0].getSubjectDN().toString());
-			TrustCredential delegation = isolatedCreds.get(seek);
-			if (delegation != null) {
-				if (_logger.isTraceEnabled())
-					_logger.trace("singleton credential cache hit--found existing delegation.");
-				if (delegation.isValid()) {
-					// a good delegation deserves to be kept around, especially if in use.
-					isolatedCreds.refresh(seek);
-				}
-			} else {
+//		synchronized (isolatedCreds) {
+//			SingletonCacheKey seek = new SingletonCacheKey(delegatee[0].getSubjectDN().toString(), issuer[0].getSubjectDN().toString());
+//			TrustCredential delegation = isolatedCreds.get(seek);
+//			if (delegation != null) {
+//				if (_logger.isTraceEnabled())
+//					_logger.trace("singleton credential cache hit--found existing delegation.");
+//				if (delegation.isValid()) {
+//					// a good delegation deserves to be kept around, especially if in use.
+//					isolatedCreds.refresh(seek);
+//				}
+//			} else {
 				// not in cache: create a new isolated trust credential.
-				delegation =
+		TrustCredential delegation =
 					new TrustCredential(delegatee, IdentityType.CONNECTION, issuer, IdentityType.OTHER, restrictions, accessCategories);
 				delegation.signAssertion(issuerPrivateKey);
 				if (_logger.isTraceEnabled())
 					_logger.trace("singleton credential cache miss--created new delegation.");
-				isolatedCreds.put(seek, delegation);
-			}
+//				isolatedCreds.put(seek, delegation);
+//			}
 			return delegation;
-		}
+//		}
 	}
 }

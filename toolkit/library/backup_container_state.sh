@@ -73,7 +73,7 @@ mkdir "$GENII_USER_DIR/breadcrumbs"
 cp -R "$GENII_INSTALL_DIR/context.xml"* "$GENII_INSTALL_DIR/lib/container.properties" "$GENII_INSTALL_DIR/lib/client.properties" "$GENII_INSTALL_DIR/toolkit"/*cfg "$GENII_INSTALL_DIR/deployments" "$GENII_INSTALL_DIR/toolkit/tools/deployment_generator" "$GENII_USER_DIR/breadcrumbs" 2>/dev/null
 
 ( pushd / ;
-tar -czf $backup_file "$GENII_USER_DIR" ;
+tar -hczf $backup_file "$GENII_USER_DIR" ;
 popd ) >$TMP/zz_container_backup_${USER}.log
 
 #hmmm: auto-restart?

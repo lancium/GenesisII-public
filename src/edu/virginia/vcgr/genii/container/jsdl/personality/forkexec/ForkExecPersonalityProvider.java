@@ -7,7 +7,6 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.POSIXApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SPMDApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.jsdl.personality.common.CommonPersonalityProvider;
-import edu.virginia.vcgr.genii.container.jsdl.personality.qsub.QSubSPMDApplicationFacet;
 
 public class ForkExecPersonalityProvider extends CommonPersonalityProvider
 {

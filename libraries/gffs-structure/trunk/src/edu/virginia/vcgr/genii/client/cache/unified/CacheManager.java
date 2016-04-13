@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.axis.transport.http.CommonsHTTPSender;
 import org.apache.axis.types.URI;
-import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
@@ -17,6 +15,7 @@ import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierT
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.NotificationBrokerDirectory;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.Subscriber;
 import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.SubscriptionDirectory;
+import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.security.credentials.ClientCredentialTracker;
 
 /*
@@ -326,18 +325,20 @@ public class CacheManager
 			// flush all tracking information on credentials.
 			ClientCredentialTracker.flushEntireTracker();
 
-			try {
-				// drop any connections that are established to avoid keeping session alive with wrong creds.
-				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
-				if (connMgr != null) {
-					// we close idle with an idle timeout of 0, which should mean everyone, even active connections.
-					connMgr.closeIdleConnections(0);
-				}
-
-			} catch (Throwable t) {
-				if (_logger.isTraceEnabled())
-					_logger.debug("screwup from closing idle connections", t);
-			}
+			VcgrSslSocketFactory.closeIdleConnections();
+			
+//			try {
+//				// drop any connections that are established to avoid keeping session alive with wrong creds.
+//				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+//				if (connMgr != null) {
+//					// we close idle with an idle timeout of 0, which should mean everyone, even active connections.
+//					connMgr.closeIdleConnections(0);
+//				}
+//
+//			} catch (Throwable t) {
+//				if (_logger.isTraceEnabled())
+//					_logger.debug("screwup from closing idle connections", t);
+//			}
 		} catch (Exception ex) {
 			_logger.error("Alarm: couldn't reset the caching system after a failure. " + "To avoid seeing, possibly, stale contents, "
 				+ "restart the grid client: " + ex.getMessage());

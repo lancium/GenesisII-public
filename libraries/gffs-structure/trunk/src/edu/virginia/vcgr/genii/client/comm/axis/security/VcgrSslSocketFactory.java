@@ -28,6 +28,8 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.components.net.DefaultCommonsHTTPClientProperties;
+import org.apache.axis.transport.http.CommonsHTTPSender;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -334,5 +336,25 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 
 			return false;
 		}
+	}
+	
+	/**
+	 * drops any connections that are not being used currently.  this causes the ssl information to be flushed out.
+	 */
+	public static void closeIdleConnections()
+	{
+		try {
+			// drop any connections that are established to avoid keeping session alive with wrong creds.
+			HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+			if (connMgr != null) {
+				// we close idle with an idle timeout of 0, which should mean everyone, even active connections.
+				connMgr.closeIdleConnections(0);
+			}
+
+		} catch (Throwable t) {
+			if (_logger.isTraceEnabled())
+				_logger.debug("screwup from closing idle connections", t);
+		}
+
 	}
 }

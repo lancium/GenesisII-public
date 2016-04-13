@@ -208,10 +208,7 @@ public class JSDLUtils extends JNIContainerBaseClass
 		 */
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		JSDLUtility.JSDLContext.createMarshaller().marshal(jaxbType, baos);
-		// String readBaos = new String (baos.toByteArray(), Charset.defaultCharset());
-		// System.out.println("Reading baos \n" + readBaos);
 		baos.close();
-		// jaxbType.toString();
 		return ObjectDeserializer.fromBytes(JobDefinition_Type.class, baos.toByteArray());
 	}
 }
