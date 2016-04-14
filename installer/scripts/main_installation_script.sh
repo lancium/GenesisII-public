@@ -39,9 +39,14 @@ fi
 
 replace_installdir_variables "$GENII_INSTALL_DIR"
 
+##############
+
+# all variable replacing in config files and scripts should be done by this point.
+
 # make a link for the Container startup script.
 rm -f "$GENII_BINARY_DIR/GFFSContainer"
 ln -s "$GENII_INSTALL_DIR/JavaServiceWrapper/wrapper/bin/GFFSContainer" "$GENII_BINARY_DIR/GFFSContainer"
+chmod 755 "$GENII_BINARY_DIR/GFFSContainer"
 
 # clean up some older files and directories.
 \rm -rf "$GENII_INSTALL_DIR/ApplicationWatcher" "$GENII_INSTALL_DIR/XCGContainer" "$GENII_INSTALL_DIR/lib/gffs-container.jar" "$GENII_INSTALL_DIR/GFFSContainer" "$GENII_INSTALL_DIR/cert-tool" "$GENII_INSTALL_DIR/client-ui"

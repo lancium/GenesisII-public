@@ -360,22 +360,6 @@ public class JobDocument implements PostUnmarshallListener
 			builder.pop();
 		}
 
-		// hmmm: all made up, not sure if we need a similar section like this:
-		// if (_threadsPerProcess.value() != null) {
-		// if (resources == null)
-		// resources = new Resources();
-		// builder.push(new DefaultXPathNode("http://vcgr.cs.virginia.edu/jsdl/genii", "IndividualThreadsPerProcess"));
-		// builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
-		//
-		// RangeValue rv = new RangeValue();
-		//
-		// rv.upperBoundedRange(new Boundary(_threadsPerProcess.value()));
-		// resources.individualThreadsPerProcess(rv);
-		//
-		// builder.pop();
-		// builder.pop();
-		// }
-
 		if (_matchingParameters.size() > 0) {
 			if (resources == null)
 				resources = new Resources();

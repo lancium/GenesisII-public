@@ -19,8 +19,10 @@ public class SMBTreeConnect implements SMBCommand
 {
 	static private Log _logger = LogFactory.getLog(SMBTreeConnect.class);
 
-	// hmmm: ARGH, this code is nearly identical to SMBTreeConnectAndX. abstract the shared code!
-	// hmmm: ARGH ARGH ARGH, probably all of these AndX are similar copies of functionality.
+	/*
+	 * future: this code is nearly identical to SMBTreeConnectAndX. abstract the shared code! probably all of these AndX are similar copies of
+	 * functionality.
+	 */
 
 	@Override
 	public void execute(SMBConnection c, SMBHeader h, SMBBuffer params, SMBBuffer data, SMBBuffer message, SMBBuffer acc)

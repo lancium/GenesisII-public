@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="5.1.15" transformSequenceNumber="4">
+<install4j version="6.1.1" transformSequenceNumber="5">
   <directoryPresets config="../grid" />
-  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
+  <application name="Genesis II GFFS" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:genii.simple-name}-v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genesis2-${compiler:genii.simple-name}" publisher="${compiler:genii.publisher}" publisherWeb="${compiler:genii.publisher-url}" version="${compiler:genii.app-version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="false" macSignature="????" macVolumeId="57c117fbfcc34f6f" javaMinVersion="1.7" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.7">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -262,17 +262,17 @@
   </files>
   <launchers>
     <launcher name="GFFSContainer" id="264" customizedId="" external="true" excludeFromMenu="true" unixMode="755" menuName="" externalFile="JavaServiceWrapper/wrapper/bin/GFFSContainer" />
-    <launcher name="runContainer" id="1450" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="runContainer" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+    <launcher name="runContainer" id="1450" customizedId="" external="false" excludeFromMenu="true" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="">
+      <executable name="runContainer" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
-      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+      <splashScreen show="false" width="0" height="0" bitmapFile="" windowsNative="false" textOverlay="false">
         <text>
-          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
-          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <statusLine x="20" y="20" text="" fontSize="8" fontColor="0,0,0" bold="false" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dlog4j.configuration=production.container.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-container-application.properties&quot; -Xmx1024m" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
         <classPath>
           <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
           <scanDirectory location="ext" failOnError="false" />
@@ -280,11 +280,15 @@
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
         </nativeLibraryDirectories>
+        <vmOptions />
       </java>
       <includedFiles />
       <unextractableFiles />
-      <vmOptionsFile mode="none" overwriteMode="0" fileMode="644">
-        <content />
+      <vmOptionsFile mode="content" overwriteMode="0" fileMode="644">
+        <content>-Dlog4j.configuration=production.container.log4j.properties
+-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}
+-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-container-application.properties
+-Xmx1024m</content>
       </vmOptionsFile>
       <customScript mode="1" file="">
         <content />
@@ -294,17 +298,17 @@
       </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="grid" id="39" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+    <launcher name="grid" id="39" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="">
+      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
-      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+      <splashScreen show="false" width="0" height="0" bitmapFile="" windowsNative="false" textOverlay="false">
         <text>
-          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
-          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <statusLine x="20" y="20" text="" fontSize="8" fontColor="0,0,0" bold="false" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <scanDirectory location="ext" failOnError="false" />
@@ -313,11 +317,16 @@
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
         </nativeLibraryDirectories>
+        <vmOptions />
       </java>
       <includedFiles />
       <unextractableFiles />
-      <vmOptionsFile mode="none" overwriteMode="0" fileMode="644">
-        <content />
+      <vmOptionsFile mode="content" overwriteMode="4" fileMode="644">
+        <content>-Dedu.virginia.vcgr.genii.net-name=grid
+-Dlog4j.configuration=production.client.log4j.properties
+-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}
+-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties
+-Xmx${compiler:genii.client-memory.normal}m</content>
       </vmOptionsFile>
       <customScript mode="1" file="">
         <content />
@@ -327,17 +336,17 @@
       </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="client-ui" id="1773" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+    <launcher name="client-ui" id="1773" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="">
+      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
-      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+      <splashScreen show="false" width="0" height="0" bitmapFile="" windowsNative="false" textOverlay="false">
         <text>
-          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
-          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <statusLine x="20" y="20" text="" fontSize="8" fontColor="0,0,0" bold="false" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.normal}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
@@ -346,11 +355,16 @@
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
         </nativeLibraryDirectories>
+        <vmOptions />
       </java>
       <includedFiles />
       <unextractableFiles />
-      <vmOptionsFile mode="none" overwriteMode="0" fileMode="644">
-        <content />
+      <vmOptionsFile mode="content" overwriteMode="0" fileMode="644">
+        <content>-Dedu.virginia.vcgr.genii.net-name=grid
+-Dlog4j.configuration=production.client.log4j.properties
+-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}
+-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties
+-Xmx${compiler:genii.client-memory.normal}m</content>
       </vmOptionsFile>
       <customScript mode="1" file="">
         <content />
@@ -360,17 +374,17 @@
       </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="grid32" id="5619" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+    <launcher name="grid32" id="5619" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="">
+      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
-      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+      <splashScreen show="false" width="0" height="0" bitmapFile="" windowsNative="false" textOverlay="false">
         <text>
-          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
-          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <statusLine x="20" y="20" text="" fontSize="8" fontColor="0,0,0" bold="false" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
@@ -379,11 +393,16 @@
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
         </nativeLibraryDirectories>
+        <vmOptions />
       </java>
       <includedFiles />
       <unextractableFiles />
-      <vmOptionsFile mode="none" overwriteMode="0" fileMode="644">
-        <content />
+      <vmOptionsFile mode="content" overwriteMode="0" fileMode="644">
+        <content>-Dedu.virginia.vcgr.genii.net-name=grid
+-Dlog4j.configuration=production.client.log4j.properties
+-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}
+-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties
+-Xmx${compiler:genii.client-memory.win32}m</content>
       </vmOptionsFile>
       <customScript mode="1" file="">
         <content />
@@ -393,17 +412,17 @@
       </infoPlist>
       <iconImageFiles />
     </launcher>
-    <launcher name="client-ui32" id="5622" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="">
-      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true">
+    <launcher name="client-ui32" id="5622" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="">
+      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="bin" redirectStderr="false" stderrFile="stderr.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
-      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+      <splashScreen show="false" width="0" height="0" bitmapFile="" windowsNative="false" textOverlay="false">
         <text>
-          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
-          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <statusLine x="20" y="20" text="" fontSize="8" fontColor="0,0,0" bold="false" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties&quot; -Xmx${compiler:genii.client-memory.win32}m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="bundles/org.apache.commons.logging_1.1.1.v201101211721.jar" failOnError="false" />
@@ -412,11 +431,16 @@
         <nativeLibraryDirectories>
           <directory name="jni-lib" />
         </nativeLibraryDirectories>
+        <vmOptions />
       </java>
       <includedFiles />
       <unextractableFiles />
-      <vmOptionsFile mode="none" overwriteMode="0" fileMode="644">
-        <content />
+      <vmOptionsFile mode="content" overwriteMode="0" fileMode="644">
+        <content>-Dedu.virginia.vcgr.genii.net-name=grid
+-Dlog4j.configuration=production.client.log4j.properties
+-Dedu.virginia.vcgr.genii.install-base-dir=${installer:sys.installationDir}
+-Dedu.virginia.vcgr.appwatch.application-description=${installer:sys.installationDir}/ext/genii-client-application.properties
+-Xmx${compiler:genii.client-memory.win32}m</content>
       </vmOptionsFile>
       <customScript mode="1" file="">
         <content />
@@ -428,6 +452,7 @@
     </launcher>
   </launchers>
   <installerGui installerType="1" addOnAppId="" suggestPreviousLocations="true" autoUpdateDescriptorUrl="" useAutoUpdateBaseUrl="false" autoUpdateBaseUrl="">
+    <staticMembers script="" />
     <customCode />
     <autoUpdate useMinUpdatableVersion="false" minUpdatableVersion="" useMaxUpdatableVersion="false" maxUpdatableVersion="">
       <commentFiles />
@@ -1258,7 +1283,10 @@ return true;</string>
                             </array>
                           </void>
                           <void property="overwriteMode">
-                            <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.context.OverwriteMode</class>
+                              <string>ALWAYS</string>
+                            </object>
                           </void>
                         </object>
                       </java>
@@ -1284,7 +1312,10 @@ return true;</string>
                             </array>
                           </void>
                           <void property="overwriteMode">
-                            <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.context.OverwriteMode</class>
+                              <string>NEVER</string>
+                            </object>
                           </void>
                         </object>
                       </java>
@@ -1334,7 +1365,10 @@ return true;</string>
                             </array>
                           </void>
                           <void property="overwriteMode">
-                            <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.context.OverwriteMode</class>
+                              <string>NEVER</string>
+                            </object>
                           </void>
                         </object>
                       </java>
@@ -1405,7 +1439,10 @@ return true;</string>
                             </array>
                           </void>
                           <void property="overwriteMode">
-                            <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.context.OverwriteMode</class>
+                              <string>NEVER</string>
+                            </object>
                           </void>
                         </object>
                       </java>
@@ -1476,7 +1513,10 @@ return true;</string>
                             </array>
                           </void>
                           <void property="overwriteMode">
-                            <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.context.OverwriteMode</class>
+                              <string>NEVER</string>
+                            </object>
                           </void>
                         </object>
                       </java>
@@ -1864,6 +1904,52 @@ return true;
                     </serializedBean>
                     <condition />
                   </action>
+                  <action name="Patch vmoptions files since install4j will not" id="12428" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="6">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>${installer:sys.installationDir}/bin/*.vmoptions</string>
+                                </object>
+                              </void>
+                              <void index="1">
+                                <object class="java.io.File">
+                                  <string>${installer:sys.installationDir}/bin/grid.vmoptions</string>
+                                </object>
+                              </void>
+                              <void index="2">
+                                <object class="java.io.File">
+                                  <string>${installer:sys.installationDir}/bin/grid32.vmoptions</string>
+                                </object>
+                              </void>
+                              <void index="3">
+                                <object class="java.io.File">
+                                  <string>${installer:sys.installationDir}/bin/client-ui.vmoptions</string>
+                                </object>
+                              </void>
+                              <void index="4">
+                                <object class="java.io.File">
+                                  <string>${installer:sys.installationDir}/bin/client-ui32.vmoptions</string>
+                                </object>
+                              </void>
+                              <void index="5">
+                                <object class="java.io.File">
+                                  <string>${installer:sys.installationDir}/bin/runContainer.vmoptions</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
                   <action name="Set Progress to 25%" id="10898" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
@@ -2209,7 +2295,10 @@ return true;</string>
                             </array>
                           </void>
                           <void property="overwriteMode">
-                            <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.context.OverwriteMode</class>
+                              <string>ALWAYS</string>
+                            </object>
                           </void>
                           <void property="showProgress">
                             <boolean>true</boolean>
@@ -2244,7 +2333,10 @@ return true;</string>
                             </array>
                           </void>
                           <void property="overwriteMode">
-                            <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.context.OverwriteMode</class>
+                              <string>ALWAYS</string>
+                            </object>
                           </void>
                           <void property="showProgress">
                             <boolean>true</boolean>
@@ -2519,7 +2611,10 @@ return userDir;
                                     </array>
                                   </void>
                                   <void property="overwriteMode">
-                                    <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                                    <object class="java.lang.Enum" method="valueOf">
+                                      <class>com.install4j.api.context.OverwriteMode</class>
+                                      <string>ALWAYS</string>
+                                    </object>
                                   </void>
                                 </object>
                               </java>
@@ -2705,7 +2800,10 @@ return !signer.exists() || !tls.exists();
                                     </array>
                                   </void>
                                   <void property="overwriteMode">
-                                    <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                                    <object class="java.lang.Enum" method="valueOf">
+                                      <class>com.install4j.api.context.OverwriteMode</class>
+                                      <string>NEVER</string>
+                                    </object>
                                   </void>
                                 </object>
                               </java>
@@ -2841,7 +2939,10 @@ return !signer.exists() || !tls.exists();
                                     </array>
                                   </void>
                                   <void property="overwriteMode">
-                                    <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
+                                    <object class="java.lang.Enum" method="valueOf">
+                                      <class>com.install4j.api.context.OverwriteMode</class>
+                                      <string>NEVER</string>
+                                    </object>
                                   </void>
                                 </object>
                               </java>
@@ -3967,8 +4068,14 @@ return startService;</string>
         <serializedBean>
           <java class="java.beans.XMLDecoder">
             <object class="com.install4j.runtime.beans.applications.UninstallerApplication">
+              <void property="customMacosExecutableName">
+                <string>${i18n:UninstallerMenuEntry(${compiler:sys.fullName})}</string>
+              </void>
               <void property="frameSizeClientArea">
                 <boolean>false</boolean>
+              </void>
+              <void property="useCustomMacosExecutableName">
+                <boolean>true</boolean>
               </void>
             </object>
           </java>
@@ -4052,7 +4159,10 @@ return startService;</string>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
                       <void property="progressChangeType">
-                        <object class="com.install4j.runtime.beans.actions.control.ProgressChangeType" field="SET_INDETERMINATE" />
+                        <object class="java.lang.Enum" method="valueOf">
+                          <class>com.install4j.runtime.beans.actions.control.ProgressChangeType</class>
+                          <string>SET_INDETERMINATE</string>
+                        </object>
                       </void>
                     </object>
                   </java>
@@ -4492,7 +4602,12 @@ return startService;</string>
     </applications>
   </installerGui>
   <mediaSets>
-    <macosFolder name="mac64_gui" id="2088" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-macosx-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="macosx-amd64-1.8.0_66_unpacked" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" signLaunchers="false">
+    <macosFolder name="mac64_gui" id="2088" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-macosx-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-1.8.0_66_unpacked" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" appleJre="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" signLaunchers="false">
+      <excludedComponents>
+        <component id="30" />
+        <component id="40" />
+      </excludedComponents>
+      <includedDownloadableComponents />
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4509,13 +4624,13 @@ return startService;</string>
         <commentFiles />
         <customAttributes />
       </autoUpdate>
+      <topLevelFiles />
+    </macosFolder>
+    <unixInstaller name="linux64_gui" id="3416" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" includeAllDownloadableComponents="false" includedJRE="linux-amd64-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1">
       <excludedComponents>
         <component id="30" />
-        <component id="40" />
       </excludedComponents>
       <includedDownloadableComponents />
-    </macosFolder>
-    <unixInstaller name="linux64_gui" id="3416" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-amd64-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4536,15 +4651,13 @@ return startService;</string>
         <commentFiles />
         <customAttributes />
       </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-      </excludedComponents>
-      <includedDownloadableComponents />
       <installerScript mode="1" file="">
         <content />
       </installerScript>
     </unixInstaller>
-    <linuxDeb name="gffs_deb" id="5991" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-${compiler:genii.release-number}-x86_64" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="" manualJREEntry="false" bzip="false" description="GenesisII GFFS Client Software" dependencies="bash" maintainerEmail="xcghelp@cs.virginia.edu" architectureSet="false" architecture="">
+    <linuxDeb name="gffs_deb" id="5991" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-${compiler:genii.release-number}-x86_64" installDir="/opt/${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="true" includedJRE="" manualJREEntry="false" overwriteNeverAsConfigFiles="false" bzip="false" description="GenesisII GFFS Client Software" dependencies="bash" maintainerEmail="xcghelp@cs.virginia.edu" architectureSet="false" architecture="">
+      <excludedComponents />
+      <includedDownloadableComponents />
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -4579,7 +4692,11 @@ return startService;</string>
         <content />
       </postUninstallScript>
     </linuxDeb>
-    <windows name="windows64_gui" id="8974" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-amd64-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows64_gui" id="8974" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" includeAllDownloadableComponents="false" includedJRE="windows-amd64-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
+      <excludedComponents>
+        <component id="30" />
+      </excludedComponents>
+      <includedDownloadableComponents />
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4601,12 +4718,12 @@ return startService;</string>
         <commentFiles />
         <customAttributes />
       </autoUpdate>
+    </windows>
+    <unixInstaller name="linux32_gui" id="11295" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" includeAllDownloadableComponents="false" includedJRE="linux-x86-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1">
       <excludedComponents>
         <component id="30" />
       </excludedComponents>
       <includedDownloadableComponents />
-    </windows>
-    <unixInstaller name="linux32_gui" id="11295" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-linux-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="linux-x86-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="5619" />
@@ -4627,15 +4744,15 @@ return startService;</string>
         <commentFiles />
         <customAttributes />
       </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-      </excludedComponents>
-      <includedDownloadableComponents />
       <installerScript mode="1" file="">
         <content />
       </installerScript>
     </unixInstaller>
-    <windows name="windows32_gui" id="11297" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows32_gui" id="11297" customizedId="" mediaFileName="${compiler:sys.shortName}-${compiler:sys.version}-windows-${compiler:genii.name-addin}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" includeAllDownloadableComponents="false" includedJRE="windows-x86-1.8.0_66" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
+      <excludedComponents>
+        <component id="30" />
+      </excludedComponents>
+      <includedDownloadableComponents />
       <excludedLaunchers>
         <launcher id="1450" />
         <launcher id="39" />
@@ -4657,15 +4774,10 @@ return startService;</string>
         <commentFiles />
         <customAttributes />
       </autoUpdate>
-      <excludedComponents>
-        <component id="30" />
-      </excludedComponents>
-      <includedDownloadableComponents />
     </windows>
   </mediaSets>
   <buildIds buildAll="true">
     <mediaSet refId="3416" />
   </buildIds>
-  <buildOptions verbose="true" faster="false" disableSigning="false" debug="false" />
+  <buildOptions verbose="true" faster="false" disableSigning="false" disableJreBundling="false" debug="false" />
 </install4j>
-

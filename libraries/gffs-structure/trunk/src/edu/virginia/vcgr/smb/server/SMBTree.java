@@ -91,10 +91,13 @@ public class SMBTree
 		searches.remove(SID);
 	}
 
-	// hmmm: case-insensitive matching should be turned off since it is awfully slow.
-	// hmmm: but we have also found it cannot be turned off because windows whips out these all upper case versions of our file names
-	// sometimes.
-	// the protection we did by ignoring all those bogus file names may make this usable again?
+	/*
+	 * future: case-insensitive matching should be turned off since it is awfully slow.
+	 * 
+	 * but we have also found it cannot be turned off because windows whips out these all upper case versions of our file names sometimes.
+	 * 
+	 * the protection we did by ignoring all those bogus file names may make this usable again?
+	 */
 
 	private static RNSPath lookupInsensitive(RNSPath dir, String file)
 	{
@@ -173,8 +176,7 @@ public class SMBTree
 		path = FileSystemHelper.sanitizeFilename(path);
 
 		/*
-		 * hmmm: !!!! ham-handed kludge for the names windows keeps asking us about and which cause us to endlessly look for things in the
-		 * grid.
+		 * future: ham-handed kludge for the names windows keeps asking us about and which cause us to endlessly look for things in the grid.
 		 */
 		if (path.endsWith("folder.gif") || path.endsWith("folder.jpg") || path.endsWith("Thumbs.db") || path.endsWith("desktop.ini")) {
 			if (_logger.isDebugEnabled())

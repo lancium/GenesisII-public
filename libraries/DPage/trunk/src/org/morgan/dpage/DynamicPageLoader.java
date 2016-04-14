@@ -12,9 +12,10 @@ import org.eclipse.jetty.server.handler.HandlerList;
 
 public class DynamicPageLoader
 {
-
-	// hmmm: this code is remembered as non-working...
-	// hmmm: !!! it has been re-done more rationally now, but still is a good thing to look at if things fail to run properly.
+	/*
+	 * hmmm: this code is remembered as non-working... it has been re-done more rationally now, but still is a good thing to look at if things
+	 * fail to run properly.
+	 */
 
 	static public void addHandler(Server jettyServer, AbstractHandler newHandler)
 	{

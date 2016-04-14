@@ -64,7 +64,7 @@ public class EPRUtils
 		Pattern.compile(String.format("%s=([-a-fA-F0-9:]+)", Pattern.quote(GENII_SHORT_PARAMETER_NAME)));
 
 	/*
-	 * hmmm: CAK added synchronization on EPRs in this class due to suspicions that there are problems because we are using EPRs from multiple
+	 * CAK: added synchronization on EPRs in this class due to suspicions that there are problems because we are using EPRs from multiple
 	 * threads and that axis is not thread safe with respect to message elements.
 	 */
 

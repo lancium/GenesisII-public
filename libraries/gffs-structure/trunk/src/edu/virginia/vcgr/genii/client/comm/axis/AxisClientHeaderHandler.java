@@ -375,12 +375,6 @@ public class AxisClientHeaderHandler extends BasicHandler
 						X509Certificate passOn[] = new X509Certificate[1];
 						passOn[0] = passThrough;
 						
-						// crucial cache flush so we don't bring up an old version of this cred.
-//						CredentialCache.flushForCredential(passOn[0].getSubjectDN().toString(), tlsKey._certChain[0].getSubjectDN().toString());
-						//hmmm: above flush followed by cache usage is bogus.  it turns out the below line is the only one that uses this cache at all,
-						//and now we're saying this cache is a bad idea.  so instead, we should just call this delegateCred or something
-						// and do no caching in it!
-						
 						TrustCredential newerTC = CredentialCache.generateCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
 							tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
 						if (newerTC == null) {
@@ -399,17 +393,14 @@ public class AxisClientHeaderHandler extends BasicHandler
 		if (!foundAny) {
 			_logger.debug("Found zero credentials to delegate for soap header.");
 		}
-		// hmmm: CAK: craziness here to synchronize on this, but it was indicted in a recent thread-safety crash...
 		SOAPMessage msg = messageContext.getMessage();
-		synchronized (msg) {
-			final javax.xml.soap.SOAPHeader soapHeader = msg.getSOAPHeader();
-			ArrayList<String> credRefs = new ArrayList<>();
-			soapHeader.addChildElement(
-				walletForResource.convertToSOAPElement((containerGUID != null) ? containerGUID.toString(true) : null, credRefs));
-			SOAPHeaderElement refsElem = walletForResource.emitReferencesAsSoap(credRefs);
-			if (refsElem != null)
-				soapHeader.addChildElement(refsElem);
-		}
+		final javax.xml.soap.SOAPHeader soapHeader = msg.getSOAPHeader();
+		ArrayList<String> credRefs = new ArrayList<>();
+		soapHeader.addChildElement(
+			walletForResource.convertToSOAPElement((containerGUID != null) ? containerGUID.toString(true) : null, credRefs));
+		SOAPHeaderElement refsElem = walletForResource.emitReferencesAsSoap(credRefs);
+		if (refsElem != null)
+			soapHeader.addChildElement(refsElem);
 	}
 
 	@SuppressWarnings("unchecked")

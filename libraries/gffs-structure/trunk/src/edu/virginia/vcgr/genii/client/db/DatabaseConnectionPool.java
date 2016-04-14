@@ -195,7 +195,7 @@ public class DatabaseConnectionPool
 				 */
 				if (connection == null) {
 					if (_logger.isTraceEnabled())
-					_logger.debug("handing out a new connection since none are in pool.");
+						_logger.debug("handing out a new connection since none are in pool.");
 					connection = createConnection();
 				}
 				if (connection != null) {

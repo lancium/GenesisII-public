@@ -398,13 +398,8 @@ public class CredentialWallet implements Externalizable, Describable
 					}
 				}
 			}
-			/*
-			 * hmmm: cak: had to add the check to see if the bag was empty already, in which case we must have made progress since everything
-			 * is reattached. not sure what is allowing it to get here yet, if this is truly the problem.
-			 */
-			if (!progressMade
-				// hmmm: incorrect somehow? can't bootstrap???
-				&& !credentialsToConsume.isEmpty()) {
+
+			if (!progressMade && !credentialsToConsume.isEmpty()) {
 				if (_logger.isDebugEnabled()) {
 					_logger.debug("this is what remains in problematic reattachment:");
 					_logger.debug(describeCredentialMap(credentialsToConsume, VerbosityLevel.HIGH));

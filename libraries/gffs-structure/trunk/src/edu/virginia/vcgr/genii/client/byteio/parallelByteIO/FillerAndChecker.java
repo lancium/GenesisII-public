@@ -29,10 +29,7 @@ public class FillerAndChecker
 
 	// Each thread copies the sub-fetch into the global buffer
 
-	public void copyFetch(byte[] temp_buffer, long offset)
-	//		, int length)
-		//int threadID, int subBufferSize)
-	throws IOException
+	public void copyFetch(byte[] temp_buffer, long offset) throws IOException
 	{
 		if ((temp_buffer == null) || (temp_buffer.length == 0)) {
 			//hmmm: clean out logging.

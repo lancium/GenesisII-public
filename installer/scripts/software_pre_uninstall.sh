@@ -13,10 +13,19 @@ export GENII_BINARY_DIR="$GENII_INSTALL_DIR/bin"
 
 ##############
 
-#hmmm: this is still somehow not safe.  if we remove here, the new link somehow does not show up.
+# this script should run to clean up the install folder after the last install
+# has gone.  currently only used for debian packages, which behave rationally.
+# (rpms have really bizarre and wrong seeming behavior with this script, which
+# seems to not work as either %preun or %postun, or the parameters that are
+# claimed to be sent to the %preun script do not seem to show up.)
+
+##############
+
 # removing the generated container script should be safe.
-#\rm -f "$GENII_INSTALL_DIR/bin/GFFSContainer" &>/dev/null
-# if that was the last thing, we can remove the dir too.
-#rmdir "$GENII_INSTALL_DIR/bin" &>/dev/null
+\rm -f "$GENII_BINARY_DIR/GFFSContainer" &>/dev/null
+# removing a couple of other generated files should work also.
+\rm -f "$GENII_BINARY_DIR/gffschown" &>/dev/null
+\rm -f "$GENII_BINARY_DIR/proxyio.launcher" &>/dev/null
+\rm -f "$GENII_INSTALL_DIR/client-ui.desktop" &>/dev/null
 
 exit 0

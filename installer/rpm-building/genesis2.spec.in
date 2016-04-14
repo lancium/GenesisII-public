@@ -174,8 +174,14 @@ echo done with RPM install step.
 %post
 bash /opt/genesis2-%GRID%/scripts/software_post_install.sh
 
-%preun
-bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
+#well great, preun doesn't pass us a parameter that we were told would happen on the
+#last uninstall.  and postun doesn't do what it's supposed to either; we're still seeing
+#the cleanup code get invoked, and it's happening after all our setup that makes the
+#files during the install phase.  until someone can figure out what rpms want here, we just
+#can't clean up.
+#%preun  <- always called, not getting a parameter
+#%postun <- also saw this called before last uninstall, then fails on real uninstall since script gone
+#bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 
 %files
 %defattr(-, root, root)

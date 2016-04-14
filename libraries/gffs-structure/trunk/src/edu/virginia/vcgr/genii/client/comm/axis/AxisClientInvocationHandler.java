@@ -658,7 +658,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				_logger.debug("container did not have a credential we referenced so will try sending again");
 
 			// don't allow credentials to be remembered for the retry, if at all possible.
-			// hmmm: can other threads come in an hose this state? this did seem possible and was dealt with by locking code.
 			ClientCredentialTracker.setContainerStreamliningSupport(guidString, false, false);
 
 			boolean failedParsingRefs = false;

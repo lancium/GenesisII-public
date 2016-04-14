@@ -20,6 +20,8 @@ function replace_phrase_in_file()
     echo "was passed file='$file' phrase='$phrase' replacement='$replacement'"
     return 1
   fi
+#echo "replace '$phrase' with '$replacement' in:"
+#echo "    '$file'"
   sed -i -e "s%$phrase%$replacement%g" "$file"
 }
 
@@ -188,7 +190,7 @@ function replace_installdir_variables()
   local fname
 
   for fname in $(find "$dir/toolkit/tools/genesis_module" -type f) \
-    $(find $dir -type f ! -iname "*.sh" -exec grep -l installer:sys.installationDir {} ';') \
+    $(find $dir -type f ! -iname "*.sh" -a ! -iname "i4jparams.conf" -exec grep -l installer:sys.installationDir {} ';') \
     ; do
     local seeking="\${installer:sys.installationDir}"
     local replacement="$dir"

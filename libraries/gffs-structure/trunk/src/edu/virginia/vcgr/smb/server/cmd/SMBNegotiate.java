@@ -107,12 +107,12 @@ public class SMBNegotiate implements SMBCommand
 
 			// Max Mpx Count; number of simultaneous requests
 			acc.putShort((short) 0xffff);
-			// hmmm: adjusted to 50 to see if makes a difference. not helping.
+			// future: adjusted to 50 to see if makes a difference. not helping.
 
 			// Max VCs; number of setups per individual connection
 			// future: maybe force 1
 			acc.putShort((short) 0xffff);
-			// hmmm: upped this also to see if helps with windows hoseups. did not help
+			// future: upped this also to see if helps with windows hoseups. did not help
 
 			// Support for write raw and read raw
 			acc.putShort((short) 0);

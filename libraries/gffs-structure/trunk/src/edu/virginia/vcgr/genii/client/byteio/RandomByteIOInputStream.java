@@ -25,6 +25,8 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
  * An implementation of the standard Java Input stream that reads from remote Random ByteIO resources.
  * 
  * @author mmm2a
+ * @author avinash
+ * @author cak0l
  */
 public class RandomByteIOInputStream extends InputStream
 {
@@ -210,16 +212,16 @@ public class RandomByteIOInputStream extends InputStream
 				// I have fetched some data
 				if (lastFilledBufferIndex != (length - 1)) {
 					// I have fetched only a subset of the requested amount!
-					// hmmm: clean logging levels.
-					_logger.debug("rbyteio read: read fetched a subset of request, last index is " + lastFilledBufferIndex);
+					if (_logger.isTraceEnabled())
+						_logger.debug("rbyteio read: read fetched a subset of request, last index is " + lastFilledBufferIndex);
 					byte[] temp_data = new byte[lastFilledBufferIndex + 1];
 					System.arraycopy(readAssembler.getData(), 0, temp_data, 0, lastFilledBufferIndex + 1);
 					_offset += temp_data.length;
 					return temp_data;
 				} else {
 					// I have fetched the requested amount !
-					// hmmm: clean logging levels.
-					_logger.debug("rbyteio read: read fetched entire length requested, last index at " + lastFilledBufferIndex);
+					if (_logger.isTraceEnabled())
+						_logger.debug("rbyteio read: read fetched entire length requested, last index at " + lastFilledBufferIndex);
 					_offset += readAssembler.getData().length;
 					return readAssembler.getData();
 				}
