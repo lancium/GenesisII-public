@@ -123,11 +123,12 @@
       </dirEntry>
       <dirEntry mountPoint="34" file="../bin" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" entryMode="subdir" subDirectory="bin" excludeSuffixes="" dirMode="755" overrideDirMode="false">
         <exclude>
-          <entry location="cert-tool" fileType="regular" />
-          <entry location="proxyio.launcher" fileType="regular" />
           <entry location="gffschown" fileType="regular" />
-          <entry location="runContainer.sh" fileType="regular" />
+          <entry location="cert-tool" fileType="regular" />
           <entry location="fastgrid" fileType="regular" />
+          <entry location="grid" fileType="regular" />
+          <entry location="proxyio.launcher" fileType="regular" />
+          <entry location="runContainer.sh" fileType="regular" />
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../grid" overwriteMode="1" shared="false" fileMode="755" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="false" />
@@ -1908,9 +1909,6 @@ return true;
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
-                          <void property="escapeForPropertyFile">
-                            <boolean>true</boolean>
-                          </void>
                           <void property="files">
                             <array class="java.io.File" length="6">
                               <void index="0">
