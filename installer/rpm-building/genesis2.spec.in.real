@@ -114,6 +114,8 @@ chmod 755 $GEN2_BUILDOUT/bin/client-ui
 cp $GEN2_SOURCE_LOC/scripts/fastgrid \
   $GEN2_BUILDOUT/bin
 chmod 755 $GEN2_BUILDOUT/bin/fastgrid
+cp $GEN2_SOURCE_LOC/grid $GEN2_BUILDOUT/grid
+chmod 755 $GEN2_BUILDOUT/grid
 
 # some new copies of library scripts where they can be found in path.
 cp $GEN2_SOURCE_LOC/toolkit/library/backup_container_state.sh \
@@ -139,8 +141,8 @@ cp $GEN2_SOURCE_LOC/scripts/gffschown.template $GEN2_BUILDOUT/bin/gffschown
 chmod 755 $GEN2_BUILDOUT/bin/gffschown
 cp $GEN2_SOURCE_LOC/scripts/proxyio.launcher.template $GEN2_BUILDOUT/bin/proxyio.launcher
 chmod 755 $GEN2_BUILDOUT/bin/proxyio.launcher
-cp $GEN2_SOURCE_LOC/installer/data_files/container.properties $GEN2_BUILDOUT/lib/container.properties
-cp $GEN2_SOURCE_LOC/installer/data_files/client.properties $GEN2_BUILDOUT/lib/client.properties
+cp $GEN2_SOURCE_LOC/lib/container.properties.template $GEN2_BUILDOUT/lib/container.properties
+cp $GEN2_SOURCE_LOC/lib/client.properties.template $GEN2_BUILDOUT/lib/client.properties
 cp $GEN2_SOURCE_LOC/scripts/cert-tool $GEN2_BUILDOUT/bin/cert-tool
 chmod 755 $GEN2_BUILDOUT/bin/cert-tool
 
@@ -171,8 +173,14 @@ echo done with RPM install step.
 %post
 bash /opt/genesis2-%GRID%/scripts/software_post_install.sh
 
-%preun
-bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
+#well great, preun doesn't pass us a parameter that we were told would happen on the
+#last uninstall.  and postun doesn't do what it's supposed to either; we're still seeing
+#the cleanup code get invoked, and it's happening after all our setup that makes the
+#files during the install phase.  until someone can figure out what rpms want here, we just
+#can't clean up.
+#%preun  <- always called, not getting a parameter
+#%postun <- also saw this called before last uninstall, then fails on real uninstall since script gone
+#bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 
 %files
 %defattr(-, root, root)
@@ -199,6 +207,7 @@ bash /opt/genesis2-%GRID%/scripts/software_pre_uninstall.sh
 /opt/genesis2-%GRID%/bin/gffschown
 /opt/genesis2-%GRID%/bin/grid
 /opt/genesis2-%GRID%/bin/fastgrid
+/opt/genesis2-%GRID%/grid
 /opt/genesis2-%GRID%/jar-desc.xml
 /opt/genesis2-%GRID%/set_gffs_vars
 /opt/genesis2-%GRID%/bin/proxyio.launcher
