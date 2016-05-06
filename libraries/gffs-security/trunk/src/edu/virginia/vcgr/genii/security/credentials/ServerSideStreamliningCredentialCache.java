@@ -35,7 +35,7 @@ public class ServerSideStreamliningCredentialCache extends TimedOutLRUCache<Stri
 
 	private ServerSideStreamliningCredentialCache(int maxElements, long defaultTimeoutMS)
 	{
-		super(maxElements, defaultTimeoutMS);
+		super(maxElements, defaultTimeoutMS, "server side streamlining credential cache");
 	}
 
 	public TimedOutCredentialsCachePerSession get(String sessionCertDN)

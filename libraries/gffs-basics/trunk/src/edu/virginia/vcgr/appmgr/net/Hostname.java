@@ -50,7 +50,7 @@ public class Hostname
 	private static final int DNS_NAME_TIMEOUT_MS = 30 * 60 * 1000; // current timeout is 30 minutes.
 
 	// cache quite a few names for the timeout period so we can cross over twitchy DNS responses / failures.
-	private static TimedOutLRUCache<String, String> _dnsCache = new TimedOutLRUCache<String, String>(256, DNS_NAME_TIMEOUT_MS);
+	private static TimedOutLRUCache<String, String> _dnsCache = new TimedOutLRUCache<String, String>(256, DNS_NAME_TIMEOUT_MS, "dns cache");
 
 	/*
 	 * used only for local host to avoid repeated lookups. this differs from the _cachedHostName in that this string is formatted according to

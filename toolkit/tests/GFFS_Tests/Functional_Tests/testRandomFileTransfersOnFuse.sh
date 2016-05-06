@@ -73,11 +73,11 @@ function copyOneFileUp()
   local size="$1"; shift
 
   local base="$(basename "$filename")"
-  local fusePath="$HOME_PATH_ON_MOUNT/$base"
+  local path="$HOME_PATH_ON_MOUNT/$base"
 
-#echo "filename=$filename size=$size base=$base fusePath=$fusePath"
+#echo "filename=$filename size=$size base=$base path=$path"
 
-  timed_command cp "$filename" "$fusePath"
+  timed_command cp "$filename" "$path"
   retval=$?
   assertEquals "Copying local file $filename" 0 $retval
   if [ $? -ne 0 ]; then ((error_count++)); fi
@@ -95,18 +95,18 @@ function copyOneFileDown()
   local size="$1"; shift
 
   local base="$(basename "$filename")"
-  local fusePath="$HOME_PATH_ON_MOUNT/$base"
+  local path="$HOME_PATH_ON_MOUNT/$base"
   local newLocal="${filename}.new"
 
-#echo "filename=$filename size=$size base=$base fusePath=$fusePath newLocal=$newLocal"
+#echo "filename=$filename size=$size base=$base path=$path newLocal=$newLocal"
 
-  timed_command cp "$fusePath" "$newLocal"
+  timed_command cp "$path" "$newLocal"
   retval=$?
-  assertEquals "Copying remote file $fusePath" 0 $retval
+  assertEquals "Copying remote file $path" 0 $retval
   if [ $? -ne 0 ]; then ((error_count++)); fi
   if [ $retval -eq 0 ]; then
     real_time=$(calculateTimeTaken)
-    echo "Time taken to copy $fusePath with $size bytes is $real_time s"
+    echo "Time taken to copy $path with $size bytes is $real_time s"
     actual_size=$(\ls -l $filename | awk '{print $5}')
     showBandwidth "$real_time" $size
   fi

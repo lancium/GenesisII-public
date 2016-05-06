@@ -69,11 +69,11 @@ function copyOneFileUp()
   local size="$1"; shift
 
   local base="$(basename "$filename")"
-  local gridPath="$RNSPATH/$base"
+  local path="$RNSPATH/$base"
 
-#echo "filename=$filename size=$size base=$base gridPath=$gridPath"
+#echo "filename=$filename size=$size base=$base path=$path"
 
-  timed_grid cp "local:$filename" "$gridPath"
+  timed_grid cp "local:$filename" "$path"
   retval=$?
   assertEquals "Copying local file $filename" 0 $retval
   if [ $? -ne 0 ]; then ((error_count++)); fi
@@ -91,18 +91,18 @@ function copyOneFileDown()
   local size="$1"; shift
 
   local base="$(basename "$filename")"
-  local gridPath="$RNSPATH/$base"
+  local path="$RNSPATH/$base"
   local newLocal="${filename}.new"
 
-#echo "filename=$filename size=$size base=$base gridPath=$gridPath newLocal=$newLocal"
+#echo "filename=$filename size=$size base=$base path=$path newLocal=$newLocal"
 
-  timed_grid cp "$gridPath" "local:$newLocal"
+  timed_grid cp "$path" "local:$newLocal"
   retval=$?
-  assertEquals "Copying remote file $gridPath" 0 $retval
+  assertEquals "Copying remote file $path" 0 $retval
   if [ $? -ne 0 ]; then ((error_count++)); fi
   if [ $retval -eq 0 ]; then
     real_time=$(calculateTimeTaken)
-    echo "Time taken to copy $gridPath with $size bytes is $real_time s"
+    echo "Time taken to copy $path with $size bytes is $real_time s"
     actual_size=$(\ls -l $filename | awk '{print $5}')
     showBandwidth "$real_time" $size
   fi

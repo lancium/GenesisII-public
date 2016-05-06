@@ -31,7 +31,7 @@ public class TimedOutCredentialsCachePerSession extends TimedOutLRUCache<String,
 
 	public TimedOutCredentialsCachePerSession()
 	{
-		super(MAXIMUM_CREDENTIALS_CACHED, CREDENTIAL_LIFETIME);
+		super(MAXIMUM_CREDENTIALS_CACHED, CREDENTIAL_LIFETIME, "per-session timed out credentials cache");
 	}
 
 	/**

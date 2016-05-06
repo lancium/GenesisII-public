@@ -104,8 +104,6 @@ public class BESActivityTerminatorActor implements OutcallActor
 			}
 
 			// Now, go ahead and kill it.
-			// hmmmm: ARGHHHH!!!! have been searching for this stupid timeout for ever!!!! 8 seconds is NOT enough.
-			// ClientUtils.setTimeout(bes, 8 * 1000);
 			TerminateActivitiesResponseType resp =
 				bes.terminateActivities(new TerminateActivitiesType(new EndpointReferenceType[] { _activityEPR }, null));
 			if (resp != null) {

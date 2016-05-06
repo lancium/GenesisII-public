@@ -32,25 +32,23 @@ public class FillerAndChecker
 	public void copyFetch(byte[] temp_buffer, long offset) throws IOException
 	{
 		if ((temp_buffer == null) || (temp_buffer.length == 0)) {
-			//hmmm: clean out logging.
 			_logger.debug("ignoring empty buffer");
 			return;
 		}
-		//int index = threadID * subBufferSize;
-		int index = (int)offset;  // hmmm, better not be past 2gig.
-		
+		int index = (int) offset; // hmmm, better not be past 2gig.
 		if (index >= data.length) {
 			String msg = "computed index is past main buffer end: index is " + index + " but buffer is only " + data.length + " bytes";
 			_logger.error(msg);
 			throw new IOException(msg);
 		} else if (index + temp_buffer.length > data.length) {
-			String msg = "chunk will overwrite main buffer end: index is " + index + " and temp buffer is " + temp_buffer.length + " bytes but buffer is only " + data.length + " bytes";
+			String msg = "chunk will overwrite main buffer end: index is " + index + " and temp buffer is " + temp_buffer.length
+				+ " bytes but buffer is only " + data.length + " bytes";
 			_logger.error(msg);
-			throw new IOException(msg);			
+			throw new IOException(msg);
 		}
 
-		//hmmm: denoise this.
-		_logger.debug("copying buffer of " + temp_buffer.length + " bytes into index " + index + " of parent buffer");
+		if (_logger.isTraceEnabled())
+			_logger.debug("copying buffer of " + temp_buffer.length + " bytes into index " + index + " of parent buffer");
 
 		synchronized (data) {
 			System.arraycopy(temp_buffer, 0, data, index, temp_buffer.length);

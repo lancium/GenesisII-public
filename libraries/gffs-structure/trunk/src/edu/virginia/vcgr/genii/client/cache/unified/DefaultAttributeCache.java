@@ -23,10 +23,10 @@ public class DefaultAttributeCache extends CommonCache
 
 	private TimedOutLRUCache<String, Collection<MessageElement>> cache;
 
-	public DefaultAttributeCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
+	public DefaultAttributeCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoringEnabled)
 	{
-		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
-		cache = new TimedOutLRUCache<String, Collection<MessageElement>>(capacity, cacheLifeTime);
+		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
+		cache = new TimedOutLRUCache<String, Collection<MessageElement>>(capacity, cacheLifeTime, "default attribute cache");
 	}
 
 	@Override

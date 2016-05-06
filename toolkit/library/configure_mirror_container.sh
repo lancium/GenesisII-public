@@ -96,10 +96,3 @@ multi_grid <<eof
 eof
 check_if_failed setting up mirror container deployment
 
-#maybe remove
-echo "after multigrid command that includes a logout and login sequence!!!"
-check_logs_for_errors
-if [ ! -z "$BACKUP_DEPLOYMENT_NAME" ]; then
-  check_logs_for_errors "$BACKUP_DEPLOYMENT_NAME"
-fi
-

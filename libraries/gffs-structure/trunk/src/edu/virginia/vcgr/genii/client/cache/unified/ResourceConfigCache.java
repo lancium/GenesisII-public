@@ -36,9 +36,9 @@ public class ResourceConfigCache extends CommonCache
 	{
 		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
 		int directoryLookupCacheCapacity = capacity / 10;
-		directoryConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(directoryLookupCacheCapacity, cacheLifeTime);
+		directoryConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(directoryLookupCacheCapacity, cacheLifeTime, "directory config cache");
 		int fileLookupCacheCapacity = capacity - directoryLookupCacheCapacity;
-		fileConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(fileLookupCacheCapacity, cacheLifeTime);
+		fileConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(fileLookupCacheCapacity, cacheLifeTime, "file config cache");
 
 		if (_logger.isTraceEnabled()) {
 			_logger.debug("ResourceConfig cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "

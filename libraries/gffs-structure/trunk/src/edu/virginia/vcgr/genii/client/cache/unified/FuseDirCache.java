@@ -21,7 +21,7 @@ public class FuseDirCache extends CommonCache
 	public FuseDirCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled)
 	{
 		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
-		cache = new TimedOutLRUCache<String, UnixDirectory>(capacity, cacheLifeTime);
+		cache = new TimedOutLRUCache<String, UnixDirectory>(capacity, cacheLifeTime, "fuse directory cache");
 
 		if (_logger.isTraceEnabled()) {
 			_logger.debug("Fuse directory cache size: " + capacity + ", lifetime: " + cacheLifeTime + "ms, freshness monitored: "

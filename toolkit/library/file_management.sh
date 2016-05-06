@@ -85,6 +85,6 @@ function createRandomFile()
   local kbs=$(( $size / $secs / 1024))
   
   local fsizenow="$(getFileSize "$file")"
-  assertEquals "Creating random file of $size bytes in: $file" $size $fsizenow
+  assertEquals "Creating random file of $size bytes at ${kbs} kbps in: $file" $size $fsizenow
 }
 

@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/ivy-2.3.0.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-compress-1.8.1.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/SizeOf.jar" sourcepath="/home/fred/gffs/code/fred-trunk/libraries/sizeof_uvamods"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

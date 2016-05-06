@@ -140,14 +140,14 @@ public class ServerAuthorizationManagement
 					X509Certificate passThrough =
 						(X509Certificate) callContext.getSingleValueProperty(GenesisIIConstants.PASS_THROUGH_IDENTITY);
 					if (passThrough != null) {
-						if (_logger.isDebugEnabled())
+						if (_logger.isTraceEnabled())
 							_logger.debug("got a pass through cert, checking delegatee: " + passThrough.getSubjectDN().toString());
 						if (assertion.getDelegatee()[0].equals(passThrough)) {
 							X509Certificate[] pt = new X509Certificate[1];
 							pt[0] = passThrough;
 							// found a matching pass-through identity, so allow the caller to act as this.
 							X509Identity x509 = new X509Identity(pt, IdentityType.CONNECTION);
-							if (_logger.isDebugEnabled())
+							if (_logger.isTraceEnabled())
 								_logger.debug("adding matching pass-through identity for: " + x509.toString());
 							retval.add(x509);
 						} else {
@@ -156,7 +156,7 @@ public class ServerAuthorizationManagement
 									+ assertion.getDelegatee()[0] + "'");
 						}
 					} else {
-						if (_logger.isDebugEnabled())
+						if (_logger.isTraceEnabled())
 							_logger.trace("did not get a pass through credential.");
 					}
 				}

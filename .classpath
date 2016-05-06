@@ -58,5 +58,6 @@
 	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.webapp_8.1.18.v20150929.jar"/>
 	<classpathentry kind="lib" path="ext/jetty8/org.eclipse.jetty.xml_8.1.18.v20150929.jar"/>
 	<classpathentry kind="lib" path="ext/jetty8/javax.servlet-api-3.0.1.jar"/>
+	<classpathentry kind="lib" path="ext/SizeOf.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

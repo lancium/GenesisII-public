@@ -353,13 +353,13 @@
 
 <gsh:sleep value="30" units="SECONDS"/>
 
-<gsh:echo message="Testing second recursive 'mkdir TestDir' command"/>
+<gsh:echo message="Testing second recursive 'mkdir ToastDir' command"/>
 <gsh:for param-name="i" initial-value="0" inclusive-limit="4">
         <geniix:mkdir>
-                <gsh:param>TestDir</gsh:param>
+                <gsh:param>ToastDir</gsh:param>
         </geniix:mkdir>
         <geniix:cd>
-                <gsh:param>TestDir</gsh:param>
+                <gsh:param>ToastDir</gsh:param>
         </geniix:cd>
 </gsh:for>
 
@@ -375,7 +375,7 @@
 <gsh:echo message="Testing 'rm -rf' command"/>
 <geniix:rm>
         <gsh:param>-rf</gsh:param>
-        <gsh:param>TestDir</gsh:param>
+        <gsh:param>ToastDir</gsh:param>
 </geniix:rm>
 
 </gsh:script>

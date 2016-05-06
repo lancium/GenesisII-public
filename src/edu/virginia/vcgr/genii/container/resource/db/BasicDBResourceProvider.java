@@ -19,7 +19,7 @@ public class BasicDBResourceProvider implements IResourceProvider, Initializable
 	{
 	}
 
-	private ServerDatabaseConnectionPool createConnectionPool()
+	public static ServerDatabaseConnectionPool createConnectionPool()
 	{
 		ServerDatabaseConnectionPool pool = null;
 

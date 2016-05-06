@@ -40,8 +40,8 @@ public class AuthZConfigCache extends CommonAttributeCache
 		int authZStorageCapacity = capacity / 10;
 		int permissionStrStorageCapacity = capacity - authZStorageCapacity;
 
-		authZCache = new TimedOutLRUCache<String, AuthZConfig>(authZStorageCapacity, cacheLifeTime);
-		permissionCache = new TimedOutLRUCache<String, Permissions>(permissionStrStorageCapacity, cacheLifeTime);
+		authZCache = new TimedOutLRUCache<String, AuthZConfig>(authZStorageCapacity, cacheLifeTime, "authZ cache");
+		permissionCache = new TimedOutLRUCache<String, Permissions>(permissionStrStorageCapacity, cacheLifeTime, "permission cache");
 
 		authZTranslator = new DefaultSingleResourcePropertyTranslator();
 		permissionTranslator = new PermissionsStringTranslator();

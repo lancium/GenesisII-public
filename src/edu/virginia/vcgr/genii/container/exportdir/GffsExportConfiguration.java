@@ -35,7 +35,7 @@ public class GffsExportConfiguration
 
 	// the cache for mapping between DN and grid map users.
 	private static TimedOutLRUCache<String, GridMapUserList> _dnCache =
-		new TimedOutLRUCache<String, GridMapUserList>(MAX_GRIDMAP_CACHE_ELEMENTS, GRIDMAP_CACHE_LIFETIME);
+		new TimedOutLRUCache<String, GridMapUserList>(MAX_GRIDMAP_CACHE_ELEMENTS, GRIDMAP_CACHE_LIFETIME, "DN to gridmap cache");
 
 	// tracks last timestamp we saw on the gridmap file.
 	private static FileChangeTracker _GridmapChangeTracker = null;

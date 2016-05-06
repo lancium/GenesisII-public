@@ -118,7 +118,12 @@ public class AxisCredentialWallet
 			}
 		}
 		
-		//hmmm: it's not safe!  not until the rpc has happened!
+		/*
+		 * hmmm: it's not safe!  not until the rpc has happened!
+		 * 
+		 * actually this concern may be slightly overblown, since we always have the mechanism for handling
+		 * missing credentials.
+		 */
 		
 		// now it should be safe to add the references as "seen", since we've generated the set for all the chains.
 		for (String ref : newlySent) {

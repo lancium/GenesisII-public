@@ -23,7 +23,7 @@ public class RNSElementCountCache extends CommonAttributeCache
 	{
 		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
 
-		cache = new TimedOutLRUCache<String, Integer>(capacity, cacheLifeTime);
+		cache = new TimedOutLRUCache<String, Integer>(capacity, cacheLifeTime, "rns element count cache");
 		translator = new DefaultSingleResourcePropertyTranslator();
 
 		if (_logger.isTraceEnabled()) {

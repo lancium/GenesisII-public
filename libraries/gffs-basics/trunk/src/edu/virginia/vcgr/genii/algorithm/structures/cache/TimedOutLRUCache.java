@@ -35,11 +35,15 @@ public class TimedOutLRUCache<KeyType, DataType>
 	private long _defaultTimeoutMS;
 	private Thread _activeTimeoutThread = null;
 	private boolean _logCacheEjection = false;
+	public String _cacheName = null; // the name for this cache.
 
-	public TimedOutLRUCache(int maxElements, long defaultTimeoutMS)
+	public TimedOutLRUCache(int maxElements, long defaultTimeoutMS, String cacheName)
 	{
 		if (maxElements < 1)
 			throw new IllegalArgumentException("\"maxElements\" must be greater than 0.");
+		_cacheName = cacheName;
+		if (_cacheName == null)
+			throw new IllegalArgumentException("must provide a non-null cache name");
 
 		_maxElements = maxElements;
 		_defaultTimeoutMS = defaultTimeoutMS;
@@ -76,6 +80,11 @@ public class TimedOutLRUCache<KeyType, DataType>
 			}
 		}
 	}
+	
+	public String debugPrefix()
+	{
+		return _cacheName + ": ";
+	}
 
 	public void put(KeyType key, DataType data, long timeoutMS)
 	{
@@ -95,7 +104,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 			while (_map.size() >= _maxElements) {
 				RoleBasedCacheNode<KeyType, DataType> node = _lruList.removeFirst();
 				if (_logCacheEjection && _logger.isDebugEnabled())
-					_logger.debug("overloaded cache: removing cached item with key: " + node.getKey());
+					_logger.debug(debugPrefix() + "overloaded cache: removing cached item with key: " + node.getKey());
 				_timeoutList.remove(node);
 				_map.remove(node.getKey());
 			}
@@ -139,9 +148,32 @@ public class TimedOutLRUCache<KeyType, DataType>
 		}
 	}
 
+	// hmmm: highly experimental memory analysis code here!
+	//private final long CHECK_INTERVAL = 1000 * 60; // one minute interval between deep checks currently.
+	
+	private final long CHECK_INTERVAL = 1000 * 10;//hmmm: way too fast interval, being used for debugging.
+	
+	
+	private Date _nextDeepSizeCheck = new Date((new Date().getTime()) + CHECK_INTERVAL);
+
 	public DataType get(KeyType key)
 	{
 		Date now = new Date();
+
+		if (now.after(_nextDeepSizeCheck)) {
+
+			// hmmm: would be nice to break that into k, m, g, etc.
+			//hmmm: trying the deep footprint on 'this' is giving unrealistic very small sizes.
+			//hmmm: also the deep size check is dying with a stack overflow during the large rns directory test, so we cannot use it yet.
+//			if (_logger.isDebugEnabled()) {
+//				long sizeUsed = MemoryFootprint.getDeepFootprint(_map) + MemoryFootprint.getDeepFootprint(_lruList)
+//					+ MemoryFootprint.getDeepFootprint(_timeoutList);
+//				_logger.debug(SizeOf.humanReadable(sizeUsed) + " consumed by "+ _cacheName);
+//			}
+
+			_nextDeepSizeCheck = new Date((new Date().getTime()) + CHECK_INTERVAL);
+		}
+
 		synchronized (_map) {
 			RoleBasedCacheNode<KeyType, DataType> node = _map.get(key);
 			if (node == null)
@@ -150,7 +182,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 			if (node.getInvalidationDate().before(now)) {
 				// this entry has become stale.
 				if (_logCacheEjection && _logger.isDebugEnabled())
-					_logger.debug("timed-out entry in get: removing cached item with key: " + node.getKey());
+					_logger.debug(debugPrefix() + "timed-out entry in get: removing cached item with key: " + node.getKey());
 				_map.remove(key);
 				_timeoutList.remove(node);
 				return null;
@@ -181,7 +213,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 				if (_map.containsKey(key)) {
 					toReturn.add(_map.get(key).getData());
 				} else {
-					_logger.error("failed to locate referenced object in cache: " + key);
+					_logger.error(debugPrefix() + "failed to locate referenced object in cache: " + key);
 				}
 			}
 		}
@@ -200,7 +232,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 
 				if (node.getInvalidationDate().compareTo(now) <= 0) {
 					if (_logCacheEjection && _logger.isDebugEnabled())
-						_logger.debug("removing timed-out node: " + node.getKey());
+						_logger.debug(debugPrefix() + "removing timed-out node: " + node.getKey());
 					_map.remove(node.getKey());
 					_timeoutList.removeFirst();
 					_lruList.remove(node);

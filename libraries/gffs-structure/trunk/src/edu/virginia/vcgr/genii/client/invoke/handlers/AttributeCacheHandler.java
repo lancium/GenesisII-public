@@ -51,7 +51,7 @@ public class AttributeCacheHandler
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 45;
 
 	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache =
-		new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
+		new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS, "attribute cache handler's cache");
 
 	static private QName rxferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
 	static private QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);

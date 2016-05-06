@@ -104,6 +104,16 @@ if [ ! -z "$BACKUP_DEPLOYMENT_NAME" -a ! -z "$BACKUP_USER_DIR" ]; then
     "${mirrorlog}" "${mirrorlog}".[0-9]*
 fi
 
+# allow the container's export path from the toolkit config to be exported,
+# but only that path.
+if [ ! -f "$GENII_INSTALL_DIR/lib/gffs.exports" ]; then
+  echo "Unexpected failure: lack of gffs.exports in the lib directory under GENII_INSTALL_DIR."
+  exit 1
+else
+  # we have an exports file, so we can add the export path to it.
+  echo "$EXPORTPATH * rw" >>"$GENII_INSTALL_DIR/lib/gffs.exports"
+fi
+
 # bootstrap and configure a bunch of rights for the admin account.
 bash "$GFFS_TOOLKIT_ROOT/library/configure_root_container.sh" "$USERS_LOC/admin" "$ADMIN_ACCOUNT_PASSWD" $SUBMIT_GROUP $(basename $CONTAINERPATH)
 check_if_failed "bootstrap procedure"
@@ -136,21 +146,11 @@ if [ ! -z "$BACKUP_DEPLOYMENT_NAME" ]; then
   check_logs_for_errors "$BACKUP_DEPLOYMENT_NAME"
 fi
 
-# stop the container again so we can snapshot the config.
-echo "Stopping the container and making a snapshot of the user directory..."
-bash "$GFFS_TOOLKIT_ROOT/library/zap_genesis_javas.sh"
+# snapshot the configuration for the containers.
+echo "Making a snapshot of the state directories..."
 
 #hmmm: could use a variable for where this file lives.
 save_grid_data $TMP/bootstrap_save.tar.gz
-
-# launch the containers again to leave things going.
-launch_container_if_not_running "$DEPLOYMENT_NAME"
-if [ ! -z "$BACKUP_DEPLOYMENT_NAME" -a ! -z "$BACKUP_USER_DIR" ]; then
-  save_and_switch_userdir "$BACKUP_USER_DIR"
-  save_grid_data $TMP/mirror_save.tar.gz
-  launch_container_if_not_running "$BACKUP_DEPLOYMENT_NAME"
-  restore_userdir
-fi
 
 echo "All done setting up the container and logging in as user '$(basename $USERPATH)'."
 

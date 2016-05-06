@@ -43,9 +43,9 @@ public class ByteIORPCache extends CommonAttributeCache
 	{
 		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
 
-		sizeAttributeCache = new TimedOutLRUCache<String, Long>(capacity, cacheLifeTime);
-		modTimeAttributeCache = new TimedOutLRUCache<String, Calendar>(capacity, cacheLifeTime);
-		accessTimeAttributeCache = new TimedOutLRUCache<String, Calendar>(capacity, cacheLifeTime);
+		sizeAttributeCache = new TimedOutLRUCache<String, Long>(capacity, cacheLifeTime, "size attribute cache");
+		modTimeAttributeCache = new TimedOutLRUCache<String, Calendar>(capacity, cacheLifeTime, "modtime attribute cache");
+		accessTimeAttributeCache = new TimedOutLRUCache<String, Calendar>(capacity, cacheLifeTime, "accesstime attribute cache");
 
 		// Create time cache has a very long life time for cached entries as once cached
 		// we never have to remove this information from the cache. The same is true for
@@ -53,8 +53,8 @@ public class ByteIORPCache extends CommonAttributeCache
 		// an infinite lifetime as in that case the cache implementation we are using fails
 		// to safe the attributes.
 		long millisecondsInDay = 24 * 60 * 60 * 1000L;
-		createTimeAttributeCache = new TimedOutLRUCache<String, Calendar>(capacity, millisecondsInDay);
-		xferAttributeCache = new TimedOutLRUCache<String, Set<String>>(capacity, millisecondsInDay);
+		createTimeAttributeCache = new TimedOutLRUCache<String, Calendar>(capacity, millisecondsInDay, "createtime attribute cache");
+		xferAttributeCache = new TimedOutLRUCache<String, Set<String>>(capacity, millisecondsInDay, "xfer attribute cache");
 
 		translator = new DefaultSingleResourcePropertyTranslator();
 

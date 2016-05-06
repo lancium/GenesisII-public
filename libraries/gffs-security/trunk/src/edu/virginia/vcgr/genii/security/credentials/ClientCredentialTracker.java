@@ -13,7 +13,7 @@ public class ClientCredentialTracker
 {
 	static private Log _logger = LogFactory.getLog(ClientCredentialTracker.class);
 
-	// hmmm: these values below should come from config file!
+	// hmmm: the values below should come from config file!
 
 	// how many containers we will track overall for the client.
 	public static final int MAX_CONTAINERS_TRACKED = 100;
@@ -37,12 +37,12 @@ public class ClientCredentialTracker
 	{
 		public PreviouslySeenCredentialsList()
 		{
-			super(MAXIMUM_CREDS_TRACKED_PER_CONTAINER, CredentialCache.CRED_CACHE_TIMEOUT_MS);
+			super(MAXIMUM_CREDS_TRACKED_PER_CONTAINER, CredentialCache.CRED_CACHE_TIMEOUT_MS, "previously seen credentials list");
 		}
 
 		public PreviouslySeenCredentialsList(int maxElements, long defaultTimeoutMS)
 		{
-			super(maxElements, defaultTimeoutMS);
+			super(maxElements, defaultTimeoutMS, "previously seen credentials list");
 		}
 	}
 
@@ -53,7 +53,7 @@ public class ClientCredentialTracker
 	{
 		public StreamliningUsageTracker(int maxElements, long defaultTimeoutMS)
 		{
-			super(maxElements, defaultTimeoutMS);
+			super(maxElements, defaultTimeoutMS, "streamlining usage tracker");
 		}
 	}
 
@@ -186,8 +186,11 @@ public class ClientCredentialTracker
 		}
 	}
 
-	// hmmm: perhaps separate out this implementation...
-	// hmmm: or move the thing into the above code, since that also tracks containers by EPI! just the two states needed.
+	/*
+	 * hmmm: perhaps separate out this implementation...
+	 * 
+	 * or move the thing into the above code, since that also tracks containers by EPI! just the two states needed.
+	 */
 
 	// how many container streamlining support states should we keep track of?
 	final static int SUPPORTING_CONTAINERS_TRACKED = 200;
@@ -217,7 +220,7 @@ public class ClientCredentialTracker
 	}
 
 	private static TimedOutLRUCache<String, ContainerSupportLevel> _streamliningContainerList =
-		new TimedOutLRUCache<String, ContainerSupportLevel>(SUPPORTING_CONTAINERS_TRACKED, SUPPORTING_CONTAINER_MEMORY_DURATION);
+		new TimedOutLRUCache<String, ContainerSupportLevel>(SUPPORTING_CONTAINERS_TRACKED, SUPPORTING_CONTAINER_MEMORY_DURATION, "streamlining containers list");
 
 	/**
 	 * returns true or false based on our memory of whether the container supports credential streamlining or not. the default for an unknown
