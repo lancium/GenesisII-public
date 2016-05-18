@@ -625,15 +625,14 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 			}
 
 			if (_tabIndex <= 3) {
-				int n = JOptionPane.showOptionDialog(null, "Going back to legacy JSDL option, Only the contents of the common tab will prevail !!!",
-					"",	JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
-					null,null,null);
+				int n = JOptionPane.showOptionDialog(null,
+					"Going back to legacy JSDL option, Only the contents of the common tab will prevail !!!", "",
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
 				if(n == 0){
 					if(_documentContext.jobRoot().jobDocument().size() == 3 ){
 						_documentContext.jobRoot().jobDocument().remove(2);
 						_documentContext.jobRoot().jobDocument().remove(1);
-					}
-					else{
+					} else {
 						JOptionPane.showMessageDialog(null, "Something is wrong. Can't go back to legacy JSDL");
 						return;
 					}
@@ -652,15 +651,13 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 					_ePanels.add(ePanel);
 					
 				}
-				
 
 				return;
 			}
 
 			if(_documentContext.jobRoot().jobDocument().size() > selected ){
 				_documentContext.jobRoot().jobDocument().remove(selected);
-			}
-			else{
+			} else {
 				JOptionPane.showMessageDialog(null, "Something is wrong. Can't remove the selected tab");
 				return;
 			}
@@ -668,7 +665,6 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 			_tabbedPane.remove(selected);
 			_superTabbedPane.remove(selected);
 			_tabIndex--;
-			
 			
 			/*
 			 * int[] indices = _table.getSelectedRows(); for (int lcv = indices.length - 1; lcv >= 0; lcv--)

@@ -37,7 +37,7 @@ public class HistoryContainerService extends AbstractContainerService
 
 	static final private Object lock = new Object();
 
-	static final int HISTORY_RECORDS_CLEANING_COUNT = 10;
+	static final int HISTORY_RECORDS_CLEANING_COUNT = 50;
 
 	private class CleanupAlarmHandler implements AlarmHandler
 	{

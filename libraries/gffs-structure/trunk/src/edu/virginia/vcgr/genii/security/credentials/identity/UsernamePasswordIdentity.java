@@ -36,6 +36,8 @@ public class UsernamePasswordIdentity implements Identity, NuCredential, XMLComp
 	protected String _userName;
 	protected String _password;
 
+	static public final String USER_NAME_PASSWD_EPI = "urn:ws-naming:username-pw:";
+
 	// zero-arg constructor for externalizable use only.
 	public UsernamePasswordIdentity()
 	{

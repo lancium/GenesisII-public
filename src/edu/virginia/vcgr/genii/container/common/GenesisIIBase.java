@@ -306,6 +306,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters)
 		throws ResourceException, BaseFaultType, RemoteException
 	{
+		if (_logger.isTraceEnabled())
 		_logger.debug("postCreate: " + this.getClass().getName() + " -- " + constructionParameters.size() + " construct parms, "
 			+ resolverCreationParameters.size() + " resolver creation parms");
 

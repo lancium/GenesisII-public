@@ -8,20 +8,33 @@ cd "$WORKDIR"
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
+modifiers="$1"; shift
+
+HUGE_MODE=
+if [ "$modifiers" == "huge" ]; then
+  HUGE_MODE=true
+fi
+
 # the number of files to create in the RNS directory.
-MAX_FILES=1000
+if [ -z "$HUGE_MODE" ]; then
+  # how many files to create.
+  MAX_FILES=1000
+  # where we hook in the fuse mount.
+  export MOUNT_POINT="$TEST_TEMP/mount-largeRNS"
+  # directory name we create for testing.
+  export BIGDIRNAME=large_dir
+else
+  # how many files to create in huge mode.
+  MAX_FILES=20000
+  # where we hook in the fuse mount for huge mode.
+  export MOUNT_POINT="$TEST_TEMP/mount-hugeRNS"
+  # directory name we create for testing.
+  export BIGDIRNAME=huge_dir
+fi
 
-# how many files to copy up at once; this is a limiter for the size of the grid client's
-# memory usage.  the full thousand at once does not currently fit in 512M.
-COPY_CHUNK=100
-
-# where we hook in the fuse mount.
-export MOUNT_POINT="$TEST_TEMP/mount-largeRNS"
 # the user's home directory from fuse perspective.
 export HOME_DIR="$MOUNT_POINT/$RNSPATH"
 
-export BIGDIRNAME=huge_dir
- 
 oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.

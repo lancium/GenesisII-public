@@ -89,8 +89,9 @@ public class ReplicationThread extends Thread
 			_logger.error("ReplicationThread: error getting resource", exception);
 			return;
 		}
-		ResourceLock resourceLock = rKey.getResourceLock();
+		ResourceLock resourceLock = null;
 		try {
+			resourceLock = rKey.getResourceLock();
 			resourceLock.lock();
 			IResource resource = rKey.dereference();
 			String state = (String) resource.getProperty(SyncProperty.ERROR_STATE_PROP_NAME);

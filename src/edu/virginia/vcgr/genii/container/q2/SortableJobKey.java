@@ -54,6 +54,11 @@ public class SortableJobKey implements Comparable<SortableJobKey>
 		return false;
 	}
 
+	public Long getJobID()
+	{
+		return _jobID;
+	}
+
 	/**
 	 * This method is used to order to SortableJobKey's.
 	 * 

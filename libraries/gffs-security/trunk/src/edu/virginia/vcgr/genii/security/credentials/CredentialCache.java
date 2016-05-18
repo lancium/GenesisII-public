@@ -57,8 +57,8 @@ public class CredentialCache
 	public static boolean SHOW_CREDENTIAL_STREAMLINING_ACTIONS = false;
 
 	// cache of credential chains for reusing previously signed delegations.
-	static private TimedOutLRUCache<ChainsCacheKey, TrustCredential> credentialChains =
-		new TimedOutLRUCache<ChainsCacheKey, TrustCredential>(CRED_CACHE_SIZE, SecurityConstants.CredentialCacheTimeout, "credential chains cache");
+	static private TimedOutLRUCache<ChainsCacheKey, TrustCredential> credentialChains = new TimedOutLRUCache<ChainsCacheKey, TrustCredential>(
+		CRED_CACHE_SIZE, SecurityConstants.CredentialCacheTimeout, "credential chains cache");
 
 	/**
 	 * the key to the cache for delegation chains is a 2-tuple with the guid of the base credential and the delegatee's x509 certificate DN.
@@ -91,15 +91,15 @@ public class CredentialCache
 	 * that the restrictions and access would be the same for any credential created for the delegatee and issuer, because currently they
 	 * always are.
 	 */
-//	public static class SingletonCacheKey extends Pair<String, String>
-//	{
-//		private static final long serialVersionUID = 1L;
-//
-//		SingletonCacheKey(String delegatee, String issuer)
-//		{
-//			super(delegatee, issuer);
-//		}
-//	};
+	// public static class SingletonCacheKey extends Pair<String, String>
+	// {
+	// private static final long serialVersionUID = 1L;
+	//
+	// SingletonCacheKey(String delegatee, String issuer)
+	// {
+	// super(delegatee, issuer);
+	// }
+	// };
 
 	/**
 	 * this returns a cached credential that matches the requested trust delegation, or it creates a new delegation.
@@ -138,7 +138,7 @@ public class CredentialCache
 		}
 	}
 
-	//hmmm: could move this method to someplace else; it's no longer involved in caching.
+	// hmmm: could move this method to someplace else; it's no longer involved in caching.
 	/**
 	 * this creates a new delegated credential for the delegatee and issuer.
 	 */

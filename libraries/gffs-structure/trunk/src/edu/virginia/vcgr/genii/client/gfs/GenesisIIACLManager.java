@@ -42,6 +42,23 @@ public class GenesisIIACLManager
 		return _remoteACL;
 	}
 
+	public static String extractPermissions(String ACLString, String epi)
+	{
+		// This is new by ASG 1/7/2016
+		String ret = null;
+		// Now extract the permissions string for this EPI into a string
+		// Recall the string structure is "some stuff;EPIofInterest permissions;" AND EPIs CANNOT have any spaces
+		int epiPos = ACLString.indexOf(epi);
+		if (epiPos >= 0) {
+			int trailingSpacePos = ACLString.indexOf(" ", epiPos);
+			int trailingSemiColonPos = ACLString.indexOf(";", epiPos);
+			ret = ACLString.substring(trailingSpacePos, trailingSemiColonPos);
+			// Major hack for testing follows
+			ret = ret.toLowerCase();
+		}
+		return ret;
+	}
+
 	static private boolean hasPermission(Collection<AclEntry> acls, Collection<Identity> callerIds)
 	{
 		for (AclEntry entry : acls) {

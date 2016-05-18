@@ -256,28 +256,27 @@ public class AxisClientHeaderHandler extends BasicHandler
 			if (resourceCertChain == null) {
 				if (_logger.isTraceEnabled())
 					_logger.trace("no resource cert chain; using bare credentials.");
-				
+
 				if (ConfigurationManager.getCurrentConfiguration().isServerRole()) {
 					/*
-					 * in the server role, we still want to delegate to the TLS certificate so that any credentials
-					 * will mention the true sender (at the TLS level) of the credentials.
+					 * in the server role, we still want to delegate to the TLS certificate so that any credentials will mention the true
+					 * sender (at the TLS level) of the credentials.
 					 */
 					CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
 					if (tlsKey != null) {
 						// delegate from the credential's resource to our tls cert.
-						TrustCredential newCred = walletForResource.getRealCreds().delegateTrust(tlsKey._certChain,
-							IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
-							restrictions, accessCategories, trustDelegation);
+						TrustCredential newCred = walletForResource.getRealCreds().delegateTrust(tlsKey._certChain, IdentityType.CONNECTION,
+							clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey, restrictions,
+							accessCategories, trustDelegation);
 						if (newCred == null) {
 							if (_logger.isTraceEnabled()) {
-								_logger.debug(
-									"failure in trust delegation to tls cert.  dropping this credential on floor:\n"
-										+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+								_logger.debug("failure in trust delegation to tls cert.  dropping this credential on floor:\n"
+									+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
 							}
 							continue;
 						}
 					}
-				}	
+				}
 
 			} else {
 
@@ -374,7 +373,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 					} else {
 						X509Certificate passOn[] = new X509Certificate[1];
 						passOn[0] = passThrough;
-						
+
 						TrustCredential newerTC = CredentialCache.generateCredential(passOn, IdentityType.CONNECTION, tlsKey._certChain,
 							tlsKey._privateKey, restrictions, RWXCategory.FULL_ACCESS);
 						if (newerTC == null) {
@@ -396,8 +395,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 		SOAPMessage msg = messageContext.getMessage();
 		final javax.xml.soap.SOAPHeader soapHeader = msg.getSOAPHeader();
 		ArrayList<String> credRefs = new ArrayList<>();
-		soapHeader.addChildElement(
-			walletForResource.convertToSOAPElement((containerGUID != null) ? containerGUID.toString(true) : null, credRefs));
+		soapHeader
+			.addChildElement(walletForResource.convertToSOAPElement((containerGUID != null) ? containerGUID.toString(true) : null, credRefs));
 		SOAPHeaderElement refsElem = walletForResource.emitReferencesAsSoap(credRefs);
 		if (refsElem != null)
 			soapHeader.addChildElement(refsElem);

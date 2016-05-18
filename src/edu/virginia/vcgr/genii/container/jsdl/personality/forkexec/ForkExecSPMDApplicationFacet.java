@@ -5,7 +5,8 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.jsdl.personality.common.CommonPosixLikeSPMDApplicationFacet;
 
-public class ForkExecSPMDApplicationFacet extends CommonPosixLikeSPMDApplicationFacet{
+public class ForkExecSPMDApplicationFacet extends CommonPosixLikeSPMDApplicationFacet
+{
 	private FilesystemManager _fsManager;
 	private BESWorkingDirectory _workingDirectory;
 

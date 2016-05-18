@@ -1,8 +1,21 @@
 
-to profile with yourkit profiler, add a line like this to the trunk's
-"runContainer.sh" or "grid" after a build:
+To profile with yourkit java profiler, you can either update the current
+build's configuration to run the profiler or make the change persistent
+to run the profiler.
 
-"-agentpath:/usr/local/yjp-2013/bin/linux-x86-64/libyjpagent.so"
+To use the profiler just for the current build, make sure the code is built
+first and then add a line like this to "bin/runContainer.sh" or "bin/grid":
 
-note: this addition will be wiped out if you build again.
+"-agentpath:/usr/local/yjp-2016.02/bin/linux-x86-64/libyjpagent.so"
+
+This addition will be wiped out if you build again.
+
+If you want the yjp setting to persist, then edit the files in
+"scripts/runContainer.sh" or "scripts/grid" instead by adding the above
+profiler line.  Then build the code again, and all future builds will
+have the profiler line in the bin directory versions of the scripts.
+
+Don't leave this change in place in the scripts directory on the main
+trunk, or the build will break.
+
 

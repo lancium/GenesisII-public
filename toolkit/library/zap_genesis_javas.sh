@@ -17,8 +17,6 @@ export SHOWED_SETTINGS_ALREADY=true
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
   source ../prepare_tools.sh ../prepare_tools.sh 
 fi
-#export POSSIBLY_UNBUILT=true
-#source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 source "$GFFS_TOOLKIT_ROOT/library/helper_methods.sh"
 source "$GFFS_TOOLKIT_ROOT/library/grid_management.sh"
 
@@ -38,14 +36,39 @@ for i in ${genesis_java_pids[*]} ; do
   fi
 done 
 
-#retval=0
-## give a tiny snooze.
-#sleep 2
-#genesis_java_pids=()
-#find_genesis_javas "$pattern"
-#for i in ${genesis_java_pids[*]} ; do
-#  echo FAILED to zap java process: $i
-#  retval=1
-#done
-#exit $retval
+# check that it or they are really gone.
+MAX_PROCESS_CHECKS=6
+checking_count=0
+while true; do
+  genesis_java_pids=()
+#echo empty list sees ${#genesis_java_pids[*]} genesis java processes
+  find_genesis_javas "$pattern"
+  checking_count=$(($checking_count + 1))
+#echo checking count now at $checking_count
+  for i in ${genesis_java_pids[@]} ; do
+    # take a tiny snooze.  we do this first since checking immediately is counter-productive.
+    sleep 1
+
+    if [ $checking_count -gt $MAX_PROCESS_CHECKS ]; then
+      echo "failed to zap java process $i normally; now zapping it decisively."
+      if [ "$OS" == "Windows_NT" ]; then
+#is there a more forceful version of this?
+        taskkill -F -pid $i
+      else
+        kill -9 $i
+      fi
+    else
+      echo "gffs java process $i is still running..."
+    fi
+  done
+
+  if [ ${#genesis_java_pids[@]} -eq 0 ]; then
+    echo "expected processes have all exited."
+    break
+#else
+#echo still seeing ${#genesis_java_pids[*]} genesis java processes
+  fi
+done
+
+# out of loop, we can leave now.
 

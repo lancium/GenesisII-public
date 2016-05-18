@@ -420,7 +420,11 @@ function find_genesis_javas()
     patterns+="${i}${addon} "
   done
   # find all the processes matching those patterns.
-  genesis_java_pids="$(psfind -u $USER $patterns)"
+  genesis_java_pids=$(psfind -u $USER $patterns)
+  if [ "${genesis_java_pids[0]}" == "" ]; then
+    # this was actually an empty list.  reset it.
+    genesis_java_pids=()
+  fi
 }
 
 ##############

@@ -82,7 +82,7 @@ public class CredentialWallet implements Externalizable, Describable
 		} catch (Throwable t) {
 			_logger.error("failure to create credential wallet from list of creds; probably missing links!");
 		}
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("added " + assertionChains.size() + " credentials into list");
 	}
 

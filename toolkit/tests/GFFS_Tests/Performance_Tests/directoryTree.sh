@@ -9,6 +9,11 @@ cd "$WORKDIR"
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
+modifier="$1"; shift
+if [ "$modifier" == "abusive" ]; then
+  ABUSIVE_MODE=true
+fi
+
 # where we will export a part of rns space from the grid.
 export TEST_AREA="$EXPORTPATH"
 # where we will fuse mount the grid locally.
@@ -122,7 +127,13 @@ echo mount point is $MOUNT_POINT
 
 testCreateDirectory () {
   if ! fuse_supported; then return 0; fi
-  fan_out_directories $TEST_TEMP/testDir 3 6 3
+  if [ -z "$ABUSIVE_MODE" ]; then
+    # normal strength fanned out directory creation.
+    fan_out_directories $TEST_TEMP/testDir 3 6 3
+  else
+    # harshness, an abusively wide space of directory fanning out.
+    fan_out_directories $TEST_TEMP/testDir 18 16 14
+  fi
 }
 
 testListingExportViaFuse()
@@ -144,7 +155,7 @@ testListingExportViaFuse()
 
 testFuseRecursiveCp() {
   if ! fuse_supported; then return 0; fi
-  # Recursively copy files from $1 into the $2
+  # Recursively copy files from the test directory into the target.
   time cp -r $TEST_TEMP/testDir "$MOUNT_POINT/$RNSPATH" 
   assertEquals "Recursively copying from testDir to $MOUNT_POINT/$RNSPATH" 0 $?
   # Then ls -lR the directory (not yet: and count the number of lines)
@@ -155,7 +166,7 @@ testFuseRecursiveCp() {
 testFuseRecursiveCpOntoExport()
 {
   if ! fuse_supported; then return 0; fi
-  # Recursively copy files from $1 into the $2
+  # Recursively copy files from the test directory into the exported folder.
   time cp -r $TEST_TEMP/testDir "$MOUNT_POINT/$FULL_EXPORT_PATH" 
   assertEquals "Recursively copying from testDir to $MOUNT_POINT/$FULL_EXPORT_PATH" 0 $?
   echo "Recursively listing the copied files in $MOUNT_POINT/$FULL_EXPORT_PATH"

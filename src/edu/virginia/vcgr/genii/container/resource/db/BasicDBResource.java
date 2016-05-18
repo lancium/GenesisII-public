@@ -229,7 +229,7 @@ public class BasicDBResource implements IResource
 			long startTime = System.currentTimeMillis();
 			rs = stmt.executeQuery();
 			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
-				_logger.debug("getProperty time is " + (System.currentTimeMillis() - startTime));
+				_logger.debug("getProperty " + propertyName + ": time is " + (System.currentTimeMillis() - startTime));
 
 			if (!rs.next())
 				return null;
@@ -672,4 +672,5 @@ public class BasicDBResource implements IResource
 			StreamUtils.close(stmt);
 		}
 	}
+
 }

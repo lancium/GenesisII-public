@@ -125,8 +125,8 @@ public class RandomByteIOInputStream extends InputStream
 	private byte[] read(int length) throws IOException
 	{
 		/*
-		 * note: we must try to read the whole length, even if the file size says we can't get that many bytes. we may have a cached
-		 * size that is incorrect for a file that grew recently. we need to not check the file size that was known previously in this case.
+		 * note: we must try to read the whole length, even if the file size says we can't get that many bytes. we may have a cached size that
+		 * is incorrect for a file that grew recently. we need to not check the file size that was known previously in this case.
 		 * surprisingly, this also affected replication somehow, seemingly because some notifications were failing, but not sure why they
 		 * would use byte io at all.
 		 */

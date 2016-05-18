@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.container.q2.forks;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,7 +68,7 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 
 		ResourceKey rKey = getService().getResourceKey();
 		Collection<? extends ReducedJobInformationType> jobs;
-		Collection<InternalEntry> ret = new LinkedList<InternalEntry>();
+		Collection<InternalEntry> ret = new ArrayList<InternalEntry>();
 
 		try {
 			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());

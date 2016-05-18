@@ -213,7 +213,7 @@ public class GffsExportConfiguration
 			owner = tempWallet.getFirstUserCredential().getOriginalAsserter()[0];
 		}
 
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("ownerDN resolved to: '" + owner.getSubjectDN() + "'");
 
 		return owner;

@@ -51,8 +51,7 @@ public class FilesystemUnderstanding
 
 	public boolean isGridFileSystem()
 	{
-		return ((_fsType == null) || (_fsType == FileSystemTypeEnumeration.normal)) &&
-			((_fsName != null) && (_fsName.equals("GRID")));
+		return ((_fsType == null) || (_fsType == FileSystemTypeEnumeration.normal)) && ((_fsName != null) && (_fsName.equals("GRID")));
 	}
 
 	public JSDLFileSystem createScratchFilesystem(String jobAnnotation) throws JSDLException

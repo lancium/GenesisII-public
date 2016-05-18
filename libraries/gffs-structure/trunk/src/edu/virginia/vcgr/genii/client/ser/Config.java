@@ -56,8 +56,8 @@ public class Config
 	static public MessageContext getContext()
 	{
 		/*
-		 * hands out the current context, if one exists (indicating that axis is probably working on a call). otherwise it makes a
-		 * new one that's still thread local, to avoid concurrency issues when deserializing things.
+		 * hands out the current context, if one exists (indicating that axis is probably working on a call). otherwise it makes a new one
+		 * that's still thread local, to avoid concurrency issues when deserializing things.
 		 */		
 		MessageContext toReturn = MessageContext.getCurrentContext();
 		if (toReturn == null) {

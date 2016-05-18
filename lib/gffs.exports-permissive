@@ -4,7 +4,7 @@
 #   {path} {user-id} {option(s)}
 #
 # The default configuration disallows all paths and all users for creating exports.
-/ * n
+#/ * n
 
 # The below example is a permissive configuration that allows any user to
 # create an export on any path.  NOTE: this is very dangerous for ACL type
@@ -13,7 +13,7 @@
 # system user is the one who performs the export, so their system-level
 # restrictions are kept in place.  It's still up to that user to not export
 # something important, like the .ssh directory:
-# / * rw
+/ * rw
 
 # Another example below that is very selective.  It enables just one directory
 # for exports:

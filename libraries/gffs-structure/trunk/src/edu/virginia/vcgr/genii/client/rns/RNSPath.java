@@ -887,8 +887,6 @@ public class RNSPath implements Serializable, Cloneable
 				RNSPath newEntry = new RNSPath(this, entry.getEntryName(), entry.getEndpoint(), !getShortForm);
 				newEntry.extractPortTypesAndURIFromMetadata(entry, translator);
 				boolean funcRet = applier.applyToPath(newEntry);
-				newEntry = null;
-				entry = null;
 				if (funcRet != true)
 					return false;
 			}

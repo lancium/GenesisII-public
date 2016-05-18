@@ -105,6 +105,12 @@ public class JobData
 	private String _sweepState = null;
 
 	private int _numOfCores;
+	/*
+	 * We need to keep track of the userID of the job so we can look up the identity information without going to the database
+	 */
+	private String _userName = null;
+	private Date _startTime = null;
+	private Date _finishTime = null;
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
 		Long besID, HistoryContext history, int numOfCores)
@@ -121,6 +127,9 @@ public class JobData
 		_history = history;
 		_resourceRequirements = new ArrayList<JobResourceRequirements>();
 		_numOfCores = numOfCores;
+		_startTime = new Date();
+		_finishTime = new Date();
+		_userName = "Not Defined";
 	}
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
@@ -140,6 +149,36 @@ public class JobData
 			return;
 		}
 		_sweepState = sweep.getEncodedSweepState();
+	}
+
+	public void setUserName(String uname)
+	{
+		_userName = uname;
+	}
+
+	public String getUserName()
+	{
+		return _userName;
+	}
+
+	public void setStartTime(Date start)
+	{
+		_startTime = start;
+	}
+
+	public Date getStartTime()
+	{
+		return _startTime;
+	}
+
+	public void setFinishTime(Date endTime)
+	{
+		_finishTime = endTime;
+	}
+
+	public Date getFinishTime()
+	{
+		return _finishTime;
 	}
 
 	public boolean isSweepingJob()

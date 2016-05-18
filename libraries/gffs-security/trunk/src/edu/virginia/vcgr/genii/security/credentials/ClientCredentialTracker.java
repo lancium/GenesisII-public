@@ -220,7 +220,8 @@ public class ClientCredentialTracker
 	}
 
 	private static TimedOutLRUCache<String, ContainerSupportLevel> _streamliningContainerList =
-		new TimedOutLRUCache<String, ContainerSupportLevel>(SUPPORTING_CONTAINERS_TRACKED, SUPPORTING_CONTAINER_MEMORY_DURATION, "streamlining containers list");
+		new TimedOutLRUCache<String, ContainerSupportLevel>(SUPPORTING_CONTAINERS_TRACKED, SUPPORTING_CONTAINER_MEMORY_DURATION,
+			"streamlining containers list");
 
 	/**
 	 * returns true or false based on our memory of whether the container supports credential streamlining or not. the default for an unknown

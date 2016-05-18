@@ -1,12 +1,12 @@
 package edu.virginia.vcgr.genii.container.iterator;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryIteratorWrapper
 {
 	private String _className;
-	private List<InMemoryIteratorEntry> _indices = new LinkedList<InMemoryIteratorEntry>();
+	private List<InMemoryIteratorEntry> _indices = new ArrayList<InMemoryIteratorEntry>();
 	private Object[] _commonMember;
 
 	public InMemoryIteratorWrapper(String className, List<InMemoryIteratorEntry> indices, Object[] commonMember)

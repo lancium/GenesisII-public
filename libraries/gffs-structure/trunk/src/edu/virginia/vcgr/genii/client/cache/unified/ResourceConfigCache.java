@@ -36,7 +36,8 @@ public class ResourceConfigCache extends CommonCache
 	{
 		super(priorityLevel, capacity, cacheLifeTime, monitoringEnabled);
 		int directoryLookupCacheCapacity = capacity / 10;
-		directoryConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(directoryLookupCacheCapacity, cacheLifeTime, "directory config cache");
+		directoryConfigCache =
+			new TimedOutLRUCache<String, WSResourceConfig>(directoryLookupCacheCapacity, cacheLifeTime, "directory config cache");
 		int fileLookupCacheCapacity = capacity - directoryLookupCacheCapacity;
 		fileConfigCache = new TimedOutLRUCache<String, WSResourceConfig>(fileLookupCacheCapacity, cacheLifeTime, "file config cache");
 

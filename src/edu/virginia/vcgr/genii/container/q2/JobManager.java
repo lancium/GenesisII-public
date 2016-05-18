@@ -146,6 +146,14 @@ public class JobManager implements Closeable
 	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersWithJobs = new HashMap<String, TreeMap<SortableJobKey, JobData>>();
 
 	/**
+	 * All jobs in the queue, separated into lists for each user. Each user map is sorted like the full map above.
+	 */
+	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersNotReadyJobs = new HashMap<String, TreeMap<SortableJobKey, JobData>>();
+	/*
+	 * Map of string user id's to identity arrays. This is needed so we can identify more formally who owns the job to clients.
+	 */
+	private HashMap<String, byte[][]> _userIDs = new HashMap<String, byte[][]>();
+	/**
 	 * A map of all jobs currently running (or starting) in the queue.
 	 */
 	private HashMap<Long, JobData> _runningJobs = new HashMap<Long, JobData>();
@@ -185,6 +193,61 @@ public class JobManager implements Closeable
 		_statusChecker.close();
 	}
 
+	private void putInUserBucket(HashMap<String, TreeMap<SortableJobKey, JobData>> bucket, JobData job, String username)
+	{
+		// Also re-insert into user list
+		SortableJobKey jobKey = new SortableJobKey(job.getJobID(), job.getPriority(), job.getSubmitTime());
+		if (bucket.containsKey(username)) {
+			bucket.get(username).put(jobKey, job);
+		} else {
+			TreeMap<SortableJobKey, JobData> userJobs = new TreeMap<SortableJobKey, JobData>();
+			userJobs.put(jobKey, job);
+			bucket.put(username, userJobs);
+		}
+	}
+
+	private void removeFromUserBucket(HashMap<String, TreeMap<SortableJobKey, JobData>> bucket, JobData job)
+	{
+		SortableJobKey jobKey = new SortableJobKey(job);
+		// Remove the job from _users with jobs, and move it to _usersNotReadyJobs
+		for (TreeMap<SortableJobKey, JobData> user : bucket.values()) {
+			user.remove(jobKey);
+		}
+	}
+
+	private String updateJobData(Connection connection, JobData job) throws ResourceException, SQLException
+	{
+		// Get owner identities, and extract username of primary
+		Collection<Long> jobID = new ArrayList<Long>();
+		jobID.add(job.getJobID());
+		HashMap<Long, PartialJobInfo> jobInfo = _database.getPartialJobInfos(connection, jobID);
+
+		Collection<Identity> identities =
+			SecurityUtilities.filterCredentials(jobInfo.get(job.getJobID()).getOwners(), SecurityUtilities.GROUP_TOKEN_PATTERN);
+
+		identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
+
+		String username = identities.iterator().next().toString();
+		/*
+		 * Added by ASG 4/25/2016. Add the username, and start/finish to the job record.
+		 */
+		job.setUserName(username);
+		job.setStartTime(jobInfo.get(job.getJobID()).getStartTime());
+		job.setFinishTime(jobInfo.get(job.getJobID()).getFinishTime());
+		if (!_userIDs.containsKey(username)) {
+
+			try {
+				_userIDs.put(username, QueueSecurity.convert(jobInfo.get(job.getJobID()).getOwners()));
+				// System.out.println("ADDing " + username +" to userIDs");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return username;
+	}
+
 	/**
 	 * Load all jobs stored in the database into this manager. This operation should only be called once at the beginning of each web server
 	 * start.
@@ -212,7 +275,7 @@ public class JobManager implements Closeable
 			 */
 			_jobsByID.put(new Long(job.getJobID()), job);
 			_jobsByTicket.put(job.getJobTicket(), job);
-
+			String username = updateJobData(connection, job);
 			/*
 			 * Now, depending on the loaded job's state, we will perform some startup-load operations
 			 */
@@ -224,34 +287,14 @@ public class JobManager implements Closeable
 				 */
 				if (jobState.equals(QueueStates.QUEUED) || jobState.equals(QueueStates.REQUEUED)) {
 					// Get owner identities, and extract username of primary
-					Collection<Long> jobID = new ArrayList<Long>();
-					jobID.add(job.getJobID());
 
-					HashMap<Long, PartialJobInfo> jobInfo = _database.getPartialJobInfos(connection, jobID);
-
-					Collection<Identity> identities =
-						SecurityUtilities.filterCredentials(jobInfo.get(job.getJobID()).getOwners(), SecurityUtilities.GROUP_TOKEN_PATTERN);
-
-					identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
-
-					String username = identities.iterator().next().toString();
 					if (_logger.isTraceEnabled())
 						_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
-
 					SortableJobKey jobKey = new SortableJobKey(job.getJobID(), job.getPriority(), job.getSubmitTime());
-
 					_queuedJobs.put(jobKey, job);
 
 					// Also re-insert into user list
-					if (_usersWithJobs.containsKey(username)) {
-						_usersWithJobs.get(username).put(jobKey, job);
-					} else {
-						TreeMap<SortableJobKey, JobData> userJobs = new TreeMap<SortableJobKey, JobData>();
-
-						userJobs.put(jobKey, job);
-						_usersWithJobs.put(username, userJobs);
-					}
-
+					putInUserBucket(_usersWithJobs, job, username);
 				} else if (jobState.equals(QueueStates.RUNNING) || job.getBESID() != null) {
 					if (!jobState.equals(QueueStates.RUNNING)) {
 						if (_logger.isDebugEnabled())
@@ -262,6 +305,7 @@ public class JobManager implements Closeable
 					 * Otherwise, if the job was listed as running, we need to put it into the running list.
 					 */
 					_runningJobs.put(new Long(job.getJobID()), job);
+					putInUserBucket(_usersNotReadyJobs, job, username);
 				} else {
 					// If it isn't final, queued, and it isn't running, then we
 					// loaded one marked as STARTING, which we can't resolve
@@ -270,7 +314,10 @@ public class JobManager implements Closeable
 					// here that the bes container just leaked a job, but there
 					// is no way to undo that unfortunately.
 					starting.add(job);
+					putInUserBucket(_usersNotReadyJobs, job, username);
 				}
+			} else { // Final job state
+				putInUserBucket(_usersNotReadyJobs, job, username);
 			}
 		}
 
@@ -362,6 +409,9 @@ public class JobManager implements Closeable
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Requeueing job %s because we have more attempts left.", job));
 			newState = QueueStates.REQUEUED;
+			removeFromUserBucket(_usersNotReadyJobs, job);
+			putInUserBucket(_usersWithJobs, job, job.getUserName());
+
 			ret = true;
 		}
 
@@ -376,9 +426,10 @@ public class JobManager implements Closeable
 		SortableJobKey jobKey = new SortableJobKey(job);
 		_runningJobs.remove(new Long(jobID));
 		_queuedJobs.remove(jobKey);
-		for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
-			user.remove(jobKey);
-		}
+		// Remove the job from _users with jobs, and move it to _usersNotReadyJobs
+		// The job should already be in notReady bucket
+		// removeFromUserBucket(_usersWithJobs, job);
+		// putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
 
 		/*
 		 * In order to fail a job that was running, we need to make an outcall to this BES container. This is because, unless we terminate the
@@ -461,9 +512,8 @@ public class JobManager implements Closeable
 		SortableJobKey jobKey = new SortableJobKey(job);
 		_queuedJobs.remove(jobKey);
 		_runningJobs.remove(new Long(jobID));
-		for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
-			user.remove(jobKey);
-		}
+		// removeFromUserBucket(_usersWithJobs, job);
+		// putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
 
 		job.incrementRunAttempts();
 
@@ -507,10 +557,8 @@ public class JobManager implements Closeable
 		SortableJobKey jobKey = new SortableJobKey(job);
 		_queuedJobs.remove(jobKey);
 		_runningJobs.remove(new Long(jobID));
-		for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
-			user.remove(jobKey);
-		}
-
+		// removeFromUserBucket(_usersWithJobs, job);
+		// putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
 		job.incrementRunAttempts();
 
 		Long besID = job.getBESID();
@@ -618,17 +666,17 @@ public class JobManager implements Closeable
 			 */
 
 			int numOfCores = 1;
-//			JobRequest jobRequest = null;
-//			try {
-//				jobRequest = JobRequestParser.parse(jsdl);
-//				if ((jobRequest != null) && (jobRequest.getSPMDInformation() != null)) {
-//					numOfCores = jobRequest.getSPMDInformation().getNumberOfProcesses();
-//				}
-//			} catch (JSDLException e) {
-//				_logger.error("caught jsdl exception in submitJob", e);
-//			} catch (Exception ex) {
-//				_logger.error("caught exception in submitJob", ex);
-//			}
+			// JobRequest jobRequest = null;
+			// try {
+			// jobRequest = JobRequestParser.parse(jsdl);
+			// if ((jobRequest != null) && (jobRequest.getSPMDInformation() != null)) {
+			// numOfCores = jobRequest.getSPMDInformation().getNumberOfProcesses();
+			// }
+			// } catch (JSDLException e) {
+			// _logger.error("caught jsdl exception in submitJob", e);
+			// } catch (Exception ex) {
+			// _logger.error("caught exception in submitJob", ex);
+			// }
 
 			long jobID = _database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime, numOfCores);
 			if (MyProxyCertificate.isAvailable())
@@ -665,6 +713,7 @@ public class JobManager implements Closeable
 			/*
 			 * As jobs are added to the primary list, they are also added to the appropriate user list (newly created, if needed)
 			 */
+			Collection<Identity> fullIdentities = identities;
 			identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
 
 			String username = identities.iterator().next().toString();
@@ -672,16 +721,26 @@ public class JobManager implements Closeable
 			if (_logger.isTraceEnabled())
 				_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
-			if (!_usersWithJobs.keySet().contains(username)) {
-				// This user has no jobs in the queue, add a set for him
-				TreeMap<SortableJobKey, JobData> jobs = new TreeMap<SortableJobKey, JobData>();
-				jobs.put(jobKey, job);
-				_usersWithJobs.put(username, jobs);
-			} else {
-				// Add the job to this user's set
-				_usersWithJobs.get(username).put(jobKey, job);
-			}
+			putInUserBucket(_usersWithJobs, job, username);
 
+			/*
+			 * Added by ASG 4/25/2016. Add the username, and start/finish to the job record.
+			 */
+			job.setUserName(username);
+			job.setStartTime(new Date());
+			job.setFinishTime(new Date());
+			if (!_userIDs.containsKey(username)) {
+
+				try {
+					_userIDs.put(username, QueueSecurity.convert(fullIdentities));
+					// System.out.println("ADding " + username +" to userIDs");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+			// End of _userIDs updates
 			/*
 			 * We've just added a new job to the queue, so we have a new scheduling opportunity.
 			 */
@@ -719,6 +778,7 @@ public class JobManager implements Closeable
 			 * queue from each other. We use this to check against others killing, getting the status of, or completing someone elses jobs.
 			 */
 			Collection<Identity> identities = QueueSecurity.getCallerIdentities(true);
+			Collection<Identity> fullIdentities = identities;
 
 			if (identities.size() <= 0)
 				throw new ResourceException("Cannot submit a job with no non-group credentials.");
@@ -739,17 +799,17 @@ public class JobManager implements Closeable
 			 */
 
 			int numOfCores = 1;
-//			try {
-//				JobRequest jobRequest = null;
-//				jobRequest = JobRequestParser.parse(jsdl);
-//				if ((jobRequest != null) && (jobRequest.getSPMDInformation() != null)) {
-//					numOfCores = jobRequest.getSPMDInformation().getNumberOfProcesses();
-//				}
-//			} catch (JSDLException e) {
-//				_logger.error("caught jsdl exception in submitJob", e);
-//			} catch (Exception ex) {
-//				_logger.error("caught exception in submitJob", ex);
-//			}
+			// try {
+			// JobRequest jobRequest = null;
+			// jobRequest = JobRequestParser.parse(jsdl);
+			// if ((jobRequest != null) && (jobRequest.getSPMDInformation() != null)) {
+			// numOfCores = jobRequest.getSPMDInformation().getNumberOfProcesses();
+			// }
+			// } catch (JSDLException e) {
+			// _logger.error("caught jsdl exception in submitJob", e);
+			// } catch (Exception ex) {
+			// _logger.error("caught exception in submitJob", ex);
+			// }
 
 			long jobID =
 				_database.submitJob(sweep, connection, tickynum, priority, jsdl, callingContext, identities, state, submitTime, numOfCores);
@@ -795,16 +855,26 @@ public class JobManager implements Closeable
 			if (_logger.isTraceEnabled())
 				_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
-			if (!_usersWithJobs.keySet().contains(username)) {
-				// This user has no jobs in the queue, add a set for him
-				TreeMap<SortableJobKey, JobData> jobs = new TreeMap<SortableJobKey, JobData>();
-				jobs.put(jobKey, job);
-				_usersWithJobs.put(username, jobs);
-			} else {
-				// Add the job to this user's set
-				_usersWithJobs.get(username).put(jobKey, job);
-			}
+			putInUserBucket(_usersWithJobs, job, username);
+			/*
+			 * Added by ASG 4/25/2016. Add the username, and start/finish to the job record.
+			 */
 
+			job.setUserName(username);
+			job.setStartTime(new Date());
+			job.setFinishTime(new Date());
+			if (!_userIDs.containsKey(username)) {
+
+				try {
+					_userIDs.put(username, QueueSecurity.convert(fullIdentities));
+					// System.out.println("ADding " + username +" to userIDs");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+			// End of _userIDs updates
 			// now that the sweep has been set up with an id and is in the database, we can begin adding jobs based on it.
 			boolean ret = false;
 			try {
@@ -870,19 +940,27 @@ public class JobManager implements Closeable
 		} else
 			keySet = _jobsByID.keySet();
 
-		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(connection, keySet);
-
+		/*
+		 * 2016-04-29 by ASG. Updated logic to not use partial job info. Instead, use the newly updated JobData definition that has the
+		 * partial job info in it already, eliminating the need to go to the database.
+		 */
 		try {
 			/* For each job in the queue... */
-			for (Long jobID : ownerMap.keySet()) {
+			// for (Long jobID : ownerMap.keySet()) {
+			for (Long jobID : keySet) {
 				/* Get the in-memory data for the job */
 				JobData jobData = _jobsByID.get(jobID.longValue());
 
 				/* Find the corresponding database information */
-				PartialJobInfo pji = ownerMap.get(jobID);
+
+				byte[][] owners = _userIDs.get(jobData.getUserName());
+				if (owners == null) {
+					// Big problem
+					throw new ResourceException("Job owners not found.");
+				}
 
 				/* And add the sum of that too the return list */
-				ret.add(new ReducedJobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
+				ret.add(new ReducedJobInformationType(jobData.getJobTicket(), owners,
 					JobStateEnumerationType.fromString(jobData.getJobState().name())));
 			}
 
@@ -989,57 +1067,63 @@ public class JobManager implements Closeable
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
-		HashMap<Long, PartialJobInfo> ownerMap;
 
 		/*
 		 * We need to get a few pieces of information that only the database has, such as job owner.
 		 */
-		ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
+		/*
+		 * 2016-04-29 by ASG. Updated logic to not use partial job info. Instead, use the newly updated JobData definition that has the
+		 * partial job info in it already, eliminating the need to go to the database.
+		 */
 
 		/*
 		 * Look through all the jobs managed by this queue looking for the right ones.
 		 */
 
 		// Determine administrators of queue
-		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+		Collection<Identity> identities = QueueSecurity.getCallerIdentities(true);
+		identities = SecurityUtilities.filterCredentials(identities, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
+
+		String uname = identities.iterator().next().toString();
+
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
 
-		for (Long jobID : ownerMap.keySet()) {
+		for (Long jobID : _jobsByID.keySet()) {
+
 			/* Get the in-memory information for this job */
 			String scheduledOn = null;
 			JobData jobData = _jobsByID.get(jobID);
+			String username = jobData.getUserName();
+
 			BESData besData = _besManager.findBES(jobData.getBESID());
 			if (besData != null)
 				scheduledOn = besData.getName();
+			/* Get the database information for this job */
+			// Commented out by ASG 2016-4-29 PartialJobInfo pji = ownerMap.get(jobID);
+			byte[][] owners = _userIDs.get(jobData.getUserName());
+			if (isAdmin) {
+				ret.add(
+					new JobInformationType(jobData.getJobTicket(), owners, JobStateEnumerationType.fromString(jobData.getJobState().name()),
+						(byte) jobData.getPriority(), QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(jobData.getStartTime()),
+						QueueUtils.convert(jobData.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
+						jobData.getBESActivityStatus(), jobData.jobName()));
+			}
 
-			try {
-				/* Get the database information for this job */
-				PartialJobInfo pji = ownerMap.get(jobID);
+			/*
+			 * If the caller owns this jobs, then add the status information for the job to the result list.
+			 */
+			else {
+				// Here we want to only get jobs for this owner.
 
-				if (isAdmin) {
-					ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
+				if (username.equalsIgnoreCase(uname)) {
+					ret.add(new JobInformationType(jobData.getJobTicket(), owners,
 						JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-						QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()),
-						QueueUtils.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
+						QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(jobData.getStartTime()),
+						QueueUtils.convert(jobData.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
 						jobData.getBESActivityStatus(), jobData.jobName()));
 				}
-
-				/*
-				 * If the caller owns this jobs, then add the status information for the job to the result list.
-				 */
-				else {
-					if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
-						ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-							JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-							QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()),
-							QueueUtils.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-							jobData.getBESActivityStatus(), jobData.jobName()));
-					}
-				}
-			} catch (IOException ioe) {
-				throw new ResourceException("Unable to get job status for job \"" + jobData.getJobTicket() + "\".", ioe);
-
 			}
+
 		}
 
 		return ret;
@@ -1189,49 +1273,28 @@ public class JobManager implements Closeable
 		if (conn == null || jobID == null)
 			throw new ResourceException("Unable to query job status");
 
-		JobData jobData = _jobsByID.get(jobID.longValue());
-
-		if (jobData == null)
+		JobData job = _jobsByID.get(jobID.longValue());
+		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+		boolean isAdmin = QueueSecurity.isQueueAdmin();
+		callers = SecurityUtilities.filterCredentials(callers, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
+		String callerName = callers.iterator().next().toString();
+		if (job == null) {
 			throw new ResourceException("A queried job has been removed from the queue");
+		}
 
-		BESData besData = _besManager.findBES(jobData.getBESID());
+		BESData besData = _besManager.findBES(job.getBESID());
 		String scheduledOn = null;
 		if (besData != null)
 			scheduledOn = besData.getName();
-
-		Collection<Long> jobIDs = new LinkedList<Long>();
-
-		jobIDs.add(jobID);
-
-		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(conn, jobIDs);
-
-		PartialJobInfo pji = ownerMap.get(jobID);
-		if (pji == null)
-			throw new ResourceException("A queried job has been removed from the queue");
-
-		boolean isAdmin = QueueSecurity.isQueueAdmin();
-		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
-
-		try {
-
-			if (isAdmin || (QueueSecurity.isOwner(pji.getOwners(), callers))) {
-				return (new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-					JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-					QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()),
-					QueueUtils.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-					jobData.getBESActivityStatus(), jobData.jobName()));
-			}
-
-			else
-				throw new GenesisIISecurityException("Not permitted to get status of job \"" + jobData.getJobTicket() + "\".");
-
-		}
-
-		catch (IOException ioe) {
-			throw new ResourceException("Unable to serialize owner information.", ioe);
-
-		}
-
+		String username = job.getUserName();
+		byte[][] owners = _userIDs.get(job.getUserName());
+		if (isAdmin || (username.equalsIgnoreCase(callerName))) {
+			return new JobInformationType(job.getJobTicket(), owners, JobStateEnumerationType.fromString(job.getJobState().name()),
+				(byte) job.getPriority(), QueueUtils.convert(job.getSubmitTime()), QueueUtils.convert(job.getStartTime()),
+				QueueUtils.convert(job.getFinishTime()), new UnsignedShort(job.getRunAttempts()), scheduledOn, job.getBESActivityStatus(),
+				job.jobName());
+		} else
+			throw new GenesisIISecurityException("Not permitted to get status of job \"" + job.getJobTicket() + "\".");
 	}
 
 	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection, String[] jobs)
@@ -1398,149 +1461,92 @@ public class JobManager implements Closeable
 	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection)
 		throws GenesisIISecurityException, ResourceException, SQLException
 	{
-		HashMap<Long, PartialJobInfo> ownerMap;
-		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
-		Collection<String> toIterate = new LinkedList<String>();
-
+		Collection<JobInformationType> ret = new ArrayList<JobInformationType>(_jobsByID.size() + 1);
+		Collection<String> toIterate = new ArrayList<String>(_jobsByID.size() + 1); // Changed from linked list by ASG 2016-05-04
+		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+		Iterator<Long> it;
 		if (connection == null)
 			throw new ResourceException("Unable to query job status");
 
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
+		Collection<Long> batchSubset = new ArrayList<Long>(_jobsByID.size() + 1);
 
-		if (isAdmin) // is the caller qAdmin ?
+		if (!isAdmin) // is the caller qAdmin ?
 		{
+			callers = SecurityUtilities.filterCredentials(callers, SecurityUtilities.CLIENT_IDENTITY_PATTERN);
+			String username = callers.iterator().next().toString();
 
-			Iterator<Long> it = _jobsByID.keySet().iterator();
-			Collection<Long> batchSubset = new LinkedList<Long>();
-
-			// iterator will be built
-			if (_jobsByID.size() > QueueConstants.PREFERRED_BATCH_SIZE) {
-				for (int lcv = 0; lcv < QueueConstants.PREFERRED_BATCH_SIZE; lcv++) {
-					// grabs the first batch-size amount of jobs
-					batchSubset.add(it.next());
+			if (_usersWithJobs.keySet().contains(username) || _usersNotReadyJobs.keySet().contains(username)) {
+				// Add the job to this user's set
+				TreeMap<SortableJobKey, JobData> usersJobs = _usersWithJobs.get(username);
+				if (usersJobs != null) {
+					Iterator<SortableJobKey> jobKeys = usersJobs.keySet().iterator();
+					while (jobKeys.hasNext()) {
+						SortableJobKey job = jobKeys.next();
+						batchSubset.add(job.getJobID());
+					}
 				}
 
-				// gets database-stored info of these subset jobs
-				ownerMap = _database.getPartialJobInfos(connection, batchSubset);
-			}
+				// Now add their not ready to run jobs, i.e., old jobs or running jobs
+				usersJobs = _usersNotReadyJobs.get(username);
+				if (usersJobs != null) {
+					Iterator<SortableJobKey> jobKeys = usersJobs.keySet().iterator();
 
-			else // iterator will not be built
-			{
-				// grabs database-stored info of all jobs
-				ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
-			}
-
-			for (Long jobID : ownerMap.keySet()) {
-				/* Get the in-memory information for this job */
-				String scheduledOn = null;
-				JobData jobData = _jobsByID.get(jobID);
-				BESData besData = _besManager.findBES(jobData.getBESID());
-				if (besData != null)
-					scheduledOn = besData.getName();
-
-				try {
-					/* Get the database information for this job */
-					PartialJobInfo pji = ownerMap.get(jobID);
-
-					ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-						JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-						QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()),
-						QueueUtils.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-						jobData.getBESActivityStatus(), jobData.jobName()));
-				}
-
-				catch (IOException ioe) {
-					throw new ResourceException("Unable to get job status for job \"" + jobData.getJobTicket() + "\".", ioe);
-
-				}
-
-			}
-
-			if (_jobsByID.size() > QueueConstants.PREFERRED_BATCH_SIZE) {
-				while (it.hasNext()) {
-					toIterate.add(it.next().toString());
+					while (jobKeys.hasNext()) {
+						SortableJobKey job = jobKeys.next();
+						batchSubset.add(job.getJobID());
+					}
 				}
 			}
+		} else {
+			// Admin gets all the jobs
+			it = _jobsByID.keySet().iterator();
+			for (int i = 0; i < _jobsByID.size(); i++) {
+				// grabs the first batch-size amount of jobs
+				batchSubset.add(it.next());
+			}
+		}
+		// We now have all of the jobs we want to iterate over in batchSubset
+		Iterator<Long> thisBatch = batchSubset.iterator();
+		int lcv = 0;
+		while (thisBatch.hasNext() && (lcv < QueueConstants.PREFERRED_BATCH_SIZE)) {
+			Long jobID = thisBatch.next();
+			lcv++;
+			/* Get the in-memory information for this job */
+			String scheduledOn = null;
+			JobData job = _jobsByID.get(jobID);
+			if (job == null)
+				continue; // This seems to happen sometimes.
+			BESData besData = _besManager.findBES(job.getBESID());
+			if (besData != null) {
+				scheduledOn = besData.getName();
+			}
 
-			if (toIterate.size() == 0) // no iterator
-				return new QueueInMemoryIteratorEntry(false, ret, toIterate);
-
-			else
-				// iterator needed
-				return new QueueInMemoryIteratorEntry(true, ret, toIterate);
-
+			String username = job.getUserName();
+			// System.out.println("##### Getting information on " + username + " for jobid " + jobID);
+			byte[][] owners = _userIDs.get(job.getUserName());
+			if (username.equalsIgnoreCase("Not Defined")) {
+				System.out.println("##### Not Defined on " + job.jobName() + " for jobid " + jobID);
+				continue;
+			}
+			ret.add(new JobInformationType(job.getJobTicket(), owners, JobStateEnumerationType.fromString(job.getJobState().name()),
+				(byte) job.getPriority(), QueueUtils.convert(job.getSubmitTime()), QueueUtils.convert(job.getStartTime()),
+				QueueUtils.convert(job.getFinishTime()), new UnsignedShort(job.getRunAttempts()), scheduledOn, job.getBESActivityStatus(),
+				job.jobName()));
 		}
 
-		else {
-
-			/*
-			 * We need to get a few pieces of information that only the database has, such as job owner.
-			 */
-			ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
-
-			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
-			Set<Long> jobIDs = ownerMap.keySet();
-			Iterator<Long> it = jobIDs.iterator();
-
-			for (int lcv = 0; lcv < QueueConstants.PREFERRED_BATCH_SIZE;) {
-
-				if (it.hasNext()) // are there more jobs to look at ?
-				{
-					Long jobID = it.next(); // get the next job
-
-					/* Get the in-memory information for this job */
-					String scheduledOn = null;
-					JobData jobData = _jobsByID.get(jobID);
-					BESData besData = _besManager.findBES(jobData.getBESID());
-					if (besData != null)
-						scheduledOn = besData.getName();
-
-					try {
-						/* Get the database information for this job */
-						PartialJobInfo pji = ownerMap.get(jobID);
-
-						// is the caller the owner of this job?
-						if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
-							ret.add(new JobInformationType(jobData.getJobTicket(), QueueSecurity.convert(pji.getOwners()),
-								JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-								QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(pji.getStartTime()),
-								QueueUtils.convert(pji.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-								jobData.getBESActivityStatus(), jobData.jobName()));
-							lcv++;
-						}
-
-					}
-
-					catch (IOException ioe) {
-						throw new ResourceException("Unable to get job status for job \"" + jobData.getJobTicket() + "\".", ioe);
-
-					}
-
-				} else
-					// no more jobs
-					break;
-
+		if (batchSubset.size() > QueueConstants.PREFERRED_BATCH_SIZE) {
+			while (thisBatch.hasNext()) {
+				toIterate.add(thisBatch.next().toString());
 			}
-
-			while (it.hasNext()) {
-
-				Long jobID = it.next(); // get the next job
-				/* Get the database information for this job */
-				PartialJobInfo pji = ownerMap.get(jobID);
-
-				// is the caller the owner of this job?
-				if (QueueSecurity.isOwner(pji.getOwners(), callers)) {
-					toIterate.add(jobID.toString());
-				}
-
-			}
-
-			if (toIterate.size() == 0) // no iterator
-				return new QueueInMemoryIteratorEntry(false, ret, toIterate);
-			else
-				// iterator needed
-				return new QueueInMemoryIteratorEntry(true, ret, toIterate);
 		}
+
+		if (toIterate.size() == 0) // no iterator
+			return new QueueInMemoryIteratorEntry(false, ret, toIterate);
+
+		else
+			// iterator needed
+			return new QueueInMemoryIteratorEntry(true, ret, toIterate);
 
 	}
 
@@ -1621,9 +1627,8 @@ public class JobManager implements Closeable
 				_jobsByTicket.remove(data.getJobTicket());
 				_queuedJobs.remove(jobKey);
 				_runningJobs.remove(jobID);
-				for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
-					user.remove(jobKey);
-				}
+				removeFromUserBucket(_usersWithJobs, data);
+				removeFromUserBucket(_usersNotReadyJobs, data);
 
 				HistoryContainerService service = ContainerServices.findService(HistoryContainerService.class);
 				service.enqueue(_database.historyKey(data.getJobTicket()), connection);
@@ -2141,7 +2146,7 @@ public class JobManager implements Closeable
 		 * Iterate through the matches and enqueue a worker to start the jobs indicated there.
 		 */
 
-		//System.out.println("Starting the job");
+		// System.out.println("Starting the job");
 
 		for (ResourceMatch match : matches) {
 			/*
@@ -2172,9 +2177,11 @@ public class JobManager implements Closeable
 			 */
 			SortableJobKey jobKey = new SortableJobKey(data);
 			_queuedJobs.remove(jobKey);
-			for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
-				user.remove(jobKey);
-			}
+			/*
+			 * for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) { user.remove(jobKey); }
+			 */
+			removeFromUserBucket(_usersWithJobs, data);
+			putInUserBucket(_usersNotReadyJobs, data, data.getUserName());
 			data.setBESID(match.getBESID());
 			data.setJobState(QueueStates.STARTING);
 			_runningJobs.put(new Long(data.getJobID()), data);
@@ -2804,7 +2811,10 @@ public class JobManager implements Closeable
 
 						SortableJobKey jobKey = new SortableJobKey(_jobData);
 						_queuedJobs.put(jobKey, _jobData);
-						_usersWithJobs.get(username).put(jobKey, _jobData);
+						removeFromUserBucket(_usersNotReadyJobs, _jobData);
+						putInUserBucket(_usersWithJobs, _jobData, _jobData.getUserName());
+
+						// _usersWithJobs.get(username).put(jobKey, _jobData);
 					}
 				} else {
 					/*

@@ -335,13 +335,18 @@ public class AlarmManager
 
 		try {
 			conn = _connectionPool.acquire(false);
+
 			getInfoStmt = conn.prepareStatement(
 				"SELECT repeatinterval, callingcontext, target, " + "methodname, userdata " + "FROM alarmtable WHERE alarmid = ?");
-_logger.debug("current timeout for get info: " +			getInfoStmt.getQueryTimeout());
 			removeStmt = conn.prepareStatement("DELETE FROM alarmtable WHERE alarmid = ?");
-_logger.debug("current timeout for remove: " +			removeStmt.getQueryTimeout());
 			updateStmt = conn.prepareStatement("UPDATE alarmtable SET nextoccurance = ? WHERE alarmid = ?");
-_logger.debug("current timeout for update: " +			updateStmt.getQueryTimeout());
+			try {
+				_logger.debug("current timeout for get info: " + getInfoStmt.getQueryTimeout());
+				_logger.debug("current timeout for remove: " + removeStmt.getQueryTimeout());
+				_logger.debug("current timeout for update: " + updateStmt.getQueryTimeout());
+			} catch (Exception e) {
+				_logger.error("failure querying prepared statements for query timeout");
+			}
 
 			for (AlarmDescriptor desc : dueAlarms) {
 				try {

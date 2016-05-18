@@ -118,19 +118,12 @@ public class QSlotManagerTool extends BaseGridTool
 		{
 			this.current = current;
 			this.max = max;
-			this.currentCores = currentCores;
-			this.maxCores = maxCores;
 		}
 
 		// Slots
 		public int current;
 		public int max;
 		public boolean reduced;
-
-		// Cores
-		public int currentCores;
-		public int maxCores;
-		public int reducedCores;
 
 		// Jobs
 		public int scheduled;

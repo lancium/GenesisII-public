@@ -15,6 +15,7 @@ import edu.virginia.cs.vcgr.genii.job_management.JobInformationType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
+import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator.JobInformationIterator;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
@@ -43,7 +44,8 @@ public class QueueManagerTableModel extends RowTableModel<JobInformation>
 
 			WSIterable<JobInformationType> iterable = null;
 			try {
-				iterable = WSIterable.axisIterable(JobInformationType.class, _queue.iterateStatus(null).getResult(), 200);
+				iterable = WSIterable.axisIterable(JobInformationType.class, _queue.iterateStatus(null).getResult(),
+					QueueConstants.PREFERRED_BATCH_SIZE);
 				JobInformationIterator iter = new JobInformationIterator(iterable.iterator());
 				while (iter.hasNext())
 					jobInfo.add(iter.next());

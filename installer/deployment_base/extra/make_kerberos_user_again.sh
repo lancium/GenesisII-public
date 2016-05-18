@@ -33,7 +33,10 @@ $GENII_INSTALL_DIR/grid chmod /groups/xsede.org/gffs-users --pattern='O=National
 $GENII_INSTALL_DIR/grid logout --all 
 
 echo "testing new user account; please log in."
+HOLDING_DISPLAY="$DISPLAY"
+unset DISPLAY
 $GENII_INSTALL_DIR/grid xsedeLogin --username=$user 
+DISPLAY="$HOLDING_DISPLAY"
 
 #$GENII_INSTALL_DIR/grid whoami --verbosity=HIGH
 $GENII_INSTALL_DIR/grid whoami

@@ -180,12 +180,19 @@ public class Scheduler implements Closeable
 				 * of the iterator and continually re-iterate until we go through all the jobs waiting for a slot, or we run out of resources
 				 * to scheduling against. We are also going to keep track of the next job that should be scheduled, but can't be scheduled now
 				 * (for exponential backoff purposes).
+				 * 
+				 * 2016-05-05. ASG. We no longer match as many jobs to as many slots as possible. When the number of jobs is large, say in the
+				 * thousands, it takes too long. By 10,000 close to a second. Instead, as soon as there are no slots left because we have
+				 * allocated them all we simply exit.
 				 */
+
 				Date now = new Date();
 				Date nextScheduledEvent = null;
+				boolean noMoreSlots = false; // Added 2016-05-05 by ASG
 				for (JobData queuedJob : _jobManager.getQueuedJobs()) {
-					_logger.debug("Starting the queued job");
-
+					// _logger.debug("Starting the queued job");
+					if (noMoreSlots)
+						break; // Added 2016-05-05 by ASG
 					match = null;
 					if (!queuedJob.canRun(now)) {
 						Date nextRun = queuedJob.getNextCanRun();
@@ -203,15 +210,15 @@ public class Scheduler implements Closeable
 
 					Long jobId = queuedJob.getJobID();// Get job id
 					// Get JSDL document using job id
-					_logger.debug("Getting the JSDL for the job");
+					// _logger.debug("Getting the JSDL for the job");
 					JobDefinition_Type jsdl = _jobManager.getJSDL(jobId);
 
 					// Extract the common block information, put it into all job descriptions and
 					// update the JSDL document in the database
 					if (jsdl.getCommon() != null) {
-						System.out.println("old jsdl =" + jsdl.toString());
+						// System.out.println("old jsdl =" + jsdl.toString());
 						jsdl = JSDLTransformer.extractCommon(jsdl);
-						System.out.println("transformed jsdl =" + jsdl.toString());
+						// System.out.println("transformed jsdl =" + jsdl.toString());
 						_jobManager.updateJSDL(jsdl, jobId);
 					} else {
 						// System.out.println(jsdl.toString());
@@ -257,8 +264,10 @@ public class Scheduler implements Closeable
 							 */
 							if (match[i] == null) {
 								/* If there are no slots available, we're done. */
-								if (slots.isEmpty())
+								if (slots.isEmpty()) {
+									noMoreSlots = true; // Added 2016-05-05 by ASG
 									break;
+								}
 
 								/*
 								 * Create a new iterator and try to find a match again.

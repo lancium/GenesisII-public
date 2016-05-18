@@ -2,8 +2,8 @@ package edu.virginia.vcgr.genii.container.iterator;
 
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.axis.message.MessageElement;
@@ -11,7 +11,7 @@ import org.apache.axis.message.MessageElement;
 public abstract class AbstractIteratorBuilder<SourceType> implements IteratorBuilder<SourceType>, Iterable<MessageElement>
 {
 	private int _preferredBatchSize = DEFAULT_PREFERRED_BATCH_SIZE;
-	private List<Iterator<?>> _iterators = new LinkedList<Iterator<?>>();
+	private List<Iterator<?>> _iterators = new ArrayList<Iterator<?>>(DEFAULT_PREFERRED_BATCH_SIZE);
 
 	abstract protected MessageElement serialize(SourceType item) throws IOException;
 

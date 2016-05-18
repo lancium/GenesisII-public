@@ -490,7 +490,7 @@ public class Container extends ApplicationBase
 	{
 		Class<?> ret = null;
 
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug(String.format("Asked to get class for service URL \"%s\".", serviceURL));
 
 		Matcher matcher = SERVICE_NAME_FROM_URL.matcher(serviceURL);
@@ -507,7 +507,7 @@ public class Container extends ApplicationBase
 			}
 		}
 
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug(String.format("Class for %s is %s.", serviceURL, ret.getName()));
 		return ret;
 	}

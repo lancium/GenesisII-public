@@ -33,7 +33,8 @@ public class RNSLookupCache extends CommonCache
 		int fileLookupCacheCapacity = capacity - directoryLookupCacheCapacity;
 
 		fileLookupCache = new TimedOutLRUCache<String, EndpointReferenceType>(fileLookupCacheCapacity, cacheLifeTime, "file lookup cache");
-		directoryLookupCache = new TimedOutLRUCache<String, EndpointReferenceType>(directoryLookupCacheCapacity, cacheLifeTime, "directory lookup cache");
+		directoryLookupCache =
+			new TimedOutLRUCache<String, EndpointReferenceType>(directoryLookupCacheCapacity, cacheLifeTime, "directory lookup cache");
 
 		if (_logger.isTraceEnabled()) {
 

@@ -70,25 +70,21 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 	{
 		private QueueResourceInformation _row;
 		private int _newSlots;
-		private int _newCores;
 
 		private SlotChangerTask(QueueResourceInformation row, int newSlots, int newCores)
 		{
 			_row = row;
 			_newSlots = newSlots;
-			_newCores = newCores;
 		}
 
 		@Override
 		final public Boolean execute(TaskProgressListener progressListener) throws Exception
 		{
-			if(_row.resourceInformation().maxCores() == -1){
-				_queue.configureResource(
-						new ConfigureRequestType(_row.name(), new UnsignedInt(_newSlots), new UnsignedInt(_newSlots)));
-			}
-			else{
-				_queue.configureResource(
-						new ConfigureRequestType(_row.name(), new UnsignedInt(_newSlots), new UnsignedInt(_row.resourceInformation().maxCores())));
+			if (_row.resourceInformation().maxCores() == -1) {
+				_queue.configureResource(new ConfigureRequestType(_row.name(), new UnsignedInt(_newSlots), new UnsignedInt(_newSlots)));
+			} else {
+				_queue.configureResource(new ConfigureRequestType(_row.name(), new UnsignedInt(_newSlots),
+					new UnsignedInt(_row.resourceInformation().maxCores())));
 			}
 			return Boolean.TRUE;
 		}
@@ -98,12 +94,10 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 	{
 		private QueueResourceInformation _row;
 		private int _newCores;
-		private int _newSlots;
 
 		private CoreChangerTask(QueueResourceInformation row, int newSlots, int newCores)
 		{
 			_row = row;
-			_newSlots = newSlots;
 			_newCores = newCores;
 		}
 

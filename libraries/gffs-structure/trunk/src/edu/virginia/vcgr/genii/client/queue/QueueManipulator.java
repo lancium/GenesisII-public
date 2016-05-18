@@ -92,7 +92,8 @@ public class QueueManipulator
 
 		WSIterable<JobInformationType> iterable = null;
 		try {
-			iterable = WSIterable.axisIterable(JobInformationType.class, queue.iterateStatus(jobTickets).getResult(), 200);
+			iterable = WSIterable.axisIterable(JobInformationType.class, queue.iterateStatus(jobTickets).getResult(),
+				QueueConstants.PREFERRED_BATCH_SIZE);
 			return new JobInformationIterator(iterable.iterator());
 		} finally {
 			StreamUtils.close(iterable);

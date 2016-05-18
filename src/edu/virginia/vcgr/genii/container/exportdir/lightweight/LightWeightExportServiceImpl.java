@@ -141,7 +141,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 		// make sure the user is set properly if we need to know it.
 		if (ExportProperties.getExportProperties().getExportMechanism().equals(ExportMechanisms.EXPORT_MECH_PROXYIO)
 			|| ExportProperties.getExportProperties().getExportMechanism().equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
-			
+
 			if (owningUnixUser == null) {
 				// not having a unix user is fatal for these types of export creations.
 				String msg = "Failed to discover Unix user in the grid-mapfile for this export, owner DN was: " + ownerDN;
@@ -154,13 +154,13 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService implem
 		ExportControlsList ecl = ExportControlsList.getExportControlsList();
 		Set<ModeAllowance> modes;
 		/*
-		 * future: how to pick the right modes for the export based on the export's read-only or read-write nature? currently
-		 * impossible since exports are just exports without a sense of read-only. need to add this feature in future.
+		 * future: how to pick the right modes for the export based on the export's read-only or read-write nature? currently impossible since
+		 * exports are just exports without a sense of read-only. need to add this feature in future.
 		 */
 		modes = ModeAllowance.getReadWriteMode();
 		if (!ecl.checkCreationOkay(initInfo.getPath(), owningUnixUser, modes)) {
-			String msg = "cannot create export; this path is blocked for user '" + owningUnixUser + "' by export controls: "
-				+ initInfo.getPath();
+			String msg =
+				"cannot create export; this path is blocked for user '" + owningUnixUser + "' by export controls: " + initInfo.getPath();
 			_logger.error(msg);
 			throw new ResourceException(msg);
 		}

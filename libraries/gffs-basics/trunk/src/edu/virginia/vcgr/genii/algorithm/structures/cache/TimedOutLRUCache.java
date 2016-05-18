@@ -80,7 +80,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 			}
 		}
 	}
-	
+
 	public String debugPrefix()
 	{
 		return _cacheName + ": ";
@@ -149,11 +149,10 @@ public class TimedOutLRUCache<KeyType, DataType>
 	}
 
 	// hmmm: highly experimental memory analysis code here!
-	//private final long CHECK_INTERVAL = 1000 * 60; // one minute interval between deep checks currently.
-	
-	private final long CHECK_INTERVAL = 1000 * 10;//hmmm: way too fast interval, being used for debugging.
-	
-	
+	// private final long CHECK_INTERVAL = 1000 * 60; // one minute interval between deep checks currently.
+
+	private final long CHECK_INTERVAL = 1000 * 10;// hmmm: way too fast interval, being used for debugging.
+
 	private Date _nextDeepSizeCheck = new Date((new Date().getTime()) + CHECK_INTERVAL);
 
 	public DataType get(KeyType key)
@@ -163,13 +162,13 @@ public class TimedOutLRUCache<KeyType, DataType>
 		if (now.after(_nextDeepSizeCheck)) {
 
 			// hmmm: would be nice to break that into k, m, g, etc.
-			//hmmm: trying the deep footprint on 'this' is giving unrealistic very small sizes.
-			//hmmm: also the deep size check is dying with a stack overflow during the large rns directory test, so we cannot use it yet.
-//			if (_logger.isDebugEnabled()) {
-//				long sizeUsed = MemoryFootprint.getDeepFootprint(_map) + MemoryFootprint.getDeepFootprint(_lruList)
-//					+ MemoryFootprint.getDeepFootprint(_timeoutList);
-//				_logger.debug(SizeOf.humanReadable(sizeUsed) + " consumed by "+ _cacheName);
-//			}
+			// hmmm: trying the deep footprint on 'this' is giving unrealistic very small sizes.
+			// hmmm: also the deep size check is dying with a stack overflow during the large rns directory test, so we cannot use it yet.
+			// if (_logger.isDebugEnabled()) {
+			// long sizeUsed = MemoryFootprint.getDeepFootprint(_map) + MemoryFootprint.getDeepFootprint(_lruList)
+			// + MemoryFootprint.getDeepFootprint(_timeoutList);
+			// _logger.debug(SizeOf.humanReadable(sizeUsed) + " consumed by "+ _cacheName);
+			// }
 
 			_nextDeepSizeCheck = new Date((new Date().getTime()) + CHECK_INTERVAL);
 		}

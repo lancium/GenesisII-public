@@ -180,6 +180,7 @@ public class PreferredIdentity implements Serializable
 			if (prefChunk == null)
 				return null;
 			if (prefChunk instanceof String) {
+				if (_logger.isTraceEnabled())
 				_logger.debug("found preferred identity blob in calling context:" + prefChunk.toString());
 				return PreferredIdentity.decodePrefId((String) prefChunk);
 			} else if (prefChunk instanceof PreferredIdentity) {
@@ -224,7 +225,7 @@ public class PreferredIdentity implements Serializable
 			return null;
 		}
 		String justFixated = encoded.substring(0, commaPosn);
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("got fixation flag of: " + justFixated);
 		boolean fixated = Boolean.valueOf(justFixated);
 		encoded = encoded.substring(commaPosn + 1);
@@ -234,7 +235,7 @@ public class PreferredIdentity implements Serializable
 		}
 		// skip "dn=" bit and terminating colon, remainder is identity DN.
 		String ident = encoded.substring(3, encoded.length() - 1);
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("decoded identity: '" + ident + "'");
 		return new PreferredIdentity(ident, fixated);
 	}
