@@ -6,8 +6,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 
-// hmmm: fix the crazy noisy debug logging in this class.
-
 /**
  * a class that tracks previously seen credentials for a particular session credential.
  */
@@ -15,14 +13,13 @@ public class ServerSideStreamliningCredentialCache extends TimedOutLRUCache<Stri
 {
 	static private Log _logger = LogFactory.getLog(ServerSideStreamliningCredentialCache.class);
 
+	// hmmm: put the max sessions cached and session lifetime into a config file!
+
 	/*
 	 * the most client sessions that we will try to cache.
 	 */
 	static public int MAXIMUM_SESSIONS_CACHED = 100;
-	// hmmm: put this in a config file!
-
 	static public long SESSION_LIFETIME = 1000 * 60 * 10; // 10 minutes.
-	// hmmm: put this in a config file!
 
 	// our singleton listing for credentials sent by clients previously, where each client is listed by its x509 tls cert.
 	public static ServerSideStreamliningCredentialCache _clientSessionCredentialsCache =

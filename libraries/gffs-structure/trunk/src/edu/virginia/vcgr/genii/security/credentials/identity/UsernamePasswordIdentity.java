@@ -217,4 +217,17 @@ public class UsernamePasswordIdentity implements Identity, NuCredential, XMLComp
 	{
 		// the former version of this (without delegation depth) also had a null implementation.
 	}
+
+	/**
+	 * To "sanitize" means to convert a plain text password to its encrypted version
+	 */
+	@Override
+	public String getEPI(boolean sanitize)
+	{
+		String epi = USER_NAME_PASSWD_EPI + getUserName();
+		// int pwlen = getPassword().length();
+		if (!sanitize)
+			epi = epi + "/" + getPassword();
+		return epi;
+	}
 }

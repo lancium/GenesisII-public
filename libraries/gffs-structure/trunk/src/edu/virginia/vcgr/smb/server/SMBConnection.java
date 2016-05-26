@@ -296,7 +296,6 @@ public class SMBConnection implements Runnable
 	public void send(SMBBuffer buffer) throws IOException
 	{
 		// way too noisy for normal debug.
-		// hmmm: reads will be way too noisy when they are chunks of file updates too.
 		if (_logger.isTraceEnabled())
 			_logger.debug("sending buffer:\n" + TextHelper.dumpByteArray(buffer.preparePacket().array()));
 		CommUtils.writeFully(client, buffer.preparePacket());
@@ -470,8 +469,7 @@ public class SMBConnection implements Runnable
 		ByteBuffer packet = ByteBuffer.allocate(length);
 		CommUtils.readFully(client, packet);
 
-		// hmmm: reduce the logging level here!
-		if (_logger.isDebugEnabled())
+		if (_logger.isTraceEnabled())
 			_logger.debug("received buffer:\n" + TextHelper.dumpByteArray(packet.array()));
 
 		packet.flip();

@@ -92,7 +92,7 @@ public class ByteIOConfigurationPack
 	 */
 	public void verify()
 	{
-		// hmmm: consider adding constants for the out of bounds values here in this method...
+		// hmmm: add constant definitions for the out of bounds values here in this method...
 
 		if (long_buffer_size < 1024 * 256) {
 			long_buffer_size = 1024 * 256;

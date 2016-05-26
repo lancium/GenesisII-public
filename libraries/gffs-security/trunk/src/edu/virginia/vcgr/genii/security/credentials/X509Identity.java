@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -295,6 +296,47 @@ public class X509Identity implements Identity, NuCredential, RWXAccessible
 		} catch (Exception e) {
 			_logger.error("failed to generate byte representation for a cert");
 			return false;
+		}
+	}
+
+	@Override
+	public String getEPI(boolean sanitize)
+	{
+		String principal = _identity[0].getSubjectX500Principal().toString();
+
+		String epiStr = null;
+		// Now we need to suck the EPI out of the string, it is of the following form
+		/*
+		 * "CN=X509AuthnPortType, CN=gffs-tutorial-group, SERIALNUMBER=urn:ws-naming:epi:3316F3D0-6504-D5D2-2C75-49D5CD736C1A, OU=GFFS,
+		 * O=XSEDE, L=Nationwi de, ST=Virginia, C=US" or "CN=Andrew Grimshaw, O=National Center for Supercomputing Applications, C=US" So,
+		 * check if there is an EPI, if not create one by hashing the first 52 chars
+		 */
+		if (_logger.isTraceEnabled())
+			_logger.debug("getEPI: principal is " + principal);
+		int pos = principal.indexOf("urn:ws-naming:epi:");
+		if (pos >= 0) {
+			int comaPos = principal.indexOf(',', pos);
+			if (comaPos < 0)
+				comaPos = principal.length();
+			if (comaPos >= 0) {
+				epiStr = principal.substring(pos, comaPos);
+				return epiStr;
+			}
+		}
+		// Check if it just as a serial number and use that
+		BigInteger serial = _identity[0].getSerialNumber();
+		epiStr = "SN:" + _identity[0].getIssuerX500Principal().getName() + ":" + serial;
+		if (epiStr.length() < 56) {
+			// We're ok, we can only have principalEPIs of 56 char's in the x509Indentity DB
+			return epiStr;
+		} else {
+			// Got to make something up
+			epiStr = "SN:" + serial;
+			if (epiStr.length() < 56) {
+				// We're ok, we can only have principalEPIs of 56 char's in the x509Indentity DB
+				return epiStr;
+			} else
+				return null;
 		}
 	}
 

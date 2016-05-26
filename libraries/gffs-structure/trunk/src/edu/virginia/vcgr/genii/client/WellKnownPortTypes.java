@@ -280,4 +280,9 @@ public class WellKnownPortTypes
 		return PortType.portTypeFactory().get(
 			new QName("http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker", "EnhancedNotificationBrokerPortType"));
 	}
+
+	static public PortType GLOBUS_AUTHN_SERVICE_PORT_TYPE()
+	{
+		return PortType.portTypeFactory().get(new QName("http://vcgr.cs.virginia.edu/container/2007/11/globus-authn", "GlobusAuthnPortType"));
+	}
 }

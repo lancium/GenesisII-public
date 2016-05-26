@@ -6,7 +6,7 @@ import java.security.KeyStore;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
-
+import org.morgan.util.GUID;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
 
@@ -209,5 +209,13 @@ public class X509PatternAclEntry implements AclEntry
 	public AclEntry sanitize()
 	{
 		return this;
+	}
+
+	@Override
+	public String getEPI(boolean sanitize)
+	{
+		String epiStr = new GUID().toString();
+		epiStr = "GUID:" + epiStr;
+		return epiStr;
 	}
 }

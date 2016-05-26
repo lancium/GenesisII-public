@@ -304,11 +304,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParameters)
-		throws ResourceException, BaseFaultType, RemoteException
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		if (_logger.isTraceEnabled())
-		_logger.debug("postCreate: " + this.getClass().getName() + " -- " + constructionParameters.size() + " construct parms, "
-			+ resolverCreationParameters.size() + " resolver creation parms");
+			_logger.debug("postCreate: " + this.getClass().getName() + " -- " + constructionParameters.size() + " construct parms, "
+					+ resolverCreationParameters.size() + " resolver creation parms");
 
 		IResource resource = rKey.dereference();
 
@@ -1181,6 +1181,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			MessageElement[] any = ins.get_any();
 			for (MessageElement elem : any) {
 				QName name = elem.getQName();
+				if (_logger.isTraceEnabled())
+					_logger.debug("setting resource property: " + name.toString());
 				Collection<MessageElement> list = map.get(name);
 				if (list == null)
 					map.put(name, list = new ArrayList<MessageElement>());

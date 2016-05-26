@@ -55,7 +55,6 @@ public class FileSystemHelper
 		return Files.isSymbolicLink(nioPath);
 	}
 
-	// hmmm: don't we have this already? that's hard to believe....
 	/**
 	 * makes the string a more friendly filesystem path for java. this includes turning backslashes into forward slashes.
 	 */
@@ -65,7 +64,6 @@ public class FileSystemHelper
 			return toClean; // can't fix nothing.
 		// _logger.debug("before='" + toClean + "'");
 
-		// String toReturn = toClean.replaceAll("[\\\\]", "/");
 		String toReturn = toClean.replace('\\', '/');
 
 		// future: any other cleanings we should do on the path?

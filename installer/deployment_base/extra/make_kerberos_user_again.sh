@@ -19,7 +19,11 @@ fi
 
 $GENII_INSTALL_DIR/grid logout --all ; $GENII_INSTALL_DIR/grid login --username=admin "--password=$ADMIN_PASSWORD"
 
-bash $GENII_INSTALL_DIR/toolkit/tools/migration/recreate_kerb_user.sh $user
+bash $GENII_INSTALL_DIR/toolkit/tools/migration/recreate_kerb_user.sh $user &>/dev/null
+if [ $? -ne 0 ]; then
+  echo The recreate_kerb_user script has failed.  Bailing out.
+  exit 1
+fi
 
 #not portable.
 cp $GENII_INSTALL_DIR/installer/deployment_base/extra/KHANDROMA.CS.VIRGINIA.EDU@TERAGRID.ORG.gffs-sts.keytab $GENII_INSTALL_DIR/deployments/bootstrapped_grid/security/

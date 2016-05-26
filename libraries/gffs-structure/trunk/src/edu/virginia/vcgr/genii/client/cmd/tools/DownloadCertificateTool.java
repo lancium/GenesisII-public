@@ -51,7 +51,7 @@ public class DownloadCertificateTool extends BaseGridTool
 
 	public DownloadCertificateTool()
 	{
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), true, ToolCategory.SECURITY);
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.SECURITY);
 	}
 
 	@Override

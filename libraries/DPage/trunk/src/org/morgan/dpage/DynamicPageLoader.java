@@ -20,8 +20,6 @@ public class DynamicPageLoader
 	static public void addHandler(Server jettyServer, AbstractHandler newHandler)
 	{
 		HandlerList newList = new HandlerList();
-
-		// hmmm: do we want new handler to go in first? probably?
 		newList.addHandler(newHandler);
 
 		Handler[] handlers = jettyServer.getHandlers();
@@ -34,8 +32,6 @@ public class DynamicPageLoader
 	static public void addHandler(ContextHandler contexty, AbstractHandler newHandler)
 	{
 		HandlerList newList = new HandlerList();
-
-		// hmmm: do we want new handler to go in first? probably?
 		newList.addHandler(newHandler);
 
 		Handler[] handlers = contexty.getHandlers();

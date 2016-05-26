@@ -93,10 +93,11 @@ $XSEDE_HOME_PATH          = "$XSEDE_NAMESPACE_BASE/home/xsede.org";
 $XSEDE_DELETED_HOME_PATH  = "$XSEDE_NAMESPACE_BASE/home/deleted.xsede.org";
 
 # Global namespace scripts
-$XSEDE_ADDUSER_SCRIPT     = "$XSEDE_ADMIN_SCRIPTS/create-xsede-user.xml";
+#$XSEDE_ADDUSER_SCRIPT     = "$XSEDE_ADMIN_SCRIPTS/create-xsede-user.xml";
 $XSEDE_DELUSER_SCRIPT     = "$XSEDE_ADMIN_SCRIPTS/delete-xsede-user.xml";
-$XSEDE_GROUPUSER_SCRIPT   = "$XSEDE_ADMIN_SCRIPTS/link-xsede-user-to-group.xml";
+#$XSEDE_GROUPUSER_SCRIPT   = "$XSEDE_ADMIN_SCRIPTS/link-xsede-user-to-group.xml";
 $XSEDE_COMBINED_SCRIPT    = "$XSEDE_ADMIN_SCRIPTS/combined-user-management.xml";
+$XSEDE_GLOBUSAUTH_SCRIPT  = "$XSEDE_ADMIN_SCRIPTS/create-globusauth-user.sh";
 
 $XSEDE_USERS_GROUP = 'gffs-users';
 $XSEDE_ADMINS_GROUP = 'gffs-admins';
@@ -210,7 +211,7 @@ eval {
         @newaccounts = @newaccounts[1 .. $MAX_ACCOUNTS_FOR_TEST];
         print "For testing new account limit set = " . scalar(@newaccounts) . "\n" if ($DEBUG);
     }
-    my @add_commands;
+    my @parallel_add_commands;
 #trying out single-file, but conjoined, create operations.
     my @serialized_add_commands;
     foreach my $account_name (@newaccounts) {
@@ -220,7 +221,7 @@ eval {
         my $admin_group = '';  #( grep(/^$account_name$/, @ADMIN_ACCOUNTS) ) ? $XSEDE_ADMINS_GROUP : '';
         my $verbose = ($DEBUG) ? '' : '>/dev/null';
         my $cmd = "$GRIDCMD script $XSEDE_COMBINED_SCRIPT c $account_name $XSEDE_USERS_GROUP $admin_group $verbose";
-        push @add_commands, $cmd;
+        push @parallel_add_commands, $cmd;
 
         my $s_cmd = "script $XSEDE_COMBINED_SCRIPT c $account_name $XSEDE_USERS_GROUP $admin_group\n"
            . "onerror Failure to create user account $account_name\n";
@@ -228,13 +229,27 @@ eval {
     }
 
     # If in testing mode, only do a small set of users.
-    @add_commands = @add_commands[0 .. $MAX_ACCOUNTS_FOR_TEST] if ($TESTING);
+#old and redundant    @parallel_add_commands = @parallel_add_commands[0 .. $MAX_ACCOUNTS_FOR_TEST] if ($TESTING);
 
     # run some number of the commands in parallel.
-#    forker(@add_commands);
+#doesn't work well.  or maybe at all.
+#    forker(@parallel_add_commands);
 
     # run batches of commands in a single grid command.
     batch_runner(@serialized_add_commands);
+
+    # now add in the globus auth user for each of these new accounts.
+    foreach my $account_name (@newaccounts) {
+        # set up the script line we'll call.
+        my $cmd = "bash $XSEDE_GLOBUSAUTH_SCRIPT $XSEDE_STS_CONTAINER $account_name"
+        # run the command.
+        system($cmd);
+        local $exitval = $?;
+        if ($exitval != 0) {
+          print "saw failure in globus auth creation command ($exitval).\n";
+          exit $exitval;
+        }
+    }
 
     @deletedaccounts = $lc->get_Ronly;
     %accounts_to_be_preserved = map { $_ => 1 } @ADMIN_ACCOUNTS;

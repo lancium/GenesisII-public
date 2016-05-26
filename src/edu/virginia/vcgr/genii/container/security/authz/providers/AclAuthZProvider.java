@@ -247,9 +247,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				trustList = acl.executeAcl;
 				break;
 			case OPEN:
-				// /hmmm: could measure this with grant check if changed wording.
 				if (_logger.isDebugEnabled())
-					_logger.debug("giving access to identity due to OPEN permission: "
+					_logger.debug("access granted due to OPEN permission for identity: "
 						+ ((identity != null) ? identity.describe(VerbosityLevel.HIGH) : "null"));
 				return true;
 			case CLOSED:
@@ -297,9 +296,9 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			msg = msg.concat(" on '" + asset + "' at " + ProgramTools.showLastFewOnStack(7));
 			_logger.info(msg);
 
-			// hmmm: temporary added logging; was not seeing creds in other location in server wsdoall recvr.
-			_logger.debug("failed access attempt had these credentials: "
-				+ TrustCredential.showCredentialList(authenticatedCallerCredentials, VerbosityLevel.HIGH));
+			if (_logger.isDebugEnabled())
+				_logger.debug("failed access attempt had these credentials: "
+					+ TrustCredential.showCredentialList(authenticatedCallerCredentials, VerbosityLevel.HIGH));
 
 			return false;
 		}

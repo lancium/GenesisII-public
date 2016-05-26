@@ -315,6 +315,9 @@ public class GeniiPath implements Serializable
 
 	/**
 	 * returns a list of paths of either local java File or RNSPath objects.
+	 * 
+	 * hmmm: this needs to work with an iterator; it's easy to come up with a set of
+	 * result files from expansion that blow away all available memory.
 	 */
 	public static Collection<PathMixIn> pathExpander(String path)
 	{

@@ -22,5 +22,5 @@ public class QueueConstants
 	static final public String ATTEMPT_NUMBER_HISTORY_PROPERTY = "Attempt Number";
 	static final public String QUEUE_STARTED_HISTORY_PROPERTY = "Queue Started";
 
-	static final public int PREFERRED_BATCH_SIZE = 100;
+	static final public int PREFERRED_BATCH_SIZE = 1000;
 }

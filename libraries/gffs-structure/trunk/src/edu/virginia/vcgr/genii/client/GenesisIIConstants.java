@@ -134,4 +134,8 @@ public class GenesisIIConstants
 
 	// This property will hold values such as r, rw, rwx. It is used at resource creation time.
 	static public final String CREATION_MASK = "Creation_Mask";
+	
+	// some STS storage paths that we need to know about.
+	static public final String DEFAULT_XSEDE_USERS_PATH = "/users/xsede.org";
+	static public final String DEFAULT_GLOBUSAUTH_USERS_PATH = "/users/globus-auth";
 }

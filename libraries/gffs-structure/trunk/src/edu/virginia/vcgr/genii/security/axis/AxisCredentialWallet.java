@@ -117,13 +117,13 @@ public class AxisCredentialWallet
 				encodedCredentials.appendChild(convertToAxis(unicoreToAxisConverter, assertion));
 			}
 		}
-		
+
 		/*
-		 * hmmm: it's not safe!  not until the rpc has happened!
-		 * 
+		 * hmmm: it's not safe to record here, not until the rpc has happened!
+		 * two threads operating on the same resource could think the container already knows a cred that it doesn't have yet.
 		 * actually this concern may be slightly overblown, since we always have the mechanism for handling missing credentials.
 		 */
-		
+
 		// now it should be safe to add the references as "seen", since we've generated the set for all the chains.
 		for (String ref : newlySent) {
 			if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())

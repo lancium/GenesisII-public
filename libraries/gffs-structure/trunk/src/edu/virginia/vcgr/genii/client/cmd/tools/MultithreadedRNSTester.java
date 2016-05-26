@@ -61,7 +61,7 @@ public class MultithreadedRNSTester extends BaseGridTool
 
 	public MultithreadedRNSTester()
 	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.DATA);
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE), false, ToolCategory.TESTING);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 

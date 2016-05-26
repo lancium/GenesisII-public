@@ -33,9 +33,10 @@ public class DatabaseConnectionPool
 	static public final int MAX_SNOOZE_AWAITING_POOL = 2 * 60 * 1000; // in milliseconds.
 	// hmmm: ridiculously large delay allowed now; was 4 seconds originally!
 	// currently set to 2 minutes before the db attempt will fail.
+	// ends up being irrelevant since we aren't really pooling the connections; if one isn't cached, we just hand out a new one.
 
 	static public Integer extantDbConnections = 0;
-	
+
 	/*
 	 * number of milliseconds to snooze between lock attempts. it doesn't seem to help to retry very frequently, kind of seems worse.
 	 */
@@ -67,13 +68,13 @@ public class DatabaseConnectionPool
 			throw new IllegalArgumentException("Connect string cannot be null for database connection.");
 
 		// we only need this chunk of code if we're actually doing pooling, and we've found we cannot.
-//		for (int i = 0; i < getPoolSize(); i++) {
-//			try {
-//				getConnPool().add(createConnection());
-//			} catch (SQLException e) {
-//				_logger.error("failed to create initial DB connection", e);
-//			}
-//		}
+		// for (int i = 0; i < getPoolSize(); i++) {
+		// try {
+		// getConnPool().add(createConnection());
+		// } catch (SQLException e) {
+		// _logger.error("failed to create initial DB connection", e);
+		// }
+		// }
 	}
 
 	public static class DBPropertyNames
@@ -175,8 +176,6 @@ public class DatabaseConnectionPool
 		Connection connection = null;
 		if (_logger.isTraceEnabled()) {
 			_logger.debug("Acquiring DB connection with " + getConnPool().size() + " held in pool.");
-			// hmmm: remove the below one, too noisy.
-			// _logger.debug("dbconn acquire by:" + ProgramTools.showLastFewOnStack(20));
 		}
 
 		int attempts = (int) ((double) MAX_SNOOZE_AWAITING_POOL / (double) TIME_TAKEN_PER_SNOOZE + 1);
@@ -265,7 +264,7 @@ public class DatabaseConnectionPool
 			if ((extant > 5) && ((extant % 10) == 0))
 				_logger.debug("upon release, db connections in existence: " + extant);
 		}
-		
+
 		synchronized (getConnPool()) {
 			try {
 				try {
@@ -274,8 +273,8 @@ public class DatabaseConnectionPool
 						getConnPool().addLast(conn);
 						return;
 					} else {
-						//only an error for real pooling implementation.
-//						_logger.error("tried to release more db connections than should be in pool!");
+						// only an error for real pooling implementation.
+						// _logger.error("tried to release more db connections than should be in pool!");
 					}
 				} catch (SQLException sqe) {
 					_logger.error("Exception releasing connection.", sqe);

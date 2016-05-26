@@ -1,5 +1,8 @@
 #!/bin/bash
 
+### NOTE: this test is not currently working.
+### it needs some fixes / updates.
+
 # Tests the capability for staging directories in and out during job processing.
 
 # Author: Chris Koeritz
@@ -62,21 +65,25 @@ testResultingDirectoryStageOut()
 
   pushd ./vi-source
   assertEquals "Changing to source directory for compare" 0 $?
-  find . -type f >"$out1"
+  find . -type f >"${out1}.tmp"
   assertEquals "Running find on input directory to get file names" 0 $?
+  sort "${out1}.tmp" > "$out1"
+  rm "${out1}.tmp"
   popd
 
   pushd ./murphy
   assertEquals "Changing to source directory for compare" 0 $?
-  find . -type f >"$out2"
+  find . -type f >"${out2}.tmp"
   assertEquals "Running find on output directory to get file names" 0 $?
+  sort "${out2}.tmp" > "$out2"
+  rm "${out2}.tmp"
   popd
 
   outpoof=$(comm -23 "$out1" "$out2")
-  assertEquals "Comparing the files listed in both dirs with comm" 0 $?
+  assertEquals "Comparing the files listed in both dirs with comm to see if any of the original files are missing" 0 $?
 
   fsize=${#outpoof}
-  assertEquals "Output file should be empty from running comm tool" 0 $fsize
+  assertEquals "List of files missing from first set should be empty" 0 $fsize
 
 }
 

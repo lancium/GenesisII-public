@@ -146,7 +146,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 
@@ -464,6 +464,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 
 		Collection<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
 		Timer prepTimer = tSink.getTimer("Prepare Entries");
+
 		for (InternalEntry internalEntry : entries) {
 			if (!internalEntry.isExistent()) {
 				// the looked-up entry does not exist . Only for non-batch

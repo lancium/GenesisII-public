@@ -97,7 +97,6 @@ public class SMBRByteIOFile extends SMBFile
 	public void setWriteTime(long millis)
 	{
 		if (millis <= 0) {
-			// hmmm: lower logging level
 			if (_logger.isDebugEnabled())
 				_logger.debug("setWriteTime bailing from setting time to bogus " + millis);
 			return;
@@ -116,7 +115,6 @@ public class SMBRByteIOFile extends SMBFile
 	public void setAccessTime(long millis)
 	{
 		if (millis <= 0) {
-			// hmmm: lower logging level
 			if (_logger.isDebugEnabled())
 				_logger.debug("setAccessTime bailing from setting time to bogus " + millis);
 			return;

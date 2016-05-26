@@ -21,8 +21,6 @@ public class GridJobToolApplication extends AbstractExternalApplication
 		initialFiles.add(content);
 		JobToolManager.launch(initialFiles, null);
 
-		// hmmm: do we ever actually hit this method at all?
-
 		while (true) {
 			if (BasicFrameWindow.activeFrames(GridJobToolFrame.class) <= 0) {
 				/*

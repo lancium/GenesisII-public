@@ -12,12 +12,18 @@ fi
 echo "going to build in '$source_directory' and copy results to '$target_directory'"
 
 # clean first.
-\rm -rf "$source_directory"
+#no!!!   \rm -rf "$source_directory"
 
 # then make sure the source directory exists.
-mkdir "$source_directory"
-if [ $? -ne 0 ]; then
-  echo failed to make the source directory and it does not already exist.
+#no!!!   mkdir "$source_directory"
+#no!!!   if [ $? -ne 0 ]; then
+#no!!!     echo failed to make the source directory and it does not already exist.
+#no!!!     exit 1
+#no!!!   fi
+
+# make sure the source directory already exists.
+if [ ! -d "$source_directory" ]; then
+  echo "The specified source directory does not exist: $source_directory"
   exit 1
 fi
 

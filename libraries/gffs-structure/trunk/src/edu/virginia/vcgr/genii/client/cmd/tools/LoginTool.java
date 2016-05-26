@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -17,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
@@ -75,19 +75,29 @@ public class LoginTool extends BaseLoginTool
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 
+	/**
+	 * login will checks this list of idp paths, in order, if one is not passed on the command line
+	 */
 	private static Collection<String> getDefaultIDPPaths(String username)
 	{
-		LinkedList<String> idpList = new LinkedList<String>();
+		ArrayList<String> idpList = new ArrayList<String>();
 
 		NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
 
 		String constructedPath = constructPathFromLoginName(null, username);
 		if (constructedPath != null) {
+			// add the default path in front of the weird email hierarchy name we got back.
 			idpList.add(nsd.getUsersDirectory() + "/" + constructedPath);
 		}
 
-		// Checks this lists of idp paths, in order,
-		// if one is not passed on the command line
+		// if we're in xsede.org namespace, we need to add the globus auth path in as first try.
+		if (nsd.getUsersDirectory().equals(GenesisIIConstants.DEFAULT_XSEDE_USERS_PATH)) {
+			idpList.add(0, GenesisIIConstants.DEFAULT_GLOBUSAUTH_USERS_PATH + "/" + username);
+			if (_logger.isTraceEnabled())
+				_logger.debug("found xsede user path is default, so trying globus first, with this path: " + idpList.get(0));
+		}
+
+		// add in the attempt to login based on the default users storage path.
 		idpList.add(nsd.getUsersDirectory() + "/" + username);
 
 		// Let's first load the LoginSearchPath properties file
@@ -250,9 +260,18 @@ public class LoginTool extends BaseLoginTool
 		CacheManager.resetCachingSystem();
 
 		{
+			// special code to not use /home/globus-auth as a home path, since we don't have those.
+			String pathToChop = _authnUri;
+			if (pathToChop.startsWith(GenesisIIConstants.DEFAULT_GLOBUSAUTH_USERS_PATH + "/")) {
+				pathToChop = GenesisIIConstants.DEFAULT_XSEDE_USERS_PATH + "/"
+					+ _authnUri.substring(GenesisIIConstants.DEFAULT_GLOBUSAUTH_USERS_PATH.length() + 1);
+				if (_logger.isTraceEnabled())
+					_logger.debug("amended path for auth after saw globus in there to move back to /users/xsede.org: " + pathToChop);
+			}
+
 			// jumps to the user's home directory.
 			// Assumption is that user idp's are off /user and homes off /home
-			String userHome = _authnUri.replaceFirst("users", "home");
+			String userHome = pathToChop.replaceFirst("users", "home");
 			try {
 				CdTool.chdir(userHome);
 				SetTool.set_var("HOME", userHome);
@@ -269,11 +288,6 @@ public class LoginTool extends BaseLoginTool
 		int numArgs = numArguments();
 		if (numArgs > 1)
 			throw new InvalidToolUsageException("This tool takes at most one argument.");
-
-		/*
-		 * cannot check this here, since verify is called before runCommand, which gathers this argument. if ((_username == null) ||
-		 * (_username.length() == 0)) throw new InvalidToolUsageException("The username cannot be blank.");
-		 */
 
 		if (_bogusPassword) {
 			if (_password != null) {
@@ -297,25 +311,11 @@ public class LoginTool extends BaseLoginTool
 
 	}
 
-	/*
-	 * public static void jumpToUserHomeIfExists(String loginName) {
-	 * 
-	 * if (loginName == null) return;
-	 * 
-	 * List<String> candidateHomeDirs = new ArrayList<String>(); String constructedPathToHome = constructPathFromLoginName(null, loginName);
-	 * 
-	 * NamespaceDefinitions nsd = Installation.getDeployment(new DeploymentName()).namespace();
-	 * 
-	 * if (constructedPathToHome != null) { candidateHomeDirs.add(nsd.getHomesDirectory() + "/" + constructedPathToHome);
-	 * candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + constructedPathToHome); } candidateHomeDirs.add(nsd.getHomesDirectory() +
-	 * "/" + loginName); candidateHomeDirs.add(nsd.getHomesDirectory() + "/demo/" + loginName); candidateHomeDirs.add("rns:/");
-	 * 
-	 * for (String userHome : candidateHomeDirs) { try { CdTool.chdir(userHome); break; } catch (Throwable e) { } } }
+	/**
+	 * a special purpose function that builds a reverse ordered path from an email address hierarchy, if we see that in the user name,
 	 */
-
 	public static String constructPathFromLoginName(String pathPrefix, String loginName)
 	{
-
 		if (loginName == null)
 			return null;
 

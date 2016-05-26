@@ -134,11 +134,6 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 
 			// future: is it useful to know the user? we do know it for slurm.
 
-			/*
-			 * hmmm: this overall approach seems to be kind of crazy. we are always asking the native queue for absolutely all jobs. why are
-			 * we not restricting that to the jobs submitted as the user that we submit jobs as???
-			 */
-
 			if ((_lastJobID == null) || (_lastJobState == null)) {
 				String msg = "Unable to parse status output.";
 				_logger.error(msg);

@@ -199,8 +199,6 @@ public class SMBTree
 
 		RNSPath file = root.lookup(path);
 
-		// hmmm: disabling case insensitive searches here.
-		// return file; //added to disable case insensitivity.
 		// File exists or no case-insensitive search needed?
 		if (caseSensitive || file.exists()) {
 			if (_logger.isDebugEnabled())

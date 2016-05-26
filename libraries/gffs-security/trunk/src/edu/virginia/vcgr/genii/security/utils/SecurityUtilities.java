@@ -51,6 +51,7 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.security.CertificateValidator;
 import edu.virginia.vcgr.genii.security.TrustStoreProvider;
+import edu.virginia.vcgr.genii.security.acl.AclEntry;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 import sun.misc.BASE64Encoder;
 
@@ -390,6 +391,16 @@ public class SecurityUtilities implements CertificateValidator
 			}
 		}
 	};
+
+	static public AclEntry getPrincipal(String principleEPI)
+	{
+		return null;
+	}
+
+	static public void createPrincipal(String principleEPI, AclEntry entry)
+	{
+		return;
+	}
 
 	static public List<Certificate> loadCertificatesFromDirectory(File directory)
 	{

@@ -177,7 +177,7 @@ public class CreateUserTool extends BaseGridTool
 	 * Enact the steps necessary to create the new IDP instance.
 	 * 
 	 * @param storeType
-	 *            THe store type to get a source credential from, or NULL
+	 *            The store type to get a source credential from, or NULL
 	 * @param sourcePath
 	 *            the Source URI to get a source credential from, or NULL
 	 * @param idpServicePath
@@ -200,7 +200,7 @@ public class CreateUserTool extends BaseGridTool
 			idpTool.addArgument(sourcePath);
 
 		// Set as user type
-		idpTool.setCredentialType(IdentityType.USER);
+		idpTool.setCredentialType(IdentityType.USER.name());
 
 		idpTool.addArgument(idpServicePath);
 		idpTool.addArgument(idpName);

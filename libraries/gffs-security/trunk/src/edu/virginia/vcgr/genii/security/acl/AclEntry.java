@@ -21,4 +21,6 @@ public interface AclEntry extends Serializable, Describable
 	public boolean isPermitted(Identity identity) throws GeneralSecurityException;
 
 	public AclEntry sanitize();
+
+	public String getEPI(boolean sanitize);
 }

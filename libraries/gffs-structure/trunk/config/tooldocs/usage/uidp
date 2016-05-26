@@ -17,3 +17,11 @@ idp
 		+ [--validDuration=<duration-string>]  
 		+ <Kerberos IDP service path> 
 		+ <Kerberos Id>		
+
+Create GlobusAuth-based user identity:
+idp
+		+ [--validDuration=<duration-string>]  
+		+ <Globus Auth IDP service path> 
+		+ <Globus Auth Id>		
+
+

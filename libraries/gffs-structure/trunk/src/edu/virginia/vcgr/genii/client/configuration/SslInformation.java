@@ -50,6 +50,31 @@ public class SslInformation
 	// connector.setWantClientAuth(true);
 	// }
 
+	public String getKeystoreFilename()
+	{
+		return _keystoreFilename;
+	}
+
+	public String getKeystoreType()
+	{
+		return _keystoreType;
+	}
+
+	public String getKeystorePassword()
+	{
+		return _keystorePassword;
+	}
+
+	public String getKeyPassword()
+	{
+		return _keyPassword;
+	}
+
+	/*
+	 * hmmm: neither the kerberos keytab stuff nor the globus auth stuff seem to belong in this file.
+	 * they both do need access to security.properties though.
+	 */
+	
 	// simple wrapper for the two strings needed to authorize against kerberos realm.
 	public class KerberosKeytabAndPrincipal
 	{
@@ -80,23 +105,32 @@ public class SslInformation
 		return new KerberosKeytabAndPrincipal(keytabFile, principal);
 	}
 
-	public String getKeystoreFilename()
+	
+	// simple wrapper for the two strings needed to authorize against kerberos realm.
+	public class GlobusAuthClientSecrets
 	{
-		return _keystoreFilename;
+		public String _clientId;
+		public String _clientSecret;
+
+		public GlobusAuthClientSecrets(String clientId, String clientSecret)
+		{
+			_clientId = clientId;
+			_clientSecret = clientSecret;
+		}
 	}
 
-	public String getKeystoreType()
+	public GlobusAuthClientSecrets loadGlobusAuthSecrets()
 	{
-		return _keystoreType;
+		String clientId = (String) _properties.getProperty(KeystoreSecurityConstants.GlobusAuth.GLOBUSAUTH_CLIENTID_STRING);
+		String clientSecret = (String) _properties.getProperty(KeystoreSecurityConstants.GlobusAuth.GLOBUSAUTH_CLIENTSECRET_STRING);
+
+		if ((clientId == null) || (clientSecret == null)) {
+			_logger.warn("Could not find the client id or client secret properties for GlobusAuth authentication in the security.properties");
+			return null;
+		}
+
+		return new GlobusAuthClientSecrets(clientId, clientSecret);
 	}
 
-	public String getKeystorePassword()
-	{
-		return _keystorePassword;
-	}
 
-	public String getKeyPassword()
-	{
-		return _keyPassword;
-	}
 }

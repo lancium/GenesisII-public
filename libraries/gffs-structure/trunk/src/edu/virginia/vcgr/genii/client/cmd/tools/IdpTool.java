@@ -45,7 +45,6 @@ import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 
 public class IdpTool extends BaseLoginTool
 {
-
 	static private final String _DESCRIPTION = "config/tooldocs/description/didp";
 	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/uidp";
 	static final private String _MANPAGE = "config/tooldocs/man/idp";
@@ -260,9 +259,10 @@ public class IdpTool extends BaseLoginTool
 	}
 
 	@Option({ "type" })
-	public void setCredentialType(IdentityType type)
+	public void setCredentialType(String type)
 	{
-		_type = type;
+		_type = IdentityType.valueOf(IdentityType.class, type);
+		_logger.debug("got passed a type of: " + _type );
 	}
 
 	/**

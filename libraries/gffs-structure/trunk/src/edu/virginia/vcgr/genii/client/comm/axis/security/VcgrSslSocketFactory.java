@@ -116,6 +116,9 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			_logger.warn("exception occurred in loadTrustManager", ex);
 		}
 	}
+	
+	// provided externally for cases where other mechanisms use the socket factory.
+	static public ICallingContext extraneousCallingContextForSocketFactory = null;
 
 	protected SSLSocketFactory getSSLSocketFactory() throws IOException
 	{
@@ -126,8 +129,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		try {
 			ICallingContext callingContext = threadCallingContext.get();
 			if (callingContext == null) {
-				throw new RuntimeException(
-					"We got a null calling context which " + "means that client invocation handler " + "didn't set it up correctly.");
+				_logger.debug("getSSLSocketFactory got a null calling context, so not a GFFS standard request; using external calling context.");
+				callingContext = extraneousCallingContextForSocketFactory;
 			}
 
 			KeyAndCertMaterial clientKeyMaterial =
@@ -337,9 +340,9 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			return false;
 		}
 	}
-	
+
 	/**
-	 * drops any connections that are not being used currently.  this causes the ssl information to be flushed out.
+	 * drops any connections that are not being used currently. this causes the ssl information to be flushed out.
 	 */
 	public static void closeIdleConnections()
 	{

@@ -231,6 +231,7 @@ public class InstallationProperties extends Properties
 	static public String getUserDir()
 	{
 		String userDir = null;
+		
 		// see if we have a valid container properties and can retrieve the value that way.
 		// ContainerProperties cProperties = ContainerProperties.getContainerProperties();
 		// if (cProperties != null)
@@ -239,8 +240,6 @@ public class InstallationProperties extends Properties
 		// well, see if we can just get the state directory from the environment.
 		// if (userDir == null)
 		userDir = ApplicationBase.getUserDirFromEnvironment();
-
-		// hmmm: getting the setting from environment is our only option at this point.
 
 		// now, if we have something at all, try comparing it with our replacement property.
 		userDir = ApplicationBase.replaceKeywords(userDir);

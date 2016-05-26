@@ -74,7 +74,7 @@ function nukem() {
 
 	#GRIDCMD=`which grid`
 	#GRIDPID=`pgrep -f "/bin/sh $GRIDCMD"`
-	GRIDPID=`cat $PIDFILE`
+	GRIDPID=`cat $PIDFILE 2>/dev/null`
 	if [ ! -z "$GRIDPID" ] ;
 	then
 		pkill --signal 9 -P $GRIDPID
@@ -155,7 +155,8 @@ then
 	PERM=`stat -c%A $SOCKFILE`
 	if [ "$PERM" != "srwx------" ] ;
 	then
-		echo "WARNING - PERMISSIONS HAVE BEEN MODIFIED ON $SOCKFILE"
+		#turned off because we can't parse extra lines in grid output.
+		#echo "WARNING - PERMISSIONS HAVE BEEN MODIFIED ON $SOCKFILE"
 		chmod go-rwx $SOCKFILE
 	fi
 else

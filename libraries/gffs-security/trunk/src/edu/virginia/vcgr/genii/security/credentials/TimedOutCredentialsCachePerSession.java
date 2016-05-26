@@ -14,7 +14,7 @@ public class TimedOutCredentialsCachePerSession extends TimedOutLRUCache<String,
 {
 	private static Log _logger = LogFactory.getLog(TimedOutCredentialsCachePerSession.class);
 
-	// hmmm: make these configurable values!
+	// hmmm: make these configurable values from a config file!
 
 	/*
 	 * this is the limit for the number of credentials that the container remembers coming from the client. it should be tuned to be a bit

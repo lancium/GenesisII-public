@@ -41,31 +41,15 @@ public class Config
 		}
 	};
 
-	/**
-	 * swaps in a "newContext" for the thread local message context to enable the config function below to return the right object if we're
-	 * actually in an axis call. the returned context must be swapped back in after the call, to avoid polluting other serialization attempts
-	 * with the transient message context for a call.
-	 */
-//	static public MessageContext rehookLocalContext(MessageContext newContext)
-//	{
-//		MessageContext toReturn = _heldContext.get();
-//		_heldContext.set(newContext);
-//		return toReturn;
-//	}
-
 	static public MessageContext getContext()
 	{
 		/*
 		 * hands out the current context, if one exists (indicating that axis is probably working on a call). otherwise it makes a new one
 		 * that's still thread local, to avoid concurrency issues when deserializing things.
-		 */		
+		 */
 		MessageContext toReturn = MessageContext.getCurrentContext();
 		if (toReturn == null) {
-//			 toReturn = new MessageContext(getClientEngine());
-//			 toReturn.setEncodingStyle("");
-//			 toReturn.setProperty(AxisClient.PROP_DOMULTIREFS, Boolean.FALSE);
-
-			// hmmm: newest scheme attempts to get rid of thread unsafety by using a different context per thread.
+			// newest scheme attempts to get rid of thread unsafety by using a different context per thread.
 			toReturn = _heldContext.get();
 		}
 

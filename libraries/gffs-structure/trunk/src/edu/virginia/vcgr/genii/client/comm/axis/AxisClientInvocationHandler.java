@@ -159,7 +159,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	public AxisClientInvocationHandler(Class<?>[] locators, EndpointReferenceType epr, ICallingContext callContext)
 		throws ResourceException, GenesisIISecurityException
 	{
-//		AxisServiceAndStubTracking.recordHandlerCreationAndTakeOutTrashIfAppropriate();
+		// AxisServiceAndStubTracking.recordHandlerCreationAndTakeOutTrashIfAppropriate();
 
 		try {
 			_epr = epr;
@@ -354,14 +354,14 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			Stub stubInstance = null;
 
 			Date startStubbing = new Date();
-//			stubInstance = AxisServiceAndStubTracking.getStubCache().getStub(reco._service, _serviceURL);
+			// stubInstance = AxisServiceAndStubTracking.getStubCache().getStub(reco._service, _serviceURL);
 
-//			if (stubInstance != null) {
-//				long duration = (new Date()).getTime() - startStubbing.getTime();
-//				_acquiredStubs.add(new AcquiredStubRecord(stubInstance, _serviceURL, reco));
-//				if (AxisServiceAndStubTracking.enableExtraLogging && _logger.isDebugEnabled())
-//					_logger.debug("reusing stub instance " + stubInstance + " for url " + _serviceURL + " took " + duration + " ms");
-//			}
+			// if (stubInstance != null) {
+			// long duration = (new Date()).getTime() - startStubbing.getTime();
+			// _acquiredStubs.add(new AcquiredStubRecord(stubInstance, _serviceURL, reco));
+			// if (AxisServiceAndStubTracking.enableExtraLogging && _logger.isDebugEnabled())
+			// _logger.debug("reusing stub instance " + stubInstance + " for url " + _serviceURL + " took " + duration + " ms");
+			// }
 
 			Method locatorPortTypeMethod = ClientUtils.getLocatorPortTypeMethod(reco._service.getClass());
 			if (stubInstance == null) {
@@ -690,7 +690,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					if (!failedParsingRefs) {
 						// hey, we made it, so now we can forget just those individual references.
 						for (String ref : refs) {
-							// hmmm: quiet this one.
 							if (_logger.isDebugEnabled())
 								_logger.debug("forgetting reference '" + ref + "' on container '" + guidString + "'");
 							ClientCredentialTracker.forgetCredentialForContainer(guidString, ref);
@@ -990,14 +989,12 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 
 		if (supportsStreamlining) {
-			// hmmm: reduce noise here.
 			if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())
 				_logger.debug("container supports credential streamlining: " + guidString);
 			if (containerGUID != null) {
 				ClientCredentialTracker.setContainerStreamliningSupport(guidString, true, true);
 			}
 		} else {
-			// hmmm: reduce noise here.
 			if (CredentialCache.SHOW_CREDENTIAL_STREAMLINING_ACTIONS && _logger.isDebugEnabled())
 				_logger.debug("container does not support credential streamlining: " + guidString);
 			if (containerGUID != null) {

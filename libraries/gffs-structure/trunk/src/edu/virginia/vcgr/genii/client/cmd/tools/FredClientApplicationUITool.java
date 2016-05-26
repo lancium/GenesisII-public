@@ -45,7 +45,7 @@ public class FredClientApplicationUITool extends BaseGridTool
 
 	public FredClientApplicationUITool()
 	{
-		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.GENERAL);
+		super(new LoadFileResource(DESCRIPTION), new LoadFileResource(USAGE), false, ToolCategory.TESTING);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 

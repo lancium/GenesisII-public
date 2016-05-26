@@ -344,7 +344,6 @@ public class ClientProperties extends Properties
 		return new SocketConfigurer(properties);
 	}
 
-	// hmmm: is this used to configure accepting sockets also??
 	/**
 	 * loads the configuration properties used by for configuring client (outgoing) sockets.
 	 */

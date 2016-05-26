@@ -123,21 +123,29 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 		ArrayList<RequestSecurityTokenResponseType> gatheredResponses = new ArrayList<RequestSecurityTokenResponseType>();
 		Collection<InternalEntry> entries = resource.retrieveEntries(null);
 
+		ICallingContext context = null;
+		try {
+			context = ContextManager.getCurrentContext();
+		} catch (Exception e2) {
+			String msg = "could not load calling context.";
+			_logger.error(msg, e2);
+			throw new RemoteException(msg, e2);
+		}
+
 		for (InternalEntry entry : entries) {
 			try {
 				EndpointReferenceType idpEpr = entry.getEntryReference();
 
 				if (_logger.isTraceEnabled()) {
-					ICallingContext context;
-					try {
-						context = ContextManager.getCurrentContext();
-						TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
-						_logger.debug("calling context has these creds before aggregation: "
-							+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
-					} catch (Exception e2) {
-						String msg = "could not load calling context to inspect credentials.";
-						_logger.error(msg, e2);
-					}
+					// try {
+					// context = ContextManager.getCurrentContext();
+					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
+					_logger.debug("calling context has these creds before aggregation: "
+						+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
+					// } catch (Exception e2) {
+					// String msg = "could not load calling context to inspect credentials.";
+					// _logger.error(msg, e2);
+					// }
 				}
 
 				// create a proxy to the remote idp and invoke it.
@@ -146,22 +154,23 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				if (responses != null) {
 					for (RequestSecurityTokenResponseType response : responses) {
 						gatheredResponses.add(response);
+
 					}
 				}
 			} catch (Exception e) {
 				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
 
 				if (_logger.isTraceEnabled()) {
-					ICallingContext context;
-					try {
-						context = ContextManager.getCurrentContext();
-						TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
-						_logger.error("calling context has these creds for failed IDP retrieval: "
-							+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
-					} catch (Exception e2) {
-						String msg = "could not load calling context to inspect credentials for failed IDP.";
-						_logger.error(msg, e2);
-					}
+					// ICallingContext context;
+					// try {
+					// context = ContextManager.getCurrentContext();
+					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
+					_logger.error("calling context has these creds for failed IDP retrieval: "
+						+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
+					// } catch (Exception e2) {
+					// String msg = "could not load calling context to inspect credentials for failed IDP.";
+					// _logger.error(msg, e2);
+					// }
 
 				}
 

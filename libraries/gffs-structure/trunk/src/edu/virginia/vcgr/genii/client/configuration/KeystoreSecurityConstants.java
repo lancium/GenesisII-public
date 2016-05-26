@@ -75,4 +75,13 @@ public interface KeystoreSecurityConstants
 			return KERBEROS_PRINCIPAL_STRING + realm;
 		}
 	}
+
+	/**
+	 * some constants for globus auth authentication. the client id and secret must be provided for authentication via two-legged oauth.
+	 */
+	public class GlobusAuth
+	{
+		static public final String GLOBUSAUTH_CLIENTID_STRING = "gffs-sts.globusauth.clientid";
+		static public final String GLOBUSAUTH_CLIENTSECRET_STRING = "gffs-sts.globusauth.clientsecret";
+	}
 }

@@ -45,7 +45,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 	protected ScriptBasedQueueConnection(File workingDirectory, ResourceOverrides resourceOverrides,
 		CmdLineManipulatorConfiguration cmdLineManipulatorConf, NativeQueueConfiguration queueConfig, ProviderConfigType providerConfig)
-		throws NativeQueueException
+			throws NativeQueueException
 	{
 		super(workingDirectory, resourceOverrides, cmdLineManipulatorConf, queueConfig, providerConfig);
 	}
@@ -104,7 +104,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		} finally {
 			StreamUtils.close(ps);
 
-			// hmmm: move this to gffs-basics as filesystem helper, but support passing a stream for the output to go to.
+			// hmmm: abstract this as a function in gffs-basics for filesystem helper, but support passing a stream for the output to go to.
 			if (_logger.isDebugEnabled()) {
 				_logger.debug("full script about to be sent is:");
 				int line = 0;

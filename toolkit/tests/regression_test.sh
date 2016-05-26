@@ -142,12 +142,12 @@ if [ "$BES_TYPE" = "Genesis" ]; then
   # clean up after itself.  the submission point test will clean up.
   EMS_TESTS+=(EMS_Tests/rnsEnabledBESTests/bes-test-submission-point.sh)
 
+  # test handling files as archives for stage in or out.
   EMS_TESTS+=(EMS_Tests/archiveStagingTest/testArchiveStaging.sh)
 
-  # this is a new test for staging of directories.  it does stage-in and
-  # stage-out in the same job.
-#not ready yet.
-#  EMS_TESTS+=(EMS_Tests/directoryStaging/testStagingDirectories.sh)
+  # test staging of directories as stage in and out; this test does both in
+  # the same job.
+  EMS_TESTS+=(EMS_Tests/directoryStagingTest/testStagingDirectories.sh)
 else
   # Unicore specific tests...
   if [ ! -z "TEST_PARALLEL_JOBS" ]; then

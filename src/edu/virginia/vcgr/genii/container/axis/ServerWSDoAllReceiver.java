@@ -103,7 +103,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ServerWSDoAllReceiver.ServerPWCallback.class.getName());
 		setOption(WSHandlerConstants.USER, GenesisIIConstants.CRYPTO_ALIAS);
 	}
-	
+
 	/**
 	 * returns true if the container has finished starting up.
 	 */
@@ -199,12 +199,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					+ PermissionDeniedException.extractMethodName(pde.getMessage()) + "' on asset: "
 					+ PermissionDeniedException.extractAssetDenied(pde.getMessage()));
 
-				// hmmm: temporary logging block! although this thing is often handy.
 				try {
 					ICallingContext context = ContextManager.getCurrentContext();
 					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
-					_logger.debug("failed access attempt had these credentials: "
-						+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
+					if (_logger.isDebugEnabled())
+						_logger.debug("failed access attempt had these credentials: "
+							+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
 				} catch (Throwable t) {
 					_logger.error("failed to get calling context or show credentials", t);
 				}

@@ -54,7 +54,7 @@ public class ServerAuthorizationManagement
 	 */
 	public static Collection<NuCredential> authenticateBearerCredentials(ArrayList<NuCredential> bearerCredentials,
 		ArrayList<X509Certificate[]> authenticatedCertChains, X509Certificate[] callerTLSCert, ICallingContext callContext)
-		throws AuthZSecurityException, GeneralSecurityException
+			throws AuthZSecurityException, GeneralSecurityException
 	{
 		if (_logger.isTraceEnabled()) {
 			_logger.debug("entered authBearCred with caller: " + callerTLSCert[0].getSubjectDN());
@@ -262,7 +262,7 @@ public class ServerAuthorizationManagement
 				} else {
 					if (_logger.isDebugEnabled())
 						_logger.debug("startup: rejecting client at remote address: " + clientIP);
-					// hmmm: make this something they can handle by trying again, not the try again fault so much, but something like that.
+					// hmmm: make this fault into something they can handle by trying again, not the try again fault so much, but something like that.
 					throw new AxisFault("container in startup mode; access temporarily denied for remote connections.");
 				}
 			}

@@ -9,9 +9,10 @@ public class CredentialOmittedException extends AttributeInvalidException
 {
 	static public final long serialVersionUID = 0L;
 
-	// hmmm: the user of this class needs to put the failed guids into the message!
-
-	// hmmm: this class needs some support functions for pulling the guids that failed out of the list.
+	/*
+	 * hmmm: this class could use a support function for pulling the guids that failed out of the list. that's done in someplace else
+	 * currently.
+	 */
 
 	public CredentialOmittedException()
 	{

@@ -93,7 +93,6 @@ public class LogoutTool extends BaseGridTool
 
 		// destroy notification brokers before we lose permission on them.
 		CacheManager.resetCachingSystem();
-		//hmmm: this one may not be needed?  it was added when there were weird bugs happening with creds.
 
 		if (_all) {
 			// toss out all credentials, including TLS cert.

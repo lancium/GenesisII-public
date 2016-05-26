@@ -14,7 +14,8 @@ public enum ToolCategory {
 	EXECUTION(false, "Job/Execution"),
 	// ANTIQUATED(false, "Antiquated"),
 	GENERAL(false, "General"),
-	ADMINISTRATION(false, "Administration");
+	ADMINISTRATION(false, "Administration"),
+	TESTING(true, "Testing");
 
 	private boolean _hidden;
 	private String _desc;

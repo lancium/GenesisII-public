@@ -376,4 +376,9 @@
 		<description>EnhancedNotificationBroker</description>
 	</portType>
 	
+	<portType name="{http://vcgr.cs.virginia.edu/container/2007/11/globus-authn}GlobusAuthnPortType">
+		<display-rank>100</display-rank>
+		<description>GlobusAuth</description>
+	</portType>
+
 </known-porttypes>

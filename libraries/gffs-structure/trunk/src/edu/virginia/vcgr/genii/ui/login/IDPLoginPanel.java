@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
@@ -53,7 +54,7 @@ final class IDPLoginPanel extends LoginPanel
 
 	// future: move these to a more general login related constants file.
 	final public String DEFAULT_LRZ_USER_PATH = "/users/gffs.eu/lrz.de";
-	final public String DEFAULT_MYPROXY_USER_PATH = "/users/xsede.org";
+	final public String DEFAULT_MYPROXY_USER_PATH = GenesisIIConstants.DEFAULT_XSEDE_USERS_PATH;
 
 	// future: move this to a more useful place, so other classes can rely on it.
 	final public static String USER_SECURITY_PROPERTIES_FILE = "clientui-settings.properties";

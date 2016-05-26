@@ -503,9 +503,6 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 				_logger.debug("Write to offset " + fileOffset + ", p " + source.limit());
 			_synch.startWrite();
 
-			// hmmm: is this code not used?
-			// _transferer.write(fileOffset, source);
-
 			AsynchWriteBuffer B;
 			// Note the deepcopy of source.
 			B = new AsynchWriteBuffer(_tq, fileOffset, deepCopy(source), _synch);

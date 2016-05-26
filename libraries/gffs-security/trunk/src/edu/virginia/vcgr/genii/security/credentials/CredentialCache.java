@@ -27,8 +27,6 @@ public class CredentialCache
 	static public final int CRED_CACHE_SIZE = 200;
 	static public final long CRED_CACHE_TIMEOUT_MS = 1000L * 60L * 10L; // 10 minute lifetime in cache
 
-	// hmmm: move these selector booleans out to a better place, maybe even genesis ii constants? ugh, no, but someplace else.
-
 	/*
 	 * this flag must be CHANGED at startup time if the client supports credential streamlining. the security code is lower level than the
 	 * client properties file, so we need to track the feature like this.
@@ -138,7 +136,6 @@ public class CredentialCache
 		}
 	}
 
-	// hmmm: could move this method to someplace else; it's no longer involved in caching.
 	/**
 	 * this creates a new delegated credential for the delegatee and issuer.
 	 */
@@ -149,8 +146,6 @@ public class CredentialCache
 		TrustCredential delegation =
 			new TrustCredential(delegatee, IdentityType.CONNECTION, issuer, IdentityType.OTHER, restrictions, accessCategories);
 		delegation.signAssertion(issuerPrivateKey);
-		if (_logger.isTraceEnabled())
-			_logger.trace("singleton credential cache miss--created new delegation.");
 		return delegation;
 	}
 }

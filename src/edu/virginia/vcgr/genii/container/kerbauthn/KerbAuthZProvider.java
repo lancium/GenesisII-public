@@ -67,7 +67,6 @@ public class KerbAuthZProvider extends AclAuthZProvider
 	{
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean checkAccess(Collection<NuCredential> authenticatedCallerCredentials, IResource resource, Class<?> serviceClass,
 		Method operation)
@@ -90,7 +89,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			}
 			for (NuCredential cred : authenticatedCallerCredentials) {
 				if (cred.getOriginalAsserter().equals(resourceCertChain)) {
-					_logger.debug("dropping kerberos own identity from cred set so we can authorize it.");
+					_logger.debug("dropping own identity from cred set so we can authorize properly.");
 					continue;
 				}
 				prunedCredentials.add(cred);
@@ -114,7 +113,42 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			 */
 		}
 
-		// Try kerberos back-end.
+		/*
+		 * just try a traditional access check now.  we do this before kerberos in case we already have permission;
+		 * otherwise we would re-authorize using username and password where we could avoid it.
+		 */
+		boolean accessOkay = super.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation);
+		if (accessOkay) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("allowing kerberos auth due to base class permission.");
+			return true;
+		}
+
+		// Try kerberos back-end.  This is the 'normal' case.
+		boolean kerberosAuthOkay = testKerberosAuthorization(resource);
+		if (kerberosAuthOkay) {
+			return true;
+		}
+		
+		// Nobody appreciates us.
+		String assetName = resource.toString();
+		try {
+			String addIn = (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart());
+			if (addIn != null)
+				assetName.concat(" -- " + addIn);
+		} catch (ResourceException e) {
+			// ignore.
+		}
+		_logger.error("failure to authorize " + operation.getName() + " for " + assetName);
+		return false;
+	}
+
+	/**
+	 * does the heavy lifting of authenticating the user against kerberos.  for xsede kdc, this also requires
+	 * that the sts container have a secret that authorizes the app against the kdc.
+	 */
+	static public boolean testKerberosAuthorization(IResource resource)
+	{
 		String username = "";
 		String realm = "";
 		String kdc = "";
@@ -157,6 +191,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		}
 
 		// try each identity in the caller's credentials
+		@SuppressWarnings("unchecked")
 		ArrayList<NuCredential> callerCredentials =
 			(ArrayList<NuCredential>) callingContext.getTransientProperty(SAMLConstants.CALLER_CREDENTIALS_PROPERTY);
 		for (NuCredential cred : callerCredentials) {
@@ -252,25 +287,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 				}
 			}
 		}
-
-		// just try a traditional access check now.
-		boolean accessOkay = super.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation);
-		if (accessOkay) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("allowing kerberos auth due to base class permission.");
-			return true;
-		}
-
-		// Nobody appreciates us.
-		String assetName = resource.toString();
-		try {
-			String addIn = (String) resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart());
-			if (addIn != null)
-				assetName.concat(" -- " + addIn);
-		} catch (ResourceException e) {
-			// ignore.
-		}
-		_logger.error("failure to authorize " + operation.getName() + " for " + assetName);
+		// ultimately, a failure, since we would have returned true before here if things were good.
 		return false;
 	}
 }

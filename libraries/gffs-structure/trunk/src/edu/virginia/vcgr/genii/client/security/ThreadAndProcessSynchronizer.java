@@ -98,7 +98,10 @@ public class ThreadAndProcessSynchronizer
 		}
 	}
 
-	// hmmm: these should move to a more certificatey area.
+	/*
+	 * hmmm: these (getConsistencyLockFile, lockConsistencyFile and unlockConsistencyFile) should move to a more certificatey area, since
+	 * these are only about certificates.
+	 */
 	/**
 	 * returns the file name of the consistency lock file that is used for upgrading certificates.
 	 */

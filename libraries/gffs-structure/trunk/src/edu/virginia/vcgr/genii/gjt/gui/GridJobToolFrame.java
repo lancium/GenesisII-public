@@ -116,7 +116,7 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 		ButtonPanel minusButton = ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Minus, new MinusAction()));
 		add(minusButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL,
 			new Insets(0, 0, 0, 0), 0, 0));
-		// minusButton.setEnabled(false);
+			// minusButton.setEnabled(false);
 
 		// _ePanels.add(null);// Common Tab should not have an error panel
 
@@ -146,9 +146,7 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 		if (menuBar != null)
 			setJMenuBar(menuBar);
 
-		// hmmm: Remove this later (why? too big?)
 		setPreferredSize(new Dimension(750, 750));
-
 	}
 
 	abstract protected Action getExitAction();
@@ -628,8 +626,8 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 				int n = JOptionPane.showOptionDialog(null,
 					"Going back to legacy JSDL option, Only the contents of the common tab will prevail !!!", "",
 					JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
-				if(n == 0){
-					if(_documentContext.jobRoot().jobDocument().size() == 3 ){
+				if (n == 0) {
+					if (_documentContext.jobRoot().jobDocument().size() == 3) {
 						_documentContext.jobRoot().jobDocument().remove(2);
 						_documentContext.jobRoot().jobDocument().remove(1);
 					} else {
@@ -639,33 +637,33 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 					_tabIndex--;
 					_tabbedPane.remove(_tabIndex);
 					_superTabbedPane.remove(_tabIndex);
-	
+
 					_tabIndex--;
 					_tabbedPane.remove(_tabIndex);
 					_superTabbedPane.remove(_tabIndex);
-	
+
 					_superTabbedPane.setTitleAt(0, "Job Description");
-	
+
 					ErrorPanel ePanel = new ErrorPanel(_generateJSDL, _documentContext.jobRoot().jobDocument().get(_tabIndex - 1));
 					_documentContext.getModificationBroker().addModificationListener(ePanel);
 					_ePanels.add(ePanel);
-					
+
 				}
 
 				return;
 			}
 
-			if(_documentContext.jobRoot().jobDocument().size() > selected ){
+			if (_documentContext.jobRoot().jobDocument().size() > selected) {
 				_documentContext.jobRoot().jobDocument().remove(selected);
 			} else {
 				JOptionPane.showMessageDialog(null, "Something is wrong. Can't remove the selected tab");
 				return;
 			}
-			
+
 			_tabbedPane.remove(selected);
 			_superTabbedPane.remove(selected);
 			_tabIndex--;
-			
+
 			/*
 			 * int[] indices = _table.getSelectedRows(); for (int lcv = indices.length - 1; lcv >= 0; lcv--)
 			 * _tableModel.removeRow(indices[lcv]);
