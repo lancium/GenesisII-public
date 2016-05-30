@@ -38,7 +38,7 @@ while read line ; do
       cp "$CURRENT_OUTPUT" "$local_file"
       echo "Failure log recorded in: $local_file"
     else
-      echo "OKAY: $line was given Globus Auth identity successfully."
+      echo "OKAY: $line was successfully given a Globus Auth identity."
     fi
   fi
 done < "$TEMP_USER_LIST"

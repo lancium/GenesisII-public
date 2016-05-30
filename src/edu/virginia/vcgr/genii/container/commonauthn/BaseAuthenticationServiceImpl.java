@@ -137,15 +137,11 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				EndpointReferenceType idpEpr = entry.getEntryReference();
 
 				if (_logger.isTraceEnabled()) {
-					// try {
-					// context = ContextManager.getCurrentContext();
 					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
-					_logger.debug("calling context has these creds before aggregation: "
-						+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
-					// } catch (Exception e2) {
-					// String msg = "could not load calling context to inspect credentials.";
-					// _logger.error(msg, e2);
-					// }
+					if (tc != null) {
+						_logger.debug("calling context has these creds before aggregation: "
+							+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
+					}
 				}
 
 				// create a proxy to the remote idp and invoke it.
@@ -158,20 +154,14 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 					}
 				}
 			} catch (Exception e) {
-				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage(), e);
+				_logger.error("Could not retrieve token for IDP " + entry.getName() + ": " + e.getMessage());
 
 				if (_logger.isTraceEnabled()) {
-					// ICallingContext context;
-					// try {
-					// context = ContextManager.getCurrentContext();
 					TransientCredentials tc = TransientCredentials.getTransientCredentials(context);
-					_logger.error("calling context has these creds for failed IDP retrieval: "
-						+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
-					// } catch (Exception e2) {
-					// String msg = "could not load calling context to inspect credentials for failed IDP.";
-					// _logger.error(msg, e2);
-					// }
-
+					if (tc != null) {
+						_logger.error("calling context has these creds for failed IDP retrieval: "
+							+ TrustCredential.showCredentialList(tc.getCredentials(), VerbosityLevel.HIGH));
+					}
 				}
 
 			}

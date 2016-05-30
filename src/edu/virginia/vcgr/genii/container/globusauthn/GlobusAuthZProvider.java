@@ -143,7 +143,8 @@ public class GlobusAuthZProvider extends AclAuthZProvider
 				.header("Authorization", "Basic " + encoded)
 				
 				//new addition from alex:				
-				.ignoreHttpErrors(true).ignoreContentType(true)			
+	//			.ignoreHttpErrors(true)
+				.ignoreContentType(true)			
 				//end new additions.
 				
 				.timeout(10000);
@@ -156,28 +157,29 @@ public class GlobusAuthZProvider extends AclAuthZProvider
 			_logger.debug("Finish login and token request for: " + username);
 			Document respDoc = resp.parse();
 			String jsonResp = respDoc.getElementsByTag("body").first().text();
-			_logger.debug("status code: " + resp.statusCode() + " response body: \n" + jsonResp);
+			if (_logger.isDebugEnabled()) {
+				String cookedResponse = jsonResp;
+				for (int i = 0; i < 2; i++)
+					cookedResponse = cookedResponse.replaceFirst(":\"[^\"*]+\"", ":\"*****\"");
+				_logger.debug("status code: " + resp.statusCode() + " response body: \n" + cookedResponse);
+			}
 			int result = resp.statusCode();
 			if (result == 200) {
 				ObjectMapper mapper = new ObjectMapper();
 				JsonNode obj = mapper.readTree(jsonResp);
+				@SuppressWarnings("unused")
 				String accessToken = obj.get("access_token").asText();
+				@SuppressWarnings("unused")
 				String expiresIn = obj.get("expires_in").asText();
 
 				// future: we can record the tokens here if we need them, but currently we drop them on the floor.
 
-				// hmmm: do not want to log these secrets here!!! just for debugging!!!!!!!
-				_logger.debug("REMOVE THIS LINE: access token: '" + accessToken + "' expires in: '" + expiresIn + "'");
-
+				_logger.info("successfully authenticated user " + username + "@xsede.org against Globus Auth server.");
 				return true;
 			} else if (result == 403) {
-				
-				//hmmm: REMOVE THIS IMMEDIATELY WHEN THEY GET THE CONSENT ISSUE FIXED.
-				
-				_logger.warn("FAILED TO GAIN ACCESS DUE TO 403 ERROR, PROBABLY CONSENT ISSUE.  DEBUGGING MODE ALLOWING THIS!!!!");
-				return true;
+				_logger.warn("FAILED TO GAIN ACCESS DUE TO 403 ERROR, PROBABLY 'MUST CONSENT' ISSUE.  This should be enabled at Globus Auth server for client id f79986da-fdb4-11e5-b59b-8c705ad34f60 -- please consult Globus support.");
 			} else {
-				_logger.debug("failed to authenticate to globus auth with http code=" + result);
+				_logger.warn("failed to authenticate user '" + username + "@xsede.org to globus auth with http code=" + result);
 			}
 
 		} catch (Exception e) {

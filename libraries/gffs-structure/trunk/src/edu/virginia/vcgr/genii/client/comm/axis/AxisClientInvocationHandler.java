@@ -88,6 +88,7 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.PermissionDeniedException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.utils.DetailedLogger;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
 import edu.virginia.vcgr.genii.security.axis.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.credentials.ClientCredentialTracker;
@@ -443,7 +444,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			String method = edu.virginia.vcgr.genii.client.security.PermissionDeniedException.extractMethodName(t.getMessage());
 			if ((method != null) && (asset != null)) {
 				msg = t.getLocalizedMessage() + "; permission denied on \"" + asset + "\" (in method \"" + method;
-				_logger.info(msg + " -- " + ProgramTools.showLastFewOnStack(8));
+				_logger.info(msg);
 			} else {
 				_logger.error(msg, t);
 			}
@@ -838,7 +839,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					_logger.warn("trying operation again, since we received a try again fault, on method " + calledMethod.getName());
 				} else {
 					// report the error once we're sure we'll handle it here.
-					_logger.error("resolveAndInvoke saw exception on method " + calledMethod.getName(), throwable);
+
+					DetailedLogger.detailed().warn("resolveAndInvoke saw " + throwable.getClass().getCanonicalName() + " exception on method " + calledMethod.getName());
 
 					if (firstException == null)
 						firstException = throwable;

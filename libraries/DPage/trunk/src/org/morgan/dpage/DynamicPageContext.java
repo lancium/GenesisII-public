@@ -28,7 +28,7 @@ class DynamicPageContext extends AbstractHandler
 		_injectionHandlerFactory = injectionHandlerFactory;
 	}
 
-	// hmmm: not doing anything with the Request object here yet.  that's probably wrong.
+	// hmmm: not doing anything with the Request object here yet. that's probably wrong.
 	@Override
 	public void handle(String target, Request newRequestObjectToHandle, HttpServletRequest request, HttpServletResponse response)
 		throws IOException, ServletException

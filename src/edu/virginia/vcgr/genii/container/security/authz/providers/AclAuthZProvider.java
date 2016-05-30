@@ -293,7 +293,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 		if (!checkAccess(authenticatedCallerCredentials, resource, category)) {
 			String msg = "denying access for operation: " + operation.getName();
 			String asset = ResourceManager.getResourceName(resource);
-			msg = msg.concat(" on '" + asset + "' at " + ProgramTools.showLastFewOnStack(7));
+			msg = msg.concat(" on '" + asset + "'");
 			_logger.info(msg);
 
 			if (_logger.isDebugEnabled())

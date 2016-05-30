@@ -94,4 +94,6 @@ check_if_failed "linking xsede.org $username under globus auth idp for automatic
 #need resolver addition also if we are supporting replication with globus auth.
 
 
+echo "GlobusAuth STS successfully created for $username"
+
 

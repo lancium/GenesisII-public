@@ -340,12 +340,21 @@ public class AlarmManager
 				"SELECT repeatinterval, callingcontext, target, " + "methodname, userdata " + "FROM alarmtable WHERE alarmid = ?");
 			removeStmt = conn.prepareStatement("DELETE FROM alarmtable WHERE alarmid = ?");
 			updateStmt = conn.prepareStatement("UPDATE alarmtable SET nextoccurance = ? WHERE alarmid = ?");
-			try {
-				_logger.debug("current timeout for get info: " + getInfoStmt.getQueryTimeout());
-				_logger.debug("current timeout for remove: " + removeStmt.getQueryTimeout());
-				_logger.debug("current timeout for update: " + updateStmt.getQueryTimeout());
-			} catch (Exception e) {
-				_logger.error("failure querying prepared statements for query timeout");
+			if (_logger.isTraceEnabled()) {
+				/*
+				 * future: was debugging why we get this "ERROR 40XL1: A lock could not be obtained within the time requested" exception as a
+				 * failure in sql actions, mostly regarding alarms. all of these timeouts printed 0 as the current timeout for queries. so,
+				 * maybe that means use the default? otherwise, zero should mean wait forever. in any case, the next step would have been
+				 * trying some different query timeouts to see if that can remove the exceptions.
+				 */
+
+				try {
+					_logger.debug("current timeout for get info: " + getInfoStmt.getQueryTimeout());
+					_logger.debug("current timeout for remove: " + removeStmt.getQueryTimeout());
+					_logger.debug("current timeout for update: " + updateStmt.getQueryTimeout());
+				} catch (Exception e) {
+					_logger.error("failure querying prepared statements for query timeout");
+				}
 			}
 
 			for (AlarmDescriptor desc : dueAlarms) {
