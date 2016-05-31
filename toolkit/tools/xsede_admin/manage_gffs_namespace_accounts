@@ -97,7 +97,8 @@ $XSEDE_DELETED_HOME_PATH  = "$XSEDE_NAMESPACE_BASE/home/deleted.xsede.org";
 $XSEDE_DELUSER_SCRIPT     = "$XSEDE_ADMIN_SCRIPTS/delete-xsede-user.xml";
 #$XSEDE_GROUPUSER_SCRIPT   = "$XSEDE_ADMIN_SCRIPTS/link-xsede-user-to-group.xml";
 $XSEDE_COMBINED_SCRIPT    = "$XSEDE_ADMIN_SCRIPTS/combined-user-management.xml";
-$XSEDE_GLOBUSAUTH_SCRIPT  = "$XSEDE_ADMIN_SCRIPTS/create-globusauth-user.sh";
+
+$XSEDE_GLOBUSAUTH_SCRIPT  = "$SCRIPT_DIR/create-globusauth-user.sh";
 
 $XSEDE_USERS_GROUP = 'gffs-users';
 $XSEDE_ADMINS_GROUP = 'gffs-admins';
@@ -238,10 +239,13 @@ eval {
     # run batches of commands in a single grid command.
     batch_runner(@serialized_add_commands);
 
+#hmmm: may want to eventually just run the hierarchy adding version, since the user
+# might interrupt this script, which would cause there to be no globus auth for some
+# identities just created.
     # now add in the globus auth user for each of these new accounts.
     foreach my $account_name (@newaccounts) {
         # set up the script line we'll call.
-        my $cmd = "bash $XSEDE_GLOBUSAUTH_SCRIPT $XSEDE_STS_CONTAINER $account_name"
+        my $cmd = "bash $XSEDE_GLOBUSAUTH_SCRIPT $XSEDE_STS_CONTAINER $account_name";
         # run the command.
         system($cmd);
         local $exitval = $?;

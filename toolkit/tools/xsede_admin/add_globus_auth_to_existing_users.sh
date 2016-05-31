@@ -40,7 +40,13 @@ while read line ; do
     else
       echo "OKAY: $line was successfully given a Globus Auth identity."
     fi
+    # clean out the temp file.
+    \rm -f "$CURRENT_OUTPUT"
   fi
 done < "$TEMP_USER_LIST"
 
+# clean out the users list file too.
+\rm -f "$TEMP_USER_LIST"
+
+echo "Done adding Globus Auth STS for existing users."
 

@@ -11,9 +11,6 @@ source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 # shows the parameter usage info.
 function print_instructions()
 {
-#scavenge code for getting basename.
-
-#hmmm: not done...
   echo This script requires 2 parameters, the container path where the GlobusAuth IDP will be created and the user name to create on that container.
 }
 
