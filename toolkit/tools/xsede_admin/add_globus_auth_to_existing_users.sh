@@ -4,10 +4,18 @@ echo "This script will add Globus Auth identities for all users in /users/xsede.
 echo "who do not yet have them.  It will report any serious errors to the console."
 echo "If a user already has a Globus Auth identity, then that user is skipped."
 
-# quit to shake any prior credentials this client could remember.
-fastgrid -q
+# cannot use fastgrid on centos currently.
+#USE_FASTGRID=y
 
-fastgrid cd /users/xsede.org
+if [ ! -z "$USE_FASTGRID" ]; then
+  # quit to shake any prior credentials this client could remember.
+  fastgrid -q
+  GRIDTOOL=fastgrid
+else
+  GRIDTOOL=grid
+fi
+
+$GRIDTOOL cd /users/xsede.org
 if [ $? -ne 0 ]; then
   echo "Failed to change directory to /users/xsede.org.  Is the grid command"
   echo "available?  Are you logged in as a grid administrator?"
@@ -19,7 +27,7 @@ CONTAINER="/resources/xsede.org/containers/sts-1.xsede.org"
 TEMP_USER_LIST="$(mktemp /tmp/globusauthanizer-users.XXXXXX)"
 CURRENT_OUTPUT="$(mktemp /tmp/globusauthanizer-run.XXXXXX)"
 
-fastgrid ls | tail -n +2 >"$TEMP_USER_LIST"
+$GRIDTOOL ls | tail -n +2 >"$TEMP_USER_LIST"
 
 while read line ; do
   # blank line for readability, per user attempt.
