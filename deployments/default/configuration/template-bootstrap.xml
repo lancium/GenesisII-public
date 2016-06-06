@@ -95,6 +95,18 @@
                 <gsh:param>--everyone</gsh:param>
         </geniix:chmod>
 
+	<gsh:echo message="Creating /users/globus-auth, /users/deleted.globus-auth directory"></gsh:echo>
+        <geniix:mkdir>
+                <gsh:param>-p</gsh:param>
+                <gsh:param>/users/globus-auth</gsh:param>
+                <gsh:param>/users/deleted.globus-auth</gsh:param>
+        </geniix:mkdir>
+        <geniix:chmod>
+                <gsh:param>/users/globus-auth</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>--everyone</gsh:param>
+        </geniix:chmod>
+
 	<gsh:echo message="Creating /users/incommon.org, /users/deleted.incommon.org directory"></gsh:echo>
         <geniix:mkdir>
                 <gsh:param>-p</gsh:param>
@@ -310,6 +322,18 @@
                 <gsh:param>/groups/FOLDERSPACE/gffs-users</gsh:param>
         </geniix:chmod>
 
+	<!-- chmod /users/globus-auth +rwx gffs-amie, gffs-users  -->
+	<geniix:chmod>
+		<gsh:param>/users/globus-auth</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/FOLDERSPACE/gffs-users</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/users/globus-auth</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/FOLDERSPACE/gffs-amie</gsh:param>
+        </geniix:chmod>
+
 	<!-- chmod /users/incommon.org +rwx gffs-amie, gffs-users  -->
 	<geniix:chmod>
 		<gsh:param>/users/incommon.org</gsh:param>
@@ -330,6 +354,18 @@
         </geniix:chmod>
 	<geniix:chmod>
 		<gsh:param>/users/deleted.FOLDERSPACE</gsh:param>
+                <gsh:param>+rwx</gsh:param>
+                <gsh:param>/groups/FOLDERSPACE/gffs-amie</gsh:param>
+        </geniix:chmod>
+
+	<!-- chmod /users/deleted.globus-auth +rwx gffs-amie, gffs-users  -->
+	<geniix:chmod>
+		<gsh:param>/users/deleted.globus-auth</gsh:param>
+                <gsh:param>+r</gsh:param>
+                <gsh:param>/groups/FOLDERSPACE/gffs-users</gsh:param>
+        </geniix:chmod>
+	<geniix:chmod>
+		<gsh:param>/users/deleted.globus-auth</gsh:param>
                 <gsh:param>+rwx</gsh:param>
                 <gsh:param>/groups/FOLDERSPACE/gffs-amie</gsh:param>
         </geniix:chmod>

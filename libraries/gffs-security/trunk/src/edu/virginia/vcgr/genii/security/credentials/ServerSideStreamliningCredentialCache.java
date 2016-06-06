@@ -18,8 +18,8 @@ public class ServerSideStreamliningCredentialCache extends TimedOutLRUCache<Stri
 	/*
 	 * the most client sessions that we will try to cache.
 	 */
-	static public int MAXIMUM_SESSIONS_CACHED = 100;
-	static public long SESSION_LIFETIME = 1000 * 60 * 10; // 10 minutes.
+	static public int MAXIMUM_SESSIONS_CACHED = 40;
+	static public long SESSION_LIFETIME = 1000 * 60 * 5; // 5 minutes.
 
 	// our singleton listing for credentials sent by clients previously, where each client is listed by its x509 tls cert.
 	public static ServerSideStreamliningCredentialCache _clientSessionCredentialsCache =

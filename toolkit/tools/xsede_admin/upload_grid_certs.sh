@@ -3,9 +3,19 @@
 # Uploads the in-grid copy of the certificates from the official XSEDE storage
 # location of /etc/grid-security/certificates.
 
+####
+
+# example cron job for running this script.
+#GENII_INSTALL_DIR=/opt/genesis2-xsede
+#GENII_USER_DIR=/home/sts1/state-sts1  (fill this in!)
+#58 13 * * 3 $GENII_INSTALL_DIR/grid login --username=AccountAdminGuy --password=SomePassword ; bash $GENII_INSTALL_DIR/toolkit/tools/xsede_admin/upload_grid_certs.sh &>>/tmp/zz_upload_grid_certs_$USER.log 
+
+####
+
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 
+source "../../prepare_tools.sh" "../../prepare_tools.sh"
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 

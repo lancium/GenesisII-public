@@ -16,13 +16,13 @@ public class ClientCredentialTracker
 	// hmmm: the values below should come from config file!
 
 	// how many containers we will track overall for the client.
-	public static final int MAX_CONTAINERS_TRACKED = 100;
+	public static final int MAX_CONTAINERS_TRACKED = 20;
 
 	// number of credentials we will remember per container. should vaguely suit the container's memory size.
-	public static final int MAXIMUM_CREDS_TRACKED_PER_CONTAINER = 350;
+	public static final int MAXIMUM_CREDS_TRACKED_PER_CONTAINER = 175;
 
 	// how long we hope that the container will remember credentials.
-	static public long CONTAINER_MEMORY_GUESSTIMATE = 1000 * 60 * 4; // should be shorter than container retention time.
+	static public long CONTAINER_MEMORY_GUESSTIMATE = 1000 * 60 * 3; // should be shorter than container retention time.
 
 	/**
 	 * currently empty but could track more info about a previously used credential.

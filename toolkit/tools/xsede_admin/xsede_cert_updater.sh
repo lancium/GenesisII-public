@@ -3,6 +3,13 @@
 # where we'll install certificates into.
 CERTSDIR="/etc/grid-security/certificates"
 
+####
+
+# an example cron job line to update the xsede certificates using this script...
+# 30 13 * * 3 PATH=$HOME/fetch-crl-3.0.14:$PATH bash /opt/genesis2-xsede/toolkit/tools/xsede_admin/xsede_cert_updater.sh &>>/tmp/zz_xsede_cert_updater_$USER.log 
+
+####
+
 function print_instructions()
 {
   scriptname="$(basename "$0")"
@@ -30,6 +37,9 @@ function check_result()
     exit 1
   fi
 }
+
+# try to create the certs directory but ignore any errors if already exists.
+mkdir -p $CERTSDIR &>/dev/null
 
 # create a nice temporary directory to work in.
 scratchdir="$(mktemp -d "/tmp/certs-check.${USER}.XXXXXX")"

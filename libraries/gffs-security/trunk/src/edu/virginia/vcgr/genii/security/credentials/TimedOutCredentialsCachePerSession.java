@@ -20,7 +20,7 @@ public class TimedOutCredentialsCachePerSession extends TimedOutLRUCache<String,
 	 * this is the limit for the number of credentials that the container remembers coming from the client. it should be tuned to be a bit
 	 * larger and to last a bit longer than what the client might expect (in client side tracking of what it told the container).
 	 */
-	static public int MAXIMUM_CREDENTIALS_CACHED = 400;
+	static public int MAXIMUM_CREDENTIALS_CACHED = 200;
 
 	/*
 	 * how long each credential is kept around before timing out of the cache. we use the client side's default tracking lifetime plus an
