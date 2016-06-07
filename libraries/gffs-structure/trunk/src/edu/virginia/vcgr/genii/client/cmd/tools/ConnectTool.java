@@ -28,7 +28,7 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.urls.URLUtilities;
 
 public class ConnectTool extends BaseGridTool
-{	
+{
 	static private Log _logger = LogFactory.getLog(ConnectTool.class);
 
 	static private final String _DESCRIPTION = "config/tooldocs/description/dconnect";
@@ -81,10 +81,10 @@ public class ConnectTool extends BaseGridTool
 		ContextManager.storeCurrentContext(ctxt);
 		if (deploymentName != null) {
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName.toString());
-			
+
 			if (_logger.isDebugEnabled())
 				_logger.debug("prior to connecting, setting deployment name to '" + deploymentName + "'");
-			
+
 			UserConfig userConfig = new UserConfig(deploymentName);
 			UserConfigUtils.setCurrentUserConfig(userConfig);
 
@@ -93,18 +93,18 @@ public class ConnectTool extends BaseGridTool
 			 * "default" deployment).
 			 */
 			UserConfigUtils.reloadConfiguration();
-			
+
 			ctxt = ContextManager.getCurrentContext();
-			
-//			// ignore first call to let it get warmed up again.
-//			ContextManager.isGood(ctxt);
-//			// now it should be happy with the context.
-//			boolean okay = ContextManager.isGood(ctxt);			
-//			if (!okay) {
-//				_logger.error("reporting context is BAD after reload.");
-//			}else {
-//				_logger.debug("reporting context is GOOD after reload.");
-//			}
+
+			// // ignore first call to let it get warmed up again.
+			// ContextManager.isGood(ctxt);
+			// // now it should be happy with the context.
+			// boolean okay = ContextManager.isGood(ctxt);
+			// if (!okay) {
+			// _logger.error("reporting context is BAD after reload.");
+			// }else {
+			// _logger.debug("reporting context is GOOD after reload.");
+			// }
 		}
 	}
 

@@ -231,7 +231,7 @@ public class InstallationProperties extends Properties
 	static public String getUserDir()
 	{
 		String userDir = null;
-		
+
 		// see if we have a valid container properties and can retrieve the value that way.
 		// ContainerProperties cProperties = ContainerProperties.getContainerProperties();
 		// if (cProperties != null)

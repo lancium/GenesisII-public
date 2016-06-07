@@ -116,7 +116,7 @@ public abstract class GridJobToolFrame extends BasicFrameWindow
 		ButtonPanel minusButton = ButtonPanel.createHorizontalPanel(new SimpleIconButton(ShapeIcons.Minus, new MinusAction()));
 		add(minusButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL,
 			new Insets(0, 0, 0, 0), 0, 0));
-			// minusButton.setEnabled(false);
+		// minusButton.setEnabled(false);
 
 		// _ePanels.add(null);// Common Tab should not have an error panel
 

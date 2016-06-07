@@ -39,7 +39,7 @@ public class RandomByteIOInputStream extends InputStream
 	private boolean isMultiThreaded = true; // denoting if we are doing parallel byteIO
 	private int numThreads = 1; // number of parallel threads, calculated in constructor.
 	private RandomByteIOTransferer[] transferer; // Each transferer denotes a unique end-point
-	//private long _fileSize = 0; // record the full file size at time of construction.
+	// private long _fileSize = 0; // record the full file size at time of construction.
 
 	private int _protocolReadBlockSize = 0; // filled in based on type of resource in constructor.
 

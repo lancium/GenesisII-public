@@ -79,7 +79,7 @@ public class SecurityConstants
 
 	// Globus Auth STS constants...
 
-//	static public final QName NEW_OAUTH_IDP_SERVER_NAME =
-//		new QName("http://vcgr.cs.virginia.edu/security/2007/11/globus-authn", "new-idp-oauthserver-param");
+	// static public final QName NEW_OAUTH_IDP_SERVER_NAME =
+	// new QName("http://vcgr.cs.virginia.edu/security/2007/11/globus-authn", "new-idp-oauthserver-param");
 
 }

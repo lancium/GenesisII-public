@@ -315,7 +315,7 @@ public class SMBBuffer
 					this.buffer.putChar(s.charAt(i));
 				}
 
-				// hmmm: this seems to produce chinese characters!?  the conversion stuff is baffling.
+				// hmmm: this seems to produce chinese characters!? the conversion stuff is baffling.
 				// newer version:
 				// byte[] utf16 = s.getBytes("UTF-16");
 				// buffer.put(utf16);

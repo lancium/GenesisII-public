@@ -262,7 +262,7 @@ public class IdpTool extends BaseLoginTool
 	public void setCredentialType(String type)
 	{
 		_type = IdentityType.valueOf(IdentityType.class, type);
-		_logger.debug("got passed a type of: " + _type );
+		_logger.debug("got passed a type of: " + _type);
 	}
 
 	/**

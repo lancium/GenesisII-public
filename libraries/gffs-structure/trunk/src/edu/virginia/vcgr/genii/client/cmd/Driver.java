@@ -153,7 +153,7 @@ public class Driver extends ApplicationBase
 		} catch (IOException e1) {
 			_logger.error("could not retrieve calling context in checkCertUpdateTime");
 		}
-		
+
 		if (new Date().getTime() >= _nextCertUpdateCheck) {
 			// time to update certificates if we have a valid connection.
 			if (gridOkay.equals(GridStates.CONNECTION_ALREADY_GOOD) || gridOkay.equals(GridStates.CONNECTION_GOOD_NOW)) {

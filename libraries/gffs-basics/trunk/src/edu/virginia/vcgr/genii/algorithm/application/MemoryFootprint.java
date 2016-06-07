@@ -40,7 +40,7 @@ public class MemoryFootprint
 	}
 
 	/**
-	 * reports the size of the object 'o' plus the size of all other objects reachable from it. 
+	 * reports the size of the object 'o' plus the size of all other objects reachable from it.
 	 */
 	public static long getDeepFootprint(Object o)
 	{
@@ -48,7 +48,7 @@ public class MemoryFootprint
 			_logger.error("abusive memory footprint called when not in debug mode.  a logging statement is wrong.");
 			return 0;
 		}
-			
+
 		try {
 			return SizeOf.deepSizeOf(o);
 		} catch (Exception e) {

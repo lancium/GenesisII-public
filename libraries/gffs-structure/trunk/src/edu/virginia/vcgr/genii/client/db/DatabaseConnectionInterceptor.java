@@ -25,9 +25,9 @@ public class DatabaseConnectionInterceptor implements InvocationHandler
 	private DatabaseHistogramStatistics _histo = null;
 
 	/*
-	 * hmmm: this seems like an awful blocker for everything, opening db stats stuff. instead, set up a thread that will take the queue of pending
-	 * things and stuff those into the db stats. then we can instantly return, since all we have to do is lock our local queue to add that
-	 * thing at the end.
+	 * hmmm: this seems like an awful blocker for everything, opening db stats stuff. instead, set up a thread that will take the queue of
+	 * pending things and stuff those into the db stats. then we can instantly return, since all we have to do is lock our local queue to add
+	 * that thing at the end.
 	 */
 
 	public DatabaseConnectionInterceptor(Object instance)

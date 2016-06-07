@@ -111,5 +111,5 @@ public class ByteIOConstants
 
 	// maximum read size below was instituted due to axis failures with large attachments.
 	static public int MAXIMUM_READ_ATTEMPTED = 1097108;
-	//arbitrary value slightly larger than a meg.
+	// arbitrary value slightly larger than a meg.
 }

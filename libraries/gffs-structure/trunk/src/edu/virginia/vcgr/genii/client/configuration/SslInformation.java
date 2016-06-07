@@ -71,10 +71,10 @@ public class SslInformation
 	}
 
 	/*
-	 * hmmm: neither the kerberos keytab stuff nor the globus auth stuff seem to belong in this file.
-	 * they both do need access to security.properties though.
+	 * hmmm: neither the kerberos keytab stuff nor the globus auth stuff seem to belong in this file. they both do need access to
+	 * security.properties though.
 	 */
-	
+
 	// simple wrapper for the two strings needed to authorize against kerberos realm.
 	public class KerberosKeytabAndPrincipal
 	{
@@ -105,7 +105,6 @@ public class SslInformation
 		return new KerberosKeytabAndPrincipal(keytabFile, principal);
 	}
 
-	
 	// simple wrapper for the two strings needed to authorize against kerberos realm.
 	public class GlobusAuthClientSecrets
 	{
@@ -131,6 +130,5 @@ public class SslInformation
 
 		return new GlobusAuthClientSecrets(clientId, clientSecret);
 	}
-
 
 }

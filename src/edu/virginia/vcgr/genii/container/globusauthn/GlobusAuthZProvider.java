@@ -141,14 +141,14 @@ public class GlobusAuthZProvider extends AclAuthZProvider
 			String encoded = new String(Base64.encode((clientID + ":" + clientSecret).getBytes()));
 			Connection conn = Jsoup.connect(server).method(Method.POST).header("Content-Type", "application/x-www-form-urlencoded")
 				.header("Authorization", "Basic " + encoded)
-				
-				//new addition from alex:				
-	//			.ignoreHttpErrors(true)
-				.ignoreContentType(true)			
-				//end new additions.
-				
+
+				// new addition from alex:
+				// .ignoreHttpErrors(true)
+				.ignoreContentType(true)
+				// end new additions.
+
 				.timeout(10000);
-			
+
 			conn.data("grant_type", "password");
 			conn.data("username", username + "@xsede.org");
 			conn.data("password", password);
@@ -177,7 +177,8 @@ public class GlobusAuthZProvider extends AclAuthZProvider
 				_logger.info("successfully authenticated user " + username + "@xsede.org against Globus Auth server.");
 				return true;
 			} else if (result == 403) {
-				_logger.warn("FAILED TO GAIN ACCESS DUE TO 403 ERROR, PROBABLY 'MUST CONSENT' ISSUE.  This should be enabled at Globus Auth server for client id f79986da-fdb4-11e5-b59b-8c705ad34f60 -- please consult Globus support.");
+				_logger.warn(
+					"FAILED TO GAIN ACCESS DUE TO 403 ERROR, PROBABLY 'MUST CONSENT' ISSUE.  This should be enabled at Globus Auth server for client id f79986da-fdb4-11e5-b59b-8c705ad34f60 -- please consult Globus support.");
 			} else {
 				_logger.warn("failed to authenticate user '" + username + "@xsede.org to globus auth with http code=" + result);
 			}
@@ -218,7 +219,7 @@ public class GlobusAuthZProvider extends AclAuthZProvider
 			_logger.error("Calling context exception", e);
 			return false;
 		}
-		
+
 		// kludge required to get the jsoup connector able to see our calling context.
 		VcgrSslSocketFactory.extraneousCallingContextForSocketFactory = callingContext;
 
@@ -231,7 +232,7 @@ public class GlobusAuthZProvider extends AclAuthZProvider
 				// Grab password from usernametoken (but use the username that is our resource name)
 				UsernamePasswordIdentity utIdentity = (UsernamePasswordIdentity) cred;
 				String password = utIdentity.getPassword();
-				
+
 				boolean success = performGlobusAuthentication(username, password, server, secrets._clientId, secrets._clientSecret);
 				if (success == true) {
 					return success;
@@ -239,7 +240,7 @@ public class GlobusAuthZProvider extends AclAuthZProvider
 
 			}
 		}
-		
+
 		// reset this kludge.
 		VcgrSslSocketFactory.extraneousCallingContextForSocketFactory = null;
 

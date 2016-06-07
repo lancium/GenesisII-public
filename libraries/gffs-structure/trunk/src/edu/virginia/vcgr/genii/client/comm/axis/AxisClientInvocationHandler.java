@@ -840,7 +840,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				} else {
 					// report the error once we're sure we'll handle it here.
 
-					DetailedLogger.detailed().warn("resolveAndInvoke saw " + throwable.getClass().getCanonicalName() + " exception on method " + calledMethod.getName());
+					DetailedLogger.detailed().warn(
+						"resolveAndInvoke saw " + throwable.getClass().getCanonicalName() + " exception on method " + calledMethod.getName());
 
 					if (firstException == null)
 						firstException = throwable;

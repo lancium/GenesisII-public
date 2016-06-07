@@ -181,7 +181,7 @@ public class PreferredIdentity implements Serializable
 				return null;
 			if (prefChunk instanceof String) {
 				if (_logger.isTraceEnabled())
-				_logger.debug("found preferred identity blob in calling context:" + prefChunk.toString());
+					_logger.debug("found preferred identity blob in calling context:" + prefChunk.toString());
 				return PreferredIdentity.decodePrefId((String) prefChunk);
 			} else if (prefChunk instanceof PreferredIdentity) {
 				/*

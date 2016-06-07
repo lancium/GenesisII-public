@@ -146,7 +146,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	@Override
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR, ConstructionParameters cParams,
 		GenesisHashMap constructionParameters, Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException
+		throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, newEPR, cParams, constructionParameters, resolverCreationParams);
 

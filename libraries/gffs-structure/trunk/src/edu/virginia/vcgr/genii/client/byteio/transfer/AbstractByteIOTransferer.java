@@ -61,7 +61,7 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	{
 		return _maximumWriteSize;
 	}
-	
+
 	public static final String NO_ATTACHMENTS_FAILURE = "No attachments were received!";
 
 	/**

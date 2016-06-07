@@ -16,7 +16,7 @@ import edu.virginia.vcgr.genii.algorithm.filesystem.FileSystemHelper;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 
 public class ConfigurationManager
-{	
+{
 	static private Log _logger = LogFactory.getLog(ConfigurationManager.class);
 
 	static public final String _USER_DIR_PROPERTY = "edu.virginia.vcgr.genii.client.configuration.user-dir";
@@ -25,7 +25,7 @@ public class ConfigurationManager
 	static private final String _SERVER_CONF_FILENAME = "server-config.xml";
 
 	// initialized configuration manager.
-	//(old: "cannot be re-initialized"; now it is allowed to be reinitialized)
+	// (old: "cannot be re-initialized"; now it is allowed to be reinitialized)
 	static private ConfigurationManager _manager = null;
 
 	static private ArrayList<ConfigurationUnloadedListener> _unloadListeners = new ArrayList<ConfigurationUnloadedListener>();

@@ -116,7 +116,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			_logger.warn("exception occurred in loadTrustManager", ex);
 		}
 	}
-	
+
 	// provided externally for cases where other mechanisms use the socket factory.
 	static public ICallingContext extraneousCallingContextForSocketFactory = null;
 
@@ -129,7 +129,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		try {
 			ICallingContext callingContext = threadCallingContext.get();
 			if (callingContext == null) {
-				_logger.debug("getSSLSocketFactory got a null calling context, so not a GFFS standard request; using external calling context.");
+				_logger
+					.debug("getSSLSocketFactory got a null calling context, so not a GFFS standard request; using external calling context.");
 				callingContext = extraneousCallingContextForSocketFactory;
 			}
 

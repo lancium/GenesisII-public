@@ -78,13 +78,13 @@ public class ClientContextResolver implements IContextResolver
 				 * incur a 7 second or so penalty while updating certs. it would be nice to figure out where the unicore context actually gets
 				 * loaded and fix this.
 				 */
-//				_logger.debug("loaded combined context for unicore...");
+				// _logger.debug("loaded combined context for unicore...");
 				/*
 				 * this should only be set in a context using the old combined method, which has only one current client: unicore. note that
 				 * we never set this property in the context unless it's unicore, so no one had better check for 'false'. if there's anything
 				 * in the context listed with this key, then it's a combined-style unicore context.
 				 */
-//				toReturn.setSingleValueProperty(UNICORE_COMBINED_CONTEXT_LOADED, "true");
+				// toReturn.setSingleValueProperty(UNICORE_COMBINED_CONTEXT_LOADED, "true");
 
 			} else {
 				// we must unlock the file again before letting the context load occur (since it also locks).

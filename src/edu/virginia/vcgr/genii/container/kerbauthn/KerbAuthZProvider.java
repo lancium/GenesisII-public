@@ -114,8 +114,8 @@ public class KerbAuthZProvider extends AclAuthZProvider
 		}
 
 		/*
-		 * just try a traditional access check now.  we do this before kerberos in case we already have permission;
-		 * otherwise we would re-authorize using username and password where we could avoid it.
+		 * just try a traditional access check now. we do this before kerberos in case we already have permission; otherwise we would
+		 * re-authorize using username and password where we could avoid it.
 		 */
 		boolean accessOkay = super.checkAccess(authenticatedCallerCredentials, resource, serviceClass, operation);
 		if (accessOkay) {
@@ -124,12 +124,12 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			return true;
 		}
 
-		// Try kerberos back-end.  This is the 'normal' case.
+		// Try kerberos back-end. This is the 'normal' case.
 		boolean kerberosAuthOkay = testKerberosAuthorization(resource);
 		if (kerberosAuthOkay) {
 			return true;
 		}
-		
+
 		// Nobody appreciates us.
 		String assetName = resource.toString();
 		try {
@@ -144,8 +144,8 @@ public class KerbAuthZProvider extends AclAuthZProvider
 	}
 
 	/**
-	 * does the heavy lifting of authenticating the user against kerberos.  for xsede kdc, this also requires
-	 * that the sts container have a secret that authorizes the app against the kdc.
+	 * does the heavy lifting of authenticating the user against kerberos. for xsede kdc, this also requires that the sts container have a
+	 * secret that authorizes the app against the kdc.
 	 */
 	static public boolean testKerberosAuthorization(IResource resource)
 	{

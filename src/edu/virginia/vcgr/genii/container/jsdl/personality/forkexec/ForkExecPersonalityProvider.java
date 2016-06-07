@@ -32,7 +32,7 @@ public class ForkExecPersonalityProvider extends CommonPersonalityProvider
 	{
 		return new ForkExecHPCApplicationFacet(_fsManager, _workingDirectory);
 	}
-	
+
 	@Override
 	public SPMDApplicationFacet getSPMDApplicationFacet(Object currentUnderstanding) throws JSDLException
 	{

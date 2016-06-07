@@ -326,19 +326,19 @@ public class CacheManager
 			ClientCredentialTracker.flushEntireTracker();
 
 			VcgrSslSocketFactory.closeIdleConnections();
-			
-//			try {
-//				// drop any connections that are established to avoid keeping session alive with wrong creds.
-//				HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
-//				if (connMgr != null) {
-//					// we close idle with an idle timeout of 0, which should mean everyone, even active connections.
-//					connMgr.closeIdleConnections(0);
-//				}
-//
-//			} catch (Throwable t) {
-//				if (_logger.isTraceEnabled())
-//					_logger.debug("screwup from closing idle connections", t);
-//			}
+
+			// try {
+			// // drop any connections that are established to avoid keeping session alive with wrong creds.
+			// HttpConnectionManager connMgr = CommonsHTTPSender.getConnectionManager();
+			// if (connMgr != null) {
+			// // we close idle with an idle timeout of 0, which should mean everyone, even active connections.
+			// connMgr.closeIdleConnections(0);
+			// }
+			//
+			// } catch (Throwable t) {
+			// if (_logger.isTraceEnabled())
+			// _logger.debug("screwup from closing idle connections", t);
+			// }
 		} catch (Exception ex) {
 			_logger.error("Alarm: couldn't reset the caching system after a failure. " + "To avoid seeing, possibly, stale contents, "
 				+ "restart the grid client: " + ex.getMessage());
