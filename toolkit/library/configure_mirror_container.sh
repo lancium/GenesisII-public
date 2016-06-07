@@ -77,6 +77,7 @@ multi_grid <<eof
   onerror failed to link mirror container
 
   grid date
+  # these are the original set of permissions granted to everyone on the mirror container.
   chmod "$BACKUP_CONTAINER" +rx --everyone
   onerror failed to chmod mirror container for everyone
   chmod "$BACKUP_CONTAINER"/Services +rx --everyone
@@ -87,6 +88,27 @@ multi_grid <<eof
   onerror failed to chmod mirror container RByteIO port type for everyone
   chmod "$BACKUP_CONTAINER"/Services/EnhancedRNSPortType +rx --everyone
   onerror failed to chmod mirror container RNS port type for everyone
+
+  # permissions added in to enable ACL speedup code; probably not necessary.
+#  chmod "$BACKUP_CONTAINER"/Services/EnhancedNotificationBrokerFactoryPortType +rx --everyone
+#  onerror failed to chmod mirror container EnhancedNotificationBrokerFactoryPortType port type for everyone
+#  chmod "$BACKUP_CONTAINER"/Services/EnhancedNotificationBrokerPortType +rx --everyone
+#  onerror failed to chmod mirror container EnhancedNotificationBrokerPortType port type for everyone
+#
+#  chmod "$BACKUP_CONTAINER"/Services/GeniiPublisherRegistrationPortType +rx --everyone
+#  onerror failed to chmod mirror container GeniiPublisherRegistrationPortType port type for everyone
+#  
+#  chmod "$BACKUP_CONTAINER"/Services/GeniiPullPointPortType +rx --everyone
+#  onerror failed to chmod mirror container GeniiPullPointPortType port type for everyone
+#  
+#  chmod "$BACKUP_CONTAINER"/Services/GeniiResolverPortType +rx --everyone
+#  onerror failed to chmod mirror container EnhancedNotificationBrokerPortType port type for everyone
+#
+#  chmod "$BACKUP_CONTAINER"/Services/GeniiSubscriptionPortType +rx --everyone
+#  onerror failed to chmod mirror container GeniiSubscriptionPortType port type for everyone
+#
+#  chmod "$BACKUP_CONTAINER"/Services/GeniiWSNBrokerPortType +rx --everyone
+#  onerror failed to chmod mirror container GeniiWSNBrokerPortType port type for everyone
 
   grid date
   logout --all 
