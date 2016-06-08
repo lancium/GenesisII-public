@@ -55,8 +55,8 @@ echo
 # clean out any previous context file.
 rm -f $HOME/$REPLICATEDCONTEXTFILE
 
-export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
-cd "$WORKDIR"
+#export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
+#cd "$WORKDIR"
 #export SHOWED_SETTINGS_ALREADY=true
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
   source ../../prepare_tools.sh ../../prepare_tools.sh 

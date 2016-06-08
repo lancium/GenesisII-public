@@ -55,8 +55,8 @@ function launch_container_if_not_running()
 {
   dep="$1"; shift
   # launch the container here if we don't think it's running.
-  local running="$(find_genesis_javas $dep)"
-  if [ ! -z "$running" ]; then
+  find_genesis_javas "$dep"
+  if [ ${#genesis_java_pids[@]} -ne 0 ]; then
     echo "The container already seems to be running for this user."
     return
   else
@@ -403,13 +403,13 @@ declare -a genesis_java_pids=()
 # locates any running processes that seem to be from genesis 2.
 function find_genesis_javas()
 {
-  pattern="$1"; shift
+  local pattern="$1"; shift
   # reset any prior contents.
   genesis_java_pids=()
   # now a cascade of attempts to find some processes.
-  user=$USER
+  local userflag="-u $USER"
   if [ "$OS" == "Windows_NT" ]; then
-    unset user
+    unset userflag
   fi
   temp_array=()
   # make sure we match the user-defined pattern also.
@@ -419,9 +419,10 @@ function find_genesis_javas()
   for i in "java.*genesis[^2][^-][^g][^f]" "java.*genii-" "JavaServiceWrapper" "JavaSe.*wrapper.*windows"; do
     patterns+="${i}${addon} "
   done
+
   # find all the processes matching those patterns.
-  genesis_java_pids=$(psfind -u $USER $patterns)
-  if [ "${genesis_java_pids[0]}" == "" ]; then
+  genesis_java_pids=$(psfind $userflag $patterns)
+  if [ -z "${genesis_java_pids[0]}" ]; then
     # this was actually an empty list.  reset it.
     genesis_java_pids=()
   fi

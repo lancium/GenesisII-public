@@ -23,4 +23,5 @@ public interface AclEntry extends Serializable, Describable
 	public AclEntry sanitize();
 
 	public String getEPI(boolean sanitize);
+
 }
