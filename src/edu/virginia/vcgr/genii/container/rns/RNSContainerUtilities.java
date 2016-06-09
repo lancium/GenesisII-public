@@ -58,12 +58,13 @@ public class RNSContainerUtilities
 				IResource iresource = rKey.dereference();
 				try {
 					// Get the access control list of the directory
-					if (iresource instanceof BasicDBResource) {
-						BasicDBResource resource = (BasicDBResource) iresource;
-						acl = resource.getAcl();
-					} else {
-						acl = (Acl) iresource.getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
-					}
+					acl = BasicDBResource.rationalizeAcl(iresource);
+//					if (iresource instanceof BasicDBResource) {
+//						BasicDBResource resource = (BasicDBResource) iresource;
+//						acl = resource.getAcl();
+//					} else {
+//						acl = (Acl) iresource.getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+//					}
 
 					// Now add "w" everyone -- so the client can clean up
 					// (destroy) the iterator properly later
@@ -126,17 +127,10 @@ public class RNSContainerUtilities
 			// trying to find the real types involved by looking at ACLs.
 			Acl acl = null;
 			try {
-
-				// Get the access control list of the directory
-				if (resource instanceof BasicDBResource) {
-					BasicDBResource dbresource = (BasicDBResource) resource;
-					acl = dbresource.getAcl();
-				} else {
-					acl = (Acl) resource.getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
-				}
-
-			} catch (ResourceException | SQLException e1) {
-				_logger.warn("failed to look up the ACL for resource " + resource);
+				// Get the access control list of the directory.
+				acl = BasicDBResource.rationalizeAcl(resource);
+			} catch (ResourceException e1) {
+				_logger.warn("failed to look up the ACL for resource " + resource, e1);
 			}
 
 			// we will fill this in if we can find it in the resource ACL.

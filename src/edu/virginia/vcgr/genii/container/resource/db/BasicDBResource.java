@@ -98,6 +98,30 @@ public class BasicDBResource implements IResource
 		_connection = _connectionPool.acquire(false);
 	}
 
+	/**
+	 * if the "iresource" is one of our objects, we'll return the new ACL format.
+	 * if it's not our type of object, we'll just return its ACL property under the old name, which might not exist.
+	 * @throws SQLException 
+	 * @throws ResourceException 
+	 */
+	static public Acl rationalizeAcl(IResource iresource) throws ResourceException
+	{
+		Acl toReturn = null;
+		if (iresource instanceof BasicDBResource) { 
+			BasicDBResource resource = (BasicDBResource) iresource;
+			try {
+				toReturn = resource.getAcl();
+			} catch (SQLException e) {
+				String msg = "failed to get ACL string for resource: " + iresource.toString();
+				_logger.warn(msg, e);
+				throw new ResourceException(msg);
+			}
+		} else {
+			toReturn = (Acl) iresource.getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+		}
+		return toReturn;
+	}
+	
 	public Connection getConnection()
 	{
 		return _connection;
@@ -369,6 +393,8 @@ public class BasicDBResource implements IResource
 		if (acl == null)
 			return false;
 		String result = setAclMatrix(acl, true);
+		if (_logger.isTraceEnabled())
+			_logger.debug("acl translation result: " + result);
 		return true;
 	}
 

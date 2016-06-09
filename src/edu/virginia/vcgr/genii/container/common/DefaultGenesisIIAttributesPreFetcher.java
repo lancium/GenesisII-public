@@ -47,17 +47,24 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 		return _resource;
 	}
 
-	/*
-	 * Old version protected Permissions getPermissions() throws Throwable { long start = System.currentTimeMillis(); IResource resource =
-	 * getResource(); System.out.println("Time to get resource = " + (System.currentTimeMillis()-start)); start = System.currentTimeMillis();
-	 * IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
-	 * System.out.println("Time to get getprovider = " + (System.currentTimeMillis()-start)); AuthZConfig config = null; start =
-	 * System.currentTimeMillis(); if (authZHandler != null) config = authZHandler.getAuthZConfig(resource); System.out.println(
-	 * "Time to get getauthzconfig = " + (System.currentTimeMillis()-start)); start = System.currentTimeMillis(); Acl acl =
-	 * AxisAcl.decodeAcl(config); System.out.println("Time to decode = " + (System.currentTimeMillis()-start)); return
-	 * GenesisIIACLManager.getPermissions(acl, QueueSecurity.getCallerIdentities(false)); }
-	 * 
-	 */
+//	protected Permissions oldgetPermissions() throws Throwable
+//	{
+//		long start = System.currentTimeMillis();
+//		IResource resource = getResource();
+//		System.out.println("Time to get resource = " + (System.currentTimeMillis() - start));
+//		start = System.currentTimeMillis();
+//		IAuthZProvider authZHandler = AuthZProviders.getProvider(((ResourceKey) resource.getParentResourceKey()).getServiceName());
+//		System.out.println("Time to get getprovider = " + (System.currentTimeMillis() - start));
+//		AuthZConfig config = null;
+//		start = System.currentTimeMillis();
+//		if (authZHandler != null)
+//			config = authZHandler.getAuthZConfig(resource);
+//		System.out.println("Time to get getauthzconfig = " + (System.currentTimeMillis() - start));
+//		start = System.currentTimeMillis();
+//		Acl acl = AxisAcl.decodeAcl(config);
+//		System.out.println("Time to decode = " + (System.currentTimeMillis() - start));
+//		return GenesisIIACLManager.getPermissions(acl, QueueSecurity.getCallerIdentities(false));
+//	}
 
 	protected Permissions getPermissions() throws Throwable
 	{

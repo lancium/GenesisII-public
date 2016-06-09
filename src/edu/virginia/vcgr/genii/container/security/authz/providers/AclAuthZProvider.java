@@ -33,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.InstallationProperties;
 import edu.virginia.vcgr.genii.client.configuration.Security;
@@ -584,13 +583,13 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	{
 		try {
 			// get ACL
-			Acl acl = null;
-			if (iresource instanceof BasicDBResource) {
-				BasicDBResource resource = (BasicDBResource) iresource;
-				acl = resource.getAcl();
-			} else {
-				acl = (Acl) iresource.getProperty(GENII_ACL_PROPERTY_NAME);
-			}
+			Acl acl = BasicDBResource.rationalizeAcl(iresource);
+//			if (iresource instanceof BasicDBResource) {
+//				BasicDBResource resource = (BasicDBResource) iresource;
+//				acl = resource.getAcl();
+//			} else {
+//				acl = (Acl) iresource.getProperty(GENII_ACL_PROPERTY_NAME);
+//			}
 			if (acl == null) {
 
 				// return no security requirements if null ACL
@@ -605,8 +604,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			return _defaultMinMsgSec;
 		} catch (ResourceException e) {
 			throw new AuthZSecurityException("Could not retrieve minimum incoming message level security.", e);
-		} catch (SQLException e) {
-			throw new AuthZSecurityException("Could not retrieve minimum incoming message level security.", e);
+//		} catch (SQLException e) {
+//			throw new AuthZSecurityException("Could not retrieve minimum incoming message level security.", e);
 		}
 	}
 
@@ -651,7 +650,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			try {
 				((BasicDBResource) resource).setAclMatrix(acl, true);
 			} catch (SQLException e) {
-				_logger.debug("Could not set ACL for object");
+				_logger.debug("Could not set ACL for object", e);
 			}
 		} else {
 			resource.setProperty(GENII_ACL_PROPERTY_NAME, acl);
@@ -729,16 +728,16 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	 */
 	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource) throws ResourceException, AuthZSecurityException
 	{
-		Acl acl = null;
-		if (resource instanceof BasicDBResource) {
-			try {
-				acl = ((BasicDBResource) resource).getAcl();
-			} catch (SQLException e) {
-				_logger.debug("Could not get ACL for object");
-			}
-		} else {
-			acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
-		}
+		Acl acl = BasicDBResource.rationalizeAcl(resource);
+//		if (resource instanceof BasicDBResource) {
+//			try {
+//				acl = ((BasicDBResource) resource).getAcl();
+//			} catch (SQLException e) {
+//				_logger.debug("Could not get ACL for object");
+//			}
+//		} else {
+//			acl = (Acl) resource.getProperty(GENII_ACL_PROPERTY_NAME);
+//		}
 
 		AclChangeContents contents = (AclChangeContents) message;
 		AclEntryListType encodedList = contents.aclEntryList();
@@ -758,7 +757,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 			try {
 				((BasicDBResource) resource).setAclMatrix(acl, true);
 			} catch (SQLException e) {
-				_logger.debug("Could not set ACL for object");
+				_logger.debug("Could not set ACL for object", e);
 			}
 		} else {
 			resource.setProperty(GENII_ACL_PROPERTY_NAME, acl);

@@ -119,6 +119,7 @@ import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.axis.AxisAcl;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
@@ -186,6 +187,7 @@ import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 import edu.virginia.vcgr.genii.iterator.IterableElementType;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.acl.Acl;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.security.x509.KeyAndCertMaterial;
@@ -561,13 +563,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return request;
 	}
 
-	@Override
-	@RWXMapping(RWXCategory.READ)
-	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(QName[] getMultipleResourcePropertiesRequest)
+	/**
+	 * helper method for both GetResourceProperty and GetMultipleResourceProperties that finds all the requested items
+	 * and provides an array which can be packaged up as a MessageElement list needed for the response. 
+	 */
+	public ArrayList<MessageElement> gatherProperties(QName[] getMultipleResourcePropertiesRequest)
 		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
 	{
 		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
 		Map<QName, Collection<MessageElement>> unknowns = null;
+		QName old_acl_name = new QName(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
 
 		for (QName name : getMultipleResourcePropertiesRequest) {
 			IAttributeManipulator manipulator = _attributePackage.getManipulator(name);
@@ -576,9 +581,17 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				if (unknowns == null)
 					unknowns = _attributePackage.getUnknownAttributes(ResourceManager.getCurrentResource().dereference());
 
-				Collection<MessageElement> values = unknowns.get(name);
-				if (values == null && unknowns.containsKey(name))
+				Collection<MessageElement> values = null;
+				if (name.equals(old_acl_name)) {
+					_logger.debug("adding in ACL info in properties request with null manipulator.");
+					Acl acl = BasicDBResource.rationalizeAcl(ResourceManager.getCurrentResource().dereference());
 					values = new ArrayList<MessageElement>(0);
+					values.add(new MessageElement(old_acl_name, AxisAcl.encodeAcl(acl)));
+				} else {
+					values = unknowns.get(name);
+					if (values == null && unknowns.containsKey(name))
+						values = new ArrayList<MessageElement>(0);
+				}
 
 				if (values == null) {
 					_logger.error("The resource property \"" + name + "\" is unknown.");
@@ -590,18 +603,29 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				document.addAll(values);
 			} else {
 				document.addAll(manipulator.getAttributeValues());
+				_logger.debug("adding in ACL info for properties request with active manipulator.");
+				// make sure we don't give the old format acls out to anyone any more.
+				for (int i = 0; i < document.size(); i++) {
+					if (document.get(i).getQName().equals(old_acl_name)) {
+						_logger.debug("caught older acl property in property request; removing in favor of newer form");
+						document.remove(i);
+						break;
+					}
+				}
+				Acl acl = BasicDBResource.rationalizeAcl(ResourceManager.getCurrentResource().dereference());
+				document.add(new MessageElement(old_acl_name, AxisAcl.encodeAcl(acl)));
 			}
-
 		}
-		/*
-		 * Updated 2016-03-18 by ASG to also grab the access control list information and add it. Needed to do this because ACLS are not
-		 * longer stored in resource properties, they are stored in a separate database. So, first get . Update 2016-05-28 by ASG. Do for both
-		 * if and else cases above.
-		 */
-		_logger.debug("ADDING ACL INTO THE RESOURCE PROPERTIES");
-		Object val = ResourceManager.getCurrentResource().dereference().getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
-		if (val != null)
-			document.add(new MessageElement(new QName(AclAuthZProvider.GENII_ACL_PROPERTY_NAME), val));
+		
+		return document;
+	}
+		
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(QName[] getMultipleResourcePropertiesRequest)
+		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
+	{
+		ArrayList<MessageElement> document = gatherProperties(getMultipleResourcePropertiesRequest);
 		MessageElement[] ret = new MessageElement[document.size()];
 		document.toArray(ret);
 		return new GetMultipleResourcePropertiesResponse(ret);
@@ -612,6 +636,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	public GetResourcePropertyResponse getResourceProperty(QName getResourcePropertyRequest)
 		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
 	{
+		/*
 		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
 
 		IAttributeManipulator manipulator = _attributePackage.getManipulator(getResourcePropertyRequest);
@@ -629,9 +654,12 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 							null));
 
 			document.addAll(unknowns.get(getResourcePropertyRequest));
-		} else
+		} else {
 			document.addAll(manipulator.getAttributeValues());
-
+		}
+		*/
+		
+		ArrayList<MessageElement> document = gatherProperties(new QName[]{getResourcePropertyRequest});
 		MessageElement[] ret = new MessageElement[document.size()];
 		document.toArray(ret);
 		return new GetResourcePropertyResponse(ret);

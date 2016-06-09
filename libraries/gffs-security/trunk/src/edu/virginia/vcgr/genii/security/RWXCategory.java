@@ -70,6 +70,7 @@ public enum RWXCategory {
 		} else if ("OWNER".equalsIgnoreCase(categoryName)) {
 			return OWNER;
 		}
+
 		return null;
 	}
 }

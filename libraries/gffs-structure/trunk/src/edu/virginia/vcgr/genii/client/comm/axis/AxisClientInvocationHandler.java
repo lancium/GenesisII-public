@@ -49,7 +49,6 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
-import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.client.ClientProperties;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
