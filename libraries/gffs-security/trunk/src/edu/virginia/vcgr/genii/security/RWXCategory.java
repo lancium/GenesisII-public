@@ -6,10 +6,10 @@ public enum RWXCategory {
 	INHERITED,
 	READ,
 	WRITE,
-	APPEND,
 	EXECUTE,
 	OPEN,
 	CLOSED,
+	APPEND,
 	OWNER;
 
 	// a constant representing all rwx capabilities.
@@ -65,6 +65,10 @@ public enum RWXCategory {
 			return OPEN;
 		} else if ("CLOSED".equalsIgnoreCase(categoryName)) {
 			return CLOSED;
+		} else if ("APPEND".equalsIgnoreCase(categoryName)) {
+			return APPEND;
+		} else if ("OWNER".equalsIgnoreCase(categoryName)) {
+			return OWNER;
 		}
 		return null;
 	}
