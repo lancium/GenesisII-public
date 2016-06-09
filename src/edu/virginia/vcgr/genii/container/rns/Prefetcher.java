@@ -72,7 +72,9 @@ public class Prefetcher
 			return newattrs;
 
 		try {
+			// long start2 = System.currentTimeMillis();
 			preFetcher = factory.getPreFetcher(target, rKey, service);
+			// System.out.println("\ttime to fetch prefetcher is " + (System.currentTimeMillis()-start2));
 			if (preFetcher == null)
 				return newattrs;
 			Collection<MessageElement> attrs = preFetcher.preFetch();

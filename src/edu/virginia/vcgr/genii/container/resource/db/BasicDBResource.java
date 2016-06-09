@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -43,6 +45,10 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerServi
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
+import edu.virginia.vcgr.genii.container.security.authz.providers.AclAuthZProvider;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.acl.Acl;
+import edu.virginia.vcgr.genii.security.acl.AclEntry;
 
 public class BasicDBResource implements IResource
 {
@@ -56,8 +62,21 @@ public class BasicDBResource implements IResource
 	static private final String _DESTROY_KEYS_STMT = "DELETE FROM resources WHERE resourceid = ?";
 	static private final String _DESTROY_PROPERTIES_STMT = "DELETE FROM properties WHERE resourceid = ?";
 	static private final String _DESTROY_MATCHING_PARAMS_STMT = "DELETE FROM matchingparams WHERE resourceid = ?";
-
+	static private final String _GET_ACL_ITEMS = "SELECT PrincipalEPI, permissions FROM AccessMatrix WHERE ResourceEPI = ?";
+	static private final String _DELETE_ACL_ITEMS = "DELETE FROM  AccessMatrix  WHERE ResourceEPI = ?";
+	static private final String _GET_PRINCIPAL_STMT = "SELECT ACLEntry FROM X509Identities WHERE PrincipalEPI = ?";
+	static private final String _REMOVE_PRINCIPAL_STMT = "DELETE FROM X509Identities WHERE PrincipalEPI = ?";
+	static private final String _INSERT_PRINCIPAL_STMT = "INSERT INTO X509Identities VALUES (?, ?)";
+	static private final String _REMOVE_ACLENTRY_STMT = "DELETE FROM AccessMatrix WHERE ResourceEPI  = ? AND PrincipalEPI = ?";
+	static private final String _INSERT_ACLENTRY_STMT = "INSERT INTO AccessMatrix VALUES (?, ?, ?)";
+	static private final int ACL_STRING_CACHE_SIZE = 100000;
 	static private Log _logger = LogFactory.getLog(BasicDBResource.class);
+
+	static private TimedOutLRUCache<String, Acl> aclCache = new TimedOutLRUCache<String, Acl>(100, 10000000, "ACL cache");
+	static private TimedOutLRUCache<String, String> aclStringCache =
+		new TimedOutLRUCache<String, String>(ACL_STRING_CACHE_SIZE, 10000000, "aclstring cache");
+	static private TimedOutLRUCache<String, AclEntry> principalCache =
+		new TimedOutLRUCache<String, AclEntry>(100, 10000000, "auth principal cache");
 
 	protected ServerDatabaseConnectionPool _connectionPool;
 	protected Connection _connection;
@@ -215,6 +234,251 @@ public class BasicDBResource implements IResource
 		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
+	}
+
+	public String setAclMatrix(Acl acl, boolean updateDB) throws ResourceException, SQLException
+	{
+		HashSet<AclEntry> ids = new HashSet<AclEntry>(); // unique set of AclEntries
+		ids.addAll(acl.executeAcl);
+		ids.addAll(acl.readAcl);
+		ids.addAll(acl.writeAcl);
+		String aclString = "";
+		// First, if we are updating the database, remove all the old entries
+		if (updateDB) {
+			removeAclMatrix();
+			// Now dump the cache entries for this resource
+			String epi = getEPI(_connection, _resourceKey);
+			aclCache.remove(epi);
+			aclStringCache.remove(epi);
+		}
+
+		// Now go ahead and update.
+		for (AclEntry entry : ids) {
+			AclEntry temp = null;
+			String epi = null;
+			if (entry == null) {
+				// This is a bizzare case. In the old implementation a null was used in an access control list
+				// to indicate "everyone". I find this strange. ASG
+				epi = "EVERYONE";
+				if (_logger.isTraceEnabled())
+					_logger.debug("Translating an entry for EVERYONE");
+			} else {
+				if (_logger.isTraceEnabled())
+					_logger.debug("examining entry: " + entry.describe(VerbosityLevel.HIGH));
+
+				// Now check if there is already an entry in the X509 database, if so, skip
+				// Else, create an entry for this AclEntry
+				epi = entry.getEPI(false);
+				if (_logger.isTraceEnabled())
+					_logger.debug("The EPI  :" + epi.toString());
+				/*
+				 * Note that the EPI returned will be formed in one of several ways: if from an X509 with an EPI in the DN, then the EPI if
+				 * from an X509 without an EPI, then "SN:issuerDN:serial_number" if a username/password, then with the false flag it will have
+				 * the (hashed) password embedded. If an X.509 pattern, then an EPI with a new GUID will be returned.
+				 */
+				if (updateDB) {
+					temp = getPrincipalfromDB(epi);
+					if (temp == null) {
+						// The entry is not in the DB, put it there
+						createPrincipalinDB(epi, entry);
+					}
+				}
+			}
+			// Ok, now the principal is in the database, need to determine what that principal can do
+			String permissions = " ";
+			if (acl.readAcl.contains(entry)) {
+				// It is in the read list, add "R"
+				permissions = permissions + "r";
+			}
+			if (acl.writeAcl.contains(entry)) {
+				// It is in the read list, add "R"
+				permissions = permissions + "w";
+			}
+			if (acl.executeAcl.contains(entry)) {
+				// It is in the read list, add "R"
+				permissions = permissions + "x";
+			}
+			// now add the access matrix entry
+			if (updateDB)
+				addACLMatrixEntry(epi, permissions);
+			aclString = aclString + ";" + epi + permissions;
+		}
+		// System.out.println("SetACLMatrix done :");
+		return aclString;
+	}
+
+	public String ACLtoAclString(Acl acl)
+	{
+		try {
+			return setAclMatrix(acl, false);
+		} catch (ResourceException | SQLException e) {
+			return null;
+		}
+	}
+
+	public Acl aclStringToAcl(String aclString)
+	{
+		/*
+		 * This constructor takes an aclString and parses it, looking up the principals in the principal DB, and building up the read write,
+		 * and execute access control lists.
+		 */
+		// While there are elements in the acl list, break them out;
+		Acl rval = new Acl();
+		String current = aclString.substring(0, aclString.indexOf(';'));
+		String remainder = aclString.substring(aclString.indexOf(';') + 1);
+		while (current != "") {
+			// current will be of the form "principalID permissions"
+			String principal = current.substring(0, current.indexOf(' '));
+			String permissions = current.substring(current.indexOf(' ') + 1);
+			// Now get the principal from the database
+			boolean found = false;
+			AclEntry aclPrincipal = null;
+			if (principal.equalsIgnoreCase("EVERYONE")) {
+				found = true;
+			} else {
+				aclPrincipal = getPrincipalfromDB(principal);
+				// if is not there, something is not right. it should never happen.
+				if (aclPrincipal == null) {
+					found = false;
+					_logger
+						.error("Trying to reconstruct AclEntry from aclString, principal \"" + principal + "\" not in principal database. ");
+					// This should not happen - EVER - but yet it has. So what to do. We'll just skip it
+				} else
+					found = true;
+			}
+			if (found) {
+				if ((permissions.indexOf('R') >= 0) || (permissions.indexOf('r') >= 0))
+					rval.readAcl.add(aclPrincipal);
+				if ((permissions.indexOf('W') >= 0) || (permissions.indexOf('w') >= 0))
+					rval.writeAcl.add(aclPrincipal);
+				if ((permissions.indexOf('X') >= 0) || (permissions.indexOf('x') >= 0))
+					rval.executeAcl.add(aclPrincipal);
+			}
+			if (remainder.indexOf(';') >= 0) {
+				current = remainder.substring(0, remainder.indexOf(';'));
+				remainder = remainder.substring(remainder.indexOf(';') + 1);
+			} else // end the loop
+				current = "";
+		}
+		return rval;
+	}
+
+	public boolean translateOldAcl() throws ResourceException, SQLException
+	{
+		Acl acl = (Acl) getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+		if (acl == null)
+			return false;
+		String result = setAclMatrix(acl, true);
+		return true;
+	}
+
+	public Acl getAcl() throws ResourceException, SQLException
+	{
+		Acl acl = null;
+		/*
+		 * So now instead we need to resource.getAclString(); if null - translate aclstring, then getaclstring Acl acl = new Acl(aclString)
+		 */
+		String EPI = getEPI(_connection, _resourceKey);
+		acl = aclCache.get(EPI);
+		if (acl != null) {
+			return acl;
+		}
+		String aclString = getACLString(false);
+		if (aclString == null) {
+			translateOldAcl();
+			aclString = getACLString(false);
+		}
+		if (aclString != null) {
+			// System.out.println("TRANSLATING AN ACL STRING INTO AN ACL");
+			acl = aclStringToAcl(aclString);
+		}
+		aclCache.put(EPI, acl);
+		return acl;
+	}
+
+	public void addACLMatrixEntry(String principalEPI, String permission) throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		// Will need to first look up the EPI of the resource
+		try {
+			String EPI = getEPI(_connection, _resourceKey);
+			// Then we remove an entry if it is there
+			stmt = _connection.prepareStatement(_REMOVE_ACLENTRY_STMT);
+			stmt.setString(1, EPI);
+			stmt.setString(2, principalEPI);
+			if (stmt.execute()) {
+				// worked ok, there was something there
+			}
+			stmt.close();
+			// Then we insert it
+			stmt = _connection.prepareStatement(_INSERT_ACLENTRY_STMT);
+			stmt.setString(1, EPI);
+			stmt.setString(2, principalEPI);
+			stmt.setString(3, permission);
+			stmt.executeUpdate();
+		} catch (SQLException sqe) {
+			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+		} finally {
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+
+	public void removeAclMatrix() throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			String EPI = getEPI(_connection, _resourceKey);
+			stmt = _connection.prepareStatement(_DELETE_ACL_ITEMS);
+			stmt.setString(1, EPI);
+			stmt.executeUpdate();
+
+		} catch (SQLException sqe) {
+			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+		} finally {
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+
+	}
+
+	@Override
+	public String getACLString(boolean sanitize) throws ResourceException
+	{
+		// ASG 12/23/2015
+		String ACLString = null;
+
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			String EPI = getEPI(_connection, _resourceKey);
+			ACLString = aclStringCache.get(EPI);
+			if (ACLString != null) {
+				return ACLString;
+			}
+			stmt = _connection.prepareStatement(_GET_ACL_ITEMS);
+			stmt.setString(1, EPI);
+			rs = stmt.executeQuery();
+			// if (!rs.next())
+			// return null;
+			while (rs.next()) {
+				String principal = rs.getString(1);
+				String permissions = rs.getString(2);
+				if (ACLString == null)
+					ACLString = "";
+				ACLString = ACLString + principal + " " + permissions + " ;";
+			}
+			aclStringCache.put(EPI, ACLString);
+		} catch (SQLException sqe) {
+			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+		} finally {
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+
+		return ACLString;
 	}
 
 	static public Object getProperty(Connection connection, String resourceKey, String propertyName) throws SQLException
@@ -457,6 +721,86 @@ public class BasicDBResource implements IResource
 			stmt.executeBatch();
 		} catch (SQLException sqe) {
 			throw new ResourceException("Unable to delete matching parameters.", sqe);
+		} finally {
+			StreamUtils.close(stmt);
+		}
+	}
+
+	public static AclEntry getPrincipalfromDB(String epi)
+	{
+		ServerDatabaseConnectionPool pool = BasicDBResourceProvider.createConnectionPool();
+		Connection connection = null;
+
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		AclEntry retval;
+		retval = principalCache.get(epi);
+		if (retval != null) {
+			return retval;
+		}
+		try {
+			connection = pool.acquire(false);
+			stmt = connection.prepareStatement(_GET_PRINCIPAL_STMT);
+			stmt.setString(1, epi);
+			long startTime = System.currentTimeMillis();
+			rs = stmt.executeQuery();
+			if (DatabaseConnectionPool.ENABLE_DB_TIMING_LOGS && _logger.isDebugEnabled())
+				_logger.debug("getPrincipalfromDB " + epi + ": is " + (System.currentTimeMillis() - startTime));
+
+			if (!rs.next())
+				return null;
+
+			Blob blob = rs.getBlob(1);
+			if (blob == null)
+				return null;
+
+			retval = (AclEntry) DBSerializer.fromBlob(blob);
+			principalCache.put(epi, retval);
+			return retval;
+		} catch (SQLException sqe) {
+			return null;
+
+		} finally {
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+			pool.release(connection);
+		}
+	}
+
+	public void createPrincipalinDB(String epi, AclEntry entry) throws SQLException
+	{
+		PreparedStatement stmt = null;
+
+		try {
+			// Remove the old one, though there should not an existing one
+			stmt = _connection.prepareStatement(_REMOVE_PRINCIPAL_STMT);
+			stmt.setString(1, epi);
+			stmt.executeUpdate();
+			stmt.close();
+			stmt = null;
+
+			// Make sure they gave us something
+			if (entry == null)
+				return;
+			stmt = _connection.prepareStatement(_INSERT_PRINCIPAL_STMT);
+			stmt.setString(1, epi);
+
+			Blob b = DBSerializer.toBlob(entry, "X509Identities", "ACLEntry");
+			if (b != null) {
+				if (_logger.isTraceEnabled())
+					_logger.trace("Serializing " + b.length() + " bytes into X509Indenties database.");
+				if (b.length() <= 0) {
+					_logger.error("Attempt to serialize property \"" + "entry" + "\" with 0 bytes into the X509Indenties database.");
+				} else if (b.length() >= 128 * 1024) {
+					_logger.error(
+						"Attempt to serialize property \"" + "entry" + "\" of length " + b.length() + " bytes into a " + "128K space.");
+				}
+			}
+
+			stmt.setBlob(2, b);
+			// Put it in the database
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException("Unable to update X509Identitites \"" + epi + "\".");
 		} finally {
 			StreamUtils.close(stmt);
 		}

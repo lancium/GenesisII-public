@@ -85,6 +85,14 @@ public interface IResource extends Closeable
 	public Rollbackable getParentResourceKey();
 
 	/**
+	 * @param sanitize
+	 *            .. whether or not to remove password hashes from generated EPIs
+	 * @return The ACL string consisting of "EPI permissions;EPI permissions .."
+	 * @throws ResourceException
+	 */
+	public String getACLString(boolean sanitize) throws ResourceException;
+
+	/**
 	 * Retrieve the value of a stored property.
 	 * 
 	 * @param propertyName

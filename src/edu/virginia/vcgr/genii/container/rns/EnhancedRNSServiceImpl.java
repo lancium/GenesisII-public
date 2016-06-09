@@ -476,13 +476,18 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 					name);
 				resultEntries.add(entry);
 			} else {
+				// long start2;
 				EndpointReferenceType epr = internalEntry.getEntryReference();
 				RNSEntryResponseType entry = null;
+				// System.out.println("\tTime to getentry reference is " + (System.currentTimeMillis()-start2));
+				// start2 = System.currentTimeMillis();
+				MessageElement[] me = Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm);
+				// System.out.println("\ttime to prefetch is " + (System.currentTimeMillis()-start2));
+				RNSMetadataType met = RNSUtilities.createMetadata(epr, me);
+				// System.out.println("\ttime to produce metatdata is " + (System.currentTimeMillis()-start2));
 
-				entry = new RNSEntryResponseType(epr,
-					RNSUtilities.createMetadata(epr,
-						Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm)),
-					null, internalEntry.getName());
+				entry = new RNSEntryResponseType(epr, met, null, internalEntry.getName());
+				// System.out.println("\tTime to getentry reference and build entry response is " + (System.currentTimeMillis()-start2));
 
 				// ---------------------------------------------------------------------------------------------
 				// Removing EPR from entry when short form is requested
@@ -491,9 +496,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				// ---------------------------------------------------------------------------------------------
 
 				resultEntries.add(entry);
+				// System.out.println("Time to prepare an entry is " + (System.currentTimeMillis()-start2));
 			}
 		}
 
+		// System.out.println("Time to prepare entries is " + (System.currentTimeMillis()-start));
 		prepTimer.noteTime();
 
 		Timer createTimer = tSink.getTimer("Create Iterator");

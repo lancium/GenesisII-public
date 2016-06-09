@@ -123,7 +123,7 @@ public class JobManager implements Closeable
 	// the time when we should check all the pending status notifications.
 	private volatile Calendar _whenToProcessNotifications;
 	// how frequently to check for notifications.
-	private final int NOTIFICATION_CHECKING_DELAY = 5 * 1000;
+	private final int NOTIFICATION_CHECKING_DELAY = 1 * 1000;
 
 	/**
 	 * A map of all jobs in the queue based off of the job's key in the database.

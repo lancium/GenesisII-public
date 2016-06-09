@@ -89,7 +89,7 @@ public class KerbAuthZProvider extends AclAuthZProvider
 			}
 			for (NuCredential cred : authenticatedCallerCredentials) {
 				if (cred.getOriginalAsserter().equals(resourceCertChain)) {
-					_logger.debug("dropping own identity from cred set so we can authorize properly.");
+					_logger.debug("dropping kerberos own identity from cred set so we can authorize it.");
 					continue;
 				}
 				prunedCredentials.add(cred);

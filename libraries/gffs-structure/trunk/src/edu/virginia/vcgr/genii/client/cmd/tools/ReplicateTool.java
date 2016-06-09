@@ -21,6 +21,7 @@ import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
@@ -190,27 +191,44 @@ public class ReplicateTool extends BaseGridTool
 	 */
 	private int listReplicas() throws RNSException, AuthZSecurityException, ResourceException, ToolException
 	{
-		String replicaPath = getArgument(0);
-		RNSPath current = RNSPath.getCurrent();
-		RNSPath replicaRNS = current.lookup(replicaPath, RNSPathQueryFlags.MUST_EXIST);
-		EndpointReferenceType replicaEPR = replicaRNS.getEndpoint();
-		int[] list = null;
-		// First get the vector or replica numbers
-		list = ResolverUtils.getEndpoints(replicaEPR);
-		// Now look them all up and get their EPRs
-		LookupResponseType dir = ResolverUtils.getEndpointEntries(replicaEPR);
-		if (dir != null && list != null) {
-			RNSEntryResponseType[] response = dir.getEntryResponse();
-			for (int j = 0; j < response.length; j++) {
-				String temp = response[j].getEndpoint().getAddress().toString();
-				int axisIndex = temp.indexOf("/axis");
-				int containerID = temp.indexOf("container-id");
-				if (axisIndex >= 0 && containerID >= 0)
-					stdout.println("Replica " + list[j] + ": " + temp.substring(0, axisIndex) + ": " + temp.substring(containerID));
-			}
-		} else {
-			stdout.println("There are no replicas of resource " + replicaPath);
+
+		/*
+		 * 2016-06-03 by ASG Updated to allow wildcards in arguments. Got tired of not having the capability
+		 */
+		Collection<GeniiPath.PathMixIn> paths = GeniiPath.pathExpander(getArgument(0));
+		if (paths == null) {
+			String msg = "Path does not exist or is not accessible: " + getArgument(0);
+			stdout.println(msg);
+			return 1;
 		}
+		for (GeniiPath.PathMixIn gpath : paths) {
+			if (gpath._rns != null) {
+				// Do what needs doing
+				String replicaPath = gpath._rns.pwd();
+				RNSPath current = RNSPath.getCurrent();
+				RNSPath replicaRNS = current.lookup(replicaPath, RNSPathQueryFlags.MUST_EXIST);
+				EndpointReferenceType replicaEPR = replicaRNS.getEndpoint();
+				int[] list = null;
+				// First get the vector or replica numbers
+				list = ResolverUtils.getEndpoints(replicaEPR);
+				// Now look them all up and get their EPRs
+				LookupResponseType dir = ResolverUtils.getEndpointEntries(replicaEPR);
+				if (dir != null && list != null) {
+					RNSEntryResponseType[] response = dir.getEntryResponse();
+					for (int j = 0; j < response.length; j++) {
+						String temp = response[j].getEndpoint().getAddress().toString();
+						int axisIndex = temp.indexOf("/axis");
+						int containerID = temp.indexOf("container-id");
+						if (axisIndex >= 0 && containerID >= 0)
+							stdout.println("Replica " + list[j] + ": " + temp.substring(0, axisIndex) + ": " + temp.substring(containerID));
+					}
+				} else {
+					stdout.println("There are no replicas of resource " + replicaPath);
+				}
+			}
+		}
+		// End ASG updates
+
 		return 0;
 	}
 

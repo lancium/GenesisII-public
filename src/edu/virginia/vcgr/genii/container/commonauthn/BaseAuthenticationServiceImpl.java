@@ -150,7 +150,6 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 				if (responses != null) {
 					for (RequestSecurityTokenResponseType response : responses) {
 						gatheredResponses.add(response);
-
 					}
 				}
 			} catch (Exception e) {
@@ -278,6 +277,14 @@ public abstract class BaseAuthenticationServiceImpl extends GenesisIIBase implem
 			ReplicationThread thread = new ReplicationThread(context);
 			thread.add(new ReplicationItem(new ReplicaSynchronizer(getResourcePropertyRetriver()), newEPR));
 			thread.start();
+		} else {
+			// 2016-05-31 by ASG. We need to ensure that the object itself is in its own ACL
+			/*
+			 * Acl acl = (Acl) resource.getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME); if (acl!=null) { X509Identity res = new
+			 * X509Identity((X509Certificate[]) resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME)); acl.readAcl.add(res);
+			 * acl.writeAcl.add(res); acl.executeAcl.add(res); resource.setProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME, acl); }
+			 */
+
 		}
 	}
 

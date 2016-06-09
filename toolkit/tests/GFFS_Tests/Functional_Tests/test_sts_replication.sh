@@ -3,6 +3,12 @@
 # Author: High-Performance-Computing Team, UVa
 
 #hmmm: this test doesn't seem to clean up after itself.  should be able to run repeatedly.
+#      ah, this may be due to the test being interrupted in process; in the normal case of it
+#      running to completion, it does clean up by restoring the backed up bootstrap grid state.
+#      part of the problem is that grid_chk is used a lot, which exits the script when an 
+#      error is found.  instead, it should use grid and check the error result and then skip
+#      remaining tests (but not cleanup) when an error is found.  otherwise, this test causes
+#      everything after it in the build to behave very badly.
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"

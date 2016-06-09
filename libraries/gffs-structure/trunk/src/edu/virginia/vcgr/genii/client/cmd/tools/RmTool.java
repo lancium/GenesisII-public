@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,20 +67,42 @@ public class RmTool extends BaseGridTool
 		RNSPath path = RNSPath.getCurrent();
 		int toReturn = 0;
 		for (int lcv = 0; lcv < numArguments(); lcv++) {
-			GeniiPath gPath = new GeniiPath(getArgument(lcv));
+			/*
+			 * 2016-06-03 by ASG Updated to allow wildcards in arguments. Got tired of not having the capability
+			 */
+			Collection<GeniiPath.PathMixIn> paths = GeniiPath.pathExpander(getArgument(lcv));
 			PathOutcome ret = PathOutcome.OUTCOME_ERROR;
-			if (gPath.pathType() == GeniiPathType.Grid) {
-				ret = rm(path, gPath.path(), recursive, force, stderr);
-			} else {
-				File fPath = new File(gPath.path());
-				ret = rm(fPath, recursive, force, stderr);
+			if (paths == null) {
+				String msg = "Path does not exist or is not accessible: " + getArgument(lcv);
+				stdout.println(msg);
+				continue;
 			}
-			if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
-				String msg = "Failed to remove " + gPath.toString() + " because " + PathOutcome.outcomeText(ret) + ".";
-				stderr.println(msg);
-				_logger.error(msg);
-				toReturn = 1;
+			for (GeniiPath.PathMixIn gpath : paths) {
+				if (gpath._rns != null) {
+					// Do what needs doing
+					ret = rm(path, gpath._rns.pwd(), recursive, force, stderr);
+				} else {
+					// Do what needs doing
+					File fPath = new File(gpath._file.getCanonicalPath());
+					ret = rm(fPath, recursive, force, stderr);
+				}
+				if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
+					String msg = "Failed to remove " + gpath.toString() + " because " + PathOutcome.outcomeText(ret) + ".";
+					stderr.println(msg);
+					_logger.error(msg);
+					toReturn = 1;
+				}
 			}
+			// End ASG updates
+
+			/*
+			 * Old Code
+			 * 
+			 * GeniiPath gPath = new GeniiPath(getArgument(lcv)); PathOutcome ret = PathOutcome.OUTCOME_ERROR; if (gPath.pathType() ==
+			 * GeniiPathType.Grid) { ret = rm(path, gPath.path(), recursive, force, stderr); } else { File fPath = new File(gPath.path()); ret
+			 * = rm(fPath, recursive, force, stderr); } if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) { String msg = "Failed to remove " +
+			 * gPath.toString() + " because " + PathOutcome.outcomeText(ret) + "."; stderr.println(msg); _logger.error(msg); toReturn = 1; }
+			 */
 		}
 
 		return toReturn;

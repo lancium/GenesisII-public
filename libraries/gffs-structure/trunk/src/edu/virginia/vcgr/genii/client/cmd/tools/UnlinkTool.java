@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
@@ -36,14 +37,30 @@ public class UnlinkTool extends BaseGridTool
 		RNSPath path = RNSPath.getCurrent();
 		int toReturn = 0;
 		for (int lcv = 0; lcv < numArguments(); lcv++) {
-			GeniiPath gPath = new GeniiPath(getArgument(lcv));
-			if (gPath.pathType() == GeniiPathType.Local) {
-				File fPath = new File(gPath.path());
-				toReturn += unlink(fPath);
-			} else
-				unlink(path, new GeniiPath(getArgument(lcv)).path());
+			/*
+			 * 2016-06-03 by ASG Updated to allow wildcards in arguments. Got tired of not having the capability
+			 */
+			Collection<GeniiPath.PathMixIn> paths = GeniiPath.pathExpander(getArgument(lcv));
+			if (paths == null) {
+				String msg = "Path does not exist or is not accessible: " + getArgument(lcv);
+				stdout.println(msg);
+				continue;
+			}
+			for (GeniiPath.PathMixIn gpath : paths) {
+				if (gpath._rns != null) {
+					if (gpath._rns.exists())
+						gpath._rns.unlink();
+				} else {
+					File fPath = gpath._file;
+					toReturn += unlink(fPath);
+				}
+			}
+			// End ASG updates
 		}
-
+		/*
+		 * ASG - old code - no wildcards GeniiPath gPath = new GeniiPath(getArgument(lcv)); if (gPath.pathType() == GeniiPathType.Local) {
+		 * File fPath = new File(gPath.path()); toReturn += unlink(fPath); } else unlink(path, new GeniiPath(getArgument(lcv)).path()); }
+		 */
 		return toReturn;
 	}
 

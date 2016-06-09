@@ -16,6 +16,7 @@ import edu.virginia.vcgr.genii.client.security.axis.AxisAcl;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.security.acl.Acl;
 import edu.virginia.vcgr.genii.security.acl.AclEntry;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 import edu.virginia.vcgr.genii.security.identity.IdentityType;
 
@@ -114,6 +115,67 @@ public class GenesisIIACLManager
 			p.set(PermissionBits.EVERYONE_READ, hasPermission(acl.readAcl, null));
 			p.set(PermissionBits.EVERYONE_WRITE, hasPermission(acl.writeAcl, null));
 			p.set(PermissionBits.EVERYONE_EXECUTE, hasPermission(acl.executeAcl, null));
+		}
+		return p;
+	}
+
+	static public Permissions getPermissions(String ACLString, Collection<Identity> callerIdentities)
+	{
+		Permissions p = new Permissions();
+		if (ACLString != null) {
+			for (Identity id : callerIdentities) {
+				String EPI = id.getEPI(false);
+				// Need to check if it is a username/password; they are a bit different -
+				if (EPI.indexOf(UsernamePasswordIdentity.USER_NAME_PASSWD_EPI) >= 0) {
+					UsernamePasswordIdentity uid = (UsernamePasswordIdentity) id;
+					int epiPos = ACLString.indexOf(UsernamePasswordIdentity.USER_NAME_PASSWD_EPI + uid.getUserName());
+					if (epiPos >= 0) {
+						// First extract the username and hashed password from the ACLstring
+						String aclpart = ACLString.substring(epiPos, ACLString.indexOf(';', epiPos));
+						String uname = aclpart.substring(aclpart.lastIndexOf(':') + 1, aclpart.indexOf('/'));
+						String password = aclpart.substring(aclpart.indexOf('/') + 1, aclpart.indexOf(' '));
+						// If these strings are not in the ACL string, then return false;
+						if ((password == null) || (uname == null) || (password == null))
+							return p;
+						UsernamePasswordIdentity aclid = new UsernamePasswordIdentity(uname, password);
+						EPI = aclid.getEPI(false);
+					}
+				}
+
+				String perm = extractPermissions(ACLString, EPI);
+				if (perm != null) {
+					if (perm.indexOf('r') >= 0) {
+						p.set(PermissionBits.OWNER_READ, true);
+					}
+					;
+					if (perm.indexOf('w') >= 0) {
+						p.set(PermissionBits.OWNER_WRITE, true);
+					}
+					;
+					if (perm.indexOf('x') >= 0) {
+						p.set(PermissionBits.OWNER_EXECUTE, true);
+					}
+					;
+				}
+			}
+			if (ACLString.indexOf("EVERYONE") >= 0) {
+				String perm = extractPermissions(ACLString, "EVERYONE");
+				if (perm != null) {
+					if (perm.indexOf('r') >= 0) {
+						p.set(PermissionBits.EVERYONE_READ, true);
+					}
+					;
+					if (perm.indexOf('w') >= 0) {
+						p.set(PermissionBits.EVERYONE_WRITE, true);
+					}
+					;
+					if (perm.indexOf('x') >= 0) {
+						p.set(PermissionBits.EVERYONE_EXECUTE, true);
+					}
+					;
+					System.out.println("EVERYONE is allowed access");
+				}
+			}
 		}
 		return p;
 	}

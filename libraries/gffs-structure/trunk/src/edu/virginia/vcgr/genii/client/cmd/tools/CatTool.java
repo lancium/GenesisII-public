@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 
 import org.morgan.util.io.StreamUtils;
 
@@ -12,6 +13,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.rns.PathOutcome;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
@@ -32,9 +34,28 @@ public class CatTool extends BaseGridTool
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
 		IOException, ResourcePropertyException
 	{
-		for (int lcv = 0; lcv < numArguments(); lcv++)
-			cat(getArgument(lcv));
-
+		for (int lcv = 0; lcv < numArguments(); lcv++) {
+			/*
+			 * 2016-06-03 by ASG Updated to allow wildcards in arguments. Got tired of not having the capability
+			 */
+			Collection<GeniiPath.PathMixIn> paths = GeniiPath.pathExpander(getArgument(lcv));
+			if (paths == null) {
+				String msg = "Path does not exist or is not accessible: " + getArgument(lcv);
+				stdout.println(msg);
+				continue;
+			}
+			for (GeniiPath.PathMixIn gpath : paths) {
+				if (gpath._rns != null) {
+					// Do what needs doing
+					cat(gpath._rns.pwd());
+				} else {
+					// Do what needs doing
+					cat("local:" + gpath._file.getCanonicalPath());
+				}
+			}
+			// End ASG updates
+			// cat(getArgument(lcv));
+		}
 		return 0;
 	}
 

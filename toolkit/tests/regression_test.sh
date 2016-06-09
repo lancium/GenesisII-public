@@ -107,7 +107,6 @@ if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
   GFFS_TESTS+=( \
     GFFS_Tests/Scalability_Tests/multiuser-gffs-submit.sh \
-    GFFS_Tests/Functional_Tests/test_sts_replication.sh \
   )
 fi
 
@@ -159,6 +158,14 @@ fi
 #holding onto these until fully vetted:
 #  EMS_Tests/multiUserTests/bes-multiuser-10-few.sh \
 #  EMS_Tests/multiUserTests/bes-multiuser-3-many.sh \
+
+if [ ! -z "$AUTOBUILD_RUNNING" ]; then
+  # only add sts replication for a bootstrapped grid under test, and add it
+  # at the end of the run, because when it fails, it doesn't clean up.
+  GFFS_TESTS+=( \
+    GFFS_Tests/Functional_Tests/test_sts_replication.sh \
+  )
+fi
 
 ##############
 

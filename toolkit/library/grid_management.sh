@@ -57,10 +57,10 @@ function launch_container_if_not_running()
   # launch the container here if we don't think it's running.
   find_genesis_javas "$dep"
   if [ ${#genesis_java_pids[@]} -ne 0 ]; then
-    echo "The container already seems to be running for this user."
+    echo "The container '$dep' already seems to be running for this user."
     return
   else
-    echo "Grid container not seen running--starting it."
+    echo "Grid container '$dep' not seen running--starting it."
   fi
   launch_container "$dep"
 }

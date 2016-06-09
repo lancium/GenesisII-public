@@ -588,10 +588,20 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				}
 
 				document.addAll(values);
-			} else
+			} else {
 				document.addAll(manipulator.getAttributeValues());
-		}
+			}
 
+		}
+		/*
+		 * Updated 2016-03-18 by ASG to also grab the access control list information and add it. Needed to do this because ACLS are not
+		 * longer stored in resource properties, they are stored in a separate database. So, first get . Update 2016-05-28 by ASG. Do for both
+		 * if and else cases above.
+		 */
+		_logger.debug("ADDING ACL INTO THE RESOURCE PROPERTIES");
+		Object val = ResourceManager.getCurrentResource().dereference().getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+		if (val != null)
+			document.add(new MessageElement(new QName(AclAuthZProvider.GENII_ACL_PROPERTY_NAME), val));
 		MessageElement[] ret = new MessageElement[document.size()];
 		document.toArray(ret);
 		return new GetMultipleResourcePropertiesResponse(ret);

@@ -33,6 +33,10 @@ public class BasicDBResourceFactory implements IResourceFactory
 		"CREATE TABLE persistedproperties(" + "resourceid VARCHAR(128) NOT NULL," + "category VARCHAR(128) NOT NULL,"
 			+ "propertyname VARCHAR(512) NOT NULL," + "propertyvalue VARCHAR(512) NOT NULL,"
 			+ "CONSTRAINT persistedpropertiesconstraints1 PRIMARY KEY (" + "resourceid, category, propertyname))";
+	static private final String _CREATE_X509_IDENTITIES =
+		"CREATE TABLE X509Identities (PrincipalEPI VARCHAR(128) NOT NULL, AclEntry BLOB(1M), " + "PRIMARY KEY(PrincipalEPI))";
+	static private final String _CREATE_ACCESS_MATRIX = "CREATE TABLE AccessMatrix(ResourceEPI VARCHAR(56) NOT NULL, "
+		+ " PrincipalEPI VARCHAR(128) NOT NULL, permissions VARCHAR(16) NOT NULL, PRIMARY KEY (ResourceEPI, PrincipalEPI) )";
 
 	protected ServerDatabaseConnectionPool _pool;
 
@@ -76,7 +80,7 @@ public class BasicDBResourceFactory implements IResourceFactory
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_UNKNOWN_ATTRS_TABLE_STMT, _CREATE_KEY_TABLE_STMT,
 				_CREATE_PROPERTY_TABLE_STMT, _CREATE_MATCHING_PARAMS_STMT, _CREATE_RESOURCES_TABLE_STMT,
-				_CREATE_PERSISTED_PROPERTIES_TABLE_STMT);
+				_CREATE_PERSISTED_PROPERTIES_TABLE_STMT, _CREATE_X509_IDENTITIES, _CREATE_ACCESS_MATRIX);
 
 			try {
 				ResourceSummary.cleanupLeakedResources(conn);
