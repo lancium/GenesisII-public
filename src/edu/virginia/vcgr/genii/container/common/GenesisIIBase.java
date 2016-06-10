@@ -561,11 +561,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return request;
 	}
 
-	/**
-	 * helper method for both GetResourceProperty and GetMultipleResourceProperties that finds all the requested items
-	 * and provides an array which can be packaged up as a MessageElement list needed for the response. 
-	 */
-	public ArrayList<MessageElement> gatherProperties(QName[] getMultipleResourcePropertiesRequest)
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(QName[] getMultipleResourcePropertiesRequest)
 		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
 	{
 		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
@@ -593,8 +591,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			} else {
 				document.addAll(manipulator.getAttributeValues());
 			}
+
 		}
-		
 		/*
 		 * Updated 2016-03-18 by ASG to also grab the access control list information and add it. Needed to do this because ACLS are not
 		 * longer stored in resource properties, they are stored in a separate database. So, first get . Update 2016-05-28 by ASG. Do for both
@@ -604,16 +602,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		Object val = ResourceManager.getCurrentResource().dereference().getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
 		if (val != null)
 			document.add(new MessageElement(new QName(AclAuthZProvider.GENII_ACL_PROPERTY_NAME), val));
-
-		return document;
-	}
-
-	@Override
-	@RWXMapping(RWXCategory.READ)
-	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(QName[] getMultipleResourcePropertiesRequest)
-		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
-	{
-		ArrayList<MessageElement> document = gatherProperties(getMultipleResourcePropertiesRequest);
 		MessageElement[] ret = new MessageElement[document.size()];
 		document.toArray(ret);
 		return new GetMultipleResourcePropertiesResponse(ret);
@@ -624,7 +612,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	public GetResourcePropertyResponse getResourceProperty(QName getResourcePropertyRequest)
 		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
 	{
-		/*
 		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
 
 		IAttributeManipulator manipulator = _attributePackage.getManipulator(getResourcePropertyRequest);
@@ -642,12 +629,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 							null));
 
 			document.addAll(unknowns.get(getResourcePropertyRequest));
-		} else {
+		} else
 			document.addAll(manipulator.getAttributeValues());
-		}
-		*/
 
-		ArrayList<MessageElement> document = gatherProperties(new QName[]{getResourcePropertyRequest});
 		MessageElement[] ret = new MessageElement[document.size()];
 		document.toArray(ret);
 		return new GetResourcePropertyResponse(ret);
