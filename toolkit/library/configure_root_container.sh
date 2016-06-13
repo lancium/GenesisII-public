@@ -192,7 +192,7 @@ check_if_failed Logging in as $new_admin_name
 # and also let everyone read that file.
 multi_grid <<eof
   cp "local:$WORKDIR/a_bogus_grid.txt" "/a_bogus_grid_on_${HOSTNAME}_owned_by_${USER}.txt"
-  onerror Failed copy bogus grid file up to root directory.
+  onerror Failed to copy bogus grid file up to root directory.
   chmod /a_bogus_grid* +r --everyone
   onerror Failed to change permissions on bogus grid file.
 eof

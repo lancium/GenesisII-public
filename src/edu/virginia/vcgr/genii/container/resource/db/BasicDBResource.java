@@ -99,8 +99,9 @@ public class BasicDBResource implements IResource
 	}
 
 	/**
-	 * if the "iresource" is one of our objects, we'll return the new ACL format.
-	 * if it's not our type of object, we'll just return its ACL property under the old name, which might not exist.
+	 * if the "iresource" is one of our objects, we'll return the new ACL format. if it's not our type of object, we'll just return its ACL
+	 * property under the old name, which might not exist.
+	 * 
 	 * @throws SQLException 
 	 * @throws ResourceException 
 	 */
@@ -400,6 +401,8 @@ public class BasicDBResource implements IResource
 
 	public Acl getAcl() throws ResourceException, SQLException
 	{
+		if (_logger.isDebugEnabled())
+			_logger.debug("getAcl called for resource: " + _resourceKey);
 		Acl acl = null;
 		/*
 		 * So now instead we need to resource.getAclString(); if null - translate aclstring, then getaclstring Acl acl = new Acl(aclString)
@@ -411,14 +414,20 @@ public class BasicDBResource implements IResource
 		}
 		String aclString = getACLString(false);
 		if (aclString == null) {
+			_logger.debug("translating an old ACL into new form");
 			translateOldAcl();
 			aclString = getACLString(false);
 		}
 		if (aclString != null) {
-			// System.out.println("TRANSLATING AN ACL STRING INTO AN ACL");
 			acl = aclStringToAcl(aclString);
+			aclCache.put(EPI, acl);
+		} else {
+			String msg = "utterly failed to find the ACL for this resource: " + _resourceKey;
+			_logger.debug(msg);
+			throw new ResourceException(msg);
 		}
-		aclCache.put(EPI, acl);
+		if (_logger.isDebugEnabled())
+			_logger.debug("getAcl succeeded for resource: " + _resourceKey);
 		return acl;
 	}
 

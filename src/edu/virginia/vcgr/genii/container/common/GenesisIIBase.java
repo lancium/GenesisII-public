@@ -561,24 +561,53 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		return request;
 	}
 
-	@Override
-	@RWXMapping(RWXCategory.READ)
-	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(QName[] getMultipleResourcePropertiesRequest)
+	/**
+	 * helper method for both GetResourceProperty and GetMultipleResourceProperties that finds all the requested items and provides an array
+	 * which can be packaged up as a MessageElement list needed for the response.
+	 */
+	public ArrayList<MessageElement> gatherProperties(QName[] getMultipleResourcePropertiesRequest)
 		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
 	{
 		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
 		Map<QName, Collection<MessageElement>> unknowns = null;
+		QName old_acl_name = new QName(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+		boolean sawNullList = false; // records if the array is empty.
+		boolean requestedAclInfo = false; // records if they wanted to know the ACL information.
+		boolean addedAclExplicitly = false; // true if we added the appropriate form of ACL info already.
 
 		for (QName name : getMultipleResourcePropertiesRequest) {
+			if (name == null) {
+				sawNullList = true;
+				if (_logger.isDebugEnabled())
+					_logger.debug("** saw null for qname while iterating array, so array is empty, meaning wildcard request.");
+			} else if (name.equals(old_acl_name)) {
+				requestedAclInfo = true;
+				if (_logger.isDebugEnabled())
+					_logger.debug("** saw a specific request for the ACL information, so will add.");
+			}
+
+			if (_logger.isDebugEnabled())
+				_logger.debug("## get mult resource props requesting name: " + name);
+
 			IAttributeManipulator manipulator = _attributePackage.getManipulator(name);
 
 			if (manipulator == null) {
 				if (unknowns == null)
 					unknowns = _attributePackage.getUnknownAttributes(ResourceManager.getCurrentResource().dereference());
 
-				Collection<MessageElement> values = unknowns.get(name);
+				Collection<MessageElement> values = null;
+				// if (!sawNullList && name.equals(old_acl_name)) {
+				// if (_logger.isDebugEnabled())
+				// _logger.debug("** adding in ACL info in properties request with null manipulator.");
+				// Acl acl = BasicDBResource.rationalizeAcl(ResourceManager.getCurrentResource().dereference());
+				// values = new ArrayList<MessageElement>(0);
+				// values.add(new MessageElement(old_acl_name, AxisAcl.encodeAcl(acl)));
+				// addedAclExplicitly = true;
+				// } else {
+				values = unknowns.get(name);
 				if (values == null && unknowns.containsKey(name))
 					values = new ArrayList<MessageElement>(0);
+				// }
 
 				if (values == null) {
 					_logger.error("The resource property \"" + name + "\" is unknown.");
@@ -591,17 +620,43 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			} else {
 				document.addAll(manipulator.getAttributeValues());
 			}
-
 		}
+
 		/*
-		 * Updated 2016-03-18 by ASG to also grab the access control list information and add it. Needed to do this because ACLS are not
-		 * longer stored in resource properties, they are stored in a separate database. So, first get . Update 2016-05-28 by ASG. Do for both
-		 * if and else cases above.
+		 * see if the item for ACLs was already present, and whack it if so, since it's the older style answer.
 		 */
-		_logger.debug("ADDING ACL INTO THE RESOURCE PROPERTIES");
-		Object val = ResourceManager.getCurrentResource().dereference().getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
-		if (val != null)
-			document.add(new MessageElement(new QName(AclAuthZProvider.GENII_ACL_PROPERTY_NAME), val));
+		// for (int i = 0; i < document.size(); i++) {
+		// if (document.get(i).getQName().equals(old_acl_name)) {
+		// if (_logger.isDebugEnabled())
+		// _logger.debug("** found acl property in property-based answer; cleaning out.");
+		// document.remove(i);
+		// break;
+		// }
+		// }
+
+		// make sure we have the right conditions before we add in the new form of ACL.
+		// if (!addedAclExplicitly && (sawNullList || requestedAclInfo)) {
+		// if (_logger.isDebugEnabled())
+		// _logger.debug("** adding in ACL info in properties request.");
+		// // new.
+		// Acl acl = BasicDBResource.rationalizeAcl(ResourceManager.getCurrentResource().dereference());
+		// // old. Acl acl = (Acl) ResourceManager.getCurrentResource().dereference().getProperty(AclAuthZProvider.GENII_ACL_PROPERTY_NAME);
+		// if (acl != null) {
+		// document.add(new MessageElement(old_acl_name, AxisAcl.encodeAcl(acl)));
+		// } else {
+		// _logger.debug("** not adding ACL to properties request since it came back as null.");
+		// }
+		// }
+
+		return document;
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(QName[] getMultipleResourcePropertiesRequest)
+		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
+	{
+		ArrayList<MessageElement> document = gatherProperties(getMultipleResourcePropertiesRequest);
 		MessageElement[] ret = new MessageElement[document.size()];
 		document.toArray(ret);
 		return new GetMultipleResourcePropertiesResponse(ret);
@@ -612,26 +667,22 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	public GetResourcePropertyResponse getResourceProperty(QName getResourcePropertyRequest)
 		throws RemoteException, InvalidResourcePropertyQNameFaultType, ResourceUnavailableFaultType, ResourceUnknownFaultType
 	{
-		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
+		/*
+		 * ArrayList<MessageElement> document = new ArrayList<MessageElement>();
+		 * 
+		 * IAttributeManipulator manipulator = _attributePackage.getManipulator(getResourcePropertyRequest);
+		 * 
+		 * if (manipulator == null) { Map<QName, Collection<MessageElement>> unknowns =
+		 * _attributePackage.getUnknownAttributes(ResourceManager.getCurrentResource().dereference());
+		 * 
+		 * if (!unknowns.containsKey(getResourcePropertyRequest)) throw FaultManipulator .fillInFault( new
+		 * InvalidResourcePropertyQNameFaultType(null, null, null, null, new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+		 * "The resource property " + getResourcePropertyRequest + " is unknown.") }, null));
+		 * 
+		 * document.addAll(unknowns.get(getResourcePropertyRequest)); } else { document.addAll(manipulator.getAttributeValues()); }
+		 */
 
-		IAttributeManipulator manipulator = _attributePackage.getManipulator(getResourcePropertyRequest);
-
-		if (manipulator == null) {
-			Map<QName, Collection<MessageElement>> unknowns =
-				_attributePackage.getUnknownAttributes(ResourceManager.getCurrentResource().dereference());
-
-			if (!unknowns.containsKey(getResourcePropertyRequest))
-				throw FaultManipulator
-					.fillInFault(
-						new InvalidResourcePropertyQNameFaultType(null, null, null, null,
-							new BaseFaultTypeDescription[] {
-								new BaseFaultTypeDescription("The resource property " + getResourcePropertyRequest + " is unknown.") },
-							null));
-
-			document.addAll(unknowns.get(getResourcePropertyRequest));
-		} else
-			document.addAll(manipulator.getAttributeValues());
-
+		ArrayList<MessageElement> document = gatherProperties(new QName[] { getResourcePropertyRequest });
 		MessageElement[] ret = new MessageElement[document.size()];
 		document.toArray(ret);
 		return new GetResourcePropertyResponse(ret);
@@ -1112,7 +1163,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	{
 		QueryExpressionType qet = queryResourcePropertiesRequest.getQueryExpression();
 
-		// First, make sure we understand the query expresion dialect
+		// First, make sure we understand the query expression dialect
 		URI dialect = qet.getDialect();
 		if (!dialect.toString().equals(WSRFConstants.XPATH_QUERY_EXPRESSION_DIALECT_STRING))
 			throw FaultManipulator.fillInFault(new UnknownQueryExpressionDialectFaultType(null, null, null, null, null, null));
