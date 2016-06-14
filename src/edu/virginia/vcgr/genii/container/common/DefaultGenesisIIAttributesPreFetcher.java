@@ -47,7 +47,7 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource> extend
 		return _resource;
 	}
 
-//	protected Permissions oldgetPermissions() throws Throwable
+//	old version: protected Permissions getPermissions() throws Throwable
 //	{
 //		long start = System.currentTimeMillis();
 //		IResource resource = getResource();

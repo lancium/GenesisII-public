@@ -33,7 +33,6 @@ public class UnlinkTool extends BaseGridTool
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
 		IOException, ResourcePropertyException
 	{
-//		RNSPath path = RNSPath.getCurrent();
 		int toReturn = 0;
 		for (int lcv = 0; lcv < numArguments(); lcv++) {
 			/*
