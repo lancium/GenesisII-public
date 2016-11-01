@@ -219,6 +219,16 @@ public class ExportControl
 	}
 
 	/**
+	 * returns true if the indexth character in toCheck is a slash character, either unix or dos style.
+	 * 
+	 * note that here we don't need to match backward slashes, although in general one might.
+	 */
+	public boolean isSlashAtIndex(String toCheck, int index)
+	{
+		return toCheck.substring(index, index + 1).equals("/") || toCheck.substring(index, index + 1).equals("\\");
+	}
+
+	/**
 	 * returns a positive number if the pathToCheck is rooted by the path in this restriction. if so, then this restriction may be important
 	 * for the path, but otherwise this restriction has nothing to say about the pathToCheck (and zero is returned). this does not guarantee
 	 * that some later restriction will not be more specific than this one, so all restrictions known must be checked. the returned number is
@@ -238,9 +248,11 @@ public class ExportControl
 			// we have the simplest match, both are rooted at root so neither is a relative path.
 			matchCount++;
 		} else {
-			// windows path handling.
-			if (pathToCheck.substring(1, 2).equals(":") && _path.substring(1, 2).equals(":") && pathToCheck.substring(2, 3).equals("/")
-				&& _path.substring(2, 3).equals("/") && pathToCheck.substring(0, 1).equalsIgnoreCase(_path.substring(0, 1))) {
+			// windows path handling. slashes will already be converted to forward slashes in all paths.
+			if ((pathToCheck.length() >= 3) && (_path.length() >= 3)
+				&& pathToCheck.substring(1, 2).equals(":") && _path.substring(1, 2).equals(":")
+				&& isSlashAtIndex(pathToCheck, 2) && isSlashAtIndex(_path, 2)
+				&& pathToCheck.substring(0, 1).equalsIgnoreCase(_path.substring(0, 1))) {
 				// important for C: to match c:, which is why ignores case is used above.
 				matchCount++;
 				windowsPath = true;
