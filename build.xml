@@ -64,7 +64,7 @@
 <!-- hmmm: does the jni xml file above matter if it's 32 or 64 bits? -->
 
 	<!-- Build Targets -->
-	<target name="build" depends="announce,libraries,jars,lib-setup,scripts,run.unit.tests,conclude"/>
+	<target name="build" depends="announce, libraries, jars, lib-setup, set-up-scripts, scripts, run.unit.tests, conclude"/>
 
 	<target name="init">
 		<mkdir dir="${obj.dir}"/>
@@ -287,6 +287,12 @@
 			<arg value="&quot;${basedir}/jni-libs/win32/IFS/editRegistry.bat&quot;"/>
 			<arg value="&quot;${basedir}&quot;"/>
   		</exec>
+	</target>
+
+	<target name="set-up-scripts" description="Sets up scripts" >
+
+		<chmod file="${basedir}/grid" perm="ugo+rx"/>
+
 	</target>
 
 	<target name="run.unit.tests" description="Run All Unit Tests" depends="tests.compile">
