@@ -36,6 +36,8 @@ import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -223,11 +225,36 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				_phaseShiftLock.wait(DEFAULT_LOOP_CYCLE);
 			}
 			context.setProperty(JOB_TOKEN_PROPERTY, null);
-			postDelay();
+			// =========================================================
+			// 2016-09-07 New code by ASG to probe every second until the post execution delay has passed rather than waiting for that long.
+			// First set up the delay; default to 10 seconds if not set
+			int delay=10;
+			int secondsWaited=0;
+			if (_constructionParameters != null) {
+				Duration postDelay = _constructionParameters.postExecutionDelay();
+				if (postDelay != null) {
+					delay=(int) postDelay.as(DurationUnits.Seconds);
 
-			int exitCode = queue.getExitCode(_jobToken);
+				}
+			}
+			int exitCode=0;
+			// Wait until the data is there or time is expired.
+			while (secondsWaited <= delay) {				
+				try {
+					exitCode = queue.getExitCode(_jobToken);
+					break;
+				} catch (NativeQueueException exe) {
+					if (secondsWaited==delay) throw exe;
+				}				
+				Thread.sleep(1000);
+				secondsWaited++;
+			}
+			//postDelay();
+			//exitCode = queue.getExitCode(_jobToken);
+			// End of 2016-09-07 ASG updates
+			// **********************************************************
+			
 			history.info("Job Exited with Exit Code %d", exitCode);
-
 			if (resourceUsageFile != null) {
 				try {
 					ExitResults eResults = ProcessWrapper.readResults(resourceUsageFile);

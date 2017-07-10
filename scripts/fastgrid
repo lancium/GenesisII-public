@@ -73,13 +73,13 @@ function nukem() {
 # be restarted.
 
 	#GRIDCMD=`which grid`
-	#GRIDPID=`pgrep -f "/bin/sh $GRIDCMD"`
+	#GRIDPID=`pgrep -f "/bin/bash $GRIDCMD"`
 	GRIDPID=`cat $PIDFILE 2>/dev/null`
 	if [ ! -z "$GRIDPID" ] ;
 	then
 		pkill --signal 9 -P $GRIDPID
 	fi
-	#pkill --signal 9 -f "/bin/sh $GRIDCMD"
+	#pkill --signal 9 -f "/bin/bash $GRIDCMD"
 	pkill -f "$NC_COMMAND"
 	pkill -f "$CL_NC_COMMAND"
 	pkill -f "cat $REDIRECTFILE"
@@ -113,7 +113,7 @@ function startServer() {
 SOCKPID=`pgrep -f "$NC_COMMAND"`
 #echo $SOCKPID
 GRIDCMD=`which grid`
-GRIDPID=`pgrep -f "/bin/sh $GRIDCMD"`
+GRIDPID=`pgrep -f "/bin/bash $GRIDCMD"`
 #echo $GRIDPID
 # We are also going to want to check to make sure it is MY process
 # that is sitting on the other end of this pipe.

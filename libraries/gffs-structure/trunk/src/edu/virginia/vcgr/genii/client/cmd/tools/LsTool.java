@@ -147,7 +147,7 @@ public class LsTool extends BaseGridTool
 				dirs.add(path);
 		}
 		for (RNSPath path : dirs) {
-			listDirectory(stdout, null, path, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+			if (listDirectory(stdout, null, path, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive) !=true) returnValue++;;
 		}
 
 		// Third, output the local files specified on the command line.
@@ -295,7 +295,7 @@ public class LsTool extends BaseGridTool
 
 	}
 
-	static private void listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll, boolean isEPR,
+	static private Boolean listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll, boolean isEPR,
 		boolean isMultiline, boolean isCertChain, boolean isRecursive) throws RNSException, ResourceException
 	{
 		String name = path.getName();
@@ -304,7 +304,7 @@ public class LsTool extends BaseGridTool
 		if (prefix != null)
 			name = prefix + "/" + name;
 		out.println(name + ":");
-
+		Boolean ok=true;
 		try {
 			ArrayList<String> subdirs = new ArrayList<String>();
 			DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR, isMultiline, isCertChain);
@@ -314,7 +314,7 @@ public class LsTool extends BaseGridTool
 			if (isRecursive) {
 				for (String entry : subdirs) {
 					RNSPath sub = new RNSPath(path, entry, null, false);
-					listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+					ok = ok || listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
 				}
 			}
 		} catch (Throwable t) {
@@ -324,7 +324,9 @@ public class LsTool extends BaseGridTool
 				excepMsg = t.getClass().getCanonicalName();
 			String msg = "failed during listDirectory: " + excepMsg;
 			out.println(msg);
+			ok=false;
 			_logger.error(msg, t);
 		}
+		return ok;
 	}
 }

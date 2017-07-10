@@ -88,6 +88,7 @@ public class FuseTool extends BaseGridTool
 		if (gPath.pathType() != GeniiPathType.Local)
 			throw new InvalidToolUsageException("mount-point must be a local path beginning with 'local:' ");
 		if (_isMount) {
+//			GeniiFuse.mountGenesisII(new File(gPath.path()), new String[] { "-f", }, null, _sandbox, _uid, _daemon);
 			GeniiFuse.mountGenesisII(new File(gPath.path()), new String[] { "-f", "-s" }, null, _sandbox, _uid, _daemon);
 		} else {
 			try {

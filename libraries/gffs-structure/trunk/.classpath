@@ -44,5 +44,7 @@
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/jetty8/org.eclipse.jetty.webapp_8.1.18.v20150929.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/jetty8/javax.servlet-api-3.0.1.jar"/>
 	<classpathentry kind="lib" path="/GenesisII-trunk/ext/commons-httpclient-3.0.1.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/httpclient-4.5.2.jar"/>
+	<classpathentry kind="lib" path="/GenesisII-trunk/ext/httpcore-4.4.4.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>
