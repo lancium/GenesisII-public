@@ -53,7 +53,7 @@ public class AccountingService extends AbstractContainerService
 
 	public void addAccountingRecord(ICallingContext callingContext, String besepi, ProcessorArchitecture arch, OperatingSystemNames os,
 		String machineName, Collection<String> commandLine, int exitCode, ElapsedTime user, ElapsedTime kernel, ElapsedTime wallclock,
-		long maximumRSS) throws SQLException, IOException, GeneralSecurityException
+		long maximumRSS, int numProcessors) throws SQLException, IOException, GeneralSecurityException
 	{
 		Connection conn = null;
 
@@ -74,7 +74,7 @@ public class AccountingService extends AbstractContainerService
 		try {
 			conn = getConnectionPool().acquire(false);
 			AccountingDatabase.addRecord(conn, besepi, arch, os, machineName, commandLine, exitCode, user, kernel, wallclock, maximumRSS,
-				identities);
+				identities, numProcessors);
 			conn.commit();
 		} finally {
 			getConnectionPool().release(conn);

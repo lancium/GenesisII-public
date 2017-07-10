@@ -85,7 +85,7 @@ public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase imp
 					ProcessorArchitecture arch = _constructionParameters.getResourceOverrides().cpuArchitecture();
 
 					acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null, _commandLine,
-						exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(), eResults.maximumRSS());
+						exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(), eResults.maximumRSS(),1);
 				}
 
 			} catch (ProcessWrapperException pwe) {

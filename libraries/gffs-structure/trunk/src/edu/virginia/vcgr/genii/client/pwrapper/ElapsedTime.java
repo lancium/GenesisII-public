@@ -22,6 +22,10 @@ public class ElapsedTime
 	{
 		return _value;
 	}
+	
+	final public void setValue(long val){
+		_value=val;
+	}
 
 	final public TimeUnit units()
 	{

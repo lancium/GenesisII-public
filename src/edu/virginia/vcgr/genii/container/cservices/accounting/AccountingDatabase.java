@@ -46,6 +46,9 @@ class AccountingDatabase
 		"CREATE INDEX acctreccredmaparididx ON acctreccredmap(arid)", "CREATE INDEX acctreccredmapcididx ON acctreccredmap(cid)",
 		"CREATE INDEX acctcommandlinesarididx ON acctcommandlines(arid)" };
 
+	static private final String _ADD_NUMCORES_COLUMN = "ALTER TABLE accountingrecords ADD COLUMN numcores INTEGER";
+	static private final String _ADD_USER_COLUMN = "ALTER TABLE accountingrecords ADD COLUMN owners BLOB(2G)";
+	
 	static private Calendar convert(Timestamp stamp)
 	{
 		Calendar ret = Calendar.getInstance();
@@ -58,6 +61,8 @@ class AccountingDatabase
 		try {
 			for (String createStmt : CREATE_TABLE_STMTS)
 				DatabaseTableUtils.createTables(connection, false, createStmt);
+		DatabaseTableUtils.addColumns(connection, false, _ADD_NUMCORES_COLUMN);
+		DatabaseTableUtils.addColumns(connection, false, _ADD_USER_COLUMN);
 		} catch (SQLException sqe) {
 			_logger.warn("Error trying to create accounting record tables.", sqe);
 		}
@@ -65,7 +70,7 @@ class AccountingDatabase
 
 	static void addRecord(Connection conn, String besepi, ProcessorArchitecture arch, OperatingSystemNames os, String machineName,
 		Collection<String> commandLine, int exitCode, ElapsedTime user, ElapsedTime kernel, ElapsedTime wallclock, long maximumRSS,
-		Collection<Identity> identities) throws SQLException
+		Collection<Identity> identities, int numProcessors) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		PreparedStatement stmt2 = null;
@@ -75,7 +80,7 @@ class AccountingDatabase
 		try {
 			stmt = conn.prepareStatement(
 				"INSERT INTO accountingrecords (besepi," + "arch, os, besmachinename, exitcode, usertimemicrosecs, "
-					+ "kerneltimemicrosecs, wallclocktimemicrosecs, " + "maxrssbytes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					+ "kerneltimemicrosecs, wallclocktimemicrosecs, " + "maxrssbytes, numcores, owners) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 				Statement.RETURN_GENERATED_KEYS);
 			if (besepi == null)
 				stmt.setNull(1, Types.VARCHAR);
@@ -89,6 +94,8 @@ class AccountingDatabase
 			stmt.setLong(7, kernel.as(TimeUnit.MICROSECONDS));
 			stmt.setLong(8, wallclock.as(TimeUnit.MICROSECONDS));
 			stmt.setLong(9, maximumRSS);
+			stmt.setInt(10,  numProcessors);
+			stmt.setBlob(11, DBSerializer.toBlob(identities, "accountingrecords", "owners"));
 			stmt.executeUpdate();
 
 			rs = stmt.getGeneratedKeys();

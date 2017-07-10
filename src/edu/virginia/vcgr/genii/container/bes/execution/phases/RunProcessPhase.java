@@ -230,7 +230,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				AccountingService acctService = ContainerServices.findService(AccountingService.class);
 				if (acctService != null) {
 					acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), null, null, null, newCmdLine,
-						results.exitCode(), results.userTime(), results.kernelTime(), results.wallclockTime(), results.maximumRSS());
+						results.exitCode(), results.userTime(), results.kernelTime(), results.wallclockTime(), results.maximumRSS(),1);
 				}
 			}
 
