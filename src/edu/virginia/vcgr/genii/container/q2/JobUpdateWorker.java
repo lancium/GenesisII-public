@@ -2,7 +2,9 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -43,9 +45,10 @@ public class JobUpdateWorker implements OutcallHandler
 	private ServerDatabaseConnectionPool _connectionPool;
 	private IJobEndpointResolver _jobEndpointResolver;
 	private JobData _data;
+	private Date _lastUpdate;
 
 	public JobUpdateWorker(JobManager jobManager, IBESPortTypeResolver clientStubResolver, IJobEndpointResolver jobEndpointResolver,
-		ServerDatabaseConnectionPool connectionPool, JobCommunicationInfo jobInfo, JobData data)
+		ServerDatabaseConnectionPool connectionPool, JobCommunicationInfo jobInfo, JobData data, Date lastUpdate)
 	{
 		_jobManager = jobManager;
 		_clientStubResolver = clientStubResolver;
@@ -53,6 +56,7 @@ public class JobUpdateWorker implements OutcallHandler
 		_connectionPool = connectionPool;
 		_jobEndpointResolver = jobEndpointResolver;
 		_data = data;
+		_lastUpdate = lastUpdate;
 	}
 
 	public boolean equals(JobUpdateWorker other)
@@ -215,7 +219,7 @@ public class JobUpdateWorker implements OutcallHandler
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Job %s has activity status %s.", _data, state));
 				history.trace("Job Status on BES:  %s", state);
-
+								
 				if (state.isFailedState()) {
 					/* If the job failed in the BES, fail it in the queue */
 					_jobManager.failJob(connection, _jobInfo.getJobID(), !state.isIgnoreable(), false, true);
@@ -225,7 +229,22 @@ public class JobUpdateWorker implements OutcallHandler
 				} else if (state.isFinishedState()) {
 					/* If the job finished on the bes, finish it here */
 					_jobManager.finishJob(_jobInfo.getJobID());
+				} else if(state.getGeniiState().equals("Queued") && _data.getBesQueueTime() == -1){
+					_data.setBesQueueTime(Calendar.getInstance().getTimeInMillis());
+					history.info("Job is queued on the BES @ " + Calendar.getInstance().getTime() + " in millis " + _data.getBesQueueTime());
+				} else if(!state.getGeniiState().equals("Queued") && _data.getBesQueueTime() != -1 && _data.getBesStartTime() == -1){
+					_data.setBesStartTime(Calendar.getInstance().getTimeInMillis());
+					history.info("Job started executing on the BES between " + _lastUpdate + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());
+					history.info("Approximate queue delay for the job was " + (_data.getBesStartTime() - _data.getBesQueueTime())/(1000 * 3600.0) + " hrs");
+				} else if(state.getGeniiState().equals("Executing") && _data.getBesQueueTime() == -1){
+					_data.setBesQueueTime(Calendar.getInstance().getTimeInMillis());
+					_data.setBesStartTime(Calendar.getInstance().getTimeInMillis());
+					history.info("Job was queued and executing on the BES between " + _lastUpdate.toString() + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());
+					history.info("Approximate queue delay for the job was zero");
 				}
+
+				
+				//_lastUpdate = Calendar.getInstance().getTime();
 			}
 		} catch (Throwable cause) {
 			history.warn(cause, "Error Updating Job State");

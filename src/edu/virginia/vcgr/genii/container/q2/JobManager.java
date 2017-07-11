@@ -55,7 +55,10 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.history.SequenceNumber;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLTransformer;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.client.jsdl.JobRequestParser;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -124,6 +127,8 @@ public class JobManager implements Closeable
 	private volatile Calendar _whenToProcessNotifications;
 	// how frequently to check for notifications.
 	private final int NOTIFICATION_CHECKING_DELAY = 1 * 1000;
+	
+	private Date _lastUpdate = null;
 
 	/**
 	 * A map of all jobs in the queue based off of the job's key in the database.
@@ -175,6 +180,7 @@ public class JobManager implements Closeable
 		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
 		_pendingChecks = new ArrayList<Long>();
 		_statusChecker = new JobStatusChecker(connectionPool, this, _STATUS_CHECK_FREQUENCY);
+		_lastUpdate = Calendar.getInstance().getTime();
 	}
 
 	protected void finalize() throws Throwable
@@ -666,17 +672,17 @@ public class JobManager implements Closeable
 			 */
 
 			int numOfCores = 1;
-			// JobRequest jobRequest = null;
-			// try {
-			// jobRequest = JobRequestParser.parse(jsdl);
-			// if ((jobRequest != null) && (jobRequest.getSPMDInformation() != null)) {
-			// numOfCores = jobRequest.getSPMDInformation().getNumberOfProcesses();
-			// }
-			// } catch (JSDLException e) {
-			// _logger.error("caught jsdl exception in submitJob", e);
-			// } catch (Exception ex) {
-			// _logger.error("caught exception in submitJob", ex);
-			// }
+			JobRequest jobRequest = null;
+			try {
+				jobRequest = JobRequestParser.parse(jsdl);
+				if ((jobRequest != null) && (jobRequest.getSPMDInformation() != null)) {
+					numOfCores = jobRequest.getSPMDInformation().getNumberOfProcesses();
+				}
+			} catch (JSDLException e) {
+				_logger.error("caught jsdl exception in submitJob", e);
+			} catch (Exception ex) {
+				_logger.error("caught exception in submitJob", ex);
+			}
 
 			long jobID = _database.submitJob(connection, ticket, priority, jsdl, callingContext, identities, state, submitTime, numOfCores);
 			if (MyProxyCertificate.isAvailable())
@@ -702,7 +708,7 @@ public class JobManager implements Closeable
 			 */
 
 			JobData job =
-				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history, numOfCores);
+				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history, numOfCores, -1, -1);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -837,7 +843,7 @@ public class JobManager implements Closeable
 			 * Create a new data structure for the job's in memory information and put it into the in-memory lists.
 			 */
 			JobData job = new JobData(sweep, jobID, PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), tickynum, priority, state,
-				submitTime, (short) 0, history, numOfCores);
+				submitTime, (short) 0, history, numOfCores, -1, -1);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -1858,7 +1864,8 @@ public class JobManager implements Closeable
 		Resolver resolver = new Resolver();
 
 		/* Enqueue the worker into the outcall thread pool */
-		_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job));
+		_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job, _lastUpdate));
+		_lastUpdate = Calendar.getInstance().getTime();
 
 		int newCount = _outcallThreadPool.size();
 
@@ -1973,7 +1980,8 @@ public class JobManager implements Closeable
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job));
+			_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job, _lastUpdate));
+			_lastUpdate = Calendar.getInstance().getTime();
 		}
 
 		int newCount = _outcallThreadPool.size();

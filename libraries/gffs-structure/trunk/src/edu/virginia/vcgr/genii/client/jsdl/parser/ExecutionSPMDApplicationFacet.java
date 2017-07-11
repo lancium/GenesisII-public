@@ -10,11 +10,15 @@ import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.SPMDInformation;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultSPMDApplicationFacet;
+import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
 import edu.virginia.vcgr.genii.client.jsdl.spmd.SPMDConstants;
+import edu.virginia.vcgr.jsdl.JSDLConstants;
 
 public class ExecutionSPMDApplicationFacet extends DefaultSPMDApplicationFacet
 {
 	private int _numberOfProcesses = 1;
+	private int _processesPerHost = 1;
+	private int _threadsPerProcess = 1;
 	private String _spmdVariation = null;
 
 	@Override
@@ -26,7 +30,26 @@ public class ExecutionSPMDApplicationFacet extends DefaultSPMDApplicationFacet
 
 		_numberOfProcesses = numberOfProcesses.intValue();
 	}
+	
+	@Override
+	public void consumeProcessesPerHost(Object currentUnderstanding, Integer proceessesPerHost)
+			throws JSDLException
+		{
+			_processesPerHost = proceessesPerHost.intValue();
+		}
+	
+	@Override
+	public void consumeThreadsPerProcess(Object currentUnderstanding, Integer threadsPerProcess, boolean useActualIndividualCPUCount)
+			throws JSDLException
+		{
+			if (useActualIndividualCPUCount)
+					throw new UnsupportedJSDLElement(new QName(SPMDConstants.JSDL_SPMD_NS, "useActualIndividualCPUCount"));
 
+			_threadsPerProcess = threadsPerProcess.intValue();
+			_numberOfProcesses = _numberOfProcesses * _threadsPerProcess;
+		}
+	
+	
 	@Override
 	public void consumeSPMDVariation(Object currentUnderstanding, URI spmdVariation)
 	{
@@ -88,4 +111,5 @@ public class ExecutionSPMDApplicationFacet extends DefaultSPMDApplicationFacet
 		JobRequest jr = (JobRequest) currentUnderstanding;
 		jr.setSPMDInformation(new SPMDInformation(_spmdVariation, _numberOfProcesses));
 	}
+	
 }

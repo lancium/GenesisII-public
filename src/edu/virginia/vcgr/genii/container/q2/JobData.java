@@ -111,9 +111,28 @@ public class JobData
 	private String _userName = null;
 	private Date _startTime = null;
 	private Date _finishTime = null;
+	
+	private long _besQueueTime;
+    public long getBesQueueTime() {
+		return _besQueueTime;
+	}
+
+	public void setBesQueueTime(long _besQueueTime) {
+		this._besQueueTime = _besQueueTime;
+	}
+
+	public long getBesStartTime() {
+		return _besStartTime;
+	}
+
+	public void setBesStartTime(long _besStartTime) {
+		this._besStartTime = _besStartTime;
+	}
+
+	private long _besStartTime;
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		Long besID, HistoryContext history, int numOfCores)
+		Long besID, HistoryContext history, int numOfCores, long besQueueTime, long besStartTime)
 	{
 		_jobName = jobName;
 		_killed = false;
@@ -130,18 +149,20 @@ public class JobData
 		_startTime = new Date();
 		_finishTime = new Date();
 		_userName = "Not Defined";
+		_besQueueTime = besQueueTime;
+        _besStartTime = besStartTime;
 	}
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		HistoryContext history, int numOfCores)
+		HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime);
 	}
 
 	public JobData(SweepingJob sweep, long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, HistoryContext history, int numOfCores)
+		short runAttempts, HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime);
 		if (sweep == null) {
 			_logger.error("not adding sweep job since sweep object is null!");
 			/* important to keep the state non-null, since this is supposedly a sweep even if broken. we don't want this sent to a BES. */

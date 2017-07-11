@@ -191,6 +191,12 @@ public class InCommonLoginTool extends BaseLoginTool
 				transientCredentials = TransientCredentials.getTransientCredentials(callContext);
 				transientCredentials.addAll(creds);
 			}
+			
+			/*****   WHOAMITOOL *******/
+            WhoamiTool whtool = new WhoamiTool();
+            whtool.run(stdout, stderr, stdin);
+            /*****  end WHOAMITOOL *******/
+
 
 			// drop any notification brokers or other cached info after credential change.
 			CacheManager.resetCachingSystem();
@@ -246,6 +252,8 @@ public class InCommonLoginTool extends BaseLoginTool
 		} catch (CertificateException e) {
 			_logger.error("Couldn't convert resulting certificate. See stack trace for details.", e);
 			stderr.println("Login failed, see logs for additional details.");
+		} catch (Exception e){
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -280,7 +288,8 @@ public class InCommonLoginTool extends BaseLoginTool
 					new SimpleMenuItem("University of Illinois at Urbana-Champaign",
 						"https://shibboleth.illinois.edu/idp/profile/SAML2/SOAP/ECP"),
 					new SimpleMenuItem("University of Washington", "https://idp.u.washington.edu/idp/profile/SAML2/SOAP/ECP"),
-					new SimpleMenuItem("University of Wisconsin-Madison", "https://login.wisc.edu/idp/profile/SAML2/SOAP/ECP"));
+					new SimpleMenuItem("University of Wisconsin-Madison", "https://login.wisc.edu/idp/profile/SAML2/SOAP/ECP"),
+					new SimpleMenuItem("Marshall University", "https://idp.marshall.edu/idp/profile/SAML2/SOAP/ECP"));
 				idpDialog.showDialog();
 
 				MenuItem response = idpDialog.getSelectedItem();

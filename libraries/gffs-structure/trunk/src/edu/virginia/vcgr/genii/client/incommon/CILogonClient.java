@@ -16,6 +16,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Consts;
@@ -124,8 +125,11 @@ public class CILogonClient
 
 	private String call2(String query2) throws IOException, URISyntaxException
 	{
-		HttpPost post = defaultPost(_params.IDPUrl, query2);
-		return makeSecureCall(post, _params.username, _params.password);
+		String base64string = new String(Base64.encodeBase64((_params.username + ":"  + _params.password).getBytes()));
+        base64string = base64string.replace("\n", "");
+        HttpPost post = defaultPost(_params.IDPUrl, query2, base64string);
+        // return makeSecureCall(post, _params.username, _params.password);
+        return makeCall(post);
 	}
 
 	private String call3(String query3) throws IOException, URISyntaxException
@@ -267,6 +271,22 @@ public class CILogonClient
 		return get;
 	}
 
+	private HttpPost defaultPost(String site, String content, String base64string) throws UnsupportedEncodingException
+    {
+            HttpPost post = new HttpPost(site);
+            if (content != null) {
+                    HttpEntity entity = new StringEntity(content);
+                    post.setEntity(entity);
+            }
+            // post.addHeader("Accept", "text/html; application/vnd.paos+xml");
+            // post.addHeader("PAOS", "ver=\"urn:liberty:paos:2003-08\";\"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp");
+            post.addHeader("Content-type", "text/xml");
+            post.addHeader("Authorization", "Basic " + base64string);
+            return post;
+    }
+
+
+	
 	private HttpPost defaultPost(String site, String content) throws UnsupportedEncodingException
 	{
 		HttpPost post = new HttpPost(site);
@@ -278,6 +298,7 @@ public class CILogonClient
 		post.addHeader("PAOS", "ver=\"urn:liberty:paos:2003-08\";\"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp");
 		return post;
 	}
+	
 
 	private String makeCall(HttpRequestBase request) throws ClientProtocolException, IOException
 	{
@@ -289,7 +310,7 @@ public class CILogonClient
 		return makeCall(request, _defaultContext);
 	}
 
-	private String makeSecureCall(HttpPost request, String username, String password) throws ClientProtocolException, IOException
+	/* private String makeSecureCall(HttpPost request, String username, String password) throws ClientProtocolException, IOException
 	{
 		UsernamePasswordCredentials creds = new UsernamePasswordCredentials(username, password);
 		BasicCredentialsProvider provider = new BasicCredentialsProvider();
@@ -304,7 +325,7 @@ public class CILogonClient
 		debug("Calling " + request.getMethod() + " on " + request.getURI().toString() + " with username=" + username + " and password="
 			+ stars);
 		return makeCall(request, context);
-	}
+	}*/
 
 	private String makeCall(HttpRequestBase request, HttpClientContext context) throws ClientProtocolException, IOException
 	{

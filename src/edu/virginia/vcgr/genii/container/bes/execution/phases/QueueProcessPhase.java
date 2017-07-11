@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
+import edu.virginia.vcgr.genii.client.pwrapper.ElapsedTime;
 import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
@@ -195,7 +196,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
-
+			
 			String lastState = null;
 			while (true) {
 				boolean stateIsUsable = false;
@@ -269,9 +270,11 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						Vector<String> command = new Vector<String>(_arguments);
 						command.add(0, _executable.getAbsolutePath());
 						eResults.wallclockTime().setValue(eResults.wallclockTime().value() * _numProcesses);
+						//ElapsedTime wallcockTime = 
 						acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null,
 							_jobToken.getCmdLine(), exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(),
 							eResults.maximumRSS(),_numProcesses);
+						history.info("Job wallclocktime is: " + eResults.wallclockTime().toString() + " and the job executed with %d procesoors", _numProcesses);
 					}
 
 				} catch (ProcessWrapperException pwe) {

@@ -96,6 +96,8 @@ public class ActivityState implements Serializable, Cloneable
 	{
 		this(ObjectDeserializer.toObject(element, ActivityStatusType.class));
 	}
+	
+	public String getGeniiState() { return _geniiState;} 
 
 	static private boolean equals(String one, String two)
 	{
