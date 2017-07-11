@@ -16,7 +16,8 @@ source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
 # how long should we snooze before checking that fuse has gotten the
 # notification that new files are available?
-FUSE_SNOOZE_TIME=4
+# ASG - 4 seconds is short, we are changing to 30. But, we really need to check the cache coherence code
+FUSE_SNOOZE_TIME=30
 # how many times we should test that fuse sees a new file in the grid.
 #FUSE_COPY_COUNT=1
 FUSE_COPY_COUNT=20
