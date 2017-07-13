@@ -1954,6 +1954,12 @@ public class JobManager implements Closeable
 					if (_logger.isDebugEnabled())
 						_logger.debug(String.format(
 							"Last minute decision not to check on job %s " + "status because it doesn't have a BES associated.", job));
+					// Added 7/13/2017 by ASG  .. should have already been removed, but for some reason it is still there, so get rid of it.
+					if (job.getJobState()==QueueStates.FINISHED) {
+						SortableJobKey jobKey = new SortableJobKey(job);
+						_runningJobs.remove(jobKey);
+						
+					}
 				}
 				continue;
 			} else {
@@ -2021,7 +2027,7 @@ public class JobManager implements Closeable
 			/* Get the bes id that the job is running on */
 			Long besID = job.getBESID();
 			if (besID == null) {
-				_logger.warn("A job is marked as running which isn't " + "assigned to a BES container.");
+				_logger.warn(job + "is marked as running which isn't " + "assigned to a BES container.");
 				continue;
 			}
 
