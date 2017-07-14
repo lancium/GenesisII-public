@@ -123,7 +123,7 @@ public class JobUpdateWorker implements OutcallHandler
 				// Another thread has removed this from the database.
 				if (_logger.isDebugEnabled())
 					_logger.debug(
-						String.format("Asked to check status on job %s which is " + "no longer running according to the database.", _data));
+						String.format("Asked to check status on job %s which is " + "no longer running according to the database.State is " + _data.getJobState(), _data));
 				_jobManager.failJob(connection, _jobInfo.getJobID(), false, false, false);
 				return;
 			}
