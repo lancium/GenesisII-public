@@ -113,13 +113,14 @@ fi
 # the standard tests for the execution management services.
 EMS_TESTS=( \
   EMS_Tests/besStatus/bes-attributes-and-activities.sh \
-  EMS_Tests/fileStagingTests/protocols-test.sh \
-  EMS_Tests/besFunctionality/bes-submission-test-sync.sh \
-  EMS_Tests/queueFunctionalityTests/queue-submission-test.sh \
-  EMS_Tests/performanceTests/queue-performance-test.sh \
-  EMS_Tests/performanceTests/file-staging-performance-test.sh \
-  EMS_Tests/faultJobsTests/bes-submission-sync-fault.sh \
 )
+
+#  EMS_Tests/fileStagingTests/protocols-test.sh \
+#  EMS_Tests/besFunctionality/bes-submission-test-sync.sh \
+#  EMS_Tests/queueFunctionalityTests/queue-submission-test.sh \
+#  EMS_Tests/performanceTests/queue-performance-test.sh \
+#  EMS_Tests/performanceTests/file-staging-performance-test.sh \
+#  EMS_Tests/faultJobsTests/bes-submission-sync-fault.sh \
 
 if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
