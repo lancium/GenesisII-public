@@ -71,6 +71,7 @@ fi
 if [ "$which" == "EMS" ]; then
   GFFS_ENABLED=0
 fi
+GFFS_ENABLED=0
 
 if [ $EMS_ENABLED -eq 0 ] && [ $GFFS_ENABLED -eq 0 ]; then
   echo "No tests to run: a test folder exists but the tests for that folder were disabled"
