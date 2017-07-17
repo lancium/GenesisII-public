@@ -29,7 +29,7 @@ public class HistoryContainerService extends AbstractContainerService
 {
 	static private Log _logger = LogFactory.getLog(HistoryContainerService.class);
 
-	static final private long CLEANUP_INTERVAL = 5000L; // 1000L * 60 * 60; // 1 hour.
+	static final private long CLEANUP_INTERVAL = 50000L; // 1000L * 60 * 60; // 1 hour.
 
 	static final public String SERVICE_NAME = "History Service";
 

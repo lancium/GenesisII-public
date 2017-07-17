@@ -149,8 +149,8 @@ public class TimedOutLRUCache<KeyType, DataType>
 	}
 
 	// hmmm: highly experimental memory analysis code here!
-	// private final long CHECK_INTERVAL = 1000 * 60; // one minute interval between deep checks currently.
-	private final long CHECK_INTERVAL = 1000 * 10;// hmmm: way too fast interval, being used for debugging.
+	private final long CHECK_INTERVAL = 1000 * 60; // one minute interval between deep checks currently.
+	//private final long CHECK_INTERVAL = 1000 * 10;// hmmm: way too fast interval, being used for debugging.
 
 	private Date _nextDeepSizeCheck = new Date((new Date().getTime()) + CHECK_INTERVAL);
 

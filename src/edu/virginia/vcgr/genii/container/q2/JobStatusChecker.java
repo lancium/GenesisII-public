@@ -22,7 +22,7 @@ public class JobStatusChecker
 	private ServerDatabaseConnectionPool _connectionPool;
 	private JobManager _manager;
 	private long _updateFrequency; // provided by caller for the slower status checking interval.
-	private int STATUS_THREAD_PERIOD = 5 * 1000; // notified status update checking interval, in
+	private int STATUS_THREAD_PERIOD = 30 * 1000; // notified status update checking interval, in
 													// milliseconds.
 	// tracks when the next long running status check should occur.
 	private volatile Calendar _nextSlowCheck;
