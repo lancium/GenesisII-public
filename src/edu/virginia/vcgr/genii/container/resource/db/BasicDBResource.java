@@ -75,6 +75,8 @@ public class BasicDBResource implements IResource
 	static private TimedOutLRUCache<String, Acl> aclCache = new TimedOutLRUCache<String, Acl>(100, 10000000, "ACL cache");
 	static private TimedOutLRUCache<String, String> aclStringCache =
 		new TimedOutLRUCache<String, String>(ACL_STRING_CACHE_SIZE, 10000000, "aclstring cache");
+	static private TimedOutLRUCache<String, String> rkeyToEPICache =
+			new TimedOutLRUCache<String, String>(ACL_STRING_CACHE_SIZE, 10000000, "Resource Key to EPI cache cache");
 	static private TimedOutLRUCache<String, AclEntry> principalCache =
 		new TimedOutLRUCache<String, AclEntry>(100, 10000000, "auth principal cache");
 
@@ -401,13 +403,18 @@ public class BasicDBResource implements IResource
 
 	public Acl getAcl() throws ResourceException, SQLException
 	{
-		if (_logger.isDebugEnabled())
-			_logger.debug("getAcl called for resource: " + _resourceKey);
+
 		Acl acl = null;
 		/*
 		 * So now instead we need to resource.getAclString(); if null - translate aclstring, then getaclstring Acl acl = new Acl(aclString)
 		 */
-		String EPI = getEPI(_connection, _resourceKey);
+		String EPI=rkeyToEPICache.get(_resourceKey);
+		if (EPI==null) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("getAcl epi cache miss for resource: " + _resourceKey);
+			EPI = getEPI(_connection, _resourceKey);
+			rkeyToEPICache.put(_resourceKey, EPI);
+		}
 		acl = aclCache.get(EPI);
 		if (acl != null) {
 			return acl;

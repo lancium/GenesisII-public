@@ -209,10 +209,12 @@ public class DatabaseConnectionPool
 						extantDbConnections++;
 						extant = extantDbConnections;
 					}
+					/*
 					if (_logger.isDebugEnabled()) {
 						if ((extant > 5) && ((extant % 10) == 0))
 							_logger.debug("upon acquire, db connections in existence: " + extant);
 					}
+					*/
 					return connection;
 				}
 
@@ -259,11 +261,13 @@ public class DatabaseConnectionPool
 			extantDbConnections--;
 			extant = extantDbConnections;
 		}
+		/*
 		if (_logger.isDebugEnabled()) {
 			// only print if there are a few connections and if they're divisible by 10.
 			if ((extant > 5) && ((extant % 10) == 0))
 				_logger.debug("upon release, db connections in existence: " + extant);
 		}
+		*/
 
 		synchronized (getConnPool()) {
 			try {

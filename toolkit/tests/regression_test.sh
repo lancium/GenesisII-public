@@ -108,12 +108,13 @@ if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
   GFFS_TESTS+=( \
     GFFS_Tests/Scalability_Tests/multiuser-gffs-submit.sh \
+    EMS_Tests/multiUserTests/multiuser-3users-manyjobs.sh \
   )
 fi
 
 # the standard tests for the execution management services.
 EMS_TESTS=( \
-  EMS_Tests/besStatus/bes-attributes-and-activities.sh \
+  EMS_Tests/multiUserTests/multiuser-3users-manyjobs.sh \
 )
 
 #  EMS_Tests/fileStagingTests/protocols-test.sh \
