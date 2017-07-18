@@ -36,6 +36,7 @@ public class HistoryContainerService extends AbstractContainerService
 	static final private Queue<String> queue = new LinkedList<String>();
 
 	static final private Object lock = new Object();
+	static final private Object outerLock = new Object();
 
 	static final int HISTORY_RECORDS_CLEANING_COUNT = 50;
 
@@ -45,31 +46,32 @@ public class HistoryContainerService extends AbstractContainerService
 		public void alarmWentOff(AlarmToken token, Object userData)
 		{
 			Connection connection = null;
+			synchronized (outerLock) {
+				try {
+					connection = getConnectionPool().acquire(false);
+					HistoryDatabase.cleanupDeadEvents(connection);
+					String resourceId = new String();
+					int count = 0;
+					while (count < HISTORY_RECORDS_CLEANING_COUNT && resourceId != null) {
+						synchronized (lock) {
+							resourceId = queue.poll();
+						}
 
-			try {
-				connection = getConnectionPool().acquire(false);
-				HistoryDatabase.cleanupDeadEvents(connection);
-				String resourceId = new String();
-				int count = 0;
-				while (count < HISTORY_RECORDS_CLEANING_COUNT && resourceId != null) {
-					synchronized (lock) {
-						resourceId = queue.poll();
+						if (resourceId != null) {
+							deleteRecords(connection, resourceId);
+							HistoryDatabase.removeStaleRecord(resourceId, connection);
+							_logger.info(String.format("Deleting history for resource %s", resourceId));
+						}
+						count++;
 					}
 
-					if (resourceId != null) {
-						deleteRecords(connection, resourceId);
-						HistoryDatabase.removeStaleRecord(resourceId, connection);
-						_logger.info(String.format("Deleting history for resource %s", resourceId));
-					}
-					count++;
+					connection.commit(); // commits combined to 1 for performance
+
+				} catch (SQLException sqe) {
+					_logger.warn("Error trying to clean up dead history events.", sqe);
+				} finally {
+					getConnectionPool().release(connection);
 				}
-
-				connection.commit(); // commits combined to 1 for performance
-
-			} catch (SQLException sqe) {
-				_logger.warn("Error trying to clean up dead history events.", sqe);
-			} finally {
-				getConnectionPool().release(connection);
 			}
 		}
 	}

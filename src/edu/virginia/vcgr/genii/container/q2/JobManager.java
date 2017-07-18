@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.naming.ConfigurationException;
@@ -133,35 +135,36 @@ public class JobManager implements Closeable
 	/**
 	 * A map of all jobs in the queue based off of the job's key in the database.
 	 */
-	private HashMap<Long, JobData> _jobsByID = new HashMap<Long, JobData>();
+	private Map<Long, JobData> _jobsByID = Collections.synchronizedMap(new HashMap<Long, JobData>());
 
 	/**
 	 * A map of all jobs in the queue based off of the job's human readable job ticket.
 	 */
-	private HashMap<String, JobData> _jobsByTicket = new HashMap<String, JobData>();
+	private Map<String, JobData> _jobsByTicket = Collections.synchronizedMap(new HashMap<String, JobData>());
 
 	/**
 	 * All jobs in the queue that are waiting to run. This map is sorted by priority, then submit time, then job ID.
 	 */
-	private TreeMap<SortableJobKey, JobData> _queuedJobs = new TreeMap<SortableJobKey, JobData>();
+	//private TreeMap<SortableJobKey, JobData> _queuedJobs = new TreeMap<SortableJobKey, JobData>();
+	private SortedMap<SortableJobKey, JobData> _queuedJobs = Collections.synchronizedSortedMap(new TreeMap<SortableJobKey, JobData>());
 
 	/**
 	 * All jobs in the queue, separated into lists for each user. Each user map is sorted like the full map above.
 	 */
-	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersWithJobs = new HashMap<String, TreeMap<SortableJobKey, JobData>>();
+	private Map<String, TreeMap<SortableJobKey, JobData>> _usersWithJobs = Collections.synchronizedMap(new HashMap<String, TreeMap<SortableJobKey, JobData>>());
 
 	/**
 	 * All jobs in the queue, separated into lists for each user. Each user map is sorted like the full map above.
 	 */
-	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersNotReadyJobs = new HashMap<String, TreeMap<SortableJobKey, JobData>>();
+	private Map<String, TreeMap<SortableJobKey, JobData>> _usersNotReadyJobs = Collections.synchronizedMap(new HashMap<String, TreeMap<SortableJobKey, JobData>>());
 	/*
 	 * Map of string user id's to identity arrays. This is needed so we can identify more formally who owns the job to clients.
 	 */
-	private HashMap<String, byte[][]> _userIDs = new HashMap<String, byte[][]>();
+	private Map<String, byte[][]> _userIDs = Collections.synchronizedMap(new HashMap<String, byte[][]>());
 	/**
 	 * A map of all jobs currently running (or starting) in the queue.
 	 */
-	private HashMap<Long, JobData> _runningJobs = new HashMap<Long, JobData>();
+	private Map<Long, JobData>  _runningJobs = Collections.synchronizedMap(new HashMap<Long, JobData>());
 
 	public JobManager(ThreadPool outcallThreadPool, QueueDatabase database, SchedulingEvent schedulingEvent, BESManager manager,
 		Connection connection, ServerDatabaseConnectionPool connectionPool) throws SQLException, ResourceException, GenesisIISecurityException
@@ -199,7 +202,7 @@ public class JobManager implements Closeable
 		_statusChecker.close();
 	}
 
-	private void putInUserBucket(HashMap<String, TreeMap<SortableJobKey, JobData>> bucket, JobData job, String username)
+	private void putInUserBucket(Map<String, TreeMap<SortableJobKey, JobData>> bucket, JobData job, String username)
 	{
 		// Also re-insert into user list
 		SortableJobKey jobKey = new SortableJobKey(job.getJobID(), job.getPriority(), job.getSubmitTime());
@@ -212,7 +215,7 @@ public class JobManager implements Closeable
 		}
 	}
 
-	private void removeFromUserBucket(HashMap<String, TreeMap<SortableJobKey, JobData>> bucket, JobData job)
+	private void removeFromUserBucket(Map<String, TreeMap<SortableJobKey, JobData>> bucket, JobData job)
 	{
 		SortableJobKey jobKey = new SortableJobKey(job);
 		// Remove the job from _users with jobs, and move it to _usersNotReadyJobs

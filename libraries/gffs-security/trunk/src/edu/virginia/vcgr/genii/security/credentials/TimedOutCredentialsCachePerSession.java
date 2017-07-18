@@ -26,7 +26,7 @@ public class TimedOutCredentialsCachePerSession extends TimedOutLRUCache<String,
 	 * how long each credential is kept around before timing out of the cache. we use the client side's default tracking lifetime plus an
 	 * additional few seconds.
 	 */
-	static public long CREDENTIAL_LIFETIME = ClientCredentialTracker.CONTAINER_MEMORY_GUESSTIMATE + (1000 * 30);
+	static public long CREDENTIAL_LIFETIME = ClientCredentialTracker.CONTAINER_MEMORY_GUESSTIMATE + (1000 * 60 * 15); // 15 minutes
 	// hmmm: should come from config file, but also be checked for rational choice against the client cred tracker's config.
 
 	public TimedOutCredentialsCachePerSession()
