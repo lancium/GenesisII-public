@@ -61,7 +61,7 @@ testGatherMultiUserResults()
 {
   # snooze a bit before trying to acquire results.
   # ASG 7/11/17 - changed from 28 to 240
-  sleep 240
+  sleep 28
 
   # we don't care who exits first, as long as they all do.  we'll gather
   # the results and figure out how many failed.
