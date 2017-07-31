@@ -117,9 +117,11 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(creationParameters);
 
 		Subscribe subscribe = initInfo.getSubscribeRequest();
-		if (subscribe != null)
+		if (subscribe != null){
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Subscribe request for resource key \"%s\"." + subscribe.toString(), rKey.getResourceKey()));
 			processSubscribeRequest((String) _resource.getKey(), new SubscribeRequest(subscribe));
-
+		}
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
 

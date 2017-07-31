@@ -318,6 +318,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				QName name = a.getQName();
 				if (name.equals(bconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME)) {
 					subscribe = a;
+					_logger.info(String.format("BES with resource key \"%s\" received a subscription with job", _resource.getKey()));
 				}
 			}
 		}

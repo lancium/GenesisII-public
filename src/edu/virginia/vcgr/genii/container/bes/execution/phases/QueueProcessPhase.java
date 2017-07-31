@@ -269,7 +269,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 						Vector<String> command = new Vector<String>(_arguments);
 						command.add(0, _executable.getAbsolutePath());
-						eResults.wallclockTime().setValue(eResults.wallclockTime().value() * _numProcesses);
+						if (_numProcesses !=null)
+							eResults.wallclockTime().setValue(eResults.wallclockTime().value() * _numProcesses);
 						//ElapsedTime wallcockTime = 
 						acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null,
 							_jobToken.getCmdLine(), exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(),
