@@ -477,9 +477,14 @@ public class QueueManager implements Closeable
 		}
 	}
 
-	public void checkJobStatus(long jobID) throws SQLException
+	public void cleanUpJob(long jobID) throws SQLException
 	{
-		_jobManager.checkJobStatus(jobID);
+		try {
+			_jobManager.finishJob(jobID);
+		} catch (ResourceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public JobInformationType getStatusFromID(Long jobID, Connection conn) throws ResourceException, GenesisIISecurityException, SQLException
@@ -490,10 +495,12 @@ public class QueueManager implements Closeable
 	public QueueInMemoryIteratorEntry getIterableJobStatus(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
-
+		_logger.debug("Entering QManager::getIterableJobStatus");
 		try {
 			connection = _connectionPool.acquire(true);
-			return _jobManager.getIterableJobStatus(connection, jobs);
+			QueueInMemoryIteratorEntry temp=_jobManager.getIterableJobStatus(connection, jobs);
+			_logger.debug("Exiting QManager::getIterableJobStatus");
+			return temp;
 		} finally {
 			_connectionPool.release(connection);
 		}
@@ -538,8 +545,10 @@ public class QueueManager implements Closeable
 		Connection connection = null;
 
 		try {
+			_logger.debug("Entering QManager::completeJobs");
 			connection = _connectionPool.acquire(false);
 			_jobManager.completeJobs(connection, jobs);
+			_logger.debug("Exiting QManager::completeJobs");
 		} finally {
 			_connectionPool.release(connection);
 		}

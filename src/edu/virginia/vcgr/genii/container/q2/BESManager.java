@@ -62,6 +62,7 @@ public class BESManager implements Closeable
 	private QueueDatabase _database;
 
 	private Map<Long, BESInformation> _besInformation;
+	private HashMap<Long, EndpointReferenceType> _besEPRs=new HashMap<Long, EndpointReferenceType>();
 
 	/**
 	 * The scheduling event is an object which allows code to raise and wait on events indicating that a good opportunity exists to schedule a
@@ -126,6 +127,34 @@ public class BESManager implements Closeable
 		}
 	}
 
+	public EndpointReferenceType getBESEPR(Connection connection,long besID) {
+		LegacyEntryType entryType;
+		synchronized (_besEPRs) {
+			EndpointReferenceType EPR=_besEPRs.get(besID);
+			if (EPR==null) {
+				// Need to get it
+				HashMap<Long, LegacyEntryType> entries = new HashMap<Long, LegacyEntryType>();
+				entries.put(new Long(besID), entryType = new LegacyEntryType());
+				System.out.println("The EPR for BesID " + besID + " was NOT found");
+				try {
+					_database.fillInBESEPRs(connection, entries);
+					EPR=entryType.getEntry_reference();
+					_besEPRs.put(new Long(besID), EPR);
+					return EPR;
+				} catch (ResourceException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			System.out.println("The EPR for BesID " + besID + " was found");
+			return EPR;
+		}
+	}
+	
 	Collection<BESInformation> allBESInformation()
 	{
 		Collection<BESInformation> ret;

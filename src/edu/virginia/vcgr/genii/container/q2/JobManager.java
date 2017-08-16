@@ -76,6 +76,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventWriter;
 import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventSink;
 import edu.virginia.vcgr.genii.container.cservices.history.NullHistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.percall.BESActivityTerminatorActor;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.iterator.QueueInMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
@@ -128,7 +129,7 @@ public class JobManager implements Closeable
 	// the time when we should check all the pending status notifications.
 	private volatile Calendar _whenToProcessNotifications;
 	// how frequently to check for notifications.
-	private final int NOTIFICATION_CHECKING_DELAY = 1 * 1000;
+	private final int NOTIFICATION_CHECKING_DELAY = 1 * 500;
 	
 	private Date _lastUpdate = null;
 
@@ -305,6 +306,10 @@ public class JobManager implements Closeable
 					// Also re-insert into user list
 					putInUserBucket(_usersWithJobs, job, username);
 				} else if (jobState.equals(QueueStates.RUNNING) || job.getBESID() != null) {
+					// New by ASG, 2017-08-02
+					JobStatusInformation info = _database.getJobStatusInformation(connection, job.getJobID());
+					job.setJobEPR(info.getJobEndpoint());
+					// End new stuff
 					if (!jobState.equals(QueueStates.RUNNING)) {
 						if (_logger.isDebugEnabled())
 							_logger.debug("Found a job not marked as running in the database, but with a bes id.");
@@ -355,7 +360,7 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public boolean failJob(Connection connection, long jobID, boolean countAsAnAttempt, boolean isPermanent, boolean attemptKill)
+	public boolean failJob(Connection connection, long jobID, boolean countAsAnAttempt, boolean isPermanent, boolean attemptKill)
 		throws SQLException, ResourceException
 	{
 		boolean ret = false;
@@ -366,7 +371,7 @@ public class JobManager implements Closeable
 			_logger.warn(String.format("Couldn't find job %d to fail it.", jobID));
 			return ret;
 		}
-
+		synchronized (job) {
 		if (job.isSweepingJob()) {
 			_logger.debug("in failJob, seeing attempt to fail on sweep job, ignoring.");
 			return true;
@@ -458,6 +463,7 @@ public class JobManager implements Closeable
 
 		job.history(HistoryEventCategory.Terminating).debug("Finishing Job with JobKiller");
 		_outcallThreadPool.enqueue(new JobKiller(job, newState, false, attemptKill, besName, null));
+		}
 		return ret;
 	}
 
@@ -472,7 +478,7 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void finishJob(long jobID) throws SQLException, ResourceException
+	public void finishJob(long jobID) throws SQLException, ResourceException
 	{
 		/* Find the job in the in-memory maps */
 		JobData job = _jobsByID.get(new Long(jobID));
@@ -482,7 +488,7 @@ public class JobManager implements Closeable
 				_logger.debug(String.format("Couldn't find job for id %d, so I can't finish it.", jobID));
 			return;
 		}
-
+		synchronized (job) {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Finished job " + job);
 
@@ -493,10 +499,14 @@ public class JobManager implements Closeable
 		Long besID = job.getBESID();
 		if (besID != null)
 			besName = _besManager.getBESName(besID);
+		// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
+		connection = _connectionPool.acquire(false);
+		// TEMP KillInformation killInfo = _database.getKillInfo(connection, job.getJobID(), besID);
 
 		try {
-			connection = _connectionPool.acquire(false);
+
 			_database.incrementFinishCount(connection);
+
 
 			if (besName == null) {
 				/*
@@ -529,12 +539,33 @@ public class JobManager implements Closeable
 		/*
 		 * See failJob for a complete discussion of why we enqueue an outcall worker at this point -- the reasons are the same.
 		 */
+		QueueStates _newState=QueueStates.FINISHED;
 		if (besName != null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Creating a JobKiller for finished job %s.", job));
 
 			job.history(HistoryEventCategory.Terminating).debug("Finishing Job with JobKiller");
 			_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, besName, null));
+/* TEMP boolean successfullCall=false;
+			BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(_database.historyKey(job.getJobTicket()), 
+				job.historyToken(), _besManager.getBESName(besID), killInfo.getJobEndpoint());
+			try {
+				successfullCall=firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null);
+				}
+			catch (Throwable e) {
+			}
+			if (!successfullCall) {
+				_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, besName, null));
+				return;
+			}
+			else
+			{
+				_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), _newState, new Date(), null, null, null);
+				connection.commit();
+				job.setJobState(_newState);
+				job.clearBESID();
+			}
+			*/
 		} else {
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Setting job %s to finished state without job killer (non-BES job).", job));
@@ -542,9 +573,11 @@ public class JobManager implements Closeable
 			job.setJobState(QueueStates.FINISHED);
 			job.history(HistoryEventCategory.Terminating).debug("Finishing non-BES Job without JobKiller");
 		}
+		}
+		// TEMP _schedulingEvent.notifySchedulingEvent();
 	}
 
-	synchronized public void killJob(Connection connection, long jobID) throws SQLException, ResourceException
+	public void killJob(Connection connection, long jobID) throws SQLException, ResourceException
 	{
 		/* Find the job in the in-memory maps */
 		JobData job = _jobsByID.get(new Long(jobID));
@@ -554,7 +587,7 @@ public class JobManager implements Closeable
 				_logger.debug(String.format("Couldn't find job for id %d, so I can't kill it.", jobID));
 			return;
 		}
-
+		synchronized (job) {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Killing a running job:" + jobID);
 
@@ -587,7 +620,7 @@ public class JobManager implements Closeable
 		 * Otherwise, we assume that he's already in the right list
 		 */
 		if (_logger.isDebugEnabled())
-			_logger.debug("Moving job \"" + job.getJobTicket() + "\" to the " + QueueStates.FINISHED + " state.");
+			_logger.debug("KillJob::Moving job \"" + job.getJobTicket() + "\" to the " + QueueStates.FINISHED + " state.");
 
 		String besName = null;
 		if (besID != null)
@@ -595,6 +628,7 @@ public class JobManager implements Closeable
 
 		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true, true, besName, besID));
 		_schedulingEvent.notifySchedulingEvent();
+		}
 	}
 
 	/**
@@ -711,13 +745,11 @@ public class JobManager implements Closeable
 			 */
 
 			JobData job =
-				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history, numOfCores, -1, -1);
+				new JobData(jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, submitTime, (short) 0, history, numOfCores, -1, -1, null);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
-			_jobsByID.put(new Long(jobID), job);
-			_jobsByTicket.put(ticket, job);
-			_queuedJobs.put(jobKey, job);
+
 
 			/*
 			 * As jobs are added to the primary list, they are also added to the appropriate user list (newly created, if needed)
@@ -730,7 +762,6 @@ public class JobManager implements Closeable
 			if (_logger.isTraceEnabled())
 				_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
-			putInUserBucket(_usersWithJobs, job, username);
 
 			/*
 			 * Added by ASG 4/25/2016. Add the username, and start/finish to the job record.
@@ -753,6 +784,10 @@ public class JobManager implements Closeable
 			/*
 			 * We've just added a new job to the queue, so we have a new scheduling opportunity.
 			 */
+			putInUserBucket(_usersWithJobs, job, username);
+			_jobsByID.put(new Long(jobID), job);
+			_jobsByTicket.put(ticket, job);
+			_queuedJobs.put(jobKey, job);
 			_schedulingEvent.notifySchedulingEvent();
 
 			return ticket;
@@ -846,7 +881,7 @@ public class JobManager implements Closeable
 			 * Create a new data structure for the job's in memory information and put it into the in-memory lists.
 			 */
 			JobData job = new JobData(sweep, jobID, PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), tickynum, priority, state,
-				submitTime, (short) 0, history, numOfCores, -1, -1);
+				submitTime, (short) 0, history, numOfCores, -1, -1, null);
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
@@ -912,12 +947,12 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public EndpointReferenceType getActivityEPR(Connection connection, String jobTicket) throws ResourceException, SQLException
+	public EndpointReferenceType getActivityEPR(Connection connection, String jobTicket) throws ResourceException, SQLException
 	{
 		JobData jData = _jobsByTicket.get(jobTicket);
-		JobStatusInformation info = _database.getJobStatusInformation(connection, jData.getJobID());
-
-		return info.getJobEndpoint();
+		// REMOVEJobStatusInformation info = _database.getJobStatusInformation(connection, jData.getJobID());
+		// REMOVE return info.getJobEndpoint();
+		return jData.getJobEPR();
 	}
 
 	/**
@@ -979,7 +1014,7 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public JobDefinition_Type getJSDL(long jobID) throws SQLException, ResourceException
+	public JobDefinition_Type getJSDL(long jobID) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 
@@ -991,7 +1026,7 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public void updateJSDL(JobDefinition_Type jsdl, long jobID) throws SQLException, ResourceException
+	public void updateJSDL(JobDefinition_Type jsdl, long jobID) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 
@@ -1003,7 +1038,7 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public void updateJSDL(JobDefinition_Type jsdl, String jobID) throws SQLException, ResourceException
+	public void updateJSDL(JobDefinition_Type jsdl, String jobID) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 
@@ -1015,12 +1050,12 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public EndpointReferenceType getLogEPR(String jobTicket) throws ResourceException, SQLException
+	public EndpointReferenceType getLogEPR(String jobTicket) throws ResourceException, SQLException
 	{
 		return getLogEPR(_jobsByTicket.get(jobTicket).getJobID());
 	}
 
-	synchronized public EndpointReferenceType getLogEPR(long jobID) throws ResourceException, SQLException
+	public EndpointReferenceType getLogEPR(long jobID) throws ResourceException, SQLException
 	{
 		Connection connection = null;
 
@@ -1032,7 +1067,7 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public void printLog(long jobID, PrintStream out) throws IOException
+	public void printLog(long jobID, PrintStream out) throws IOException
 	{
 		InputStream in = null;
 
@@ -1047,12 +1082,12 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public JobDefinition_Type getJSDL(String ticket) throws ResourceException, SQLException
+	public JobDefinition_Type getJSDL(String ticket) throws ResourceException, SQLException
 	{
 		return getJSDL(_jobsByTicket.get(ticket).getJobID());
 	}
 
-	synchronized public void printLog(String ticket, PrintStream out) throws IOException
+	public void printLog(String ticket, PrintStream out) throws IOException
 	{
 		printLog(_jobsByTicket.get(ticket).getJobID(), out);
 	}
@@ -1072,7 +1107,7 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 */
 
-	synchronized public Collection<JobInformationType> getJobStatus(Connection connection)
+	public Collection<JobInformationType> getJobStatus(Connection connection)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
@@ -1309,11 +1344,14 @@ public class JobManager implements Closeable
 	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection, String[] jobs)
 		throws GenesisIISecurityException, ResourceException, SQLException
 	{
+		_logger.debug("Entering jobManager::getIterableJobStatus new");
 		if (connection == null)
 			throw new ResourceException("Unable to query job status");
 
 		if (jobs == null || jobs.length == 0) {
-			return getIterableJobStatus(connection);
+			QueueInMemoryIteratorEntry temp=getIterableJobStatus(connection);
+			_logger.debug("Exiting jobManager::getIterableJobStatus");
+			return temp;
 		}
 
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
@@ -1381,7 +1419,7 @@ public class JobManager implements Closeable
 					toIterate.add(it.next().toString());
 				}
 			}
-
+			_logger.debug("Exiting jobManager::getIterableStatus");
 			if (toIterate.size() == 0) // no iterator
 				return new QueueInMemoryIteratorEntry(false, ret, toIterate);
 
@@ -1456,7 +1494,7 @@ public class JobManager implements Closeable
 						"Not permitted to get status of job \"" + _jobsByID.get(jobID.longValue()).getJobTicket() + "\".");
 
 			}
-
+			_logger.debug("Exiting jobManager::getIterableStatus");
 			if (toIterate.size() == 0) // no iterator
 				return new QueueInMemoryIteratorEntry(false, ret, toIterate);
 			else
@@ -1467,7 +1505,7 @@ public class JobManager implements Closeable
 
 	}
 
-	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection)
+	public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection)
 		throws GenesisIISecurityException, ResourceException, SQLException
 	{
 		Collection<JobInformationType> ret = new ArrayList<JobInformationType>(_jobsByID.size() + 1);
@@ -1476,7 +1514,7 @@ public class JobManager implements Closeable
 		Iterator<Long> it;
 		if (connection == null)
 			throw new ResourceException("Unable to query job status");
-
+		_logger.debug("Entering jobManager::getIterableStatus-2");
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
 		Collection<Long> batchSubset = new ArrayList<Long>(_jobsByID.size() + 1);
 
@@ -1549,7 +1587,7 @@ public class JobManager implements Closeable
 				toIterate.add(thisBatch.next().toString());
 			}
 		}
-
+		_logger.debug("Exiting jobManager::getIterableStatus-2");
 		if (toIterate.size() == 0) // no iterator
 			return new QueueInMemoryIteratorEntry(false, ret, toIterate);
 
@@ -1559,7 +1597,7 @@ public class JobManager implements Closeable
 
 	}
 
-	synchronized public JobErrorPacket[] queryErrorInformation(Connection connection, String job)
+	public JobErrorPacket[] queryErrorInformation(Connection connection, String job)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		JobData jobData = _jobsByTicket.get(job);
@@ -1613,8 +1651,10 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized private void completeJobs(Connection connection, Collection<Long> jobsToComplete) throws SQLException, ResourceException
+	// Took out synchronized ... ASG
+	private void completeJobs(Connection connection, Collection<Long> jobsToComplete) throws SQLException, ResourceException
 	{
+		_logger.debug("Entering jobManager::completeJobs 2");
 		/* First, remove the job from the database and commit the changes. */
 		_database.completeJobs(connection, jobsToComplete);
 		connection.commit();
@@ -1643,6 +1683,8 @@ public class JobManager implements Closeable
 				service.enqueue(_database.historyKey(data.getJobTicket()), connection);
 			}
 		}
+		_logger.debug("Exiting jobManager::completeJobs 2");
+
 	}
 
 	synchronized private void rescheduleJobs(Connection connection, Collection<Long> jobs)
@@ -1668,11 +1710,12 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 * @throws GenesisIISecurityException
 	 */
-	synchronized public void completeJobs(Connection connection) throws SQLException, ResourceException, GenesisIISecurityException
+	// Took out synchronized ... ASG
+	private void completeJobs(Connection connection) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Collection<Long> jobsToComplete = new LinkedList<Long>();
 		HashMap<Long, PartialJobInfo> ownerMap;
-
+		_logger.debug("Entering jobManager::completeJobs 3");
 		/* Get information needed from the database (like owner id) */
 		ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
 
@@ -1701,6 +1744,8 @@ public class JobManager implements Closeable
 
 		// Go ahead and complete them
 		completeJobs(connection, jobsToComplete);
+		_logger.debug("Exiting jobManager::completeJobs 3");
+
 	}
 
 	/**
@@ -1718,6 +1763,7 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 * @throws GenesisIISecurityException
 	 */
+	
 	synchronized public void completeJobs(Connection connection, String[] jobs)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
@@ -1729,7 +1775,7 @@ public class JobManager implements Closeable
 			completeJobs(connection);
 			return;
 		}
-
+		_logger.debug("Entering jobManager::completeJobs 1");
 		Collection<Long> jobsToComplete = new LinkedList<Long>();
 		HashMap<Long, PartialJobInfo> ownerMap;
 
@@ -1769,6 +1815,8 @@ public class JobManager implements Closeable
 
 		// Go ahead and complete them
 		completeJobs(connection, jobsToComplete);
+		_logger.debug("Exiting jobManager::completeJobs 1");
+
 	}
 
 	synchronized public void rescheduleJobs(Connection connection, String[] jobs)
@@ -1832,7 +1880,7 @@ public class JobManager implements Closeable
 			_pendingChecks.remove(0);
 			if (_logger.isDebugEnabled())
 				_logger.debug("JobManager: scheduling job status check on: " + jobId);
-			scheduleAJobStatusCheck(jobId);
+			scheduleAJobStatusCheck(jobId); 
 		}
 		// reset for the next time to check notified statuses.
 		_whenToProcessNotifications = Calendar.getInstance();
@@ -1934,7 +1982,8 @@ public class JobManager implements Closeable
 	synchronized public void checkJobStatuses(Connection connection) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		// reset any stored notifications, since we're checking everything.
-		_pendingChecks = new ArrayList<Long>();
+		// 2017-07-27 ASG. We cannot just delete the old checks .. there could be notifications in there
+		if (_pendingChecks==null) _pendingChecks = new ArrayList<Long>();
 
 		int originalCount = _outcallThreadPool.size();
 
@@ -2005,7 +2054,7 @@ public class JobManager implements Closeable
 	 * 
 	 * @return True if there are any jobs still waiting to run.
 	 */
-	synchronized public boolean hasQueuedJobs()
+	public boolean hasQueuedJobs()
 	{
 		return !_queuedJobs.isEmpty();
 	}
@@ -2074,7 +2123,7 @@ public class JobManager implements Closeable
 		}
 	}
 
-	synchronized public void addJobErrorInformation(Connection connection, long jobid, short attempt, Collection<String> errors)
+	public void addJobErrorInformation(Connection connection, long jobid, short attempt, Collection<String> errors)
 	{
 		try {
 			_database.addError(connection, jobid, attempt, errors);
@@ -2089,7 +2138,7 @@ public class JobManager implements Closeable
 	 * 
 	 * @return The list of currently queued jobs.
 	 */
-	synchronized public Collection<JobData> getQueuedJobs()
+	public Collection<JobData> getQueuedJobs()
 	{
 		/*
 		 * Note: This method changes the meaning of the "Priority" of a job. Previously, setting a higher priority meant a user could push his
@@ -2152,7 +2201,7 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void startJobs(Connection connection, Collection<ResourceMatch> matches, List<Integer> selectedMatchIndices)
+	public void startJobs(Connection connection, Collection<ResourceMatch> matches, List<Integer> selectedMatchIndices)
 		throws SQLException, ResourceException
 	{
 		HashSet<ResourceMatch> badMatches = new HashSet<ResourceMatch>();
@@ -2182,6 +2231,7 @@ public class JobManager implements Closeable
 
 			/* Find the job data for the match */
 			JobData data = _jobsByID.get(new Long(match.getJobID()));
+			synchronized (data) {
 
 			if (data.isSweepingJob()) {
 				_logger.debug("saw that job is sweeping type; not sending to bes.");
@@ -2202,7 +2252,7 @@ public class JobManager implements Closeable
 			data.setBESID(match.getBESID());
 			data.setJobState(QueueStates.STARTING);
 			_runningJobs.put(new Long(data.getJobID()), data);
-
+			}
 			/*
 			 * Finally, enqueue a worker to make the out call to the BES to start the job. Until this worker completes, a restart of the
 			 * container will cause this attempt at starting a job to fail.
@@ -2246,9 +2296,12 @@ public class JobManager implements Closeable
 		 */
 		private void resolve(Connection connection, long jobID) throws Throwable
 		{
+			
 			JobStatusInformation info = _database.getJobStatusInformation(connection, jobID);
 
 			_endpoint = info.getJobEndpoint();
+			
+		//	EndpointReferenceType endpoint=_besManager.getBESEPR(connection,_jobsByID.get(jobID).getBESID());
 			_portType = ClientUtils.createProxy(GeniiBESPortType.class, info.getBESEndpoint(), info.getCallingContext());
 		}
 
@@ -2292,7 +2345,7 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void killJobs(Connection connection, String[] tickets)
+	public void killJobs(Connection connection, String[] tickets)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		/* If we weren't given any tickets, then just ignore */
@@ -2324,6 +2377,7 @@ public class JobManager implements Closeable
 		/* Iterate through the job information */
 		for (Long jobID : ownerMap.keySet()) {
 			JobData jobData = _jobsByID.get(jobID);
+			synchronized (jobData) {
 			PartialJobInfo pji = ownerMap.get(jobID);
 
 			/*
@@ -2355,15 +2409,16 @@ public class JobManager implements Closeable
 				 */
 				finishJob(jobID);
 			}
+			}
 		}
 	}
 
-	synchronized public void resetJobCommunicationAttempts(Connection connection, long jobid) throws SQLException
+	public void resetJobCommunicationAttempts(Connection connection, long jobid) throws SQLException
 	{
 		_database.setJobCommunicationAttempts(connection, jobid, 0);
 	}
 
-	synchronized public void addJobCommunicationAttempt(Connection connection, long jobid, long besid) throws SQLException, ResourceException
+	public void addJobCommunicationAttempt(Connection connection, long jobid, long besid) throws SQLException, ResourceException
 	{
 		int commAttempts = _database.getJobCommunicationAttempts(connection, jobid);
 		if (commAttempts > MAX_COMM_ATTEMPTS) {
@@ -2426,6 +2481,23 @@ public class JobManager implements Closeable
 			JobData data = null;
 			HistoryContext history = new NullHistoryContext();
 
+			// REMOVE synchronized (_manager) {
+				/* Get the in-memory information for the job */
+				data = _jobsByID.get(new Long(_jobID));
+				if (data == null) {
+					_logger.warn("Job " + _jobID + " dissappeared before it could be started.");
+					return;
+				}
+			// REMOVE }
+			
+			synchronized (data) {
+				String oldAction = data.setJobAction("Creating");
+				if (oldAction != null) {
+					_logger.error("We're trying to create an activity for job " + data.getJobTicket() + " that " + "is already undergoing some action:  " + oldAction);
+					data.setJobAction(oldAction);
+					return;
+				}
+				
 			try {
 				/* Acquire a new database connection to use. */
 				connection = _connectionPool.acquire(false);
@@ -2436,17 +2508,10 @@ public class JobManager implements Closeable
 				JobStartInformation startInfo = _database.getStartInformation(connection, _jobID);
 				connection.commit();
 
-				synchronized (_manager) {
-					/* Get the in-memory information for the job */
-					data = _jobsByID.get(new Long(_jobID));
-					if (data == null) {
-						_logger.warn("Job " + _jobID + " dissappeared before it could be started.");
-						return;
-					}
-				}
 
+			
 				////////////////////////////////////////////////////////////////////
-				_logger.debug("Inside run ... Creating the job now");
+				_logger.debug("Inside run ... Creating job " + data);
 				////////////////////////////////////////////////////////////////////
 
 				history = data.history(HistoryEventCategory.CreatingJob);
@@ -2473,16 +2538,16 @@ public class JobManager implements Closeable
 				/*
 				 * Use the database's fillInBESEPRs function to get the EPR of the BES container that we are going to launch on.
 				 */
-				entries.put(new Long(_besID), entryType = new LegacyEntryType());
-				_database.fillInBESEPRs(connection, entries);
+				// REMOVE entries.put(new Long(_besID), entryType = new LegacyEntryType());
+				// REMOVE _database.fillInBESEPRs(connection, entries);
 
-				synchronized (_manager) {
+				// TEMP synchronized (_manager) {
 					/* Get the in-memory information for the job */
-					data = _jobsByID.get(new Long(_jobID));
-					if (data == null) {
-						_logger.warn("Job " + _jobID + " dissappeared before it could be started.");
-						return;
-					}
+					// TEMP data = _jobsByID.get(new Long(_jobID));
+					// TEMP if (data == null) {
+					// TEMP 	_logger.warn("Job " + _jobID + " dissappeared before it could be started.");
+					// TEMP 	return;
+					// TEMP }
 
 					/*
 					 * If the thing was marked as killed, then we simply won't start it. Instead, we will finish it early.
@@ -2493,13 +2558,9 @@ public class JobManager implements Closeable
 						finishJob(_jobID);
 						return;
 					}
-				}
+				// TEMP }
 
-				String oldAction = data.setJobAction("Creating");
-				if (oldAction != null) {
-					_logger.error("We're trying to create an activity for a job that " + "is already undergoing some action:  " + oldAction);
-					return;
-				}
+
 
 				CreateActivityResponseType resp;
 
@@ -2522,7 +2583,8 @@ public class JobManager implements Closeable
 
 					startCtxt = history.setContextProperties(startCtxt);
 
-					GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, entryType.getEntry_reference(), startCtxt);
+				//	GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, entryType.getEntry_reference(), startCtxt);
+					GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, _besManager.getBESEPR(connection, _besID), startCtxt);
 
 					ClientUtils.setTimeout(bes, 120 * 1000);
 					ActivityDocumentType adt = new ActivityDocumentType(startInfo.getJSDL(), null);
@@ -2563,7 +2625,7 @@ public class JobManager implements Closeable
 					data.clearJobAction();
 				}
 
-				synchronized (_manager) {
+				// TEMP synchronized (_manager) {
 					/*
 					 * We successfully got back here, so mark the job as started in the database.
 					 */
@@ -2573,7 +2635,7 @@ public class JobManager implements Closeable
 					/*
 					 * Now it's stored in the database. Note that it's started in memory as well.
 					 */
-					data = _jobsByID.get(new Long(_jobID));
+					// TEMP data = _jobsByID.get(new Long(_jobID));
 					data.setJobState(QueueStates.RUNNING);
 
 					/*
@@ -2582,7 +2644,7 @@ public class JobManager implements Closeable
 					 */
 					if (data.killed())
 						finishJob(_jobID);
-				}
+					// TEMP }
 			} catch (Throwable cause) {
 				history.error(cause, "Exception Thrown During Create Activity");
 
@@ -2613,7 +2675,7 @@ public class JobManager implements Closeable
 					countAgainstJob = true;
 					countAgainstBES = true;
 				}
-
+				data.clearJobAction();
 				if (countAgainstBES) {
 					_besManager.markBESAsUnavailable(_besID,
 						String.format("Exception during job start %s(%s)", cause.getClass().getName(), cause.getLocalizedMessage()));
@@ -2642,6 +2704,7 @@ public class JobManager implements Closeable
 			} finally {
 				_connectionPool.release(connection);
 			}
+		}
 		}
 	}
 
@@ -2715,7 +2778,21 @@ public class JobManager implements Closeable
 			KillInformation killInfo = _database.getKillInfo(connection, _jobData.getJobID(), _besID);
 			connection.commit();
 
-			String oldAction = _jobData.setJobAction("Terminating");
+			String oldAction = _jobData.currentJobAction();
+			while (oldAction != null) {
+				_logger.error(String.format("JK:Terminate:Attempted to kill activity %s which was " + "already undergoing another action:  %s", _jobData,
+					oldAction));
+				// we cannot arbitrarily decide to keep going;
+				// that's a violation of trust for the other actors
+				// who check/use the action flag.
+				try {
+					this.wait(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			oldAction = _jobData.setJobAction("Terminating");
 			if (oldAction != null) {
 				_logger.error(String.format("Attempted to kill activity %s which was " + "already undergoing another action:  %s", _jobData,
 					oldAction));
@@ -2734,10 +2811,17 @@ public class JobManager implements Closeable
 				if (_attemptKill) {
 					if (_logger.isDebugEnabled())
 						_logger.debug(
-							String.format("JobKiller::terminateActivity making the kill request for %s a persistent outcall.", _jobData));
+							String.format("JobKiller::terminateActivity killing request for %s a persistent outcall.", _jobData));
+					// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
+					BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(_database.historyKey(_jobData.getJobTicket()), _jobData.historyToken(), _besName, killInfo.getJobEndpoint());
+					if (!firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null)) {
+						if (_logger.isDebugEnabled())
+							_logger.debug(
+								String.format("JobKiller::terminateActivity making a request for %s a persistent outcall.", _jobData));
+						PersistentOutcallJobKiller.killJob(_besName, killInfo.getBESEndpoint(), _database.historyKey(_jobData.getJobTicket()),
+							_jobData.historyToken(), killInfo.getJobEndpoint(), killInfo.getCallingContext());
+					}
 
-					PersistentOutcallJobKiller.killJob(_besName, killInfo.getBESEndpoint(), _database.historyKey(_jobData.getJobTicket()),
-						_jobData.historyToken(), killInfo.getJobEndpoint(), killInfo.getCallingContext());
 
 					_jobData.historyToken(null);
 					_database.historyToken(connection, _jobData.getJobID(), null);
@@ -2755,6 +2839,7 @@ public class JobManager implements Closeable
 
 		public void run()
 		{
+			synchronized (_jobData) {
 			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
 
 			if (_logger.isDebugEnabled())
@@ -2838,7 +2923,7 @@ public class JobManager implements Closeable
 					 * Otherwise, we assume that he's already in the right list
 					 */
 					if (_logger.isDebugEnabled())
-						_logger.debug("Moving job \"" + _jobData + "\" to the " + _newState + " state.");
+						_logger.debug("JobKiller::Run::Moving job \"" + _jobData + "\" to the " + _newState + " state.");
 				}
 
 				/*
@@ -2853,5 +2938,6 @@ public class JobManager implements Closeable
 				_connectionPool.release(connection);
 			}
 		}
+	}
 	}
 }

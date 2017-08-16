@@ -158,9 +158,10 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
 	public Object completeJobs(String[] completeRequest) throws RemoteException
-	{
+	{_logger.debug("Entering Qservice::completeJobs");
 		try {
 			_queueMgr.completeJobs(completeRequest);
+			_logger.debug("Exiting Qservice::completeJobs");
 			return null;
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to complete jobs in queue.", sqe);
@@ -194,21 +195,24 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 	private QueueInMemoryIteratorEntry getIterableStatus(String[] getStatusRequest) throws RemoteException
 	{
-
+		_logger.debug("QService::Entering getIterableStatus");
 		try {
 			QueueInMemoryIteratorEntry qmie = _queueMgr.getIterableJobStatus(getStatusRequest);
-			return qmie;
+			_logger.debug("QService::Exiting getIterableStatus");	return qmie;
 		}
 
 		catch (SQLException sqe) {
+			_logger.debug("QService:: EXCEPTION Exiting getIterableStatus");	
 			throw new RemoteException("Unable to list jobs in queue.", sqe);
 		}
+
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
 	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest) throws RemoteException
 	{
+		_logger.debug("QService::Entering iterateStatus");
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
 		QueueInMemoryIteratorEntry qmie = getIterableStatus(iterateStatusRequest);
 		List<InMemoryIteratorEntry> indices = new LinkedList<InMemoryIteratorEntry>();
@@ -226,6 +230,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
 		builder.preferredBatchSize(QueueConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(col);
+		_logger.debug("QService::Exiting iterateStatus");
+
 		return new IterateStatusResponseType(builder.create(imiw));
 	}
 
@@ -419,7 +425,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			long jobid = userData.jobID();
 			ActivityState state = contents.activityState();
 			if (state.isFinalState())
-				_queueMgr.checkJobStatus(jobid);
+				_queueMgr.cleanUpJob(jobid);
 			return NotificationConstants.OK;
 		}
 	}

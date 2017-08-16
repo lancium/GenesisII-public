@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
@@ -113,6 +114,9 @@ public class JobData
 	private Date _finishTime = null;
 	
 	private long _besQueueTime;
+	
+	private EndpointReferenceType _jobEPR;
+	
     public long getBesQueueTime() {
 		return _besQueueTime;
 	}
@@ -132,7 +136,7 @@ public class JobData
 	private long _besStartTime;
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		Long besID, HistoryContext history, int numOfCores, long besQueueTime, long besStartTime)
+		Long besID, HistoryContext history, int numOfCores, long besQueueTime, long besStartTime, EndpointReferenceType EPR)
 	{
 		_jobName = jobName;
 		_killed = false;
@@ -151,18 +155,19 @@ public class JobData
 		_userName = "Not Defined";
 		_besQueueTime = besQueueTime;
         _besStartTime = besStartTime;
+        _jobEPR=EPR;
 	}
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime)
+		HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime,EndpointReferenceType EPR)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime,EPR);
 	}
 
 	public JobData(SweepingJob sweep, long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime)
+		short runAttempts, HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime,EndpointReferenceType EPR)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime, EPR);
 		if (sweep == null) {
 			_logger.error("not adding sweep job since sweep object is null!");
 			/* important to keep the state non-null, since this is supposedly a sweep even if broken. we don't want this sent to a BES. */
@@ -176,7 +181,16 @@ public class JobData
 	{
 		_userName = uname;
 	}
+	
+	public EndpointReferenceType getJobEPR() {
+		return _jobEPR;
+		
+	}
 
+	
+	public void setJobEPR(EndpointReferenceType EPR) {
+		_jobEPR=EPR;
+	}
 	public String getUserName()
 	{
 		return _userName;

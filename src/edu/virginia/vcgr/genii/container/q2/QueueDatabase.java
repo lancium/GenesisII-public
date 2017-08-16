@@ -322,7 +322,6 @@ public class QueueDatabase
 					if (_logger.isDebugEnabled())
 						_logger.debug("found sweep state in call context, and state is: " + sweepState);
 				}
-
 				JobData data = null;
 				if (sweepState != null) {
 
@@ -343,13 +342,13 @@ public class QueueDatabase
 
 					data = new JobData(sweep, jobid, JobManager.PARAMETER_SWEEP_NAME_ADDITION + QueueUtils.getJobName(jsdl), jobTicket,
 						rs.getShort(3), state, new Date(rs.getTimestamp(5).getTime()), rs.getShort(6),
-						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)), 1, -1, -1);
+						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)), 1, -1, -1, null);
 
 				} else {
 
 					data = new JobData(jobid, QueueUtils.getJobName(jsdl), jobTicket, rs.getShort(3), QueueStates.valueOf(rs.getString(4)),
 						new Date(rs.getTimestamp(5).getTime()), rs.getShort(6), (Long) rs.getObject(7),
-						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)), 1, -1, -1);
+						HistoryContextFactory.createContext(HistoryEventCategory.Default, callContext, historyKey(jobTicket)), 1, -1, -1, null);
 				}
 
 				Blob blob = rs.getBlob(8);
