@@ -454,6 +454,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	@RWXMapping(RWXCategory.OPEN)
 	public void notify(Notify msg) throws RemoteException
 	{
+		_logger.debug("A notification has arrived");
 		NotificationHelper.notify(msg, notificationMultiplexer());
 	}
 

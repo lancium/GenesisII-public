@@ -386,8 +386,10 @@ public class BES implements Closeable
 	synchronized public void deleteActivity(Connection connection, String activityid) throws UnknownActivityIdentifierFaultType, SQLException
 	{
 		UnknownActivityIdentifierFaultType fault = null;
-
+		if (_logger.isDebugEnabled())
+			_logger.debug("BES: deleteActivity " + activityid);
 		BESActivity activity = _containedActivities.get(activityid);
+		
 		if (activity == null)
 			fault = new UnknownActivityIdentifierFaultType("Couldn't find activity \"" + activityid + "\".", null);
 		else
