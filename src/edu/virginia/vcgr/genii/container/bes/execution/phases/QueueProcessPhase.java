@@ -274,7 +274,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null,
 							_jobToken.getCmdLine(), exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(),
 							eResults.maximumRSS(),_numProcesses);
-						history.info("Job wallclocktime is: " + eResults.wallclockTime().toString() + " and the job executed with %d procesoors", _numProcesses);
+					//	history.info("Job wallclocktime is: " + eResults.wallclockTime().toString() + " and the job executed with %d procesoors", _numProcesses);
 					}
 
 				} catch (ProcessWrapperException pwe) {
