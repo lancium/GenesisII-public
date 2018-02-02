@@ -17,7 +17,7 @@ if [ -z "$GENII_INSTALL_DIR" ]; then
   export GENII_INSTALL_DIR="$TOPDIR"
 fi
 Now take care of a minor problem in jenkins
-if [ -n "$WORKSPACE" ]; then 
+if [ ! -z "$WORKSPACE" ]; then 
 export GENII_INSTALL_DIR="$WORKSPACE"
 fi
 
