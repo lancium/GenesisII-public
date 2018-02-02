@@ -27,6 +27,9 @@ export AUTOBUILD_RUNNING=true
 # get required parameters...
 export BUILDS_FOLDER="$(readlink -f "$1")"; shift
 export WORKSPACE_DIR="$(readlink -f "$1")"; shift
+echo "BUILDS folder is $BUILDS_FOLDER"
+echo "WORKSPACE is $WORKSPACE"
+echo "RAM file is set, and at location $RAMFS"
 # optional parameters...
 # using a different port for the container is an option...
 export DIFFERENT_PORT="$1"; shift
@@ -50,8 +53,10 @@ fi
 # things we can intuit or have hard-coded for now.
 export GRITTY_TESTING_TOP_LEVEL="$SCRIPT_TOP"
 export TMP="$SCRIPT_TOP"
-export GENII_USER_DIR="$SCRIPT_TOP/genesis_user_dir"
-export BACKUP_USER_DIR="$SCRIPT_TOP/genesis_secondary_dir"
+#export GENII_USER_DIR="$SCRIPT_TOP/genesis_user_dir"
+export GENII_USER_DIR="/mnt/ramfs/genesis_user_dir"
+export BACKUP_USER_DIR="/mnt/ramfs/genesis_secondary_dir"
+#export BACKUP_USER_DIR="$SCRIPT_TOP/genesis_secondary_dir"
 export GENII_INSTALL_DIR="$SCRIPT_TOP/genesis_build"
 export NON_INTERACTIVE=true
 #if [ -z "$JAVA_HOME" ]; then
@@ -144,6 +149,14 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 popd &>/dev/null
+echo "RAM file is set, and at location $RAMFS"
+if [ ! -z "$RAMFS" ];
+then
+echo "RAM file is set, and at location $RAMFS"
+cp -r $GENII_INSTALL_DIR $RAMFS/genii_install_dir
+export GENII_INSTALL_DIR="$RAMFS/genii_install_dir"
+echo "GENII_INSTALL_DIR is reset and at location $GENII_INSTALL_DIR"
+fi
 
 # patch all the paths so they point to the current genesis 2 location, rather
 # than at the location where the code was built.
