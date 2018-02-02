@@ -112,9 +112,15 @@ function startServer() {
 # ps l | grep "nc -Ukl $SOCKFILE" | grep `id -u` | awk '{ print $3 }'`
 SOCKPID=`pgrep -f "$NC_COMMAND"`
 #echo $SOCKPID
+# This next section, now commented out, stopped working because the GRIDCMD no
+# longer is what it was ... So let's get it out of the PIDFILE
 GRIDCMD=`which grid`
-GRIDPID=`pgrep -f "/bin/bash $GRIDCMD"`
-#echo $GRIDPID
+#GRIDPID=`pgrep -f "/bin/bash $GRIDCMD"`
+GRIDPID=`cat $PIDFILE`
+if [ $? == 1 ] ;
+then
+	GRIDPID=
+fi
 # We are also going to want to check to make sure it is MY process
 # that is sitting on the other end of this pipe.
 if [ -z "$SOCKPID" -o  -z "$GRIDPID" ] ;

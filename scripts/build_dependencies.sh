@@ -10,10 +10,17 @@ export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's work
 export TOPDIR="$WORKDIR/.."
 pushd "$TOPDIR"
 
+#changed for new environment where GENII_INSTALL_DIR was wrong by ASG ... yes it is a hack
+
 # set the install dir variable if not already.
 if [ -z "$GENII_INSTALL_DIR" ]; then
   export GENII_INSTALL_DIR="$TOPDIR"
 fi
+Now take care of a minor problem in jenkins
+if [ -n "$WORKSPACE" ]; then 
+export GENII_INSTALL_DIR="$WORKSPACE"
+fi
+
 # set up some important variables for the success of the build.
 export ANT_OPTS='-Xms512m -Xmx768m -XX:MaxPermSize=768m'
 
