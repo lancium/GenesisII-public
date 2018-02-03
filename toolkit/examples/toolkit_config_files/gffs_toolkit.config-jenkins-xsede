@@ -87,7 +87,9 @@ LOCAL_CONTAINER=/resources/$FOLDERSPACE/containers/BootstrapContainer
 # on that path for the container-running user id must match the desired export
 # permissions (e.g., container's unix user should have write access to the
 # export path if the export path would ever be written to *from* the grid).
-EXPORTPATH=/home/jenkins/.tmp/export-path
+# Updated by ASG 2/6/2018 for new Jenkins test environment.
+EXPORTPATH=/localtmp/jenkins/.tmp/export-path
+#EXPORTPATH=/home/jenkins/.tmp/export-path
 
 ##############
 
