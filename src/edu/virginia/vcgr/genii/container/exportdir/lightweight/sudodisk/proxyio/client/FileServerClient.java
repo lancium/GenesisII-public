@@ -530,7 +530,10 @@ public class FileServerClient
 		int port = 0;
 		try {
 			String line = stdout.readLine();
-			port = Integer.parseInt(line);
+			if (line!=null) 
+				port = Integer.parseInt(line);
+			else 
+				return null;
 
 			if (_logger.isDebugEnabled())
 				_logger.debug("port received from proxyio server is: " + port);

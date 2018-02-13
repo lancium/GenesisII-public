@@ -40,7 +40,7 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir, VExportFil
 
 		return forkPath.substring(0, index);
 	}
-
+	public String getPath() { return _zipFileTarget.getAbsolutePath(); }
 	static private String getName(String forkPath)
 	{
 		int index = forkPath.lastIndexOf('/');

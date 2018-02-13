@@ -1,7 +1,13 @@
 package edu.virginia.vcgr.genii.container.exportdir.lightweight;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,9 +28,11 @@ import org.ggf.rns.RNSEntryDoesNotExistFaultType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSMetadataType;
 import org.morgan.util.Pair;
+import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
+import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.ExportProperties.ExportMechanisms;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -35,6 +43,8 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.StatsLogger;
 import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
@@ -75,6 +85,39 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 	@RWXMapping(RWXCategory.WRITE)
 	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry) throws IOException
 	{
+		VExportDir dir = getTarget();
+		// 2018-02-07 ASG - adding support for links to exports. Log it first though.
+		String caller = (String) WorkingContext.getCurrentWorkingContext().getProperty(WorkingContext.CALLING_HOST);
+		StatsLogger.logStats("LightWeightExport:  Create ln \"" + entryName + "\" in \"" + dir.getName() + "\" from " + caller);
+		// End logging
+
+		if (dir.createFile(entryName + ".gffs_ln")) {
+			String forkPath = formForkPath(entryName  + ".gffs_ln");
+			ResourceForkService service = getService();
+			// Ok, we created the file. No we need to put the EPR into it.
+			BufferedWriter out = null;
+			try  
+			{
+				//System.err.println(dir.getPath() +forkPath);
+			    FileWriter fstream = new FileWriter(dir.getPath() +forkPath, false); //true tells to append data.
+			    out = new BufferedWriter(fstream);
+				ObjectSerializer.serialize(out, entry, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"));
+				out.flush();
+				out.close();
+			}
+			catch (IOException e)
+			{
+			    System.err.println("Error: " + e.getMessage());
+			}
+			finally
+			{
+			    if(out != null) {
+			        out.close();
+			    }
+			}
+
+			return service.createForkEPR(forkPath, new LightWeightExportFileFork(service, forkPath).describe());
+		}
 		throw new IOException("Not allowed to add arbitrary endpoints to a " + "light-weight export.");
 	}
 
@@ -109,16 +152,29 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 		// End logging
 		for (VExportEntry dirEntry : dir.list(entryName)) {
 			String dName = dirEntry.getName();
-
-			if (entryName == null || entryName.equals(dName)) {
+			// Aded 2018-02-08 by ASG to handle links
+			String sName="";
+			if (dName.endsWith(".gffs_ln")) {
+				// First let's get the file name without the suffix
+				int index=dName.lastIndexOf(".gffs_ln");
+				sName=dName.substring(0, index);
+				//System.out.println("sName is " + sName);
+			}
+			//System.out.println(dName);
+			if (entryName == null || entryName.equals(dName) || entryName.equals(sName)) {
 				ResourceForkInformation info;
-
-				if (dirEntry.isDirectory())
-					info = new LightWeightExportDirFork(getService(), formForkPath(dName)).describe();
-				else
-					info = new LightWeightExportFileFork(getService(), formForkPath(dName)).describe();
-
-				entries.add(createInternalEntry(exemplarEPR, dName, info));
+				if (dName.endsWith(".gffs_ln")) {
+					entries.add(new InternalEntry(sName,getLnEPR(dName,dir)));
+				}	
+				else {
+					if (dirEntry.isDirectory())
+						info = new LightWeightExportDirFork(getService(), formForkPath(dName)).describe();
+					else
+						info = new LightWeightExportFileFork(getService(), formForkPath(dName)).describe();
+					entries.add(createInternalEntry(exemplarEPR, dName, info));
+				}
+				// ASG 2018-02-09; seems to me that if we found the file we should exit the loop
+				if (entryName!=null) break;
 			}
 		}
 
@@ -178,6 +234,29 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 
 	}
 
+	private EndpointReferenceType getLnEPR(String dName, VExportDir dir) {
+		//System.out.println("dName is " + dName + ", forkpath is "+getForkPath() + ", getPath() is " + dir.getPath());
+		String fPath=dir.getPath()+"/"+dName;
+		//System.out.println(fPath);
+		ResourceForkService service = getService();
+		InputStream in = null;
+		EndpointReferenceType epr=null;
+		try {
+			FileInputStream inp = new FileInputStream(fPath);
+			// Ok, we created the file. No we need to put the EPR into it.	
+			epr= (EndpointReferenceType)ObjectDeserializer.deserialize(new InputSource(inp), EndpointReferenceType.class);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ResourceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			StreamUtils.close(in);
+		}
+		return epr;
+	}
+	
 	@Override
 	public IterableSnapshot splitAndList(EndpointReferenceType exemplarEPR, ResourceKey myKey) throws IOException
 	{
@@ -204,15 +283,23 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 			String dName = dirEntry.getName();
 
 			if (count < RNSConstants.PREFERRED_BATCH_SIZE) {
-
 				ResourceForkInformation info;
-
-				if (dirEntry.isDirectory())
-					info = new LightWeightExportDirFork(getService(), formForkPath(dName)).describe();
-				else
-					info = new LightWeightExportFileFork(getService(), formForkPath(dName)).describe();
-
-				entries.add(createInternalEntry(exemplarEPR, dName, info));
+				if (dName.endsWith(".gffs_ln")) {
+					String sName="";
+					
+						// First let's get the file name without the suffix
+						int index=dName.lastIndexOf(".gffs_ln");
+						sName=dName.substring(0, index);
+						//System.out.println("sName is " + sName);
+					
+						entries.add(new InternalEntry(sName,getLnEPR(dName,dir)));
+				}	
+				else {
+					if (dirEntry.isDirectory())
+						info = new LightWeightExportDirFork(getService(), formForkPath(dName)).describe();
+					else
+						info = new LightWeightExportFileFork(getService(), formForkPath(dName)).describe();entries.add(createInternalEntry(exemplarEPR, dName, info));	
+				}
 
 			}
 
@@ -392,7 +479,16 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 						if ((expMech == null) || expMech.equals(ExportMechanisms.EXPORT_MECH_ACL)
 							|| expMech.equals(ExportMechanisms.EXPORT_MECH_ACLANDCHOWN)) {
 							// normal exports just go directly to a File.
-							elements = forkFile.list().length;
+							/* 2018-010-0 by ASG
+							 * Fixed the following bug. If the container does not have read/execute permissions on the 
+							 * directory about to be read to compute the number of elements, the code faults. what we are going to do instead
+							 * is return 0 entries if we have no permission. The old code is:
+							 * elements = forkFile.list().length;
+							 */	
+							elements=0;
+							String theElements[] = forkFile.list();
+							if (theElements!=null) elements = theElements.length;
+							// End changes.
 						} else if (expMech.equals(ExportMechanisms.EXPORT_MECH_PROXYIO)) {
 							// this export is in proxyio mode which uses sudo and a co-process.
 							String user = (String) rKey.dereference().getProperty(LightWeightExportConstants.EXPORT_OWNER_UNIX_NAME);
@@ -642,8 +738,16 @@ public class LightWeightExportDirFork extends AbstractRNSResourceFork implements
 							MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), next)));
 
 					} else if (fd == FileOrDir.DIRECTORY) {
-						int elements = forkFile.list().length;
-
+						int elements = 0;  //forkFile.list().length;
+						/* 2018-010-0 by ASG
+						 * Fixed the following bug. If the container does not have read/execute permissions on the 
+						 * directory about to be read to compute the number of elements, the code faults. what we are going to do instead
+						 * is return 0 entries if we have no permission. The old code is:
+						 * elements = forkFile.list().length;
+						 */	
+						String theElements[] = forkFile.list();
+						if (theElements!=null) elements = theElements.length;
+						// End changes.
 						// Now replace the message elements
 						for (int pos = 0; pos < me.length; pos++) {
 							MessageElement element = ent.getMetadata().get_any()[pos];

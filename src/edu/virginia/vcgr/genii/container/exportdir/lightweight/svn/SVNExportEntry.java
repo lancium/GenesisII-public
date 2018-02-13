@@ -54,6 +54,7 @@ class SVNExportEntry extends AbstractVExportEntry implements VExportFile, VExpor
 		return c;
 	}
 
+	public String getPath() { return _relativePath; }
 	@Override
 	public void accessTime(Calendar c) throws IOException
 	{

@@ -44,6 +44,8 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 	{
 		return _target;
 	}
+	
+	public String getPath() { return _target.getAbsolutePath(); }
 
 	@Override
 	public boolean createFile(String newFileName) throws IOException
@@ -63,11 +65,12 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
 
 		for (File entry : _target.listFiles()) {
-			if (name == null || name.equals(entry.getName()))
-				if (!isLink(_target))
-					entries.add(new DiskExportEntry(entry));
-		}
+			//if (name == null || name.equals(entry.getName())) System.err.println("diskexportentry::list(string) entry name is " + entry.getName());
 
+			if (!isLink(_target)) {
+				entries.add(new DiskExportEntry(entry));
+			}
+		}
 		return entries;
 	}
 
@@ -80,7 +83,11 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 	@Override
 	public boolean remove(String entryName) throws IOException
 	{
-		return new File(_target, entryName).delete();
+		File tmp = new File(_target, entryName+".gffs_ln");
+		if (tmp.exists())
+			return new File(_target, entryName+".gffs_ln").delete();
+		else
+			return new File(_target, entryName).delete();
 	}
 
 	@Override
@@ -235,8 +242,10 @@ public class DiskExportEntry extends AbstractVExportEntry implements VExportDir,
 		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
 
 		for (File entry : _target.listFiles()) {
-			if (!isLink(_target))
-				entries.add(new DiskExportEntry(entry));
+			//System.err.println("diskexportentry::list entry name is " + entry.getName());
+			if (!isLink(_target)) {
+					entries.add(new DiskExportEntry(entry));
+			}
 		}
 
 		return entries;

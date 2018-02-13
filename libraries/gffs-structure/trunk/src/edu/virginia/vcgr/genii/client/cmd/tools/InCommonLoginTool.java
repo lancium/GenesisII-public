@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.security.KeyPair;
@@ -12,11 +13,22 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.ArrayList;
+
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -73,6 +85,7 @@ public class InCommonLoginTool extends BaseLoginTool
 	private static final String _DESCRIPTION = "config/tooldocs/description/diclogin";
 	private static final String _USAGE = "config/tooldocs/usage/uiclogin";
 	private static final String _MANPAGE = "config/tooldocs/man/iclogin";
+	private static final String ECPidpsURL = "https://cilogon.org/include/ecpidps.txt";
 
 	static private Log _logger = LogFactory.getLog(InCommonLoginTool.class);
 
@@ -273,11 +286,74 @@ public class InCommonLoginTool extends BaseLoginTool
 	private CILogonParameters promptForParams() throws ToolException
 	{
 		DialogProvider provider = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
-
 		if (_idpUrl == null) {
 			/*
 			 * future: get these from server instead of hard code; list hosted at: https://cilogon.org/include/ecpidps.txt
 			 */
+			/* 
+			 * 2018-01-09 by ASG. Download the list from cilogin
+			 */
+			CloseableHttpClient _client = null;
+			HttpClientContext _defaultContext = null;
+			CookieStore _cookieJar = new BasicCookieStore();
+
+			_defaultContext = HttpClientContext.create();
+			_defaultContext.setCookieStore(_cookieJar);
+
+			HttpGet request = new HttpGet(ECPidpsURL);
+			// I don't think we need to add headers
+			if (_client == null) {
+				@SuppressWarnings("deprecation")
+				RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.BEST_MATCH).build();
+				_client = HttpClients.custom().setDefaultCookieStore(_cookieJar).setDefaultRequestConfig(config).build();
+			}
+			CloseableHttpResponse result;
+			ArrayList<SimpleMenuItem> arList = new  ArrayList<SimpleMenuItem>();
+			try {
+				result = _client.execute(request, _defaultContext);
+
+
+				if (result.getStatusLine().getStatusCode() >= 400) {
+					_logger.error("Request failed: " + result.getStatusLine().getStatusCode() + ": " + result.getStatusLine().getReasonPhrase());
+					return null;
+				}
+
+				BufferedReader br;
+
+				br = new BufferedReader(new InputStreamReader(result.getEntity().getContent()));
+
+				// The format of a line from cilogin is
+				// https://idp.marshall.edu/idp/profile/SAML2/SOAP/ECP Marshall University
+
+				String str = br.readLine();
+				do {
+					//System.out.println(str);
+					int loc=str.indexOf(' ');
+					String url=str.substring(0, loc);
+					String institution=str.substring(loc+1);
+					//System.out.println(institution + " " + url);
+					arList.add(new SimpleMenuItem(institution,url));
+				} while ((str = br.readLine()) != null);
+				br.close();
+			} catch (UnsupportedOperationException | IOException e1 ) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			SimpleMenuItem[] items=arList.toArray(new SimpleMenuItem[0]);
+			try {				
+				ComboBoxDialog idpDialog = provider.createSingleListSelectionDialog("IDP Choice", "Please choose IDP",items[0],items);
+				idpDialog.showDialog();
+				MenuItem response = idpDialog.getSelectedItem();
+				_idpUrl = (String) response.getContent();
+			} catch (DialogException e) {
+				e.printStackTrace(stderr);
+				_idpUrl = "https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP";
+				stdout.println("Defaulting to ProtectNetwork");
+			} catch (UserCancelException e) {
+				e.printStackTrace(stderr);
+				return null;
+			}
+/* Old Code  
 			try {
 				ComboBoxDialog idpDialog = provider.createSingleListSelectionDialog("IDP Choice", "Please choose IDP",
 					new SimpleMenuItem("ProtectNetwork", "https://idp.protectnetwork.org/protectnetwork-idp/profile/SAML2/SOAP/ECP"),
@@ -302,6 +378,7 @@ public class InCommonLoginTool extends BaseLoginTool
 				e.printStackTrace(stderr);
 				return null;
 			}
+			*/
 		}
 
 		try {

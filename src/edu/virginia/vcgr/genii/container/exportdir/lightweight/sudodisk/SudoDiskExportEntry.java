@@ -53,6 +53,7 @@ public class SudoDiskExportEntry extends AbstractVExportEntry implements VExport
 	{
 		return _target;
 	}
+	public String getPath() { return _target.getAbsolutePath(); }
 
 	/**
 	 * 

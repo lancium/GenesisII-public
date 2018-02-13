@@ -14,4 +14,6 @@ public interface VExportDir extends VExportEntry
 	public Collection<VExportEntry> list(String name) throws IOException;
 
 	public Collection<VExportEntry> list() throws IOException;
+	
+	public String getPath();
 }
