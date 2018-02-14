@@ -273,6 +273,7 @@ function testKerberosPortTypeReplication()
     exit 1
   fi
 
+<<<<<<< .working
 echo ====
 echo listing all containers running...
 bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" 
@@ -282,6 +283,15 @@ echo listing just main container to see if running...
 bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" "$DEPLOYMENT_NAME"
 echo ====
 
+=======
+echo ====
+echo listing all containers running...
+bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" 
+echo listing just backup to see if running...
+bash "$GFFS_TOOLKIT_ROOT/library/list_genesis_javas.sh" "$BACKUP_DEPLOYMENT_NAME"
+echo ====
+
+>>>>>>> .merge-right.r8921
   # login to the kerberos user
   grid_chk login --username=$userName --password=$kerberosPassword
 

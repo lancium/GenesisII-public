@@ -67,7 +67,7 @@ testJobStatus()
   # assume 20 minutes allowed for this copy, if they haven't said it should
   # get more time to complete.
   if [ -z "$QUEUE_SLEEP_DURATION" ]; then
-    QUEUE_SLEEP_DURATION=120
+    QUEUE_SLEEP_DURATION=30
   fi
   local mins20=$((20 * 60 / $QUEUE_SLEEP_DURATION))
   if [ -z "$QUEUE_TRIES_ALLOWED" ]; then export QUEUE_TRIES_ALLOWED=$mins20; fi
