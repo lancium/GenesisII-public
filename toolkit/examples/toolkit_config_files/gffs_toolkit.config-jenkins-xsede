@@ -36,7 +36,7 @@ EMAIL=koeritz@virginia.edu
 QUEUE_NAME=grid-queue
 
 # How many default slots to configure when setting up a BES on a queue.
-QUEUE_SLOTS=10
+QUEUE_SLOTS=1
 
 # Used for windows testing; provides the path to the binaries directory of cygwin.
 #CYGWIN_BIN_PATH=c:/cygwin/bin
