@@ -103,10 +103,10 @@ GFFS_TESTS=( \
   GFFS_Tests/Performance_Tests/loadUpRNSDirectory.sh \
 )
 
+#    GFFS_Tests/Scalability_Tests/multiuser-gffs-submit.sh \
 if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
   GFFS_TESTS+=( \
-    GFFS_Tests/Scalability_Tests/multiuser-gffs-submit.sh \
     GFFS_Tests/Functional_Tests/test_sts_replication.sh \
   )
 fi
@@ -122,10 +122,10 @@ EMS_TESTS=( \
   EMS_Tests/faultJobsTests/bes-submission-sync-fault.sh \
 )
 
+#    EMS_Tests/multiUserTests/multiuser-3users-manyjobs.sh \
 if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
   EMS_TESTS+=( \
-    EMS_Tests/multiUserTests/multiuser-3users-manyjobs.sh \
     EMS_Tests/multiUserTests/multiuser-10users-fewjobs.sh \
   )
 fi

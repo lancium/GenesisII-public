@@ -35,7 +35,7 @@ fi
 
 # first we sleep a random amount to ensure that the jobs aren't simply started
 # at the same exact time.  they start close to each other though.
-sleep $(expr $RANDOM % 3)
+sleep $(expr $RANDOM % 13)
 
 # we track how many non-fatal errors were encountered and use this to judge
 # whether the test worked or not.  fatal errors exit immediately.
@@ -74,6 +74,10 @@ done  # end of job submissions and other activity.
 
 sleep 10  # snooze to allow jobs to begin to percolate through.
 
+OLD_DURATION=$QUEUE_SLEEP_DURATION
+
+let "QUEUE_SLEEP_DURATION = $QUEUE_SLEEP_DURATION + 10 * $index "
+
 echo "will wait for jobs $QUEUE_TRIES_ALLOWED times (at $QUEUE_SLEEP_DURATION seconds each)."
 
 # now gather up results from that run.
@@ -82,6 +86,9 @@ if [ $? -ne 0 ]; then
   echo Failed while waiting for queue to clear after test runs.
   ((TEST_FAIL_COUNT++))
 fi
+
+QUEUE_SLEEP_DURATION=$OLD_DURATION
+
 
 # stop being the user.
 take_off_hat
