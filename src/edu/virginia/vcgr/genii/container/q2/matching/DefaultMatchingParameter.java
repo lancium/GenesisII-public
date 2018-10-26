@@ -31,6 +31,7 @@ public class DefaultMatchingParameter extends MatchingParameter
 
 	private void checkProperty(String property)
 	{
+		
 		int index = property.indexOf(':');
 		if (index > 0) {
 			String enumValue = property.substring(0, index);

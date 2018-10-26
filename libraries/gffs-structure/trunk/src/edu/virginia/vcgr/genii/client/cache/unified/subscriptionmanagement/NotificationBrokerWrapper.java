@@ -32,8 +32,7 @@ public class NotificationBrokerWrapper
 	private static final int MAX_NUMBER_OF_TRIES_TO_CHANGE_MODE = 3;
 	private static final long MODE_TEST_TRIAL_INTERVAL = 30 * 1000L; // thirty seconds
 
-	private static final long NOTIFICATION_POLLING_SCHEDULE_TESTING_INTERVAL = 100L; // hundred
-																						// milliseconds
+	private static final long NOTIFICATION_POLLING_SCHEDULE_TESTING_INTERVAL = 10000L; // ten thousand milliseconds
 
 	private boolean brokerInActiveMode;
 	private String containerId;

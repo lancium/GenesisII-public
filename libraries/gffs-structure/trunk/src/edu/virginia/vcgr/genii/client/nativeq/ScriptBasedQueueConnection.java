@@ -25,11 +25,13 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
+import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorConstants;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
@@ -42,6 +44,10 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	static public final String PATH_TO_DEV_NULL = "/dev/null";
 
 	static public final String QUEUE_SCRIPT_RESULT_FILENAME = "queue.script.result";
+	
+	static public Map<String,String> Modules=new HashMap<String,String>();
+	
+	static boolean ModuleMapLoaded=false;
 
 	protected ScriptBasedQueueConnection(File workingDirectory, ResourceOverrides resourceOverrides,
 		CmdLineManipulatorConfiguration cmdLineManipulatorConf, NativeQueueConfiguration queueConfig, ProviderConfigType providerConfig)
@@ -225,6 +231,52 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, application.getSPMDVariation(), application.getNumProcesses(),
 				application.getNumProcessesPerHost(), application.getThreadsPerProcess());
 
+			/* ASG 10-20-2018. Adding code to take care of MODULES
+			 	Get the environment strings; check for "MODULES_TO_LOAD".
+			 	If found they will be of the form =moduleName;moduleName.
+			 	Then look up each module name one at a time to get the translation to the local environment.
+			 	Then, emit a "module load translatedName" to the script.
+			*/ 
+			boolean loaded=ModuleMapLoaded;
+			synchronized (Modules) {
+				if (loaded==false){
+					String modulesSupported = ContainerProperties.getContainerProperties().getModuleList();
+					String []Supported=modulesSupported.split(";");
+					for (int i=0;i<Supported.length;i++){
+						String []mod=Supported[i].split(":"); // There had better be two strings
+						if (mod.length==2) {
+							Modules.put(mod[0],mod[1]);
+						}								
+					}
+					ModuleMapLoaded=true;
+					// The Modules map is now loaded.
+				}
+			}
+			
+			if (application.getEnvironment() != null) {
+				String modList=application.getEnvironment().get("MODULES_TO_LOAD");
+				if (modList != null) {
+					// We have a module list. Let's parse it.
+					System.err.println("Modules="+modList);
+					// Assuming the environment variable is the RHS of "MODULES_TO_LOAD=module1;module2" then split will do the job
+					String []mods=modList.split(";");
+					// Not sure why I had to introduce a local variable for this ... but it always behaved as if true.
+
+					// Now for each of the mods requested by the user, see if it in Supported. 
+					for (int i=0;i<mods.length;i++) {
+						if (Modules.get(mods[i])!=null){
+							// Found it
+							script.println("module load " + Modules.get(mods[i]));
+						}
+						else {
+							// Did not find it, need to throw a fault
+							throw new NativeQueueException(String.format("Could not find binding for module: %s", mods[i]));
+						}
+					}
+				}
+			}
+			
+			// End of 10-20-2018 ASG module updates
 			if (_logger.isDebugEnabled())
 				_logger.debug("Trying to call cmdLine manipulators.");
 			try {
@@ -278,7 +330,10 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			StreamCopier stdoutCopy = new StreamCopier(proc.getInputStream());
 			StreamCopier stderrCopy = new StreamCopier(proc.getErrorStream());
 			int result = proc.waitFor();
-
+			// 2017-7-24 ASG. Fix to see if the command worked. If not, throw a fault.
+			// That way we will not assume that the absence of information on a process means 
+			// it has failed.
+			if (result!=0) throw new NativeQueueException("Unable to execute squeue command.");
 			logProcessResult(result, stdoutCopy, stderrCopy);
 
 			if (result == 0) {
@@ -286,9 +341,9 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			}
 			throw new ScriptExecutionException(commandLine, result, stderrCopy.getResult());
 		} catch (InterruptedException ie) {
-			throw new NativeQueueException("Unable to execute command.", ie);
+			throw new NativeQueueException("Unable to execute squeue command.", ie);
 		} catch (IOException ioe) {
-			throw new NativeQueueException("Unable to execute command.", ioe);
+			throw new NativeQueueException("Unable to execute squeue command.", ioe);
 		}
 	}
 

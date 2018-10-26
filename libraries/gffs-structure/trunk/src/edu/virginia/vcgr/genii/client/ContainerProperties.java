@@ -23,6 +23,9 @@ public class ContainerProperties extends Properties
 	// specifies which service types do not need to include X509 certificates in response EPRs.
 	static final public String NO_X509_CLASS_LIST = "NO_X509_CLASS_LIST";
 
+	// specifies which service types do not need to include X509 certificates in response EPRs.
+	static final public String MODULE_LIST = "MODULE_LIST";
+
 	// flag that can be set to true / false for credential streamlining for container.
 	static final public String CONTAINER_CREDENTIAL_STREAMLINING_ENABLED = "gffs.container.credential_streamlining";
 
@@ -112,6 +115,18 @@ public class ContainerProperties extends Properties
 		return toReturn;
 	}
 
+	/**
+	 * returns the "MODULE_LIST" list of modules supported on this machine. The list is in the form 
+	 * "fred:local_fred;joan:local_joan"
+	 
+	 */
+	public String getModuleList()
+	{
+		String toReturn = InstallationProperties.getInstallationProperties().getProperty(MODULE_LIST);
+		if (toReturn == null)
+			toReturn = getProperty(MODULE_LIST);
+		return toReturn;
+	}
 	/**
 	 * reports whether the client has the credential streamlining enabled or not. the default is for it to be enabled.
 	 */

@@ -105,19 +105,19 @@ public class LightWeightExportUtils
 
 	static VExportEntry getEntry(String forkPath) throws IOException
 	{
-		// Modified 10/23/2017 by ASG to check if the file/directory is actually there, and if not to throw a meaningful fault.
-		VExportEntry ret=null;
-		try {
-			VExportRoot root = getRoot(null);
-		
-			ret=root.lookup(forkPath);
-		}
-		catch (IOException e) {
-			_logger.error("Caught IOException: " + e.getMessage() + "lookingup " + forkPath);
-			throw e;
-		}
-		return ret;
-		
+	        // Modified 10/23/2017 by ASG to check if the file/directory is actually there, and if not to throw a meaningful fault.
+                VExportEntry ret=null;
+                try {
+                        VExportRoot root = getRoot(null);
+
+                        ret=root.lookup(forkPath);
+                }
+                catch (IOException e) {
+                        _logger.error("Caught IOException: " + e.getMessage() + "lookingup " + forkPath);
+                        throw e;
+                }
+                return ret;
+
 	}
 
 	static VExportEntry getEntry(String forkPath, ResourceKey rKey) throws IOException

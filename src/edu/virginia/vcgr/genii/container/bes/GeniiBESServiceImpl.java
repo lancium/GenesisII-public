@@ -58,6 +58,7 @@ import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobResponseType;
 import edu.virginia.vcgr.genii.algorithm.graph.GridDependency;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
+import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
@@ -421,6 +422,23 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			MessageElement me = new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, param);
 			any.add(me);
 		}
+		// Now check if there are any modules set
+				String modulesSupported = ContainerProperties.getContainerProperties().getModuleList();
+				String []Supported=modulesSupported.split(";");
+				for (int i=0;i<Supported.length;i++){
+					String []mod=Supported[i].split(":"); // There had better be two strings
+					if (mod.length==2) {
+						System.err.println("Module " + mod[0]);
+						MatchingParameter param=new MatchingParameter();
+						param.setName("supports:Module");
+						param.setValue(mod[0]);
+						//param.setName(mod[0]);
+						//param.setValue("true");
+						MessageElement me = new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, param);
+						any.add(me);
+					}								
+				}
+		
 	}
 
 	@Override
