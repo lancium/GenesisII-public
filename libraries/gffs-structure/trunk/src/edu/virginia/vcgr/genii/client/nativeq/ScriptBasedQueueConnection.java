@@ -241,15 +241,17 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			synchronized (Modules) {
 				if (loaded==false){
 					String modulesSupported = ContainerProperties.getContainerProperties().getModuleList();
-					String []Supported=modulesSupported.split(";");
-					for (int i=0;i<Supported.length;i++){
-						String []mod=Supported[i].split(":"); // There had better be two strings
-						if (mod.length==2) {
-							Modules.put(mod[0],mod[1]);
-						}								
+					if (modulesSupported!=null) {					
+						String []Supported=modulesSupported.split(";");
+						for (int i=0;i<Supported.length;i++){
+							String []mod=Supported[i].split(":"); // There had better be two strings
+							if (mod.length==2) {
+								Modules.put(mod[0],mod[1]);
+							}								
+						}
+						ModuleMapLoaded=true;
+						// The Modules map is now loaded.
 					}
-					ModuleMapLoaded=true;
-					// The Modules map is now loaded.
 				}
 			}
 			
