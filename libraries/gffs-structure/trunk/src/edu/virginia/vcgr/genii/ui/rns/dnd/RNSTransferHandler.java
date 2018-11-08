@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
@@ -244,7 +245,16 @@ public class RNSTransferHandler extends TransferHandler
 							operator = RNSTreeLinker.link(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(), data.paths());
 							break;
 						case COPY:
-							operator = RNSTreeCopier.copy(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(), data.paths());
+							// 2018-11-08 ASG. Added confimation dialog on drag and drop, got tired of copy whole sub-trees by accident
+							int answer = JOptionPane.showConfirmDialog((RNSTree)comp,
+									String.format("Are you sure you wish to copy to\"%s\"?", dl.getPath().toString()), "Copy Confirmation",
+									JOptionPane.YES_NO_OPTION);
+							
+							if (answer == 0) 
+								{
+								operator = RNSTreeCopier.copy(data.tree(), (RNSTree) comp, dl.getPath(), data.sourceContext(), data.paths());
+								}
+							else { return false;}
 							break;
 						default:
 							return false;

@@ -314,7 +314,10 @@ public class LsTool extends BaseGridTool
 			if (isRecursive) {
 				for (String entry : subdirs) {
 					RNSPath sub = new RNSPath(path, entry, null, false);
-					ok = ok || listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+					// 2018-11-07 ASG, as an "OR" this was not doing sub-dirs because of short-circuit evaluation.
+					//ok = ok || listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+					ok = ok && listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+
 				}
 			}
 		} catch (Throwable t) {
