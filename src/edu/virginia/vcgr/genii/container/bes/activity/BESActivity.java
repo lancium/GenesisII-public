@@ -29,6 +29,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.nativeq.QueueResultsException;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
@@ -742,6 +743,12 @@ public class BESActivity implements Closeable
 
 					try {
 						execute(_currentPhase);
+					} catch (QueueResultsException qre) {
+						// Ok, the job terminated without a queue results file being generated, therefore the pwrapper did not complete.
+						// So, basically the system lost the job, the queue system killed it, the node died, something like that
+						// We want to move to the next phase. But do we want it to count against tries?		
+						_logger.debug("BES Activity faulted with QueueResultsException - ontinuing as planned.", qre);
+						addFault(qre, 3);
 					} catch (ContinuableExecutionException cee) {
 						addFault(cee, 3);
 					} catch (InterruptedException ie) {

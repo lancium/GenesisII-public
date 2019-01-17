@@ -18,6 +18,7 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 	private CreationFlagEnumeration _creationFlag = null;
 	private Boolean _deleteOnTerminate = null;
 	private Boolean _handleAsArchive = null;
+	private Boolean _alwaysStageOut = null;
 	private String _filesystemName = null;
 	private String _fileName = null;
 	private UsernamePasswordIdentity _credential = null;
@@ -59,6 +60,12 @@ public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 	public void consumeHandleAsArchiveFlag(Object currentUnderstanding, boolean handleAsArchive)
 	{
 		_handleAsArchive = new Boolean(handleAsArchive);
+	}
+	
+	@Override
+	public void consumeAlwaysStageOutFlag(Object currentUnderstanding, boolean alwaysStageOut)
+	{
+		_alwaysStageOut = new Boolean(alwaysStageOut);
 	}
 
 	@Override

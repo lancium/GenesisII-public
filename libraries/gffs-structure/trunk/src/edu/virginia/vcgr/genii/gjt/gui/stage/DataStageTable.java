@@ -42,7 +42,7 @@ public class DataStageTable extends JTable
 	@SuppressWarnings("unchecked")
 	DataStageTable(FilesystemMap filesystemMap, StageList stageList, boolean isStageIn)
 	{
-		super(new DataStageTableModel(stageList));
+		super(new DataStageTableModel(stageList, isStageIn));
 		DataStageTableModel model = (DataStageTableModel) getModel();
 		model.setOwner(this);
 
@@ -61,6 +61,7 @@ public class DataStageTable extends JTable
 		TableColumn deleteOnTerminateColumn = cModel.getColumn(4);
 		TableColumn unpackArchiveColumn = cModel.getColumn(5);
 		TableColumn fsColumn = cModel.getColumn(6);
+		
 
 		filenameColumn.setHeaderValue("Filename");
 
@@ -85,6 +86,11 @@ public class DataStageTable extends JTable
 		fsColumn.setHeaderValue("Filesystem");
 		fsColumn.setCellRenderer(new FilesystemCellRenderer());
 		fsColumn.setCellEditor(new DefaultCellEditor(new FilesystemCombo(filesystemMap)));
+		
+		if(!isStageIn) {
+			TableColumn alwaysstageoutColumn = cModel.getColumn(7);
+			alwaysstageoutColumn.setHeaderValue("Always Stage-out");
+		}
 
 		putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 	}

@@ -97,8 +97,6 @@ public class ActivityState implements Serializable, Cloneable
 		this(ObjectDeserializer.toObject(element, ActivityStatusType.class));
 	}
 	
-	public String getGeniiState() { return _geniiState;} 
-
 	static private boolean equals(String one, String two)
 	{
 		if (one == null) {
@@ -178,6 +176,8 @@ public class ActivityState implements Serializable, Cloneable
 		return new ActivityStatusType((anyC.size() == 0) ? null : Elementals.toArray(anyC), ActivityStateEnumeration.fromValue(_besState));
 	}
 
+	public String getGeniiState() { return _geniiState; }
+	
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();

@@ -165,14 +165,14 @@ public class JSDLFormer
 		// hmmm: why are the stage constructors using default values for the delete on term and handle as archive below?
 
 		for (String stage : _stageIn.keySet()) {
-			stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE, Boolean.TRUE,
+			stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
 				new SourceTarget_Type(_stageIn.get(stage), null), null, null, null));
 		}
 
 		for (String stage : _stageOut.keySet()) {
 			DataStaging_Type stageElement = stages.get(stage);
 			if (stageElement == null) {
-				stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE, Boolean.TRUE, null,
+				stages.put(stage, new DataStaging_Type(stage, null, CreationFlagEnumeration.overwrite, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, null,
 					new SourceTarget_Type(_stageOut.get(stage), null), null, null));
 			} else {
 				stageElement.setTarget(new SourceTarget_Type(_stageOut.get(stage), null));

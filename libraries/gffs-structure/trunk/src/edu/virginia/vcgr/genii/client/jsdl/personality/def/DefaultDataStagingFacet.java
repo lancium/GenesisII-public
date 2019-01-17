@@ -30,6 +30,12 @@ public class DefaultDataStagingFacet extends DefaultPersonalityFacet implements 
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "HandleAsArchiveFlag"));
 	}
+	
+	@Override
+	public void consumeAlwaysStageOutFlag(Object currentUnderstanding, boolean alwaysStageOut) throws JSDLException
+	{
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "alwaysStageOut"));
+	}
 
 	@Override
 	public void consumeFileName(Object currentUnderstanding, String fileName) throws JSDLException

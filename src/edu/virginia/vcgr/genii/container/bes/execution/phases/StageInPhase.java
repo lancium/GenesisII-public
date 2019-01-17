@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,6 +17,7 @@ import edu.virginia.vcgr.genii.algorithm.compression.UnpackTar;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -202,7 +205,8 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 
 		history.createInfoWriter("Staging in to %s", _target.getName()).format("Staging in from %s to %s.", _source, _target).close();
 		DataTransferStatistics stats;
-
+		if (_logger.isDebugEnabled())
+			_logger.debug("Entering StageinPhase: execute '" + _source + "', target = " + _target);
 		try {
 			if (_creationFlag.equals(CreationFlagEnumeration.dontOverwrite)) {
 				DownloadManagerContainerService service = ContainerServices.findService(DownloadManagerContainerService.class);
@@ -210,6 +214,13 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 			} else {
 				stats = URIManager.get(_source, _target, _usernamePassword);
 			}
+			
+			// 2019-01-07 ASG - Fixed it to give group rw permissions
+			List<String> commandLine = new LinkedList<String>();
+			FileSystemUtils.chmod(_target.getAbsolutePath(),
+				FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE | FileSystemUtils.MODE_USER_EXECUTE | 
+				FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE | FileSystemUtils.MODE_GROUP_EXECUTE);
+			// End of updates
 			history.createTraceWriter("%s: %d Bytes Transferred", _target.getName(), stats.bytesTransferred())
 				.format("%d bytes were transferred in %d ms.", stats.bytesTransferred(), stats.transferTime()).close();
 			// The file has been transfered. Now we check if it needs to be handled as an archive.

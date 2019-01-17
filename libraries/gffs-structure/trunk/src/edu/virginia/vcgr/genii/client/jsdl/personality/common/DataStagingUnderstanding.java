@@ -12,6 +12,7 @@ public class DataStagingUnderstanding
 	private CreationFlagEnumeration _creationFlag = null;
 	private boolean _deleteOnTerminate = true;
 	private boolean _handleAsArchive = false;
+	private boolean _alwaysStageOut = false;
 	private String _fileSystemName = null;
 	private String _filename = null;
 	private URI _sourceURI = null;
@@ -42,11 +43,22 @@ public class DataStagingUnderstanding
 	{
 		return _handleAsArchive;
 	}
+	
+	public boolean isAlwaysStageOut()
+	{
+		return _alwaysStageOut;
+	}
 
 	public void setHandleAsArchive(boolean handleAsArchive)
 	{
 		_handleAsArchive = handleAsArchive;
 	}
+	
+	public void setAlwaysStageOut(boolean alwaysStageOut)
+	{
+		_alwaysStageOut = alwaysStageOut;
+	}
+
 
 	public void setFileSystemName(String fileSystemName)
 	{

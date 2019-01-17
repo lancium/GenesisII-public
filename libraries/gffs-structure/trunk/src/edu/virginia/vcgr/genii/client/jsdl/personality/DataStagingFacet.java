@@ -18,6 +18,8 @@ public interface DataStagingFacet extends PersonalityFacet
 	public void consumeDeleteOnTerminateFlag(Object currentUnderstanding, boolean deleteOnTerminate) throws JSDLException;
 
 	public void consumeHandleAsArchiveFlag(Object currentUnderstanding, boolean handleAsArchive) throws JSDLException;
+	
+	public void consumeAlwaysStageOutFlag(Object currentUnderstanding, boolean handleAsArchive) throws JSDLException;
 
 	public void consumeUsernamePassword(Object currentUnderstanding, UsernamePasswordIdentity upi) throws JSDLException;
 }

@@ -42,6 +42,9 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 	@XmlAttribute(name = "handle-as-archive")
 	private boolean _handleAsArchive = false;
 
+	@XmlAttribute(name = "always-stage-out")
+	private boolean _alwaysStageOut = false;
+	
 	@XmlAttribute(name = "creation-flag")
 	private CreationFlag _creationFlag = CreationFlag.overwrite;
 
@@ -103,7 +106,19 @@ public class DataStage extends DefaultDataItem implements PostUnmarshallListener
 	{
 		return _handleAsArchive;
 	}
+	
+	public boolean alwaysStageOut()
+	{
+		return _alwaysStageOut;
+	}
 
+	public void alwaysStageOut(boolean alwaysStageOut)
+	{
+		if (_alwaysStageOut != alwaysStageOut)
+			fireJobDescriptionModified();
+		_alwaysStageOut = alwaysStageOut;
+	}
+	
 	public void handleAsArchive(boolean handleAsArchive)
 	{
 		if (_handleAsArchive != handleAsArchive)

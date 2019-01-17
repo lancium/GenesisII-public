@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
+import edu.virginia.vcgr.genii.client.nativeq.QueueResultsException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
@@ -317,7 +318,7 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 	}
 
 	@Override
-	public int getExitCode(JobToken token) throws NativeQueueException
+	public int getExitCode(JobToken token) throws NativeQueueException, QueueResultsException
 	{
 		BufferedReader reader = null;
 
@@ -326,14 +327,16 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			String line = reader.readLine();
 			if (line == null) {
 				StreamUtils.close(reader);
-				throw new NativeQueueException("Unable to determine application exit status.");
+				throw new QueueResultsException("Unable to determine application exit status.");
 			}
 			StreamUtils.close(reader);
 			return Integer.parseInt(line.trim());
 		} catch (FileNotFoundException ioe) {
-			throw new NativeQueueException("Application doesn't appear to have exited.", ioe);
+			// Changed to throw a ContinuableExecutionException. Now there are continuable conditions from not finding exit codes,
+			// e.g., if the scheduler terminated it, or the nodes died, we still want to stageout.
+			throw new QueueResultsException("Pwrapper queue.script.result does not exist.", ioe);
 		} catch (IOException ioe) {
-			throw new NativeQueueException("Unable to determine application exit status.", ioe);
+			throw new QueueResultsException("Unable to determine application exit status.", ioe);
 		}
 	}
 

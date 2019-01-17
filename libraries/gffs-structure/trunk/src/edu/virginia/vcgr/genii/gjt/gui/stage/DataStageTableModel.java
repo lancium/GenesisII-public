@@ -16,12 +16,14 @@ class DataStageTableModel extends AbstractTableModel
 	static final long serialVersionUID = 0L;
 
 	private StageList _stageList;
+	private boolean _isStageIn;
 
 	private JComponent _owner = null;
 
-	DataStageTableModel(StageList stageList)
+	DataStageTableModel(StageList stageList, boolean isStageIn)
 	{
 		_stageList = stageList;
+		_isStageIn = isStageIn;
 	}
 
 	void setOwner(JComponent owner)
@@ -32,7 +34,10 @@ class DataStageTableModel extends AbstractTableModel
 	@Override
 	public int getColumnCount()
 	{
-		return 7;
+		if(_isStageIn)
+			return 7;
+		else
+			return 8;
 	}
 
 	@Override
@@ -67,6 +72,9 @@ class DataStageTableModel extends AbstractTableModel
 
 			case 6:
 				return stage.filesystemType();
+				
+			case 7:
+				return stage.alwaysStageOut();
 		}
 
 		return null;
@@ -110,6 +118,10 @@ class DataStageTableModel extends AbstractTableModel
 			case 6:
 				stage.filesystemType((FilesystemType) aValue);
 				break;
+				
+			case 7:
+				stage.alwaysStageOut(((Boolean) aValue).booleanValue());
+				break;
 		}
 
 		fireTableCellUpdated(rowIndex, columnIndex);
@@ -139,6 +151,8 @@ class DataStageTableModel extends AbstractTableModel
 				return Boolean.class;
 			case 6:
 				return FilesystemType.class;
+			case 7:
+				return Boolean.class;
 		}
 
 		return null;

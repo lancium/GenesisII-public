@@ -241,7 +241,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			synchronized (Modules) {
 				if (loaded==false){
 					String modulesSupported = ContainerProperties.getContainerProperties().getModuleList();
-					if (modulesSupported!=null) {					
+					if (modulesSupported!=null) {
 						String []Supported=modulesSupported.split(";");
 						for (int i=0;i<Supported.length;i++){
 							String []mod=Supported[i].split(":"); // There had better be two strings
@@ -254,7 +254,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 					}
 				}
 			}
-			
+
 			if (application.getEnvironment() != null) {
 				String modList=application.getEnvironment().get("MODULES_TO_LOAD");
 				if (modList != null) {

@@ -772,6 +772,10 @@ public class JSDLInterpreter
 		Boolean b2 = stage.getHandleAsArchive();
 		if (b2 != null)
 			facet.consumeHandleAsArchiveFlag(understanding, b2.booleanValue());
+		
+		Boolean b3 = stage.getAlwaysStageOut();
+		if (b3 != null)
+			facet.consumeHandleAsArchiveFlag(understanding, b3.booleanValue());
 
 		understandSource(provider, understanding, stage.getSource());
 		understandTarget(provider, understanding, stage.getTarget());

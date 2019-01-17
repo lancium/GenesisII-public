@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -20,6 +22,7 @@ import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServicePropertyListener;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 
 public class DownloadManagerContainerService extends AbstractContainerService
 {
@@ -183,6 +186,7 @@ public class DownloadManagerContainerService extends AbstractContainerService
 
 		ret = URIManager.get(source, tmpTarget, credential);
 		tmpTarget.renameTo(realTarget);
+
 		return ret.bytesTransferred();
 	}
 

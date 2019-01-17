@@ -3,6 +3,8 @@ package org.morgan.ftp.cmd;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -41,7 +43,7 @@ public class DataChannelManager
 
 			Date timeoutDate = new Date(System.currentTimeMillis() + timeoutSeconds * 1000);
 			DataChannelImpl ret = new DataChannelImpl(socketDescription);
-			Thread th = new Thread(new ChannelHandler(serverChannel, ret, timeoutDate));
+			Thread th = new Thread(new ServerChannelHandler(serverChannel, ret, timeoutDate));
 			th.setName("Data Channel Manager Thread");
 			th.setDaemon(true);
 			th.start();
@@ -53,13 +55,45 @@ public class DataChannelManager
 		}
 	}
 
-	static private class ChannelHandler implements Runnable
+	/*
+	 * Added 1/15/2018 by ASG to support the FTP PORT command
+	 */
+	static public DataChannelKey createDataChannel(String IPAddr, int port, long timeoutSeconds) throws IOException, SocketException
+	
+	{
+		String socketDescription;
+		Socket serverChannel=null;
+		//ServerSocket servSock;
+
+		try {
+			serverChannel = new Socket(IPAddr,port, true);
+			//servSock = serverChannel.socket();
+			//servSock.bind(null, 5);
+			
+			socketDescription = serverChannel.getInetAddress().getHostAddress()+":" + serverChannel.getPort();
+
+			Date timeoutDate = new Date(System.currentTimeMillis() + timeoutSeconds * 1000);
+			DataChannelImpl ret = new DataChannelImpl(socketDescription);
+			Thread th = new Thread(new DataChannelHandler(serverChannel, ret, timeoutDate));
+			th.setName("Data Channel Manager Thread");
+			th.setDaemon(true);
+			th.start();
+			serverChannel = null;
+
+			return ret;
+		} finally {
+			StreamUtils.close(serverChannel);
+		}
+	}
+
+	
+	static private class ServerChannelHandler implements Runnable
 	{
 		private Date _timeoutDate;
 		private DataChannelImpl _dataChannel;
 		private ServerSocketChannel _serverChannel;
 
-		public ChannelHandler(ServerSocketChannel serverChannel, DataChannelImpl dataChannel, Date timeoutDate)
+		public ServerChannelHandler(ServerSocketChannel serverChannel, DataChannelImpl dataChannel, Date timeoutDate)
 		{
 			_timeoutDate = timeoutDate;
 			_dataChannel = dataChannel;
@@ -83,6 +117,42 @@ public class DataChannelManager
 		}
 	}
 
+	/*
+	 * Added 1/15/2018 by ASG to support the FTP PORT command
+	 */
+	static private class DataChannelHandler implements Runnable
+	{
+		private Date _timeoutDate;
+		private DataChannelImpl _dataChannel;
+		private Socket _serverChannel;
+
+		public DataChannelHandler(Socket serverChannel, DataChannelImpl dataChannel, Date timeoutDate)
+		{
+			_timeoutDate = timeoutDate;
+			_dataChannel = dataChannel;
+			_serverChannel = serverChannel;
+		}
+
+		@Override
+		public void run()
+		{
+			SocketAcceptor acceptor = null;
+/*
+
+			try {
+				//acceptor = new SocketAcceptor(_serverChannel);
+				//SocketChannel channel = acceptor.accept(_timeoutDate);
+				//_serverChannel.connect(new Socket());
+				//_dataChannel.manageSocketChannel(_serverChannel, _timeoutDate);
+			} catch (IOException ioe) {
+				_logger.error("IO Exception while trying to create data channel.", ioe);
+			} finally {
+				StreamUtils.close(acceptor);
+			}
+*/
+		}
+	}
+	
 	static private class SocketAcceptor implements Closeable
 	{
 		private ServerSocketChannel _serverChannel;

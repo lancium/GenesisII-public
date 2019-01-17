@@ -387,6 +387,9 @@ public class GenesisIIFilesystem implements FSFilesystem
 			} else {
 				throw new FSNotADirectoryException(String.format("Path %s is not a directory.", target.pwd()));
 			}
+			if (fullPath.equals("/")) {
+				System.out.println("got root");
+			}
 			return directoryHandle;
 
 		} catch (Throwable cause) {

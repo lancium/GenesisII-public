@@ -690,7 +690,7 @@ public class JobDocument implements PostUnmarshallListener
 		builder.pop();
 
 		DataStaging staging =
-			new DataStaging(results.first(), dataStage.creationFlag(), dataStage.deleteOnTerminate(), dataStage.handleAsArchive());
+			new DataStaging(results.first(), dataStage.creationFlag(), dataStage.deleteOnTerminate(), dataStage.handleAsArchive(), dataStage.alwaysStageOut());
 
 		FilesystemType fsType = dataStage.filesystemType();
 		if (JSDLGenerator.indicatesFilesystem(fsType)) {

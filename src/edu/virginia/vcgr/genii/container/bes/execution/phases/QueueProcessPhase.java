@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
+import edu.virginia.vcgr.genii.client.nativeq.QueueResultsException;
 import edu.virginia.vcgr.genii.client.pwrapper.ElapsedTime;
 import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
@@ -244,8 +245,13 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				try {
 					exitCode = queue.getExitCode(_jobToken);
 					break;
-				} catch (NativeQueueException exe) {
-					if (secondsWaited==delay) throw exe;
+				} catch (QueueResultsException exe) {
+					if (secondsWaited==delay){  
+					// ASG 2019-01-13 Ok, if we get here we have been unable to get queue.script.result. That most likely means it disappeared and did not exit.
+					// This can happen if the job is terminated by the scheduling system, or the node died. So we want to throw an exception, though not
+					// necessarily a fatal one.
+						throw exe;
+					}
 				}				
 				Thread.sleep(1000);
 				secondsWaited++;

@@ -10,5 +10,5 @@ public interface NativeQueueConnection extends Closeable
 
 	public void cancel(JobToken token) throws NativeQueueException;
 
-	public int getExitCode(JobToken token) throws NativeQueueException;
+	public int getExitCode(JobToken token) throws NativeQueueException, QueueResultsException;
 }

@@ -218,7 +218,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 				return;
 			}
-
+			// ASG 2019-01-13 At some point we will need to do accounting for jobs that disappeared. 
 			if (results == null) {
 				_logger.error("Somehow we got an exit with no exit results.");
 				history.debug("Job Exited with No Resulst");
