@@ -41,8 +41,10 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.jsdl.DirectoryBasedFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
@@ -67,6 +69,10 @@ import edu.virginia.vcgr.genii.container.bes.activity.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.BESActivityDBResourceProvider;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.downloadmgr.DownloadManagerContainerService;
+import edu.virginia.vcgr.genii.container.cservices.scratchmgr.ScratchFSManagerContainerService;
+import edu.virginia.vcgr.genii.container.cservices.scratchmgr.ScratchFileSystem;
 import edu.virginia.vcgr.genii.container.jsdl.personality.forkexec.ForkExecPersonalityProvider;
 import edu.virginia.vcgr.genii.container.jsdl.personality.qsub.QSubPersonalityProvider;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
@@ -91,6 +97,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 	@MInject(lazy = true)
 	private IBESActivityResource _resource;
+
+	private JSDLFileSystem filesystem;
 
 	public BESActivityServiceImpl() throws RemoteException
 	{
@@ -130,7 +138,12 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
-
+		// ASG 2/24/2019 - this is a super hack that MUST be elimnated. It seems that the setScratchSpaceDirectory in containerServices is never being called
+		//ScratchFSManagerContainerService service = ContainerServices.findService(ScratchFSManagerContainerService.class);
+		//String prop = (String) getContainerServicesProperties().getProperty(SCRATCH_DIRECTORY_PROPERTY);
+		//fsManager.addFilesystem("SCRATCH", new DirectoryBasedFileSystem(new File("/home/coder/Scratch")));
+		
+		// END masive ugly hack.
 		try {
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
 			String jobName;

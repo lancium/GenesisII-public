@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.gjt.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import edu.virginia.vcgr.genii.gjt.data.xpath.DefaultXPathNode;
 import edu.virginia.vcgr.genii.gjt.data.xpath.XPathBuilder;
 import edu.virginia.vcgr.jsdl.Application;
 import edu.virginia.vcgr.jsdl.Common;
+import edu.virginia.vcgr.jsdl.DataStaging;
 import edu.virginia.vcgr.jsdl.JSDLConstants;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.JobDescription;
@@ -132,11 +134,13 @@ public class JobRoot
 		for (int i = num_of_jobDescriptions; i < _jobDocs.size(); i++) {
 			JobIdentification jobIdent = _jobDocs.get(i).generateJobIdentification(builder, variables);
 			Application application = _jobDocs.get(i).generateApplication(builder, variables, filesystemSet);
+			Collection<DataStaging> datastage = _jobDocs.get(i).generateDataStaging(builder, variables, filesystemSet);
 			Resources resources = _jobDocs.get(i).generateResources(builder, variables, filesystemSet);
-
+			
 			JobDescription jobDesc = new JobDescription(jobIdent, application, resources);
 
-			jobDesc.staging().addAll(_jobDocs.get(i).generateDataStaging(builder, variables, filesystemSet));
+			jobDesc.staging().addAll(datastage);
+			
 
 			jobDef.jobDescription().add(jobDesc);
 

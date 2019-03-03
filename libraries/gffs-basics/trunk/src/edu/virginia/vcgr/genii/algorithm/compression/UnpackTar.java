@@ -42,12 +42,22 @@ public class UnpackTar
 			throw new IOException("Directory " + dest.getAbsolutePath() + " already exists. Unpacking exiting");
 		}
 		dest.mkdir();
-
+		// using PosixFilePermission to set file permissions that we extracted earlier.
+		HashSet<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+		// add owners permission
+		perms.add(PosixFilePermission.OWNER_READ);
+		perms.add(PosixFilePermission.OWNER_WRITE);
+		perms.add(PosixFilePermission.OWNER_EXECUTE);
+		// add group permissions
+		perms.add(PosixFilePermission.GROUP_READ);
+		perms.add(PosixFilePermission.GROUP_WRITE);					
+			perms.add(PosixFilePermission.GROUP_EXECUTE);
+		Files.setPosixFilePermissions(Paths.get(dest.getCanonicalPath()), perms);
 		ArchiveEntry tarEntry = tarIn.getNextEntry();
 		while (tarEntry != null) {
 			// New code by ASG 2016-02-21. Added extracting user permission bits and OR ing them with group permissions
 			int mode = 0;
-			int defaultMode = 0750; // assume somewhat standard executable permissions if we cannot get the mode.
+			int defaultMode = 0770; // assume somewhat standard executable permissions if we cannot get the mode.
 			switch (archType) {
 				case TAR:
 				case TGZ:
@@ -98,7 +108,8 @@ public class UnpackTar
 				bout.close();
 			}
 			// using PosixFilePermission to set file permissions that we extracted earlier.
-			HashSet<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+			//HashSet<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+			perms = new HashSet<PosixFilePermission>();
 			// add owners permission
 			if ((mode & 0400) != 0)
 				perms.add(PosixFilePermission.OWNER_READ);
@@ -109,7 +120,7 @@ public class UnpackTar
 			// add group permissions
 			if ((mode & 0040) != 0)
 				perms.add(PosixFilePermission.GROUP_READ);
-			if ((mode & 0020) != 0)
+			if (((mode & 0020) != 0) || tarEntry.isDirectory())
 				perms.add(PosixFilePermission.GROUP_WRITE);
 			if ((mode & 0010) != 0)
 				perms.add(PosixFilePermission.GROUP_EXECUTE);
