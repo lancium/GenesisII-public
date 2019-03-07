@@ -272,7 +272,7 @@ public class BasicDBResource implements IResource
 		String aclString = "";
 		// First, if we are updating the database, remove all the old entries
 		if (updateDB) {
-			removeAclMatrix();
+			removeAclMatrix(_connection,_resourceKey);
 			// Now dump the cache entries for this resource
 			String epi = getEPI(_connection, _resourceKey);
 			aclCache.remove(epi);
@@ -467,13 +467,13 @@ public class BasicDBResource implements IResource
 		}
 	}
 
-	public void removeAclMatrix() throws ResourceException
+	static public void removeAclMatrix(Connection connection, String resourceKey) throws ResourceException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			String EPI = getEPI(_connection, _resourceKey);
-			stmt = _connection.prepareStatement(_DELETE_ACL_ITEMS);
+			String EPI = getEPI(connection, resourceKey);
+			stmt = connection.prepareStatement(_DELETE_ACL_ITEMS);
 			stmt.setString(1, EPI);
 			stmt.executeUpdate();
 
@@ -581,7 +581,7 @@ public class BasicDBResource implements IResource
 	public void destroy() throws ResourceException
 	{
 		PreparedStatement stmt = null;
-
+		// ASG 2019-03-06. Need to update this to also remove accessMatrix entries, Resources entries, and resources2 entries.
 		try {
 			stmt = _connection.prepareStatement(_DESTROY_PROPERTIES_STMT);
 			stmt.setString(1, _resourceKey);

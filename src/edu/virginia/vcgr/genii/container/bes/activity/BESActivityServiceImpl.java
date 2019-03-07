@@ -138,12 +138,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
-		// ASG 2/24/2019 - this is a super hack that MUST be elimnated. It seems that the setScratchSpaceDirectory in containerServices is never being called
-		//ScratchFSManagerContainerService service = ContainerServices.findService(ScratchFSManagerContainerService.class);
-		//String prop = (String) getContainerServicesProperties().getProperty(SCRATCH_DIRECTORY_PROPERTY);
-		//fsManager.addFilesystem("SCRATCH", new DirectoryBasedFileSystem(new File("/home/coder/Scratch")));
-		
-		// END masive ugly hack.
+
 		try {
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
 			String jobName;

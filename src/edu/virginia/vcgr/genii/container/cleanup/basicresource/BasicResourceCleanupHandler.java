@@ -13,11 +13,13 @@ import org.morgan.util.Triple;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.cleanup.AbstractCleanupHandler;
 import edu.virginia.vcgr.genii.container.cleanup.CleanupContext;
 import edu.virginia.vcgr.genii.container.cleanup.wsnsubscription.WSNSubscriptionCleanupHandler;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
+import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 {
@@ -202,6 +204,9 @@ public class BasicResourceCleanupHandler extends AbstractCleanupHandler
 	@Override
 	public void enactCleanup(Connection connection, String resourceID) throws Throwable
 	{
+		// ASG 2019-03-06 updated to clean out the access control matrix. We had a massive DB leak
+		BasicDBResource.removeAclMatrix( connection,  resourceID);
+		// End updates
 		removeRowsFromTable(connection, new Triple<String, String, String>("resources", "resourceid", resourceID));
 		removeRowsFromTable(connection, new Triple<String, String, String>("resources2", "resourceid", resourceID));
 		removeRowsFromTable(connection, new Triple<String, String, String>("properties", "resourceid", resourceID));
