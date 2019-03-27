@@ -1,6 +1,6 @@
 Description:
 
-The replicate tool creates, lists, and destroys replicas. <source-path> is an RNS path to any resource. <container> is an RNS path to a container resource. The replica will be created in this container.
+The replicate tool creates, lists, clears, and destroys replicas. <source-path> is an RNS path to any resource. <container> is an RNS path to a container resource. The replica will be created in this container.
 
 If the source's EPR does not contain a resolver element, then the replicate tool will abort. (See the "resolver" tool.)
 
@@ -15,6 +15,9 @@ The options are:
 -l | --list	Lists all of the replicas of the resource
 
 -d | --destroy	Destroys the specified instance.
+
+-c | --clear	This command is used to reset the replication status of a resource when the Resolver resource is no longer available, and will never be available again. Note that all replica's are turned into orphans. 
+
 Examples
 
 Suppose newfile1 is a replicated file

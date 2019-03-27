@@ -259,7 +259,8 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		if (resourceConstraints != null) {
 			Double totalPhyscialMemory = resourceConstraints.getTotalPhysicalMemory();
 			if ((totalPhyscialMemory != null) && (!totalPhyscialMemory.equals(Double.NaN)))
-				script.format("#SBATCH --mem-per-cpu=%d\n", totalPhyscialMemory.longValue());
+				script.format("#SBATCH --mem-per-cpu=%d\n", (totalPhyscialMemory.longValue()/(1024*2024)));
+			// ASG 2019-03-19 SLURM expects memory in MB not bytes, causes failures.
 
 			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();
 			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))

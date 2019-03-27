@@ -1,1 +1,1 @@
-replicate [-l|--list] [-d|--destroy] [-p] <source-path> <container> [replicant number]
+replicate [-l|--list] [-d|--destroy] [-c|--clear] [-p] <source-path> <container> [replicant number]

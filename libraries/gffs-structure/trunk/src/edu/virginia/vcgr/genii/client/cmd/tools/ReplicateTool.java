@@ -51,6 +51,7 @@ public class ReplicateTool extends BaseGridTool
 	private boolean _policy;
 	private boolean _destroy;
 	private boolean _list;
+	private boolean _clearResolver;
 
 	public ReplicateTool()
 	{
@@ -64,12 +65,20 @@ public class ReplicateTool extends BaseGridTool
 		_policy = true;
 	}
 
+	@Option({ "clear", "c" })
+	public void setClear()
+	{
+		_clearResolver = true;
+	}
+
+	
 	@Option({ "destroy", "d" })
 	public void setDestroy()
 	{
 		_destroy = true;
 	}
 
+	
 	@Option({ "list", "l" })
 	public void setList()
 	{
@@ -79,11 +88,17 @@ public class ReplicateTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (_destroy) {
+		if (_destroy ) {
 			if (numArguments() != 2)
 				throw new InvalidToolUsageException();
 			return;
 		}
+		if (_clearResolver ) {
+			if (numArguments() != 1)
+				throw new InvalidToolUsageException();
+			return;
+		}
+
 		if (_list) {
 			if (numArguments() != 1)
 				throw new InvalidToolUsageException();
@@ -106,6 +121,9 @@ public class ReplicateTool extends BaseGridTool
 		}
 		if (_list)
 			return listReplicas();
+		if (_clearResolver) {
+			return clearResolver();
+		}
 		String sourcePath = getArgument(0);
 		String containerPath = getArgument(1);
 		String linkPath = (numArguments() < 3 ? null : getArgument(2));
@@ -184,6 +202,41 @@ public class ReplicateTool extends BaseGridTool
 			if (type.isRNS())
 				stack.push(child);
 		}
+	}
+	/*
+	 * Wipe out the resolver info. This is only useful when the Resolver container no longer exists so we cannot find out the replica's,
+	 * nor destroy them. It may leave orphans out there.
+	 */
+	private int clearResolver() throws RNSException, AuthZSecurityException, ResourceException, ToolException
+	{
+
+		Collection<GeniiPath.PathMixIn> paths = GeniiPath.pathExpander(getArgument(0));
+		if (paths == null) {
+			String msg = "Path does not exist or is not accessible: " + getArgument(0);
+			stdout.println(msg);
+			return 1;
+		}
+		for (GeniiPath.PathMixIn gpath : paths) {
+			String replicaPath=null;
+			if (gpath._rns != null) {
+				// Do what needs doing
+				replicaPath = gpath._rns.pwd();
+				RNSPath current = RNSPath.getCurrent();
+				RNSPath replicaRNS = current.lookup(replicaPath, RNSPathQueryFlags.MUST_EXIST);
+				EndpointReferenceType replicaEPR = replicaRNS.getEndpoint();
+				// Ok, now we have the wsname. Now we need to do three things: remove the resolver from the SW name, and replace the link
+				WSName sourceName = new WSName(replicaEPR);
+				sourceName.removeAllResolvers();
+				replicaRNS.unlink();
+				replicaRNS.link(sourceName.getEndpoint());
+			} else {
+				stdout.println("Resource " + replicaPath + " does not exist");
+			}
+		}
+
+	// End ASG updates
+
+		return 0;
 	}
 
 	/*
