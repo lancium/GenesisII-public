@@ -319,7 +319,7 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 	}
 
 	@Override
-	public int getExitCode(JobToken token) throws NativeQueueException, QueueResultsException
+	public int getExitCode(JobToken token) throws NativeQueueException, QueueResultsException, FileNotFoundException, IOException
 	{
 		BufferedReader reader = null;
 

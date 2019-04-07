@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
 import java.io.Closeable;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public interface NativeQueueConnection extends Closeable
 {
@@ -10,5 +12,5 @@ public interface NativeQueueConnection extends Closeable
 
 	public void cancel(JobToken token) throws NativeQueueException;
 
-	public int getExitCode(JobToken token) throws NativeQueueException, QueueResultsException;
+	public int getExitCode(JobToken token) throws NativeQueueException, QueueResultsException,FileNotFoundException, IOException;
 }

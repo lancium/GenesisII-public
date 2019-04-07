@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.security.cert.X509Certificate;
@@ -135,6 +137,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	{
 		String stderrPath = null;
 		File resourceUsageFile = null;
+		// 2019-04-04 ASG. Added to handle jobs disappearing from the queu. We're going to make them as complete for now.
+		boolean jobDisapparedFromQueue=false;
 
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
@@ -245,14 +249,37 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				try {
 					exitCode = queue.getExitCode(_jobToken);
 					break;
-				} catch (QueueResultsException exe) {
+				} catch (QueueResultsException | NativeQueueException  exe) {
 					if (secondsWaited==delay){  
 					// ASG 2019-01-13 Ok, if we get here we have been unable to get queue.script.result. That most likely means it disappeared and did not exit.
 					// This can happen if the job is terminated by the scheduling system, or the node died. So we want to throw an exception, though not
 					// necessarily a fatal one.
-						throw exe;
+						// 2019-04-04 ASG. So this turns out to be a mistake. It turns jobs that were terminated due to node failure and time limit terminations into job
+						// failures. Particularly the time limit excepts are a problem, since the job will be marked as failed and they will be restarted ....
+						// What we want is to be able to talk to the queue manager accounting system .. that is not possible right now on most resources. When it is 
+						// available we will pick it up in getExitCode.
+						jobDisapparedFromQueue=true;
+						exitCode=250;
+						context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
+						if (lastState == null || !lastState.equals(_state.toString())) {
+							if (_logger.isDebugEnabled())
+								_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
+							history.trace("Batch System State:  %s", _state);
+							lastState = _state.toString();
+						}
 					}
-				}				
+				}	catch (IOException ioe) {
+					// See comments for catch above, they are the same
+					jobDisapparedFromQueue=true;
+					exitCode=250;
+					context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
+					if (lastState == null || !lastState.equals(_state.toString())) {
+						if (_logger.isDebugEnabled())
+							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
+						history.trace("Batch System State:  %s", _state);
+						lastState = _state.toString();
+					}
+				}
 				Thread.sleep(1000);
 				secondsWaited++;
 			}
@@ -262,7 +289,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			// **********************************************************
 			
 			history.info("Job Exited with Exit Code %d", exitCode);
-			if (resourceUsageFile != null) {
+			if (!jobDisapparedFromQueue && resourceUsageFile != null) {
 				try {
 					ExitResults eResults = ProcessWrapper.readResults(resourceUsageFile);
 					exitCode = eResults.exitCode();

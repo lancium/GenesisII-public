@@ -712,7 +712,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 		try {
 			return new CreateFileResponseType(fork.createFile(getExemplarEPR(), request.getFilename()));
 		} catch (IOException ioe) {
-			_logger.error("failure during add request", ioe);
+			_logger.error("failure during add request for file " + request.getFilename() + ": ", ioe);
 			throw new RemoteException("Unable to create file: " + ioe.getMessage(), ioe);
 		}
 	}
