@@ -172,6 +172,17 @@
 			element="job-management:CompleteResponse"/>
 	</wsdl:message>
 
+
+	<wsdl:message name="ResetJobRequest">
+		<wsdl:part name="ResetJobRequest"
+			element="job-management:ResetJobRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="ResetJobResponse">
+		<wsdl:part name="ResetJobResponse"
+			element="job-management:ResetJobResponse"/>
+	</wsdl:message>
+
 	<wsdl:message name="ForceUpdateRequest">
 		<wsdl:part name="ForceUpdateRequest"
 			element="job-management:ForceUpdateRequestType"/>
@@ -242,6 +253,11 @@
 		<wsdl:operation name="killJobs">
 			<wsdl:input message="job-management:KillRequest"/>
 			<wsdl:output message="job-management:KillResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="ResetJobs">
+			<wsdl:input message="job-management:ResetJobRequest"/>
+			<wsdl:output message="job-management:ResetJobResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="completeJobs">

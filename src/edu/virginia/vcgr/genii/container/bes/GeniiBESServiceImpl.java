@@ -594,6 +594,12 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{
 		return null;
 	}
+	
+	@Override
+	public Object resetJobs(String[] rescheduleJobsRequest) throws RemoteException
+	{
+		return null;
+	}
 
 	@Override
 	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest) throws RemoteException

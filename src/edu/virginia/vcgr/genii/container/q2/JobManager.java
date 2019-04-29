@@ -1819,11 +1819,11 @@ public class JobManager implements Closeable
 
 	}
 
-	synchronized public void rescheduleJobs(Connection connection, String[] jobs)
-		throws SQLException, ResourceException, GenesisIISecurityException
+	private Collection<Long> checkOwnershipAndGenerateJobID(Connection connection, String[] jobs, String message)
+			throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		if (jobs == null || jobs.length == 0)
-			return;
+			return null;
 
 		Collection<Long> jobsToReschedule = new LinkedList<Long>();
 		HashMap<Long, PartialJobInfo> ownerMap;
@@ -1856,9 +1856,55 @@ public class JobManager implements Closeable
 
 			/* If the job isn't owned by the caller, throw an exception. */
 			if (!QueueSecurity.isOwner(pji.getOwners()))
-				throw new GenesisIISecurityException("Don't have permission to reschedule job \"" + jobData.getJobTicket() + "\".");
+				throw new GenesisIISecurityException(message + jobData.getJobTicket() + "\".");
 		}
+		return jobsToReschedule;
 
+	}
+
+	synchronized public void resetJobs(Connection connection, String[] jobs) 
+		throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Collection<Long> jobsToReset = checkOwnershipAndGenerateJobID(connection, jobs,"Don't have permission to reset job \"");
+		for (Long jobID : jobsToReset) {
+			JobData jobData = _jobsByID.get(jobID);
+
+			QueueStates state = jobData.getJobState();
+			if (state == QueueStates.RUNNING || state == QueueStates.STARTING) {	
+				
+				continue;
+			}
+			
+			// Now we need to move the job between queues
+
+			synchronized (jobData) {
+				HistoryContext history = jobData.history(HistoryEventCategory.ResetCount);
+				history.createTraceWriter("Resetting Job tries count to 0")
+				.format("Resetting job.").close();
+				jobData.resetJob();
+
+				if (_logger.isDebugEnabled())
+					_logger.debug(String.format("Resetting job %s", jobData));
+				SortableJobKey jobKey = new SortableJobKey(jobData);
+				_queuedJobs.put(jobKey, jobData);
+
+				Connection connection2 = _connectionPool.acquire(false);
+
+				/* Ask the database to update the job state */
+				_database.modifyJobState(connection, jobData.getJobID(), jobData.getRunAttempts(), QueueStates.REQUEUED, new Date(), null, null,
+						null);
+				connection2.commit();
+
+		
+			}
+			
+		}
+		
+	}
+	synchronized public void rescheduleJobs(Connection connection, String[] jobs)
+		throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Collection<Long> jobsToReschedule = checkOwnershipAndGenerateJobID(connection, jobs,"Don't have permission to reschedule \"");
 		// Go ahead and complete them
 		rescheduleJobs(connection, jobsToReschedule);
 	}

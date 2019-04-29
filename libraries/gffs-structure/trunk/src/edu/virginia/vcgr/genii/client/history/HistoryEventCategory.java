@@ -12,6 +12,7 @@ public enum HistoryEventCategory {
 	ReQueing(new DefaultHistoryCategoryInformation("Re-Queing", new StandardIconProvider("re-queing.png"))),
 	Checking(new DefaultHistoryCategoryInformation("Checking", new StandardIconProvider("checking.png"))),
 	Cleanup(new DefaultHistoryCategoryInformation("Cleanup", new StandardIconProvider("cleanup.png"))),
+	ResetCount(new DefaultHistoryCategoryInformation("Resetting Count", new StandardIconProvider("re-queing.png"))),
 	Terminating(new DefaultHistoryCategoryInformation("Terminating", new StandardIconProvider("terminating.png"))),
 	CloudSetup(new DefaultHistoryCategoryInformation("Cloud-Setup", new StandardIconProvider("create-job.png")));
 

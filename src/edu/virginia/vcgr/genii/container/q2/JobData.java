@@ -352,6 +352,12 @@ public class JobData
 		incrementRunAttempts(1);
 	}
 
+	synchronized public void resetJob() {
+		_runAttempts=0;
+		_killed = false;
+		_jobState=QueueStates.REQUEUED;
+		clearBESID();
+	}
 	synchronized public JobResourceRequirements getResourceRequirements(JobManager _jobManager, int jobDescIndex)
 		throws ResourceException, SQLException
 	{
