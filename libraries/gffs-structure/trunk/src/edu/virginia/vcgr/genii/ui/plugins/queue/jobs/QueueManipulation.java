@@ -83,6 +83,21 @@ class QueueManipulation
 			return 0;
 		}
 	}
+	static private class JobRescheduleTask extends TypicalTask<Integer>
+	{
+		private JobRescheduleTask(UIPluginContext context, Collection<String> jobTickets)
+		{
+			super(context, jobTickets);
+		}
+
+		@Override
+		final public Integer execute(TaskProgressListener progressListener) throws Exception
+		{
+			QueuePortType queue = queue();
+			queue.rescheduleJobs(_jobTickets.toArray(new String[_jobTickets.size()]));
+			return 0;
+		}
+	}
 
 	static private class OpenJobHistoryDumpTargetTask extends TypicalTask<OutputStream>
 	{
@@ -185,7 +200,33 @@ class QueueManipulation
 			_model.refresh(_ownerComponent);
 		}
 	}
+	
+	static private class JobRescheduleCompletionListener extends TypicalTaskCompletionListener<Integer>
+	{
+		private JobRescheduleCompletionListener(Component ownerComponent, UIPluginContext context, QueueManagerTableModel model)
+		{
+			super(ownerComponent, context, model);
+		}
 
+		@Override
+		public void taskCancelled(Task<Integer> task)
+		{
+			// JOptionPane.showMessageDialog(_ownerComponent,
+			// "This task runs asynchronously and results from executing it may not appear immediately.", "Delayed Results Warning",
+			// JOptionPane.WARNING_MESSAGE);
+			_model.refresh(_ownerComponent);
+		}
+
+		@Override
+		public void taskCompleted(Task<Integer> task, Integer result)
+		{
+			// JOptionPane.showMessageDialog(_ownerComponent,
+			// "This task runs asynchronously and results from executing it may not appear immediately.", "Delayed Results Warning",
+			// JOptionPane.WARNING_MESSAGE);
+			_model.refresh(_ownerComponent);
+		}
+	}
+	
 	static private class JobCompleterCompletionListener extends TypicalTaskCompletionListener<Integer>
 	{
 		private JobCompleterCompletionListener(Component ownerComponent, UIPluginContext context, QueueManagerTableModel model)
@@ -298,6 +339,12 @@ class QueueManipulation
 			new JobKillerTask(context, jobTickets), new JobKillerCompletionListener(ownerComponent, context, model)).start();
 	}
 
+	static void JobRescheduleTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
+	{
+		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Rescheduling Jobs", "Asking queue to reschedule jobs", 1000L,
+			new JobRescheduleTask(context, jobTickets), new JobRescheduleCompletionListener(ownerComponent, context, model)).start();
+	}
+	
 	static void completeJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
 	{
 		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Removing Jobs", "Asking queue to remove jobs", 1000L,
