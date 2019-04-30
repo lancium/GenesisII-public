@@ -1819,7 +1819,7 @@ public class JobManager implements Closeable
 
 	}
 
-	private Collection<Long> checkOwnershipAndGenerateJobID(Connection connection, String[] jobs, String message)
+	private Collection<Long> checkOwnershipAndGenerateJobID(Connection connection, String[] jobs, boolean skipCheck, String message)
 			throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		if (jobs == null || jobs.length == 0)
@@ -1849,9 +1849,11 @@ public class JobManager implements Closeable
 			PartialJobInfo pji = ownerMap.get(jobID);
 
 			QueueStates state = jobData.getJobState();
-			if (!(state == QueueStates.RUNNING || state == QueueStates.STARTING)) {
-				jobsToReschedule.remove(jobID);
-				continue;
+			if (!skipCheck) {
+				if (!(state == QueueStates.RUNNING || state == QueueStates.STARTING)) {
+					jobsToReschedule.remove(jobID);
+					continue;
+				}
 			}
 
 			/* If the job isn't owned by the caller, throw an exception. */
@@ -1865,7 +1867,7 @@ public class JobManager implements Closeable
 	synchronized public void resetJobs(Connection connection, String[] jobs) 
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
-		Collection<Long> jobsToReset = checkOwnershipAndGenerateJobID(connection, jobs,"Don't have permission to reset job \"");
+		Collection<Long> jobsToReset = checkOwnershipAndGenerateJobID(connection, jobs,true,"Don't have permission to reset job \"");
 		for (Long jobID : jobsToReset) {
 			JobData jobData = _jobsByID.get(jobID);
 
@@ -1899,12 +1901,12 @@ public class JobManager implements Closeable
 			}
 			
 		}
-		
+		_schedulingEvent.notifySchedulingEvent();
 	}
 	synchronized public void rescheduleJobs(Connection connection, String[] jobs)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
-		Collection<Long> jobsToReschedule = checkOwnershipAndGenerateJobID(connection, jobs,"Don't have permission to reschedule \"");
+		Collection<Long> jobsToReschedule = checkOwnershipAndGenerateJobID(connection, jobs,false,"Don't have permission to reschedule \"");
 		// Go ahead and complete them
 		rescheduleJobs(connection, jobsToReschedule);
 	}

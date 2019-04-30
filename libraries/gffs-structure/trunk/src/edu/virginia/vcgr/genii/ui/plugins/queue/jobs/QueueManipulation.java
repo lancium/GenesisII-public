@@ -99,6 +99,21 @@ class QueueManipulation
 		}
 	}
 
+	static private class JobResetTask extends TypicalTask<Integer>
+	{
+		private JobResetTask(UIPluginContext context, Collection<String> jobTickets)
+		{
+			super(context, jobTickets);
+		}
+
+		@Override
+		final public Integer execute(TaskProgressListener progressListener) throws Exception
+		{
+			QueuePortType queue = queue();
+			queue.resetJobs(_jobTickets.toArray(new String[_jobTickets.size()]));
+			return 0;
+		}
+	}
 	static private class OpenJobHistoryDumpTargetTask extends TypicalTask<OutputStream>
 	{
 		private GeniiPath _dumpPath;
@@ -343,6 +358,12 @@ class QueueManipulation
 	{
 		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Rescheduling Jobs", "Asking queue to reschedule jobs", 1000L,
 			new JobRescheduleTask(context, jobTickets), new JobRescheduleCompletionListener(ownerComponent, context, model)).start();
+	}
+	
+	static void JobResetTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
+	{
+		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Rescheduling Jobs", "Asking queue to reschedule jobs", 1000L,
+			new JobResetTask(context, jobTickets), new JobRescheduleCompletionListener(ownerComponent, context, model)).start();
 	}
 	
 	static void completeJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
