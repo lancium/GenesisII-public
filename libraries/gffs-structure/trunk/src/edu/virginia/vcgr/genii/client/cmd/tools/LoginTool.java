@@ -28,6 +28,7 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamespaceDefinitions;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
@@ -253,7 +254,23 @@ public class LoginTool extends BaseLoginTool
 		if (creds != null) {
 			transientCredentials.addAll(creds);
 		}
-
+		/*
+		 * May 9, 2019 by ASG. Code added to create support for multiple identity sessions, first step, create a nonce to refer to each sesstion.
+		 */
+		if (_create_nonce) {
+			
+			System.out.println("create nonce set\n");
+			String nonce = _username+"NONCE";
+			// Now put it in the LRU Cache
+			if (WorkingContext.getCurrentWorkingContext()!=null) {
+				WorkingContext.stash(nonce, WorkingContext.getCurrentWorkingContext());
+				System.out.println(nonce);
+			}
+			else {
+				System.err.println("There was no context");
+			}
+			
+		}
 		ContextManager.storeCurrentContext(realCallingContext);
 
 		// reset caching system again prior to changing directory to make sure nothing old is left.

@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.Rollbackable;
 
@@ -29,8 +30,15 @@ public class WorkingContext implements Closeable, Cloneable
 	static public final String CERT_CHAIN_KEY = "cert-chain-key";
 	static public final String EPI_KEY = "epi-key";
 	static public final String CALLING_HOST = "calling-host";
+	static private final int MAX_IDENTITIES  = 200;
+	static private final int LIFETIME = 1000*60*60*12; // 12 hours
 
 	static private ThreadLocal<Stack<WorkingContext>> _currentWorkingContext = new ThreadLocal<Stack<WorkingContext>>();
+
+	/* Added May 9, 2009 by ASG
+	 * _idMap holds a set of credentials from login sessions
+	 */
+	static private TimedOutLRUCache<String,WorkingContext>	_idMap = new TimedOutLRUCache<String, WorkingContext>(MAX_IDENTITIES,LIFETIME, "IdentityCache" );
 
 	private boolean _closed = false;
 	private boolean _succeeded = true;
@@ -64,7 +72,18 @@ public class WorkingContext implements Closeable, Cloneable
 			}
 		}
 	}
-
+	/* Added May 9, 2009 by ASG
+	 * stash and grab store and retrieve working contexts that contain security context information. They are here now so the client
+	 * can rapidly change identities.
+	 */
+	static public void stash(String nonce, WorkingContext val){
+		_idMap.put(nonce, val);
+	}
+	
+	static public WorkingContext grab(String nonce) {
+		return _idMap.get(nonce);
+	}
+	
 	static public void temporarilyAssumeNewIdentity(EndpointReferenceType newTarget) throws ContextException
 	{
 		Stack<WorkingContext> stack = _currentWorkingContext.get();

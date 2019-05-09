@@ -31,6 +31,10 @@ public abstract class BaseLoginTool extends BaseGridTool
 	protected String _username = null;
 	protected String _pattern = null;
 	protected String _authnUri = null;
+	protected boolean _create_nonce=false;
+	protected boolean _push_nonce=false;
+	protected String _nonce=null;
+	protected boolean _pop_nonce=false;
 
 	protected BaseLoginTool(String description, String usage, boolean isHidden)
 	{
@@ -58,6 +62,25 @@ public abstract class BaseLoginTool extends BaseGridTool
 	{
 		_bogusPassword = true;
 	}
+
+	@Option({ "create-nonce" })
+	public void setcreate_nonce()
+	{
+		_create_nonce = true;
+	}
+	
+	@Option({ "pop-nonce" })
+	public void setpop_nonce()
+	{
+		_pop_nonce = true;
+	}
+	
+	@Option({ "push-nonce" })
+	public void setpushnonce(String nonce)
+	{
+		_nonce = nonce;
+	}
+
 
 	@Option({ "password" })
 	public void setPassword(String password)
