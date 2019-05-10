@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
+import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
@@ -36,7 +37,29 @@ public class ContextManager
 {
 	static private final String _CONTEXT_RESOLVER_NAME = "context-resolver";
 	static private Log _logger = LogFactory.getLog(ContextManager.class);
+	
+	
+	static private final int MAX_IDENTITIES  = 200;
+	static private final int LIFETIME = 1000*60*60*12; // 12 hours
+	/* Added May 9, 2009 by ASG
+	 * _idMap holds a set of credentials from login sessions
+	 */
+	static private TimedOutLRUCache<String,ICallingContext>	_idMap = new TimedOutLRUCache<String, ICallingContext>(MAX_IDENTITIES,LIFETIME, "IdentityCache" );
 
+	/* Added May 9, 2009 by ASG
+	 * stash and grab store and retrieve working contexts that contain security context information. They are here now so the client
+	 * can rapidly change identities.
+	 */
+	synchronized static public void stash(String nonce, ICallingContext val){
+		_idMap.put(nonce, val);
+	}
+	
+	synchronized static public ICallingContext grab(String nonce) {
+		return _idMap.get(nonce);
+	}
+	
+
+	
 	static private class ResolverThreadLocal extends InheritableThreadLocal<IContextResolver>
 	{
 		@Override

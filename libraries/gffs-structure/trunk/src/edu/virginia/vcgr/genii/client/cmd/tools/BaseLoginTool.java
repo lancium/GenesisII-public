@@ -76,9 +76,10 @@ public abstract class BaseLoginTool extends BaseGridTool
 	}
 	
 	@Option({ "push-nonce" })
-	public void setpushnonce(String nonce)
+	public void setpush_nonce(String nonce)
 	{
 		_nonce = nonce;
+		_push_nonce=true;
 	}
 
 
