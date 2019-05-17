@@ -605,9 +605,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 				// values.add(new MessageElement(old_acl_name, AxisAcl.encodeAcl(acl)));
 				// addedAclExplicitly = true;
 				// } else {
-				values = unknowns.get(name);
-				if (values == null && unknowns.containsKey(name))
-					values = new ArrayList<MessageElement>(0);
+					values = unknowns.get(name);
+					if (values == null && unknowns.containsKey(name)) {
+						values = new ArrayList<MessageElement>(0);
+					}
 				// }
 
 				if (values == null) {

@@ -201,7 +201,7 @@ fan_out_directories()
       user_flag="-u ${patterns[1]}" 
 #echo "found a -u parm and user=${patterns[1]}" 
       # void the two elements with that user flag so we don't use them as patterns.
-      unset patterns[0] patterns[1]=
+      unset patterns[0] patterns[1]
     else
       # select all users.
       user_flag="-e"

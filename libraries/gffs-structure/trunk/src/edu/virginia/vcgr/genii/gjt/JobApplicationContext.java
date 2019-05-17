@@ -138,7 +138,7 @@ public class JobApplicationContext
 			 * now clean up the list of documents we decided to remove.
 			 */
 			for (JobDocumentContext jc : toWhack) {
-				_openDocuments.remove(toWhack);
+				_openDocuments.remove(jc);
 				jc.close();
 			}
 
