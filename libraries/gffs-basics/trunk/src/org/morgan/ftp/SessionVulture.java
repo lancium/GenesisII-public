@@ -13,7 +13,7 @@ public class SessionVulture implements Closeable, FTPListener
 
 	static private Logger _logger = Logger.getLogger(SessionVulture.class);
 
-	private HashMap<Integer, FTPSession> _sessions = new HashMap<Integer, FTPSession>();
+	private HashMap<Integer, ConnectionSession> _sessions = new HashMap<Integer, ConnectionSession>();
 	private Thread _thread;
 
 	public SessionVulture()
@@ -24,6 +24,13 @@ public class SessionVulture implements Closeable, FTPListener
 		_thread.start();
 	}
 
+	public void addSession(ConnectionSession session)
+	{
+		synchronized (_sessions) {
+			_sessions.put(new Integer(session.getSessionID()), session);
+			_sessions.notify();
+		}
+	}
 	public void addSession(FTPSession session)
 	{
 		synchronized (_sessions) {
@@ -51,7 +58,7 @@ public class SessionVulture implements Closeable, FTPListener
 						else
 							_sessions.wait(_VULTURE_SLEEP_CYCLE);
 
-						for (FTPSession session : _sessions.values()) {
+						for (ConnectionSession session : _sessions.values()) {
 							if (session.getIdleTime() >= session.getIdleTimeout()) {
 								_logger.info("Timing out idle session " + session.getSessionID());
 								StreamUtils.close(session);

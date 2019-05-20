@@ -139,24 +139,11 @@ public class LoginTool extends BaseLoginTool
 		 * May 9, 2019 by ASG. Code added to create support for multiple identity sessions, first step, create a nonce to refer to each sesstion.
 		 */
 		
-		if (_push_nonce) {
-			System.out.println("pushd nonce set: " + _nonce + "\n");
-			ICallingContext context = ContextManager.grab(_nonce);
-			if (context==null) {
-				System.err.println("Nonce " + _nonce + " not found\n");
-				return -2;
-			}
-/*			if (!ContextManager.isGood(context)) {
-				System.err.println("Context for " + _nonce + " is not good\n");
-				return -3;
-			}
-			*/
-			System.out.println(context.toString());
-			ContextManager.storeCurrentContext(context);
-			return 0;
+
+		// Added 2019-05-17 by ASG
+		if (_password==null && _username==null){
+			aquireUsername();
 		}
-		
-		aquireUsername();
 
 		// Determine IDP path
 		if (numArguments() == 1) {

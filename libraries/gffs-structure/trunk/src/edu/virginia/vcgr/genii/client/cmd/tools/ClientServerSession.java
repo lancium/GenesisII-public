@@ -1,10 +1,17 @@
-package org.morgan.ftp;
-
+package edu.virginia.vcgr.genii.client.cmd.tools;
+import org.morgan.ftp.*;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.Writer;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -30,7 +37,16 @@ import org.morgan.ftp.cmd.TypeCommandHandler;
 import org.morgan.ftp.cmd.UserCommandHandler;
 import org.morgan.util.io.StreamUtils;
 
-public class FTPSession extends ConnectionSession implements Runnable, Closeable
+import edu.virginia.vcgr.genii.client.cmd.CommandLineFormer;
+import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
+import edu.virginia.vcgr.genii.client.cmd.ExceptionHandlerManager;
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.cmd.tools.CopyTool;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
+
+public class ClientServerSession extends ConnectionSession implements Runnable, Closeable
 {
 	static private Logger _logger = Logger.getLogger(FTPSession.class);
 
@@ -71,7 +87,7 @@ public class FTPSession extends ConnectionSession implements Runnable, Closeable
 		addCommand(new ReflectiveCommand(DeleteCommandHandler.class, "DELE"));
 	}
 
-	FTPSession(FTPListenerManager manager, FTPConfiguration configuration, int sessionID, IBackend backend, Socket socket)
+	ClientServerSession(FTPListenerManager manager, FTPConfiguration configuration, int sessionID, IBackend backend, Socket socket)
 	{
 		_configuration = configuration;
 		_socket = socket;
@@ -98,79 +114,107 @@ public class FTPSession extends ConnectionSession implements Runnable, Closeable
 	@Override
 	public void run()
 	{
-		RollingCommandHistory history = _sessionState.getHistory();
-		FTPAction action;
-
 		BufferedReader reader = null;
 		PrintStream out = null;
 
 		String line;
-		Pattern verbExtractor = Pattern.compile("\\s*(\\w+)\\s*(.*)\\s*");
-
+		
 		try {
+			// get the local identity's key material (or create one if necessary)
+			ICallingContext realCallingContext = ContextManager.getCurrentOrMakeNewContext();
+			// we will make a clone of our context now to avoid having this credential stick around.
+			ICallingContext newContext = realCallingContext.deriveNewContext();
+			// temporary context to hold username password junk.
+			Closeable assumedContextToken = null;
+			assumedContextToken = ContextManager.temporarilyAssumeContext(newContext);
+
+	
 			reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
 			out = new FTPPrintStream(_socket.getOutputStream(), true);
-
-			out.println("220 " + _sessionState.getBackend().getGreeting());
-			_logger.info("220 " + _sessionState.getBackend().getGreeting());
+			PrintWriter outwriter=new PrintWriter(_socket.getOutputStream());
+//			out.println("220 " + _sessionState.getBackend().getGreeting());
+//			_logger.info("220 " + _sessionState.getBackend().getGreeting());
 
 			while ((line = reader.readLine()) != null) {
 				synchronized (_idleTimer) {
 					_idleTimer.noteActivity();
 				}
-
-				if (_logger.isDebugEnabled())
-					_logger.debug("FTP Session Received \"" + line + "\".");
-
-				Matcher matcher = verbExtractor.matcher(line);
-				if (!matcher.matches()) {
-					_logger.error("FTP command unrecognized.");
+				System.out.println(line);
+				
+				// ============================================================ copied stuff ===============
+				String[] args = CommandLineFormer.formCommandLine(line);
+				if (args.length == 0)
 					continue;
+				CommandLineRunner runner = new CommandLineRunner();
+				int firstArg = 0;
+				// First lets check for "context" as the first word
+				if (line.indexOf("context")==0) {
+					// The line is of the form "context <some-nonce> command arguments"
+					// Now we need to set first arg to 2 to skep past the first two
+					firstArg=2;
+					// Now look up the nonce
+					String nonce = args[1];
+					System.out.println("pushd nonce set: " + nonce + "\n");
+					ICallingContext context = ContextManager.grab(nonce);
+					if (context==null) {
+						System.err.println("Nonce " + nonce + " not found\n");
+						return;
+					}
+					System.out.println(context.toString());
+					ContextManager.storeCurrentContext(context);
 				}
-
-				String verb = matcher.group(1);
-				String parameters = matcher.group(2);
-
-				ICommand command = _commands.get(verb);
-
 				try {
-					if (command == null)
-						throw new UnimplementedException(verb);
 
-					ICommandHandler handler = command.createHandler();
-					synchronized (history) {
-						action = history.addCommand(handler);
-					}
+					long startTime = System.currentTimeMillis();
+					String[] passArgs = new String[args.length - firstArg];
+					System.arraycopy(args, firstArg, passArgs, 0, passArgs.length);
 
-					try {
-						handler.handleCommand(_sessionState, verb, parameters, out);
-					} finally {
-						synchronized (history) {
-							action.complete();
-						}
-					}
-				} catch (AuthorizationFailedException ue) {
-					if (++_authAttemptCount >= _configuration.getMissedAuthenticationsLimit()) {
-						_logger.info("Too many authentication failures...closing session.");
+					int lastExit = runner.runCommand(passArgs, outwriter, outwriter, reader);
 
-						ConnectionCloseException cce = new ConnectionCloseException();
-						cce.communicate(_logger);
-						cce.communicate(out);
+					long elapsed = System.currentTimeMillis() - startTime;
 
-						break;
-					}
 
-					ue.communicate(_logger);
-					ue.communicate(out);
-				} catch (FTPException ftpe) {
-					ftpe.communicate(_logger);
-					ftpe.communicate(out);
-				}
+					long hours = elapsed / (60 * 60 * 1000);
+					if (hours != 0)
+						elapsed = elapsed % (hours * 60 * 60 * 1000);
+					long minutes = elapsed / (60 * 1000);
+					if (minutes != 0)
+						elapsed = elapsed % (minutes * 60 * 1000);
+					long seconds = elapsed / (1000);
+					if (seconds != 0)
+						elapsed = elapsed % (seconds * 1000);
+					System.out.println("Elapsed time: " + hours + "h:" + minutes + "m:" + seconds + "s." + elapsed + "ms");
+
+				} catch (ReloadShellException e) {
+					throw e;
+				} catch (Throwable cause) {
+					int toReturn = ExceptionHandlerManager.getExceptionHandler().handleException(cause, new OutputStreamWriter(System.err));
+
+				} 
+				// ======================================================================================== end of copied stuff ===================================================
+				/*
+ 				WhoamiTool t=new WhoamiTool();
+				
+				t.run(outwriter, outwriter, reader);
+				if (_logger.isDebugEnabled())
+					_logger.debug("ClientServer Session Received \"" + line + "\".");
+				*/
+
+				outwriter.flush();
+				// Use a break to get out. It should really just be straight line code.
+				break;
 			}
-		} catch (IOException ioe) {
-			_logger.warn("Unknown IO Exception in FTP Session.", ioe);
+		} catch (ReloadShellException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		} finally {
-			_logger.info("Closing FTP Session.");
+			_logger.info("Closing ClientServer Session.");
 
 			StreamUtils.close(out);
 			StreamUtils.close(reader);

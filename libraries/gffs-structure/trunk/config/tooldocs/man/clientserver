@@ -1,0 +1,18 @@
+Description:
+
+The clientserver tool allows the user to create an client session daemon that listens on a specified port on the client.
+
+The following options are available:
+
+--idle-timeout=<secs>
+
+--data-connection-timeout=<secs>
+
+--max-auth-attempts=<number>
+
+--sandbox=<path>
+
+stop
+
+Stops the clientserver daemon on the client.
+

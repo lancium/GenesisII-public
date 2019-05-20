@@ -38,7 +38,7 @@ public class GeniiBackendConfiguration implements Cloneable
 		ContextManager.storeCurrentContext(_callingContext);
 	}
 
-	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr, ICallingContext callingContext)
+	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr, ICallingContext callingContext, boolean dologin)
 		throws RNSException, IOException, ReloadShellException, ToolException
 	{
 		IContextResolver oldResolver = ContextManager.getResolver();
@@ -61,13 +61,15 @@ public class GeniiBackendConfiguration implements Cloneable
 				throw new AuthZSecurityException(msg);
 			}
 
-			// Assume normal user/pass -> idp login
-			LoginTool login = new LoginTool();
-			retVal = login.run(stdout, stderr, stdin);
-			if (retVal != 0) {
-				String msg = "failure calling login tool: return value=" + retVal;
-				_logger.error(msg);
-				throw new AuthZSecurityException(msg);
+			if (dologin) {
+				// Assume normal user/pass -> idp login
+				LoginTool login = new LoginTool();
+				retVal = login.run(stdout, stderr, stdin);
+				if (retVal != 0) {
+					String msg = "failure calling login tool: return value=" + retVal;
+					_logger.error(msg);
+					throw new AuthZSecurityException(msg);
+				}
 			}
 			_callingContext = newResolver.resolveContext();
 		} catch (FileNotFoundException e) {
@@ -80,10 +82,10 @@ public class GeniiBackendConfiguration implements Cloneable
 		}
 	}
 
-	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr)
+	public GeniiBackendConfiguration(BufferedReader stdin, PrintWriter stdout, PrintWriter stderr, boolean dologin)
 		throws RNSException, FileNotFoundException, IOException, ReloadShellException, ToolException
 	{
-		this(stdin, stdout, stderr, ContextManager.getExistingContext());
+		this(stdin, stdout, stderr, ContextManager.getExistingContext(),dologin);
 	}
 
 	public void setSandboxPath(String sandboxPath) throws RNSException

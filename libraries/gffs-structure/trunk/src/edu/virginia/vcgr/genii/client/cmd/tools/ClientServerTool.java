@@ -2,8 +2,8 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
 
+
 import org.morgan.ftp.FTPConfiguration;
-import org.morgan.ftp.FTPDaemon;
 import org.morgan.ftp.FTPException;
 import org.morgan.ftp.NetworkConstraint;
 
@@ -20,11 +20,11 @@ import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.network.ftp.GeniiBackendConfiguration;
 import edu.virginia.vcgr.genii.network.ftp.GeniiBackendFactory;
 
-public class FtpdTool extends BaseGridTool
+public class ClientServerTool extends BaseGridTool
 {
-	static private final String _DESCRIPTION = "config/tooldocs/description/dftpd";
-	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/uftpd";
-	static private final String _MANPAGE = "config/tooldocs/man/ftpd";
+	static private final String _DESCRIPTION = "config/tooldocs/description/dclientserver";
+	static private final String _USAGE_RESOURCE = "config/tooldocs/usage/uclientserver";
+	static private final String _MANPAGE = "config/tooldocs/man/clientserver";
 
 	private boolean _block = false;
 	private int _idleTimeout = -1;
@@ -32,9 +32,9 @@ public class FtpdTool extends BaseGridTool
 	private int _maxAuthAttempts = -1;
 	private String _sandbox = null;
 
-	static private FTPDaemon _daemon = null;
+	static private ClientServerDaemon _daemon = null;
 
-	public FtpdTool()
+	public ClientServerTool()
 	{
 		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE_RESOURCE), true, ToolCategory.MISC);
 		addManPage(new LoadFileResource(_MANPAGE));
@@ -77,16 +77,16 @@ public class FtpdTool extends BaseGridTool
 		String arg = getArgument(0);
 
 		if (arg.equals("stop")) {
-			synchronized (FtpdTool.class) {
+			synchronized (ClientServerTool.class) {
 				if (_daemon == null) {
-					stderr.println("There is no ftpd currently running.");
+					stderr.println("There is no ClientServer currently running.");
 					return 1;
 				}
 
 				try {
 					_daemon.stop();
 				} catch (FTPException e) {
-					throw new ToolException("failure to stop ftp daemon: " + e.getLocalizedMessage(), e);
+					throw new ToolException("failure to stop ClientServer daemon: " + e.getLocalizedMessage(), e);
 				}
 				_daemon = null;
 			}
@@ -94,13 +94,13 @@ public class FtpdTool extends BaseGridTool
 			return 0;
 		}
 
-		GeniiBackendConfiguration backConf = new GeniiBackendConfiguration(stdin, stdout, stderr, true);
+		GeniiBackendConfiguration backConf = new GeniiBackendConfiguration(stdin, stdout, stderr, false);
 
 		FTPConfiguration conf = new FTPConfiguration(Integer.parseInt(arg));
 
-		synchronized (FtpdTool.class) {
+		synchronized (ClientServerTool.class) {
 			if (_daemon != null) {
-				this.stderr.println("An ftpd is already running on port " + _daemon.getPort());
+				this.stderr.println("An ClientServer is already running on port " + _daemon.getPort());
 				return 1;
 			}
 
@@ -125,15 +125,15 @@ public class FtpdTool extends BaseGridTool
 				conf.setNetworkConstraints(constraints);
 			}
 
-			_daemon = new FTPDaemon(new GeniiBackendFactory(backConf), conf);
+			_daemon = new ClientServerDaemon(new GeniiBackendFactory(backConf), conf);
 			try {
 				_daemon.start();
 			} catch (FTPException e) {
-				throw new ToolException("failure to start ftp daemon: " + e.getLocalizedMessage(), e);
+				throw new ToolException("failure to start ClientServer daemon: " + e.getLocalizedMessage(), e);
 			}
 		}
 
-		stdout.format("FTP Daemon started on port %d\n", conf.getListenPort());
+		stdout.format("ClientServer Daemon started on port %d\n", conf.getListenPort());
 
 		while (_block) {
 			try {
@@ -141,7 +141,7 @@ public class FtpdTool extends BaseGridTool
 			} catch (Throwable cause) {
 			}
 		}
-
+		
 		return 0;
 	}
 

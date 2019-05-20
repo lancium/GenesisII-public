@@ -185,6 +185,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RmTool</mconf:class>
 		<mconf:class name="ftpd"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.FtpdTool</mconf:class>
+		<mconf:class name="clientserver"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ClientServerTool</mconf:class>
 		<mconf:class name="schedule-termination"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TerminationScheduleTool</mconf:class>
 		<mconf:class name="get-attributes"
