@@ -44,7 +44,8 @@ if [ "$which" == "--help" -o "$which" == "-help" -o "$which" == "-h" ]; then
   echo "To run both tests, do not pass a first parameter on the command line."
   echo "By default, the report will be a 'full' listing that includes all test"
   echo "run logging.  If 'summary' is passed as the second parameter, then only"
-  echo "the test results will be presented."
+  echo "the test results will be displayed; otherwise the full run's output is"
+  echo "shown."
   exit 0
 fi
 
@@ -103,12 +104,11 @@ GFFS_TESTS=( \
   GFFS_Tests/Performance_Tests/loadUpRNSDirectory.sh \
 )
 
-#    GFFS_Tests/Scalability_Tests/multiuser-gffs-submit.sh \
 if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
-  GFFS_TESTS+=( \
-    GFFS_Tests/Functional_Tests/test_sts_replication.sh \
-  )
+#  GFFS_TESTS+=( \
+#    GFFS_Tests/Scalability_Tests/multiuser-gffs-submit.sh \
+#  )
 fi
 
 # the standard tests for the execution management services.
@@ -123,6 +123,7 @@ EMS_TESTS=( \
 )
 
 #    EMS_Tests/multiUserTests/multiuser-3users-manyjobs.sh \
+
 if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
   EMS_TESTS+=( \

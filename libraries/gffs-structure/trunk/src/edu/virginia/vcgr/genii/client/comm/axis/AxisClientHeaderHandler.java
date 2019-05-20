@@ -224,7 +224,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 			_logger.error("no active key and cert material available: not performing delegation");
 			return;
 		}
-
+		
 		EndpointReferenceType target = (EndpointReferenceType) messageContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
 		GUID containerGUID = null;
 		if (target == null) {

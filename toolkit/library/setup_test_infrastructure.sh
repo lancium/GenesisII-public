@@ -66,6 +66,9 @@ testGetTestUserEstablished()
   bash "$GFFS_TOOLKIT_ROOT/library/create-user-and-group.sh" "$USERPATH" "$new_password" "$SUBMIT_GROUP" "$HOMES_LOC" "$(dirname "$USERPATH")"
   assertEquals "Create user at '$USERPATH'" 0 $?
 
+  local identipath="/home/$FOLDERSPACE/$BASE_USER/i_am_${BASE_USER}"
+#echo identipath for main user is $identipath
+
   multi_grid <<eof
     mkdir --parents grid:$RNSPATH
     chmod "grid:$RNSPATH" +rwx "$USERPATH"
@@ -73,6 +76,8 @@ testGetTestUserEstablished()
     chmod $BOOTSTRAP_LOC/Services/LightWeightExportPortType +rx $USERPATH
     chmod $BOOTSTRAP_LOC/Services/EnhancedRNSPortType +rx $USERPATH
     onerror Failed to give export capabilities to $USERPATH.
+    echo hello > "grid:$identipath"
+    onerror Failed to create folder identifier in $identipath
 eof
   check_if_failed Could not give $USERPATH permission to the work area $RNSPATH
 
@@ -107,10 +112,15 @@ testCreateUsers()
     bash "$GFFS_TOOLKIT_ROOT/library/create-user-and-group.sh" "$username" "$passwd" "$SUBMIT_GROUP" "$HOMES_LOC" "$(dirname "$username")"
     assertEquals "Create user '$username'" 0 $?
     # also provide writability to the test user for staging job data.
+    # ...and a simple id file.
+    local identipath="/home/$FOLDERSPACE/$(basename $username)/i_am_$(basename $username)"
+#echo identipath for test user is $identipath
     multi_grid <<eof
       chmod "grid:$RNSPATH" +rwx "$username"
       chmod "grid:$RNSPATH/.." +r "$username"
       chmod "grid:$RNSPATH/../.." +r "$username"
+      echo hello > "grid:$identipath"
+      onerror Failed to create folder identifier in $identipath
 eof
     assertEquals "Allow '$username' to operate on '$RNSPATH'" 0 $?
   done

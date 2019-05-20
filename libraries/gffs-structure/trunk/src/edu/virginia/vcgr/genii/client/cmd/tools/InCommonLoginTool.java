@@ -13,9 +13,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.ArrayList;
-
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;

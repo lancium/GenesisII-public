@@ -13,7 +13,6 @@ import org.morgan.util.Triple;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.cleanup.AbstractCleanupHandler;
 import edu.virginia.vcgr.genii.container.cleanup.CleanupContext;

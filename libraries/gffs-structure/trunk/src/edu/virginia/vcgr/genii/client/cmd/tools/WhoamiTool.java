@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
@@ -58,28 +59,38 @@ public class WhoamiTool extends BaseGridTool
 	{
 
 		ICallingContext callingContext = ContextManager.getCurrentContext();
-
-		if (callingContext == null)
+		return displayCredentials(callingContext, true, stdout, stderr);
+	}
+	
+	public int displayCredentials(ICallingContext callingContext, boolean refreshCreds, PrintWriter stdout, PrintWriter stderr) throws AuthZSecurityException
+	{
+		if (callingContext == null) {
 			stdout.println("No credentials");
-		else {
-			// remove/renew stale creds/attributes
-			KeyAndCertMaterial clientKeyMaterial =
-				ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+			return 0;
+		}
 
-			TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callingContext);
-			stdout.format("Client Tool Identity: \n\t%s\n",
+		KeyAndCertMaterial clientKeyMaterial = null;
+		if (refreshCreds) {
+			// remove/renew stale creds/attributes.
+			clientKeyMaterial = ClientUtils.checkAndRenewCredentials(callingContext, BaseGridTool.credsValidUntil(), new SecurityUpdateResults());
+		} else {
+			// just go with what we have already.
+			clientKeyMaterial = callingContext.getActiveKeyAndCertMaterial();
+		}
+
+		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callingContext);
+		stdout.format("Client Tool Identity: \n\t%s\n",
 				(new X509Identity(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION)).describe(_verbosity));
-			if (_oneLine) {
-				stdout.format("\t%s\n", X509Identity.getOpensslRdn(clientKeyMaterial._clientCertChain[0]));
-			}
-			stdout.format("\n");
-			if (!transientCredentials.isEmpty()) {
-				stdout.format("Additional Credentials: \n");
-				for (NuCredential cred : transientCredentials.getCredentials()) {
-					stdout.format("\t%s\n", cred.describe(_verbosity));
-					if (_oneLine) {
-						stdout.format("\t%s\n", X509Identity.getOpensslRdn(cred.getOriginalAsserter()[0]));
-					}
+		if (_oneLine) {
+			stdout.format("\t%s\n", X509Identity.getOpensslRdn(clientKeyMaterial._clientCertChain[0]));
+		}
+		stdout.format("\n");
+		if (!transientCredentials.isEmpty()) {
+			stdout.format("Additional Credentials: \n");
+			for (NuCredential cred : transientCredentials.getCredentials()) {
+				stdout.format("\t%s\n", cred.describe(_verbosity));
+				if (_oneLine) {
+					stdout.format("\t%s\n", X509Identity.getOpensslRdn(cred.getOriginalAsserter()[0]));
 				}
 			}
 		}

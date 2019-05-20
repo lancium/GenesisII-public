@@ -55,6 +55,11 @@ public class ClientContextResolver implements IContextResolver
 		if (_logger.isTraceEnabled())
 			_logger.trace("<into calling context load>");
 		File contextFile = getContextFile();
+
+		//FIXME temp!!!!
+//		System.out.println("loading context from file now!");
+		//end temp
+		
 		FileLock fl = null;
 		try {
 			fl = FileLock.lockFile(contextFile);

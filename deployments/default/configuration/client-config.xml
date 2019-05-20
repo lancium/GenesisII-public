@@ -153,6 +153,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PwdTool</mconf:class>
 		<mconf:class name="login"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LoginTool</mconf:class>
+		<mconf:class name="multilogin"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MultiLoginTool</mconf:class>
 		<mconf:class name="passwordLogin"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PasswordLoginTool</mconf:class>
 	    <mconf:class name="IDPLogin"

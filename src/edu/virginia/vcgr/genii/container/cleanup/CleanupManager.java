@@ -59,10 +59,10 @@ public class CleanupManager
 
 		if (firstTimeStartup(connection))
 			return;
-System.err.println("About to run doCleanups\n");
+//System.err.println("About to run doCleanups\n");
 		for (CleanupHandler handler : ServiceLoader.load(CleanupHandler.class)) {
 			boolean succeeded = false;
-			System.err.println("About to run doCleanups for \n" + handler.getClass().getName());
+//			System.err.println("About to run doCleanups for \n" + handler.getClass().getName());
 
 			try {
 				boolean doEnact = enactCleanup

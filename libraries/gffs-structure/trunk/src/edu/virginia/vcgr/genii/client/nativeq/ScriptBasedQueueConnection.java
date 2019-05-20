@@ -31,7 +31,6 @@ import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
-import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorConstants;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;

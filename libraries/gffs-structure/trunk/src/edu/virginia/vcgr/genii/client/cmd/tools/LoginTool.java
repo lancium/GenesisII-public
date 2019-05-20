@@ -28,7 +28,6 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamespaceDefinitions;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gui.HelpLinkConfiguration;
@@ -79,7 +78,7 @@ public class LoginTool extends BaseLoginTool
 	/**
 	 * login will checks this list of idp paths, in order, if one is not passed on the command line
 	 */
-	private static Collection<String> getDefaultIDPPaths(String username)
+	protected static Collection<String> getDefaultIDPPaths(String username)
 	{
 		ArrayList<String> idpList = new ArrayList<String>();
 

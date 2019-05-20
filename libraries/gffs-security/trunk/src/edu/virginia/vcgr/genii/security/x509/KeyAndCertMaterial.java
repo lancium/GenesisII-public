@@ -14,6 +14,10 @@ package edu.virginia.vcgr.genii.security.x509;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+
+import edu.virginia.vcgr.genii.security.credentials.X509Identity;
+import edu.virginia.vcgr.genii.security.identity.IdentityType;
+
 import java.io.*;
 
 public class KeyAndCertMaterial implements Serializable
@@ -31,5 +35,11 @@ public class KeyAndCertMaterial implements Serializable
 	{
 		_clientCertChain = clientCertChain;
 		_clientPrivateKey = clientPrivateKey;
+	}
+	
+	public String toString()
+	{
+		X509Identity temp = new X509Identity(_clientCertChain, IdentityType.CONNECTION);
+		return temp.toString();
 	}
 }

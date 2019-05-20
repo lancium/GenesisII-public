@@ -10,9 +10,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.SPMDInformation;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultSPMDApplicationFacet;
-import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
 import edu.virginia.vcgr.genii.client.jsdl.spmd.SPMDConstants;
-import edu.virginia.vcgr.jsdl.JSDLConstants;
 
 public class ExecutionSPMDApplicationFacet extends DefaultSPMDApplicationFacet
 {

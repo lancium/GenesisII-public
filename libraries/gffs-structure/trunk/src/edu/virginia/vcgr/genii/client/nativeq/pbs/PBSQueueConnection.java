@@ -229,9 +229,9 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 
 		ResourceConstraints resourceConstraints = application.getResourceConstraints();
 		if (resourceConstraints != null) {
-			Double totalPhyscialMemory = resourceConstraints.getTotalPhysicalMemory();
-			if ((totalPhyscialMemory != null) && (!totalPhyscialMemory.equals(Double.NaN)))
-				script.format("#PBS -l mem=%d\n",  (totalPhyscialMemory.longValue()/(1024*2024)));
+			Double totalPhysicalMemory = resourceConstraints.getTotalPhysicalMemory();
+			if ((totalPhysicalMemory != null) && (!totalPhysicalMemory.equals(Double.NaN)))
+				script.format("#PBS -l mem=%d\n",  (totalPhysicalMemory.longValue()/(1024*2024)));
 				// ASG 2019-03-19 SLURM expects memory in MB not bytes, causes failures.
 
 			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();

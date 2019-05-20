@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -60,19 +61,102 @@ public class LogoutTool extends BaseGridTool
 	 * checks whether the credential "cred" is equivalent to the preferred identity or not. if it is, then we toss out the current preferred
 	 * identity unless it's fixated.
 	 */
-	public void removePreferredIdentityIfAppropriate(NuCredential cred)
+	public static void removePreferredIdentityIfAppropriate(NuCredential cred)
 	{
 		// remove the preferred identity if this guy matches (and pref id is not fixated).
 		if (!PreferredIdentity.fixatedInCurrent()) {
 			PreferredIdentity current = PreferredIdentity.getCurrent();
 
-			if (current.matchesIdentity(cred.getOriginalAsserter()[0])) {
+			if ((current != null) && (current.matchesIdentity(cred.getOriginalAsserter()[0]))) {
 				/*
 				 * ouch, we have a match to the preferred identity. they just logged out of it, so we need to drop it. if they don't have it
 				 * in their credentials, it's worthless to everyone.
 				 */
 				PreferredIdentity.dropCurrent();
 				_logger.debug("dropping preferred identity found same as logged out credential: " + current.getIdentityString());
+			}
+		}
+	}
+	
+	/**
+	 * clears all credentials, including the TLS certificate.
+	 */
+	public static void logoutAll(ICallingContext callContext) throws FileNotFoundException, IOException
+	{
+		ClientUtils.invalidateCredentials(callContext);
+		ContextManager.storeCurrentContext(callContext);
+	}
+	
+	public static void logoutByPattern(ICallingContext callContext, String pattern) throws IOException
+	{		
+		int flags = 0;
+		Pattern p = Pattern.compile("^.*" + Pattern.quote(pattern) + ".*$", flags);
+
+		int numMatched = 0;
+		ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
+		Iterator<NuCredential> itr = credentials.iterator();
+		while (itr.hasNext()) {
+			NuCredential cred = itr.next();
+			String toMatch = null;
+			if (cred instanceof Identity) {
+				toMatch = cred.toString();
+			} else if (cred instanceof TrustCredential) {
+				toMatch = ((TrustCredential) cred).getRootIdentity().toString();
+			}
+
+			Matcher matcher = p.matcher(toMatch);
+			if (matcher.matches()) {
+				removePreferredIdentityIfAppropriate(cred);
+
+				itr.remove();
+				numMatched++;
+				if (_logger.isDebugEnabled()) {
+					_logger.debug("Removed credential from current calling context credentials.");
+				}
+			}
+		}
+
+		if (numMatched == 0) {
+			throw new IOException("No credentials matched the pattern \"" + pattern + "\".");
+		}
+		ContextManager.storeCurrentContext(callContext);
+	}
+	
+	public void logoutByUserChoices(ICallingContext callContext)
+	{
+		while (true) {
+			ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
+			if (credentials.size() == 0)
+				break;
+			stdout.println("Please select a credential to logout from:");
+			for (int lcv = 0; lcv < credentials.size(); lcv++) {
+				stdout.println("\t[" + lcv + "]:  " + credentials.get(lcv));
+			}
+
+			stdout.println("\t[x]:  Cancel");
+			stdout.print("\nSelection?  ");
+			try {
+				String answer = stdin.readLine();
+				if (answer == null)
+					continue;
+				if (answer.equalsIgnoreCase("x"))
+					break;
+				int which = Integer.parseInt(answer);
+				if (which >= credentials.size()) {
+					stderr.println("Selection index must be between 0 and " + (credentials.size() - 1));
+				}
+
+				NuCredential cred = credentials.get(which);
+				removePreferredIdentityIfAppropriate(cred);
+
+				credentials.remove(which);
+				if (_logger.isDebugEnabled())
+					_logger.debug("Removing credential from current calling context credentials.");
+
+				ContextManager.storeCurrentContext(callContext);
+			} catch (Throwable t) {
+				stderr.println("Error getting login selection:  " + t.getLocalizedMessage());
+				break;
 			}
 		}
 	}
@@ -95,77 +179,12 @@ public class LogoutTool extends BaseGridTool
 		CacheManager.resetCachingSystem();
 
 		if (_all) {
-			// toss out all credentials, including TLS cert.
-			ClientUtils.invalidateCredentials(callContext);
-			ContextManager.storeCurrentContext(callContext);
+			// completely toss out all credentials, including TLS cert.
+			logoutAll(callContext);
 		} else if (_pattern != null) {
-			int flags = 0;
-			Pattern p = Pattern.compile("^.*" + Pattern.quote(_pattern) + ".*$", flags);
-
-			int numMatched = 0;
-			ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
-			Iterator<NuCredential> itr = credentials.iterator();
-			while (itr.hasNext()) {
-				NuCredential cred = itr.next();
-				String toMatch = null;
-				if (cred instanceof Identity) {
-					toMatch = cred.toString();
-				} else if (cred instanceof TrustCredential) {
-					toMatch = ((TrustCredential) cred).getRootIdentity().toString();
-				}
-
-				Matcher matcher = p.matcher(toMatch);
-				if (matcher.matches()) {
-					removePreferredIdentityIfAppropriate(cred);
-
-					itr.remove();
-					numMatched++;
-					if (_logger.isDebugEnabled()) {
-						_logger.debug("Removed credential from current calling context credentials.");
-					}
-				}
-			}
-
-			if (numMatched == 0) {
-				throw new IOException("No credentials matched the pattern \"" + _pattern + "\".");
-			}
-			ContextManager.storeCurrentContext(callContext);
+			logoutByPattern(callContext, _pattern);
 		} else {
-			while (true) {
-				ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
-				if (credentials.size() == 0)
-					break;
-				stdout.println("Please select a credential to logout from:");
-				for (int lcv = 0; lcv < credentials.size(); lcv++) {
-					stdout.println("\t[" + lcv + "]:  " + credentials.get(lcv));
-				}
-
-				stdout.println("\t[x]:  Cancel");
-				stdout.print("\nSelection?  ");
-				try {
-					String answer = stdin.readLine();
-					if (answer == null)
-						continue;
-					if (answer.equalsIgnoreCase("x"))
-						break;
-					int which = Integer.parseInt(answer);
-					if (which >= credentials.size()) {
-						stderr.println("Selection index must be between 0 and " + (credentials.size() - 1));
-					}
-
-					NuCredential cred = credentials.get(which);
-					removePreferredIdentityIfAppropriate(cred);
-
-					credentials.remove(which);
-					if (_logger.isDebugEnabled())
-						_logger.debug("Removing credential from current calling context credentials.");
-
-					ContextManager.storeCurrentContext(callContext);
-				} catch (Throwable t) {
-					stderr.println("Error getting login selection:  " + t.getLocalizedMessage());
-					break;
-				}
-			}
+			logoutByUserChoices(callContext);
 		}
 
 		// drop any notification brokers or other cached info after credential change.

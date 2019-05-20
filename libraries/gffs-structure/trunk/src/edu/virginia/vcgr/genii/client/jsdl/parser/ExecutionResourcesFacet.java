@@ -1,13 +1,9 @@
 package edu.virginia.vcgr.genii.client.jsdl.parser;
 
-import javax.xml.namespace.QName;
-
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
-import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultResourcesFacet;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
-import edu.virginia.vcgr.jsdl.JSDLConstants;
 
 public class ExecutionResourcesFacet extends DefaultResourcesFacet
 {
