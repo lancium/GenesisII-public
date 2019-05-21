@@ -36,7 +36,7 @@ public class ClientServerTool extends BaseGridTool
 
 	public ClientServerTool()
 	{
-		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE_RESOURCE), true, ToolCategory.MISC);
+		super(new LoadFileResource(_DESCRIPTION), new LoadFileResource(_USAGE_RESOURCE), false, ToolCategory.MISC);
 		addManPage(new LoadFileResource(_MANPAGE));
 	}
 

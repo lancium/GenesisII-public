@@ -289,7 +289,8 @@ public class Scheduler implements Closeable
 								.format("Job matched to resource %s.", _besManager.getBESName(match[i].getBESID())).close();
 							// matches.add(match[i]);
 						} else {
-							Counter c = jobCounts.get(requirements);
+							//FIXME: this seems more likely than passing the entire requirements array.  is it correct now?
+							Counter c = jobCounts.get(requirements[i]);
 							if (c == null)
 								jobCounts.put(requirements[i], c = new Counter());
 							c.modify(1);

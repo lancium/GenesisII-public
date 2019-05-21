@@ -1,7 +1,7 @@
 Definitions:
 
---pattern=<certificate/token pattern> | --all 
-    This optional flag determines the logout that will be performed. The default value is --all which means that a total logout will be performed (all certificates or token patterns will be removed). There is also an option allowing you to choose which exactly pattern you would like to remove. 
+--pattern=<certificate/token pattern> | --all | --complete
+    This optional flag determines the logout that will be performed. The value --complete means that a total logout will be performed (all certificates or token patterns will be removed). The value --all logs out of all credentials but keeps the TLS certificate. The --pattern option allows you to choose the exact credentials you would like to remove, given a string that the credential contains. The default behavior is to query the user for the credentials to remove.
 
 Description:
 

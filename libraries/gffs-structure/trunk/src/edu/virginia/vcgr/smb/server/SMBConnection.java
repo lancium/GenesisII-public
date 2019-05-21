@@ -146,7 +146,7 @@ public class SMBConnection implements Runnable
 
 	public boolean negotiated = false;
 
-	private HashMap<Integer, SMBTree> trees = new HashMap<Integer, SMBTree>();
+	private HashMap<Short, SMBTree> trees = new HashMap<Short, SMBTree>();
 
 	/**
 	 * Are we parsing a transaction that requires multiple messages.
@@ -182,7 +182,7 @@ public class SMBConnection implements Runnable
 	public int allocateTID(SMBTree tree) throws SMBException
 	{
 		/* future: improve */
-		for (int i = 0; i < 0xffff; i++) {
+		for (Short i = 0; i < 0xffff; i++) {
 			if (trees.get(i) == null) {
 				trees.put(i, tree);
 
@@ -201,7 +201,7 @@ public class SMBConnection implements Runnable
 	 * @throws SMBException
 	 *             The TID is invalid.
 	 */
-	public SMBTree verifyTID(int TID) throws SMBException
+	public SMBTree verifyTID(Short TID) throws SMBException
 	{
 		SMBTree tree = trees.get(TID);
 		if (tree == null)

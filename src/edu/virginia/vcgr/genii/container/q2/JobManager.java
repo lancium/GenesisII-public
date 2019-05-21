@@ -539,7 +539,7 @@ public class JobManager implements Closeable
 		/*
 		 * See failJob for a complete discussion of why we enqueue an outcall worker at this point -- the reasons are the same.
 		 */
-		QueueStates _newState=QueueStates.FINISHED;
+//		QueueStates _newState=QueueStates.FINISHED;
 		if (besName != null) {
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Creating a JobKiller for finished job %s.", job));
@@ -2057,8 +2057,8 @@ public class JobManager implements Closeable
 					// Added 7/13/2017 by ASG  .. should have already been removed, but for some reason it is still there, so get rid of it.
 					if (job.getJobState()==QueueStates.FINISHED) {
 						SortableJobKey jobKey = new SortableJobKey(job);
-						_runningJobs.remove(jobKey);
-						
+						//FIXME wants a long not a jobkey object
+						_runningJobs.remove(jobKey.getJobID());
 					}
 				}
 				continue;

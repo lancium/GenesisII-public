@@ -43,7 +43,6 @@ import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
@@ -93,7 +92,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 	@MInject(lazy = true)
 	private IBESActivityResource _resource;
 
-	private JSDLFileSystem filesystem;
+//	private JSDLFileSystem filesystem;
 
 	public BESActivityServiceImpl() throws RemoteException
 	{

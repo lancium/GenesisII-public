@@ -38,6 +38,7 @@ public class LogoutTool extends BaseGridTool
 
 	protected String _pattern = null;
 	protected boolean _all = false;
+	protected boolean _complete = false;
 
 	public LogoutTool()
 	{
@@ -57,6 +58,12 @@ public class LogoutTool extends BaseGridTool
 		_all = true;
 	}
 
+	@Option({ "complete" })
+	public void setComplete()
+	{
+		_complete = true;
+	}
+	
 	/**
 	 * checks whether the credential "cred" is equivalent to the preferred identity or not. if it is, then we toss out the current preferred
 	 * identity unless it's fixated.
@@ -81,12 +88,23 @@ public class LogoutTool extends BaseGridTool
 	/**
 	 * clears all credentials, including the TLS certificate.
 	 */
-	public static void logoutAll(ICallingContext callContext) throws FileNotFoundException, IOException
+	public static void logoutCompletely(ICallingContext callContext) throws FileNotFoundException, IOException
 	{
 		ClientUtils.invalidateCredentials(callContext);
 		ContextManager.storeCurrentContext(callContext);
 	}
 	
+	/**
+	 * clears all credentials but keeps TLS certificate.
+	 */
+	public static void logoutAll(ICallingContext callContext) throws FileNotFoundException, IOException
+	{
+		logoutByPattern(callContext, "");
+	}
+	
+	/**
+	 * logs out credentials by regular expression.
+	 */
 	public static void logoutByPattern(ICallingContext callContext, String pattern) throws IOException
 	{		
 		int flags = 0;
@@ -94,6 +112,10 @@ public class LogoutTool extends BaseGridTool
 
 		int numMatched = 0;
 		ArrayList<NuCredential> credentials = TransientCredentials.getTransientCredentials(callContext).getCredentials();
+		if (credentials.size() == 0) {
+			// nothing to log out, so just leave.
+			return;
+		}
 		Iterator<NuCredential> itr = credentials.iterator();
 		while (itr.hasNext()) {
 			NuCredential cred = itr.next();
@@ -122,6 +144,9 @@ public class LogoutTool extends BaseGridTool
 		ContextManager.storeCurrentContext(callContext);
 	}
 	
+	/**
+	 * logs out the credentials that the user specifies in an interactive mode.
+	 */
 	public void logoutByUserChoices(ICallingContext callContext)
 	{
 		while (true) {
@@ -167,7 +192,7 @@ public class LogoutTool extends BaseGridTool
 	{
 		ICallingContext callContext = ContextManager.getCurrentContext();
 
-		if ((callContext == null) && _all) {
+		if ((callContext == null) && (_all || _complete)) {
 			// nothing to log out.
 			return 0;
 		}
@@ -177,9 +202,11 @@ public class LogoutTool extends BaseGridTool
 
 		// destroy notification brokers before we lose permission on them.
 		CacheManager.resetCachingSystem();
-
-		if (_all) {
+		if (_complete) {
 			// completely toss out all credentials, including TLS cert.
+			logoutCompletely(callContext);
+		} else if (_all) {
+			// toss out all regular credentials but keep TLS cert.
 			logoutAll(callContext);
 		} else if (_pattern != null) {
 			logoutByPattern(callContext, _pattern);

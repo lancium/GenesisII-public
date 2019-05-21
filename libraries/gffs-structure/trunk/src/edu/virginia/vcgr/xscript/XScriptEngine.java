@@ -244,7 +244,8 @@ public class XScriptEngine implements ScriptEngine, Compilable, Invocable
 		{
 			for (Method m : iface.getMethods()) {
 				String mName = m.getName();
-				ParseStatement stmt = _functions.get(m);
+				//FIXME the below code using a string instead of a Method seems more correct.  is it correct?
+				ParseStatement stmt = _functions.get(mName);
 				if (stmt != null)
 					throw new NoSuchMethodException(String.format("Unable to find unique function \"%s\".", mName));
 				_functions.put(mName, findFunction(mName));

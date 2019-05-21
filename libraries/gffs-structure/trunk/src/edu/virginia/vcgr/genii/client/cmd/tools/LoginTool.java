@@ -13,6 +13,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -135,7 +136,7 @@ public class LoginTool extends BaseLoginTool
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext realCallingContext = ContextManager.getCurrentOrMakeNewContext();
 		/*
-		 * May 9, 2019 by ASG. Code added to create support for multiple identity sessions, first step, create a nonce to refer to each sesstion.
+		 * May 9, 2019 by ASG. Code added to create support for multiple identity sessions, first step, create a nonce to refer to each session.
 		 */
 		
 
@@ -260,23 +261,7 @@ public class LoginTool extends BaseLoginTool
 		if (creds != null) {
 			transientCredentials.addAll(creds);
 		}
-		/*
-		 * May 9, 2019 by ASG. Code added to create support for multiple identity sessions, first step, create a nonce to refer to each sesstion.
-		 */
-		if (_create_nonce) {
-			System.out.println("create nonce set\n");
-			String nonce = _username+"NONCE";
-			// Now put it in the LRU Cache
-			if (realCallingContext!=null) {
-				ContextManager.stash(nonce, realCallingContext);
-				System.out.println(nonce);
-			}
-			else {
-				System.err.println("There was no context");
-			}
 
-			
-		}
 		ContextManager.storeCurrentContext(realCallingContext);
 
 		// reset caching system again prior to changing directory to make sure nothing old is left.
@@ -302,6 +287,24 @@ public class LoginTool extends BaseLoginTool
 			}
 		}
 
+		// reload context since CdTool stored to disk and didn't update our context here.
+		realCallingContext = ContextManager.getCurrentContext();
+		
+		/*
+		 * May 9, 2019 by ASG. Code added to create support for multiple identity sessions, first step, create a nonce to refer to each sesstion.
+		 */
+		if (_create_nonce) {
+			String nonce = _username + "-" + (new GUID()).toString();
+			// Now put it in the LRU Cache
+			if (realCallingContext != null) {
+				ContextManager.stash(nonce, realCallingContext);
+				stdout.println("#nonce=" + nonce);
+			}
+			else {
+				_logger.error("There was no context to be stored for nonce of: " + nonce);
+			}
+		}
+		
 		return 0;
 	}
 

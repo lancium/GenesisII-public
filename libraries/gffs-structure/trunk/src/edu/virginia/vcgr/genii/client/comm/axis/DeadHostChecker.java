@@ -109,7 +109,8 @@ public class DeadHostChecker
 
 		// Added July 14, 2015 by ASG to deal with dead hosts and not bother trying to talk to them. The timeouts kill us.
 		synchronized (deadHosts) {
-			if (deadHosts.containsKey(host)) {
+			//FIXME deadhosts wants a HostKey here, not a string 
+			if (deadHosts.containsKey(key)) {
 				RetryInfo inf = deadHosts.get(key);
 				if (inf == null) {
 					_logger.warn("logic error: dead hosts list said it had host " + key + " was listed but we got a null record for it.");

@@ -87,7 +87,7 @@ public class ContainerServices
 
 		_services = new HashMap<Class<? extends ContainerService>, ContainerService>();
 
-		Collection<String> toRemove = new LinkedList<String>();
+		Collection<Class<? extends ContainerService>> toRemove = new LinkedList<Class<? extends ContainerService>>();
 
 		Deployment deployment = Installation.getDeployment(new DeploymentName());
 		try {
@@ -99,11 +99,15 @@ public class ContainerServices
 						service.load(executor, connectionPool, properties);
 					} catch (Throwable cause) {
 						_logger.error(String.format("Unable to load service \"%s\".", service.serviceName()), cause);
-						toRemove.add(service.serviceName());
+						toRemove.add(service.getClass());
 					}
 				}
 
-				for (String remove : toRemove)
+				/*FIXME below was wrong; the _services list is keyed by some object derived from ContainerService.
+				  so, the object itself seems bizarre, but this attempt to remove a service by a string is definitely not right.
+				  fix changes the toRemove object to be of the proper type.
+				  */
+				for (Class<? extends ContainerService> remove : toRemove)
 					_services.remove(remove);
 			}
 		} catch (IOException ioe) {
@@ -113,7 +117,7 @@ public class ContainerServices
 
 	synchronized static public void startAll()
 	{
-		Collection<String> toRemove = new LinkedList<String>();
+		Collection<Class<? extends ContainerService>> toRemove = new LinkedList<Class<? extends ContainerService>>();
 
 		for (ContainerService service : _services.values()) {
 			if (service.started()) {
@@ -125,11 +129,15 @@ public class ContainerServices
 				service.start();
 			} catch (Throwable cause) {
 				_logger.error(String.format("Unable to start service \"%s\".", service.serviceName()), cause);
-				toRemove.add(service.serviceName());
+				toRemove.add(service.getClass());
 			}
 		}
 
-		for (String remove : toRemove)
+		/*FIXME below was wrong; the _services list is keyed by some object derived from ContainerService.
+		  so, the object itself seems bizarre, but an attempt to remove a service by a string is definitely not right.
+		  fix changes the toRemove object to be of the proper type.
+		  */
+		for (Class<? extends ContainerService> remove : toRemove)
 			_services.remove(remove);
 	}
 }

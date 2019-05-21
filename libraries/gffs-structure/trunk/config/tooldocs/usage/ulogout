@@ -1,2 +1,2 @@
-logout [--pattern=<certificate/token pattern> | --all]
+logout [--pattern=<certificate/token pattern> | --all | --complete]
 

@@ -1,23 +1,26 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
-import org.morgan.ftp.*;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.Writer;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.morgan.ftp.ConnectionSession;
+import org.morgan.ftp.FTPConfiguration;
+import org.morgan.ftp.FTPListenerManager;
+import org.morgan.ftp.FTPPrintStream;
+import org.morgan.ftp.FTPSession;
+import org.morgan.ftp.FTPSessionState;
+import org.morgan.ftp.IBackend;
+import org.morgan.ftp.ICommand;
+import org.morgan.ftp.IdleTimer;
+import org.morgan.ftp.ReflectiveCommand;
 import org.morgan.ftp.cmd.CWDCommandHandler;
 import org.morgan.ftp.cmd.DeleteCommandHandler;
 import org.morgan.ftp.cmd.ListCommandHandler;
@@ -41,16 +44,15 @@ import edu.virginia.vcgr.genii.client.cmd.CommandLineFormer;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.cmd.ExceptionHandlerManager;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
-import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.cmd.tools.CopyTool;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
 
 public class ClientServerSession extends ConnectionSession implements Runnable, Closeable
 {
 	static private Logger _logger = Logger.getLogger(FTPSession.class);
 
-	private int _authAttemptCount = 0;
+//	private int _authAttemptCount = 0;
 	private FTPConfiguration _configuration;
 
 	private Socket _socket;
@@ -93,7 +95,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 		_socket = socket;
 
 		_commands = new HashMap<String, ICommand>();
-		_sessionState = new FTPSessionState(manager, configuration, backend, sessionID);
+		_sessionState = new FTPSessionState(manager, _configuration, backend, sessionID);
 
 		try {
 			addCommands();
@@ -121,13 +123,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 		
 		try {
 			// get the local identity's key material (or create one if necessary)
-			ICallingContext realCallingContext = ContextManager.getCurrentOrMakeNewContext();
-			// we will make a clone of our context now to avoid having this credential stick around.
-			ICallingContext newContext = realCallingContext.deriveNewContext();
-			// temporary context to hold username password junk.
-			Closeable assumedContextToken = null;
-			assumedContextToken = ContextManager.temporarilyAssumeContext(newContext);
-
+			ICallingContext initialCallingContext = ContextManager.getCurrentOrMakeNewContext();
 	
 			reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
 			out = new FTPPrintStream(_socket.getOutputStream(), true);
@@ -135,44 +131,74 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 //			out.println("220 " + _sessionState.getBackend().getGreeting());
 //			_logger.info("220 " + _sessionState.getBackend().getGreeting());
 
+			// sentinel that lets us know it's okay to execute commands.
+			boolean gotNonceOrLogin = false;
+			
 			while ((line = reader.readLine()) != null) {
 				synchronized (_idleTimer) {
 					_idleTimer.noteActivity();
 				}
-				System.out.println(line);
+//				System.out.println(line);
 				
-				// ============================================================ copied stuff ===============
 				String[] args = CommandLineFormer.formCommandLine(line);
 				if (args.length == 0)
 					continue;
 				CommandLineRunner runner = new CommandLineRunner();
 				int firstArg = 0;
+				String nonce = null;
 				// First lets check for "context" as the first word
-				if (line.indexOf("context")==0) {
+				if (line.indexOf("context") == 0) {
 					// The line is of the form "context <some-nonce> command arguments"
-					// Now we need to set first arg to 2 to skep past the first two
+					// Now we need to set first arg to 2 to skip past the first two
 					firstArg=2;
 					// Now look up the nonce
-					String nonce = args[1];
-					System.out.println("pushd nonce set: " + nonce + "\n");
-					ICallingContext context = ContextManager.grab(nonce);
-					if (context==null) {
-						System.err.println("Nonce " + nonce + " not found\n");
-						return;
+					nonce = args[1];
+					_logger.debug("nonce requested: " + nonce);
+					ICallingContext context = null;
+					try {
+						context = ContextManager.grab(nonce);
+					} catch (ClassNotFoundException e) {
+						_logger.error("exception occurred while grabbing context", e);
 					}
-					System.out.println(context.toString());
-					ContextManager.storeCurrentContext(context);
+					if (context == null) {
+						outwriter.println("#nonce-invalid=" + nonce);
+					} else {	
+						// use a memory based resolver to load our saved context; we don't want to use the file based one.
+						MemoryBasedContextResolver ourResolver = new MemoryBasedContextResolver(context);			
+						ContextManager.setResolver(ourResolver);
+						
+						// now set that we have a valid nonce.
+						gotNonceOrLogin = true;
+					}
+				} else if (line.indexOf("login") == 0) {
+					// the only other thing they can do is create a nonce with a login command, so we allow that.
+					gotNonceOrLogin = true;
+					// make sure we are prepared for the login.
+					LogoutTool.logoutAll(initialCallingContext);
 				}
+				
 				try {
+					if (!gotNonceOrLogin) {
+						String msg = "#failed to create nonce or acquire nonce context before attempting to run a command; closing connection";
+						outwriter.println(msg);
+						_logger.error(msg);
+						return; 
+					}					
 
 					long startTime = System.currentTimeMillis();
 					String[] passArgs = new String[args.length - firstArg];
 					System.arraycopy(args, firstArg, passArgs, 0, passArgs.length);
 
 					int lastExit = runner.runCommand(passArgs, outwriter, outwriter, reader);
+					outwriter.println("#return=" + lastExit);
 
 					long elapsed = System.currentTimeMillis() - startTime;
 
+					// if the nonce was set, then store the context again after possible changes.
+					if (nonce != null) {
+						ICallingContext context = ContextManager.getCurrentContext();
+						ContextManager.stash(nonce, context);
+					}
 
 					long hours = elapsed / (60 * 60 * 1000);
 					if (hours != 0)
@@ -183,24 +209,17 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 					long seconds = elapsed / (1000);
 					if (seconds != 0)
 						elapsed = elapsed % (seconds * 1000);
-					System.out.println("Elapsed time: " + hours + "h:" + minutes + "m:" + seconds + "s." + elapsed + "ms");
+					outwriter.println("#elapsed time: " + hours + "h:" + minutes + "m:" + seconds + "s." + elapsed + "ms");
 
 				} catch (ReloadShellException e) {
 					throw e;
 				} catch (Throwable cause) {
 					int toReturn = ExceptionHandlerManager.getExceptionHandler().handleException(cause, new OutputStreamWriter(System.err));
-
+					outwriter.println("#return=" + toReturn);
 				} 
-				// ======================================================================================== end of copied stuff ===================================================
-				/*
- 				WhoamiTool t=new WhoamiTool();
-				
-				t.run(outwriter, outwriter, reader);
-				if (_logger.isDebugEnabled())
-					_logger.debug("ClientServer Session Received \"" + line + "\".");
-				*/
 
 				outwriter.flush();
+				
 				// Use a break to get out. It should really just be straight line code.
 				break;
 			}

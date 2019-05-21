@@ -58,11 +58,13 @@ public class RandomByteIOInputStream extends InputStream
 		// If there is no type info let's increase by 8
 		_protocolReadBlockSize = ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE * 8;
 		if (desiredTransferProtocol != null) {
-			if (desiredTransferProtocol.equals(ByteIOConstants.TRANSFER_TYPE_MTOM)) {
+			//FIXME added new URI around String constant to quell complaint. 
+			if (desiredTransferProtocol.equals(new URI(ByteIOConstants.TRANSFER_TYPE_MTOM))) {
 				// keep in mind that preferred read size has a *numThreads
 				_protocolReadBlockSize = MTOMByteIOTransferer.PREFERRED_READ_SIZE;
 			}
-			if (desiredTransferProtocol.equals(ByteIOConstants.TRANSFER_TYPE_DIME)) {
+			//FIXME added new URI around String constant to quell complaint. 
+			if (desiredTransferProtocol.equals(new URI(ByteIOConstants.TRANSFER_TYPE_DIME))) {
 				// keep in mind that preferred read size has a *numThreads
 				_protocolReadBlockSize = DimeByteIOTransferer.PREFERRED_READ_SIZE;
 			}

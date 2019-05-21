@@ -153,8 +153,13 @@ public class CreateGroupPlugin extends AbstractCombinedUIMenusPlugin
 					throw (Exception) cause;
 				throw new RuntimeException("Unable to create group.", cause);
 			} finally {
-				if (sourcePath != null)
+				if (sourcePath != null) {
+					/*
+					 * FIXME below is comparing a RemoveTask to an ExecutorService and garnering a complaint. what should it compare?
+					 * plus, it's performing an equals check whose return value is totally ignored.  
+					 */					
 					_context.uiContext().executor().equals(new RemoveTask(sourcePath));
+				}
 			}
 			return false;
 		}

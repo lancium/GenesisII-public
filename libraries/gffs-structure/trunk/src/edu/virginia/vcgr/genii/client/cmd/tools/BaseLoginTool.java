@@ -69,19 +69,19 @@ public abstract class BaseLoginTool extends BaseGridTool
 		_create_nonce = true;
 	}
 	
-	@Option({ "pop-nonce" })
-	public void setpop_nonce()
-	{
-		_pop_nonce = true;
-	}
-	
-	@Option({ "push-nonce" })
-	public void setpush_nonce(String nonce)
-	{
-		_nonce = nonce;
-		_push_nonce=true;
-	}
-
+	//FIXME are pop-nonce and push-nonce unused?
+//	@Option({ "pop-nonce" })
+//	public void setpop_nonce()
+//	{
+//		_pop_nonce = true;
+//	}
+//	
+//	@Option({ "push-nonce" })
+//	public void setpush_nonce(String nonce)
+//	{
+//		_nonce = nonce;
+//		_push_nonce=true;
+//	}
 
 	@Option({ "password" })
 	public void setPassword(String password)

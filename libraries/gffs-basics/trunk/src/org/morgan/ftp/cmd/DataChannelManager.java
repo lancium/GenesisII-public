@@ -135,8 +135,8 @@ public class DataChannelManager
 		@Override
 		public void run()
 		{
-			SocketAcceptor acceptor = null;
 /*
+			SocketAcceptor acceptor = null;
 
 			try {
 				//acceptor = new SocketAcceptor(_serverChannel);

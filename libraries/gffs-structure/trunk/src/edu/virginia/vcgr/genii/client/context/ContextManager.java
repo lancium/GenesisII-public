@@ -12,9 +12,14 @@
  */
 package edu.virginia.vcgr.genii.client.context;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
@@ -31,34 +36,51 @@ import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.context.ContextType;
+import edu.virginia.vcgr.genii.security.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.NuCredential;
 import edu.virginia.vcgr.genii.security.identity.Identity;
 
 public class ContextManager
 {
 	static private final String _CONTEXT_RESOLVER_NAME = "context-resolver";
 	static private Log _logger = LogFactory.getLog(ContextManager.class);
-	
-	
+		
 	static private final int MAX_IDENTITIES  = 200;
 	static private final int LIFETIME = 1000*60*60*12; // 12 hours
 	/* Added May 9, 2019 by ASG
 	 * _idMap holds a set of credentials from login sessions
 	 */
-	static private TimedOutLRUCache<String,ICallingContext>	_idMap = new TimedOutLRUCache<String, ICallingContext>(MAX_IDENTITIES,LIFETIME, "IdentityCache" );
+	static private TimedOutLRUCache<String, byte[]> _idMap = new TimedOutLRUCache<String, byte[] >(MAX_IDENTITIES, LIFETIME, "IdentityCache" );
 
 	/* Added May 9, 2019 by ASG
 	 * stash and grab store and retrieve working contexts that contain security context information. They are here now so the client
 	 * can rapidly change identities.
 	 */
-	synchronized static public void stash(String nonce, ICallingContext val){
-		_idMap.put(nonce, val);
+	synchronized static public void stash(String nonce, ICallingContext val) throws IOException
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		oos.writeObject(val);
+		oos.flush();
+		_idMap.put(nonce, baos.toByteArray());
 	}
 	
-	synchronized static public ICallingContext grab(String nonce) {
-		return _idMap.get(nonce);
+	synchronized static public ICallingContext grab(String nonce) throws IOException, ClassNotFoundException {
+		byte[] serializedContext = _idMap.get(nonce);
+		if (serializedContext == null) {
+			_logger.info("no stored nonce found for " + nonce);
+			return null;
+		}
+		ByteArrayInputStream bais = new ByteArrayInputStream(serializedContext);
+		ObjectInputStream ois = new ObjectInputStream(bais);
+		ICallingContext toReturn = (ICallingContext) ois.readObject();		
+		if (TransientCredentials.getTransientCredentials(toReturn).isEmpty()) {
+			_idMap.remove(nonce);
+			_logger.info("dead nonce--no credentials listed anymore for " + nonce);
+			return null;
+		}
+		return toReturn;
 	}
-	
-
 	
 	static private class ResolverThreadLocal extends InheritableThreadLocal<IContextResolver>
 	{
