@@ -1,10 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -43,7 +41,6 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineFormer;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.cmd.ExceptionHandlerManager;
-import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
@@ -118,6 +115,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 	{
 		BufferedReader reader = null;
 		PrintStream out = null;
+		PrintWriter outwriter = null;
 
 		String line;
 		
@@ -127,7 +125,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 	
 			reader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
 			out = new FTPPrintStream(_socket.getOutputStream(), true);
-			PrintWriter outwriter=new PrintWriter(_socket.getOutputStream());
+			outwriter=new PrintWriter(_socket.getOutputStream());
 //			out.println("220 " + _sessionState.getBackend().getGreeting());
 //			_logger.info("220 " + _sessionState.getBackend().getGreeting());
 
@@ -182,6 +180,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 						String msg = "#failed to create nonce or acquire nonce context before attempting to run a command; closing connection";
 						outwriter.println(msg);
 						_logger.error(msg);
+						outwriter.println("#return=1");
 						return; 
 					}					
 
@@ -210,30 +209,26 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 					if (seconds != 0)
 						elapsed = elapsed % (seconds * 1000);
 					outwriter.println("#elapsed time: " + hours + "h:" + minutes + "m:" + seconds + "s." + elapsed + "ms");
-
-				} catch (ReloadShellException e) {
-					throw e;
 				} catch (Throwable cause) {
-					int toReturn = ExceptionHandlerManager.getExceptionHandler().handleException(cause, new OutputStreamWriter(System.err));
-					outwriter.println("#return=" + toReturn);
+					int toReturn = ExceptionHandlerManager.getExceptionHandler().handleException(cause, outwriter);
+					outwriter.println("#exception handler invoked=" + toReturn);
+					outwriter.println("#return=1");
 				} 
-
-				outwriter.flush();
 				
 				// Use a break to get out. It should really just be straight line code.
 				break;
 			}
-		} catch (ReloadShellException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (Throwable e) {
+			if (outwriter != null) {
+				outwriter.println("#Throwable exception seen");
+				outwriter.println(e.getMessage());
+				outwriter.println("#return=1");
+			}
+			_logger.error("caught exception in outer block of client server session", e);
 		} finally {
 			_logger.info("Closing ClientServer Session.");
+
+			if (outwriter != null) outwriter.flush();
 
 			StreamUtils.close(out);
 			StreamUtils.close(reader);
