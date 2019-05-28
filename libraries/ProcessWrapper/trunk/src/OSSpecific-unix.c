@@ -8,6 +8,9 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <signal.h>
+
+
 
 #include "Memory.h"
 #include "OSSpecific.h"
@@ -17,6 +20,7 @@
 #define GENII_INSTALL_DIR_VAR "GENII_INSTALL_DIR"
 #define GENII_USER_DIR_VAR "GENII_USER_DIR"
 #define FUSE_DEVICE "/dev/fuse"
+#define SLEEP_DURATION 1
 
 #ifdef PWRAP_macosx
 	#define UNMOUNT_BINARY_NAME "umount"
@@ -47,6 +51,28 @@ static const char* getOverloadedEnvironment(const char *variableName,
 	static int verifyFuseDevice(char **errorMessage);
 #endif
 
+// The following is an ugly hack by ASG to allow the signal handler to print out info
+CommandLine *CL=0;
+struct timeval start;
+struct timeval stop;
+void sig_handler(int signo)
+{
+	if (signo == SIGTERM) {
+		int exitCode=0;
+		struct rusage usage;
+		waitpid(-1,&exitCode,WNOHANG);
+		getrusage(RUSAGE_CHILDREN,&usage);
+		gettimeofday(&stop, NULL);
+		writeExitResults(CL->getResourceUsageFile(CL),
+                	autorelease(createExitResults(exitCode,
+                	toMicroseconds(usage.ru_utime),
+                	toMicroseconds(usage.ru_stime),
+                	(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
+                        	(long long)(stop.tv_usec - start.tv_usec),
+                	(long long)usage.ru_maxrss * 1024)));
+	}
+}
+
 int wrapJob(CommandLine *commandLine)
 {
 	int exitCode;
@@ -55,8 +81,11 @@ int wrapJob(CommandLine *commandLine)
 	FuseMount *mount = NULL;
 	char **cmdLine;
 	struct rusage usage;
-	struct timeval start;
-	struct timeval stop;
+	// 2019--5-27 by ASG. Put in signal handler for SIGTERM
+	CL=commandLine;
+	if (signal(SIGTERM, sig_handler) == SIG_ERR)
+  		printf("\ncan't catch SIGTERM\n");
+	// End updates
 
 	/* Now, if a grid file system was requested, we try and set that up.
 	 */
@@ -134,13 +163,33 @@ int wrapJob(CommandLine *commandLine)
 	release(cmdLine);
 
 	/* I am the parent process */
+/*		Old code
 	if (wait4(pid, &exitCode, 0x0, &usage) != pid)
 	{
 		fprintf(stderr, "Unable to wait for child to exit.\n");
 		return -1;
 	}
-
-	gettimeofday(&stop, NULL);
+*/
+	// 2019-05-27 by ASG. Code to deal with the process getting killed and losing 
+	// the accounting records.
+	int running=1;
+	int ticks=0;
+	while (running==1) {
+		sleep(SLEEP_DURATION);
+		getrusage(RUSAGE_CHILDREN,&usage);
+		gettimeofday(&stop, NULL);
+		exitCode=100;
+		running=(waitpid(pid,&exitCode,WNOHANG)==0);
+		ticks++;
+		writeExitResults(commandLine->getResourceUsageFile(commandLine),
+                	autorelease(createExitResults(exitCode,
+                	toMicroseconds(usage.ru_utime),
+                	toMicroseconds(usage.ru_stime),
+                	(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
+                        	(long long)(stop.tv_usec - start.tv_usec),
+                	(long long)usage.ru_maxrss * 1024)));
+	}
+	// End of updates
 
 	if (mount)
 		mount->unmount(mount);
@@ -150,13 +199,6 @@ int wrapJob(CommandLine *commandLine)
 	else
 		exitCode = WEXITSTATUS(exitCode);
 
-	writeExitResults(commandLine->getResourceUsageFile(commandLine),
-		autorelease(createExitResults(exitCode,
-		toMicroseconds(usage.ru_utime),
-		toMicroseconds(usage.ru_stime),
-		(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
-			(long long)(stop.tv_usec - start.tv_usec),
-		(long long)usage.ru_maxrss * 1024)));
 	return exitCode;
 }
 
