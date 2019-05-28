@@ -55,21 +55,35 @@ static const char* getOverloadedEnvironment(const char *variableName,
 CommandLine *CL=0;
 struct timeval start;
 struct timeval stop;
+
+int dumpStats() {
+/* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
+	Note that it is using global variables. This is unfortunate, but the 
+	only way to get the data into a signal handler.
+*/
+	int exitCode=100;
+	struct rusage usage;
+	waitpid(-1,&exitCode,WNOHANG);
+	getrusage(RUSAGE_CHILDREN,&usage);
+	if (WIFSIGNALED(exitCode))
+		exitCode = 128 + WTERMSIG(exitCode);
+	else
+		exitCode = WEXITSTATUS(exitCode);
+	gettimeofday(&stop, NULL);
+	writeExitResults(CL->getResourceUsageFile(CL),
+               	autorelease(createExitResults(exitCode,
+               	toMicroseconds(usage.ru_utime),
+               	toMicroseconds(usage.ru_stime),
+               	(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
+                       	(long long)(stop.tv_usec - start.tv_usec),
+               	(long long)usage.ru_maxrss * 1024)));
+	return exitCode;
+}
+
 void sig_handler(int signo)
 {
 	if (signo == SIGTERM) {
-		int exitCode=0;
-		struct rusage usage;
-		waitpid(-1,&exitCode,WNOHANG);
-		getrusage(RUSAGE_CHILDREN,&usage);
-		gettimeofday(&stop, NULL);
-		writeExitResults(CL->getResourceUsageFile(CL),
-                	autorelease(createExitResults(exitCode,
-                	toMicroseconds(usage.ru_utime),
-                	toMicroseconds(usage.ru_stime),
-                	(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
-                        	(long long)(stop.tv_usec - start.tv_usec),
-                	(long long)usage.ru_maxrss * 1024)));
+		dumpStats();
 	}
 }
 
@@ -80,7 +94,6 @@ int wrapJob(CommandLine *commandLine)
 	FuseMounter *mounter = NULL;
 	FuseMount *mount = NULL;
 	char **cmdLine;
-	struct rusage usage;
 	// 2019--5-27 by ASG. Put in signal handler for SIGTERM
 	CL=commandLine;
 	if (signal(SIGTERM, sig_handler) == SIG_ERR)
@@ -176,28 +189,14 @@ int wrapJob(CommandLine *commandLine)
 	int ticks=0;
 	while (running==1) {
 		sleep(SLEEP_DURATION);
-		getrusage(RUSAGE_CHILDREN,&usage);
-		gettimeofday(&stop, NULL);
-		exitCode=100;
-		running=(waitpid(pid,&exitCode,WNOHANG)==0);
+		exitCode=dumpStats();
 		ticks++;
-		writeExitResults(commandLine->getResourceUsageFile(commandLine),
-                	autorelease(createExitResults(exitCode,
-                	toMicroseconds(usage.ru_utime),
-                	toMicroseconds(usage.ru_stime),
-                	(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
-                        	(long long)(stop.tv_usec - start.tv_usec),
-                	(long long)usage.ru_maxrss * 1024)));
 	}
 	// End of updates
 
 	if (mount)
 		mount->unmount(mount);
 
-	if (WIFSIGNALED(exitCode))
-		exitCode = 128 + WTERMSIG(exitCode);
-	else
-		exitCode = WEXITSTATUS(exitCode);
 
 	return exitCode;
 }
