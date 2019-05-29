@@ -8,6 +8,7 @@
             <ns2:POSIXApplication>
                 <ns2:Executable>/bin/bash</ns2:Executable>
                 <ns2:Argument>hostname-sleep.sh</ns2:Argument>
+                <ns2:Output>host.out</ns2:Output>
             </ns2:POSIXApplication>
         </Application>
         <DataStaging>
@@ -17,6 +18,14 @@
             <Source>
                 <URI>rns:PATH/hostname-sleep.sh</URI>
             </Source>
+        </DataStaging>
+        <DataStaging>
+            <FileName>host.out</FileName>
+            <CreationFlag>overwrite</CreationFlag>
+            <DeleteOnTermination>true</DeleteOnTermination>
+            <Target>
+                <URI>rns:PATH/host.out</URI>
+            </Target>
         </DataStaging>
     </JobDescription>
 </JobDefinition>

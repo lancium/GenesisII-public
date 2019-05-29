@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jsdl:JobDefinition xmlns:jsdl-hpcpa="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcpa" xmlns:hpcfse-ac="http://schemas.ogf.org/hpcp/2007/11/ac" xmlns:jsdl-sweep="http://schemas.ogf.org/jsdl/2009/03/sweep" xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix" xmlns:jsdl-spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd" xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl" xmlns:wss="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:ns8="http://vcgr.cs.virginia.edu/jsdl/genii" xmlns:ns9="http://schemas.ogf.org/jsdl/2009/03/sweep/functions">
+    <jsdl:JobDescription>
+        <jsdl:JobIdentification>
+            <jsdl:JobName>simple-scratcher</jsdl:JobName>
+            <jsdl:Description>tests out the scratch file system</jsdl:Description>
+        </jsdl:JobIdentification>
+        <jsdl:Application>
+            <jsdl-posix:POSIXApplication>
+                <jsdl-posix:Executable>/bin/bash</jsdl-posix:Executable>
+                <jsdl-posix:Argument>scratch_job_script.sh</jsdl-posix:Argument>
+                <jsdl-posix:Argument filesystemName="SCRATCH">from_scratch.txt</jsdl-posix:Argument>
+                <jsdl-posix:Output>scratch.out</jsdl-posix:Output>
+                <jsdl-posix:Error>scratch.err</jsdl-posix:Error>
+            </jsdl-posix:POSIXApplication>
+        </jsdl:Application>
+        <jsdl:Resources>
+            <jsdl:FileSystem xmlns:ns10="http://vcgr.cs.virginia.edu/genesisII/jsdl" name="SCRATCH" ns10:unique-id="toenail">
+                <jsdl:FileSystemType>spool</jsdl:FileSystemType>
+            </jsdl:FileSystem>
+        </jsdl:Resources>
+        <jsdl:DataStaging>
+            <jsdl:FileName>scratch_job_script.sh</jsdl:FileName>
+            <jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+            <jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+            <jsdl:HandleAsArchive>false</jsdl:HandleAsArchive>
+            <jsdl:AlwaysStageOut>false</jsdl:AlwaysStageOut>
+            <jsdl:Source>
+                <jsdl:URI>rns:PATH/scratch_job_script.sh</jsdl:URI>
+            </jsdl:Source>
+        </jsdl:DataStaging>
+        <jsdl:DataStaging>
+            <jsdl:FileName>from_scratch.txt</jsdl:FileName>
+            <jsdl:FilesystemName>SCRATCH</jsdl:FilesystemName>
+            <jsdl:CreationFlag>dontOverwrite</jsdl:CreationFlag>
+            <jsdl:DeleteOnTermination>false</jsdl:DeleteOnTermination>
+            <jsdl:HandleAsArchive>false</jsdl:HandleAsArchive>
+            <jsdl:AlwaysStageOut>false</jsdl:AlwaysStageOut>
+            <jsdl:Source>
+                <jsdl:URI>rns:PATH/from_scratch.txt</jsdl:URI>
+            </jsdl:Source>
+        </jsdl:DataStaging>
+        <jsdl:DataStaging>
+            <jsdl:FileName>scratch.out</jsdl:FileName>
+            <jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+            <jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+            <jsdl:HandleAsArchive>false</jsdl:HandleAsArchive>
+            <jsdl:AlwaysStageOut>false</jsdl:AlwaysStageOut>
+            <jsdl:Target>
+                <jsdl:URI>rns:PATH/scratch.out</jsdl:URI>
+            </jsdl:Target>
+        </jsdl:DataStaging>
+        <jsdl:DataStaging>
+            <jsdl:FileName>scratch.err</jsdl:FileName>
+            <jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+            <jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+            <jsdl:HandleAsArchive>false</jsdl:HandleAsArchive>
+            <jsdl:AlwaysStageOut>false</jsdl:AlwaysStageOut>
+            <jsdl:Target>
+                <jsdl:URI>rns:PATH/scratch.err</jsdl:URI>
+            </jsdl:Target>
+        </jsdl:DataStaging>
+    </jsdl:JobDescription>
+</jsdl:JobDefinition>

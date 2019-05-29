@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -182,7 +185,13 @@ public class DownloadManagerContainerService extends AbstractContainerService
 		}
 
 		ret = URIManager.get(source, tmpTarget, credential);
-		tmpTarget.renameTo(realTarget);
+		
+		// CAK 2019-05-29: new approach: use nio for platform independent move.
+	    Files.move(tmpTarget.toPath(), realTarget.toPath(), StandardCopyOption.REPLACE_EXISTING);		
+//		boolean renameReturn = tmpTarget.renameTo(realTarget);
+//		if (!renameReturn) {
+//			throw new IOException("failed to renameTo from '" + tmpTarget + "' to '" + realTarget + "'");
+//		}
 
 		return ret.bytesTransferred();
 	}

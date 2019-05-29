@@ -168,6 +168,8 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 
 				conn.commit();
 
+				_logger.info("creating new scratch file system at: " + directory);
+				
 				return new ScratchFileSystem(directory, reservationID);
 			} catch (SQLException sqe) {
 				throw new IOException("Unable to reserve swap file system.", sqe);
