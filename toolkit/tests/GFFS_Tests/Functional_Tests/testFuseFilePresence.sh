@@ -20,7 +20,7 @@ source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 FUSE_SNOOZE_TIME=5
 # how many times we should test that fuse sees a new file in the grid.
 #FUSE_COPY_COUNT=1
-FUSE_COPY_COUNT=20
+FUSE_COPY_COUNT=2
 
 # where we hook in the fuse mount.
 MOUNT_POINT="$TEST_TEMP/mount-gffsFuseCommands"
