@@ -27,7 +27,10 @@ public class ResourceUsageDirectory
 	synchronized public File getNewResourceUsageFile() throws ProcessWrapperException
 	{
 		try {
-			File tempFile = File.createTempFile("rusage-", ".xml", _directory);
+			// 2019-06-05 ASG. Changing the nameing scheme for resource usage files to be constant, without 
+			// any random bits. That way we can always stage it out.
+			// File tempFile = File.createTempFile("rusage-", ".xml", _directory);
+			File tempFile = new File(_directory,"rusage.xml");
 
 			if (OperatingSystemType.isWindows())
 				tempFile.setWritable(true, false);
