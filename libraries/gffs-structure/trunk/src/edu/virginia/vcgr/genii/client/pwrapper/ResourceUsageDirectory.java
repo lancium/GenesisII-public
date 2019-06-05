@@ -31,6 +31,7 @@ public class ResourceUsageDirectory
 			// any random bits. That way we can always stage it out.
 			// File tempFile = File.createTempFile("rusage-", ".xml", _directory);
 			File tempFile = new File(_directory,"rusage.xml");
+			tempFile.createNewFile();
 
 			if (OperatingSystemType.isWindows())
 				tempFile.setWritable(true, false);
