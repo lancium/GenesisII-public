@@ -55,6 +55,8 @@ static const char* getOverloadedEnvironment(const char *variableName,
 CommandLine *CL=0;
 struct timeval start;
 struct timeval stop;
+pid_t pid;
+int running=1;
 
 int dumpStats() {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
@@ -63,7 +65,9 @@ int dumpStats() {
 */
 	int exitCode=100;
 	struct rusage usage;
-	waitpid(-1,&exitCode,WNOHANG);
+	// Check if it is still running, if not set running=0
+	pid_t tp=waitpid(pid,&exitCode,WNOHANG);
+	if (tp==pid) running=0;
 	getrusage(RUSAGE_CHILDREN,&usage);
 	if (WIFSIGNALED(exitCode))
 		exitCode = 128 + WTERMSIG(exitCode);
@@ -90,7 +94,7 @@ void sig_handler(int signo)
 int wrapJob(CommandLine *commandLine)
 {
 	int exitCode;
-	pid_t pid;
+
 	FuseMounter *mounter = NULL;
 	FuseMount *mount = NULL;
 	char **cmdLine;
@@ -185,7 +189,7 @@ int wrapJob(CommandLine *commandLine)
 */
 	// 2019-05-27 by ASG. Code to deal with the process getting killed and losing 
 	// the accounting records.
-	int running=1;
+	running=1;
 	int ticks=0;
 	while (running==1) {
 		sleep(SLEEP_DURATION);
