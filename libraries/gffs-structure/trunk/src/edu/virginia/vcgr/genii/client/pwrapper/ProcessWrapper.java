@@ -40,13 +40,16 @@ public class ProcessWrapper
 			return (ExitResults) u.unmarshal(file);
 		} catch (JAXBException e) {
 			throw new ProcessWrapperException("Unable to read exit results from file.", e);
-		} finally {
+		} 
+		/* 2019-06-07 by ASG. Removed the delete as we are now letting the user stage it out.
+		   finally {
 			try {
 				file.delete();
 			} catch (Throwable cause) {
 				_logger.warn(String.format("Unable to cleanup resource usage file \"%s\".", file), cause);
 			}
 		}
+		*/
 	}
 
 	private Collection<ProcessWrapperListener> _listeners = new LinkedList<ProcessWrapperListener>();
