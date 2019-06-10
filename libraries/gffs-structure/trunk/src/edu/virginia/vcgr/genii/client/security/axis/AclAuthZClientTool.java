@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -339,31 +340,54 @@ public class AclAuthZClientTool
 		return AxisAcl.encodeAcl(acl);
 	}
 
+	protected static void removeUserNamePasswordIdentity(List<AclEntry> theList, AclEntry entry) {
+	// 2019-06-9 by ASG. An ugly bit of code to remove username password entries checking only if the username is the same
+		int i;
+		AclEntry temp;
+		for (i=0;i<theList.size();i++){
+			temp=theList.get(i);
+			if (temp.getClass()==UsernamePasswordIdentity.class ) {
+				UsernamePasswordIdentity foo = (UsernamePasswordIdentity)temp;
+				if (foo.getUserName().equals(((UsernamePasswordIdentity)entry).getUserName()))
+					theList.remove(i);
+					return;
+			}
+		}
+	}
 	/**
 	 * Add or remove read, write, and/or execute permission for the given entry in the given ACL as specified by the given mode.
 	 */
 	protected static void chmod(Acl acl, String modeString, AclEntry newEntry) throws AuthZSecurityException
 	{
+		// 2019-060-9 by ASG. Ugly hack to deal with passwords that we cannot compare.
+		// First check if it is username password, if so call removeusernamepasswordidentity to pick it out by hand
+		boolean isUP=false;  // UP= username password
+		if (newEntry.getClass()==UsernamePasswordIdentity.class ){
+			isUP=true;
+		}
 		int mode = parseMode(modeString);
 		if ((mode & READ) > 0) {
 			if (!acl.readAcl.contains(newEntry))
 				acl.readAcl.add(newEntry);
 		} else if ((mode & NOT_READ) > 0) {
-			acl.readAcl.remove(newEntry);
+			if (isUP) removeUserNamePasswordIdentity(acl.readAcl,newEntry);
+			else acl.readAcl.remove(newEntry);
 		}
 
 		if ((mode & WRITE) > 0) {
 			if (!acl.writeAcl.contains(newEntry))
 				acl.writeAcl.add(newEntry);
 		} else if ((mode & NOT_WRITE) > 0) {
-			acl.writeAcl.remove(newEntry);
+			if (isUP) removeUserNamePasswordIdentity(acl.writeAcl,newEntry);
+			else acl.writeAcl.remove(newEntry);
 		}
 
 		if ((mode & EXECUTE) > 0) {
 			if (!acl.executeAcl.contains(newEntry))
 				acl.executeAcl.add(newEntry);
 		} else if ((mode & NOT_EXECUTE) > 0) {
-			acl.executeAcl.remove(newEntry);
+			if (isUP) removeUserNamePasswordIdentity(acl.executeAcl,newEntry);
+			else acl.executeAcl.remove(newEntry);
 		}
 	}
 }

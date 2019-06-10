@@ -374,7 +374,8 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 	{
 		// This is new by ASG 1/7/2016
 		/*
-		 * There are four possible prefixes for principals in the ACL string: ws-nameing-epi:, SN:, GUID:, and username-password, and three
+		 * An ACLSTring is of the form ID rxw'ID rwx; ....
+		 * There are four possible ID types represented by  prefixes for principals in the ACL string: ws-nameing-epi:, SN:, GUID:, and username-password, and three
 		 * prefixes that getEPI can return: ws-naming-epi: SN:, and username-password. A ws-naming prefix is one of our identities. A SN
 		 * identity is an X.509, a GUID: is a pattern-based ACL, and a username password is just that.
 		 */
@@ -469,6 +470,7 @@ public class AclAuthZProvider implements IAuthZProvider, AclTopics
 				// Problem ... may contain a BasicDBResource and not be an instance of
 				BasicDBResource resource = (BasicDBResource) iresource;
 				ACLString = resource.getACLString(false);
+				System.out.println("ACLSTRNING is: " + ACLString);
 				if (ACLString == null) {
 					// This is the case were we need to convert from old format to new
 					if (resource.translateOldAcl()) {
