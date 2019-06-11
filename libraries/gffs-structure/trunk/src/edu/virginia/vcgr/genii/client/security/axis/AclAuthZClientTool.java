@@ -340,19 +340,18 @@ public class AclAuthZClientTool
 		return AxisAcl.encodeAcl(acl);
 	}
 
-	protected static void removeUserNamePasswordIdentity(List<AclEntry> theList, AclEntry entry) {
-	// 2019-06-9 by ASG. An ugly bit of code to remove username password entries checking only if the username is the same
-		int i;
-		AclEntry temp;
-		for (i=0;i<theList.size();i++){
-			temp=theList.get(i);
-			if (temp.getClass()==UsernamePasswordIdentity.class ) {
-				UsernamePasswordIdentity foo = (UsernamePasswordIdentity)temp;
-				if (foo.getUserName().equals(((UsernamePasswordIdentity)entry).getUserName()))
-					theList.remove(i);
+	// 2019-06-10 by ASG. Find and remove a particular username password entry if it is there.
+	protected static void removeUserNamePassordIdentity(List<AclEntry> tlist, AclEntry toRM) {
+		UsernamePasswordIdentity iD= (UsernamePasswordIdentity)toRM;
+		for (int i=0;i<tlist.size();i++) {
+			if (tlist.get(i).getClass()==UsernamePasswordIdentity.class) {
+				if (((UsernamePasswordIdentity)tlist.get(i)).getUserName().equals(iD.getUserName())) {
+					tlist.remove(i);
 					return;
+				}
 			}
 		}
+		return;
 	}
 	/**
 	 * Add or remove read, write, and/or execute permission for the given entry in the given ACL as specified by the given mode.
@@ -362,7 +361,7 @@ public class AclAuthZClientTool
 		// 2019-060-9 by ASG. Ugly hack to deal with passwords that we cannot compare.
 		// First check if it is username password, if so call removeusernamepasswordidentity to pick it out by hand
 		boolean isUP=false;  // UP= username password
-		if (newEntry.getClass()==UsernamePasswordIdentity.class ){
+		if (newEntry!=null && newEntry.getClass()==UsernamePasswordIdentity.class ){
 			isUP=true;
 		}
 		int mode = parseMode(modeString);
@@ -370,7 +369,9 @@ public class AclAuthZClientTool
 			if (!acl.readAcl.contains(newEntry))
 				acl.readAcl.add(newEntry);
 		} else if ((mode & NOT_READ) > 0) {
-			if (isUP) removeUserNamePasswordIdentity(acl.readAcl,newEntry);
+			if (isUP) {
+				removeUserNamePassordIdentity(acl.readAcl, newEntry);
+			}
 			else acl.readAcl.remove(newEntry);
 		}
 
@@ -378,7 +379,9 @@ public class AclAuthZClientTool
 			if (!acl.writeAcl.contains(newEntry))
 				acl.writeAcl.add(newEntry);
 		} else if ((mode & NOT_WRITE) > 0) {
-			if (isUP) removeUserNamePasswordIdentity(acl.writeAcl,newEntry);
+			if (isUP) {
+				removeUserNamePassordIdentity(acl.writeAcl, newEntry);
+			}
 			else acl.writeAcl.remove(newEntry);
 		}
 
@@ -386,7 +389,9 @@ public class AclAuthZClientTool
 			if (!acl.executeAcl.contains(newEntry))
 				acl.executeAcl.add(newEntry);
 		} else if ((mode & NOT_EXECUTE) > 0) {
-			if (isUP) removeUserNamePasswordIdentity(acl.executeAcl,newEntry);
+			if (isUP) {
+				removeUserNamePassordIdentity(acl.executeAcl, newEntry);
+			}
 			else acl.executeAcl.remove(newEntry);
 		}
 	}
