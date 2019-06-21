@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,12 +35,16 @@ public class CleanupPhase extends AbstractExecutionPhase implements Serializable
 	private void removeFile(File f)
 	{
 		if (f.exists()) {
-			if (f.isDirectory()) {
+			//CAK 5-30-2019: do not remove files under symbolic links; just whack the link.
+			if (!Files.isSymbolicLink(f.toPath()) && f.isDirectory()) {
+				_logger.debug("clearing all files in directory: " + f);
 				for (File ff : f.listFiles())
 					removeFile(ff);
 			}
-
+			_logger.debug("whacking fs object: " + f);
 			f.delete();
+		} else {
+			_logger.warn("cannot whack non-existent fs object: " + f);
 		}
 	}
 

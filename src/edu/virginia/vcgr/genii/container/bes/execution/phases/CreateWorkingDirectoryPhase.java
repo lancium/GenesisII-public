@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,13 +24,15 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 	static private Log _logger = LogFactory.getLog(CreateWorkingDirectoryPhase.class);
 
 	private File _workingDirectory;
+	private File _scratchDirectory;
 
 	static private final String CREATE_WORKINGDIR_STATE = "create-workingdir";
 
-	public CreateWorkingDirectoryPhase(BESWorkingDirectory workingDirectory)
+	public CreateWorkingDirectoryPhase(BESWorkingDirectory workingDirectory, File scratchDirectory)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, CREATE_WORKINGDIR_STATE, false));
 		_workingDirectory = workingDirectory.getWorkingDirectory();
+		_scratchDirectory = scratchDirectory;
 	}
 
 	@Override
@@ -54,6 +58,18 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 			history.createErrorWriter(cause, "Unable to create directory.")
 				.format("Unable to create working directory %s.", _workingDirectory).close();
 			throw cause;
+		}
+		
+		try {
+			// only try to link in scratch if we were given a good path and if OS is not windows based.
+			if ((_scratchDirectory != null) && !OperatingSystemType.isWindows()) {
+				Path newPath = Files.createSymbolicLink(_workingDirectory.toPath().resolve("scratch"), _scratchDirectory.toPath());
+				_logger.debug("created new path for job's scratch directory: " + newPath);
+			}
+		} catch (Throwable cause) {
+			history.createErrorWriter(cause, "Unable to create scratch space link in working directory.")
+				.format("Unable to create scratch space link to %s in working directory %s.", _scratchDirectory, _workingDirectory).close();
+			throw cause;			
 		}
 	}
 }

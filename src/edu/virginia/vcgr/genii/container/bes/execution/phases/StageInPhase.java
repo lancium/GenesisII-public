@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -216,7 +214,7 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 			}
 			
 			// 2019-01-07 ASG - Fixed it to give group rw permissions
-			List<String> commandLine = new LinkedList<String>();
+//			List<String> commandLine = new LinkedList<String>();
 			FileSystemUtils.chmod(_target.getAbsolutePath(),
 				FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE | FileSystemUtils.MODE_USER_EXECUTE | 
 				FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE | FileSystemUtils.MODE_GROUP_EXECUTE);

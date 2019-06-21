@@ -15,6 +15,7 @@ package edu.virginia.vcgr.genii.client.io;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,6 +103,10 @@ public class FileSystemUtils extends JNIClientBaseClass
 		if (file == null)
 			throw new NullPointerException("File must not be null");
 
+		//CAK 5-30-2019: new implementation using java.nio; much simpler.
+		return Files.isSymbolicLink(file.toPath());
+		
+		/*
 		File canon;
 
 		if (file.getParent() == null)
@@ -112,6 +117,7 @@ public class FileSystemUtils extends JNIClientBaseClass
 		}
 
 		return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+		*/
 	}
 
 	static public boolean recursiveDelete(File target, boolean followSoftLinks)
@@ -129,6 +135,7 @@ public class FileSystemUtils extends JNIClientBaseClass
 		} else if (target.isDirectory()) {
 			try {
 				if (followSoftLinks || !isSoftLink(target)) {
+					_logger.debug("recursively deleting directory: " + target);
 					for (File entry : target.listFiles()) {
 						if (!recursiveDelete(entry, followSoftLinks))
 							succeed = false;
