@@ -11,6 +11,8 @@ OBJECTS		=		$(OBJDIR)/Memory.o										\
 
 BINARIES	=		$(BINDIR)/pwrapper
 
+CFLAGS	=	-g
+
 ###############
 
 all:	$(BINDIR) $(OBJDIR) $(OBJECTS) $(BINARIES)

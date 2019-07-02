@@ -141,7 +141,15 @@ public class ResolverTool extends BaseGridTool
 		}
 		if (sourceName.hasValidResolver()) {
 			stdout.println(sourceRNS + ": already has resolver");
-			return;
+			stdout.println("Do you want to replace existing resolver? (y/n)  Note: Resolver will be replaced in EPR, BUT, the existing resolver will NOT be notified!");
+			String inp = stdin.readLine();
+			if (!inp.equalsIgnoreCase("y")) {
+				stdout.println("Exiting without updating EPR");
+				return;
+			}
+			sourceName.removeAllResolvers();
+			sourceEPR=sourceName.getEndpoint();
+			stdout.println("Resolver replaced for " + sourceRNS);
 		}
 		UpdateResponseType response = ResolverUtils.updateResolver(resolverEPR, sourceEPR);
 		EndpointReferenceType finalEPR = response.getNew_EPR();
