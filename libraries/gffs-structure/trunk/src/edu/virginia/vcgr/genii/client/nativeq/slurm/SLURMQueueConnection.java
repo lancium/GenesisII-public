@@ -166,7 +166,8 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			List<String> commandLine = new LinkedList<String>();
 			commandLine.addAll(_qstatStart);
 			commandLine.add("-h");
-			commandLine.add("-l");
+			// Removed 2019-07-16 by ASG. Version 19 of SLURM barfs if it gets -l and -o
+			// commandLine.add("-l");
 			commandLine.add("-o");
 			commandLine.add("id=%A state=%t user=%u");
 
