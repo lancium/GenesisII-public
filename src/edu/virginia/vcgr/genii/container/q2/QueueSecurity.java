@@ -157,7 +157,9 @@ public class QueueSecurity
 		if (Security.isAdministrator())
 			return true;
 		try {
-			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			// 2019-07-21 by ASG. Changed the parameter below to NOT filter out group IDs. If the user is in a group with write access
+			// on the queue, then they should have QueueAdmin permissions.
+			Collection<Identity> callers = QueueSecurity.getCallerIdentities(false);
 
 			ResourceKey rKey = ResourceManager.getCurrentResource();
 			IAuthZProvider authZHandler = AuthZProviders.getProvider(rKey.getServiceName());
