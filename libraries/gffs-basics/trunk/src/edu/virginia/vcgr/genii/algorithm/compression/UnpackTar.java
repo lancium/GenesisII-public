@@ -101,9 +101,13 @@ public class UnpackTar
 					wroteAnything = true;
 					bout.write(btoRead, 0, len);
 				}
+				// 2019-07-28 by ASG. This "ERROR" happens all the time with no effect. It seems there are a LOT of empty files in many archives.
+				// So I am commenting out the error message. It is just cluttering up the logs.
+				/*
 				if (!wroteAnything) {
 					_logger.error("zero bytes read from: " + destPath.getCanonicalPath());
 				}
+				*/
 
 				bout.close();
 			}

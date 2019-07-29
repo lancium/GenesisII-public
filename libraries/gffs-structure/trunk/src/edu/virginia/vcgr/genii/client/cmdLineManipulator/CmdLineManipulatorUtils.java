@@ -126,9 +126,13 @@ public class CmdLineManipulatorUtils
 				throw new CmdLineManipulatorException(String.format("Construction params lack a manipulator named \"%s\".", manipulatorName));
 			if (manipulatorCount > 1)
 				throw new IllegalArgumentException("Construction params contain " + "mulitple manipulator variations with same name.");
+			/*
+			 * 2019-07-29 by ASG. This code block seems wrong. It is possible to be SPMD and NOT MPI, e.g., shared threaded and exclusive threaded.
+			 * So, I am taking it out.
 			if (spmdJob && (!mpiManipulatorCalled))
 				throw new IllegalArgumentException(
-					"No MPI manipulator " + "in manipulator call chain: Attempting to run SPMD job " + "on BES with no SPMD support.");
+					"No MPI manipulator in manipulator call chain: Attempting to run SPMD job on BES with no SPMD support.");
+			*/
 
 		}
 

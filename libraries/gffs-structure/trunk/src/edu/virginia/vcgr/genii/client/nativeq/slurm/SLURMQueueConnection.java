@@ -231,19 +231,24 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 				script.format("#SBATCH --exclusive\n");
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using exclusive flag for NodeExclusiveThreaded spmd");
-			} else if (application.getSPMDVariation().toString().contains(CmdLineManipulatorConstants.SHARED_THREADED_PHRASE)) {
+			} 
+			/*
+			 2019-07-29. ASG. The 2019 version of SLURM no longer supports --share. It is implied. The closest thing is to -s , to oversubscribe. Which 
+			 is not what we want. So the code no longer needs that flag.
+			else if (application.getSPMDVariation().toString().contains(CmdLineManipulatorConstants.SHARED_THREADED_PHRASE)) {
 				script.format("#SBATCH --share\n");
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using shared flag for SharedThreaded spmd");
 			}
-
+			*/
 			// in slurm, processes are tasks. so we only worry about tasks/processes and processes per host here.
 			if (numProcs != null) {
 				// always specify number of tasks if they told us.
 				script.format("#SBATCH --ntasks=%d\n", numProcs.intValue());
 				// if we also know processes per host, add in the node and tasks per node counts.
-				if (numProcsPerHost != null) {
-					Integer hosts = numProcs / numProcsPerHost;
+				if (numProcsPerHost != null && (numProcsPerHost.intValue()!=0)) {
+					// 2019-07-29 by ASG. Added cieling function and checking for zero
+					Integer hosts = (numProcs+numProcsPerHost-1) / numProcsPerHost;
 					script.format("#SBATCH --nodes=%d\n", hosts.intValue());
 					script.format("#SBATCH --ntasks-per-node=%d\n", numProcsPerHost.intValue());
 				}

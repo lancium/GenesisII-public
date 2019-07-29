@@ -135,7 +135,7 @@ public class FileSystemUtils extends JNIClientBaseClass
 		} else if (target.isDirectory()) {
 			try {
 				if (followSoftLinks || !isSoftLink(target)) {
-					_logger.debug("recursively deleting directory: " + target);
+					//_logger.debug("recursively deleting directory: " + target);
 					for (File entry : target.listFiles()) {
 						if (!recursiveDelete(entry, followSoftLinks))
 							succeed = false;

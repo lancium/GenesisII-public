@@ -27,7 +27,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(AbstractRunProcessPhase.class);
-	static final private int STDERR_SIZE_CAP = 1024;
+	static final private int STDERR_SIZE_CAP = 1024*128;
 
 	protected BESConstructionParameters _constructionParameters;
 

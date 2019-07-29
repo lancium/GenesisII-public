@@ -333,7 +333,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			// 2017-7-24 ASG. Fix to see if the command worked. If not, throw a fault.
 			// That way we will not assume that the absence of information on a process means 
 			// it has failed.
-			if (result!=0) throw new NativeQueueException("Unable to execute sbatch command: check permissions on path to working directory.");
+			if (result!=0) throw new NativeQueueException("Unable to execute sbatch command: Error " + result + ", check permissions on path to working directory.");
 			logProcessResult(result, stdoutCopy, stderrCopy);
 
 			if (result == 0) {
