@@ -58,7 +58,7 @@ struct timeval stop;
 pid_t pid;
 int running=1;
 
-int dumpStats() {
+int dumpStats(int beingKilled) {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
 	Note that it is using global variables. This is unfortunate, but the 
 	only way to get the data into a signal handler.
@@ -74,6 +74,13 @@ int dumpStats() {
 	else
 		exitCode = WEXITSTATUS(exitCode);
 	gettimeofday(&stop, NULL);
+	/*
+	2019-08-22 by ASG. If the child is still running AND being killed,
+	set the exit code to 250. It means the enclosing environment, e.g.,
+	the queueing system is terminating it, likely for too much time, processes, 
+	or memory.
+	*/
+	if (running==1 && beingKilled==1) exitCode=250;
 	writeExitResults(CL->getResourceUsageFile(CL),
                	autorelease(createExitResults(exitCode,
                	toMicroseconds(usage.ru_utime),
@@ -87,7 +94,7 @@ int dumpStats() {
 void sig_handler(int signo)
 {
 	if (signo == SIGTERM) {
-		dumpStats();
+		dumpStats(1);
 	}
 }
 
@@ -193,7 +200,7 @@ int wrapJob(CommandLine *commandLine)
 	int ticks=0;
 	while (running==1) {
 		sleep(SLEEP_DURATION);
-		exitCode=dumpStats();
+		exitCode=dumpStats(0);
 		ticks++;
 	}
 	// End of updates
