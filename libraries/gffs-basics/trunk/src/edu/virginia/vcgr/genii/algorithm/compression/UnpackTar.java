@@ -86,9 +86,13 @@ public class UnpackTar
 			if (_logger.isTraceEnabled())
 				_logger.debug("working on: " + destPath.getCanonicalPath());
 			if (tarEntry.isDirectory()) {
-				destPath.mkdirs();
+				if (!destPath.mkdirs()) {
+					throw (new IOException("Could not create directory " + destPath.getAbsolutePath()));
+				}
 			} else {
-				destPath.createNewFile();
+				if (!destPath.createNewFile()) {				
+					throw (new IOException("Could not create file " + destPath.getAbsolutePath()));
+				}
 
 				// byte [] btoRead = new byte[(int)tarEntry.getSize()];
 				byte[] btoRead = new byte[8192];

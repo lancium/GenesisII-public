@@ -19,11 +19,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collection;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
+
 
 import edu.virginia.vcgr.genii.algorithm.application.ProgramTools;
 import edu.virginia.vcgr.genii.algorithm.structures.cache.TimedOutLRUCache;
@@ -33,6 +41,7 @@ import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.security.KeystoreManager;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.TransientCredentials;
@@ -44,7 +53,7 @@ public class ContextManager
 	static private Log _logger = LogFactory.getLog(ContextManager.class);
 		
 	static private final int MAX_IDENTITIES  = 200;
-	static private final int LIFETIME = 1000*60*60*12; // 12 hours
+	static private final int LIFETIME = 1000*60*60*24; // 24 hours
 	/* Added May 9, 2019 by ASG
 	 * _idMap holds a set of credentials from login sessions
 	 */
@@ -79,7 +88,33 @@ public class ContextManager
 		}
 		return toReturn;
 	}
+	/*
+	 * 2019-0805 by ASG. Added function to re-load the idMap from $GENII_USER_DIR/IDMAP
+	 */
+	synchronized static public void loadStash() throws IOException
+	{
+		// First we create the directory if it is not already there. Make sure the permissions are correct!!!
+		// We also have to put a hook in so that when stash is called it puts it in the directory, and when the LRU empties one we throw it out.
+		// This will require adding a call back to timeoutlrucache
+		String path=ApplicationBase.USER_DIR_ENVIRONMENT_VARIABLE + "/IDMAP";
+		//You can create a new directory by using the createDirectory(Path, FileAttribute<?>) method. If you don't specify any FileAttributes, the new directory will have default attributes. For example:
+
+		Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwx------");
+		FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+		Files.createDirectories(Paths.get(path),attr);
+		// Ok, now there either was a directory, or now is a directory. Read read in the nonces and data
+		File folder = new File(path);
+		File[] listOfFiles = folder.listFiles();
+		for (int i = 0; i < listOfFiles.length; i++) {
+		  if (listOfFiles[i].isFile()) {
+		    System.out.println("File " + listOfFiles[i].getName());
+		  } else if (listOfFiles[i].isDirectory()) {
+		    System.out.println("Directory " + listOfFiles[i].getName());
+		  }
+		}
+	}
 	
+
 	static private class ResolverThreadLocal extends InheritableThreadLocal<IContextResolver>
 	{
 		@Override
