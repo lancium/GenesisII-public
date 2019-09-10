@@ -1,10 +1,15 @@
 package edu.virginia.vcgr.genii.client.informationService;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class GUIInternalStruct
 {
+	static private Log _logger = LogFactory.getLog(GUIInternalStruct.class);
 	private String OSTypeValue = "";
 	private String OSVersionValue = "";
 	private String CPUArchitectureNameValue = "";
+	private String GPUArchitectureNameValue = "";
 	private String CPUCountValue = "";
 	private String CPUSpeedValue = "";
 	private String physicalMemoryValue = "";
@@ -20,13 +25,14 @@ public class GUIInternalStruct
 	}
 
 	public GUIInternalStruct(String OSTypeValue, String OSVersionValue, String CPUArchitectureNameValue, String CPUCountValue,
-		String CPUSpeedValue, String physicalMemoryValue, String virtualMemoryValue, String commonNameValue,
+		String CPUSpeedValue, String GPUArchitectureNameValue, String physicalMemoryValue, String virtualMemoryValue, String commonNameValue,
 		String totalNumberOfActivitiesValue, String localResourceManagerValue, String namingProfileValue,
 		boolean isAcceptingNewActivitiesvalue)
 	{
 		this.OSTypeValue = OSTypeValue;
 		this.OSVersionValue = OSVersionValue;
 		this.CPUArchitectureNameValue = CPUArchitectureNameValue;
+		this.GPUArchitectureNameValue = GPUArchitectureNameValue;
 		this.CPUCountValue = CPUCountValue;
 		this.CPUSpeedValue = CPUSpeedValue;
 		this.physicalMemoryValue = physicalMemoryValue;
@@ -50,8 +56,16 @@ public class GUIInternalStruct
 
 	public String getCPUArchitectureNameValue()
 	{
+		_logger.info("--------JSDL: GUIInternalStruct --" + CPUArchitectureNameValue);
 		return CPUArchitectureNameValue;
 	}
+
+	public String getGPUArchitectureNameValue()
+        {
+                _logger.info("--------JSDL: GUIInternalStruct --" + GPUArchitectureNameValue);
+                return GPUArchitectureNameValue;
+        }
+
 
 	public String getCPUCountValue()
 	{

@@ -32,6 +32,8 @@ public interface PersonalityProvider
 
 	public CPUArchitectureFacet getCPUArchitectureFacet(Object currentUnderstanding) throws JSDLException;
 
+	public GPUArchitectureFacet getGPUArchitectureFacet(Object currentUnderstanding) throws JSDLException;
+
 	public GeniiPropertyFacet getGeniiPropertyFacet(Object currentUnderstanding) throws JSDLException;
 
 	public GeniiOrFacet getGeniiOrFacet(Object currentUnderstanding) throws JSDLException;

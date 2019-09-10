@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.morgan.util.io.StreamUtils;
 
@@ -36,6 +37,11 @@ public class SystemUtils
 	{
 		throw new RuntimeException("This type of cpu arch query is no longer supported.");
 	}
+
+	static public GPUArchitecture_Type[] getSupportedGPUArchitectures()
+        {
+                throw new RuntimeException("This type of gpu arch query is no longer supported.");
+        }
 
 	static public OperatingSystem_Type[] getSupportedOperatingSystems()
 	{

@@ -64,4 +64,16 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 	{
 		((CommonExecutionUnderstanding) currentUnderstanding).setIndividualCPUCount(individualCPUCount.describe().getUpperBound());
 	}
+
+	@Override
+	public void consumeGPUCountPerNode(Object currentUnderstanding, RangeExpression GPUCountPerNode) throws JSDLException
+	{
+		((CommonExecutionUnderstanding) currentUnderstanding).setGPUCountPerNode(GPUCountPerNode.describe().getUpperBound());
+	}
+
+	@Override
+	public void consumeGPUMemoryPerNode(Object currentUnderstanding, RangeExpression GPUMemoryPerNode) throws JSDLException
+	{
+		((CommonExecutionUnderstanding) currentUnderstanding).setGPUMemoryPerNode(GPUMemoryPerNode.describe().getUpperBound());
+	}
 }

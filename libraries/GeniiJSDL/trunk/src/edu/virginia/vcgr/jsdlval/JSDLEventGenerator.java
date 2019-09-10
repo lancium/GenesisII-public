@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import edu.virginia.vcgr.jsdl.Application;
 import edu.virginia.vcgr.jsdl.ApplicationBase;
 import edu.virginia.vcgr.jsdl.CPUArchitecture;
+import edu.virginia.vcgr.jsdl.GPUArchitecture;
 import edu.virginia.vcgr.jsdl.DataStaging;
 import edu.virginia.vcgr.jsdl.FileSystem;
 import edu.virginia.vcgr.jsdl.JSDLConstants;
@@ -155,6 +156,18 @@ public class JSDLEventGenerator
 		}
 	}
 
+	static private void generateGPUArchitectureEvents(XMLDocumentPathImpl path, GPUArchitecture gpuArch, JSDLEventReceiver receiver)
+                throws JSDLValidationException
+    	{
+		if (gpuArch != null) {
+			path.push(path.formQNameFromPrevious("GPUArchitecture"));
+            		receiver.startGPUArchitecture(path, gpuArch.gpuProcessorArchitecture());
+            		handleAnys(path, gpuArch.any(), gpuArch.anyAttributes(), receiver);
+            		receiver.endGPUArchitecture(path);
+            		path.pop();
+		}
+    	}
+
 	static private void generateResourcesEvents(XMLDocumentPathImpl path, Resources resources, JSDLEventReceiver receiver)
 		throws JSDLValidationException
 	{
@@ -187,10 +200,11 @@ public class JSDLEventGenerator
 
 			generateOperatingSystemEvents(path, resources.operatingSystem(), receiver);
 			generateCPUArchitectureEvents(path, resources.cpuArchitecture(), receiver);
+			generateGPUArchitectureEvents(path, resources.gpuArchitecture(), receiver);
 
 			receiver.handleIndividualResourceRanges(path, resources.individualCPUSpeed(), resources.individualCPUTime(),
 				resources.individualCPUCount(), resources.individualNetworkBandwidth(), resources.individualPhysicalMemory(),
-				resources.individualVirtualMemory(), resources.individualDiskSpace());
+				resources.individualVirtualMemory(), resources.individualDiskSpace(), resources.GPUCountPerNode(), resources.GPUMemoryPerNode());
 			receiver.handleTotalResourceRanges(path, resources.totalCPUTime(), resources.totalCPUCount(), resources.totalPhysicalMemory(),
 				resources.totalVirtualMemory(), resources.totalDiskSpace(), resources.totalResourceCount());
 
@@ -284,6 +298,7 @@ public class JSDLEventGenerator
 		generateLimitEvents(path, POSIXLimitType.ProcessCountLimit, posixApplication.processCountLimit(), receiver);
 		generateLimitEvents(path, POSIXLimitType.VirtualMemoryLimit, posixApplication.virtualMemoryLimit(), receiver);
 		generateLimitEvents(path, POSIXLimitType.ThreadCountLimit, posixApplication.threadCountLimit(), receiver);
+		generateLimitEvents(path, POSIXLimitType.GPUProcessCountLimit, posixApplication.gpuProcessCountLimit(), receiver);
 
 		generateUserNameEvents(path, posixApplication.userName(), receiver);
 		generateGroupNameEvents(path, posixApplication.groupName(), receiver);

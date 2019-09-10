@@ -166,8 +166,7 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			List<String> commandLine = new LinkedList<String>();
 			commandLine.addAll(_qstatStart);
 			commandLine.add("-h");
-			// Removed 2019-07-16 by ASG. Version 19 of SLURM barfs if it gets -l and -o
-			// commandLine.add("-l");
+			//commandLine.add("-l");
 			commandLine.add("-o");
 			commandLine.add("id=%A state=%t user=%u");
 
@@ -211,16 +210,21 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		throws NativeQueueException, IOException
 	{
 		super.generateQueueHeaders(script, workingDirectory, application);
+		
+		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---Before out and err" );
 
 		// add directives for specifying stdout and stderr redirects
 		script.format("#SBATCH -o %s\n", application.getStdoutRedirect(workingDirectory));
 		script.format("#SBATCH -e %s\n", application.getStderrRedirect(workingDirectory));
-
+		
+		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---Before out and err" );
+		
 		if (application.getSPMDVariation() != null) {
 			// add directive for specifying multiple processors
 			Integer numProcs = application.getNumProcesses();
 			Integer numProcsPerHost = application.getNumProcessesPerHost();
 			Integer threadsPerProcess = application.getThreadsPerProcess();
+			
 
 			if (_logger.isDebugEnabled())
 				_logger.debug(
@@ -231,24 +235,19 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 				script.format("#SBATCH --exclusive\n");
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using exclusive flag for NodeExclusiveThreaded spmd");
-			} 
-			/*
-			 2019-07-29. ASG. The 2019 version of SLURM no longer supports --share. It is implied. The closest thing is to -s , to oversubscribe. Which 
-			 is not what we want. So the code no longer needs that flag.
-			else if (application.getSPMDVariation().toString().contains(CmdLineManipulatorConstants.SHARED_THREADED_PHRASE)) {
+			} else if (application.getSPMDVariation().toString().contains(CmdLineManipulatorConstants.SHARED_THREADED_PHRASE)) {
 				script.format("#SBATCH --share\n");
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using shared flag for SharedThreaded spmd");
 			}
-			*/
+
 			// in slurm, processes are tasks. so we only worry about tasks/processes and processes per host here.
 			if (numProcs != null) {
 				// always specify number of tasks if they told us.
 				script.format("#SBATCH --ntasks=%d\n", numProcs.intValue());
 				// if we also know processes per host, add in the node and tasks per node counts.
-				if (numProcsPerHost != null && (numProcsPerHost.intValue()!=0)) {
-					// 2019-07-29 by ASG. Added cieling function and checking for zero
-					Integer hosts = (numProcs+numProcsPerHost-1) / numProcsPerHost;
+				if (numProcsPerHost != null) {
+					Integer hosts = numProcs / numProcsPerHost;
 					script.format("#SBATCH --nodes=%d\n", hosts.intValue());
 					script.format("#SBATCH --ntasks-per-node=%d\n", numProcsPerHost.intValue());
 				}
@@ -262,6 +261,8 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		}
 
 		ResourceConstraints resourceConstraints = application.getResourceConstraints();
+		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---Before checking resource Constraints" );
+		
 		if (resourceConstraints != null) {
 			Double totalPhysicalMemory = resourceConstraints.getTotalPhysicalMemory();
 			if ((totalPhysicalMemory != null) && (!totalPhysicalMemory.equals(Double.NaN)))
@@ -271,7 +272,25 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();
 			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))
 				script.format("#SBATCH --time=%s\n", toWallTimeFormat(wallclockTime));
+			
+			Double gpusPerNode = resourceConstraints.getGPUCountPerNode();
+			_logger.info("-----JSDL:---- SLURMQueueConnection.java got this for gpuCount--- " + gpusPerNode);
+			if (gpusPerNode != null && !gpusPerNode.equals(Double.NaN)) {
+				script.format("#SBATCH --gres=gpu:%s\n", gpusPerNode.intValue());
+				_logger.info("-----JSDL:---- SLURMQueueConnection.java got this for gpuCount--- " + gpusPerNode);
+			} 
+			
+			Double gpuMemoryPerNode = resourceConstraints.getGPUMemoryPerNode();
+			_logger.info("-----JSDL:---- SLURMQueueConnection.java got this for gpuMempry--- " + gpuMemoryPerNode);
+			if ((gpuMemoryPerNode != null) && (!gpuMemoryPerNode.equals(Double.NaN))) {
+				script.format("##SBATCH --mem-per-gpu=%d\n", (gpuMemoryPerNode.longValue()/(1024*1024)));
+				_logger.info("-----JSDL:---- SLURMQueueConnection.java got this for gpuMemory--- " + gpuMemoryPerNode);
+			}
+			
+		} else {
+			_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---no resource constraints" );
 		}
+		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---After checking resource Constraints" );
 	}
 
 	@Override

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genii:gpu-arch-map
+	xmlns:genii="http://vcgr.cs.virginia.edu/genii"
+	xmlns="http://vcgr.cs.virginia.edu/genii">
+	
+	<genii:arch-mapping jsdl-value="k40" java-value="k40"/>
+	<genii:arch-mapping jsdl-value="k80" java-value="k80"/>
+	<genii:arch-mapping jsdl-value="g1070" java-value="g1070"/>
+	<genii:arch-mapping jsdl-value="g1080" java-value="g1080"/>
+	<genii:arch-mapping jsdl-value="g2080" java-value="g2080"/>
+	<genii:arch-mapping jsdl-value="g2080ti" java-value="g2080ti"/>
+	<genii:arch-mapping jsdl-value="p100" java-value="p100"/>
+	<genii:arch-mapping jsdl-value="v100" java-value="v100"/>
+</genii:gpu-arch-map>

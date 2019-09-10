@@ -15,6 +15,21 @@ This document and the information contained herein is provided on an "AS IS" bas
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl" xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl" targetNamespace="http://schemas.ggf.org/jsdl/2005/11/jsdl" elementFormDefault="qualified">
 	<!--========================================================================-->
 	<!-- SIMPLE TYPES -->
+	<!-- Vana: 08-04-2019: GPU Enumeration, add more types here when new GPU models are suported -->
+	<xsd:simpleType name="GPUArchitectureEnumeration">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="k40"/>
+			<xsd:enumeration value="k80"/>
+			<xsd:enumeration value="g1070"/>
+			<xsd:enumeration value="g1080"/>
+			<xsd:enumeration value="g2080"/>
+			<xsd:enumeration value="g2080ti"/>
+			<xsd:enumeration value="p100"/>
+			<xsd:enumeration value="v100"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--========================================================================-->
 	<xsd:simpleType name="ProcessorArchitectureEnumeration">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="sparc"/>
@@ -205,6 +220,9 @@ This document and the information contained herein is provided on an "AS IS" bas
 			<xsd:element ref="jsdl:ExclusiveExecution" minOccurs="0"/>
 			<xsd:element ref="jsdl:OperatingSystem" minOccurs="0"/>
 			<xsd:element ref="jsdl:CPUArchitecture" minOccurs="0"/>
+			<xsd:element ref="jsdl:GPUArchitecture" minOccurs="0"/>
+			<xsd:element ref="jsdl:GPUCountPerNode" minOccurs="0"/>
+			<xsd:element ref="jsdl:GPUMemoryPerNode" minOccurs="0"/>
 			<xsd:element ref="jsdl:IndividualCPUSpeed" minOccurs="0"/>
 			<xsd:element ref="jsdl:IndividualCPUTime" minOccurs="0"/>
 			<xsd:element ref="jsdl:IndividualCPUCount" minOccurs="0"/>
@@ -232,6 +250,15 @@ This document and the information contained herein is provided on an "AS IS" bas
 	<xsd:complexType name="CPUArchitecture_Type">
 		<xsd:sequence>
 			<xsd:element ref="jsdl:CPUArchitectureName"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<!--========================================================================-->
+	<!-- Vana: 0-04-2019, Name of the GPU model. More fileds can be added here ex. vendor names nvidia, amd etc -->
+	<xsd:complexType name="GPUArchitecture_Type">
+		<xsd:sequence>
+			<xsd:element ref="jsdl:GPUArchitectureName"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
@@ -315,6 +342,10 @@ This document and the information contained herein is provided on an "AS IS" bas
 	<xsd:element name="ExclusiveExecution" type="xsd:boolean"/>
 	<xsd:element name="CPUArchitecture" type="jsdl:CPUArchitecture_Type"/>
 	<xsd:element name="CPUArchitectureName" type="jsdl:ProcessorArchitectureEnumeration"/>
+	<xsd:element name="GPUArchitecture" type="jsdl:GPUArchitecture_Type"/>
+	<xsd:element name="GPUArchitectureName" type="jsdl:GPUArchitectureEnumeration"/>
+	<xsd:element name="GPUCountPerNode" type="jsdl:RangeValue_Type"/>
+	<xsd:element name="GPUMemoryPerNode" type="jsdl:RangeValue_Type"/>
 	<xsd:element name="FileSystem" type="jsdl:FileSystem_Type"/>
 	<xsd:element name="FileSystemType" type="jsdl:FileSystemTypeEnumeration"/>
 	<xsd:element name="MountPoint" type="xsd:string"/>

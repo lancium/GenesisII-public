@@ -6,9 +6,11 @@ import java.util.Set;
 
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 import edu.virginia.vcgr.appmgr.os.ProcessorArchitecture;
+import edu.virginia.vcgr.appmgr.os.GPUArchitecture;
 
 public class ResourceSummary
 {
@@ -20,6 +22,11 @@ public class ResourceSummary
 	static public ProcessorArchitecture translate(ProcessorArchitectureEnumeration archEnum)
 	{
 		return ProcessorArchitecture.valueOf(archEnum.getValue());
+	}
+
+	static public GPUArchitecture translate(GPUArchitectureEnumeration gpuarchEnum)
+	{
+		return GPUArchitecture.valueOf(gpuarchEnum.getValue());
 	}
 
 	private Map<HostDescription, SlotSummary> _summary = new HashMap<HostDescription, SlotSummary>();

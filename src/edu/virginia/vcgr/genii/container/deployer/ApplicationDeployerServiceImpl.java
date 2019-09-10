@@ -159,7 +159,7 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements App
 	static public PlatformDescriptionType[] determineSupportedPlatforms()
 	{
 		return new PlatformDescriptionType[] {
-			new PlatformDescriptionType(SystemUtils.getSupportedArchitectures(), SystemUtils.getSupportedOperatingSystems(), null) };
+			new PlatformDescriptionType(SystemUtils.getSupportedArchitectures(), null, SystemUtils.getSupportedOperatingSystems(), null) };
 	}
 
 	static private IDeployment createZipJarDeployment(EndpointReferenceType deployDescEPR, ZipJarDeploymentType deploymentDescription)

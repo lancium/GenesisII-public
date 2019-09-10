@@ -9,11 +9,15 @@ import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.NormalizedString;
 import org.apache.axis.types.PositiveInteger;
 import org.ggf.jsdl.Application_Type;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.CreationFlagEnumeration;
 import org.ggf.jsdl.DataStaging_Type;
 import org.ggf.jsdl.FileSystemTypeEnumeration;
@@ -25,6 +29,7 @@ import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Resources_Type;
 import org.ggf.jsdl.SourceTarget_Type;
@@ -45,6 +50,7 @@ import org.ogf.jsdl.spmd.ThreadsPerProcess_Type;
 import edu.virginia.vcgr.genii.client.jsdl.hpc.HPCConstants;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CandidateHostsFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
@@ -74,6 +80,7 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
 
 public class JSDLInterpreter
 {
+	static private Log _logger = LogFactory.getLog(JSDLInterpreter.class);
 	static public Object interpretJSDL(PersonalityProvider provider, JobDefinition_Type jsdl) throws JSDLException
 	{
 		Object understanding = provider.createNewUnderstanding();
@@ -271,6 +278,8 @@ public class JSDLInterpreter
 
 	static private void understand(PersonalityProvider provider, Object parentUnderstanding, Resources_Type resources) throws JSDLException
 	{
+
+		_logger.info("---JSDL: ----- in JSDLInterpreter understand --------" );
 		if (resources == null)
 			return;
 
@@ -288,6 +297,7 @@ public class JSDLInterpreter
 
 		understand(provider, understanding, resources.getOperatingSystem());
 		understand(provider, understanding, resources.getCPUArchitecture());
+		understand(provider, understanding, resources.getGPUArchitecture());
 
 		RangeExpression range = RangeFactory.parse(resources.getIndividualCPUSpeed());
 		if (range != null)
@@ -296,6 +306,14 @@ public class JSDLInterpreter
 		range = RangeFactory.parse(resources.getIndividualCPUTime());
 		if (range != null)
 			facet.consumeIndividualCPUTime(understanding, range);
+
+		range = RangeFactory.parse(resources.getGPUCountPerNode());
+		if (range != null)
+			facet.consumeGPUCountPerNode(understanding, range);
+
+		range = RangeFactory.parse(resources.getGPUMemoryPerNode());
+		if (range != null)
+			facet.consumeGPUMemoryPerNode(understanding, range);
 
 		range = RangeFactory.parse(resources.getIndividualCPUCount());
 		if (range != null)
@@ -726,8 +744,26 @@ public class JSDLInterpreter
 		facet.completeFacet(parentUnderstanding, understanding);
 	}
 
+	static private void understand(PersonalityProvider provider, Object parentUnderstanding, GPUArchitecture_Type arch) throws JSDLException
+	{
+		_logger.info("---JSDL: ----- in JSDLInterpreter undertsand GPU"); 
+		if (arch == null)
+			return;
+
+		GPUArchitectureFacet facet = provider.getGPUArchitectureFacet(parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(parentUnderstanding);
+
+		understandAny(facet, understanding, arch.get_any());
+
+		GPUArchitectureEnumeration g = arch.getGPUArchitectureName();
+		if (g != null)
+			facet.consumeGPUArchitectureName(understanding, g);
+
+	}
+
 	static private void understand(PersonalityProvider provider, Object parentUnderstanding, CPUArchitecture_Type arch) throws JSDLException
 	{
+		_logger.info("---JSDL: ----- in JSDLInterpreter undertsand CPU"); 
 		if (arch == null)
 			return;
 

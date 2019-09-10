@@ -50,6 +50,7 @@ import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 public class QueueProcessPhase extends AbstractRunProcessPhase implements TerminateableExecutionPhase
 {
@@ -311,6 +312,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						OperatingSystemNames osName = _constructionParameters.getResourceOverrides().operatingSystemName();
 
 						ProcessorArchitecture arch = _constructionParameters.getResourceOverrides().cpuArchitecture();
+
+						GPUProcessorArchitecture gpuarch = _constructionParameters.getResourceOverrides().gpuArchitecture();
 
 						Vector<String> command = new Vector<String>(_arguments);
 						command.add(0, _executable.getAbsolutePath());

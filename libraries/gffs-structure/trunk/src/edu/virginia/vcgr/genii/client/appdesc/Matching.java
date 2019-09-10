@@ -2,10 +2,12 @@ package edu.virginia.vcgr.genii.client.appdesc;
 
 import org.apache.axis.types.URI;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 
 import edu.virginia.vcgr.genii.appdesc.PlatformDescriptionType;
 import edu.virginia.vcgr.genii.appdesc.SupportDocumentType;
@@ -40,6 +42,42 @@ public class Matching
 
 		for (CPUArchitecture_Type desiredArch : desired) {
 			ProcessorArchitectureEnumeration osname = desiredArch.getCPUArchitectureName();
+
+			if (matches(osname, potential))
+				return true;
+		}
+
+		return false;
+	}
+
+	static private boolean matches(GPUArchitectureEnumeration osname, SupportDocumentType potential)
+	{
+		PlatformDescriptionType[] platforms = potential.getPlatformDescription();
+		if (platforms == null || platforms.length == 0)
+			return true;
+
+		for (PlatformDescriptionType platform : platforms) {
+			GPUArchitecture_Type[] arches = platform.getGPUArchitecture();
+			if (arches == null || arches.length == 0)
+				return true;
+
+			for (GPUArchitecture_Type arch : arches) {
+				GPUArchitectureEnumeration targetName = arch.getGPUArchitectureName();
+				if (targetName == osname)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	static private boolean matches(GPUArchitecture_Type[] desired, SupportDocumentType potential)
+	{
+		if (desired == null || desired.length == 0)
+			return true;
+
+		for (GPUArchitecture_Type desiredArch : desired) {
+			GPUArchitectureEnumeration osname = desiredArch.getGPUArchitectureName();
 
 			if (matches(osname, potential))
 				return true;
@@ -141,6 +179,8 @@ public class Matching
 
 			for (PlatformDescriptionType desiredPlatform : desiredPlatforms) {
 				if (!matches(desiredPlatform.getCPUArchitecture(), potential))
+					continue;
+				if (!matches(desiredPlatform.getGPUArchitecture(), potential))
 					continue;
 				if (!matches(desiredPlatform.getOperatingSystem(), potential))
 					continue;

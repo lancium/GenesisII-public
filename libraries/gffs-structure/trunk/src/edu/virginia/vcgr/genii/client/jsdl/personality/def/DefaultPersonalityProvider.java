@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.jsdl.personality.def;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CandidateHostsFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
@@ -39,6 +40,12 @@ public class DefaultPersonalityProvider implements PersonalityProvider
 	public CPUArchitectureFacet getCPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultCPUArchitectureFacet();
+	}
+
+	@Override
+	public GPUArchitectureFacet getGPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
+	{
+		return new DefaultGPUArchitectureFacet();
 	}
 
 	@Override

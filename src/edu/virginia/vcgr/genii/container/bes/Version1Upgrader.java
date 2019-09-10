@@ -23,6 +23,7 @@ import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 class Version1Upgrader
 {
@@ -42,6 +43,12 @@ class Version1Upgrader
 		String value = props.getProperty(name);
 		return (value == null) ? null : ProcessorArchitecture.valueOf(value);
 	}
+
+	static private GPUProcessorArchitecture getGPUProcessorArchitecture(Properties props, String name)
+        {
+                String value = props.getProperty(name);
+                return (value == null) ? null : GPUProcessorArchitecture.valueOf(value);
+        }
 
 	static private Integer getInteger(Properties props, String name)
 	{
@@ -100,6 +107,9 @@ class Version1Upgrader
 		final String CPUSPEED = BASE + "cpu-speed";
 		final String PHYSICALMEM = BASE + "physical-memory";
 		final String VIRTUALMEM = BASE + "virtual-memory";
+		final String GPUARCH = BASE + "gpu-architecture-name";
+		final String GPUCOUNT = BASE + "gpu-count-per-node";
+		final String GPUMEMORY = BASE + "gpu-memory-per-node";
 
 		OperatingSystemNames osName = getOperatingSystemName(props, OSNAME);
 		if (osName != null) {
@@ -117,6 +127,24 @@ class Version1Upgrader
 		if (cpuArch != null) {
 			ret = true;
 			overrides.cpuArchitecture(cpuArch);
+		}
+
+		GPUProcessorArchitecture gpuArch = getGPUProcessorArchitecture(props, GPUARCH);
+		if (cpuArch != null) {
+			ret = true;
+			overrides.cpuArchitecture(cpuArch);
+		}
+	
+		Integer gpuCount = getInteger(props, GPUCOUNT);
+                if (gpuCount != null) {
+                        ret = true;
+                        overrides.gpuCount(gpuCount);
+                }
+
+		Size gpuMem = getSize(props, GPUMEMORY);
+		if (gpuMem != null) {
+			ret = true;
+			overrides.gpuMemoryPerNode(gpuMem);
 		}
 
 		Integer cpuCount = getInteger(props, CPUCOUNT);

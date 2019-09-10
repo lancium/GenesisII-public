@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import edu.virginia.vcgr.genii.client.bes.ResourceManagerType;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 @XmlRootElement(namespace = QueueConstants.QUEUE_NS, name = QueueConstants.CURRENT_RESOURCE_INFORMATION_NAME)
 @XmlAccessorType(XmlAccessType.NONE)
@@ -28,6 +29,9 @@ public class CurrentResourceInformation
 
 	@XmlAttribute(name = "processor-architecture", required = true)
 	private ProcessorArchitecture _processorArchitecture;
+
+	@XmlAttribute(name = "gpu-architecture", required = true)
+	private GPUProcessorArchitecture _gpuArchitecture;
 
 	@XmlAttribute(name = "operating-system-type", required = true)
 	private OperatingSystemNames _operatingSystemType;
@@ -60,19 +64,20 @@ public class CurrentResourceInformation
 	{
 		// This is for JAXB Only
 		this(-1, -1, false, ProcessorArchitecture.other, OperatingSystemNames.other, "<unknown>", null, ResourceManagerType.Unknown, false,
-			null, null, -1, -1);
+			null, null, -1, -1, null);
 		// this(-1, -1, false, ProcessorArchitecture.other, OperatingSystemNames.other, "<unknown>", null, ResourceManagerType.Unknown, false,
 		// null, null);
 	}
 
 	public CurrentResourceInformation(int maxSlots, int currentSlotsUsed, boolean isAcceptingActivities,
 		ProcessorArchitecture processorArchitecture, OperatingSystemNames osType, String osVersion, Double physicalMemory,
-		ResourceManagerType resourceManagerType, boolean available, Date lastUpdated, Date nextUpdate)
+		ResourceManagerType resourceManagerType, boolean available, Date lastUpdated, Date nextUpdate, GPUProcessorArchitecture gpuArchitecture)
 	{
 		_maxSlots = maxSlots;
 		_currentSlotsUsed = currentSlotsUsed;
 		_isAcceptingActivities = isAcceptingActivities;
 		_processorArchitecture = processorArchitecture;
+		_gpuArchitecture = gpuArchitecture;
 		_operatingSystemType = osType;
 		_operatingSystemVerison = osVersion;
 		_physicalMemory = physicalMemory;
@@ -91,12 +96,13 @@ public class CurrentResourceInformation
 
 	public CurrentResourceInformation(int maxSlots, int currentSlotsUsed, boolean isAcceptingActivities,
 		ProcessorArchitecture processorArchitecture, OperatingSystemNames osType, String osVersion, Double physicalMemory,
-		ResourceManagerType resourceManagerType, boolean available, Date lastUpdated, Date nextUpdate, int maxCores, int currentCoresUsed)
+		ResourceManagerType resourceManagerType, boolean available, Date lastUpdated, Date nextUpdate, int maxCores, int currentCoresUsed, GPUProcessorArchitecture gpuArchitecture)
 	{
 		_maxSlots = maxSlots;
 		_currentSlotsUsed = currentSlotsUsed;
 		_isAcceptingActivities = isAcceptingActivities;
 		_processorArchitecture = processorArchitecture;
+		_gpuArchitecture = gpuArchitecture;
 		_operatingSystemType = osType;
 		_operatingSystemVerison = osVersion;
 		_physicalMemory = physicalMemory;
@@ -138,6 +144,11 @@ public class CurrentResourceInformation
 	final public ProcessorArchitecture processorArchitecture()
 	{
 		return _processorArchitecture;
+	}
+
+	final public GPUProcessorArchitecture gpuArchitecture()
+	{
+		return _gpuArchitecture;
 	}
 
 	final public OperatingSystemNames operatingSystem()

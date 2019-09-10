@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.apache.axis.message.MessageElement;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -30,6 +31,7 @@ public class ApplicationDeployerAttributeHandler extends AbstractAttributeHandle
 
 		PlatformDescriptionType[] platform =
 			new PlatformDescriptionType[] { new PlatformDescriptionType(new CPUArchitecture_Type[] { JSDLUtils.getLocalCPUArchitecture() },
+				new GPUArchitecture_Type[] { JSDLUtils.getLocalGPUArchitecture() },
 				new OperatingSystem_Type[] { JSDLUtils.getLocalOperatingSystem() }, null) };
 
 		ret.add(new MessageElement(AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME,

@@ -4,9 +4,11 @@ import java.util.Comparator;
 
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 import edu.virginia.vcgr.appmgr.os.ProcessorArchitecture;
+import edu.virginia.vcgr.appmgr.os.GPUArchitecture;
 
 public class HostDescription implements Comparable<HostDescription>
 {
@@ -21,11 +23,13 @@ public class HostDescription implements Comparable<HostDescription>
 
 	private ProcessorArchitecture _arch;
 	private OperatingSystemTypes _osType;
+	private GPUArchitecture _gpuArch;
 
-	public HostDescription(ProcessorArchitecture arch, OperatingSystemTypes osType)
+	public HostDescription(ProcessorArchitecture arch,  OperatingSystemTypes osType)
 	{
 		_arch = arch;
 		_osType = osType;
+
 	}
 
 	public HostDescription(ProcessorArchitectureEnumeration archEnum, OperatingSystemTypeEnumeration osEnum)

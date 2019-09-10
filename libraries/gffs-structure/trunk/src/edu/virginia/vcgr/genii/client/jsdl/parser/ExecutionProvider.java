@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.jsdl.parser;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.HPCApplicationFacet;
@@ -16,6 +17,7 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.SourceURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.TargetURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultPersonalityProvider;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionCPUArchitectureFacet;
+import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionGPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionDataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionFilesystemFacet;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionHPCApplicationFacet;
@@ -94,6 +96,12 @@ public class ExecutionProvider extends DefaultPersonalityProvider
 	public CPUArchitectureFacet getCPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
 	{
 		return new ExecutionCPUArchitectureFacet();
+	}
+
+	@Override
+	public GPUArchitectureFacet getGPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
+	{
+		return new ExecutionGPUArchitectureFacet();
 	}
 
 	@Override

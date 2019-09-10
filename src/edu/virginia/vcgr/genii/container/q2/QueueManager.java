@@ -51,6 +51,8 @@ import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
+
 
 /**
  * This class is called directly from the queue service. Mostly, it acts as a conduit between the service impl, and the three managers
@@ -219,6 +221,8 @@ public class QueueManager implements Closeable
 		boolean isAccepting = (info == null) ? false : info.isAcceptingNewActivities();
 		ProcessorArchitecture arch =
 			(info == null) ? ProcessorArchitecture.other : ProcessorArchitecture.valueOf(info.getProcessorArchitecture().toString());
+		GPUProcessorArchitecture gpuArch =
+			(info == null) ? GPUProcessorArchitecture.other : GPUProcessorArchitecture.valueOf(info.getGPUProcessorArchitecture().toString());
 		OperatingSystemNames osName =
 			(info == null) ? OperatingSystemNames.Unknown : OperatingSystemNames.valueOf(info.getOperatingSystemType().toString());
 		String osVersion = (info == null) ? null : info.getOperatingSystemVersion();
@@ -234,7 +238,7 @@ public class QueueManager implements Closeable
 		_jobManager.recordUsedSlots(slots);
 		return new CurrentResourceInformation(data.getTotalSlots(), (int) (slots.get(data.getID()).slotsUsed()), isAccepting, arch, osName,
 			osVersion, physicalMemory, mgrType, isAvailable, lastUpdated, nextUpdate, data.getTotalCores(),
-			(int) (slots.get(data.getID()).coresUsed()));
+			(int) (slots.get(data.getID()).coresUsed()), gpuArch);
 	}
 
 	private Collection<LegacyEntryType> addInCurrentResourceInformation(Collection<LegacyEntryType> entries) throws JAXBException
@@ -680,8 +684,7 @@ public class QueueManager implements Closeable
 			for (Long besID : hostSlotSummary.keySet()) {
 				BESInformation info = _besManager.getBESInformation(besID);
 				if (info != null) {
-					summary.add(new HostDescription(info.getProcessorArchitecture(), info.getOperatingSystemType()),
-						hostSlotSummary.get(besID));
+					summary.add(new HostDescription(info.getProcessorArchitecture(), info.getOperatingSystemType()), hostSlotSummary.get(besID));
 				}
 			}
 		}

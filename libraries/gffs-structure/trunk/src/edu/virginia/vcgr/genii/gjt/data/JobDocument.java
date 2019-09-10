@@ -48,6 +48,7 @@ import edu.virginia.vcgr.genii.gjt.util.Triple;
 import edu.virginia.vcgr.jsdl.Application;
 import edu.virginia.vcgr.jsdl.ApplicationBase;
 import edu.virginia.vcgr.jsdl.CPUArchitecture;
+import edu.virginia.vcgr.jsdl.GPUArchitecture;
 import edu.virginia.vcgr.jsdl.DataStaging;
 import edu.virginia.vcgr.jsdl.JSDLConstants;
 import edu.virginia.vcgr.jsdl.JobDefinition;
@@ -127,6 +128,15 @@ public class JobDocument implements PostUnmarshallListener
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "processor-architecture")
 	private ProcessorArchitecture _processorArchitecture;
+
+	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "gpu-architecture")
+	private GPUArchitecture _gpuArchitecture;
+
+	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "gpu-count-per-node")
+	private SettableLong _gpuCountPerNode;
+	
+	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "gpu-memory-upper-bound")
+	private SizeValue _gpuMemoryUpperBound;
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "memory-upper-bound")
 	private SizeValue _memoryUpperBound;
@@ -297,6 +307,48 @@ public class JobDocument implements PostUnmarshallListener
 			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "CPUArchitecture"));
 			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "CPUArchitectureName"));
 			resources.cpuArchitecture(new CPUArchitecture(_processorArchitecture));
+			builder.pop();
+			builder.pop();
+		}
+
+		if (_gpuArchitecture != null) {
+                        if (resources == null)
+                                resources = new Resources();
+
+                        builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "GPUArchitecture"));
+                        builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "GPUArchitectureName"));
+                        resources.gpuArchitecture(new GPUArchitecture(_gpuArchitecture));
+                        builder.pop();
+                        builder.pop();
+                }
+
+		if (_gpuCountPerNode.value() != null) {
+			if (resources == null)
+					resources = new Resources();
+
+            		builder.push(new DefaultXPathNode("http://vcgr.cs.virginia.edu/jsdl/genii", "GPUCountPerNode"));
+            		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
+
+            		RangeValue rv = new RangeValue();
+
+            		rv.upperBoundedRange(new Boundary(_gpuCountPerNode.value()));
+            		resources.GPUCountPerNode(rv);
+
+            		builder.pop();
+            		builder.pop();
+        	}
+		
+		if (_gpuMemoryUpperBound.value() != null) {
+			if (resources == null)
+				resources = new Resources();
+
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "GPUMemoryPerNode"));
+			builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
+
+			RangeValue rv = new RangeValue();
+			rv.upperBoundedRange(new Boundary(_gpuMemoryUpperBound.units().toBytes(_gpuMemoryUpperBound.value())));
+			resources.GPUMemoryPerNode(rv);
+
 			builder.pop();
 			builder.pop();
 		}

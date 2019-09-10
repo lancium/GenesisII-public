@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.jsdl.personality.common;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobIdentificationFacet;
@@ -12,6 +13,7 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SourceURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.TargetURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.CommonCPUArchitectureFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.CommonGPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.CommonOperatingSystemFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.CommonOperatingSystemTypeFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.CommonSourceURIFacet;
@@ -74,6 +76,12 @@ public class CommonPersonalityProvider extends DefaultPersonalityProvider
 	{
 		return new CommonCPUArchitectureFacet();
 	}
+
+	@Override
+        public GPUArchitectureFacet getGPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
+        {
+                return new CommonGPUArchitectureFacet();
+        }
 
 	@Override
 	public OperatingSystemFacet getOperatingSystemFacet(Object currentUnderstanding) throws JSDLException

@@ -12,10 +12,12 @@ import org.apache.axis.types.URI.MalformedURIException;
 import org.ggf.bes.factory.BasicResourceAttributesDocumentType;
 import org.ggf.bes.factory.FactoryResourceAttributesDocumentType;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.ResourceManagerType;
@@ -35,6 +37,7 @@ import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameter;
 import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameters;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 class QueueAsBESFactoryAttributesUtilities
 {
@@ -66,6 +69,16 @@ class QueueAsBESFactoryAttributesUtilities
 
 		return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.fromString(arch.name()), null);
 	}
+
+	private GPUArchitecture_Type gpuArchitecture()
+        {
+                GPUProcessorArchitecture arch = _resO.gpuArchitecture();
+                if (arch == null)
+                        throw new IllegalArgumentException("GPU Processor Architecture cannot be null!");
+
+                return new GPUArchitecture_Type(GPUArchitectureEnumeration.fromString(arch.name()), null);
+        }
+
 
 	private Collection<MessageElement> supportedFilesystems()
 	{
@@ -147,6 +160,24 @@ class QueueAsBESFactoryAttributesUtilities
 		}
 
 		return (largest == null) ? null : new Duration(largest);
+	}
+
+	private double gpuCount()
+    	{
+		Integer i = _resO.gpuCount();
+       		if (i == null)
+        		i = 1; //VANA: JSDL---- setting this value to constant, may be needs to change?
+
+        	return i.doubleValue();
+    	}
+
+	private double gpuMemory()
+	{
+		Size size = _resO.gpuMemoryPerNode();
+		if (size == null)
+			size = null;
+
+		return size.as(SizeUnits.Bytes);
 	}
 
 	private double cpuCount()
@@ -248,7 +279,7 @@ class QueueAsBESFactoryAttributesUtilities
 			any.add(new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, parameter.toAxisType()));
 
 		BasicResourceAttributesDocumentType basicResourceAttributesDocument = new BasicResourceAttributesDocumentType(machineName,
-			operatingSystem(), cpuArchitecture(), cpuCount(), cpuSpeed(), physicalMemory(), virtualMemory(), Elementals.toArray(any));
+			operatingSystem(), cpuArchitecture(), gpuArchitecture(), gpuCount(), gpuMemory(), cpuCount(), cpuSpeed(), physicalMemory(), virtualMemory(), Elementals.toArray(any));
 
 		return new FactoryResourceAttributesDocumentType(basicResourceAttributesDocument, isAcceptingNewActivities, machineName, machineName,
 			totalNumberOfActivities, null, _allBESInformation.size(), null, namingProfiles, besExtensions, localResourceManagerType,

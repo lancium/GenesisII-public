@@ -13,6 +13,10 @@ public interface ResourcesFacet extends PersonalityFacet
 
 	public void consumeIndividualCPUCount(Object currentUnderstanding, RangeExpression individualCPUCount) throws JSDLException;
 
+	public void consumeGPUCountPerNode(Object currentUnderstanding, RangeExpression GPUCountPerNode) throws JSDLException;
+
+	public void consumeGPUMemoryPerNode(Object currentUnderstanding, RangeExpression GPUMemoryPerNode) throws JSDLException;
+
 	public void consumeIndividualNetworkBandwidth(Object currentUnderstanding, RangeExpression individualNetworkBandwidth)
 		throws JSDLException;
 

@@ -39,6 +39,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.StageInPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StageOutPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StoreContextPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
+import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 
 public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 {
@@ -60,6 +61,9 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	private Double _wallclockTimeLimit = null;
 	private Double _totalCPUCount = null;
 	private Double _individualCPUCount = null;
+
+	private Double _GPUCountPerNode = null;
+ 	private Double _GPUMemoryPerNode = null;
 
 	private ApplicationUnderstanding _application = null;
 	
@@ -194,6 +198,26 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		_individualCPUCount = individualCPUCount;
 	}
 
+	public Double getGPUCountPerNode()
+     	{
+ 		return _GPUCountPerNode;
+     	}
+ 
+ 	public void setGPUCountPerNode(Double GPUCountPerNode)
+     	{
+ 		_GPUCountPerNode = GPUCountPerNode;
+     	}
+ 
+ 	public Double getGPUMemoryPerNode()
+     	{
+ 		return _GPUMemoryPerNode;
+     	}
+ 
+ 	public void setGPUMemoryPerNode(Double GPUMemoryPerNode)
+     	{
+ 		_GPUMemoryPerNode = GPUMemoryPerNode;
+     	}
+
 	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
@@ -245,6 +269,9 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		ResourceConstraints resourceConstraints = new ResourceConstraints();
 		resourceConstraints.setTotalPhysicalMemory(getTotalPhysicalMemory());
 		resourceConstraints.setWallclockTimeLimit(getWallclockTimeLimit());
+		resourceConstraints.setGPUCountPerNode(getGPUCountPerNode());
+ 		resourceConstraints.setGPUMemoryPerNode(getGPUMemoryPerNode());
+
 
 		// Check wallclock time and memory constraint
 		if (creationProperties != null) {
@@ -267,6 +294,26 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 						throw new JSDLMatchException(
 							String.format("Job requested %f seconds, but BES limits to %s.", requestedWall, besUpperWall));
 				}
+
+				// gpus per node
+				Integer gpusperNode = overrides.gpuCount();
+ 				Double requestedGpus = resourceConstraints.getGPUCountPerNode();
+ 				_logger.info("--------JSDL:------ in commonExecutionUnderstanding.java----" + gpusperNode + "---" +requestedGpus);
+ 				if (gpusperNode != null && requestedGpus != null) {
+ 					if (requestedGpus.intValue() > gpusperNode)
+ 						throw new JSDLMatchException(
+ 							String.format("Job requested %f gpus, but BES limits to %d.", requestedGpus, gpusperNode));
+ 				}
+ 
+ 				// check gpu memory per node
+ 				Size gpuMemoryUpperLimit = overrides.gpuMemoryPerNode();
+ 				Double requestedGPUMemSize = resourceConstraints.getGPUMemoryPerNode();
+ 				_logger.info("-----JSDL:----- in commonExecutionUnderstanding.java----" + gpuMemoryUpperLimit + "---" + requestedGPUMemSize);
+ 				if (gpuMemoryUpperLimit != null && requestedGPUMemSize != null) {
+ 					if (requestedGPUMemSize > gpuMemoryUpperLimit.as(SizeUnits.Bytes))
+ 						throw new JSDLMatchException(
+ 							String.format("Job requested %f bytes, but BES limits to %s.", requestedGPUMemSize, gpuMemoryUpperLimit));
+ 				}
 			}
 		}
 

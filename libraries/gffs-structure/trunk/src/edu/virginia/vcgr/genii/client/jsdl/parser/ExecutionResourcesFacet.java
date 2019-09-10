@@ -21,6 +21,18 @@ public class ExecutionResourcesFacet extends DefaultResourcesFacet
 	}
 	
 	@Override
+	public void consumeGPUCountPerNode(Object currentUnderstanding, RangeExpression GPUCountPerNode) 	
+	{
+		
+	}
+
+	@Override
+	public void consumeGPUMemoryPerNode(Object currentUnderstanding, RangeExpression gpuMemoryPerNode) throws JSDLException
+	{
+	
+	}
+
+	@Override
 	public void consumeTotalCPUCount(Object currentUnderstanding, RangeExpression individualCPUCount)
 	{
 		

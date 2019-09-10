@@ -23,10 +23,12 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -56,6 +58,7 @@ import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 public class BESAttributesHandler extends AbstractAttributeHandler
 {
@@ -80,6 +83,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(consts.DESCRIPTION_ATTR, "getDescriptionAttr", "setDescriptionAttr");
 		addHandler(consts.OPERATING_SYSTEM_ATTR, "getOperatingSystemAttr");
 		addHandler(consts.CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
+		addHandler(consts.GPU_ARCHITECTURE_ATTR, "getGPUArchitectureAttr");
+		addHandler(consts.GPU_COUNT_ATTR, "getGPUCountAttr");
 		addHandler(consts.CPU_COUNT_ATTR, "getCPUCountAttr");
 		addHandler(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
 		addHandler(consts.SPMD_PROVIDER_ATTR, "getSPMDProvidersAttr");
@@ -145,16 +150,68 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 
 	static public CPUArchitecture_Type getCPUArchitecture() throws RemoteException
 	{
+		_logger.info("-----JSDL---in getCPUArchitecute in BESAttributeshandler---");
 		IBESResource resource = null;
 		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
 		ProcessorArchitecture override = besParams.getResourceOverrides().cpuArchitecture();
 
-		if (override != null)
+		_logger.info("-----JSDL---in getCPUArchitecute in BESAttributeshandler---");
+
+		if (override != null) {
+			_logger.info("---JSDL: ---in BESAttributesHandler --- CPU override not NULL"); 
 			return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.fromString(override.name()), null);
+		}
 
 		return JSDLUtils.getLocalCPUArchitecture();
+	}
+
+	static public GPUArchitecture_Type getGPUArchitecture() throws RemoteException
+	{
+		_logger.info("-----JSDL---in getGPUArchitecute in BESAttributeshandler---");
+        	IBESResource resource = null;
+        	resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+        	ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
+        	BESConstructionParameters besParams = (BESConstructionParameters) cParams;
+        	GPUProcessorArchitecture override = besParams.getResourceOverrides().gpuArchitecture();
+
+        	_logger.info("-----JSDL---in getGPUArchitecute in BESAttributeshandler---");
+
+        	if (override != null){
+        		_logger.info("---JSDL: ---in BESAttributesHandler --- GPU override not NULL"); 
+        		return new GPUArchitecture_Type(GPUArchitectureEnumeration.fromString(override.name()), null);
+        	}
+
+        	return JSDLUtils.getLocalGPUArchitecture();
+    	}
+
+	static public int getGPUCount() throws RemoteException
+	{
+		IBESResource resource = null;
+        	resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+        	ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
+        	BESConstructionParameters besParams = (BESConstructionParameters) cParams;
+
+        	Integer i = besParams.getResourceOverrides().gpuCount();
+        	if (i != null)
+        		return i.intValue();
+
+		//VANA---JSDL--- May want to change this? To what?
+		return 1;
+	}
+	
+	static public long getGPUMemory() throws RemoteException
+	{
+		IBESResource resource = null;
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
+		Size override = besParams.getResourceOverrides().gpuMemoryPerNode();
+		if (override != null)
+			return (long) override.as(SizeUnits.Bytes);
+
+		return 0;
 	}
 
 	static public int getCPUCount() throws RemoteException
@@ -386,6 +443,16 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		return new MessageElement(consts.CPU_ARCHITECTURE_ATTR, getCPUArchitecture());
 	}
+
+	public MessageElement getGPUArchitectureAttr() throws RemoteException
+	{
+		return new MessageElement(consts.GPU_ARCHITECTURE_ATTR, getGPUArchitecture());
+	}
+
+	public MessageElement getGPUCountAttr() throws RemoteException
+    {
+		return new MessageElement(consts.GPU_COUNT_ATTR, getGPUCount());
+    }
 
 	public MessageElement getCPUCountAttr() throws RemoteException
 	{

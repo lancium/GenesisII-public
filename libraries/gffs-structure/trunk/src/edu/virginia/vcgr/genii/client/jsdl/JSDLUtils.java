@@ -14,6 +14,9 @@ package edu.virginia.vcgr.genii.client.jsdl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+
 
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -22,12 +25,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.Boundary_Type;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.Exact_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Range_Type;
 import org.w3c.dom.Element;
@@ -46,8 +51,30 @@ public class JSDLUtils extends JNIContainerBaseClass
 {
 	static private Log _logger = LogFactory.getLog(JSDLUtils.class);
 
+	static public GPUArchitecture_Type getLocalGPUArchitecture()
+	{
+		_logger.info("----JSDL: in JSDLUtils getLocalGPUArchitecture - GPU---");
+		// do something here to return a default value, other than other???
+
+		/*
+		String arch = System.getProperty("os.arch");
+		if (arch != null) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Determined that the local GPU Type is \"" + arch + "\".");
+			if (arch.equals("g1050"))
+				return new GPUArchitecture_Type(GPUArchitectureEnumeration.g1050, null);
+			else if (arch.equals("g1070"))
+				return new GPUArchitecture_Type(GPUArchitectureEnumeration.g1070, null);
+		} */
+		_logger.debug("Determined that the local GPU Type is \"" + GPUArchitectureEnumeration.other + "\".");
+
+		return new GPUArchitecture_Type(GPUArchitectureEnumeration.other, null);
+		
+	}
+
 	static public CPUArchitecture_Type getLocalCPUArchitecture()
 	{
+		_logger.info("----JSDL: in JSDLUtils getLocalCPUArchitecture - CPU---");
 		String arch = System.getProperty("os.arch");
 		if (arch != null) {
 			if (_logger.isDebugEnabled())

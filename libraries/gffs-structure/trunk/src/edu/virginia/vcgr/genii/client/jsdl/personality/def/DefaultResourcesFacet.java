@@ -23,6 +23,18 @@ public class DefaultResourcesFacet extends DefaultPersonalityFacet implements Re
 	}
 
 	@Override
+	public void consumeGPUCountPerNode(Object currentUnderstanding, RangeExpression GPUCountperNode) throws JSDLException
+	{
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "GPUCountPerNode"));
+	}
+
+	@Override
+	public void consumeGPUMemoryPerNode(Object currentUnderstanding, RangeExpression gpuMemoryperNode) throws JSDLException
+	{
+		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "GPUMemoryPerNode"));
+	}
+
+	@Override
 	public void consumeIndividualCPUSpeed(Object currentUnderstanding, RangeExpression individualCPUSpeed) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "IndividualCPUSpeed"));

@@ -9,9 +9,15 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ResourceOverrides implements Serializable
 {
+
+	static private Log _logger = LogFactory.getLog(ResourceOverrides.class);
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "operating-system-name", required = false)
@@ -38,6 +44,15 @@ public class ResourceOverrides implements Serializable
 	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "wallclock-time-limit", required = false)
 	private String _wallclockTimeLimit = null;
 
+	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "gpu-architecture-name", required = false)
+	private GPUProcessorArchitecture _gpuArchitectureName = null;
+	
+	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "gpu-count-per-node", required = false)
+	private Integer _gpuCount = null;
+
+	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "gpu-memory-per-node", required = false)
+	private Size _gpuMemoryPerNode = null;
+
 	final public OperatingSystemNames operatingSystemName()
 	{
 		return _operatingSystemName;
@@ -60,12 +75,46 @@ public class ResourceOverrides implements Serializable
 
 	final public ProcessorArchitecture cpuArchitecture()
 	{
+		_logger.info("---JSDL: ----- in ResourceOverrides, setting cpuArch: " + _cpuArchitectureName);
 		return _cpuArchitectureName;
 	}
 
 	final public void cpuArchitecture(ProcessorArchitecture arch)
 	{
+		_logger.info("---JSDL: ----- in ResourceOverrides, returning cpuArchName: " + arch);
 		_cpuArchitectureName = arch;
+	}
+
+	final public GPUProcessorArchitecture gpuArchitecture()
+	{
+		_logger.info("---JSDL: ----- in ResourceOverrides, returning gpuArchName: " + _gpuArchitectureName);
+		return _gpuArchitectureName;
+	}
+
+	final public void gpuArchitecture(GPUProcessorArchitecture arch)
+	{
+		_logger.info("---JSDL: ----- in ResourceOverrides, setting gpuArchName: " + arch);
+		_gpuArchitectureName = arch;
+	}
+	
+	final public Integer gpuCount()
+	{
+		return _gpuCount;
+	}
+
+	final public void gpuCount(Integer count)
+	{
+		_gpuCount = count;
+	}
+
+	final public Size gpuMemoryPerNode()
+	{
+		return _gpuMemoryPerNode;
+	}
+
+	final public void gpuMemoryPerNode(Size mem)
+	{
+		_gpuMemoryPerNode = mem;
 	}
 
 	final public Integer cpuCount()

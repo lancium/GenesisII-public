@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.Boundary_Type;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.FileSystem_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
@@ -17,6 +18,7 @@ import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Resources_Type;
 
@@ -44,6 +46,7 @@ public class JobResourceRequirements
 	}
 
 	private ProcessorArchitectureEnumeration _arch = null;
+	private GPUArchitectureEnumeration _gpuarch = null;
 	private OperatingSystemTypeEnumeration _osType = null;
 	private String _osVersion = null;
 	private Double _memoryRequirement = null;
@@ -53,10 +56,19 @@ public class JobResourceRequirements
 
 	private void fillInArchInformation(CPUArchitecture_Type arch)
 	{
+                _logger.info("---JSDL-----: in JobResourceRequirement----fillInCPUArchInformation  " + arch.toString());
 		ProcessorArchitectureEnumeration pArch = arch.getCPUArchitectureName();
 		if (pArch != null)
 			_arch = pArch;
 	}
+
+	private void fillInGPUArchInformation(GPUArchitecture_Type gpuarch)
+        {
+                GPUArchitectureEnumeration gArch = gpuarch.getGPUArchitectureName();
+                _logger.info("---JSDL-----: in JobResourceRequirement----fillInGPUArchInformation  " + gArch.toString());
+                if (gArch != null)
+                        _gpuarch = gArch;
+        }
 
 	private void fillInOsInformation(OperatingSystem_Type os)
 	{
@@ -105,11 +117,19 @@ public class JobResourceRequirements
 		Resources_Type resources = desc.getResources();
 		if (resources == null)
 			return;
+		
+		_logger.info("---JSDL: ---- in JobResourceRequiements Got resources, res info not null?-----" + (resources == null));
 
+		GPUArchitecture_Type gpuArch = resources.getGPUArchitecture();
+                if (gpuArch != null)
+                        fillInGPUArchInformation(gpuArch);
+        	_logger.info("---JSDL: ---- in JobResourceRequiements Got gpuArch information-----" + gpuArch);
+                	
 		CPUArchitecture_Type arch = resources.getCPUArchitecture();
 		if (arch != null)
 			fillInArchInformation(arch);
-
+        	_logger.info("---JSDL: ---- in JobResourceRequiements Got Arch information-----" + arch);
+		
 		OperatingSystem_Type osType = resources.getOperatingSystem();
 		if (osType != null)
 			fillInOsInformation(osType);
@@ -155,6 +175,9 @@ public class JobResourceRequirements
 		if (_arch != null)
 			ret ^= _arch.hashCode();
 
+		if (_gpuarch != null)
+			ret ^= _gpuarch.hashCode();
+
 		if (_osType != null)
 			ret ^= _osType.hashCode();
 
@@ -171,6 +194,8 @@ public class JobResourceRequirements
 
 		ret ^= _requestedFilesystems.hashCode();
 
+		_logger.info("----JSDL:---- in  JobResourceRequirements---hashCode --- " + ret);
+
 		return ret;
 	}
 
@@ -186,7 +211,12 @@ public class JobResourceRequirements
 
 	public boolean equals(JobResourceRequirements other)
 	{
+		_logger.info("---JSDL:--- in JobResourceRequirements---- equals--- ");
+
 		if (!equalsWithNulls(_arch, other._arch))
+			return false;
+
+		if (!equalsWithNulls(_gpuarch, other._gpuarch))
 			return false;
 
 		if (!equalsWithNulls(_osType, other._osType))
@@ -238,16 +268,39 @@ public class JobResourceRequirements
 			return false;
 		}
 
+		if (_gpuarch != null) {
+			_logger.info("----JSDL:----n JobResourceRequirements---- Matching gpuArch not NULL -- " + _gpuarch); 
+            GPUArchitectureEnumeration bgpuArch = besInfo.getGPUProcessorArchitecture();
+			_logger.info("----JSDL:----n JobResourceRequirements---- Matching gpuArch " + bgpuArch); 
+            
+			if (bgpuArch == null) {
+				_logger.warn("BES does not have a processor architecture.");
+                return false;
+			}
+			_logger.info("----JSDL:----n JobResourceRequirements---- Matching bgpuArch not NULL " + bgpuArch); 
+
+			if (!_gpuarch.equals(bgpuArch)) {
+				_logger.info("----JSDL:----n JobResourceRequirements---- bgpuArch not same as _gpuArch");
+				return false;
+			}
+		}
+
 		if (_arch != null) {
+			_logger.info("----JSDL:----n JobResourceRequirements---- Matching Arch not NULL -- " + _arch); 
 			ProcessorArchitectureEnumeration bArch = besInfo.getProcessorArchitecture();
+			_logger.info("----JSDL:----n JobResourceRequirements---- Matching Arch " + bArch); 
 			if (bArch == null) {
 				_logger.warn("BES does not have a processor architecture.");
 				return false;
 			}
+			_logger.info("----JSDL:----n JobResourceRequirements---- Macthing bArch not NULL" + bArch); 
 
-			if (!_arch.equals(bArch))
+			if (!_arch.equals(bArch)) {
+				_logger.info("----JSDL:----n JobResourceRequirements---- bArch not same as _arch");
 				return false;
+			}
 		}
+
 
 		if (_osType != null) {
 			OperatingSystemTypeEnumeration bOsType = besInfo.getOperatingSystemType();
@@ -308,6 +361,7 @@ public class JobResourceRequirements
 		appendParameter(parameters, "OS Type", _osType);
 		appendParameter(parameters, "OS Version", _osVersion);
 		appendParameter(parameters, "Processor Arch", _arch);
+		appendParameter(parameters, "GPU Arch", _gpuarch);
 		appendParameter(parameters, "Memory Requirement", _memoryRequirement);
 		if (_matchingParameters != null) {
 			for (MatchingParameter parameter : _matchingParameters.getParameters())

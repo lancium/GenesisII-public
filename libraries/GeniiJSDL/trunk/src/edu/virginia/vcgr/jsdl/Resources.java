@@ -26,15 +26,16 @@ import javax.xml.bind.annotation.XmlType;
 
 import edu.virginia.vcgr.jsdl.rangevalue.RangeValue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author Mark Morgan (mmm2a@virginia.edu)
  */
-@XmlType(propOrder = { "_candidateHosts", "_filesystems", "_exclusiveExecution", "_os", "_arch", "_individualCPUSpeed", "_individualCPUTime",
-	"_individualCPUCount", "_individualNetworkBandwidth", "_individualPhysicalMemory", "_individualVirtualMemory", "_individualDiskSpace",
-	"_totalCPUTime", "_totalCPUCount", "_totalPhysicalMemory", "_totalVirtualMemory", "_totalDiskSpace", "_totalResourceCount",
-	"_wallclockTime", "_matchingParameters" })
+@XmlType(propOrder = { "_candidateHosts", "_filesystems", "_exclusiveExecution", "_os", "_arch", "_gpuarch", "_gpuCountPerNode", "_gpuMemoryPerNode", "_individualCPUSpeed", "_individualCPUTime", "_individualCPUCount", "_individualNetworkBandwidth", "_individualPhysicalMemory", "_individualVirtualMemory", "_individualDiskSpace", "_totalCPUTime", "_totalCPUCount", "_totalPhysicalMemory", "_totalVirtualMemory", "_totalDiskSpace", "_totalResourceCount", "_wallclockTime", "_matchingParameters" })
 public class Resources extends CommonJSDLElement implements Serializable
 {
+	static private Log _logger = LogFactory.getLog(Resources.class);
 	static final long serialVersionUID = 0L;
 
 	@XmlElementWrapper(namespace = JSDLConstants.JSDL_NS, name = "CandidateHosts")
@@ -53,6 +54,15 @@ public class Resources extends CommonJSDLElement implements Serializable
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "CPUArchitecture")
 	private CPUArchitecture _arch = null;
 
+	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "GPUArchitecture")
+	private GPUArchitecture _gpuarch = null;
+	
+	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "GPUCountPerNode")
+	private RangeValue _gpuCountPerNode = null;
+	
+	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "GPUMemoryPerNode")
+	private RangeValue _gpuMemoryPerNode = null;
+	
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "IndividualCPUSpeed")
 	private RangeValue _individualCPUSpeed = null;
 
@@ -143,13 +153,47 @@ public class Resources extends CommonJSDLElement implements Serializable
 
 	final public void cpuArchitecture(CPUArchitecture arch)
 	{
+		_logger.info("----JSDL: in Resources.java---cpuArchitecture" + arch);
 		_arch = arch;
 	}
 
 	final public CPUArchitecture cpuArchitecture()
 	{
+		_logger.info("----JSDL: in Resources.java---cpuArchitecture" + _arch);
 		return _arch;
 	}
+
+	final public void gpuArchitecture(GPUArchitecture gpuarch)
+	{
+		_logger.info("----JSDL: in Resources.java---gpuArchitecture" + gpuarch);
+        	_gpuarch = gpuarch;
+    	}
+
+    	final public GPUArchitecture gpuArchitecture()
+    	{
+		_logger.info("----JSDL: in Resources.java---gpuArchitecture" + _gpuarch);
+        	return _gpuarch;
+    	}
+        
+    	final public void GPUCountPerNode(RangeValue rangeValue)
+    	{
+    		_gpuCountPerNode = rangeValue;
+    	}
+
+    	final public RangeValue GPUCountPerNode()
+    	{
+    		return _gpuCountPerNode;
+    	}
+
+    	final public void GPUMemoryPerNode(RangeValue rangeValue)
+    	{
+    		_gpuMemoryPerNode = rangeValue;
+    	}
+
+    	final public RangeValue GPUMemoryPerNode()
+    	{
+    		return _gpuMemoryPerNode;
+    	}
 
 	final public void individualCPUSpeed(RangeValue rangeValue)
 	{

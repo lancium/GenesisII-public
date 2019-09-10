@@ -27,6 +27,8 @@
 		<xsd:sequence>
 			<xsd:element ref="jsdl:CPUArchitecture"
 				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="jsdl:GPUArchitecture"
+				minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:element ref="jsdl:OperatingSystem"
 				minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:any namespace="##other" processContents="lax"

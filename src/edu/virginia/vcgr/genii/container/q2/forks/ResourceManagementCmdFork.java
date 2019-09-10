@@ -71,6 +71,7 @@ public class ResourceManagementCmdFork extends AbstractStreamableByteIOFactoryRe
 					ps.format("\tSlots:  %d\n", mgr.getBESConfiguration(getForkName()));
 					ps.format("\tOS:  %s, %s\n", besInfo.getOperatingSystemType(), besInfo.getOperatingSystemVersion());
 					ps.format("\tArch:  %s\n", besInfo.getProcessorArchitecture());
+					ps.format("\tGPUArch:  %s\n", besInfo.getGPUProcessorArchitecture());
 					ps.format("\tMemory:  %d\n", besInfo.getPhysicalMemory().longValue());
 					MatchingParameters matching = besInfo.getMatchingParameters();
 					ps.format("\tMatching Parameters:\n");

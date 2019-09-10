@@ -16,10 +16,12 @@ import org.ggf.bes.factory.BasicResourceAttributesDocumentType;
 import org.ggf.bes.factory.FactoryResourceAttributesDocumentType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
@@ -36,6 +38,9 @@ public class BESInformation
 	private MatchingParameters _matchingParameters;
 
 	private ProcessorArchitectureEnumeration _processorArchitecture;
+	private GPUArchitectureEnumeration _gpuProcessorArchitecture;
+	private Double _gpuCount = null;
+	private Double _gpuMemory = null;
 	private OperatingSystemTypeEnumeration _operatingSystemType;
 	private String _operatingSystemVerison;
 	private Double _cpuCount = null;
@@ -68,30 +73,44 @@ public class BESInformation
 
 			BasicResourceAttributesDocumentType d2 = d1.getBasicResourceAttributesDocument();
 			if (d2 != null) {
+				_gpuCount = d2.getGPUCountPerNode();
+				_gpuMemory = d2.getGPUMemoryPerNode();
 				_cpuCount = d2.getCPUCount();
 				_cpuSpeed = d2.getCPUSpeed();
 
-				CPUArchitecture_Type d3 = d2.getCPUArchitecture();
-				if (d3 != null)
-					_processorArchitecture = d3.getCPUArchitectureName();
+				GPUArchitecture_Type d3 = d2.getGPUArchitecture();
+                if (d3 != null) {
+                	_gpuProcessorArchitecture = d3.getGPUArchitectureName();
+                	_logger.info("---JSDL: in BESInformation---- got _gpuProcessorArchitecture---" + _gpuProcessorArchitecture);
+                } else {
+                	_logger.info("---JSDL: in BESInformation---- got _gpuProcessorArchitecture--- is NULL");
+                }
 
-				OperatingSystem_Type d4 = d2.getOperatingSystem();
+				CPUArchitecture_Type d4 = d2.getCPUArchitecture();
 				if (d4 != null) {
-					OperatingSystemType_Type d5 = d4.getOperatingSystemType();
-					if (d5 != null)
-						_operatingSystemType = d5.getOperatingSystemName();
+					_processorArchitecture = d4.getCPUArchitectureName();
+					 _logger.info("---JSDL: in BESInformation---- got _processorArchitecture---" + _processorArchitecture);
+				} else {
+					_logger.info("---JSDL: in BESInformation---- got _processorArchitecture--- is NULL");
+				}
+				
+				OperatingSystem_Type d5 = d2.getOperatingSystem();
+				if (d5 != null) {
+					OperatingSystemType_Type d6 = d5.getOperatingSystemType();
+					if (d6 != null)
+						_operatingSystemType = d6.getOperatingSystemName();
 
-					_operatingSystemVerison = d4.getOperatingSystemVersion();
+					_operatingSystemVerison = d5.getOperatingSystemVersion();
 				}
 
-				Double d6 = d2.getPhysicalMemory();
-				if (d6 != null) {
-					_physicalMemory = d6;
+				Double d7 = d2.getPhysicalMemory();
+				if (d7 != null) {
+					_physicalMemory = d7;
 				}
 
-				Double d7 = d2.getVirtualMemory();
-				if (d7 == null) {
-					_virtualMemory = d7;
+				Double d8 = d2.getVirtualMemory();
+				if (d8 == null) {
+					_virtualMemory = d8;
 				}
 
 				MessageElement[] resourceAny = d2.get_any();
@@ -160,8 +179,25 @@ public class BESInformation
 
 	final public ProcessorArchitectureEnumeration getProcessorArchitecture()
 	{
+		_logger.info("---JSDL: -- in BESInformation------- procArch " + _processorArchitecture);
 		return _processorArchitecture;
 	}
+
+	final public GPUArchitectureEnumeration getGPUProcessorArchitecture()
+    	{
+		_logger.info("---JSDL: -- in BESInformation------- gpuArch " + _gpuProcessorArchitecture);
+        	return _gpuProcessorArchitecture;
+    	}
+
+	final public Double getGPUCount()
+    	{
+		return _gpuCount;
+    	}
+
+	final public Double getGPUMemoryPerNode()
+    	{
+		return _gpuMemory;
+    	}
 
 	final public OperatingSystemTypeEnumeration getOperatingSystemType()
 	{
