@@ -130,13 +130,12 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			throw new ExecutionException("Unable to cancel job in queue.", nqe);
 		}
 	}
-
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
 		String stderrPath = null;
 		File resourceUsageFile = null;
-		// 2019-04-04 ASG. Added to handle jobs disappearing from the queue. We're going to make them as complete for now.
+		// 2019-04-04 ASG. Added to handle jobs disappearing from the queu. We're going to make them as complete for now.
 		boolean jobDisapparedFromQueue=false;
 
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
@@ -188,21 +187,11 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				for (String arg : _arguments)
 					hWriter.format(" %s", arg);
 				hWriter.close();
-				try {
+
 				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
 					_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null),
 					fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
-				// 2019-08-28 by ASg .. submit can throw a fault we do not catch - NativeQueueException .. if it cannot qsub
-				}
-				catch (NativeQueueException er) {
-					// Ok, the submit did not work. Usually means that the paths don't have the right permission or the queue is down
-					// This is not something we can easily handle.
-					String error=er.getMessage();
-					_logger.error(String.format("Unable to submit job to the local queue. Submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,
-					_jobToken.getCmdLine()));
-					// Now what?
-					context.updateState(new ActivityState(ActivityStateEnumeration.Failed, _state.toString(), false));
-				}
+
 				_logger.info(String.format("Queue submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,
 					_jobToken.getCmdLine()));
 				history.createTraceWriter("Job Queued into Batch System")
@@ -254,43 +243,39 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			}
 			int exitCode=0;
 			// Wait until the data is there or time is expired.
-
-			while (secondsWaited < delay) {			
-				/*
-				 *2019-08-22 by ASG. Massive update and simplification of logic. Now if we cannot find queue state result, we assume 250, the
-				 * job was terminated by the queueing system --- for some sort of resource problem: wallClock limit, memoryLimit,
-				 * cpu/thread limit. We many also have been canceled by our power management system. getExit code will determine that by
-				 * looking for a flag in the directory and setting exitcode 251.
-				 */
-
-				exitCode = queue.getExitCode(_jobToken);
-				if (_logger.isDebugEnabled())
-					_logger.debug("queue job '" + _jobToken.toString() + "' exit code is: " + exitCode);
-				// getExitCode returns a 250 if the result file is not there, and a 251 if there is a flag set 
-				// indicating we powered down the nodes the job was running on.
-				// So if we get a 250, it means we have to wait until the delay has passed.
-				if (exitCode==250 && secondsWaited==delay) {
-					jobDisapparedFromQueue=true;
-					context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
-					if (lastState == null || !lastState.equals(_state.toString())) {
-						if (_logger.isDebugEnabled())
-							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
-						history.trace("Batch System State:  %s", _state);
-						lastState = _state.toString();
-						break;
+			while (secondsWaited <= delay) {				
+				try {
+					exitCode = queue.getExitCode(_jobToken);
+					break;
+				} catch (QueueResultsException | NativeQueueException  exe) {
+					if (secondsWaited==delay){  
+					// ASG 2019-01-13 Ok, if we get here we have been unable to get queue.script.result. That most likely means it disappeared and did not exit.
+					// This can happen if the job is terminated by the scheduling system, or the node died. So we want to throw an exception, though not
+					// necessarily a fatal one.
+						// 2019-04-04 ASG. So this turns out to be a mistake. It turns jobs that were terminated due to node failure and time limit terminations into job
+						// failures. Particularly the time limit excepts are a problem, since the job will be marked as failed and they will be restarted ....
+						// What we want is to be able to talk to the queue manager accounting system .. that is not possible right now on most resources. When it is 
+						// available we will pick it up in getExitCode.
+						jobDisapparedFromQueue=true;
+						exitCode=250;
+						context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
+						if (lastState == null || !lastState.equals(_state.toString())) {
+							if (_logger.isDebugEnabled())
+								_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
+							history.trace("Batch System State:  %s", _state);
+							lastState = _state.toString();
+						}
 					}
-				}
-				if (exitCode==251) {
-					// 2019-08-22 by ASG. We will figure out what to do with these jobs later. I'd like to requeue them.
-				}
-				if (exitCode<240) {
+				}	catch (IOException ioe) {
+					// See comments for catch above, they are the same
+					jobDisapparedFromQueue=true;
+					exitCode=250;
 					context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
 					if (lastState == null || !lastState.equals(_state.toString())) {
 						if (_logger.isDebugEnabled())
 							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
 						history.trace("Batch System State:  %s", _state);
 						lastState = _state.toString();
-						break;
 					}
 				}
 				Thread.sleep(1000);
@@ -312,7 +297,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						OperatingSystemNames osName = _constructionParameters.getResourceOverrides().operatingSystemName();
 
 						ProcessorArchitecture arch = _constructionParameters.getResourceOverrides().cpuArchitecture();
-
 						GPUProcessorArchitecture gpuarch = _constructionParameters.getResourceOverrides().gpuArchitecture();
 
 						Vector<String> command = new Vector<String>(_arguments);
@@ -340,6 +324,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 		appendStandardError(history, stderrPath);
 	}
+
 
 	static private ExitCondition interpretExitCode(int exitCode)
 	{
