@@ -9,12 +9,18 @@ import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
 
 public class CommandLineFormer
 {
+	// 2019-09-18 by ASg. Updated to allow not expanding variables in the command line.
 	static public String[] formCommandLine(String line) throws FileNotFoundException, IOException
+	{
+		return formCommandLine(line,true);
+	}
+
+	static public String[] formCommandLine(String line, boolean expandVariables) throws FileNotFoundException, IOException
 	{
 		boolean insideQuotes = false;
 		StringBuilder builder = null;
 		Collection<String> ret = new ArrayList<String>();
-		line = GridUserEnvironment.replaceVariables(GridUserEnvironment.getGridUserEnvironment(), line);
+		if (expandVariables) line = GridUserEnvironment.replaceVariables(GridUserEnvironment.getGridUserEnvironment(), line);
 		for (int begin = 0; begin < line.length(); begin++) {
 			char c = line.charAt(begin);
 			if (c == '"') {

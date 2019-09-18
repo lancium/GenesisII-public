@@ -137,8 +137,16 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 					_idleTimer.noteActivity();
 				}
 //				System.out.println(line);
-				
-				String[] args = CommandLineFormer.formCommandLine(line);
+				// 2019-09-18 by ASg. So, we have a problem that if a password in a login has a "$" in it, formCommandLine does variable expansion.
+				// We cannot allow this to happen. So we are adding a new parameter to formCommandLine so that variables are not expanded.
+				// Then, if it is a login ... we do NOT expand variables in the command line.
+				String[] args = null;
+				if ((line.indexOf("context") == 0) && (line.indexOf("create-user") == -1)) {
+					args = CommandLineFormer.formCommandLine(line);
+				}
+				else {
+					args = CommandLineFormer.formCommandLine(line,false);
+				}
 				if (args.length == 0)
 					continue;
 				CommandLineRunner runner = new CommandLineRunner();
