@@ -90,8 +90,22 @@ public class UnpackTar
 					throw (new IOException("Could not create directory " + destPath.getAbsolutePath()));
 				}
 			} else {
-				if (!destPath.createNewFile()) {				
-					throw (new IOException("Could not create file " + destPath.getAbsolutePath()));
+				//Vana: 10-31-2019. Checking for weird zip files that do not explicitly create parent
+				//folders before creating the files within the folders. If parent directories do not exit,
+				//create the parent and then create new file.
+				if(destPath.exists()) {
+					//create file
+					if (!destPath.createNewFile()) {				
+						throw (new IOException("Could not create file " + destPath.getAbsolutePath()));
+					}
+				} else {
+					//check if parent directory exists, if not create parent
+					if(!destPath.getParentFile().exists())
+						destPath.getParentFile().mkdir();
+					//create file 
+					if (!destPath.createNewFile()) {				
+						throw (new IOException("Could not create file " + destPath.getAbsolutePath()));
+					}
 				}
 
 				// byte [] btoRead = new byte[(int)tarEntry.getSize()];
