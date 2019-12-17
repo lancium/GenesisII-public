@@ -158,15 +158,15 @@ public class JSDLEventGenerator
 
 	static private void generateGPUArchitectureEvents(XMLDocumentPathImpl path, GPUArchitecture gpuArch, JSDLEventReceiver receiver)
                 throws JSDLValidationException
-    	{
+    {
 		if (gpuArch != null) {
 			path.push(path.formQNameFromPrevious("GPUArchitecture"));
-            		receiver.startGPUArchitecture(path, gpuArch.gpuProcessorArchitecture());
+            		receiver.startGPUArchitecture(path, gpuArch.gpuArchitecture());
             		handleAnys(path, gpuArch.any(), gpuArch.anyAttributes(), receiver);
             		receiver.endGPUArchitecture(path);
             		path.pop();
 		}
-    	}
+    }
 
 	static private void generateResourcesEvents(XMLDocumentPathImpl path, Resources resources, JSDLEventReceiver receiver)
 		throws JSDLValidationException
@@ -298,7 +298,6 @@ public class JSDLEventGenerator
 		generateLimitEvents(path, POSIXLimitType.ProcessCountLimit, posixApplication.processCountLimit(), receiver);
 		generateLimitEvents(path, POSIXLimitType.VirtualMemoryLimit, posixApplication.virtualMemoryLimit(), receiver);
 		generateLimitEvents(path, POSIXLimitType.ThreadCountLimit, posixApplication.threadCountLimit(), receiver);
-		generateLimitEvents(path, POSIXLimitType.GPUProcessCountLimit, posixApplication.gpuProcessCountLimit(), receiver);
 
 		generateUserNameEvents(path, posixApplication.userName(), receiver);
 		generateGroupNameEvents(path, posixApplication.groupName(), receiver);
