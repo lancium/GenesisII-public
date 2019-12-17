@@ -25,6 +25,9 @@ public class ResourceOverrides implements Serializable
 
 	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "operating-system-version", required = false)
 	private String _operatingSystemVersion = null;
+	
+	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "exclusive-execution", required = false)
+	private Boolean _exclusiveExecution = null;
 
 	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS, name = "cpu-architecture-name", required = false)
 	private ProcessorArchitecture _cpuArchitectureName = null;
@@ -72,28 +75,34 @@ public class ResourceOverrides implements Serializable
 	{
 		_operatingSystemVersion = version;
 	}
+	
+	final public Boolean exclusiveExecution()
+	{
+		return _exclusiveExecution;
+	}
+	
+	final public void exclusiveExecution(Boolean exclusiveExecution)
+	{
+		_exclusiveExecution = exclusiveExecution;
+	}
 
 	final public ProcessorArchitecture cpuArchitecture()
 	{
-		_logger.info("---JSDL: ----- in ResourceOverrides, setting cpuArch: " + _cpuArchitectureName);
 		return _cpuArchitectureName;
 	}
 
 	final public void cpuArchitecture(ProcessorArchitecture arch)
 	{
-		_logger.info("---JSDL: ----- in ResourceOverrides, returning cpuArchName: " + arch);
 		_cpuArchitectureName = arch;
 	}
 
 	final public GPUProcessorArchitecture gpuArchitecture()
 	{
-		_logger.info("---JSDL: ----- in ResourceOverrides, returning gpuArchName: " + _gpuArchitectureName);
 		return _gpuArchitectureName;
 	}
 
 	final public void gpuArchitecture(GPUProcessorArchitecture arch)
 	{
-		_logger.info("---JSDL: ----- in ResourceOverrides, setting gpuArchName: " + arch);
 		_gpuArchitectureName = arch;
 	}
 	

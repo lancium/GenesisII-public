@@ -65,6 +65,7 @@ public class BESConstants
 	public final QName ACTIVITY_REFERENCE_ATTR = new QName(GENII_BES_NS, "ActivityReference");
 	public final QName DESCRIPTION_ATTR = new QName(GENII_BES_NS, "Description");
 	public final QName OPERATING_SYSTEM_ATTR = new QName(GENII_BES_NS, "OperatingSystem");
+	public final QName EXCLUSIVE_EXECUTION_ATTR = new QName(GENII_BES_NS, "ExclusiveExecution");
 	public final QName CPU_ARCHITECTURE_ATTR = new QName(GENII_BES_NS, "CPUArchitecture");
 	public final QName GPU_ARCHITECTURE_ATTR = new QName(GENII_BES_NS, "GPUArchitecture");
 	public final QName GPU_COUNT_ATTR = new QName(GENII_BES_NS, "GPUCountPerNode");

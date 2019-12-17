@@ -16,6 +16,7 @@ public class ResourceConstraints implements Serializable
 	private Double _totalCPUCount = null;
 	private Double _GPUCountPerNode = null;
 	private Double _GPUMemoryPerNode = null;
+	private Boolean _ExclusiveExecution = null;
 
 	final public void setTotalPhysicalMemory(Double totalPhysicalMemory)
 	{
@@ -35,13 +36,17 @@ public class ResourceConstraints implements Serializable
 	final public void setGPUCountPerNode(Double GPUCountPerNode)
 	{
 		_GPUCountPerNode = GPUCountPerNode;
-		_logger.info("---JSDL:---- in ResourceConstraints setTotalGPUCount----------------" + GPUCountPerNode);
 	}
 	
 	final public void setGPUMemoryPerNode(Double gpuMemoryPerNode)
 	{
 		_GPUMemoryPerNode = gpuMemoryPerNode;
-		_logger.info("---JSDL:---- in ResourceConstraints setGPUMemory----------------" + gpuMemoryPerNode);
+	}
+	
+	final public void setExclusiveExecution(Boolean exclusiveExecution)
+	{
+		_ExclusiveExecution = exclusiveExecution;
+		_logger.info("-------EXExecution: setExclusiveExection ------" + _ExclusiveExecution);
 	}
 
 	final public Double getTotalPhysicalMemory()
@@ -61,13 +66,17 @@ public class ResourceConstraints implements Serializable
 	
 	final public Double getGPUCountPerNode()
 	{
-		_logger.info("---JSDL:---- in ResourceConstraints getTotalGPUCount----------------" + _GPUCountPerNode);
 		return _GPUCountPerNode;
 	}
 	
 	final public Double getGPUMemoryPerNode()
 	{
-		_logger.info("---JSDL:---- in ResourceConstraints getGPUMemoryPerNode----------------" + _GPUMemoryPerNode);
 		return _GPUMemoryPerNode;
+	}
+	
+	final public Boolean getExclusiveExecution()
+	{
+		_logger.info("-------EXExecution: getExclusiveExection ------" + _ExclusiveExecution);
+		return _ExclusiveExecution;
 	}
 }

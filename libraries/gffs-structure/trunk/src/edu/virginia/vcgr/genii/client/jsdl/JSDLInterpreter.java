@@ -279,7 +279,7 @@ public class JSDLInterpreter
 	static private void understand(PersonalityProvider provider, Object parentUnderstanding, Resources_Type resources) throws JSDLException
 	{
 
-		_logger.info("---JSDL: ----- in JSDLInterpreter understand --------" );
+		
 		if (resources == null)
 			return;
 
@@ -292,8 +292,10 @@ public class JSDLInterpreter
 		understand(provider, understanding, resources.getFileSystem());
 
 		Boolean b = resources.getExclusiveExecution();
-		if (b != null)
+		if (b != null) {
 			facet.consumeExclusiveExecution(understanding, b.booleanValue());
+			_logger.info("---EXExecution: ----- in JSDLInterpreter consume --------" + b.booleanValue());
+		}
 
 		understand(provider, understanding, resources.getOperatingSystem());
 		understand(provider, understanding, resources.getCPUArchitecture());

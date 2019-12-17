@@ -212,13 +212,9 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 	{
 		super.generateQueueHeaders(script, workingDirectory, application);
 		
-		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---Before out and err" );
-
 		// add directives for specifying stdout and stderr redirects
 		script.format("#SBATCH -o %s\n", application.getStdoutRedirect(workingDirectory));
 		script.format("#SBATCH -e %s\n", application.getStderrRedirect(workingDirectory));
-		
-		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---Before out and err" );
 		
 		if (application.getSPMDVariation() != null) {
 			// add directive for specifying multiple processors
@@ -263,7 +259,6 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		}
 
 		ResourceConstraints resourceConstraints = application.getResourceConstraints();
-		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---Before checking resource Constraints" );
 		
 		if (resourceConstraints != null) {
 			Double totalPhysicalMemory = resourceConstraints.getTotalPhysicalMemory();
@@ -276,23 +271,23 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 				script.format("#SBATCH --time=%s\n", toWallTimeFormat(wallclockTime));
 			
 			Double gpusPerNode = resourceConstraints.getGPUCountPerNode();
-			_logger.info("-----JSDL:---- SLURMQueueConnection.java got this for gpuCount--- " + gpusPerNode);
 			if (gpusPerNode != null && !gpusPerNode.equals(Double.NaN)) {
 				script.format("#SBATCH --gres=gpu:%s\n", gpusPerNode.intValue());
-				_logger.info("-----JSDL:---- SLURMQueueConnection.java got this for gpuCount--- " + gpusPerNode);
 			} 
 			
 			Double gpuMemoryPerNode = resourceConstraints.getGPUMemoryPerNode();
-			_logger.info("-----JSDL:---- SLURMQueueConnection.java got this for gpuMempry--- " + gpuMemoryPerNode);
 			if ((gpuMemoryPerNode != null) && (!gpuMemoryPerNode.equals(Double.NaN))) {
 				script.format("##SBATCH --mem-per-gpu=%d\n", (gpuMemoryPerNode.longValue()/(1024*1024)));
-				_logger.info("-----JSDL:---- SLURMQueueConnection.java got this for gpuMemory--- " + gpuMemoryPerNode);
+			}
+			
+			Boolean exclusiveExecution = resourceConstraints.getExclusiveExecution();
+			if ((exclusiveExecution != null) && exclusiveExecution == true) {
+				script.format("##SBATCH --exclusive\n");
 			}
 			
 		} else {
 			_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---no resource constraints" );
 		}
-		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---After checking resource Constraints" );
 	}
 
 	@Override

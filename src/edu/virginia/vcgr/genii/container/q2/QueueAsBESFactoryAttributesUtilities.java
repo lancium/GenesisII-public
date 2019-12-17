@@ -9,6 +9,8 @@ import java.util.Set;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.BasicResourceAttributesDocumentType;
 import org.ggf.bes.factory.FactoryResourceAttributesDocumentType;
 import org.ggf.jsdl.CPUArchitecture_Type;
@@ -32,6 +34,7 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
+import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameter;
 import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameters;
@@ -41,6 +44,8 @@ import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 class QueueAsBESFactoryAttributesUtilities
 {
+	static private Log _logger = LogFactory.getLog(QueueAsBESFactoryAttributesUtilities.class);
+	
 	private QueueConstructionParameters _consParms;
 	private ResourceOverrides _resO;
 	private Collection<BESInformation> _allBESInformation;
@@ -59,6 +64,15 @@ class QueueAsBESFactoryAttributesUtilities
 
 		return new OperatingSystem_Type(new OperatingSystemType_Type(OperatingSystemTypeEnumeration.fromString(osName.name()), null),
 			osVersion, null, null);
+	}
+	
+	private Boolean exclusiveExecution()
+	{
+		Boolean exclusiveExecution = _resO.exclusiveExecution();
+		if (exclusiveExecution == true)
+			_logger.info("Exclusive execution support: " + exclusiveExecution);
+
+		return exclusiveExecution;
 	}
 
 	private CPUArchitecture_Type cpuArchitecture()
@@ -279,7 +293,7 @@ class QueueAsBESFactoryAttributesUtilities
 			any.add(new MessageElement(GenesisIIBaseRP.MATCHING_PARAMETER_ATTR_QNAME, parameter.toAxisType()));
 
 		BasicResourceAttributesDocumentType basicResourceAttributesDocument = new BasicResourceAttributesDocumentType(machineName,
-			operatingSystem(), cpuArchitecture(), gpuArchitecture(), gpuCount(), gpuMemory(), cpuCount(), cpuSpeed(), physicalMemory(), virtualMemory(), Elementals.toArray(any));
+			operatingSystem(), exclusiveExecution(), cpuArchitecture(), gpuArchitecture(), gpuCount(), gpuMemory(), cpuCount(), cpuSpeed(), physicalMemory(), virtualMemory(), Elementals.toArray(any));
 
 		return new FactoryResourceAttributesDocumentType(basicResourceAttributesDocument, isAcceptingNewActivities, machineName, machineName,
 			totalNumberOfActivities, null, _allBESInformation.size(), null, namingProfiles, besExtensions, localResourceManagerType,

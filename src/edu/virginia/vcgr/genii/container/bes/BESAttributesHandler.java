@@ -82,6 +82,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(consts.ACTIVITY_REFERENCE_ATTR, "getActivityReferencesAttr");
 		addHandler(consts.DESCRIPTION_ATTR, "getDescriptionAttr", "setDescriptionAttr");
 		addHandler(consts.OPERATING_SYSTEM_ATTR, "getOperatingSystemAttr");
+		addHandler(consts.EXCLUSIVE_EXECUTION_ATTR, "getExclusiveExecutionAttr");
 		addHandler(consts.CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
 		addHandler(consts.GPU_ARCHITECTURE_ATTR, "getGPUArchitectureAttr");
 		addHandler(consts.GPU_COUNT_ATTR, "getGPUCountAttr");
@@ -147,20 +148,34 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 
 		return ret;
 	}
+	
+	static public boolean getExclusiveExecution() throws RemoteException
+	{
+		IBESResource resource = null;
+		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
+		
+		Boolean override = besParams.getResourceOverrides().exclusiveExecution();
 
+    	if (override != null){
+    		return true;
+    	}
+
+    	//VANA: According to JSDL spec, this should be undefined. How to set undefined behavior?
+    	return false;
+		
+	}
+	
 	static public CPUArchitecture_Type getCPUArchitecture() throws RemoteException
 	{
-		_logger.info("-----JSDL---in getCPUArchitecute in BESAttributeshandler---");
 		IBESResource resource = null;
 		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
 		ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
 		BESConstructionParameters besParams = (BESConstructionParameters) cParams;
 		ProcessorArchitecture override = besParams.getResourceOverrides().cpuArchitecture();
 
-		_logger.info("-----JSDL---in getCPUArchitecute in BESAttributeshandler---");
-
 		if (override != null) {
-			_logger.info("---JSDL: ---in BESAttributesHandler --- CPU override not NULL"); 
 			return new CPUArchitecture_Type(ProcessorArchitectureEnumeration.fromString(override.name()), null);
 		}
 
@@ -169,17 +184,13 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 
 	static public GPUArchitecture_Type getGPUArchitecture() throws RemoteException
 	{
-		_logger.info("-----JSDL---in getGPUArchitecute in BESAttributeshandler---");
         	IBESResource resource = null;
         	resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
         	ConstructionParameters cParams = resource.constructionParameters(GeniiBESServiceImpl.class);
         	BESConstructionParameters besParams = (BESConstructionParameters) cParams;
         	GPUProcessorArchitecture override = besParams.getResourceOverrides().gpuArchitecture();
 
-        	_logger.info("-----JSDL---in getGPUArchitecute in BESAttributeshandler---");
-
         	if (override != null){
-        		_logger.info("---JSDL: ---in BESAttributesHandler --- GPU override not NULL"); 
         		return new GPUArchitecture_Type(GPUArchitectureEnumeration.fromString(override.name()), null);
         	}
 
@@ -437,6 +448,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getOperatingSystemAttr() throws RemoteException
 	{
 		return new MessageElement(consts.OPERATING_SYSTEM_ATTR, getOperatingSystem());
+	}
+	
+	public MessageElement getExclusiveExectionAttr() throws RemoteException
+	{
+		_logger.info("---EXExecution:-----------" + getExclusiveExecution());
+		return new MessageElement(consts.EXCLUSIVE_EXECUTION_ATTR, getExclusiveExecution());
 	}
 
 	public MessageElement getCPUArchitectureAttr() throws RemoteException
