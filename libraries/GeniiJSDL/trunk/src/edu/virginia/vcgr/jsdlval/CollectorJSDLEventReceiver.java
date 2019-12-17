@@ -30,7 +30,7 @@ import edu.virginia.vcgr.jsdl.CreationFlag;
 import edu.virginia.vcgr.jsdl.FileSystemType;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
-import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUArchitecture;
 import edu.virginia.vcgr.jsdl.hpcfse.SecurityToken;
 import edu.virginia.vcgr.jsdl.rangevalue.RangeValue;
 import edu.virginia.vcgr.jsdl.sweep.parameters.NamespaceBinding;
@@ -214,16 +214,16 @@ public class CollectorJSDLEventReceiver implements JSDLEventReceiver
 	}
 
 	@Override
-        public void startGPUArchitecture(XMLDocumentPath path, GPUProcessorArchitecture gpuProcessorArchitecture) throws JSDLValidationException
-        {
-                add(path);
-        }
+    public void startGPUArchitecture(XMLDocumentPath path, GPUArchitecture gpuProcessorArchitecture) throws JSDLValidationException
+    {
+		add(path);
+    }
 
-        @Override
-        public void endGPUArchitecture(XMLDocumentPath path) throws JSDLValidationException
-        {
-                // We allow all "end..." methods
-        }
+    @Override
+    public void endGPUArchitecture(XMLDocumentPath path) throws JSDLValidationException
+    {
+    	// We allow all "end..." methods
+    }
 
 	@Override
 	public void handleIndividualResourceRanges(XMLDocumentPath path, RangeValue individualCPUSpeed, RangeValue individualCPUTime,
