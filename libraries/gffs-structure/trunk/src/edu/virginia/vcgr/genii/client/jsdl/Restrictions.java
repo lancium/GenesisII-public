@@ -18,25 +18,29 @@ public class Restrictions implements Serializable
 	private GPUArchitectureEnumeration _gpuArch = null;
 	private OperatingSystemTypeEnumeration _osType = null;
 	private String _osVersion = null;
+	private Boolean _exclusiveExecution = null;
 
 	public void setProcessorArchitectureRestriction(ProcessorArchitectureEnumeration arch)
 	{
-		_logger.info("---JSDL: in Restrictions CPU arc--------" + arch);
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("Setting Processor Arch restriction to %s.", arch));
 
 		_arch = arch;
 	}
+	
+	public void setExclusiveExecutionRestriction(Boolean exclusiveExecution)
+	{
+		_logger.info("---EXExecution:------ returning " + _exclusiveExecution);
+		_exclusiveExecution = exclusiveExecution;
+	}
 
 	public ProcessorArchitectureEnumeration getProcessorArchitectureRestriction()
 	{
-		_logger.info("---JSDL: in Restrictions get CPU arc--------" + _arch);
 		return _arch;
 	}
 
 	public void setGPUArchitectureRestriction(GPUArchitectureEnumeration gpuArch)
 	{
-		_logger.info("---JSDL: in Restrictions GPU arc--------" + gpuArch);
 		if (_logger.isTraceEnabled())
 			_logger.trace(String.format("Setting GPU Arch restriction to %s.", gpuArch));
 
@@ -45,7 +49,6 @@ public class Restrictions implements Serializable
 
 	public GPUArchitectureEnumeration getGPUArchitectureRestriction()
 	{
-		_logger.info("---JSDL: in Restrictions get GPU arc--------" + _gpuArch);
 		return _gpuArch;
 	}
 

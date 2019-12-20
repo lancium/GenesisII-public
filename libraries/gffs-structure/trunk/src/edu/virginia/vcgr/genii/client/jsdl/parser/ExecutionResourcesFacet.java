@@ -42,7 +42,7 @@ public class ExecutionResourcesFacet extends DefaultResourcesFacet
 	public void consumeWallclockTimeLimit(Object currentUnderstanding, RangeExpression wallclockTimeLimit){}
 	
 	@Override
-	public void consumeExclusiveExecution(Object currentUnderstanding, boolean exclusiveExecution) throws JSDLException
+	public void consumeExclusiveExecution(Object currentUnderstanding, Boolean exclusiveExecution) throws JSDLException
 	{
 		// throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "ExclusiveExecution"));
 	}

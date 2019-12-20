@@ -40,6 +40,12 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 		} else
 			super.consumeAny(currentUnderstanding, any);
 	}
+	
+	@Override
+	public void consumeExclusiveExecution(Object currentUnderstanding, Boolean exclusiveExecution) throws JSDLException
+	{
+		((CommonExecutionUnderstanding) currentUnderstanding).setExclusiveExecution(exclusiveExecution);
+	}
 
 	@Override
 	public void consumeTotalPhysicalMemory(Object currentUnderstanding, RangeExpression totalPhysicalMemory) throws JSDLException

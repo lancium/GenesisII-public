@@ -2,6 +2,9 @@ package edu.virginia.vcgr.genii.client.jsdl.personality.def;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
@@ -10,9 +13,12 @@ import edu.virginia.vcgr.jsdl.JSDLConstants;
 
 public class DefaultResourcesFacet extends DefaultPersonalityFacet implements ResourcesFacet
 {
+	static private Log _logger = LogFactory.getLog(DefaultResourcesFacet.class);
+	
 	@Override
-	public void consumeExclusiveExecution(Object currentUnderstanding, boolean exclusiveExecution) throws JSDLException
+	public void consumeExclusiveExecution(Object currentUnderstanding, Boolean exclusiveExecution) throws JSDLException
 	{
+		_logger.info("---EXExecution: ----" + exclusiveExecution);
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "ExclusiveExecution"));
 	}
 

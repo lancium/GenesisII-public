@@ -43,4 +43,6 @@ public interface PersonalityProvider
 	public SourceURIFacet getSourceURIFacet(Object currentUnderstanding) throws JSDLException;
 
 	public TargetURIFacet getTargetURIFacet(Object currentUnderstanding) throws JSDLException;
+	
+	public ExclusiveExecutionFacet getExclusiveExecutionFacet(Object currentUnderstanding) throws JSDLException;
 }

@@ -82,7 +82,6 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(consts.ACTIVITY_REFERENCE_ATTR, "getActivityReferencesAttr");
 		addHandler(consts.DESCRIPTION_ATTR, "getDescriptionAttr", "setDescriptionAttr");
 		addHandler(consts.OPERATING_SYSTEM_ATTR, "getOperatingSystemAttr");
-		addHandler(consts.EXCLUSIVE_EXECUTION_ATTR, "getExclusiveExecutionAttr");
 		addHandler(consts.CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
 		addHandler(consts.GPU_ARCHITECTURE_ATTR, "getGPUArchitectureAttr");
 		addHandler(consts.GPU_COUNT_ATTR, "getGPUCountAttr");

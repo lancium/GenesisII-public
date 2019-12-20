@@ -64,6 +64,8 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 
 	private Double _GPUCountPerNode = null;
  	private Double _GPUMemoryPerNode = null;
+ 	
+ 	private Boolean _exclusiveExecution = null;
 
 	private ApplicationUnderstanding _application = null;
 	
@@ -156,6 +158,16 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 			return null;
 
 		return _application.getWorkingDirectory();
+	}
+	
+	public Boolean getExclusiveExecution()
+	{
+		return _exclusiveExecution;
+	}
+	
+	public void setExclusiveExecution(Boolean exclusiveExecution)
+	{
+		_exclusiveExecution = exclusiveExecution;
 	}
 
 	public Double getTotalPhysicalMemory()
@@ -271,6 +283,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		resourceConstraints.setWallclockTimeLimit(getWallclockTimeLimit());
 		resourceConstraints.setGPUCountPerNode(getGPUCountPerNode());
  		resourceConstraints.setGPUMemoryPerNode(getGPUMemoryPerNode());
+ 		resourceConstraints.setExclusiveExecution(getExclusiveExecution());
 
 
 		// Check wallclock time and memory constraint
@@ -314,6 +327,11 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
  						throw new JSDLMatchException(
  							String.format("Job requested %f bytes, but BES limits to %s.", requestedGPUMemSize, gpuMemoryUpperLimit));
  				}
+ 				
+ 				// check ExclusiveExecution
+ 				Boolean exclusiveExecution = overrides.exclusiveExecution();
+ 				_logger.info("-----EXExecution: commonExecutionUnderstanding.java----" + exclusiveExecution);
+ 				
 			}
 		}
 

@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.jsdl.parser;
 
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.client.jsdl.personality.ExclusiveExecutionFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.GPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
@@ -16,6 +17,7 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.SPMDApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SourceURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.TargetURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultPersonalityProvider;
+import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionExclusiveExecutionFacet;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionCPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionGPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionDataStagingFacet;
@@ -50,6 +52,12 @@ public class ExecutionProvider extends DefaultPersonalityProvider
 		return new ExecutionFilesystemFacet();
 	}
 
+	@Override
+	public ExclusiveExecutionFacet getExclusiveExecutionFacet(Object currentUnderstanding)
+	{
+		return new ExecutionExclusiveExecutionFacet();
+	}
+	
 	@Override
 	public JobIdentificationFacet getJobIdentificationFacet(Object currentUnderstanding)
 	{

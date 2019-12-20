@@ -78,10 +78,10 @@ public class CommonPersonalityProvider extends DefaultPersonalityProvider
 	}
 
 	@Override
-        public GPUArchitectureFacet getGPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
-        {
-                return new CommonGPUArchitectureFacet();
-        }
+    public GPUArchitectureFacet getGPUArchitectureFacet(Object currentUnderstanding) throws JSDLException
+    {
+		return new CommonGPUArchitectureFacet();
+    }
 
 	@Override
 	public OperatingSystemFacet getOperatingSystemFacet(Object currentUnderstanding) throws JSDLException

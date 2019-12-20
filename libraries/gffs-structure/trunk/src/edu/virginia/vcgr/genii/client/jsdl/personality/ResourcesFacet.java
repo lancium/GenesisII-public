@@ -5,7 +5,7 @@ import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
 
 public interface ResourcesFacet extends PersonalityFacet
 {
-	public void consumeExclusiveExecution(Object currentUnderstanding, boolean exclusiveExecution) throws JSDLException;
+	public void consumeExclusiveExecution(Object currentUnderstanding, Boolean exclusiveExecution) throws JSDLException;
 
 	public void consumeIndividualCPUSpeed(Object currentUnderstanding, RangeExpression individualCPUSpeed) throws JSDLException;
 

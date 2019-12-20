@@ -11,4 +11,5 @@ public interface PersonalityFacet
 	public void completeFacet(Object parentUnderstanding, Object facetUnderstanding) throws JSDLException;
 
 	public void consumeAny(Object currentUnderstanding, MessageElement any) throws JSDLException;
+
 }

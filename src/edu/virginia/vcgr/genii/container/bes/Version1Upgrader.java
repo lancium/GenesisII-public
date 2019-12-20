@@ -32,6 +32,12 @@ class Version1Upgrader
 		String value = props.getProperty(propName);
 		return (value == null) ? null : OperatingSystemNames.valueOf(value);
 	}
+	
+	static private Boolean getExclusiveExecution(Properties props, String propName)
+	{
+		String value = props.getProperty(propName);
+		return (value == null) ? null : Boolean.parseBoolean(value);
+	}
 
 	static private String getString(Properties props, String name)
 	{
@@ -45,10 +51,10 @@ class Version1Upgrader
 	}
 
 	static private GPUProcessorArchitecture getGPUProcessorArchitecture(Properties props, String name)
-        {
+    {
                 String value = props.getProperty(name);
                 return (value == null) ? null : GPUProcessorArchitecture.valueOf(value);
-        }
+    }
 
 	static private Integer getInteger(Properties props, String name)
 	{
@@ -101,6 +107,7 @@ class Version1Upgrader
 
 		final String BASE = "edu.virginia.vcgr.genii.native-q.resource-override.";
 		final String OSNAME = BASE + "operating-system-name";
+		final String EXEXECUTION = BASE + "exclusive-execution-name";
 		final String OSVER = BASE + "operating-system-version";
 		final String CPUARCH = BASE + "cpu-architecture-name";
 		final String CPUCOUNT = BASE + "cpu-count";
@@ -115,6 +122,12 @@ class Version1Upgrader
 		if (osName != null) {
 			ret = true;
 			overrides.operatingSystemName(osName);
+		}
+		
+		Boolean exclusiveExecution = getExclusiveExecution(props, EXEXECUTION);
+		if (exclusiveExecution != null) {
+			ret = true;
+			overrides.exclusiveExecution(exclusiveExecution);
 		}
 
 		String osVersion = getString(props, OSVER);
@@ -132,7 +145,7 @@ class Version1Upgrader
 		GPUProcessorArchitecture gpuArch = getGPUProcessorArchitecture(props, GPUARCH);
 		if (cpuArch != null) {
 			ret = true;
-			overrides.cpuArchitecture(cpuArch);
+			overrides.gpuArchitecture(gpuArch);
 		}
 	
 		Integer gpuCount = getInteger(props, GPUCOUNT);
