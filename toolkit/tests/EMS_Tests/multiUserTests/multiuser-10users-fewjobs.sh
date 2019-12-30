@@ -47,7 +47,7 @@ oneTimeSetUp()
 testGetStagingFilesUploaded()
 {
   echo "Copying necessary file to Grid namespace"
-  grid cp local:./stagecoach-hostname.sh grid:$RNSPATH
+  grid cp local:$PWD/stagecoach-hostname.sh grid:$RNSPAT.H
   assertEquals "File upload should succeed" 0 $?
   grid chmod grid:$RNSPATH/stagecoach-hostname.sh +r --everyone
   assertEquals "chmod on staging file should work" 0 $?

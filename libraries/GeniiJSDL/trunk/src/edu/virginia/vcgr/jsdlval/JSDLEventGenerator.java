@@ -161,7 +161,7 @@ public class JSDLEventGenerator
     {
 		if (gpuArch != null) {
 			path.push(path.formQNameFromPrevious("GPUArchitecture"));
-            		receiver.startGPUArchitecture(path, gpuArch.gpuArchitecture());
+            		receiver.startGPUArchitecture(path, gpuArch.getGpuProcessorArchitecture());
             		handleAnys(path, gpuArch.any(), gpuArch.anyAttributes(), receiver);
             		receiver.endGPUArchitecture(path);
             		path.pop();

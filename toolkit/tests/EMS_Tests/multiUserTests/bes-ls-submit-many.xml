@@ -4,11 +4,12 @@
 <gsh:echo message="Testing Submission of ls 100 jobs"/>
 
 <gsh:define name="container" source="${ARGV[1]}"/>
+<gsh:define name="pwd" source="${ARGV[2]}"/>
 
 <gsh:for param-name="i" initial-value="1" inclusive-limit="100">
         <geniix:run>
                 <gsh:param>--name=plenitude_job${i}</gsh:param>
-                <gsh:param>--jsdl=local:./ls-single-job.jsdl</gsh:param>
+		<gsh:param>--jsdl=local:${pwd}/ls-single-job.jsdl</gsh:param>
                 <gsh:param>${container}</gsh:param>
         </geniix:run>
 </gsh:for>

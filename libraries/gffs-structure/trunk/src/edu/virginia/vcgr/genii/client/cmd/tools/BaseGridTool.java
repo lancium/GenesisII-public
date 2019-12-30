@@ -169,12 +169,14 @@ public abstract class BaseGridTool implements ITool
 			verify();
 			// set the last exit value based on actual return value.
 			_lastExit = runCommand();
+		
 		} catch (ClassNotFoundException e) {
 			String msg = "application error, missing class: " + e.getLocalizedMessage();
 			_logger.error(msg, e);
 			_lastExit = 1; // set last exit to a failure value.
 			throw new ToolException(e.getLocalizedMessage(), e);
-		} catch (DialogException e) {
+		} 
+		catch (DialogException e) {
 			String msg = "dialog reported problem: " + e.getLocalizedMessage();
 			_logger.error(msg, e);
 			_lastExit = 1; // set last exit to a failure value.
@@ -187,6 +189,10 @@ public abstract class BaseGridTool implements ITool
 			stderr.println();
 			_lastExit = 1; // set last exit to a failure value.
 			// this gets handled here, without forwarding the exception.
+		} catch (ToolException e) {
+			String msg = "invalid tool usage: " + e.getLocalizedMessage();
+			_logger.warn(msg);
+			_lastExit = 1; 
 		} catch (CreationException e) {
 			String msg = "a creation exception occurred during the operation: " + e.getLocalizedMessage();
 			_logger.error(msg, e);
