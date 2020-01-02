@@ -45,13 +45,11 @@ public class BasicResourceAttributes extends ResourceAttributes
 
 	public CPUArchitecture_Type getCPUArchitecture()
 	{
-		_logger.info("---JSDL: in BasicResourceAttributes, returning cpuArchitecture: " + _CPUArchitecture);
 		return _CPUArchitecture;
 	}
 
 	public GPUArchitecture_Type getGPUArchitecture()
 	{
-		_logger.info("---JSDL: in BasicResourceAttributes, returning gpuArchitecture: " + _GPUArchitecture);
 		return _GPUArchitecture;
 	}
 

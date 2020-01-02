@@ -282,11 +282,11 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			
 			Boolean exclusiveExecution = resourceConstraints.getExclusiveExecution();
 			if ((exclusiveExecution != null) && exclusiveExecution == true) {
-				script.format("##SBATCH --exclusive\n");
+				script.format("#SBATCH --exclusive\n");
 			}
 			
 		} else {
-			_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---no resource constraints" );
+			_logger.info("SLURMQueueConnection.java: no resource constraints found" );
 		}
 	}
 

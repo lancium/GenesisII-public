@@ -53,7 +53,6 @@ public class JSDLUtils extends JNIContainerBaseClass
 
 	static public GPUArchitecture_Type getLocalGPUArchitecture()
 	{
-		_logger.info("----JSDL: in JSDLUtils getLocalGPUArchitecture - GPU---");
 		// do something here to return a default value, other than other???
 
 		/*
@@ -74,7 +73,6 @@ public class JSDLUtils extends JNIContainerBaseClass
 
 	static public CPUArchitecture_Type getLocalCPUArchitecture()
 	{
-		_logger.info("----JSDL: in JSDLUtils getLocalCPUArchitecture - CPU---");
 		String arch = System.getProperty("os.arch");
 		if (arch != null) {
 			if (_logger.isDebugEnabled())

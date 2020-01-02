@@ -311,7 +311,6 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 				// gpus per node
 				Integer gpusperNode = overrides.gpuCount();
  				Double requestedGpus = resourceConstraints.getGPUCountPerNode();
- 				_logger.info("--------JSDL:------ in commonExecutionUnderstanding.java----" + gpusperNode + "---" +requestedGpus);
  				if (gpusperNode != null && requestedGpus != null) {
  					if (requestedGpus.intValue() > gpusperNode)
  						throw new JSDLMatchException(
@@ -321,17 +320,11 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
  				// check gpu memory per node
  				Size gpuMemoryUpperLimit = overrides.gpuMemoryPerNode();
  				Double requestedGPUMemSize = resourceConstraints.getGPUMemoryPerNode();
- 				_logger.info("-----JSDL:----- in commonExecutionUnderstanding.java----" + gpuMemoryUpperLimit + "---" + requestedGPUMemSize);
  				if (gpuMemoryUpperLimit != null && requestedGPUMemSize != null) {
  					if (requestedGPUMemSize > gpuMemoryUpperLimit.as(SizeUnits.Bytes))
  						throw new JSDLMatchException(
  							String.format("Job requested %f bytes, but BES limits to %s.", requestedGPUMemSize, gpuMemoryUpperLimit));
  				}
- 				
- 				// check ExclusiveExecution
- 				Boolean exclusiveExecution = overrides.exclusiveExecution();
- 				_logger.info("-----EXExecution: commonExecutionUnderstanding.java----" + exclusiveExecution);
- 				
 			}
 		}
 

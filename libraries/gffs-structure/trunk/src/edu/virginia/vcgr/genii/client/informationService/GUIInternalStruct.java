@@ -56,16 +56,13 @@ public class GUIInternalStruct
 
 	public String getCPUArchitectureNameValue()
 	{
-		_logger.info("--------JSDL: GUIInternalStruct --" + CPUArchitectureNameValue);
 		return CPUArchitectureNameValue;
 	}
 
 	public String getGPUArchitectureNameValue()
-        {
-                _logger.info("--------JSDL: GUIInternalStruct --" + GPUArchitectureNameValue);
-                return GPUArchitectureNameValue;
-        }
-
+    {
+		return GPUArchitectureNameValue;
+    }
 
 	public String getCPUCountValue()
 	{

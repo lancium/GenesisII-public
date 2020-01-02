@@ -26,9 +26,6 @@ public class ResourceMatcher
 	public boolean matches(JobResourceRequirements req, BESInformation besInfo)
 	{
 		boolean matched = req.matches(besInfo);
-		_logger.info("---JSDL:----- in ResourceMathcer---BESInformation " + besInfo.getGPUProcessorArchitecture() + "----" + besInfo.getGPUCount() + "---"+ besInfo.getProcessorArchitecture());
-		_logger.info("---JSDL:----- in ResourceMathcer-- JobRequirement " + req.toString());
-		_logger.info("---JSDL:----- in ResourceMathcer---found Match? " + matched);
 		return matched;
 	}
 }

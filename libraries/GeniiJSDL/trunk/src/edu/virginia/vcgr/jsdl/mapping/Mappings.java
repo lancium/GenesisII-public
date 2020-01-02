@@ -68,19 +68,16 @@ public class Mappings
 
 	static private ArchitectureMapping loadArchitectureMapping(JAXBContext context)
 	{
-		_logger.info("----JSDL: in Mapping.java CPU------");
 		return (ArchitectureMapping) loadMapping(context, "arch-map.xml");
 	}
 
 	static private GPUMapping loadGPUMapping(JAXBContext context)
 	{
-		_logger.info("----JSDL: in Mapping.java GPU------");
 		return (GPUMapping) loadMapping(context, "gpu-arch-map.xml");
 	}
 
 	static private OSMapping loadOSMapping(JAXBContext context)
 	{
-		_logger.info("----JSDL: in Mapping.java OS------");
 		return (OSMapping) loadMapping(context, "os-map.xml");
 	}
 
@@ -107,8 +104,6 @@ public class Mappings
 			else
 				_osMapping = oMapping.mapping();
 
-			_logger.info("---JSDL:----- in Mappings.java------" + _archMapping + "---" + _garchMapping + "----" + _osMapping);
-
 		} catch (JAXBException e) {
 			_logger.error("Unable to create JAXB Context.", e);
 		}
@@ -116,19 +111,16 @@ public class Mappings
 
 	static public Map<String, OperatingSystemNames> osMap()
 	{
-		_logger.info("-----JSDL: Mappings.java----osMap()------" + _osMapping);
 		return _osMapping;
 	}
 
 	static public Map<String, ProcessorArchitecture> architectureMap()
 	{
-		_logger.info("-----JSDL: Mappings.java----architectureMap()------" + _archMapping);
 		return _archMapping;
 	}
 
 	static public Map<String, GPUProcessorArchitecture> gpuArchitectureMap()
 	{
-		_logger.info("-----JSDL: Mappings.java----gpuArchitectureMap()------" + _garchMapping);
 		return _garchMapping;
 	}
 }

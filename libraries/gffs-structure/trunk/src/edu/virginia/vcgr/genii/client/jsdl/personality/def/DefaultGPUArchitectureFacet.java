@@ -18,7 +18,6 @@ public class DefaultGPUArchitectureFacet extends DefaultPersonalityFacet impleme
 	public void consumeGPUArchitectureName(Object currentUnderstanding, GPUArchitectureEnumeration gpuArchitectureName)
 		throws JSDLException
 	{
-		_logger.info("---JSDL: ----- in DefaultGPUArchitectureFacet--------" );
 		throw new UnsupportedJSDLElement(new QName(JSDLConstants.JSDL_NS, "GPUArchitectureName"));
 	}
 }

@@ -81,17 +81,15 @@ public class BESInformation
 				GPUArchitecture_Type d3 = d2.getGPUArchitecture();
                 if (d3 != null) {
                 	_gpuProcessorArchitecture = d3.getGPUArchitectureName();
-                	_logger.info("---JSDL: in BESInformation---- got _gpuProcessorArchitecture---" + _gpuProcessorArchitecture);
                 } else {
-                	_logger.info("---JSDL: in BESInformation---- got _gpuProcessorArchitecture--- is NULL");
+                	_logger.info("BESInformation: gpuProcessorArchitecture is NULL");
                 }
 
 				CPUArchitecture_Type d4 = d2.getCPUArchitecture();
 				if (d4 != null) {
 					_processorArchitecture = d4.getCPUArchitectureName();
-					 _logger.info("---JSDL: in BESInformation---- got _processorArchitecture---" + _processorArchitecture);
 				} else {
-					_logger.info("---JSDL: in BESInformation---- got _processorArchitecture--- is NULL");
+					_logger.info("BESInformation: cpuProcessorArchitecture is NULL");
 				}
 				
 				OperatingSystem_Type d5 = d2.getOperatingSystem();
@@ -179,25 +177,23 @@ public class BESInformation
 
 	final public ProcessorArchitectureEnumeration getProcessorArchitecture()
 	{
-		_logger.info("---JSDL: -- in BESInformation------- procArch " + _processorArchitecture);
 		return _processorArchitecture;
 	}
 
 	final public GPUArchitectureEnumeration getGPUProcessorArchitecture()
-    	{
-		_logger.info("---JSDL: -- in BESInformation------- gpuArch " + _gpuProcessorArchitecture);
-        	return _gpuProcessorArchitecture;
-    	}
+    {
+		return _gpuProcessorArchitecture;
+    }
 
 	final public Double getGPUCount()
-    	{
+    {
 		return _gpuCount;
-    	}
+    }
 
 	final public Double getGPUMemoryPerNode()
-    	{
+    {
 		return _gpuMemory;
-    	}
+    }
 
 	final public OperatingSystemTypeEnumeration getOperatingSystemType()
 	{

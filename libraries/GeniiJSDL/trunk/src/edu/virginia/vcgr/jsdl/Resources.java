@@ -153,27 +153,23 @@ public class Resources extends CommonJSDLElement implements Serializable
 
 	final public void cpuArchitecture(CPUArchitecture arch)
 	{
-		_logger.info("----JSDL: in Resources.java---cpuArchitecture" + arch);
 		_arch = arch;
 	}
 
 	final public CPUArchitecture cpuArchitecture()
 	{
-		_logger.info("----JSDL: in Resources.java---cpuArchitecture" + _arch);
 		return _arch;
 	}
 
 	final public void gpuArchitecture(GPUArchitecture gpuarch)
 	{
-		_logger.info("----JSDL: in Resources.java---gpuArchitecture" + gpuarch);
-        	_gpuarch = gpuarch;
-    	}
+		_gpuarch = gpuarch;
+    }
 
-    	final public GPUArchitecture gpuArchitecture()
-    	{
-		_logger.info("----JSDL: in Resources.java---gpuArchitecture" + _gpuarch);
-        	return _gpuarch;
-    	}
+    final public GPUArchitecture gpuArchitecture()
+    {
+		return _gpuarch;
+    }
         
     	final public void GPUCountPerNode(RangeValue rangeValue)
     	{
