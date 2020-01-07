@@ -38,13 +38,13 @@ testExitingFromXScript()
   OUTFILE=$(mktemp $TEST_TEMP/xscriptExitTest.XXXXXX)
   echo "Verbose run log is recorded in $OUTFILE"
   # try a bad exit first, since that's the case we had recorded in a bug.
-  grid script local:./xscriptBadExiter.xml 
+  grid script local:$PWD/xscriptBadExiter.xml 
   local retval=$?
   assertNotEquals "Testing exit command with failure return in XScript file" 0 $retval
   # make the actual copy of output file for inspection later.
   cp -f $GRID_OUTPUT_FILE $OUTFILE
   # try a good exit now, which should still work right.
-  grid script local:./xscriptGoodExiter.xml 
+  grid script local:$PWD/xscriptGoodExiter.xml 
   retval=$?
   assertEquals "Testing exit command with good return in XScript file" 0 $retval
   # grab the newer output file and stuff on end of reported file.
@@ -86,12 +86,12 @@ testSimplestCopy()
 }
 
 testRNSFunctioning() {
-  grid script local:./rnsTest.xml $RNSPATH 
+  grid script local:$PWD/rnsTest.xml $RNSPATH 
   assertEquals "Testing RNS" 0 $?
 }
 
 testRandomByteIO() {
-  grid script local:./randomByteIO.xml $RNSPATH
+  grid script local:$PWD/randomByteIO.xml $RNSPATH
   assertEquals "Testing RandomByteIO" 0 $?
 }
 
@@ -99,7 +99,7 @@ testBasicGridCLI() {
   if ! fuse_supported; then return 0; fi
   OUTFILE=$(mktemp $TEST_TEMP/gridCmdLine.XXXXXX)
   echo "Verbose run log is recorded in $OUTFILE"
-  grid script local:./gridCmdLine.xml "$RNSPATH" "$MOUNT_POINT" "$CONTAINERPATH" "$EXPORTPATH" "$TEST_TEMP"
+  grid script local:$PWD/gridCmdLine.xml "$RNSPATH" "$MOUNT_POINT" "$CONTAINERPATH" "$EXPORTPATH" "$TEST_TEMP"
   local retval=$?
   assertEquals "Testing basic grid command line" 0 $retval
   # make the actual copy for inspection later.
