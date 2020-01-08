@@ -81,6 +81,7 @@ int dumpStats(int beingKilled) {
 	or memory.
 	*/
 	if (running==1 && beingKilled==1) exitCode=250;
+
 	writeExitResults(CL->getResourceUsageFile(CL),
                	autorelease(createExitResults(exitCode,
                	toMicroseconds(usage.ru_utime),
@@ -88,6 +89,12 @@ int dumpStats(int beingKilled) {
                	(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
                        	(long long)(stop.tv_usec - start.tv_usec),
                	(long long)usage.ru_maxrss * 1024)));
+
+	/* 2020-01-08 LAK terminating child process instead of waiting for queueing
+	   system to kill the process itself
+	*/
+	if (running==1 && beingKilled==1) kill(pid, SIGKILL);
+
 	return exitCode;
 }
 
