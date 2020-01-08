@@ -22,9 +22,9 @@ function pick_grid_app()
     fi
   else
     # linux and mac don't need to grope about for the file quite as badly.
-    #echo "$GENII_BINARY_DIR/grid"
+    echo "$GENII_BINARY_DIR/grid"
     # and they can now take advantage of the fastgrid script.
-    echo "$GENII_BINARY_DIR/fastgrid"
+    #echo "$GENII_BINARY_DIR/fastgrid"
   fi
 }
 
