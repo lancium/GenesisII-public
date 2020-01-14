@@ -31,6 +31,8 @@ import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.PersistActivitiesResponseType;
 import org.ggf.bes.factory.PersistActivitiesType;
+import org.ggf.bes.factory.RestartActivitiesResponseType;
+import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.TerminateActivityResponseType;
@@ -680,10 +682,20 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	}
 
 	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
 	public PersistActivitiesResponseType persistActivities(PersistActivitiesType parameters)
 			throws RemoteException, UnknownActivityIdentifierFaultType {
 		// TODO Auto-generated method stub
 		_logger.debug("persistActivities called on QueueServiceImpl. This is currently unsupported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public RestartActivitiesResponseType restartActivities(RestartActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
+		_logger.debug("restartActivities called on QueueServiceImpl. This is currently unsupported. Ignoring request.");
 		return null;
 	}
 }

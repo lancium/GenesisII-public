@@ -119,8 +119,18 @@
 	
 	<xsd:complexType name="PersistActivityResponseType">
 		<xsd:sequence>
-			<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"/>
+			<xsd:element name="PersistedLocation" type="xsd:string"/>
 			<xsd:element name="Persisted" type="xsd:boolean"/>
+			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="RestartActivityResponseType">
+		<xsd:sequence>
+			<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"/>
+			<xsd:element name="Restarted" type="xsd:boolean"/>
 			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
