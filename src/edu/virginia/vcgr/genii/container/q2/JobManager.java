@@ -2661,12 +2661,6 @@ public class JobManager implements Closeable
 						MyProxyCertificate.setPEMFormattedCertificate(header);
 
 					resp = bes.createActivity(new CreateActivityType(adt, null));
-					
-					//TEMP Test
-					EndpointReferenceType tempepr = resp.getActivityIdentifier();
-					PersistActivitiesResponseType presp = bes.persistActivities(new PersistActivitiesType(new EndpointReferenceType[] {tempepr}, null));
-					
-					//END TEST
 
 					history.debug("CreateActivity Outcall Succeeded");
 
