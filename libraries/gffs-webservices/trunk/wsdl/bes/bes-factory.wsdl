@@ -53,7 +53,7 @@
 			</xsd:complexType>
 			
 			<xsd:complexType name="TerminateActivitiesType">
-				<xsd:sequence>
+				<xsd:sequence>s
 					<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"
 						minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -64,6 +64,24 @@
 			<xsd:complexType name="TerminateActivitiesResponseType">
 				<xsd:sequence>
 					<xsd:element name="Response" type="bes-factory:TerminateActivityResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="PersistActivitiesType">
+				<xsd:sequence>
+					<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="PersistActivitiesResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:PersistActivityResponseType"
 						minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
@@ -174,6 +192,10 @@
 				type="bes-factory:TerminateActivitiesType"/>
 			<xsd:element name="TerminateActivitiesResponse"
 				type="bes-factory:TerminateActivitiesResponseType"/>
+			<xsd:element name="PersistActivities"
+				type="bes-factory:PersistActivitiesType"/>
+			<xsd:element name="PersistActivitiesResponse"
+				type="bes-factory:PersistActivitiesResponseType"/>
 			<xsd:element name="GetActivityDocuments"
 				type="bes-factory:GetActivityDocumentsType"/>
 			<xsd:element name="GetActivityDocumentsResponse"
@@ -230,6 +252,16 @@
 	<wsdl:message name="TerminateActivitiesResponse">
 		<wsdl:part name="parameters"
 			element="bes-factory:TerminateActivitiesResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="PersistActivitiesRequest">
+		<wsdl:part name="parameters"
+			element="bes-factory:PersistActivities"/>
+	</wsdl:message>
+	
+	<wsdl:message name="PersistActivitiesResponse">
+		<wsdl:part name="parameters"
+			element="bes-factory:PersistActivitiesResponse"/>
 	</wsdl:message>
 	
 	<wsdl:message name="GetActivityDocumentsRequest">
@@ -342,6 +374,21 @@
 				name="TerminateActivitiesResponse"
 				message="bes-factory:TerminateActivitiesResponse"
 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/TerminateActivitiesResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="PersistActivities">
+			<wsdl:input
+				name="PersistActivities"
+				message="bes-factory:PersistActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/PersistActivities"/>
+			<wsdl:output
+				name="PersistActivitiesResponse"
+				message="bes-factory:PersistActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/PersistActivitiesResponse"/>
 			<wsdl:fault
 				name="UnknownActivityIdentifierFault"
 				message="bes-factory:UnknownActivityIdentifierFault"

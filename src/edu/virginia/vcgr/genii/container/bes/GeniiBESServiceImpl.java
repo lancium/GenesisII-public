@@ -34,6 +34,9 @@ import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.TerminateActivityResponseType;
+import org.ggf.bes.factory.PersistActivitiesResponseType;
+import org.ggf.bes.factory.PersistActivitiesType;
+import org.ggf.bes.factory.PersistActivityResponseType;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.bes.management.StartAcceptingNewActivitiesResponseType;
@@ -528,6 +531,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 		return new TerminateActivitiesResponseType(responses.toArray(new TerminateActivityResponseType[0]), null);
 	}
+	
+	
 
 	static public TerminateActivityResponseType terminateActivity(EndpointReferenceType activity) throws RemoteException
 	{
@@ -537,6 +542,30 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			return new TerminateActivityResponseType(activity, true, null, null);
 		} catch (Throwable cause) {
 			return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public PersistActivitiesResponseType persistActivities(PersistActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		Collection<PersistActivityResponseType> responses = new LinkedList<PersistActivityResponseType>();
+
+		for (EndpointReferenceType aepr : parameters.getActivityIdentifier()) {
+			responses.add(persistActivity(aepr));
+		}
+
+		return new PersistActivitiesResponseType(responses.toArray(new PersistActivityResponseType[0]), null);
+	}
+	
+	static public PersistActivityResponseType persistActivity(EndpointReferenceType activity) throws RemoteException
+	{
+		try {
+			//Add in persisting activity
+			_logger.debug("Called \"persistActivty\" on GeniiBESService.  This is currently unsupported. Ignoring request.");
+			return new PersistActivityResponseType(activity, true, null, null);
+		} catch (Throwable cause) {
+			return new PersistActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
 		}
 	}
 

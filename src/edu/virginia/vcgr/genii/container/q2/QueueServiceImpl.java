@@ -29,6 +29,8 @@ import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
+import org.ggf.bes.factory.PersistActivitiesResponseType;
+import org.ggf.bes.factory.PersistActivitiesType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.TerminateActivityResponseType;
@@ -675,5 +677,13 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		}
 		return AnyHelper.toAny(jit);
 
+	}
+
+	@Override
+	public PersistActivitiesResponseType persistActivities(PersistActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently unsupported. Ignoring request.");
+		return null;
 	}
 }

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.ggf.bes.factory.PersistActivitiesResponseType;
+import org.ggf.bes.factory.PersistActivitiesType;
+import org.ggf.bes.factory.PersistActivityResponseType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.TerminateActivityResponseType;
@@ -126,7 +129,26 @@ public class TerminateActivitiesTool extends BaseGridTool
 			int end = Math.min(activityEprs.size(), batchSize * (1 + h));
 
 			List<EndpointReferenceType> currActivityEprs = activityEprs.subList(start, end);
-
+//
+//			//TEMP 
+//			PersistActivitiesResponseType tempresp = bes.persistActivities(
+//					new PersistActivitiesType(currActivityEprs.toArray(new EndpointReferenceType[currActivityEprs.size()]), null));
+//			
+//			if(tempresp != null)
+//			{
+//				PersistActivityResponseType[] tempresps = tempresp.getResponse();
+//				if(tempresps != null)
+//				{
+//					for (PersistActivityResponseType r : tempresps){
+//						if(r.isPersisted())
+//						{
+//							stdout.println("Persisted activity through tool");
+//						}
+//					}
+//				}
+//			}
+//			//END TEMP
+			
 			TerminateActivitiesResponseType resp = bes.terminateActivities(
 				new TerminateActivitiesType(currActivityEprs.toArray(new EndpointReferenceType[currActivityEprs.size()]), null));
 
