@@ -73,12 +73,16 @@ import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.cloud.CloudAttributesHandler;
 import edu.virginia.vcgr.genii.cloud.CloudDBResourceFactory;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
@@ -551,8 +555,10 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			throws RemoteException, UnknownActivityIdentifierFaultType {
 		Collection<PersistActivityResponseType> responses = new LinkedList<PersistActivityResponseType>();
 
-		for (EndpointReferenceType aepr : parameters.getActivityIdentifier()) {
-			responses.add(persistActivity(aepr));
+		for (String epi : parameters.getEPI()) {
+			//something to do with rns path to convert epi into epr then call persistActivity
+			//RNSPath path = lookup(new GeniiPath(epi), RNSPathQueryFlags.MUST_NOT_EXIST);
+			//responses.add(persistActivity(epr));
 		}
 
 		return new PersistActivitiesResponseType(responses.toArray(new PersistActivityResponseType[0]), null);

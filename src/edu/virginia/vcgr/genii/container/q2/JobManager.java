@@ -37,8 +37,6 @@ import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
-import org.ggf.bes.factory.PersistActivitiesResponseType;
-import org.ggf.bes.factory.PersistActivitiesType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.GUID;
@@ -2661,12 +2659,6 @@ public class JobManager implements Closeable
 						MyProxyCertificate.setPEMFormattedCertificate(header);
 
 					resp = bes.createActivity(new CreateActivityType(adt, null));
-					
-					//TEMP Test
-					EndpointReferenceType tempepr = resp.getActivityIdentifier();
-					PersistActivitiesResponseType presp = bes.persistActivities(new PersistActivitiesType(new EndpointReferenceType[] {tempepr}, null));
-					
-					//END TEST
 
 					history.debug("CreateActivity Outcall Succeeded");
 

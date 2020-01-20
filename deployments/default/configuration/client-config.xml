@@ -199,6 +199,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RunTool</mconf:class>
 		<mconf:class name="terminate-activities"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TerminateActivitiesTool</mconf:class>
+		<mconf:class name="persist-activities"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PersistActivitiesTool</mconf:class>
 		<mconf:class name="create-resource"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateResourceTool</mconf:class>
 		<mconf:class name="export"

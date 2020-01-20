@@ -72,7 +72,7 @@
 			
 			<xsd:complexType name="PersistActivitiesType">
 				<xsd:sequence>
-					<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"
+					<xsd:element name="EPI" type="xsd:string"
 						minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>

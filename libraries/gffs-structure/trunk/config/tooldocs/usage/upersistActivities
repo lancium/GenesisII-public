@@ -1,0 +1,2 @@
+persistActivities --bes=<bes-container> activities> [--batchSize=<batchSize>]
+	{--activities=<activity-path>,...,<activity-path> |
