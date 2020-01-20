@@ -37,6 +37,9 @@ import org.ggf.bes.factory.TerminateActivityResponseType;
 import org.ggf.bes.factory.PersistActivitiesResponseType;
 import org.ggf.bes.factory.PersistActivitiesType;
 import org.ggf.bes.factory.PersistActivityResponseType;
+import org.ggf.bes.factory.RestartActivitiesResponseType;
+import org.ggf.bes.factory.RestartActivitiesType;
+import org.ggf.bes.factory.RestartActivityResponseType;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.bes.management.StartAcceptingNewActivitiesResponseType;
@@ -569,9 +572,33 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		try {
 			//Add in persisting activity
 			_logger.debug("Called \"persistActivty\" on GeniiBESService.  This is currently unsupported. Ignoring request.");
-			return new PersistActivityResponseType(activity, true, null, null);
+			return new PersistActivityResponseType("Location Invalid", false, null, null);
 		} catch (Throwable cause) {
-			return new PersistActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
+			return new PersistActivityResponseType("Location Invalid", false, BESFaultManager.constructFault(cause), null);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public RestartActivitiesResponseType restartActivities(RestartActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		Collection<RestartActivityResponseType> responses = new LinkedList<RestartActivityResponseType>();
+
+		for (String fileLoc : parameters.getPersistedPath()) {
+			responses.add(restartActivity(fileLoc));
+		}
+
+		return new RestartActivitiesResponseType(responses.toArray(new RestartActivityResponseType[0]), null);
+	}
+	
+	static public RestartActivityResponseType restartActivity(String persistedFileLoc) throws RemoteException
+	{
+		try {
+			//Add in restarting activity
+			_logger.debug("Called \"restartActivty\" on GeniiBESService.  This is currently unsupported. Ignoring request.");
+			return new RestartActivityResponseType(null, false, null, null);
+		} catch (Throwable cause) {
+			return new RestartActivityResponseType(null, false, BESFaultManager.constructFault(cause), null);
 		}
 	}
 
