@@ -26,15 +26,15 @@ oneTimeSetUp()
   fi
 
   echo "Copying necessary files to Grid namespace"
-  grid cp local:./cat.sh grid:$RNSPATH
-  grid cp local:./hostname.sh grid:$RNSPATH
-  grid cp local:./hostname-sleep.sh grid:$RNSPATH
+  grid cp local:$PWD/cat.sh grid:$RNSPATH
+  grid cp local:$PWD/hostname.sh grid:$RNSPATH
+  grid cp local:$PWD/hostname-sleep.sh grid:$RNSPATH
 
 }
 
 testQueueSubmitSimple()
 {
-  grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/ls-single-job.jsdl
+  grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/ls-single-job.jsdl 
   assertEquals "Submitting single '/bin/ls' job" 0 $?
 
   grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/hostname-sleep-60s.jsdl
@@ -83,7 +83,7 @@ testWaitForManyJobStatusSweep()
 testSubmitManyJobsScript()
 {
 echo "starting submit... $(date)"
-  grid script local:./ls-submit-1000.xml $QUEUE_PATH
+  grid script local:$PWD/ls-submit-1000.xml $QUEUE_PATH $PWD
   retval=$?
 echo "ending submit... $(date)"
   assertEquals "Submitting 1000 'ls' jobs, not parameter sweep" 0 $retval

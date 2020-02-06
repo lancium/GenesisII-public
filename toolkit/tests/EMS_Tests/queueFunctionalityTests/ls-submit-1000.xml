@@ -4,11 +4,12 @@
 <gsh:echo message="Testing Submission of ls 1000 jobs"/>
 
 <gsh:define name="queuePath" source="${ARGV[1]}"/>
+<gsh:define name="scriptDir" source="${ARGV[2]}"/>
 
 <gsh:for param-name="i" initial-value="1" inclusive-limit="1000">
         <geniix:qsub>
                 <gsh:param>${queuePath}</gsh:param>
-                <gsh:param>local:./ls-single-job.jsdl</gsh:param>
+		<gsh:param>local:${scriptDir}/ls-single-job.jsdl</gsh:param>
         </geniix:qsub>
 </gsh:for>
 

@@ -98,7 +98,7 @@ cat $GRID_OUTPUT_FILE
 testCopyEmptyDirectory()
 {
   mkdir $TEST_TEMP/zorba
-  cp ./rnsBearTrap.sh $TEST_TEMP/zorba
+  cp $PWD/rnsBearTrap.sh $TEST_TEMP/zorba
   mkdir $TEST_TEMP/zorba/fruvil  # empty dir
   grid mkdir $RNSPATH/q
   assertEquals "making grid temporary dir should work" 0 $?
@@ -189,7 +189,7 @@ testSalsSecondScenario()
 {
   grid mkdir $RNSPATH/1
   assertEquals "making the directory should work" 0 $?
-  grid cp local:./$(basename $0) $RNSPATH/1/file
+  grid cp local:$PWD/$(basename $0) $RNSPATH/1/file
   assertEquals "creating a simple file in the directory should work" 0 $?
   grid ls $RNSPATH/1/file
   assertEquals "simple file should exist after creation" 0 $?
@@ -232,7 +232,7 @@ testSimpleLocalRemoval()
   assertEquals "remove same local directory" 0 $?
   grid mkdir $localpath/r
   assertEquals "make one local directory" 0 $?
-  grid cp local:./rnsBearTrap.sh $localpath/r/gumboot
+  grid cp local:$PWD/rnsBearTrap.sh $localpath/r/gumboot
   assertEquals "copy file into that local directory" 0 $?
   grid rm $localpath/r
   assertNotEquals "should not remove local directory with contents" 0 $?
@@ -250,7 +250,7 @@ testSimpleGridRemoval()
   assertEquals "remove same rns directory" 0 $?
   grid mkdir $RNSPATH/r
   assertEquals "make one rns directory" 0 $?
-  grid cp local:./rnsBearTrap.sh $RNSPATH/r/gumboot
+  grid cp local:$PWD/rnsBearTrap.sh $RNSPATH/r/gumboot
   assertEquals "copy file into that rns directory" 0 $?
   grid rm $RNSPATH/r
   assertNotEquals "should not remove rns directory with contents" 0 $?
@@ -307,7 +307,7 @@ testLocalDirWithCycles()
   pushd $TEST_TEMP &>/dev/null
   ln -s $TEST_TEMP $TEST_TEMP/zorba
   mkdir ./petunia
-  grid cp -r local:./zorba local:./petunia
+  grid cp -r local:$PWD/zorba local:$PWD/petunia
   assertNotEquals "copy simple local path with cycle should bounce" 0 $?
   \rm ./zorba &>/dev/null
   \rm -rf ./petunia &>/dev/null
@@ -324,15 +324,15 @@ testLocalDirWithCycles()
   # if either of these gets trapped in infinite loop, well that's a failure.
   # if they succeed and get what they can copied, not including links, then
   # that's a success currently.
-  grid cp -r local:./foo local:./crunchy
+  grid cp -r local:$PWD/foo local:$PWD/crunchy
   assertNotEquals "copy local path with cycle to local path should fail" 0 $?
   grid mkdir $RNSPATH/q
   assertEquals "make grid directory should work" 0 $?
-  grid cp -r local:./foo $RNSPATH/q
+  grid cp -r local:$PWD/foo $RNSPATH/q
   assertNotEquals "copy local path with cycle to grid path should fail" 0 $?
   grid rm -r $RNSPATH/q
   assertEquals "cleaning up grid path should work" 0 $?
-  grid rm -r local:./crunchy
+  grid rm -r local:$PWD/crunchy
   assertEquals "cleaning up local crunchy path should work" 0 $?
   \rm -r ./foo
   popd &>/dev/null

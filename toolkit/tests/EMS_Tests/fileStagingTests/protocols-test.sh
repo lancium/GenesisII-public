@@ -20,8 +20,8 @@ oneTimeSetUp()
   fi
 
   echo "Copying necessary file to Grid namespace"
-  grid cp local:./cat.sh grid:$RNSPATH
-  grid cp local:./hostname.sh grid:$RNSPATH
+  grid cp local:$PWD/cat.sh grid:$RNSPATH
+  grid cp local:$PWD/hostname.sh grid:$RNSPATH
 }
 
 testQueueResourcesExist()

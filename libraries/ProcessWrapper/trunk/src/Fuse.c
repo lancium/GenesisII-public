@@ -19,6 +19,7 @@
 	
 #define FS_WAIT_TIME 8
 
+
 static int unmountImpl(struct FuseMount*);
 static const char* getErrorImpl(struct FuseMounter*);
 static FuseMount* mountImpl(struct FuseMounter*, const char *mountPoint);
