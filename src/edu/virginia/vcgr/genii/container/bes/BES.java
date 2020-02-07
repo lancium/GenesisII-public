@@ -230,6 +230,8 @@ public class BES implements Closeable
 	private String _besEPI;
 	private BESPolicyEnactor _enactor;
 	private HashMap<String, BESActivity> _containedActivities = new HashMap<String, BESActivity>();
+	private BESPWrapperConnection pwConnection;
+	private final int PWRAPPER_CONNECTION_PORT = 5555;
 
 	private BES(Connection connection, String besid, BESPolicy policy) throws SQLException
 	{
@@ -240,6 +242,8 @@ public class BES implements Closeable
 			_besEPI = findBESEPI(connection, besid);
 		else
 			_besEPI = null;
+		
+		pwConnection = new BESPWrapperConnection(PWRAPPER_CONNECTION_PORT);
 	}
 
 	public String getBESID()
