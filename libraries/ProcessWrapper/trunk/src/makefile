@@ -11,7 +11,7 @@ OBJECTS		=		$(OBJDIR)/Memory.o										\
 
 BINARIES	=		$(BINDIR)/pwrapper
 
-CFLAGS	=	-g -fPIC -DPWRAP_linux
+CFLAGS	=	-g -fPIC -DPWRAP_linux -pthread
 
 ###############
 

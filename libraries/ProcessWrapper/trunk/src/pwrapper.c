@@ -28,6 +28,10 @@ int main(int argc, char **argv)
 			usage(argv[0]);
 	}
 
+    if(startBesListener() || connectToBes()) {
+        // maybe: stopBesListener()
+    }
+
 	exitCode = wrapJob(commandLine);
 
 	release(commandLine);

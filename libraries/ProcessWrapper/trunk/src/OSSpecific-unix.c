@@ -10,6 +10,12 @@
 #include <sys/stat.h>
 #include <signal.h>
 
+#include <pthread.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+
 
 
 #include "Memory.h"
@@ -60,7 +66,7 @@ int running=1;
 
 int dumpStats(int beingKilled) {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
-	Note that it is using global variables. This is unfortunate, but the 
+	Note that it is using global variables. This is unfortunate, but the
 	only way to get the data into a signal handler.
 */
 	int exitCode=100;
@@ -77,7 +83,7 @@ int dumpStats(int beingKilled) {
 	/*
 	2019-08-22 by ASG. If the child is still running AND being killed,
 	set the exit code to 250. It means the enclosing environment, e.g.,
-	the queueing system is terminating it, likely for too much time, processes, 
+	the queueing system is terminating it, likely for too much time, processes,
 	or memory.
 	*/
 	if (running==1 && beingKilled==1) exitCode=250;
@@ -181,7 +187,7 @@ int wrapJob(CommandLine *commandLine)
 			commandLine->getStandardOutput(commandLine),
 			commandLine->getStandardError(commandLine)))
 			return -1;
-		
+
 		execvp(cmdLine[0], cmdLine);
 
 		/* If we got this far, the something went wrong with the exec. */
@@ -201,7 +207,7 @@ int wrapJob(CommandLine *commandLine)
 		return -1;
 	}
 */
-	// 2019-05-27 by ASG. Code to deal with the process getting killed and losing 
+	// 2019-05-27 by ASG. Code to deal with the process getting killed and losing
 	// the accounting records.
 	running=1;
 	int ticks=0;
@@ -544,7 +550,7 @@ int verifyFuseDevice(char **errorMessage)
 	if (access(FUSE_DEVICE, R_OK | W_OK))
 	{
 		*errorMessage = createStringFromFormat(
-			"Path %s is not read/write accessible.",	
+			"Path %s is not read/write accessible.",
 			FUSE_DEVICE);
 		return 1;
 	}
@@ -565,4 +571,146 @@ const char* getOverloadedEnvironment(const char *variableName,
 		result = getenv(variableName);
 
 	return result;
+}
+
+// NOTE: The following code is thread-unsafe.
+
+static pthread_t bes_conn_pthread;
+static pthread_t bes_listener_pthread;
+static int bes_listen_socket = -1;
+static int bes_connect_socket = -1;
+
+static struct BESListenerParameters {
+    const char *hostmask;
+    short port;
+} bes_listener_params;
+
+static struct BESConnectionParameters {
+    const char *host;
+    short port;
+} bes_conn_params;
+
+void *_startListener(void *arg) {
+    // Open the main control socket
+    struct sockaddr_in sa;
+    bes_listen_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (bes_listen_socket == -1) {
+        perror("cannot create socket");
+        return NULL;
+    }
+
+    // Allow re-use of the port
+    const static int tr = 1;
+    setsockopt(bes_listen_socket,SOL_SOCKET,SO_REUSEADDR,&tr,sizeof(int));
+
+    // Set the host mask and port
+    memset(&sa, 0, sizeof sa);
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(bes_listener_params.port);
+    inet_pton(AF_INET, bes_listener_params.hostmask, &sa.sin_addr.s_addr);
+    // sa.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    // Bind to port
+    if(bind(bes_listen_socket, (struct sockaddr *)&sa, sizeof sa) == -1) {
+        perror("bind failed");
+        goto stop;
+    }
+
+    // Listen for connections
+    if(listen(bes_listen_socket, 10) == -1) {
+        perror("listen failed");
+        goto stop;
+    }
+
+    // TODO: Make this a loop? - jth 02/21/2020
+    {
+        struct sockaddr_in client_addr;
+        socklen_t client_addr_size = sizeof(client_addr);
+        int connectfd = accept(bes_listen_socket, (struct sockaddr *)&client_addr,
+                &client_addr_size);
+
+        if(connectfd < 0) {
+            perror("accept failed");
+            close(connectfd);
+            goto stop;
+        }
+
+        char ip[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &client_addr, ip, client_addr_size);
+        printf("Established connection to %s:%hu\n",
+                ip, ntohs(client_addr.sin_port));
+
+        while(1) {
+            // TODO: experimental
+            char buffer[1024];
+            int numread = read(connectfd, buffer, 1023);
+            buffer[numread] = '\0';
+
+            printf("bes_listener: got string %s\n", buffer);
+        }
+
+        printf("closing...\n");
+
+        close(connectfd);
+    }
+
+stop:
+
+    close(bes_listen_socket);
+
+    return NULL;
+}
+
+void *_startBesConnection(void *arg) {
+    struct sockaddr_in addr;
+    int port = bes_conn_params.port;
+    const char *ip = bes_conn_params.host;
+    memset(&addr, 0, sizeof(struct sockaddr_in));
+    inet_pton(AF_INET, ip, &addr.sin_addr);
+    addr.sin_port = htons(port);
+    addr.sin_family = AF_INET;
+
+    if(connect(bes_connect_socket, (const struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0) {
+        fprintf(stderr, "err: could not connect to %s:%d\n", ip, port);
+        return NULL;
+    }
+
+    close(bes_connect_socket);
+
+    return NULL;
+}
+
+int startBesListener() {
+    printf("info: spawning bes listener thread\n");
+    bes_listener_params.hostmask = "0.0.0.0"; // TODO: set hostmask
+    int err = pthread_create(&bes_listener_pthread, NULL, &_startListener, NULL);
+    if(!err) {
+        printf("err: spawning bes listener thread failed: %d\n", err);
+        bes_listener_pthread = 0;
+        return -1;
+    }
+    return 0;
+}
+
+int stopBesListener() {
+    pthread_cancel(bes_listener_pthread);
+    return 0;
+}
+
+void _pipefail(int sig) {
+    fprintf(stderr, "bes_connect: pipefail -- not exiting");
+}
+
+int connectToBes() {
+    printf("info: spawning bes connection thread\n");
+    bes_conn_params.port = 9999;       // TODO: set port
+    bes_conn_params.host = "10.0.0.1"; // TODO: set host
+    signal(SIGPIPE, &_pipefail);
+    int err = pthread_create(&bes_conn_pthread, NULL, &_startBesConnection, NULL);
+    if(!err) {
+        printf("err: spawning bes connection thread failed: %d\n", err);
+        bes_conn_pthread = 0;
+        return -1;
+    }
+    return 0;
 }
