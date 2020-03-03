@@ -21,6 +21,7 @@ public class ResourcesPanel extends JPanel
 			new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		add(new ProcessorArchitecturePanel(context, index),
 			new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		
 		add(new MemoryPanel(context, index),
 			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 		add(new WallclockPanel(context, index),
@@ -31,5 +32,8 @@ public class ResourcesPanel extends JPanel
 
 		add(new SPMDPanel(context, index), new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER,
 			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
+		
+		add(new GPUPanel(context, index),
+				new GridBagConstraints(0, 4, 1, 1, 0.5, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
 	}
 }
