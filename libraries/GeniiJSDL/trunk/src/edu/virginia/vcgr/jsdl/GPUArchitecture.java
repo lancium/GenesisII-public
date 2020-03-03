@@ -26,7 +26,7 @@ public class GPUArchitecture extends CommonJSDLElement implements Serializable
 	static final long serialVersionUID = 0L;
 
 	@XmlElement(namespace = JSDLConstants.JSDL_NS, name = "GPUArchitectureName", required = true)
-	private GPUArchitecture _gpuArchitecture;
+	private GPUProcessorArchitecture _gpuArchitecture;
 
 	/**
 	 * Only to be used by XML unmarshalling.
@@ -36,7 +36,7 @@ public class GPUArchitecture extends CommonJSDLElement implements Serializable
 	{
 	}
 
-	public GPUArchitecture(GPUArchitecture gpuArchitecture)
+	public GPUArchitecture(GPUProcessorArchitecture gpuArchitecture)
 	{
 		if (gpuArchitecture == null)
 			throw new IllegalArgumentException("GPUArchitecture cannot be null.");
@@ -44,12 +44,12 @@ public class GPUArchitecture extends CommonJSDLElement implements Serializable
 		_gpuArchitecture = gpuArchitecture;
 	}
 
-	final public void gpuArchitecture(GPUArchitecture gpuArchitecture)
+	final public void gpuArchitecture(GPUProcessorArchitecture gpuArchitecture)
 	{
 		_gpuArchitecture = gpuArchitecture;
 	}
 
-	final public GPUArchitecture gpuArchitecture()
+	final public GPUProcessorArchitecture gpuArchitecture()
 	{
 		return _gpuArchitecture;
 	}

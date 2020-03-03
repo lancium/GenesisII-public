@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.gjt.data.SizeValue;
 import edu.virginia.vcgr.genii.gjt.gui.util.TitledPanel;
 import edu.virginia.vcgr.genii.gjt.units.SizeUnit;
 import edu.virginia.vcgr.jsdl.GPUArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 class GPUPanel extends TitledPanel
 {
@@ -31,6 +32,10 @@ class GPUPanel extends TitledPanel
 		
 		JSpinner gpuCountPerNode = new NullableNumberSpinner(
 			new NullableNumberSpinnerModel(context.jobRoot().jobDocument().get(index).gpuCountPerNode(), 1, Long.MAX_VALUE, 1));
+		
+		SizeValue gpuCurrentMem = context.jobRoot().jobDocument().get(index).gpuMemoryUpperBound();
+		JSpinner upperBound = new UnitValueSpinner(new UnitValueSpinnerModel<SizeUnit>(gpuCurrentMem, 1, Long.MAX_VALUE, 1));
+		SizeUnitValueComboBox upperBoundUnit = new SizeUnitValueComboBox(gpuCurrentMem);
 
 		add(new JLabel("GPU Type"), new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
@@ -38,8 +43,15 @@ class GPUPanel extends TitledPanel
 			new Insets(5, 5, 5, 5), 5, 5));
 		
 		add(new JLabel("GPUs/node"),
-			new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		add(gpuCountPerNode, new GridBagConstraints(3, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+			new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
+		add(gpuCountPerNode, new GridBagConstraints(3, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
+		
+		add(new JLabel("Memory/node"), new GridBagConstraints(4, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
+			new Insets(5, 5, 5, 5), 5, 5));
+		add(upperBound, new GridBagConstraints(5, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+			new Insets(5, 5, 5, 5), 5, 5));
+		add(upperBoundUnit, new GridBagConstraints(6, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE,
 			new Insets(5, 5, 5, 5), 5, 5));
 		
 	}
@@ -57,7 +69,7 @@ class GPUPanel extends TitledPanel
 		public void itemStateChanged(ItemEvent e)
 		{
 			if (e.getStateChange() == ItemEvent.SELECTED)
-				_doc.gpuArchitecture((GPUArchitecture) e.getItem());
+				_doc.gpuArchitecture((GPUProcessorArchitecture) e.getItem());
 			else
 				_doc.gpuArchitecture(null);
 		}
