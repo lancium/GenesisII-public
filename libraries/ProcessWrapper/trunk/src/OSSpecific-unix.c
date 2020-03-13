@@ -10,8 +10,6 @@
 #include <sys/stat.h>
 #include <signal.h>
 
-
-
 #include "Memory.h"
 #include "OSSpecific.h"
 #include "StringFunctions.h"
@@ -57,8 +55,11 @@ struct timeval start;
 struct timeval stop;
 pid_t pid;
 int running=1;
+int beingKilled=0;
 
-int dumpStats(int beingKilled) {
+int isVMJob = 0;
+
+int dumpStats() {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
 	Note that it is using global variables. This is unfortunate, but the 
 	only way to get the data into a signal handler.
@@ -80,7 +81,67 @@ int dumpStats(int beingKilled) {
 	the queueing system is terminating it, likely for too much time, processes, 
 	or memory.
 	*/
-	if (running==1 && beingKilled==1) exitCode=250;
+	if (running==1 && beingKilled==1) 
+	{
+		//we are getting killed
+		//if we are a vm job, we need to handle this
+		if(isVMJob)
+		{
+			printf("Starting vm teardown\n");
+
+			pid_t vmkillpid = fork();
+
+			if(vmkillpid < 0)
+			{
+				/* Couldn't fork */
+				fprintf(stderr, "Unable to fork new process to kill VM.\n");
+			}
+			else if(vmkillpid != 0)
+			{
+				//in parent
+				int exitCode = -1;
+				pid_t ret = waitpid(vmkillpid, &exitCode, 0);
+				
+				printf("in parent: done with exec stuff in child. Exiting \n");
+
+				//kill vmwrapper
+				kill(pid, SIGKILL);
+
+        		printf("in parent: killed vmwrapper \n");
+				fflush(stdout);
+			}
+			else
+			{
+				char const *cwd = CL->getWorkingDirectory(CL);
+				char *ticket = &strrchr(cwd, '/')[1];
+
+				char tCmd[512];
+        		strcpy(tCmd, "virsh --connect qemu:///system destroy ");
+        		strcat(tCmd, ticket);
+        		strcat(tCmd, " && virsh --connect qemu:///system undefine ");
+        		strcat(tCmd, ticket);
+
+				printf("in child: ");
+        		printf(tCmd);
+        		printf("\n");
+				fflush(stdout);
+
+        		char *cmd[] = {"/bin/bash", "-c", tCmd, 0};
+        		execvp(cmd[0], cmd);
+
+				fprintf(stderr, "Exec failed while trying to destroy VM.\n");
+			}
+		}
+		else
+		{
+			//regular job, we don't need to do anything nor wait for slurm to SIGKILL
+			kill(pid, SIGKILL);
+			printf("killed normal job \n");
+			fflush(stdout);
+		}
+
+		exitCode=250;
+	}
 	writeExitResults(CL->getResourceUsageFile(CL),
                	autorelease(createExitResults(exitCode,
                	toMicroseconds(usage.ru_utime),
@@ -94,7 +155,8 @@ int dumpStats(int beingKilled) {
 void sig_handler(int signo)
 {
 	if (signo == SIGTERM) {
-		dumpStats(1);
+		beingKilled=1;
+		dumpStats();
 	}
 }
 
@@ -126,11 +188,18 @@ int wrapJob(CommandLine *commandLine)
 		}
 	}
 
-	if (!commandLine->getExecutable(commandLine))
+	//LAK (11 March 2019): Changes made here to find out if the job is a VM job
+	const char *exec_str = commandLine->getExecutable(commandLine);
+	//hard coding this executable path should require a discussion before production
+	int exec_len = strlen(exec_str);
+	const char *comp_str = exec_len > 12 ? &exec_str[exec_len-12] : "Invalid"; //get last twelve chars from string
+	isVMJob = strcmp(comp_str, "vmwrapper.sh") == 0;
+
+	if (!exec_str)
 		return 0;
 
 	cmdLine = formCommandLine(
-		commandLine->getExecutable(commandLine),
+		exec_str,
 		commandLine->getArguments(commandLine));
 
 	if (cmdLine == NULL)
@@ -198,16 +267,18 @@ int wrapJob(CommandLine *commandLine)
 	// the accounting records.
 	running=1;
 	int ticks=0;
-	while (running==1) {
+	while (running==1 && beingKilled==0) {
 		sleep(SLEEP_DURATION);
-		exitCode=dumpStats(0);
+		exitCode=dumpStats();
 		ticks++;
 	}
 	// End of updates
 
+	printf("exiting pwrapper \n");
+	fflush(stdout);
+
 	if (mount)
 		mount->unmount(mount);
-
 
 	return exitCode;
 }

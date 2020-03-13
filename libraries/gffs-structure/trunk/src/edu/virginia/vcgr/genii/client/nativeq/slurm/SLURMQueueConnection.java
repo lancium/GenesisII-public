@@ -95,8 +95,10 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		List<String> commandLine = new LinkedList<String>();
 		commandLine.addAll(_qdelStart);
 
+		/*LAK: 13 March 2019: 	removed as we now use KillWait to delay the SIG_KILL signal until we have gracefully responded
+								to the SIG_TERM request */
 		// make sure they pay attention to us.
-		commandLine.add("--signal=KILL");
+		//commandLine.add("--signal=KILL");
 
 		String arg = token.toString();
 		if (_destination != null)
