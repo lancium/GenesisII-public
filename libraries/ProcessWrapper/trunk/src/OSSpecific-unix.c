@@ -59,6 +59,59 @@ int beingKilled=0;
 
 int isVMJob = 0;
 
+void teardownJob()
+{
+	//we are getting killed
+	//if we are a vm job, we need to handle this
+	if (isVMJob)
+	{
+		pid_t vmkillpid = fork();
+
+		if (vmkillpid < 0)
+		{
+			/* Couldn't fork */
+			fprintf(stderr, "Unable to fork new process to kill VM.\n");
+		}
+		else if (vmkillpid != 0)
+		{
+			//in parent
+			int exitCode = -1;
+			pid_t ret = waitpid(vmkillpid, &exitCode, 0);
+
+			//kill vmwrapper
+			kill(pid, SIGKILL);
+		}
+		else
+		{
+			char const *cwd = CL->getWorkingDirectory(CL);
+			char *ticket = &strrchr(cwd, '/')[1];
+
+			//~200 would overflow buffer
+			if (strlen(ticket) > 185)
+			{
+				fprintf(stderr, "Directory name is too long while building command to destroy VM.\n");
+			}
+
+			char tCmd[512];
+			strcpy(tCmd, "virsh --connect qemu:///system destroy ");
+			strcat(tCmd, ticket);
+			strcat(tCmd, " &> /dev/null && virsh --connect qemu:///system undefine ");
+			strcat(tCmd, ticket);
+			strcat(tCmd, " &> /dev/null");
+
+			char *cmd[] = {"/bin/bash", "-c", tCmd, 0};
+			execvp(cmd[0], cmd);
+
+			fprintf(stderr, "Exec failed while trying to destroy VM.\n");
+		}
+	}
+	else
+	{
+		//regular job, we don't need to do anything nor wait for slurm to SIGKILL
+		kill(pid, SIGKILL);
+	}
+}
+
 int dumpStats() {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
 	Note that it is using global variables. This is unfortunate, but the 
@@ -83,62 +136,7 @@ int dumpStats() {
 	*/
 	if (running==1 && beingKilled==1) 
 	{
-		//we are getting killed
-		//if we are a vm job, we need to handle this
-		if(isVMJob)
-		{
-			printf("Starting vm teardown\n");
-
-			pid_t vmkillpid = fork();
-
-			if(vmkillpid < 0)
-			{
-				/* Couldn't fork */
-				fprintf(stderr, "Unable to fork new process to kill VM.\n");
-			}
-			else if(vmkillpid != 0)
-			{
-				//in parent
-				int exitCode = -1;
-				pid_t ret = waitpid(vmkillpid, &exitCode, 0);
-				
-				printf("in parent: done with exec stuff in child. Exiting \n");
-
-				//kill vmwrapper
-				kill(pid, SIGKILL);
-
-        		printf("in parent: killed vmwrapper \n");
-				fflush(stdout);
-			}
-			else
-			{
-				char const *cwd = CL->getWorkingDirectory(CL);
-				char *ticket = &strrchr(cwd, '/')[1];
-
-				char tCmd[512];
-        		strcpy(tCmd, "virsh --connect qemu:///system destroy ");
-        		strcat(tCmd, ticket);
-        		strcat(tCmd, " && virsh --connect qemu:///system undefine ");
-        		strcat(tCmd, ticket);
-
-				printf("in child: ");
-        		printf(tCmd);
-        		printf("\n");
-				fflush(stdout);
-
-        		char *cmd[] = {"/bin/bash", "-c", tCmd, 0};
-        		execvp(cmd[0], cmd);
-
-				fprintf(stderr, "Exec failed while trying to destroy VM.\n");
-			}
-		}
-		else
-		{
-			//regular job, we don't need to do anything nor wait for slurm to SIGKILL
-			kill(pid, SIGKILL);
-			printf("killed normal job \n");
-			fflush(stdout);
-		}
+		teardownJob();
 
 		exitCode=250;
 	}
@@ -170,7 +168,7 @@ int wrapJob(CommandLine *commandLine)
 	// 2019--5-27 by ASG. Put in signal handler for SIGTERM
 	CL=commandLine;
 	if (signal(SIGTERM, sig_handler) == SIG_ERR)
-  		printf("\ncan't catch SIGTERM\n");
+  		fprintf(stderr, "Can't catch SIGTERM\n");
 	// End updates
 
 	/* Now, if a grid file system was requested, we try and set that up.
@@ -190,10 +188,7 @@ int wrapJob(CommandLine *commandLine)
 
 	//LAK (11 March 2019): Changes made here to find out if the job is a VM job
 	const char *exec_str = commandLine->getExecutable(commandLine);
-	//hard coding this executable path should require a discussion before production
-	int exec_len = strlen(exec_str);
-	const char *comp_str = exec_len > 12 ? &exec_str[exec_len-12] : "Invalid"; //get last twelve chars from string
-	isVMJob = strcmp(comp_str, "vmwrapper.sh") == 0;
+	isVMJob = (strstr(exec_str, "vmwrapper.sh") != NULL);
 
 	if (!exec_str)
 		return 0;
@@ -273,9 +268,6 @@ int wrapJob(CommandLine *commandLine)
 		ticks++;
 	}
 	// End of updates
-
-	printf("exiting pwrapper \n");
-	fflush(stdout);
 
 	if (mount)
 		mount->unmount(mount);
