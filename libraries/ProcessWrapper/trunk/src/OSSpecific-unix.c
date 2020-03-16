@@ -10,8 +10,6 @@
 #include <sys/stat.h>
 #include <signal.h>
 
-
-
 #include "Memory.h"
 #include "OSSpecific.h"
 #include "StringFunctions.h"
@@ -57,8 +55,64 @@ struct timeval start;
 struct timeval stop;
 pid_t pid;
 int running=1;
+int beingKilled=0;
 
-int dumpStats(int beingKilled) {
+int isVMJob = 0;
+
+void teardownJob()
+{
+	//we are getting killed
+	//if we are a vm job, we need to handle this
+	if (isVMJob)
+	{
+		pid_t vmkillpid = fork();
+
+		if (vmkillpid < 0)
+		{
+			/* Couldn't fork */
+			fprintf(stderr, "Unable to fork new process to kill VM.\n");
+		}
+		else if (vmkillpid != 0)
+		{
+			//in parent
+			int exitCode = -1;
+			pid_t ret = waitpid(vmkillpid, &exitCode, 0);
+
+			//kill vmwrapper
+			kill(pid, SIGKILL);
+		}
+		else
+		{
+			char const *cwd = CL->getWorkingDirectory(CL);
+			char *ticket = &strrchr(cwd, '/')[1];
+
+			//~200 would overflow buffer
+			if (strlen(ticket) > 185)
+			{
+				fprintf(stderr, "Directory name is too long while building command to destroy VM.\n");
+			}
+
+			char tCmd[512];
+			strcpy(tCmd, "virsh --connect qemu:///system destroy ");
+			strcat(tCmd, ticket);
+			strcat(tCmd, " &> /dev/null && virsh --connect qemu:///system undefine ");
+			strcat(tCmd, ticket);
+			strcat(tCmd, " &> /dev/null");
+
+			char *cmd[] = {"/bin/bash", "-c", tCmd, 0};
+			execvp(cmd[0], cmd);
+
+			fprintf(stderr, "Exec failed while trying to destroy VM.\n");
+		}
+	}
+	else
+	{
+		//regular job, we don't need to do anything nor wait for slurm to SIGKILL
+		kill(pid, SIGKILL);
+	}
+}
+
+int dumpStats() {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
 	Note that it is using global variables. This is unfortunate, but the 
 	only way to get the data into a signal handler.
@@ -80,7 +134,12 @@ int dumpStats(int beingKilled) {
 	the queueing system is terminating it, likely for too much time, processes, 
 	or memory.
 	*/
-	if (running==1 && beingKilled==1) exitCode=250;
+	if (running==1 && beingKilled==1) 
+	{
+		teardownJob();
+
+		exitCode=250;
+	}
 	writeExitResults(CL->getResourceUsageFile(CL),
                	autorelease(createExitResults(exitCode,
                	toMicroseconds(usage.ru_utime),
@@ -94,7 +153,8 @@ int dumpStats(int beingKilled) {
 void sig_handler(int signo)
 {
 	if (signo == SIGTERM) {
-		dumpStats(1);
+		beingKilled=1;
+		dumpStats();
 	}
 }
 
@@ -108,7 +168,7 @@ int wrapJob(CommandLine *commandLine)
 	// 2019--5-27 by ASG. Put in signal handler for SIGTERM
 	CL=commandLine;
 	if (signal(SIGTERM, sig_handler) == SIG_ERR)
-  		printf("\ncan't catch SIGTERM\n");
+  		fprintf(stderr, "Can't catch SIGTERM\n");
 	// End updates
 
 	/* Now, if a grid file system was requested, we try and set that up.
@@ -126,11 +186,15 @@ int wrapJob(CommandLine *commandLine)
 		}
 	}
 
-	if (!commandLine->getExecutable(commandLine))
+	//LAK (11 March 2019): Changes made here to find out if the job is a VM job
+	const char *exec_str = commandLine->getExecutable(commandLine);
+	isVMJob = (strstr(exec_str, "vmwrapper.sh") != NULL);
+
+	if (!exec_str)
 		return 0;
 
 	cmdLine = formCommandLine(
-		commandLine->getExecutable(commandLine),
+		exec_str,
 		commandLine->getArguments(commandLine));
 
 	if (cmdLine == NULL)
@@ -198,16 +262,15 @@ int wrapJob(CommandLine *commandLine)
 	// the accounting records.
 	running=1;
 	int ticks=0;
-	while (running==1) {
+	while (running==1 && beingKilled==0) {
 		sleep(SLEEP_DURATION);
-		exitCode=dumpStats(0);
+		exitCode=dumpStats();
 		ticks++;
 	}
 	// End of updates
 
 	if (mount)
 		mount->unmount(mount);
-
 
 	return exitCode;
 }
