@@ -38,6 +38,7 @@ int main(int argc, char **argv)
 
 void usage(const char *program)
 {
+	// Dummy comment
 	fprintf(stderr,
 		"USAGE:  %s [setup-info] <executable> [<args...>]\n"
 		"            OR\n"
