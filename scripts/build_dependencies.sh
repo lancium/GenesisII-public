@@ -81,8 +81,9 @@ for subproject in \
   gffs-webservices gffs-security \
   gffs-structure \
   DPage \
+  ProcessWrapper \
 \
-; do 
+; do
   echo "=============="
   echo "Building subproject $subproject"
   DIRNAME="$CHECKOUT_DIR$subproject"
@@ -93,30 +94,48 @@ for subproject in \
   cd trunk
   check_result "entering trunk for $subproject"
 
-  if [ ! -z "$CLEAN_UP" ]; then
-    ant clean
-    check_result "ant clean for $subproject"
-  else
-    ant build
-    retval=$?
-    if [ $retval -ne 0 -a $subproject == gffs-security ]; then
-      echo -e "\n======="
-      echo "Failures in gffs-security often result from not having the unlimited JCE jar"
-      echo "files installed in the jre/lib/security folder.  These are available at:"
-      echo "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
-      echo
-      echo "Often the command that will correct this build problem is:"
-      echo "sudo cp $GENII_INSTALL_DIR/installer/unlimited_jce_java8/*jar /usr/lib/jvm/java-8-oracle/jre/lib/security/"
-      echo
-      echo -e "=======\n"
+   if [ ! -z "$CLEAN_UP" ]; then
+    if [ "$subproject" == "ProcessWrapper" ];then
+            (
+            source goLinux64
+            echo $PWD
+            cd src
+            make clean
+            )
+    else
+        ant clean
+    	check_result "ant clean for $subproject"
     fi
-    # re-enact the retval...
-    if [ $retval -ne 0 ]; then false; else true; fi
-    check_result "ant build for $subproject"
-#    # publish the newly crafted jars into the main build's ext folder.
-#nope, done automatically now.    cp -v -f lib/*.jar "$TOPDIR/ext"
-#nope2    check_result "publishing jar file produced by $subproject"
-  fi
+  else
+    if [ "$subproject" == "ProcessWrapper" ];then
+            (
+            source goLinux64
+            echo $PWD
+            cd src
+            make
+            )
+    else
+        ant build
+    	retval=$?
+    	if [ $retval -ne 0 -a $subproject == gffs-security ]; then
+      		echo -e "\n======="
+      		echo "Failures in gffs-security often result from not having the unlimited JCE jar"
+      		echo "files installed in the jre/lib/security folder.  These are available at:"
+      		echo "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
+      		echo
+      		echo "Often the command that will correct this build problem is:"
+      		echo "sudo cp $GENII_INSTALL_DIR/installer/unlimited_jce_java8/*jar /usr/lib/jvm/java-8-oracle/jre/lib/security/"
+      		echo
+      		echo -e "=======\n"
+    	fi
+    	# re-enact the retval...
+    	if [ $retval -ne 0 ]; then false; else true; fi
+    	check_result "ant build for $subproject"
+	#    # publish the newly crafted jars into the main build's ext folder.
+	#nope, done automatically now.    cp -v -f lib/*.jar "$TOPDIR/ext"
+	#nope2    check_result "publishing jar file produced by $subproject"
+    fi
+fi
 
   popd
   echo "SUCCESS for subproject $subproject"

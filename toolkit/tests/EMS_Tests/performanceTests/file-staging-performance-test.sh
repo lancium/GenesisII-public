@@ -32,7 +32,7 @@ oneTimeSetUp()
 testCopyFilesToGFFS()
 {
   echo "Copying bash input file to GFFS"
-  grid cp local:./mv-files.sh grid:$RNSPATH
+  grid cp local:$PWD/mv-files.sh grid:$RNSPATH
   exitCode=$?
   result=`expr $exitCode`
   assertEquals "Copied bash input file" 0 $exitCode

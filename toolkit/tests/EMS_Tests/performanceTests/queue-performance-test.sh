@@ -25,16 +25,16 @@ oneTimeSetUp()
 testQueuePerformanceSubmission()
 {
   
-  time grid script local:./ls-submit-1.xml $QUEUE_PATH
+  time grid script local:$PWD/ls-submit-1.xml $QUEUE_PATH $PWD
   assertEquals "Timing - Submitting 1 'ls' jobs, not parameter sweep" 0 $?
 
-  time grid script local:./ls-submit-10.xml $QUEUE_PATH
+  time grid script local:$PWD/ls-submit-10.xml $QUEUE_PATH $PWD
   assertEquals "Timing - Submitting 10 'ls' jobs, not parameter sweep" 0 $?
 
-  time grid script local:./ls-submit-100.xml $QUEUE_PATH
+  time grid script local:$PWD/ls-submit-100.xml $QUEUE_PATH $PWD
   assertEquals "Timing - Submitting 100 'ls' jobs, not parameter sweep" 0 $?
 
-  time grid script local:./ls-submit-1000.xml $QUEUE_PATH
+  time grid script local:$PWD/ls-submit-1000.xml $QUEUE_PATH $PWD
   assertEquals "Timing - Submitting 1000 'ls' jobs, not parameter sweep" 0 $?
   echo `date`": jobs submitted"
 }

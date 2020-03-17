@@ -54,9 +54,9 @@ for (( i=0; i < $test_count; i++ )); do
 
   # run off a bunch of jobs in a chunk.
   if [ "$submit_flag" != "BES" ]; then
-    grid script local:./ls-submit-many.xml $QUEUE_PATH
+    grid script local:$PWD/ls-submit-many.xml $QUEUE_PATH $PWD
   else
-    grid script local:./bes-ls-submit-many.xml $BES_CONTAINER
+    grid script local:$PWD/bes-ls-submit-many.xml $BES_CONTAINER $PWD
   fi
   if [ $? -ne 0 ]; then
     echo Failed submitting multiple ls jobs.

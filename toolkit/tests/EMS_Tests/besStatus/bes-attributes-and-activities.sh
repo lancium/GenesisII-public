@@ -28,7 +28,7 @@ testMakingAsyncFolder()
 {
   grid mkdir $RNSPATH/test-bes-attr
   assertEquals "Making test-bes-attr directory" 0 $?
-  grid cp local:./hostname-sleep.sh grid:$RNSPATH
+  grid cp local:$PWD/hostname-sleep.sh grid:$RNSPATH
   assertEquals "Copying datafiles to grid" 0 $?
 }
 

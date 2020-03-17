@@ -24,7 +24,7 @@ function pick_grid_app()
     # linux and mac don't need to grope about for the file quite as badly.
     echo "$GENII_BINARY_DIR/grid"
     # and they can now take advantage of the fastgrid script.
-#    echo "$GENII_BINARY_DIR/fastgrid"
+    #echo "$GENII_BINARY_DIR/fastgrid"
   fi
 }
 
@@ -174,6 +174,7 @@ function grid_base()
 function raw_grid()
 {
   # expects first parms to be the app/command to run.
+  echo ${0} >> /tmp/debugfile
   "${@}" 2>&1 | grep -v "Checking for updates\|^\[.*\]$\|Updates Disabled\|YourKit Java Profiler\|Current version is\|untoward for mooch"
   return ${PIPESTATUS[0]}
 }
