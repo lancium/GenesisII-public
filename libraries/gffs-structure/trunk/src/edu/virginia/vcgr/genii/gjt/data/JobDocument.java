@@ -59,6 +59,7 @@ import edu.virginia.vcgr.jsdl.OperatingSystemJSDLElement;
 import edu.virginia.vcgr.jsdl.OperatingSystemNameElement;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 import edu.virginia.vcgr.jsdl.Resources;
 import edu.virginia.vcgr.jsdl.SourceTarget;
 import edu.virginia.vcgr.jsdl.posix.Argument;
@@ -130,7 +131,7 @@ public class JobDocument implements PostUnmarshallListener
 	private ProcessorArchitecture _processorArchitecture;
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "gpu-architecture")
-	private GPUArchitecture _gpuArchitecture;
+	private GPUProcessorArchitecture _gpuArchitecture;
 
 	@XmlElement(namespace = JobDocumentConstants.DOCUMENT_NAMESPACE, name = "gpu-count-per-node")
 	private SettableLong _gpuCountPerNode;
@@ -312,31 +313,32 @@ public class JobDocument implements PostUnmarshallListener
 		}
 
 		if (_gpuArchitecture != null) {
-                        if (resources == null)
-                                resources = new Resources();
+			if (resources == null)
+				resources = new Resources();
 
-                        builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "GPUArchitecture"));
-                        builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "GPUArchitectureName"));
-                        resources.gpuArchitecture(new GPUArchitecture(_gpuArchitecture));
-                        builder.pop();
-                        builder.pop();
-                }
+            builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "GPUArchitecture"));
+            builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "GPUArchitectureName"));
+            resources.gpuArchitecture(new GPUArchitecture(_gpuArchitecture));
+            builder.pop();
+            builder.pop();
+        }
 
+		
 		if (_gpuCountPerNode.value() != null) {
 			if (resources == null)
-					resources = new Resources();
+				resources = new Resources();
 
-            		builder.push(new DefaultXPathNode("http://vcgr.cs.virginia.edu/jsdl/genii", "GPUCountPerNode"));
-            		builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
+            builder.push(new DefaultXPathNode("http://vcgr.cs.virginia.edu/jsdl/genii", "GPUCountPerNode"));
+            builder.push(new DefaultXPathNode(JSDLConstants.JSDL_NS, "UpperBoundedRange"));
 
-            		RangeValue rv = new RangeValue();
+            RangeValue rv = new RangeValue();
 
-            		rv.upperBoundedRange(new Boundary(_gpuCountPerNode.value()));
-            		resources.GPUCountPerNode(rv);
+            rv.upperBoundedRange(new Boundary(_gpuCountPerNode.value()));
+            resources.GPUCountPerNode(rv);
 
-            		builder.pop();
-            		builder.pop();
-        	}
+            builder.pop();
+            builder.pop();
+        }
 		
 		if (_gpuMemoryUpperBound.value() != null) {
 			if (resources == null)
@@ -352,7 +354,7 @@ public class JobDocument implements PostUnmarshallListener
 			builder.pop();
 			builder.pop();
 		}
-
+		 
 		if (_memoryUpperBound.value() != null) {
 			if (resources == null)
 				resources = new Resources();
@@ -853,6 +855,12 @@ public class JobDocument implements PostUnmarshallListener
 
 		if (_stageOuts == null)
 			_stageOuts = new StageList(parameterBroker, modificationBroker, false);
+		
+		if (_gpuCountPerNode == null)
+			_gpuCountPerNode = new SettableLong(parameterBroker, modificationBroker);
+		
+		if (_gpuMemoryUpperBound == null)
+			_gpuMemoryUpperBound = new SizeValue(parameterBroker, modificationBroker);
 	}
 
 	public Map<String, VariableDefinition> variables()
@@ -944,6 +952,29 @@ public class JobDocument implements PostUnmarshallListener
 			_processorArchitecture = arch;
 			_mBroker.fireJobDescriptionModified();
 		}
+	}
+	
+	public GPUProcessorArchitecture gpuArchitecture()
+	{
+		return _gpuArchitecture;
+	}
+
+	public void gpuArchitecture(GPUProcessorArchitecture garch)
+	{
+		if (garch != _gpuArchitecture) {
+			_gpuArchitecture = garch;
+			_mBroker.fireJobDescriptionModified();
+		}
+	}
+	
+	public SizeValue gpuMemoryUpperBound()
+	{
+		return _gpuMemoryUpperBound;
+	}
+	
+	public SettableLong gpuCountPerNode()
+	{
+		return _gpuCountPerNode;
 	}
 
 	public SizeValue memoryUpperBound()

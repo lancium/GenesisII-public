@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 public class Configuration
 {
@@ -29,6 +30,7 @@ public class Configuration
 
 	private Filter<OperatingSystemNames> _operatingSystemNamesFilter;
 	private Filter<ProcessorArchitecture> _processorArchitectureFilter;
+	private Filter<GPUProcessorArchitecture> _gpuProcessorArchitectureFilter;
 	private Map<String, SPMDVariation> _spmdVariations;
 
 	private Configuration() throws IOException, JAXBException
@@ -44,6 +46,7 @@ public class Configuration
 
 		_operatingSystemNamesFilter = new Filter<OperatingSystemNames>(confDirectory, OperatingSystemNames.class);
 		_processorArchitectureFilter = new Filter<ProcessorArchitecture>(confDirectory, ProcessorArchitecture.class);
+		_gpuProcessorArchitectureFilter = new Filter<GPUProcessorArchitecture>(confDirectory, GPUProcessorArchitecture.class);
 		_spmdVariations = SPMDVariations.readVariations(confDirectory).variations();
 	}
 
@@ -55,6 +58,11 @@ public class Configuration
 	final public Filter<ProcessorArchitecture> processorArchitectureFilter()
 	{
 		return _processorArchitectureFilter;
+	}
+	
+	final public Filter<GPUProcessorArchitecture> gpuProcessorArchitectureFilter()
+	{
+		return _gpuProcessorArchitectureFilter;
 	}
 
 	final public Map<String, SPMDVariation> spmdVariations()
