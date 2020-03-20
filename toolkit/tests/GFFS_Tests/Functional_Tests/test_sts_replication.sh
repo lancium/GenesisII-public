@@ -241,6 +241,8 @@ function testCleaningUpX509()
 
 function testKerberosPortTypeReplication()
 {
+  echo "Kerberos Replication no longer being tested 2020-03-20 by ASG"
+  return
   if ! isMirrorEnabled; then return 0; fi
   echo "Testing Kerberos PortType Replication"
 
@@ -298,6 +300,8 @@ echo ====
 
 function testCleaningUpKerb()
 {
+  echo "Kerberos Replication no longer being tested 2020-03-20 by ASG"
+  return
   # logout from the kerberos user and get back root privileges
   grid_chk logout --all
   get_root_privileges

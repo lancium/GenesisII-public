@@ -112,9 +112,11 @@ GFFS_TESTS=( \
 #fi
 
 # the standard tests for the execution management services.
+# 2020-03-20 by ASG. Week two of coronovirus self isolation.
+# Removed protocols tests because filestaging.xcg.virginia.edu no longer exists.
 EMS_TESTS=( \
   EMS_Tests/besStatus/bes-attributes-and-activities.sh \
-  EMS_Tests/fileStagingTests/protocols-test.sh \
+  #EMS_Tests/fileStagingTests/protocols-test.sh \
   EMS_Tests/besFunctionality/bes-submission-test-sync.sh \
   EMS_Tests/queueFunctionalityTests/queue-submission-test.sh \
   EMS_Tests/performanceTests/queue-performance-test.sh \
