@@ -32,7 +32,12 @@ create_jsdl_from_templates()
       -e 's%SPMD_VARIATION%'$SPMD_VARIATION'%g' \
       "$GENERATED_JSDL_FOLDER/$i"
     # note that SFTP and GRIDFTP have to go first so we don't erroneously match FTP instead.
-    for j in SFTP GRIDFTP FTP HTTP SCP; do
+    # 2020-03-23 - in the depths of COVID-19 by ASG
+    # So the hosts against which the upload/download occur defined in 
+    # toolkit/gffs_toolkit_config no longer exist so the tests fail. Therefore,
+    # for now we are taking them out.
+    #for j in SFTP GRIDFTP FTP HTTP SCP; do
+    for j in ; do
       indirect="$j[*]"
 #echo "value of array named $j is ${!indirect}"
       # turn the indirect reference into a nicer array variable.
