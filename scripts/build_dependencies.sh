@@ -113,6 +113,7 @@ for subproject in \
             echo $PWD
             cd src
             make
+	    cp ../bin/linux/64/pwrapper ../../../../ext/pwrapper/bin/pwrapper-linux-64
             )
     else
         ant build
