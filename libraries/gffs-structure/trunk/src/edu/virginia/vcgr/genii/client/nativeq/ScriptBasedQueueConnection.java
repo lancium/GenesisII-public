@@ -189,7 +189,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		
 		// LAK: 13 March: Added so that the batch script does not exit when it gets a SIG_TERM, instead it lets its children
 		// repond to the signal and then gracefully exit after the children processes 
-		script.format("trap : SIGTERM");
+		// script.format("trap : SIGTERM\n");
 
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
