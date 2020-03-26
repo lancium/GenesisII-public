@@ -337,8 +337,13 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			// 2017-7-24 ASG. Fix to see if the command worked. If not, throw a fault.
 			// That way we will not assume that the absence of information on a process means 
 			// it has failed.
-			if (result!=0) throw new NativeQueueException("Unable to execute sbatch command: Error " + result + ", check permissions on path to working directory.");
+			// 2020-03-26 by ASG during the coronovirus lockdown.
+			// mal-formed sbatch file can also cause  fault 
 			logProcessResult(result, stdoutCopy, stderrCopy);
+			if (result!=0) {
+				throw new NativeQueueException("Unable to execute sbatch command: Error " + result + 
+						", check permissions on path to working directory.\n Also check if the sbtch file is malformed or has no-longer-current #sbtch options.");
+			}
 
 			if (result == 0) {
 				return stdoutCopy.getResult();

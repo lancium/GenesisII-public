@@ -239,9 +239,12 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 				if (_logger.isDebugEnabled())
 					_logger.debug("slurm using exclusive flag for NodeExclusiveThreaded spmd");
 			} else if (application.getSPMDVariation().toString().contains(CmdLineManipulatorConstants.SHARED_THREADED_PHRASE)) {
-				script.format("#SBATCH --share\n");
+				// 2020-03-26 by ASG during the coronovirus lockdown.
+				// It turns out there is no way to specify node sharing is ok. It depends on how the partition is configured. You can request
+				// exclusive though. So I am commenting out the --share option below.
+				// script.format("#SBATCH --share\n");
 				if (_logger.isDebugEnabled())
-					_logger.debug("slurm using shared flag for SharedThreaded spmd");
+					_logger.debug("slurm user requested SharedThreaded spmd");
 			}
 
 			// in slurm, processes are tasks. so we only worry about tasks/processes and processes per host here.
