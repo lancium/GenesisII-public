@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing" elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	targetNamespace="http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory">
+
+	<xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="./ws-addr.xsd" />
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2" schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:element name="NotificationBrokerLifetime" type="xsd:long"/>
+	<xsd:element name="NotificationBrokerEndpoint" type="wsa:EndpointReferenceType"/>
+
+	<xsd:complexType name="BrokerWithForwardingPortCreateRequestType">
+		<xsd:sequence>
+			<xsd:element name="notificationForwardingPort" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="notificationBrokerLifetime" type="xsd:long" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="BrokerWithForwardingPortCreateRequest" type="BrokerWithForwardingPortCreateRequestType"/>
+	
+	<!-- Fault Types -->
+	<xsd:complexType name="EnhancedNotificationBrokerFactoryFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType">
+				<xsd:sequence>
+					<xsd:element name="Path" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="EnhancedNotificationBrokerFactoryFaultType" type="EnhancedNotificationBrokerFactoryFaultType"/>
+
+	<xsd:complexType name="NotificationBrokerCreationFailedFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="EnhancedNotificationBrokerFactoryFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="NotificationBrokerCreationFailedFaultType" type="NotificationBrokerCreationFailedFaultType"/>
+
+</xsd:schema>

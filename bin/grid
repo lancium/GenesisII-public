@@ -1,0 +1,18 @@
+#!/bin/sh
+
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/dev/GenesisII/jni-libs/lin64"
+
+java_app="/home/dev/GenesisII/jre/bin/java"
+if [ ! -f "$java_app" ]; then
+  java_app="$JAVA_HOME/bin/java"
+  if [ ! -f "$java_app" ]; then
+    java_app="$(which java)"
+    if [ ! -f "$java_app" ]; then
+      echo "ERROR: could not deduce location of java from search path, JAVA_HOME or"
+      echo "the Genesis II GFFS installation directory."
+      exit 1
+    fi
+  fi
+fi
+
+"$java_app" -Xms128M -Xmx768M -classpath "/home/dev/GenesisII/bundles/org.apache.commons.logging_1.1.1.v201101211721.jar:/home/dev/GenesisII/ext/*:/home/dev/GenesisII/generated/*:/home/dev/GenesisII/lib:/home/dev/GenesisII/ext/axis/axis.jar" "-Dlog4j.configuration=build.client.log4j.properties" "-Djava.library.path=/home/dev/GenesisII/jni-libs/lin64" "-Dedu.virginia.vcgr.genii.install-base-dir=/home/dev/GenesisII" "-javaagent:/home/dev/GenesisII/ext/SizeOf.jar" edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher "/home/dev/GenesisII/ext/genii-client-application.properties" "$@"

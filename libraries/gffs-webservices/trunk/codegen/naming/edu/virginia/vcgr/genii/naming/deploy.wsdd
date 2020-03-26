@@ -1,0 +1,198 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from EndpointIdentifierResolverService WSDL service -->
+
+  <service name="EndpointIdentifierResolver" provider="java:RPC" style="document" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://schemas.ogf.org/naming/2006/08/naming/wsdl"/>
+      <parameter name="wsdlServiceElement" value="EndpointIdentifierResolverService"/>
+      <parameter name="schemaQualified" value="http://www.w3.org/2005/08/addressing,http://docs.oasis-open.org/wsrf/rw-2,http://docs.oasis-open.org/wsrf/r-2,http://schemas.ogf.org/naming/2006/08/naming/wsdl,http://docs.oasis-open.org/wsrf/bf-2,http://schemas.ogf.org/naming/2006/08/naming"/>
+      <parameter name="wsdlServicePort" value="EndpointIdentifierResolver"/>
+      <parameter name="className" value="edu.virginia.vcgr.genii.naming.EndpointIdentifierResolverSOAPBindingImpl"/>
+      <parameter name="wsdlPortType" value="EndpointIdentifierResolver"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="resolveEPI" qname="resolveEPI" returnQName="retNS:EndpointReference" xmlns:retNS="http://www.w3.org/2005/08/addressing" returnType="rtns:EndpointReferenceType" xmlns:rtns="http://www.w3.org/2005/08/addressing" >
+        <parameter qname="pns:EndpointIdentifier" xmlns:pns="http://schemas.ogf.org/naming/2006/08/naming" type="tns:anyURI" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="ResolveFailedFault" qname="fns:ResolveFailedFault" xmlns:fns="http://schemas.ogf.org/naming/2006/08/naming" class="org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType" type="tns:ResolveFailedFaultType" xmlns:tns="http://schemas.ogf.org/naming/2006/08/naming"/>
+      </operation>
+      <parameter name="allowedMethods" value="resolveEPI"/>
+
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:FaultCodesType"
+        type="java:org.ws.addressing.FaultCodesType"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/r-2"
+        qname="ns:ResourceUnknownFaultType"
+        type="java:org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedAnyType"
+        type="java:org.ws.addressing.AttributedAnyType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedQNameType"
+        type="java:org.ws.addressing.AttributedQNameType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ogf.org/naming/2006/08/naming"
+        qname="ns:ResolveFailedFaultType"
+        type="java:org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:EndpointReferenceType"
+        type="java:org.ws.addressing.EndpointReferenceType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:>BaseFaultType>Description"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:FaultCodesOpenEnumType"
+        type="java:org.ws.addressing.FaultCodesOpenEnumType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ogf.org/naming/2006/08/naming"
+        qname="ns:ResolveFailedWithReferralFaultType"
+        type="java:org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:>BaseFaultType>ErrorCode"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeErrorCode"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedURIType"
+        type="java:org.ws.addressing.AttributedURIType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelationshipType"
+        type="java:org.ws.addressing.RelationshipType"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:>BaseFaultType>FaultCause"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeFaultCause"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelatesToType"
+        type="java:org.ws.addressing.RelatesToType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:BaseFaultType"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:ReferenceParametersType"
+        type="java:org.ws.addressing.ReferenceParametersType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelationshipTypeOpenEnum"
+        type="java:org.ws.addressing.RelationshipTypeOpenEnum"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/r-2"
+        qname="ns:ResourceUnavailableFaultType"
+        type="java:org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedUnsignedLongType"
+        type="java:org.ws.addressing.AttributedUnsignedLongType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:ProblemActionType"
+        type="java:org.ws.addressing.ProblemActionType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:MetadataType"
+        type="java:org.ws.addressing.MetadataType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+</deployment>

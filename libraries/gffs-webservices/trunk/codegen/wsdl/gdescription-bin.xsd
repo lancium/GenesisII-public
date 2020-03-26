@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    xmlns="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:gdesc="http://vcgr.cs.virginia.edu/genii/application-description"
+	xmlns:genii-bin="http://vcgr.cs.virginia.edu/genii/application-description/bin"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/application-description/bin"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+	<xsd:import
+		namespace="http://vcgr.cs.virginia.edu/genii/application-description"
+		schemaLocation="./gdescription.xsd"/>
+
+	<xsd:complexType name="NamedSourceType">
+		<xsd:complexContent>
+			<xsd:extension base="gdesc:SourceElementType">
+				<xsd:attribute name="name" type="xsd:string" use="required"/>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="RelativeNamedSourceType">
+		<xsd:complexContent>
+			<xsd:extension base="genii-bin:NamedSourceType">
+				<xsd:attribute name="relative-to-component" type="xsd:boolean"
+					use="optional"/>
+				<xsd:attribute name="component-name" type="xsd:string"
+					use="optional"/>
+				<xsd:attribute name="relative-to-cwd" type="xsd:boolean"
+					use="optional"/>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="BinDeploymentType">
+		<xsd:complexContent>
+			<xsd:extension base="gdesc:CommonDeploymentDescriptionType">
+				<xsd:sequence>
+					<xsd:element name="binary"
+						type="genii-bin:NamedSourceType"
+						minOccurs="1" maxOccurs="unbounded" nillable="false"/>
+					<xsd:element name="shared-library"
+						type="genii-bin:NamedSourceType"
+						minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+					<xsd:element name="static-file"
+						type="genii-bin:RelativeNamedSourceType"
+						minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+					<xsd:any namespace="##other" processContents="lax"
+						minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="DummyDeploymentType">
+		<xsd:complexContent>
+			<xsd:extension base="genii-bin:BinDeploymentType">
+				<xsd:sequence>
+					<xsd:element name="dummy"
+						type="xsd:string"
+						minOccurs="1" maxOccurs="1" nillable="false"/>
+					<xsd:any namespace="##other" processContents="lax"
+						minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+</xsd:schema>

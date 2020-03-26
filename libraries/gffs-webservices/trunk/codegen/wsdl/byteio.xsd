@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema
+    xmlns="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+    targetNamespace="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xsd:import
+        namespace="http://docs.oasis-open.org/wsrf/bf-2"
+        schemaLocation="./wsrf/basefaults.xsd"/>
+
+    <!-- Bulk Data Transfer Container -->
+    <xsd:complexType name="transfer-information-type" mixed="false">
+        <xsd:sequence>
+			<xsd:any namespace="##any" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="transfer-mechanism" type="xsd:anyURI"/>
+    </xsd:complexType>
+
+    <xsd:element name="transfer-information-type"
+        type="byteio:transfer-information-type" />
+
+    <!-- Common Faults -->
+    <xsd:complexType name="UnsupportedTransferFaultType">
+        <xsd:complexContent>
+            <xsd:extension base="wsbf:BaseFaultType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:element name="UnsupportedTransferFault"
+        type="byteio:UnsupportedTransferFaultType"/>
+
+    <xsd:complexType name="ReadNotPermittedFaultType">
+        <xsd:complexContent>
+            <xsd:extension base="wsbf:BaseFaultType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:element name="ReadNotPermittedFault"
+        type="byteio:ReadNotPermittedFaultType"/>
+
+    <xsd:complexType name="WriteNotPermittedFaultType">
+        <xsd:complexContent>
+            <xsd:extension base="wsbf:BaseFaultType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:element name="WriteNotPermittedFault"
+        type="byteio:WriteNotPermittedFaultType"/>
+
+    <xsd:complexType name="CustomFaultType">
+        <xsd:complexContent>
+            <xsd:extension base="wsbf:BaseFaultType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:element name="CustomFault"
+        type="byteio:CustomFaultType"/>
+
+</xsd:schema>

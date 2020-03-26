@@ -1,0 +1,40 @@
+<xsd:schema
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wstop="http://docs.oasis-open.org/wsn/t-1"
+	targetNamespace="http://docs.oasis-open.org/wsn/t-1"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+<!-- =============== utility type definitions ======================= -->
+	<xsd:complexType name="Documentation" mixed="true">
+		<xsd:sequence>
+			<xsd:any processContents="lax" minOccurs="0"
+				maxOccurs="unbounded" namespace="##any"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ExtensibleDocumented" abstract="true"
+		mixed="false">
+		<xsd:sequence>
+			<xsd:element name="documentation" type="wstop:Documentation"
+				minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+
+<!-- ============== Topic Set Related ================== -->
+	<xsd:complexType name="TopicSetType">
+		<xsd:complexContent>
+			<xsd:extension base="wstop:ExtensibleDocumented">
+				<xsd:sequence>
+					<xsd:any namespace="##other"
+						minOccurs="0" maxOccurs="unbounded"
+						processContents="lax"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="TopicSet" type="wstop:TopicSetType"/>
+	<xsd:attribute name="topic" type="xsd:boolean" default="false"/>
+
+</xsd:schema>

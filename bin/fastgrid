@@ -1,0 +1,247 @@
+#!/bin/bash
+# October 1, 2015 by Andrew Grimshaw
+# This script connects via a unix domain socket to a genesis II client running as a "server"
+# The "server" is connected wrapped by nc (netcat), and is listening for connections on the socket.
+# The server accepts command and executes them, writting the result back to nc, and this to this script
+# The first time it is started it takes a few seconds to fire up the grid command.
+# Subsequent invocations are much faster.
+# October 28, 2015 ASG. 
+# Fixed startup to kill nc if there is no grid command assoicated with it.
+
+#set -x
+
+# Start by definging some variables. We might have many different "servers" running, on different machines
+# for different users. We differentiate them by username and hostname. In the future we might support
+# multiple servers for each user. For now we limit it to one.
+USERNAME=`whoami`
+HOSTNAME=`hostname`
+
+# The netcat command we will use to connect to the "server". Note that -q -1 indicates that nc should wait
+# forever after it has accepted all of its input. THIS IS CRITICAL, do not change. If it becomes some constant
+# there may be more output than can be generated in that constant time, and nc will terminate. If -q 0, the default,
+# then nc may terminate before any server output has been generated.
+LOCKFILE="/tmp/grid.server.$USERNAME.$HOSTNAME"
+SOCKFILE="/tmp/grid.sockfile.$USERNAME.$HOSTNAME"
+PIDFILE="/tmp/pidfile.$USERNAME.$HOSTNAME"
+REDIRECTFILE="/tmp/grid.redirectfile.$USERNAME.$HOSTNAME"
+NC_COMMAND="nc -Ukl $SOCKFILE"
+CL_NC_COMMAND="nc -q -1 -U $SOCKFILE"
+
+# A temp file for the input, remove when done.
+INPFILE="/tmp/grid.server.$USERNAME.$HOSTNAME.input.$$"
+
+function processOutput()
+{
+	line= 
+	# First scan through output consuming old unused output if any, we read it and throw it away
+	# until we see our start token.
+	read  line
+	until [[ $line == *"[1234start$$4567]"* ]]; do
+		read line
+	done
+	# Now we read through our data until we see the stop token.
+	# We should also consume the initial "[grid]". Later.
+	read line
+	until [[ $line == *"[1234stop.$$4567]"* ]]; do
+		# Now check if there was a fault. The use of onfault will generate a line similar to the below
+		# if there was a fault.
+		# OnFault--a fault occurred [1]:
+		# So first check if there is such a line, if so grab the [value] and return
+		if [[ $line == *"OnFault--a fault occurred"*"$$"* ]]
+		then
+			#number=$(echo $line | tr -cd '[:digit:]')
+			exitCode=$(echo $line | sed -e 's/.*\[\([0-9][0-9]*\)\].*/\1/')
+		else 
+			echo $line
+		fi
+		line=
+		read  line
+	done
+	# This is the ugliest of hacks. The shell will not terminate until nc terminates. So we kill it.
+	kill `ps l | grep "$CL_NC_COMMAND" | grep $$ | awk '{ print $3 }'`
+	return $exitCode
+}
+
+# Now we begin.
+# trap ctrl-c and call ctrl_c()
+trap ctrl_c INT
+
+function nukem() {
+# So we want to stop everything. Trying to clean up what state the 
+# grid command was in will be difficult. So we will destroy it and all
+# of the pipes and files. On the next invocation they will all
+# be restarted.
+
+	#GRIDCMD=`which grid`
+	#GRIDPID=`pgrep -f "/bin/bash $GRIDCMD"`
+	GRIDPID=`cat $PIDFILE 2>/dev/null`
+	if [ ! -z "$GRIDPID" ] ;
+	then
+		pkill --signal 9 -P $GRIDPID
+	fi
+	#pkill --signal 9 -f "/bin/bash $GRIDCMD"
+	pkill -f "$NC_COMMAND"
+	pkill -f "$CL_NC_COMMAND"
+	pkill -f "cat $REDIRECTFILE"
+	rm -f $SOCKFILE $REDIRECTFILE
+}
+
+function ctrl_c() {
+# Caught ctrl-c, echo that fact and nukem
+        echo "** Trapped CTRL-C - Exiting and cleaning up all processes"
+	nukem
+	rm -f $INPFILE
+	rm -f $LOCKFILE
+}
+
+function helpScreen() {
+echo "fastgrid is a shell script that interacts with a grid client running in"
+echo "the background via named pipes. The goal is eliminate the time waiting"
+echo "for the grid client to start up. If there is no grid client running"
+echo "for the user fastgrid will start one. "
+echo "Usage:"
+echo "fastgrid -q|--quitServer   Quits the grid 'server' process."
+echo "fastgrid -h|--help         Prints this help screen."
+echo "fastgrid -s|--stdin        Read commands from standard input until EOF."
+}
+
+
+function startServer() {
+# Now, lets check if there is a server running. If there is not this will not work well :-)
+# Perhaps we could check if there is a process owned by us "nc -Ukl $SOCKFILE", "id -u"
+# ps l | grep "nc -Ukl $SOCKFILE" | grep `id -u` | awk '{ print $3 }'`
+SOCKPID=`pgrep -f "$NC_COMMAND"`
+#echo $SOCKPID
+# This next section, now commented out, stopped working because the GRIDCMD no
+# longer is what it was ... So let's get it out of the PIDFILE
+GRIDCMD=`which grid`
+#GRIDPID=`pgrep -f "/bin/bash $GRIDCMD"`
+GRIDPID=`cat $PIDFILE`
+if [ $? == 1 ] ;
+then
+	GRIDPID=
+fi
+# We are also going to want to check to make sure it is MY process
+# that is sitting on the other end of this pipe.
+if [ -z "$SOCKPID" -o  -z "$GRIDPID" ] ;
+then
+# If there is not server running we need to start one.
+
+# 	Check if there is a grid command
+#	Assuming there is for now
+
+#	if there is no REDIRECTFILE create one, mkfifo $REDIRECTFILE;chmod go-rwx $REDIRECTFILE
+#	Now fire up the server client. cat $REDIRECTFILE | nc -Ukl $SOCKFILE | grid 2&> $REDIRECTFILE &
+#	$$$ Somehow figure out how to save that we have started it and how to check for it.
+
+#	Sleep a few sconds to let it catch up; sleep 5
+
+	# Nothing here, need to clean up and start
+	# First clean up nc if it was there
+	nukem
+	rm -f $REDIRECTFILE
+	mkfifo $REDIRECTFILE
+	chmod go-rwx $REDIRECTFILE
+	cat $REDIRECTFILE | grid 2>&1 | $NC_COMMAND  > $REDIRECTFILE &
+	# collect pids
+	pids=(`jobs -l % | sed 's/^[^ ]* \+//' | cut -d\  -f1`)
+	# Find pid of grid in ${pids[1]}
+	echo ${pids[1]} > $PIDFILE
+
+	sleep 5
+fi
+}
+
+function createSockfile() {
+# if there is no SOCKFILE, create one mkfifo $SOCKFILE;chmod go-rwx $SOCKFILE;
+if [ -e "$SOCKFILE" ] ;
+then
+	# let's make sure it is ours, and rw only by me .. don't want anybody taking over
+	# the channnel and impersonating
+	PERM=`stat -c%A $SOCKFILE`
+	if [ "$PERM" != "srwx------" ] ;
+	then
+		#turned off because we can't parse extra lines in grid output.
+		#echo "WARNING - PERMISSIONS HAVE BEEN MODIFIED ON $SOCKFILE"
+		chmod go-rwx $SOCKFILE
+	fi
+else
+	mkfifo $SOCKFILE
+	# Set permissions so only i can see it.
+	chmod go-rwx $SOCKFILE
+fi
+}
+
+function callServer() {
+
+cat <<inp > "$INPFILE"
+echo [1234start$$4567]
+$*
+onfault Error in subshell $$
+echo [1234stop.$$4567]
+inp
+
+	exitCode=0
+	# now start it up
+	cat $INPFILE | $CL_NC_COMMAND | processOutput
+	exitval=$?
+
+}
+
+####################################################
+# main program
+####################################################
+# First check if there are any special parameters to fastgrid
+
+if [[ $# > 0 ]]
+then
+key="$1"
+case $key in
+    -q|--quitServer)
+    nukem
+    exit
+    shift # past argument
+    ;;
+    -h|--help)
+    helpScreen
+    exit
+    ;;
+    -s|--stdin)
+    STDINFLAG="TRUE"
+    ;;
+    *)
+    ;;
+esac
+fi
+# Get exclusive access to eliminate race conditions on access to the "server"
+lockfile $LOCKFILE
+
+createSockfile
+
+startServer
+
+# Now there server is up, or there is trouble in river city. 
+# Generate the input script to the server. The "echo" commands bracket the command, and are used to 
+
+# Now, there are two cases, the commands on the command line, or stdin has a series of commands
+
+# make sure we only read output for us, not an old partially finished command. The "stop" tells us
+# when we have reached the end.
+
+if [ ! -z "$STDINFLAG" ] ;
+then
+	dline=
+	while read dline ;
+	do
+		callServer $dline
+	done
+else
+	dline=`echo "$*"`
+	callServer $dline
+fi
+
+# now clean up
+rm -f $INPFILE
+rm -f $LOCKFILE
+
+exit $exitval

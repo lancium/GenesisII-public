@@ -1,0 +1,254 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from StreamableByteIOFactoryService WSDL service -->
+
+  <service name="StreamableByteIOFactory" provider="java:RPC" style="document" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"/>
+      <parameter name="wsdlServiceElement" value="StreamableByteIOFactoryService"/>
+      <parameter name="schemaQualified" value="http://www.w3.org/2005/08/addressing,http://docs.oasis-open.org/wsrf/rw-2,http://docs.oasis-open.org/wsrf/r-2,http://vcgr.cs.virginia.edu/genii/2006/12/context,http://docs.oasis-open.org/wsrf/bf-2,http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory,http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory,http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"/>
+      <parameter name="wsdlServicePort" value="StreamableByteIOFactory"/>
+      <parameter name="className" value="edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactorySOAPBindingImpl"/>
+      <parameter name="wsdlPortType" value="StreamableByteIOFactory"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation name="openStream" qname="openStream" returnQName="retNS:openStreamResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory" returnType="rtns:>openStreamResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory" >
+        <parameter qname="pns:openStream" xmlns:pns="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory" type="tns:anyType" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFault" xmlns:fns="http://docs.oasis-open.org/wsrf/r-2" class="org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://docs.oasis-open.org/wsrf/r-2"/>
+        <fault name="ResourceCreationFault" qname="fns:ResourceCreationFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" class="edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType" type="tns:ResourceCreationFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"/>
+      </operation>
+      <parameter name="allowedMethods" value="openStream"/>
+
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+        qname="ns:ResourceCreationFaultType"
+        type="java:edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:FaultCodesType"
+        type="java:org.ws.addressing.FaultCodesType"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        qname="ns:ContextNameValuePairType"
+        type="java:edu.virginia.vcgr.genii.context.ContextNameValuePairType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        qname="ns:ContextType"
+        type="java:edu.virginia.vcgr.genii.context.ContextType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/r-2"
+        qname="ns:ResourceUnknownFaultType"
+        type="java:org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedAnyType"
+        type="java:org.ws.addressing.AttributedAnyType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedQNameType"
+        type="java:org.ws.addressing.AttributedQNameType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+        qname="ns:>TryAgainFaultType"
+        type="java:edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:EndpointReferenceType"
+        type="java:org.ws.addressing.EndpointReferenceType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:>BaseFaultType>Description"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:FaultCodesOpenEnumType"
+        type="java:org.ws.addressing.FaultCodesOpenEnumType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:>BaseFaultType>ErrorCode"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeErrorCode"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedURIType"
+        type="java:org.ws.addressing.AttributedURIType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelationshipType"
+        type="java:org.ws.addressing.RelationshipType"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+        qname="ns:>vcgrCreateResponse"
+        type="java:edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:>BaseFaultType>FaultCause"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeFaultCause"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+        qname="ns:>openStreamResponse"
+        type="java:edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelatesToType"
+        type="java:org.ws.addressing.RelatesToType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:BaseFaultType"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:ReferenceParametersType"
+        type="java:org.ws.addressing.ReferenceParametersType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelationshipTypeOpenEnum"
+        type="java:org.ws.addressing.RelationshipTypeOpenEnum"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        qname="ns:RNSPathDataType"
+        type="java:edu.virginia.vcgr.genii.context.RNSPathElementType[]"
+        innerType="cmp-ns:RNSPathElementType" xmlns:cmp-ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+        qname="ns:>vcgrCreate"
+        type="java:edu.virginia.vcgr.genii.common.rfactory.VcgrCreate"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/r-2"
+        qname="ns:ResourceUnavailableFaultType"
+        type="java:org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedUnsignedLongType"
+        type="java:org.ws.addressing.AttributedUnsignedLongType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:ProblemActionType"
+        type="java:org.ws.addressing.ProblemActionType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:MetadataType"
+        type="java:org.ws.addressing.MetadataType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        qname="ns:RNSPathElementType"
+        type="java:edu.virginia.vcgr.genii.context.RNSPathElementType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+</deployment>

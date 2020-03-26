@@ -1,0 +1,9 @@
+bin.eclipse/
+bin.ant/
+dpages/
+generated/
+*.swp
+set_gffs_vars
+jar-desc.xml
+unit-test-reports/
+context.xml

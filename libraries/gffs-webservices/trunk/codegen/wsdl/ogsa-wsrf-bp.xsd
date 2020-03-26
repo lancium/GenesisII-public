@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"
+	xmlns:ogsabp="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:simpleType name="QNameListType">
+		<xsd:list itemType="xsd:QName"/>
+	</xsd:simpleType>
+	<xsd:element name="ResourcePropertyNames"
+		type="ogsabp:QNameListType"/>
+	
+
+</xsd:schema>		

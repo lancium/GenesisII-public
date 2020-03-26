@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="WS-BrokeredNotification"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsn-br="http://docs.oasis-open.org/wsn/br-2"
+	xmlns:wsn-brw="http://docs.oasis-open.org/wsn/brw-2"
+	xmlns:wsn-b="http://docs.oasis-open.org/wsn/b-2"
+	xmlns:wsn-bw="http://docs.oasis-open.org/wsn/bw-2"
+	xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2"
+	targetNamespace="http://docs.oasis-open.org/wsn/brw-2">
+
+<!-- =========== Imports ============ -->
+
+	<wsdl:import namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsResourceFaults.wsdl"/>
+
+	<wsdl:import namespace="http://docs.oasis-open.org/wsn/bw-2"
+		location="wsBaseNotification.wsdl"/>
+
+<!-- ============ Types Definitions =============== -->
+
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import namespace="http://docs.oasis-open.org/wsn/br-2"
+				schemaLocation="./wsBrokeredNotification.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+
+<!-- =========== NotificationBroker::RegisterPublisher =========== -->
+
+	<wsdl:message name="RegisterPublisherRequest">
+		<wsdl:part name="RegisterPublisherRequest"
+			element="wsn-br:RegisterPublisher"/>
+	</wsdl:message>
+
+	<wsdl:message name="RegisterPublisherResponse">
+		<wsdl:part name="RegisterPublisherResponse"
+			element="wsn-br:RegisterPublisherResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="PublisherRegistrationRejectedFault">
+		<wsdl:part name="PublisherRegistrationRejectedFault"
+			element="wsn-br:PublisherRegistrationRejectedFault"/>
+	</wsdl:message>
+
+	<wsdl:message name="PublisherRegistrationFailedFault">
+		<wsdl:part name="PublisherRegistrationFailedFault"
+			element="wsn-br:PublisherRegistrationFailedFault"/>
+	</wsdl:message>
+
+	<wsdl:message name="DestroyRegistrationRequest">
+		<wsdl:part name="DestroyRegistrationRequest"
+			element="wsn-br:DestroyRegistration"/>
+	</wsdl:message>
+
+	<wsdl:message name="DestroyRegistrationResponse">
+		<wsdl:part name="DestroyRegistrationResponse"
+			element="wsn-br:DestroyRegistrationResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="ResourceNotDestroyedFault">
+		<wsdl:part name="ResourceNotDestroyedFault"
+			element="wsn-br:ResourceNotDestroyedFault"/>
+	</wsdl:message>
+
+<!-- ============= Port Type Definitions ============ -->
+
+<!-- ============= Register Publisher ============ -->
+
+	<wsdl:portType name="RegisterPublisher">
+		<wsdl:operation name="RegisterPublisher">
+			<wsdl:input message="wsn-brw:RegisterPublisherRequest"/>
+			<wsdl:output message="wsn-brw:RegisterPublisherResponse"/>
+			<wsdl:fault name="ResourceUnknownFault"
+				message="wsrf-rw:ResourceUnknownFault"/>
+			<wsdl:fault name="InvalidTopicExpressionFault"
+				message="wsn-bw:InvalidTopicExpressionFault"/>
+			<wsdl:fault name="TopicNotSupportedFault"
+				message="wsn-bw:TopicNotSupportedFault"/>
+			<wsdl:fault name="PublisherRegistrationRejectedFault"
+				message="wsn-brw:PublisherRegistrationFailedFault"/>
+			<wsdl:fault name="PublisherRegistrationFailedFault"
+				message="wsn-brw:PublisherRegistrationRejectedFault"/>
+			<wsdl:fault name="UnacceptableInitialTerminationTimeFault"
+				message="wsn-bw:UnacceptableInitialTerminationTimeFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+<!-- ============ PublisherRegistrationManager PortType Definition == -->
+
+	<wsdl:portType name="PublisherRegistrationManager">
+		<wsdl:operation name="DestroyRegistration">
+			<wsdl:input name="DestroyRegistration"
+				message="wsn-brw:DestroyRegistrationRequest"/>
+			<wsdl:output name="DestroyRegistrationResponse"
+				message="wsn-brw:DestroyRegistrationResponse"/>
+			<wsdl:fault name="ResourceUnknownFault"
+				message="wsrf-rw:ResourceUnknownFault"/>
+			<wsdl:fault name="ResourceNotDestroyedFault"
+				message="wsn-brw:ResourceNotDestroyedFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+</wsdl:definitions>

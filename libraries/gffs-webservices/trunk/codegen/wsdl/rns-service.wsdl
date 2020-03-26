@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common" xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions" xmlns:rns="http://schemas.ogf.org/rns/2009/12/rns" xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2" xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2" xmlns:wsrp="http://docs.oasis-open.org/wsrf/rp-2" xmlns:wsrpw="http://docs.oasis-open.org/wsrf/rpw-2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="RNS" targetNamespace="http://schemas.ogf.org/rns/2009/12/rns">
+
+	<wsdl:import location="./wsrf/wsResourceFaults.wsdl" namespace="http://docs.oasis-open.org/wsrf/rw-2"/>
+
+	<wsdl:import location="./wsrf/wsResourceProperties.wsdl" namespace="http://docs.oasis-open.org/wsrf/rpw-2"/>
+
+	<wsdl:import location="./wsrf/wsResourceLifetime.wsdl" namespace="http://docs.oasis-open.org/wsrf/rlw-2"/>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+<wsdl:import location="./rns.wsdl" namespace="http://schemas.ogf.org/rns/2009/12/rns"/><wsdl:binding name="RNSSOAPBinding" type="rns:RNSPortType"><soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/><wsdl:operation name="add"><wsdl:input><soap:body use="literal"/></wsdl:input><wsdl:output><soap:body use="literal"/></wsdl:output><wsdl:fault name="WriteNotPermittedFault"><soap:fault use="literal"/></wsdl:fault></wsdl:operation><wsdl:operation name="lookup"><wsdl:input><soap:body use="literal"/></wsdl:input><wsdl:output><soap:body use="literal"/></wsdl:output><wsdl:fault name="ReadNotPermittedFault"><soap:fault use="literal"/></wsdl:fault></wsdl:operation><wsdl:operation name="setMetadata"><wsdl:input><soap:body use="literal"/></wsdl:input><wsdl:output><soap:body use="literal"/></wsdl:output><wsdl:fault name="WriteNotPermittedFault"><soap:fault use="literal"/></wsdl:fault></wsdl:operation><wsdl:operation name="rename"><wsdl:input><soap:body use="literal"/></wsdl:input><wsdl:output><soap:body use="literal"/></wsdl:output><wsdl:fault name="WriteNotPermittedFault"><soap:fault use="literal"/></wsdl:fault></wsdl:operation><wsdl:operation name="remove"><wsdl:input><soap:body use="literal"/></wsdl:input><wsdl:output><soap:body use="literal"/></wsdl:output><wsdl:fault name="WriteNotPermittedFault"><soap:fault use="literal"/></wsdl:fault></wsdl:operation></wsdl:binding><wsdl:service name="RNSService"><wsdl:port binding="rns:RNSSOAPBinding" name="RNSPortType"><soap:address location="http://localhost:8080/wsrf/services"/></wsdl:port></wsdl:service></wsdl:definitions>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:enhancednbfactory="http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory" xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common" xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions" xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2" xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2" xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="EnhancedNotificationBrokerFactory" targetNamespace="http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory">
+
+	<wsdl:import location="./wsrf/wsResourceFaults.wsdl" namespace="http://docs.oasis-open.org/wsrf/rw-2"/>
+	<wsdl:import location="./wsrf/wsResourceProperties.wsdl" namespace="http://docs.oasis-open.org/wsrf/rpw-2"/>
+	<wsdl:import location="wsrf/wsResourceFaults.wsdl" namespace="http://docs.oasis-open.org/wsrf/rw-2"/>
+	<wsdl:import location="./resource-simple.wsdl" namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"/>
+	<wsdl:import location="./resource-factory.wsdl" namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"/>
+	<wsdl:import location="wsrf/wsResourceLifetime.wsdl" namespace="http://docs.oasis-open.org/wsrf/rlw-2"/>
+	<wsdl:import location="wsrf/wsBaseNotification.wsdl" namespace="http://docs.oasis-open.org/wsn/bw-2"/>
+	<wsdl:import location="./resource-authz.wsdl" namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"/>
+    <wsdl:import location="./common-generated.wsdl" namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"/>
+	<wsdl:import location="./geniiNotificationConsumer.wsdl" namespace="http://vcgr.cs.virginia.edu/genii/2010/08/notification/notification-consumer"/>
+		
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory">
+			<xsd:import namespace="http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory" schemaLocation="./enhancednbfactory.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+	
+	<wsdl:message name="CreateNotificationBrokerRequest">
+		<wsdl:part element="enhancednbfactory:NotificationBrokerLifetime" name="CreateNotificationBrokerRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="CreateNotificationBrokerResponse">
+		<wsdl:part element="enhancednbfactory:NotificationBrokerEndpoint" name="CreateNotificationBrokerResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="BrokerWithForwardingPortCreateRequest">
+		<wsdl:part element="enhancednbfactory:BrokerWithForwardingPortCreateRequest" name="BrokerWithForwardingPortCreateRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="NotificationBrokerCreationFailedFault">
+		<wsdl:part element="enhancednbfactory:NotificationBrokerCreationFailedFaultType" name="NotificationBrokerCreationFailedFault"/>
+	</wsdl:message>
+
+	<wsdl:portType name="EnhancedNotificationBrokerFactoryPortType">
+	
+		
+	
+		<wsdl:operation name="createNotificationBroker">
+			<wsdl:input message="enhancednbfactory:CreateNotificationBrokerRequest"/>
+			<wsdl:output message="enhancednbfactory:CreateNotificationBrokerResponse"/>
+			<wsdl:fault message="enhancednbfactory:NotificationBrokerCreationFailedFault" name="NotificationBrokerCreationFailedFault"/>
+		</wsdl:operation>
+		<wsdl:operation name="createNotificationBrokerWithForwardingPort">
+			<wsdl:input message="enhancednbfactory:BrokerWithForwardingPortCreateRequest"/>
+			<wsdl:output message="enhancednbfactory:CreateNotificationBrokerResponse"/>
+			<wsdl:fault message="enhancednbfactory:NotificationBrokerCreationFailedFault" name="NotificationBrokerCreationFailedFault"/>
+		</wsdl:operation>
+	
+	<wsdl:operation name="GetResourceProperty">
+      <wsdl:input message="rpw-2:GetResourcePropertyRequest" name="GetResourcePropertyRequest" wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourceProperty/GetResourcePropertyRequest"/>
+      <wsdl:output message="rpw-2:GetResourcePropertyResponse" name="GetResourcePropertyResponse" wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourceProperty/GetResourcePropertyResponse"/>
+      <wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rpw-2:InvalidResourcePropertyQNameFault" name="InvalidResourcePropertyQNameFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>     
+    </wsdl:operation><wsdl:operation name="InsertResourceProperties">
+      <wsdl:input message="rpw-2:InsertResourcePropertiesRequest" name="InsertResourcePropertiesRequest"/>
+      <wsdl:output message="rpw-2:InsertResourcePropertiesResponse" name="InsertResourcePropertiesResponse"/>
+      <wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault"/>
+      <wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault"/>
+      <wsdl:fault message="rpw-2:InvalidModificationFault" name="InvalidModificationFault"/>     
+      <wsdl:fault message="rpw-2:UnableToModifyResourcePropertyFault" name="UnableToModifyResourcePropertyFault"/>
+      <wsdl:fault message="rpw-2:InvalidResourcePropertyQNameFault" name="InvalidResourcePropertyQNameFault"/>     
+      <wsdl:fault message="rpw-2:InsertResourcePropertiesRequestFailedFault" name="InsertResourcePropertiesRequestFailedFault"/>
+    </wsdl:operation><wsdl:operation name="QueryResourceProperties">
+      <wsdl:input message="rpw-2:QueryResourcePropertiesRequest" name="QueryResourcePropertiesRequest" wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/QueryResourceProperties/QueryResourcePropertiesRequest"/>
+      <wsdl:output message="rpw-2:QueryResourcePropertiesResponse" name="QueryResourcePropertiesResponse" wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/QueryResourceProperties/QueryResourcePropertiesResponse"/>
+      <wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rpw-2:InvalidResourcePropertyQNameFault" name="InvalidResourcePropertyQNameFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>     
+      <wsdl:fault message="rpw-2:UnknownQueryExpressionDialectFault" name="UnknownQueryExpressionDialectFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rpw-2:InvalidQueryExpressionFault" name="InvalidQueryExpressionFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rpw-2:QueryEvaluationErrorFault" name="QueryEvaluationErrorFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+    </wsdl:operation><wsdl:operation name="Notify">
+			<wsdl:input xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:Notify" wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationConsumer/Notify"/>
+		</wsdl:operation><wsdl:operation name="ping">
+			<wsdl:input xmlns:genii-rsimple="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple" message="genii-rsimple:pingRequest"/>
+			<wsdl:output xmlns:genii-rsimple="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple" message="genii-rsimple:pingResponse"/>
+		</wsdl:operation><wsdl:operation name="GetCurrentMessage">
+			<wsdl:input xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:GetCurrentMessageRequest" wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationProducer/GetCurrentMessageRequest"/>
+			<wsdl:output xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:GetCurrentMessageResponse" wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationProducer/GetCurrentMessageResponse"/>
+			<wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:TopicExpressionDialectUnknownFault" name="TopicExpressionDialectUnknownFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:InvalidTopicExpressionFault" name="InvalidTopicExpressionFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:TopicNotSupportedFault" name="TopicNotSupportedFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:NoCurrentMessageOnTopicFault" name="NoCurrentMessageOnTopicFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:MultipleTopicsSpecifiedFault" name="MultipleTopicsSpecifiedFault"/>
+		</wsdl:operation><wsdl:operation name="UpdateResourceProperties">
+      <wsdl:input message="rpw-2:UpdateResourcePropertiesRequest" name="UpdateResourcePropertiesRequest"/>
+      <wsdl:output message="rpw-2:UpdateResourcePropertiesResponse" name="UpdateResourcePropertiesResponse"/>
+      <wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault"/>
+      <wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault"/>
+      <wsdl:fault message="rpw-2:InvalidModificationFault" name="InvalidModificationFault"/>     
+      <wsdl:fault message="rpw-2:UnableToModifyResourcePropertyFault" name="UnableToModifyResourcePropertyFault"/>
+      <wsdl:fault message="rpw-2:InvalidResourcePropertyQNameFault" name="InvalidResourcePropertyQNameFault"/>     
+      <wsdl:fault message="rpw-2:UpdateResourcePropertiesRequestFailedFault" name="UpdateResourcePropertiesRequestFailedFault"/>
+    </wsdl:operation><wsdl:operation name="SetTerminationTime">
+			<wsdl:input xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2" message="wsrf-rlw:SetTerminationTimeRequest" name="SetTerminationTimeRequest" wsa:Action="http://docs.oasis-open.org/wsrf/rlw-2/ScheduledResourceTermination/SetTerminationTimeRequest"/>
+			<wsdl:output xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2" message="wsrf-rlw:SetTerminationTimeResponse" name="SetTerminationTimeResponse" wsa:Action="http://docs.oasis-open.org/wsrf/rlw-2/ScheduledResourceTermination/SetTerminationTimeResponse"/>
+			<wsdl:fault xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2" message="wsrf-rlw:UnableToSetTerminationTimeFault" name="UnableToSetTerminationTimeFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+			<wsdl:fault xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2" message="wsrf-rlw:TerminationTimeChangeRejectedFault" name="TerminationTimeChangeRejectedFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+			<wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+			<wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+		</wsdl:operation><wsdl:operation name="Subscribe">
+			<wsdl:input xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:SubscribeRequest" wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationProducer/SubscribeRequest"/>
+			<wsdl:output xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:SubscribeResponse" wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationProducer/SubscribeResponse"/>
+			<wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:InvalidFilterFault" name="InvalidFilterFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:TopicExpressionDialectUnknownFault" name="TopicExpressionDialectUnknownFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:InvalidTopicExpressionFault" name="InvalidTopicExpressionFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:TopicNotSupportedFault" name="TopicNotSupportedFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:InvalidProducerPropertiesExpressionFault" name="InvalidProducerPropertiesExpressionFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:InvalidMessageContentExpressionFault" name="InvalidMessageContentExpressionFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:UnacceptableInitialTerminationTimeFault" name="UnacceptableInitialTerminationTimeFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:UnrecognizedPolicyRequestFault" name="UnrecognizedPolicyRequestFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:UnsupportedPolicyRequestFault" name="UnsupportedPolicyRequestFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:NotifyMessageNotSupportedFault" name="NotifyMessageNotSupportedFault"/>
+			<wsdl:fault xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:SubscribeCreationFailedFault" name="SubscribeCreationFailedFault"/>
+		</wsdl:operation><wsdl:operation name="removeMatchingParameter">
+			<wsdl:input message="genii-common:RemoveMatchingParameterRequest"/>
+			<wsdl:output message="genii-common:RemoveMatchingParameterResponse"/>
+		</wsdl:operation><wsdl:operation name="addMatchingParameter">
+			<wsdl:input message="genii-common:AddMatchingParameterRequest"/>
+			<wsdl:output message="genii-common:AddMatchingParameterResponse"/>
+		</wsdl:operation><wsdl:operation name="vcgrCreate">
+			<wsdl:input xmlns:genii-rfactory="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" message="genii-rfactory:vcgrCreateRequest"/>
+			<wsdl:output xmlns:genii-rfactory="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" message="genii-rfactory:vcgrCreateResponse"/>
+			<wsdl:fault xmlns:genii-rfactory="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" message="genii-rfactory:ResourceCreationFault" name="ResourceCreationFault"/>
+			<wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault"/>
+		</wsdl:operation><wsdl:operation name="GetResourcePropertyDocument">
+      <wsdl:input message="rpw-2:GetResourcePropertyDocumentRequest" name="GetResourcePropertyDocumentRequest" wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourcePropertyDocument/GetResourcePropertyDocumentRequest"/>
+      <wsdl:output message="rpw-2:GetResourcePropertyDocumentResponse" name="GetResourcePropertyDocumentResponse" wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetResourcePropertyDocument/GetResourcePropertyDocumentResponse"/>
+      <wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+    </wsdl:operation><wsdl:operation name="SetResourceProperties">
+      <wsdl:input message="rpw-2:SetResourcePropertiesRequest" name="SetResourcePropertiesRequest"/>
+      <wsdl:output message="rpw-2:SetResourcePropertiesResponse" name="SetResourcePropertiesResponse"/>
+      <wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault"/>
+      <wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault"/>
+      <wsdl:fault message="rpw-2:InvalidModificationFault" name="InvalidModificationFault"/>     
+      <wsdl:fault message="rpw-2:UnableToModifyResourcePropertyFault" name="UnableToModifyResourcePropertyFault"/>
+      <wsdl:fault message="rpw-2:InvalidResourcePropertyQNameFault" name="InvalidResourcePropertyQNameFault"/>     
+      <wsdl:fault message="rpw-2:SetResourcePropertyRequestFailedFault" name="SetResourcePropertyRequestFailedFault"/>
+    </wsdl:operation><wsdl:operation name="DeleteResourceProperties">
+      <wsdl:input message="rpw-2:DeleteResourcePropertiesRequest" name="DeleteResourcePropertiesRequest"/>
+      <wsdl:output message="rpw-2:DeleteResourcePropertiesResponse" name="DeleteResourcePropertiesResponse"/>
+      <wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault"/>
+      <wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault"/>
+      <wsdl:fault message="rpw-2:InvalidModificationFault" name="InvalidModificationFault"/>     
+      <wsdl:fault message="rpw-2:UnableToModifyResourcePropertyFault" name="UnableToModifyResourcePropertyFault"/>
+      <wsdl:fault message="rpw-2:InvalidResourcePropertyQNameFault" name="InvalidResourcePropertyQNameFault"/>     
+      <wsdl:fault message="rpw-2:DeleteResourcePropertiesRequestFailedFault" name="DeleteResourcePropertiesRequestFailedFault"/> 
+    </wsdl:operation><wsdl:operation name="iterateHistoryEvents">
+			<wsdl:input message="genii-common:iterateHistoryEventsRequest"/>
+			<wsdl:output message="genii-common:iterateHistoryEventsResponse"/>
+		</wsdl:operation><wsdl:operation name="Destroy">
+			<wsdl:input xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2" message="wsrf-rlw:DestroyRequest" name="DestroyRequest" wsa:Action="http://docs.oasis-open.org/wsrf/rlw-2/ImmediateResourceTermination/DestroyRequest"/>
+			<wsdl:output xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2" message="wsrf-rlw:DestroyResponse" name="DestroyResponse" wsa:Action="http://docs.oasis-open.org/wsrf/rlw-2/ImmediateResourceTermination/DestroyResponse"/>
+			<wsdl:fault xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2" message="wsrf-rlw:ResourceNotDestroyedFault" name="ResourceNotDestroyedFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+			<wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+			<wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+		</wsdl:operation><wsdl:operation name="GetMultipleResourceProperties">
+      <wsdl:input message="rpw-2:GetMultipleResourcePropertiesRequest" name="GetMultipleResourcePropertiesRequest" wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetMultipleResourceProperties/GetMultipleResourcePropertiesRequest"/>
+      <wsdl:output message="rpw-2:GetMultipleResourcePropertiesResponse" name="GetMultipleResourcePropertiesResponse" wsa:Action="http://docs.oasis-open.org/wsrf/rpw-2/GetMultipleResourceProperties/GetMultipleResourcePropertiesResponse"/>
+      <wsdl:fault message="rw-2:ResourceUnknownFault" name="ResourceUnknownFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rw-2:ResourceUnavailableFault" name="ResourceUnavailableFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+      <wsdl:fault message="rpw-2:InvalidResourcePropertyQNameFault" name="InvalidResourcePropertyQNameFault" wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>     
+    </wsdl:operation><wsdl:operation name="notifyWithResponse">
+			<wsdl:input xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2" message="wsntw:Notify"/>
+			<wsdl:output xmlns:genii-nc="http://vcgr.cs.virginia.edu/genii/2010/08/notification/notification-consumer" message="genii-nc:NotifyResponse"/>
+		</wsdl:operation></wsdl:portType>
+
+</wsdl:definitions>

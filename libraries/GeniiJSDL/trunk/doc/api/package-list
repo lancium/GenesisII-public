@@ -1,0 +1,12 @@
+edu.virginia.vcgr.jsdl
+edu.virginia.vcgr.jsdl.hpc
+edu.virginia.vcgr.jsdl.hpcfse
+edu.virginia.vcgr.jsdl.mapping
+edu.virginia.vcgr.jsdl.posix
+edu.virginia.vcgr.jsdl.rangevalue
+edu.virginia.vcgr.jsdl.spmd
+edu.virginia.vcgr.jsdl.sweep
+edu.virginia.vcgr.jsdl.sweep.eval
+edu.virginia.vcgr.jsdl.sweep.functions
+edu.virginia.vcgr.jsdl.sweep.parameters
+edu.virginia.vcgr.jsdl.sweep.parameters.xpath

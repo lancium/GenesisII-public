@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="Genesis2-Dev" name="edu.virginia.vcgr.genii.security.x509.TestPKCS12" skipped="0" tests="1" time="1.59" timestamp="2020-03-26T14:20:48">
+  <properties>
+    <property name="env.DESKTOP_SESSION" value="ubuntu" />
+    <property name="env.OLDPWD" value="/home/dev/GenesisII/libraries/gffs-security" />
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="ant.file.gffs-security" value="/home/dev/GenesisII/libraries/gffs-security/trunk/build.xml" />
+    <property name="java.home" value="/home/dev/jdk1.8.0_131/jre" />
+    <property name="env.DISPLAY" value=":0" />
+    <property name="env.LS_COLORS" value="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:" />
+    <property name="env.XDG_VTNR" value="2" />
+    <property name="env.DEBUGGING" value="true" />
+    <property name="java.endorsed.dirs" value="/home/dev/jdk1.8.0_131/jre/lib/endorsed" />
+    <property name="env.LOGNAME" value="dev" />
+    <property name="env.USERNAME" value="dev" />
+    <property name="src.dir" value="/home/dev/GenesisII/libraries/gffs-security/trunk/src" />
+    <property name="env.XDG_SEAT" value="seat0" />
+    <property name="env.BES_RESOURCE_OVERRIDE" value="" />
+    <property name="obj.dir" value="/home/dev/GenesisII/libraries/gffs-security/trunk/bin.ant" />
+    <property name="env.SESSION_MANAGER" value="local/Genesis2-Dev:@/tmp/.ICE-unix/2193,unix/Genesis2-Dev:/tmp/.ICE-unix/2193" />
+    <property name="env.SUBMIT_GROUP" value="/groups/xsede.org/gffs-users" />
+    <property name="sun.os.patch.level" value="unknown" />
+    <property name="java.vendor.url" value="http://java.oracle.com/" />
+    <property name="env.GENII_BINARY_DIR" value="/home/dev/GenesisII/bin" />
+    <property name="dpages.dir" value="/home/dev/GenesisII/libraries/gffs-security/trunk/dpages" />
+    <property name="env.RNSPATH" value="/home/xsede.org/userX/sandbox" />
+    <property name="java.version" value="1.8.0_131" />
+    <property name="env.ADMIN_ACCOUNT_PASSWD" value="admin" />
+    <property name="env.BACKUP_PORT_NUMBER" value="21003" />
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/" />
+    <property name="env.GNOME_SHELL_SESSION_MODE" value="ubuntu" />
+    <property name="env.XDG_MENU_PREFIX" value="gnome-" />
+    <property name="ant.project.invoked-targets" value="build" />
+    <property name="env.XDG_DATA_DIRS" value="/usr/share/ubuntu:/usr/local/share:/usr/share:/var/lib/snapd/desktop" />
+    <property name="env.GRID_TIMING_FILE" value="/home/dev/tmp/gffs_tools_output_dev/grid_times.log" />
+    <property name="env.NAMESPACE_FILE" value="/home/dev/GenesisII/deployments/current_grid/configuration/namespace.properties" />
+    <property name="user.name" value="dev" />
+    <property name="env.LANG" value="en_US.UTF-8" />
+    <property name="env.QUEUE_PATH" value="/resources/xsede.org/queues/grid-queue" />
+    <property name="ext.dir" value="../../../ext" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="sun.jnu.encoding" value="UTF-8" />
+    <property name="env.DBUS_SESSION_BUS_ADDRESS" value="unix:path=/run/user/1000/bus" />
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="env.USERS_LOC" value="/users/xsede.org" />
+    <property name="user.timezone" value="" />
+    <property name="env.LESSOPEN" value="| /usr/bin/lesspipe %s" />
+    <property name="env.REMOTE_CONTAINER" value="/resources/xsede.org/containers/BootstrapContainer" />
+    <property name="env.CONGLOMERATED_GRID_OUTPUT" value="/home/dev/tmp/gffs_tools_output_dev/full_grid_output.log" />
+    <property name="path.separator" value=":" />
+    <property name="env.LOCAL_CONTAINER" value="/resources/xsede.org/containers/BootstrapContainer" />
+    <property name="env.HOMES_LOC" value="/home/xsede.org" />
+    <property name="env.MAX_CHUNK_FILE" value="65536" />
+    <property name="env.XMODIFIERS" value="@im=ibus" />
+    <property name="file.encoding" value="UTF-8" />
+    <property name="env.EMAIL" value="userX@emailsomewhere.com" />
+    <property name="ant.project.default-target" value="build" />
+    <property name="env.TOPDIR" value="/home/dev/GenesisII/scripts/.." />
+    <property name="env.HOME" value="/home/dev" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner edu.virginia.vcgr.genii.security.x509.TestPKCS12 skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/home/dev/GenesisII/libraries/gffs-security/trunk/unit-test-reports/raw/TEST-edu.virginia.vcgr.genii.security.x509.TestPKCS12.xml crashfile=/home/dev/GenesisII/libraries/gffs-security/trunk/junitvmwatcher2372103441238458505.properties propsfile=/home/dev/GenesisII/libraries/gffs-security/trunk/junit3937177144535081465.properties" />
+    <property name="env.GNOME_TERMINAL_SERVICE" value=":1.58" />
+    <property name="bundles.home" value="../../../bundles" />
+    <property name="top.level.dir" value="/home/dev/GenesisII/libraries/gffs-security/trunk/../../.." />
+    <property name="ant.file" value="/home/dev/GenesisII/libraries/gffs-security/trunk/build.xml" />
+    <property name="env.GENERATED_JSDL_FOLDER" value="/home/dev/tmp/gffs_tools_output_dev/patched_jsdl" />
+    <property name="env.QUEUE_SLEEP_DURATION" value="120" />
+    <property name="tests.dir" value="/home/dev/GenesisII/libraries/gffs-security/trunk/tests" />
+    <property name="env._" value="/usr/local/ant/bin/ant" />
+    <property name="java.io.tmpdir" value="/tmp" />
+    <property name="env.QUEUE_NAME" value="grid-queue" />
+    <property name="user.language" value="en" />
+    <property name="line.separator" value="&#xa;" />
+    <property name="default.compile.copy.includes" value="**/*.xml,**/*.properties,**/*.html,**/*.jpg,**/*.bmp,**/*.gif,**/*.ver,**/*.txt,**/*.config,**/*.png,**/*.cfg,**/*.dat,**/*.config" />
+    <property name="env.ANT_OPTS" value="-Xms512m -Xmx768m -XX:MaxPermSize=768m" />
+    <property name="env.GFFS_TOOLKIT_CONFIG_FILE" value="/home/dev/GenesisII/toolkit/gffs_toolkit.config" />
+    <property name="ant.file.type" value="file" />
+    <property name="env.GENII_INSTALL_DIR" value="/home/dev/GenesisII" />
+    <property name="env.SSH_AGENT_PID" value="2329" />
+    <property name="env.NORMAL_ACCOUNT_PASSWD" value="FOOP" />
+    <property name="env.SHOWED_SETTINGS_ALREADY" value="true" />
+    <property name="env.CONTAINERS_LOC" value="/resources/xsede.org/containers" />
+    <property name="env.CLUTTER_IM_MODULE" value="xim" />
+    <property name="env.BES_CONTAINERS_LOC" value="/resources/xsede.org/containers" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="sun.desktop" value="gnome" />
+    <property name="app.version" value="2.7.631" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="env.COLORTERM" value="truecolor" />
+    <property name="env.CONTAINERPATH" value="/resources/xsede.org/containers/BootstrapContainer" />
+    <property name="env.TEXTDOMAIN" value="im-config" />
+    <property name="env.IM_CONFIG_PHASE" value="2" />
+    <property name="env.GDMSESSION" value="ubuntu" />
+    <property name="env.BOOTSTRAP_FILE" value="/home/dev/GenesisII/deployments/current_grid/configuration/bootstrap.xml" />
+    <property name="env.QT_ACCESSIBILITY" value="1" />
+    <property name="env.XDG_SESSION_DESKTOP" value="ubuntu" />
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob" />
+    <property name="env.VTE_VERSION" value="5202" />
+    <property name="env.BES_TYPE" value="Unicore" />
+    <property name="env.GENII_USER_DIR" value="/home/dev/.genesisII-2.0" />
+    <property name="include.ant.runtime" value="yes" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.9.14 compiled on March 12 2019" />
+    <property name="env.GROUPS_LOC" value="/groups/xsede.org" />
+    <property name="env.XDG_SESSION_TYPE" value="x11" />
+    <property name="env.DEPLOYMENTS_ROOT" value="/home/dev/GenesisII/deployments" />
+    <property name="os.name" value="Linux" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="env.TMP" value="/home/dev/tmp" />
+    <property name="env.TERM" value="xterm-256color" />
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM" />
+    <property name="env.QUEUE_TRIES_ALLOWED" value="60" />
+    <property name="env.GRID_OUTPUT_FILE" value="/home/dev/tmp/gffs_tools_output_dev/grid_output.log" />
+    <property name="env.QT_IM_MODULE" value="xim" />
+    <property name="java.library.path" value="/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib" />
+    <property name="env.PATH" value="/home/dev/install4j6/bin:/home/dev/eclipse:/home/dev/GenesisII/bin:/home/dev/jdk1.8.0_131/jre/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/ant/bin:/snap/bin:/usr/local/ant/bin" />
+    <property name="env.LESSCLOSE" value="/usr/bin/lesspipe %s %s" />
+    <property name="ant.java.version" value="1.8" />
+    <property name="env.TEXTDOMAINDIR" value="/usr/share/locale/" />
+    <property name="basedir" value="/home/dev/GenesisII/libraries/gffs-security/trunk" />
+    <property name="java.class.version" value="52.0" />
+    <property name="env.SHLVL" value="4" />
+    <property name="env.generated_installer_name" value="/home/dev/GenesisII/installer/generated-genesis2.install4j" />
+    <property name="ant.home" value="/usr/local/ant" />
+    <property name="env.INSTALL4J_DIR" value="/home/dev/install4j6" />
+    <property name="env.GJS_DEBUG_OUTPUT" value="stderr" />
+    <property name="env.BASE_USER" value="userX" />
+    <property name="env.SWT_GTK3" value="0" />
+    <property name="ant.file.type.gffs-security" value="file" />
+    <property name="env.QUEUES_LOC" value="/resources/xsede.org/queues" />
+    <property name="sun.boot.library.path" value="/home/dev/jdk1.8.0_131/jre/lib/amd64" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment" />
+    <property name="env.POSSIBLY_UNBUILT" value="true" />
+    <property name="env.USER" value="dev" />
+    <property name="env.GTK_IM_MODULE" value="ibus" />
+    <property name="env.GTK_MODULES" value="gail:atk-bridge" />
+    <property name="debug.on" value="true" />
+    <property name="ant.project.name" value="gffs-security" />
+    <property name="env.GFFS_TOOLKIT_SENTINEL" value="initialized" />
+    <property name="java.vm.specification.version" value="1.8" />
+    <property name="env.BACKUP_USER_DIR" value="/home/dev/.backup-genesisII-2.0" />
+    <property name="env.STATOP" value="qstat" />
+    <property name="env.NLSPATH" value="/usr/dt/lib/nls/msg/%L/%N.cat" />
+    <property name="env.INSTALLER_DIR" value="/home/dev/GenesisII/installer" />
+    <property name="awt.toolkit" value="sun.awt.X11.XToolkit" />
+    <property name="sun.cpu.isalist" value="" />
+    <property name="java.ext.dirs" value="/home/dev/jdk1.8.0_131/jre/lib/ext:/usr/java/packages/lib/ext" />
+    <property name="env.GJS_DEBUG_TOPICS" value="JS ERROR;JS LOG" />
+    <property name="os.version" value="5.3.0-42-generic" />
+    <property name="env.BACKUP_CONTAINER" value="/resources/xsede.org/containers/backup" />
+    <property name="env.XDG_CURRENT_DESKTOP" value="ubuntu:GNOME" />
+    <property name="env.fast_build" value="" />
+    <property name="env.STS_LOC" value="/resources/xsede.org/containers/sts-1.xsede.org" />
+    <property name="user.home" value="/home/dev" />
+    <property name="java.vm.vendor" value="Oracle Corporation" />
+    <property name="env.FOLDERSPACE" value="xsede.org" />
+    <property name="ant.file.type.GenesisII.init" value="file" />
+    <property name="env.JAVA_HOME" value="/home/dev/jdk1.8.0_131/jre" />
+    <property name="env.XDG_SESSION_ID" value="2" />
+    <property name="env.LINE_COUNT_FOR_START_CHECK" value="400" />
+    <property name="env.INSTALLER_NAME" value="genesis2.install4j" />
+    <property name="env.XAUTHORITY" value="/run/user/1000/gdm/Xauthority" />
+    <property name="user.dir" value="/home/dev/GenesisII/libraries/gffs-security/trunk" />
+    <property name="env.XFILESEARCHPATH" value="/usr/dt/app-defaults/%L/Dt" />
+    <property name="env.WINDOWPATH" value="2" />
+    <property name="env.EXPORTPATH" value="/home/dev/export-path" />
+    <property name="env.PWD" value="/home/dev/GenesisII/libraries/gffs-security/trunk" />
+    <property name="env.WORKDIR" value="/home/dev/GenesisII/scripts" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="project.dir" value="/home/dev/GenesisII/libraries/gffs-security/trunk" />
+    <property name="env.SEEK_USER_PATTERN" value=" " />
+    <property name="env.SHUNIT_DIR" value="/home/dev/GenesisII/toolkit/shunit" />
+    <property name="ant.file.GenesisII.init" value="/home/dev/GenesisII/libraries/gffs-security/trunk/init.build.xml" />
+    <property name="env.GNOME_TERMINAL_SCREEN" value="/org/gnome/Terminal/screen/581a9a21_3d28_4331_903a_bcb7d0198bf3" />
+    <property name="java.vm.version" value="25.131-b11" />
+    <property name="env.TEST_TEMP" value="/home/dev/tmp/gffs_tools_output_dev" />
+    <property name="java.class.path" value="/home/dev/GenesisII/libraries/gffs-security/trunk/bin.ant:/home/dev/GenesisII/ext/MorganUtilities.jar:/home/dev/GenesisII/ext/SizeOf.jar:/home/dev/GenesisII/ext/bcpkix-jdk15on-149.jar:/home/dev/GenesisII/ext/bcprov-jdk15on-149.jar:/home/dev/GenesisII/ext/com.springsource.org.apache.ws.security-1.5.8.jar:/home/dev/GenesisII/ext/commons-codec-1.4.jar:/home/dev/GenesisII/ext/commons-compress-1.8.1.jar:/home/dev/GenesisII/ext/commons-httpclient-3.0.1.jar:/home/dev/GenesisII/ext/commons-io-2.4.jar:/home/dev/GenesisII/ext/commons-logging-1.1.3.jar:/home/dev/GenesisII/ext/commons-net-2.2.jar:/home/dev/GenesisII/ext/derby-10.11.1.1.jar:/home/dev/GenesisII/ext/fuse-j.jar:/home/dev/GenesisII/ext/hsqldb.jar:/home/dev/GenesisII/ext/httpclient-4.5.2.jar:/home/dev/GenesisII/ext/httpcore-4.4.4.jar:/home/dev/GenesisII/ext/ivy-2.3.0.jar:/home/dev/GenesisII/ext/jackson-annotations-2.7.0.jar:/home/dev/GenesisII/ext/jackson-core-2.7.0.jar:/home/dev/GenesisII/ext/jackson-databind-2.7.0.jar:/home/dev/GenesisII/ext/jcifs-1.3.15.jar:/home/dev/GenesisII/ext/jsch-20101122.jar:/home/dev/GenesisII/ext/jsoup-1.9.2.jar:/home/dev/GenesisII/ext/junit-4.11.jar:/home/dev/GenesisII/ext/log4j-1.2.17.jar:/home/dev/GenesisII/ext/myproxy-logon-3.1.1.jar:/home/dev/GenesisII/ext/mysql-connector-java-5.1.7-bin.jar:/home/dev/GenesisII/ext/ncsa-security-core-3.1.1.jar:/home/dev/GenesisII/ext/ncsa-security-util-3.1.1.jar:/home/dev/GenesisII/ext/nis.jar:/home/dev/GenesisII/ext/slf4j-log4j12-1.6.6.jar:/home/dev/GenesisII/ext/svnkit.jar:/home/dev/GenesisII/ext/typica.jar:/home/dev/GenesisII/ext/wss4j-1.5.6.jar:/home/dev/GenesisII/ext/xmlsec-1.4.6.jar:/home/dev/GenesisII/generated/CmdLineManipulator-2.7.631.jar:/home/dev/GenesisII/generated/GeniiJSDL-2.7.631.jar:/home/dev/GenesisII/generated/GeniiProcMgmt-2.7.631.jar:/home/dev/GenesisII/generated/MNaming-2.7.631.jar:/home/dev/GenesisII/generated/MacOSXSwing-2.7.631.jar:/home/dev/GenesisII/generated/fsview-2.7.631.jar:/home/dev/GenesisII/generated/gffs-basics-2.7.631.jar:/home/dev/GenesisII/generated/gffs-security-2.7.631.jar:/home/dev/GenesisII/generated/gffs-webservices-2.7.631.jar:/home/dev/GenesisII/bundles/bundle-u6security_1.0.74.jar:/home/dev/GenesisII/bundles/com.jcraft.jsch_0.1.46.v201205102330.jar:/home/dev/GenesisII/bundles/org.eclipse.osgi_3.8.0.v20120529-1548.jar:/home/dev/GenesisII/bundles/org.apache.commons.logging_1.1.1.v201101211721.jar:/home/dev/GenesisII/bundles/org.apache.xalan_2.7.1.v201005080400.jar:/home/dev/GenesisII/bundles/org.apache.xml.serializer_2.7.1.v201005080400.jar:/home/dev/GenesisII/bundles/org.apache.xerces_2.9.0.v201101211617.jar:/home/dev/GenesisII/bundles/org.apache.commons.lang_2.6.0.v201205030909.jar:/home/dev/GenesisII/bundles/org.apache.log4j_1.2.15.v201012070815.jar:/home/dev/GenesisII/bundles/org.slf4j.api_1.6.4.v20120130-2120.jar:/usr/local/apache-ant-1.9.14/lib/ant-launcher.jar:/usr/local/ant/lib/ant.jar:/usr/local/ant/lib/ant-junit.jar:/usr/local/ant/lib/ant-junit4.jar" />
+    <property name="env.BOOTSTRAP_LOC" value="/resources/xsede.org/containers/BootstrapContainer" />
+    <property name="env.SPMD_VARIATION" value="" />
+    <property name="ant.library.dir" value="/usr/local/ant/lib" />
+    <property name="ant.home.override" value="../../../ext/ant" />
+    <property name="os.arch" value="amd64" />
+    <property name="baseDir" value="/home/dev/GenesisII/libraries/gffs-security/trunk" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="env.ACTUAL_DEPLOYMENT_FOLDER" value="/home/dev/GenesisII/deployments/current_grid" />
+    <property name="ant.core.lib" value="/usr/local/ant/lib/ant.jar" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="env.installer_config" value="xsede-production.config" />
+    <property name="file.separator" value="/" />
+    <property name="env.GFFS_TOOLKIT_ROOT" value="/home/dev/GenesisII/toolkit" />
+    <property name="java.runtime.version" value="1.8.0_131-b11" />
+    <property name="sun.boot.class.path" value="/home/dev/jdk1.8.0_131/jre/lib/resources.jar:/home/dev/jdk1.8.0_131/jre/lib/rt.jar:/home/dev/jdk1.8.0_131/jre/lib/sunrsasign.jar:/home/dev/jdk1.8.0_131/jre/lib/jsse.jar:/home/dev/jdk1.8.0_131/jre/lib/jce.jar:/home/dev/jdk1.8.0_131/jre/lib/charsets.jar:/home/dev/jdk1.8.0_131/jre/lib/jfr.jar:/home/dev/jdk1.8.0_131/jre/classes" />
+    <property name="env.SSH_AUTH_SOCK" value="/run/user/1000/keyring/ssh" />
+    <property name="env.QT4_IM_MODULE" value="xim" />
+    <property name="env.XDG_RUNTIME_DIR" value="/run/user/1000" />
+    <property name="env.XDG_CONFIG_DIRS" value="/etc/xdg/xdg-ubuntu:/etc/xdg" />
+    <property name="generated.jar.dir" value="/home/dev/GenesisII/libraries/gffs-security/trunk/../../../generated" />
+    <property name="user.country" value="US" />
+    <property name="env.ANT_HOME" value="/usr/local/ant" />
+    <property name="env.USERPATH" value="/users/xsede.org/userX" />
+    <property name="env.SHELL" value="/bin/bash" />
+    <property name="java.vendor" value="Oracle Corporation" />
+    <property name="env.GPG_AGENT_INFO" value="/run/user/1000/gnupg/S.gpg-agent:0:1" />
+    <property name="env.QUEUE_SLOTS" value="4" />
+    <property name="java.specification.version" value="1.8" />
+    <property name="env.DEPLOYMENT_NAME" value="current_grid" />
+    <property name="sun.arch.data.model" value="64" />
+    <property name="env.GNOME_DESKTOP_SESSION_ID" value="this-is-deprecated" />
+  </properties>
+  <testcase classname="edu.virginia.vcgr.genii.security.x509.TestPKCS12" name="testPKCS" time="1.074" />
+  <system-out><![CDATA[  [0]         Version: 3
+         SerialNumber: 14
+             IssuerDN: CN=f,C=AU,O=The Legion of the Bouncy Castle,OU=Bouncy Intermediate Certificate,E=feedback-crypto@bouncycastle.org
+           Start Date: Tue Feb 25 09:20:49 EST 2020
+           Final Date: Sat Apr 25 10:20:49 EDT 2020
+            SubjectDN: CN=g,C=AU,O=The Legion of the Bouncy Castle,OU=Bouncy Intermediate Certificate,E=feedback-crypto@bouncycastle.org
+           Public Key: RSA Public Key
+            modulus: b259d2d6e627a768c94be36164c2d9fc79d97aab9253140e5bf17751197731d6f7540d2509e7b9ffee0a70a6e26d56e92d2edd7f85aba85600b69089f35f6bdbf3c298e05842535d9f064e6b0391cb7d306e0a2d20c4dfb4e7b49a9640bdea26c10ad69c3f05007ce2513cee44cfe01998e62b6c3637d3fc0391079b26ee36d5
+    public exponent: 11
+
+  Signature Algorithm: SHA1WITHRSA
+            Signature: 2595ea3f86275df1f34de7dd55a298d19f42a9f6
+                       3dcbfa5095d898b0bbda9e7d9700d8bcb0036d63
+                       24c2770f4b3cd04f70feb81379ffa248ca282113
+                       c3a18b7f3dc24be546e730ccea02a33f5a258460
+                       c0a375e2f290fe8d01285febbb60e7cff0154692
+                       eb4d5c70584bdcf70e4ff1559077e2c9ec5ed591
+                       f8220cb6bdf16a3d
+       Extensions: 
+                       critical(false) 2.5.29.14 value = DER Octet String[20] 
+
+                       critical(false) 2.5.29.35 value = Sequence
+    Tagged [0] IMPLICIT 
+        DER Octet String[20] 
+    Tagged [1]
+        Tagged [4]
+            DER Sequence
+                DER Set
+                    DER Sequence
+                        ObjectIdentifier(2.5.4.3)
+                        UTF8String(e) 
+                DER Set
+                    DER Sequence
+                        ObjectIdentifier(2.5.4.6)
+                        PrintableString(AU) 
+                DER Set
+                    DER Sequence
+                        ObjectIdentifier(2.5.4.10)
+                        UTF8String(The Legion of the Bouncy Castle) 
+                DER Set
+                    DER Sequence
+                        ObjectIdentifier(2.5.4.11)
+                        UTF8String(Bouncy Intermediate Certificate) 
+                DER Set
+                    DER Sequence
+                        ObjectIdentifier(1.2.840.113549.1.9.1)
+                        IA5String(feedback-crypto@bouncycastle.org) 
+    Tagged [2] IMPLICIT 
+        DER Octet String[1] 
+
+                       critical(true) BasicConstraints: isCa(true)
+
+  [0]         Version: 1
+         SerialNumber: 10
+             IssuerDN: C=AU,O=The Legion of the Bouncy Castle,OU=Bouncy Primary Certificate
+           Start Date: Tue Feb 25 09:20:48 EST 2020
+           Final Date: Sat Apr 25 10:20:49 EDT 2020
+            SubjectDN: C=AU,O=The Legion of the Bouncy Castle,OU=Bouncy Primary Certificate
+           Public Key: RSA Public Key
+            modulus: b259d2d6e627a768c94be36164c2d9fc79d97aab9253140e5bf17751197731d6f7540d2509e7b9ffee0a70a6e26d56e92d2edd7f85aba85600b69089f35f6bdbf3c298e05842535d9f064e6b0391cb7d306e0a2d20c4dfb4e7b49a9640bdea26c10ad69c3f05007ce2513cee44cfe01998e62b6c3637d3fc0391079b26ee36d5
+    public exponent: 11
+
+  Signature Algorithm: SHA1WITHRSA
+            Signature: 9e655a178426405e25f75111d4025f21685c32bd
+                       ec9ddb3f401d55a575a75a4dd3f9603a059c631b
+                       1a9fb5324e7e78e10d2981e27817df8dbda51d87
+                       202883f4d2607e8e66c2d47b68b5531a208e1060
+                       406d9dce22c8ae1e220463794e36d94c2ed135d1
+                       5fb986fe1e73400be40a1dfe7a7084e807afb8a7
+                       1deeb3e4786dd2dd
+
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# This script is responsible for launching the ProxyIO co-process that
+# implements the file management for sudo-based exports.
+
+java_app="/home/dev/GenesisII/jre/bin/java"
+if [ ! -f "$java_app" ]; then
+  java_app="$JAVA_HOME/bin/java"
+  if [ ! -f "$java_app" ]; then
+    java_app="$(which java)"
+    if [ ! -f "$java_app" ]; then
+      echo "ERROR: could not deduce location of java from search path, JAVA_HOME or"
+      echo "the Genesis II GFFS installation directory."
+      exit 1
+    fi
+  fi
+fi
+
+"$java_app" -Xms256m -Xmx1g -cp "/home/dev/GenesisII/bundles/org.apache.commons.logging_1.1.1.v201101211721.jar:/home/dev/GenesisII/ext/*:/home/dev/GenesisII/lib" "-Dlog4j.configuration=production.client.log4j.properties" "-Dedu.virginia.vcgr.genii.install-base-dir=/home/dev/GenesisII" edu.virginia.vcgr.genii.container.exportdir.lightweight.sudodisk.proxyio.server.ProxyIOServerDriver
+
