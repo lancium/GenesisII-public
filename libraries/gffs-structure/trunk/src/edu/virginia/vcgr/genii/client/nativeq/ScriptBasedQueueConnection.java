@@ -164,6 +164,10 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				script.format("trap signalTrap %s\n", signal);
 		}
 
+		// LAK: 13 March: Added so that the batch script does not exit when it gets a SIG_TERM, instead it lets its children
+		// repond to the signal and then gracefully exit after the children processes 
+		script.format("trap : SIGTERM\n");
+
 		script.format("export QUEUE_SCRIPT_RESULT=0\n");
 	}
 
@@ -186,10 +190,6 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	{
 		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 		List<String> newCmdLine = new Vector<String>();
-		
-		// LAK: 13 March: Added so that the batch script does not exit when it gets a SIG_TERM, instead it lets its children
-		// repond to the signal and then gracefully exit after the children processes 
-		// script.format("trap : SIGTERM\n");
 
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
