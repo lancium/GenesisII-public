@@ -32,6 +32,9 @@ testQueueResourcesExist()
 
 testHTTP()
 {
+# 2020-03-30 by ASG
+echo "Skipping test - no http, scp, filestaging hosts"
+return 0
   for i in $available_resources; do
     grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-http.jsdl $i
     assertEquals "Submitting single cat job with file staging using HTTP protocol" 0 $?
@@ -43,6 +46,9 @@ testHTTP()
 
 testFTP()
 {
+# 2020-03-30 by ASG
+echo "Skipping test - no http, scp, filestaging hosts"
+return 0
   for i in $available_resources; do
     grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-ftp.jsdl $i
     assertEquals "Submitting single cat job with file staging using FTP protocol" 0 $?
@@ -65,6 +71,9 @@ testGFFS()
 
 testSCP()
 {
+# 2020-03-30 by ASG
+echo "Skipping test - no http, scp, filestaging hosts"
+return 0
   for i in $available_resources; do
         grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-scp.jsdl $i
   	assertEquals "Submitting single cat job with file staging using SCP protocol" 0 $?
@@ -76,6 +85,9 @@ testSCP()
 
 testSFTP()
 {
+# 2020-03-30 by ASG
+echo "Skipping test - no http, scp, filestaging hosts"
+return 0
   echo "BES type is: $BES_TYPE"  
   # we can't use these types of staging if the BES is a Unicore BES.
   if [ "$BES_TYPE" = "Genesis" ]; then
@@ -93,6 +105,9 @@ testSFTP()
 
 testMailTo()
 {
+# 2020-03-30 by ASG
+echo "Skipping test - no http, scp, filestaging hosts"
+return 0
   for i in $available_resources; do
     grid run --jsdl=local:$GENERATED_JSDL_FOLDER/cat-mailto.jsdl $i
     assertEquals "Submitting single cat job with file staging using the MAILTO protocol" 0 $?
