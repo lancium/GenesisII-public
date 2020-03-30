@@ -87,6 +87,9 @@ testQueueResourcesExist()
 
 testRunningSynchronousJobs()
 {
+  echo "Skipping test testRunningSynchronousJobs - no http, scp, filestaging hosts"
+  return 0
+
   for i in $available_resources; do
     echo "Submitting jobs on resource $(basename $i)..."
 

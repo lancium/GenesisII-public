@@ -55,6 +55,10 @@ testWaitForSimpleJobs()
 
 testQueueSubmitManyWithSleep()
 {
+# 2020-03-30 by ASG
+echo "Skipping test - no http, scp, filestaging hosts"
+return 0
+
   grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/hostname-parameter-sweep-100.jsdl
   assertEquals "Submitting 100 '/bin/hostname'; sleep 60 jobs" 0 $?
 }
