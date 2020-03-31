@@ -71,6 +71,9 @@ testWaitForSleepers()
 
 testSubmitManyJobsParameterSweep()
 {
+echo "determining queue state"
+  grid qstat $QUEUE_PATH
+  grid cat $QUEUE_PATH/resource-management/*
 echo "starting submit... $(date)"
   grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/ls-parameter-sweep-1000.jsdl
   retval=$?
