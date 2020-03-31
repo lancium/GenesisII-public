@@ -126,12 +126,12 @@ EMS_TESTS=( \
 
 #    EMS_Tests/multiUserTests/multiuser-3users-manyjobs.sh \
 
-if [ ! -z "$AUTOBUILD_RUNNING" ]; then
+#if [ ! -z "$AUTOBUILD_RUNNING" ]; then
   # only add the multiple user tests for automated, testing, bootstrap builds.
   EMS_TESTS+=( \
     EMS_Tests/multiUserTests/multiuser-10users-fewjobs.sh \
   )
-fi
+#fi
 
 # selectively enable certain tests that only make sense for particular
 # types of EMS.
