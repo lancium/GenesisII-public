@@ -6,6 +6,8 @@
 #include "CommandLine.h"
 #include "OSSpecific.h"
 
+const char* version="Version 1.0";
+
 static void usage(const char *program);
 
 int main(int argc, char **argv)
@@ -14,6 +16,9 @@ int main(int argc, char **argv)
 	CommandLine *commandLine;
 	int exitCode;
 
+	if ((argc==2) && strcmp(argv[1],"--version")==0) {
+		printf("%s\n",version);
+	}
 	if (argc < 2)
 		usage(argv[0]);
 
@@ -42,8 +47,10 @@ void usage(const char *program)
 	fprintf(stderr,
 		"USAGE:  %s [setup-info] <executable> [<args...>]\n"
 		"            OR\n"
-		"        %s -g<grid-mount>\n",
-		program, program);
+		"        %s -g<grid-mount>\n"
+		"	     OR\n"
+		"	 %s --version",
+		program, program,program);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "    WHERE setup-info includes:\n");
 	fprintf(stderr, "        -Dvar=value any number of times to override "

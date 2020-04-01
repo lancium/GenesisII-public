@@ -103,6 +103,10 @@ void teardownJob()
 			execvp(cmd[0], cmd);
 
 			fprintf(stderr, "Exec failed while trying to destroy VM.\n");
+			// ASG 2020-04-01. Heart of the coronovirus.
+			// Added an exit as this processes will otherwise be an
+			// orphan.
+			exit(-1);
 		}
 	}
 	else
