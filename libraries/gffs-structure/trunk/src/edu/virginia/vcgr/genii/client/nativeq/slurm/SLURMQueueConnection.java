@@ -272,9 +272,14 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		
 		if (resourceConstraints != null) {
 			Double totalPhysicalMemory = resourceConstraints.getTotalPhysicalMemory();
-			if ((totalPhysicalMemory != null) && (!totalPhysicalMemory.equals(Double.NaN)))
+			if ((totalPhysicalMemory != null) && (!totalPhysicalMemory.equals(Double.NaN))) {
 				script.format("#SBATCH --mem-per-cpu=%d\n", (totalPhysicalMemory.longValue()/(1024*1024)));
 			// ASG 2019-03-19 SLURM expects memory in MB not bytes, causes failures.
+			}
+			else {
+				// 2020-04-09 by ASG - default to 4GB
+				script.format("#SBATCH --mem-per-cpu=%d\n", 4096);
+			}
 
 			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();
 			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))
@@ -295,6 +300,8 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			}
 			
 		} else {
+			// 2020-04-09 by ASG - default to 4GB
+			script.format("#SBATCH --mem-per-cpu=%d\n", 4096);
 			_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---no resource constraints" );
 		}
 		_logger.info("---JSDL: ---- in SLURMQueueConnection.java ---After checking resource Constraints" );
