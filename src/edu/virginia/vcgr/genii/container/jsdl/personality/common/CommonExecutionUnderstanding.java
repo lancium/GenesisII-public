@@ -267,10 +267,20 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		}
 
 		ResourceConstraints resourceConstraints = new ResourceConstraints();
-		resourceConstraints.setTotalPhysicalMemory(getTotalPhysicalMemory());
+		if (getTotalPhysicalMemory()!=null) resourceConstraints.setTotalPhysicalMemory(getTotalPhysicalMemory());
 		resourceConstraints.setWallclockTimeLimit(getWallclockTimeLimit());
 		resourceConstraints.setGPUCountPerNode(getGPUCountPerNode());
  		resourceConstraints.setGPUMemoryPerNode(getGPUMemoryPerNode());
+ 		// 2020-04-21 by ASG. Deep in the coronovirus.
+ 		// We need a default number of CPUs .. actually VCPUs
+ 		if (resourceConstraints.getTotalCPUCount()==null) {
+ 			resourceConstraints.setTotalCPUCount(new Double(1.0));
+ 			setTotalCPUCount(new Double(1.0));
+ 		}
+ 		if (resourceConstraints.getTotalPhysicalMemory()==null) {
+ 			resourceConstraints.setTotalPhysicalMemory(new Double(2.0*1024.0*1024.0*1024.0*resourceConstraints.getTotalCPUCount())); // Set to 2GB per CPU .. note these are VCPUs
+ 			setTotalPhysicalMemory(new Double(2.0*1024.0*1024.0*1024.0*resourceConstraints.getTotalCPUCount()));
+ 		}
 
 
 		// Check wallclock time and memory constraint

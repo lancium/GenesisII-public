@@ -18,6 +18,7 @@ int main(int argc, char **argv)
 
 	if ((argc==2) && strcmp(argv[1],"--version")==0) {
 		printf("%s\n",version);
+		return 0;
 	}
 	if (argc < 2)
 		usage(argv[0]);

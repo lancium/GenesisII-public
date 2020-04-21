@@ -49,8 +49,9 @@ public class GPUArchitecture extends CommonJSDLElement implements Serializable
 		_gpuArchitecture = gpuArchitecture;
 	}
 
-	final public GPUProcessorArchitecture gpuArchitecture()
+	final public GPUProcessorArchitecture getGPUArchitecture()
 	{
 		return _gpuArchitecture;
 	}
+
 }

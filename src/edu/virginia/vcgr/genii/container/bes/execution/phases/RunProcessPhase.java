@@ -1,6 +1,9 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.URI;
@@ -47,6 +50,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 	static private Log _logger = LogFactory.getLog(RunProcessPhase.class);
 
 	private URI _spmdVariation;
+	private Double _memory;
 	private Integer _numProcesses;
 	private Integer _numProcessesPerHost;
 	private Integer _threadsPerProcess;
@@ -67,16 +71,30 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		process.cancel();
 	}
 
-	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
+	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
 		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
 
 		_spmdVariation = spmdVariation;
+		_memory=memory;
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
 		_threadsPerProcess = threadsPerProcess;
+		// 2020-04-21 by ASG. Need to set these to a default of 1
+		if (numProcesses==null) {
+			_numProcesses=new Integer(1);
+		}
+		if (numProcessesPerHost==null) {
+			_numProcessesPerHost=new Integer(1);
+		}
+		if (threadsPerProcess==null) {
+			_threadsPerProcess=new Integer(1);
+		}
+		if (memory==null) {
+			_memory=new Double(2.0*1024.0*1024.0*1024.0*(new Double(_threadsPerProcess)));
+		}
 		_fuseMountPoint = fuseMountPoint;
 		_commonDirectory = commonDirectory;
 
@@ -162,7 +180,17 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			for (String s : _arguments)
 				args.add(s);
 
-			File resourceUsageFile = new ResourceUsageDirectory(workingDirectory).getNewResourceUsageFile();
+			// old code
+			// File resourceUsageFile = new ResourceUsageDirectory(workingDirectory).getNewResourceUsageFile();
+			// 2020-04-18 by ASG during coronovirus to put the accounting stuff in place
+			// This next call establishes both the job working directory, JWD, and the Accounting directory for the file.
+			//resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory()).getNewResourceUsageFile();
+			ResourceUsageDirectory tmp=new ResourceUsageDirectory(workingDirectory);
+			File resourceUsageFile =tmp.getNewResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
+			generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
+					_numProcessesPerHost, _threadsPerProcess );
+
+			// End of updates 2020-04-18
 
 			HashMap<String, Object> jobProperties = new HashMap<String, Object>();
 			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, _executable.getAbsolutePath(), args);

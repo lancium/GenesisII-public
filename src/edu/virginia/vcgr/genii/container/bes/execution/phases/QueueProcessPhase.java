@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -68,6 +70,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 	private File _fuseMountPoint;
 	private URI _spmdVariation;
+	private Double _memory;
 	private Integer _numProcesses;
 	private Integer _numProcessesPerHost;
 	private Integer _threadsPerProcess;
@@ -83,7 +86,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 
-	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
+	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout,
 		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
 	{
@@ -91,6 +94,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
+		 _memory=memory;
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
 		_threadsPerProcess = threadsPerProcess;
@@ -134,7 +138,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	public void execute(ExecutionContext context) throws Throwable
 	{
 		String stderrPath = null;
-		File resourceUsageFile = null;
+		File resourceUsageFile;
 		// 2019-04-04 ASG. Added to handle jobs disappearing from the queu. We're going to make them as complete for now.
 		boolean jobDisapparedFromQueue=false;
 
@@ -178,28 +182,45 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 				_logger.info(String.format("Asking batch system (%s) to submit the job.", queue));
 				history.trace("Batch System (%s) Starting Activity", queue);
-				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory()).getNewResourceUsageFile();
+				// old code
+				// File resourceUsageFile = new ResourceUsageDirectory(workingDirectory).getNewResourceUsageFile();
+				// 2020-04-18 by ASG during coronovirus to put the accounting stuff in place
+				// This next call establishes both the job working directory, JWD, and the Accounting directory for the file.
+				//resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory()).getNewResourceUsageFile();
+				ResourceUsageDirectory tmp=new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory());
+				resourceUsageFile =tmp.getNewResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
+				generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
+						_numProcessesPerHost, _threadsPerProcess );
+
+				// End of updates 2020-04-18
+
+
 				preDelay();
 				stderrPath = fileToPath(_stderr, null);
 				PrintWriter hWriter =
-					history.createInfoWriter("Queue BES Submitting Activity").format("BES submitting job to batch system:  ");
+						history.createInfoWriter("Queue BES Submitting Activity").format("BES submitting job to batch system:  ");
 				hWriter.print(_executable.getAbsolutePath());
 				for (String arg : _arguments)
 					hWriter.format(" %s", arg);
 				hWriter.close();
 
 				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
-					_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null),
-					fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
+						_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null),
+						fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
 
 				_logger.info(String.format("Queue submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,
-					_jobToken.getCmdLine()));
+						_jobToken.getCmdLine()));
 				history.createTraceWriter("Job Queued into Batch System")
-					.format("BES submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()).close();
+				.format("BES submitted job %s using command line:\n\t%s", _jobToken, _jobToken.getCmdLine()).close();
 
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
-			
+			else
+			{
+				ResourceUsageDirectory tmp=new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory());
+				resourceUsageFile =tmp.getResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
+			}
+
 			String lastState = null;
 			while (true) {
 				boolean stateIsUsable = false;
@@ -249,9 +270,9 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					break;
 				} catch (QueueResultsException | NativeQueueException  exe) {
 					if (secondsWaited==delay){  
-					// ASG 2019-01-13 Ok, if we get here we have been unable to get queue.script.result. That most likely means it disappeared and did not exit.
-					// This can happen if the job is terminated by the scheduling system, or the node died. So we want to throw an exception, though not
-					// necessarily a fatal one.
+						// ASG 2019-01-13 Ok, if we get here we have been unable to get queue.script.result. That most likely means it disappeared and did not exit.
+						// This can happen if the job is terminated by the scheduling system, or the node died. So we want to throw an exception, though not
+						// necessarily a fatal one.
 						// 2019-04-04 ASG. So this turns out to be a mistake. It turns jobs that were terminated due to node failure and time limit terminations into job
 						// failures. Particularly the time limit excepts are a problem, since the job will be marked as failed and they will be restarted ....
 						// What we want is to be able to talk to the queue manager accounting system .. that is not possible right now on most resources. When it is 
@@ -285,7 +306,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			//exitCode = queue.getExitCode(_jobToken);
 			// End of 2016-09-07 ASG updates
 			// **********************************************************
-			
+
 			history.info("Job Exited with Exit Code %d", exitCode);
 			if (!jobDisapparedFromQueue && resourceUsageFile != null) {
 				try {
@@ -304,9 +325,9 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						if (_numProcesses ==null) _numProcesses = new Integer(1);
 						eResults.wallclockTime().setValue(eResults.wallclockTime().value() * _numProcesses);
 						acctService.addAccountingRecord(context.getCallingContext(), context.getBESEPI(), arch, osName, null,
-							_jobToken.getCmdLine(), exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(),
-							eResults.maximumRSS(),_numProcesses);
-					//	history.info("Job wallclocktime is: " + eResults.wallclockTime().toString() + " and the job executed with %d procesoors", _numProcesses);
+								_jobToken.getCmdLine(), exitCode, eResults.userTime(), eResults.kernelTime(), eResults.wallclockTime(),
+								eResults.maximumRSS(),_numProcesses);
+						//	history.info("Job wallclocktime is: " + eResults.wallclockTime().toString() + " and the job executed with %d procesoors", _numProcesses);
 					}
 
 				} catch (ProcessWrapperException pwe) {
@@ -317,7 +338,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 			ExitCondition exitCondition = interpretExitCode(exitCode);
 			_logger.info(String.format("Process exited with %s.",
-				(exitCondition instanceof SignaledExit) ? ("Signal " + exitCondition) : ("Exit code " + exitCondition)));
+					(exitCondition instanceof SignaledExit) ? ("Signal " + exitCondition) : ("Exit code " + exitCondition)));
 			if (exitCode == 257)
 				throw new IgnoreableFault("Queue process exited with signal.");
 		}
