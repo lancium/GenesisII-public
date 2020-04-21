@@ -56,23 +56,23 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 
 	final protected void generateProperties(ResourceUsageDirectory dir,String userName, String executable, Double memory, int numProcesses, int numProcessesPerHost,
 			int threadsPerProcess) {
-		File propFile=new File(dir.getAcctDir(),"properties");
+		File propFile=new File(dir.getAcctDir(),"properties.json");
 		try {
 			if (propFile.createNewFile()) {
 				// We now have the properties file, lets put the user name in
 				BufferedWriter output = null;
 				try {           
 					output = new BufferedWriter(new FileWriter(propFile));
-					output.write(userName);
-					output.write("\n");
-					output.write("Creating job locally as a process\n");
-					output.write(executable); 
-					output.write("\n");
+					output.write("{\n");
+					output.write("\"userName\": \"" + userName + "\",\n");
+					output.write("\"executable\": \"" + executable + "\",\n" ); 
 					if (memory==null) memory=new Double(2.0*1024.0*1024.0*1024.0);
-					output.write(String.format("%1$,.0f", memory)); 
-					output.write("\n");
-					output.write(String.format("\nNumProcessors: %d, NumProcessorsPerHost: %d, threadsPerProcess: %d\n" , numProcesses,
-							numProcessesPerHost, threadsPerProcess));
+					output.write("\"memory\": \"" + String.format("%1$,.0f", memory) + "\",\n" ); 
+
+					output.write("\"numProcesses\": \"" + numProcesses + "\",\n");
+					output.write("\"NumProcessorsPerHost\": \"" + numProcessesPerHost + "\",\n");
+					output.write("\"threadsPerProcess\": \"" + threadsPerProcess + "\"\n");
+					output.write("}\n");
 				} catch ( IOException e ) {
 					e.printStackTrace();
 				} finally {
