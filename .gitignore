@@ -9,5 +9,11 @@ unit-test-reports/
 context.xml
 libraries/gffs-webservices/trunk/wsdd
 deployments/current_grid
+HTTP-DIR/
+current.deployment
+deployments/default/services/
+libraries/ProcessWrapper/trunk/src/test
+libraries/ProcessWrapper/trunk/src/test.c
+
 
 

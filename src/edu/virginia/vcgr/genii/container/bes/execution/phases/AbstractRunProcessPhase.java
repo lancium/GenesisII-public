@@ -1,7 +1,9 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
+import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -51,6 +54,42 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		}
 	}
 
+	final protected void generateProperties(ResourceUsageDirectory dir,String userName, String executable, Double memory, int numProcesses, int numProcessesPerHost,
+			int threadsPerProcess) {
+		File propFile=new File(dir.getAcctDir(),"properties.json");
+		try {
+			if (propFile.createNewFile()) {
+				// We now have the properties file, lets put the user name in
+				BufferedWriter output = null;
+				try {           
+					output = new BufferedWriter(new FileWriter(propFile));
+					output.write("{\n");
+					output.write("\"userName\": \"" + userName + "\",\n");
+					output.write("\"executable\": \"" + executable + "\",\n" ); 
+					if (memory==null) memory=new Double(2.0*1024.0*1024.0*1024.0);
+					output.write("\"memory\": \"" + String.format("%1$,.0f", memory) + "\",\n" ); 
+
+					output.write("\"numProcesses\": \"" + numProcesses + "\",\n");
+					output.write("\"NumProcessorsPerHost\": \"" + numProcessesPerHost + "\",\n");
+					output.write("\"threadsPerProcess\": \"" + threadsPerProcess + "\"\n");
+					output.write("}\n");
+				} catch ( IOException e ) {
+					e.printStackTrace();
+				} finally {
+					if ( output != null ) {
+						output.close();
+					}
+				}
+			}
+
+			else {
+
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	final protected void setExportedEnvironment(Map<String, String> environmentMap)
 	{
 		try {

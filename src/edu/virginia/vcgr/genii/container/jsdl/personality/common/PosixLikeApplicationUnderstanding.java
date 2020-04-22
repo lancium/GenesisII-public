@@ -18,6 +18,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.PassiveStreamRedir
 public abstract class PosixLikeApplicationUnderstanding extends CommonApplicationUnderstanding
 {
 	private Integer _numProcesses = null;
+	private Double _memory = null;
 	private Integer _numProcessesPerHost = null;
 	private Integer _threadsPerProcess = null;
 	private URI _spmdVariation = null;
@@ -44,6 +45,15 @@ public abstract class PosixLikeApplicationUnderstanding extends CommonApplicatio
 		return _spmdVariation;
 	}
 
+	public void setMemory(Double memory)
+	{
+		_memory = new Double(memory);
+	}
+
+	public Double getMemory()
+	{
+		return _memory;
+	}
 	public void setNumProcesses(int numProcesses)
 	{
 		_numProcesses = new Integer(numProcesses);

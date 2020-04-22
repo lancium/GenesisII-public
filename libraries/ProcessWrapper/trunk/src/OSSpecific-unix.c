@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <libgen.h>
 #include <fcntl.h>
 #include <time.h>
 #include <sys/time.h>
@@ -426,7 +427,9 @@ long long toMicroseconds(struct timeval tv)
 void writeExitResults(const char *path, ExitResults *results)
 {
 	FILE *out;
-
+	// 2020-04-16 - deep in Coronovirus shutdown - ASG
+	// Also send a copy to the new accounting DB
+	
 	out = fopen(path, "wt");
 	if (!out)
 	{
@@ -436,6 +439,56 @@ void writeExitResults(const char *path, ExitResults *results)
 
 	results->toXML(results, out);
 	fclose(out);
+	// Begin new code
+	// path has the following form /path-stuff/JWD/rusage.xml
+	//	/A/JWD/C
+	//===== New code 2020-04-16
+	// The path is of the form /<path prefix>/<job-dir-name>/rusage.xml
+	// or - /A/B/C    we turn it into
+	//	/A/Accounting/B/C
+//===================
+    	char* token; 
+    	char copy[2048];
+	sprintf(copy,"%s",path);
+printf("The parameter is %s\n", copy);
+ 
+
+	char *rest=copy;
+  	int count=0;
+	char *tokens[512];
+    	while ((token = strtok_r(rest, "/", &rest))) { 
+        	printf("%s\n", token);
+		tokens[count]=token;
+		count++;
+	}
+
+	char *A,*B,*C;
+	char buf[2048];buf[0]='/';buf[1]=0;
+	C=tokens[count-1];
+	B=tokens[count-2];
+	for (int i=0;i<count-2;i++) {strcat(buf,tokens[i]);strcat(buf,"/");}	
+	strcat(buf,"Accounting/");
+	strcat(buf,B);strcat(buf,"/");
+
+	strcat(buf,C);
+	printf("%s\n",buf);
+// =====================
+
+/*	FILE *f=fopen("/home/dev/debug.txt","a+");
+	fprintf(f,"The directory is: %s\n",buf);
+	fclose(f);
+*/
+	out = fopen(buf, "w+");
+	if (!out)
+	{
+		fprintf(stderr, "Unable to open resource usage file \"%s\".\n",
+			buf);
+	}
+
+	results->toXML(results, out);
+	fclose(out);
+	//====  end of new code
+
 }
 
 int checkMountPoint(const char *mountPoint)
