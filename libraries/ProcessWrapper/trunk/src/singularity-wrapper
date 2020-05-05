@@ -1,0 +1,46 @@
+#!/bin/bash
+# Author: Charlie Houghton, James Houghton
+# Date: 05 May 2020
+
+# General purpose wrapper so that compute nodes can
+# access conda virtual environments within a singularity 
+# container when running jobs.
+
+# IFS is set to a character that no one will enter.
+# This is done to prevent word-splitting
+IFS=
+
+if [ -z "$SUBREPO" ]
+then
+	echo "No subrepo specified"
+	exit 1
+fi
+# Set BASEDIR if it is unbound or ""
+# The :- is important: if BASEDIR is empty, it will be set.
+# Without the -, it will only be set if it is unbound.
+BASEDIR=${BASEDIR:-/nfs/home/luser/.genesisII-2.0/shared/Images}
+CONTAINERSDIR="Containers"
+
+# Runs arbitrary code within singularity container
+function singularity-run() {
+        image=$1
+        shift
+	if [ -z $image ]
+	then
+		echo "No image specified. Exiting..."
+		exit 1
+	fi
+
+	# --nv enables the nvidia runtime libraries within the container
+	# -c contains the singularity container
+	# --ipc new IPC name space
+	# --pid new PID name space
+	# -B specifies a bind point within container
+	# -W specifies current working directory within container (working dir on start).
+	# -H specifies home directory within container .
+        singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp \
+                $BASEDIR/$SUBREPO/$CONTAINERSDIR/$image.simg \
+                $@
+}
+
+singularity-run $@
