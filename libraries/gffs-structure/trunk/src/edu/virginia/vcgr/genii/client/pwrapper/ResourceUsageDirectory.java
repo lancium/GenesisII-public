@@ -43,6 +43,10 @@ public class ResourceUsageDirectory
 	public File getAcctDir() {
 		return _accountingDir;
 	}
+	
+	public File getJWD() {
+		return _directory;
+	}
 
 	synchronized public File getNewResourceUsageFile() throws ProcessWrapperException
 	{

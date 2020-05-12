@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +56,8 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		}
 	}
 
-	final protected void generateProperties(ResourceUsageDirectory dir,String userName, String executable, Double memory, int numProcesses, int numProcessesPerHost,
-			int threadsPerProcess) {
+	final protected void generateProperties(ResourceUsageDirectory dir,String userName, String executable, Double memory, int numProcesses, 
+			int numProcessesPerHost, int threadsPerProcess, String jobName) {
 		File propFile=new File(dir.getAcctDir(),"properties.json");
 		try {
 			if (propFile.createNewFile()) {
@@ -65,6 +67,9 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 					output = new BufferedWriter(new FileWriter(propFile));
 					output.write("{\n");
 					output.write("\"userName\": \"" + userName + "\",\n");
+					output.write("\"jobName\": \"" + jobName + "\",\n");
+					Date today = Calendar.getInstance().getTime();
+					output.write("\"date\": \"" + today.toString() + "\",\n");
 					output.write("\"executable\": \"" + executable + "\",\n" ); 
 					if (memory==null) memory=new Double(2.0*1024.0*1024.0*1024.0);
 					output.write("\"memory\": \"" + String.format("%1$,.0f", memory) + "\",\n" ); 
