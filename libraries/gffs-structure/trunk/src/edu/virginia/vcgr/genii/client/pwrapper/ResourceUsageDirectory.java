@@ -10,39 +10,72 @@ public class ResourceUsageDirectory
 {
 	private File _directory;
 	private File _accountingDir;
+	private File _rusage;
+	
+	synchronized File checkAccountingDir(File directory) throws ProcessWrapperException, IOException
+	{
+		// We create the sharedDir/Accounting dir if it is not there.
+		String parentPath=directory.getParent();
+		File actDir = new File(parentPath+"/Accounting");
+		if (!actDir.exists()) {
+			actDir.mkdirs();
+			// set permissions next
+			if (OperatingSystemType.isWindows())
+				actDir.setWritable(true, false);
+			else
+				FileSystemUtils.chmod(actDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+		}
+		if (!actDir.exists())
+			throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", actDir));
+		return actDir;
+	}
 
 	public ResourceUsageDirectory(File directory) throws ProcessWrapperException
 	{
 		// 2020-04-16 - ASG during the coronovirus
 		// Now we temporarily need to accounting files while we switch accounting mechanisms.
-		String parentPath=directory.getParent();
-		File actDir = new File(parentPath+"/Accounting");
-		if (!actDir.exists()) {
-			actDir.mkdirs();
+		try {
+			File actDir=checkAccountingDir(directory);  // Creates ..../shared/Accounting if it is not there
+			File jobActDir = new File(actDir.getAbsolutePath()+ "/" + directory.getName());
+			jobActDir.mkdir();
+			if (!jobActDir.exists())
+				throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", jobActDir));		
+			// set permissions next
+			// jobActDir is now .../Accounting/<jobID>
+			if (OperatingSystemType.isWindows())
+				jobActDir.setWritable(true, false);
+			else
+				FileSystemUtils.chmod(jobActDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE|FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE);
+			// End of updates to create accounting directory.
+			_accountingDir=jobActDir;
+			if (!directory.exists())
+				directory.mkdirs();
+
+			if (!directory.exists())
+				throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", directory));
+
+			if (!directory.isDirectory())
+				throw new ProcessWrapperException(String.format("Path %s does not refer to a directory.", directory));
+			// directory is now .../shared/<jobID>
+			if (OperatingSystemType.isWindows())
+				directory.setWritable(true, false);
+			else
+				FileSystemUtils.chmod(directory.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE|FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE |
+						FileSystemUtils.MODE_WORLD_EXECUTE | FileSystemUtils.MODE_WORLD_READ );
+
+		} catch (IOException e){
+			throw new ProcessWrapperException(String.format("Unable to create rusage file in directory %s.", _directory), e);
 		}
-		if (!actDir.exists())
-			throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", actDir));
-		File jobActDir = new File(actDir.getAbsolutePath()+ "/" + directory.getName());
-		jobActDir.mkdir();
-		if (!jobActDir.exists())
-			throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", jobActDir));
-		// End of updates to create both directories.
-		_accountingDir=jobActDir;
-		if (!directory.exists())
-			directory.mkdirs();
-
-		if (!directory.exists())
-			throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", directory));
-
-		if (!directory.isDirectory())
-			throw new ProcessWrapperException(String.format("Path %s does not refer to a directory.", directory));
-
 		_directory = directory;
 	}
 	
 	public File getAcctDir() {
 		return _accountingDir;
 	}
+	
 
 	synchronized public File getNewResourceUsageFile() throws ProcessWrapperException
 	{
@@ -52,13 +85,13 @@ public class ResourceUsageDirectory
 			// File tempFile = File.createTempFile("rusage-", ".xml", _directory);
 			File tempFile = new File(_directory,"rusage.xml");
 			tempFile.createNewFile();
-
 			if (OperatingSystemType.isWindows())
 				tempFile.setWritable(true, false);
 			else
 				FileSystemUtils.chmod(tempFile.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
 					| FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE);
-
+			
+			_rusage= tempFile;
 			return tempFile;
 		} catch (IOException ioe) {
 			throw new ProcessWrapperException(String.format("Unable to create rusage file in directory %s.", _directory), ioe);
@@ -66,11 +99,6 @@ public class ResourceUsageDirectory
 	}
 	synchronized public File getResourceUsageFile() throws ProcessWrapperException
 	{
-
-		// 2019-06-05 ASG. Changing the nameing scheme for resource usage files to be constant, without 
-		// any random bits. That way we can always stage it out.
-		// File tempFile = File.createTempFile("rusage-", ".xml", _directory);
-		File tempFile = new File(_directory,"rusage.xml");
-		return tempFile;
+		return _rusage;
 	}
 }
