@@ -89,6 +89,11 @@ public class ApplicationDescription
 		return _arguments;
 	}
 
+	public void setArguments(Collection<String> arguments)
+	{
+		_arguments = arguments;
+	}
+
 	public Map<String, String> getEnvironment()
 	{
 		return _environment;

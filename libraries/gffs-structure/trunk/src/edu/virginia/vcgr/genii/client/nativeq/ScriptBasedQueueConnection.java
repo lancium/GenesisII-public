@@ -194,6 +194,18 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
 		String execName = application.getExecutableName();
+		if (execName.endsWith(".simg") || execName.endsWith(".qcow")) {
+		    String imagePath = execName;
+		    if (imagePath.endsWith(".simg")) {
+		        execName = "/nfs/software/wrappers/test_wrappers/startContainer-singularity-wrapper";
+		    }
+		    else {
+		        execName = "../vmwrapper";
+		    }
+		    Vector arguments = new Vector(application.getArguments());
+		    arguments.add(0, imagePath);
+		    application.setArguments(arguments);
+		}
 		if (!execName.contains("/"))
 			execName = String.format("./%s", execName);
 
