@@ -203,10 +203,10 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		    String imagePath = execName;
 		    // This should use getContainerProperty job BES directory
 		    if (imagePath.endsWith(".simg")) {
-		        execName = "../singularity-wrapper";
+		        execName = "../singularity-wrapper.sh";
 		    }
 		    else {
-		        execName = "../vmwrapper";
+		        execName = "../vmwrapper.sh";
 		    }
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable: " + execName);
