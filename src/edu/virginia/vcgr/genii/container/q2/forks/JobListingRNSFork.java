@@ -101,7 +101,7 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 						new JobFork(getService(), formForkPath(job.getJobTicket())).describe()));
 				} else {
 					ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(),
-						new JobInformationFork(getService(), formForkPath(job.getJobTicket())).describe()));
+						new JobAccountingFork(getService(), formForkPath(job.getJobTicket())).describe()));
 				}
 			}
 
