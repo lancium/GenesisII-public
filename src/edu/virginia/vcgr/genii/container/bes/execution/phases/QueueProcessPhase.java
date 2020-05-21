@@ -82,13 +82,15 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	private Map<String, String> _environment;
 
 	private ResourceConstraints _resourceConstraints;
+	private String _jobName=null;
 
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 
+	
 	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout,
-		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
+		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints, String jobName)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
 
@@ -105,6 +107,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		_stdout = stdout;
 		_stderr = stderr;
 		_resourceConstraints = resourceConstraints;
+		_jobName=jobName;
 	}
 
 	@Override
@@ -188,9 +191,24 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				// This next call establishes both the job working directory, JWD, and the Accounting directory for the file.
 				//resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory()).getNewResourceUsageFile();
 				ResourceUsageDirectory tmp=new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory());
-				resourceUsageFile =tmp.getNewResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
+                // 2020-05-01 ASG Add a HOSTNAME file
+                File jwd=tmp.getJWD();
+                File hostName=new File(jwd,"JOBNAME");
+                if (hostName.createNewFile()) // Create the HOSTNAME file
+                {                             
+                	try {
+                		FileWriter myWriter = new FileWriter(hostName);
+                		myWriter.write(_jobName+"\n");
+                		myWriter.close();
+                	} catch (IOException e) {
+                		System.out.println("An error occurred writting the HOSTNAME file.");
+                		e.printStackTrace();
+                	}
+                }
+                // End jobName updates
+                resourceUsageFile =tmp.getNewResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
 				generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
-						_numProcessesPerHost, _threadsPerProcess );
+						_numProcessesPerHost, _threadsPerProcess, _jobName );
 
 				// End of updates 2020-04-18
 

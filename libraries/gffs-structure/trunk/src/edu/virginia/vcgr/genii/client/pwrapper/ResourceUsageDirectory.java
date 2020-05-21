@@ -48,8 +48,8 @@ public class ResourceUsageDirectory
 			else
 				FileSystemUtils.chmod(jobActDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
 						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE|FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE);
-			// End of updates to create accounting directory.
 			_accountingDir=jobActDir;
+			// End of updates to create accounting directory.
 			if (!directory.exists())
 				directory.mkdirs();
 
@@ -76,6 +76,9 @@ public class ResourceUsageDirectory
 		return _accountingDir;
 	}
 	
+	public File getJWD() {
+		return _directory;
+	}
 
 	synchronized public File getNewResourceUsageFile() throws ProcessWrapperException
 	{

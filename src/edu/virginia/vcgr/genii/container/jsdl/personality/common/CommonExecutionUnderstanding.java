@@ -331,8 +331,8 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		JSDLFileSystem gridFs = _fsManager.getGridFilesystem();
 		if (gridFs != null)
 			fuseMountPoint = gridFs.getMountPoint();
-
-		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints);
+		String jobName = getJobName();
+		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName);
 
 		if (_application != null)
 			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext);
