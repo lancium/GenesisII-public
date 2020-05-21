@@ -200,19 +200,19 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		if (execName.endsWith(".simg") || execName.endsWith(".qcow2")) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable (.simg or .qcow2)...");
-		    String imagePath = execName;
-		    // This should use getContainerProperty job BES directory
-		    if (imagePath.endsWith(".simg")) {
-		        execName = "../singularity-wrapper";
-		    }
-		    else {
-		        execName = "../vmwrapper";
-		    }
+			String imagePath = execName;
+			// This should use getContainerProperty job BES directory
+			if (imagePath.endsWith(".simg")) {
+				execName = "../singularity-wrapper";
+			}
+			else {
+				execName = "../vmwrapper";
+			}
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable: " + execName);
-		    Vector arguments = new Vector(application.getArguments());
-		    arguments.add(0, imagePath);
-		    application.setArguments(arguments);
+			Vector arguments = new Vector(application.getArguments());
+			arguments.add(0, imagePath);
+			application.setArguments(arguments);
 		}
 		else {
 			// CCH 2020 May 18. Revisit later, does it make sense?
