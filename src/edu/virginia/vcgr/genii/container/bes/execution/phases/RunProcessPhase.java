@@ -106,29 +106,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		if (redirects == null)
 			redirects = new PassiveStreamRedirectionDescription(null, null, null);
 
-		if (executable.endsWith(".simg") || executable.endsWith(".sif") || executable.endsWith(".qcow2")) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("Handling image executable (.simg/.sif or .qcow2)...");
-			if (executable.endsWith(".qcow2")) {
-				_executable = new File("../vmwrapper.sh");
-			}
-			else {
-				_executable = new File("../singularity-wrapper.sh");
-			}
-			if (_logger.isDebugEnabled())
-				_logger.debug("Using image executable: " + _executable.getAbsolutepath());
-
-			// If using wrapper executable, prepend original executable to arguments list
-			_arguments = new String[arguments.length()+1];
-			_arguments[0] = executable.getAbsolutePath();
-			for (int i = 0; i < arguments.length(); i++) {
-				_arguments[1 + i] = arguments[i];
-			}
-		}
-		else {
-			_executable = executable;
-			_arguments = arguments;
-		}
+		_executable = executable;
+		_arguments = arguments;
 		_environment = environment;
 
 		_redirects = redirects;
