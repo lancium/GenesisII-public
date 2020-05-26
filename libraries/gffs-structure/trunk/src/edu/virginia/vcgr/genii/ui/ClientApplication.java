@@ -80,13 +80,13 @@ public class ClientApplication extends UIFrame
 	public ClientApplication(UIContext context, boolean launchShell, String startPath)
 		throws FileNotFoundException, IOException, RNSPathDoesNotExistException
 	{
-		super(context, "XSEDE GFFS Browser");
+		super(context, "Lancium Compute Infrastructure Browser");
 
 		// hmmm: this should also go to a help about dialog.
 		// XSEDE GFFS GUI - Provided as part of Genesis II from the University of Virginia");
 
 		// write a brag in the log file.
-		_logger.info("XSEDE GFFS Client GUI Is Provided as part of Genesis II from the University of Virginia.");
+		_logger.info("Lancium GFFS Client GUI Is Provided as part of Genesis II from the University of Virginia.");
 
 		if (!getUIContext().applicationContext().isInitialized()) {
 			getUIContext().applicationContext().setApplicationEventListener(new ApplicationEventListenerImpl());

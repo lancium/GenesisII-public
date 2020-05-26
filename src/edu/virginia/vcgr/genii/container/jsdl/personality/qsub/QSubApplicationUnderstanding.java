@@ -60,10 +60,10 @@ class QSubApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		for (StringOrPath sop : getArguments()) {
 			stringArgs.add(sop.toString(fsManager));
 		}
-
 		executionPlan.add(new QueueProcessPhase(fuseMountPoint, getSPMDVariation(), jobContext.getResourceConstraints().getTotalPhysicalMemory(), getNumProcesses(), getNumProcessesPerHost(),
 			getThreadsPerProcess(), fsManager.lookup(getExecutable()), stringArgs, stringEnv, fsManager.lookup(getStdinRedirect()),
 			fsManager.lookup(getStdoutRedirect()), fsManager.lookup(getStderrRedirect()), creationProperties,
-			jobContext.getResourceConstraints()));
+			jobContext.getResourceConstraints(), jobContext.getJobName()));
+			
 	}
 }

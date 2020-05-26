@@ -285,7 +285,7 @@ if ($@) {
     if ($MAILTO) {
         $msg = new Mail::Send;
         $msg->to($MAILTO);
-        $msg->subject("Error From XSEDE GFFS Namespace Management");
+        $msg->subject("Error From Lancium GFFS Namespace Management");
         $fh = $msg->open;
         print $fh $err;
         $fh->close;

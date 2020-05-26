@@ -61,6 +61,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 	private Map<String, String> _environment;
 	transient private ProcessWrapperToken _process = null;
 	private String _processLock = new String();
+	private String _jobName=null;
 	transient private Boolean _hardTerminate = null;
 	transient private boolean _countAsFailedAttempt = true;
 
@@ -73,7 +74,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
-		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters)
+		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters, String jobName)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
 
@@ -82,6 +83,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
 		_threadsPerProcess = threadsPerProcess;
+		_jobName=jobName;
 		// 2020-04-21 by ASG. Need to set these to a default of 1
 		if (numProcesses==null) {
 			_numProcesses=new Integer(1);
@@ -214,8 +216,23 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			//resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory()).getNewResourceUsageFile();
 			ResourceUsageDirectory tmp=new ResourceUsageDirectory(workingDirectory);
 			File resourceUsageFile =tmp.getNewResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
+            // 2020-05-01 ASG Add a HOSTNAME file
+            File jwd=tmp.getJWD();
+            File hostName=new File(jwd,"JOBNAME");
+            if (hostName.createNewFile()) // Create the HOSTNAME file
+            {                             
+            	try {
+            		FileWriter myWriter = new FileWriter(hostName);
+            		myWriter.write(_jobName+"\n");
+            		myWriter.close();
+            	} catch (IOException e) {
+            		System.out.println("An error occurred writting the HOSTNAME file.");
+            		e.printStackTrace();
+            	}
+            }
+            // End jobName updates
 			generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
-					_numProcessesPerHost, _threadsPerProcess );
+					_numProcessesPerHost, _threadsPerProcess, _jobName );
 
 			// End of updates 2020-04-18
 
