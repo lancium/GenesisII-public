@@ -144,6 +144,12 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 		synchronized (_processLock) {
 			command = new Vector<String>();
+
+			// 2020 May 26 CCH, if executable is an image, we set the new executable to be the appropriate wrapper and push the image path into the arguments
+			// To generate the image path, we use the preferred identity to fill in the path: ../Images/<identity>/<image>
+			// Images can be in the form Lancium/<image> or just <image>. 
+			// Currently, if it contains a slash we're only expected "Lancium", 
+			// but in future we might have organizations so image paths could be <Organization>/<image>
 			String execName = _executable.getAbsolutePath();
 			if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
 				// 2020 May 26 CCH, execName might be in the form Lancium/image.simg which is why we're splitting execName up here
@@ -152,10 +158,11 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				execName = execNameArray[execNameArray.length-1];
 				String imageDir = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + userName + "/";
 				if (_logger.isDebugEnabled())
-					_logger.debug("Handling image executable (.simg or .qcow2)...");
+					_logger.debug("Handling image executable (.sif/.simg or .qcow2)...");
 					_logger.debug("Executable: " + execName + ", Username: " + userName + ", Image directory: " + imageDir);
 				String imagePath = imageDir + execName;
 				// This should use getContainerProperty job BES directory
+				// Assigning the appropriate wrapper as the executable
 				if (imagePath.endsWith(".qcow2")) {
 					execName = "../vmwrapper.sh";
 				}
