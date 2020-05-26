@@ -108,12 +108,12 @@ echo Building installers...
 build_installer 3416 "genesis2-gffs-linux-amd64-${simple_name}"
 build_installer 11295 "genesis2-gffs-linux-x86-32-${simple_name}"
 
-build_installer 2088 "genesis2-gffs-macosx-amd64-${simple_name}"
+#build_installer 2088 "genesis2-gffs-macosx-amd64-${simple_name}"
 
-build_installer 5991 "genesis2-gffs-amd64-${simple_name}-deb"
+#build_installer 5991 "genesis2-gffs-amd64-${simple_name}-deb"
 
 build_installer 8974 "genesis2-gffs-windows-amd64-${simple_name}"
-build_installer 11297 "genesis2-gffs-windows-x86-32-${simple_name}"
+#build_installer 11297 "genesis2-gffs-windows-x86-32-${simple_name}"
 
 #build_installer 8972 "genesis2-gffs-linux-powerpc-${simple_name}"
 

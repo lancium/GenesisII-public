@@ -193,9 +193,33 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
+		// CCH 2020 May 18
+		// Make executable the appropirate wrapper if executable is an image
+		// Prepend image path to arguments list if executable is an image
 		String execName = application.getExecutableName();
-		if (!execName.contains("/"))
-			execName = String.format("./%s", execName);
+		if (execName.endsWith(".simg") || execName.endsWith(".qcow2")) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Handling image executable (.simg or .qcow2)...");
+		    String imagePath = execName;
+		    // This should use getContainerProperty job BES directory
+		    if (imagePath.endsWith(".simg")) {
+		        execName = "../singularity-wrapper.sh";
+		    }
+		    else {
+		        execName = "../vmwrapper.sh";
+		    }
+			if (_logger.isDebugEnabled())
+				_logger.debug("Handling image executable: " + execName);
+		    Vector arguments = new Vector(application.getArguments());
+		    arguments.add(0, imagePath);
+		    application.setArguments(arguments);
+		}
+		else {
+			// CCH 2020 May 18. Revisit later, does it make sense?
+			if (!execName.contains("/")) {
+				execName = String.format("./%s", execName);
+			}
+		}
 
 		try {
 			ResourceOverrides overrides = resourceOverrides();
