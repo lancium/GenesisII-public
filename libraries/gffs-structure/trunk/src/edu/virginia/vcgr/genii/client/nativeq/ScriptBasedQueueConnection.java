@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
@@ -197,16 +198,21 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		// Make executable the appropirate wrapper if executable is an image
 		// Prepend image path to arguments list if executable is an image
 		String execName = application.getExecutableName();
-		if (execName.endsWith(".simg") || execName.endsWith(".qcow2")) {
+		if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable (.simg or .qcow2)...");
-			String imagePath = execName;
+			String prefID = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
+			String username = (prefID == null ? "Lancium" : prefID.split("CN=")[1].split(",")[0]);
+			String[] execNameArray = execName.split("/");
+			boolean usingLanciumImage = execNameArray[0].equals("Lancium");
+			execName = execNameArray[execNameArray.length-1];
+			String imagePath = usingLanciumImage ? "../Images/Lancium/" + execName : "../Images/" + username + "/" +  execName;
 			// This should use getContainerProperty job BES directory
-			if (imagePath.endsWith(".simg")) {
-				execName = "../singularity-wrapper";
+			if (imagePath.endsWith(".qcow2")) {
+				execName = "../vmwrapper.sh";
 			}
 			else {
-				execName = "../vmwrapper";
+				execName = "../singularity-wrapper.sh";
 			}
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable: " + execName);

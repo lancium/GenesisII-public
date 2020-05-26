@@ -142,7 +142,34 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 		synchronized (_processLock) {
 			command = new Vector<String>();
-			command.add(_executable.getAbsolutePath());
+			String execName = _executable.getAbsolutePath();
+			if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
+				// 2020 May 26 CCH, execName might be in the form Lancium/image.simg which is why we're splitting execName up here
+				String[] execNameArray = execName.split("/");
+				boolean usingLanciumImage = (execNameArray[0].equals("Lancium"));
+				execName = execNameArray[execNameArray.length-1];
+				String imageDir = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + userName + "/";
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling image executable (.simg or .qcow2)...");
+					_logger.debug("Executable: " + execName + ", Username: " + userName + ", Image directory: " + imageDir);
+				String imagePath = imageDir + execName;
+				// This should use getContainerProperty job BES directory
+				if (imagePath.endsWith(".qcow2")) {
+					execName = "../vmwrapper.sh";
+				}
+				else {
+					execName = "../singularity-wrapper.sh";
+				}
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling image executable: " + execName);
+					_logger.debug("Adding executable: " + execName);
+					_logger.debug("Adding path to image: " + imagePath);
+				command.add(execName);
+				command.add(imagePath);
+			}
+			else {
+				command.add(execName);
+			}
 			for (String arg : _arguments)
 				command.add(arg);
 
