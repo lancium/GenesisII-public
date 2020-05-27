@@ -193,7 +193,13 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	{
 		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 		List<String> newCmdLine = new Vector<String>();
-
+		
+		// 2020 May 27 CCH, add trap handling in qsub script
+		// When scancel is called, slurm will send a SIGTERM (sent to this qsub script), then a SIGKILL if the job hasn't ended
+		// Added here is a function that essentially passes on the SIGTERM to pwrapper, otherwise VMs will continue running
+		script.println("\nterm_handler() { nkill -TERM \"$pwrapperpid\" 2>/dev/null }");
+		script.println("\ntrap term_handler SIGTERM");
+		
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
 		// CCH 2020 May 18
@@ -360,9 +366,16 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			throw new NativeQueueException("Unable to generate submission script.", e);
 		}
 
-		if (signals.size() > 0)
-			script.print(" &");
-
+		// 2020 May 27 CCH, part of signal handling in the qsub script
+		// Commenting this out because we want to background the process so we can handle SLURM's SIGTERM
+		// But it looks like part of what we're trying to do has already been done, so we may very well add this line back in
+		//if (signals.size() > 0)
+		script.print(" &");
+		
+		// 2020 May 27 CCH, part of signal handling in the qsub script
+		script.println("\npwrapperpid=$!");
+		script.println("wait \"$pwrapperpid\"");
+		
 		script.println();
 		return newCmdLine;
 	}
