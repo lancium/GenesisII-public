@@ -166,11 +166,6 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			for (UnixSignals signal : signals)
 				script.format("trap signalTrap %s\n", signal);
 		}
-
-		// LAK: 13 March: Added so that the batch script does not exit when it gets a SIG_TERM, instead it lets its children
-		// repond to the signal and then gracefully exit after the children processes 
-		script.format("trap : SIGTERM\n");
-
 		script.format("export QUEUE_SCRIPT_RESULT=0\n");
 	}
 
@@ -197,8 +192,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		// 2020 May 27 CCH, add trap handling in qsub script
 		// When scancel is called, slurm will send a SIGTERM (sent to this qsub script), then a SIGKILL if the job hasn't ended
 		// Added here is a function that essentially passes on the SIGTERM to pwrapper, otherwise VMs will continue running
-		script.println("\nterm_handler() { kill -TERM \"$pwrapperpid\" 2>/dev/null }");
-		script.println("\ntrap term_handler SIGTERM");
+		script.println("\nterm_handler() { \n\tkill -TERM \"$pwrapperpid\" 2>/dev/null \n}");
+		script.println("trap term_handler SIGTERM");
 		
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
@@ -214,7 +209,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			String[] execNameArray = execName.split("/");
 			boolean usingLanciumImage = execNameArray[0].equals("Lancium");
 			execName = execNameArray[execNameArray.length-1];
-			String imagePath = usingLanciumImage ? "../Images/Lancium/" + execName : "../Images/" + username + "/" +  execName;
+			String imagePath = usingLanciumImage ? "../Images/Lancium/" + execName : "../Images/" + username +  execName;
 			// This should use getContainerProperty job BES directory
 			if (imagePath.endsWith(".qcow2")) {
 				execName = "../vmwrapper.sh";
@@ -249,7 +244,6 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			application.setArguments(arguments);
 		}
 		else {
-			// CCH 2020 May 18. Revisit later, does it make sense?
 			if (!execName.contains("/")) {
 				execName = String.format("./%s", execName);
 			}
