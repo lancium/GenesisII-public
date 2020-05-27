@@ -95,15 +95,6 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		List<String> commandLine = new LinkedList<String>();
 		commandLine.addAll(_qdelStart);
 
-		/*LAK: 13 March 2019: 	removed as we now use KillWait to delay the SIG_KILL signal until we have gracefully responded
-								to the SIG_TERM request */
-		// make sure they pay attention to us.
-		//commandLine.add("--signal=KILL");
-		// 2020-05-18; added back the signal, though this time SIGUSR1.
-		// This should cause all processes to get SIGUSR1/ All of our processwrappers know that this means clean up and terminate thyself. 
-		// In the case of the vmwrapper, it also means to virsh destroy <jobID>
-		commandLine.add("--full --signal=SIGTERM");
-		// End 2020-05-18 updates
 		String arg = token.toString();
 		if (_destination != null)
 			arg = arg + "@" + _destination;

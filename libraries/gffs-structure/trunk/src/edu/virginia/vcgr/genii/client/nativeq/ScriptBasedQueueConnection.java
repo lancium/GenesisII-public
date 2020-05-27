@@ -192,7 +192,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		// 2020 May 27 CCH, add trap handling in qsub script
 		// When scancel is called, slurm will send a SIGTERM (sent to this qsub script), then a SIGKILL if the job hasn't ended
 		// Added here is a function that essentially passes on the SIGTERM to pwrapper, otherwise VMs will continue running
-		script.println("\nterm_handler() { \n\tkill -TERM \"$pwrapperpid\" 2>/dev/null \n}");
+		script.println("\nterm_handler() { \n\tkill -TERM \"$pwrapperpid\" 2>/dev/null \necho \"Caught SIGTERM...\" >> ../Accounting/\"${PWD##*/}\"/vmwrapper_out.txt\n}");
 		script.println("trap term_handler SIGTERM");
 		
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
