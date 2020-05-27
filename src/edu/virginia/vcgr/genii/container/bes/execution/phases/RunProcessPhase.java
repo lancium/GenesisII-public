@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -173,6 +175,25 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 					_logger.debug("Handling image executable: " + execName);
 					_logger.debug("Adding executable: " + execName);
 					_logger.debug("Adding path to image: " + imagePath);
+				if (Files.exists(Paths.get(imagePath))) {
+					String MIME = Files.probeContentType(Paths.get(imagePath));
+					if (_logger.isDebugEnabled())
+						_logger.debug(imagePath + " exists with MIME type: " + MIME);
+					if (MIME.contains("QEMU QCOW Image") || MIME.contains("run-singularity script executable")) {
+						if (_logger.isDebugEnabled())
+							_logger.debug(imagePath + " exists and has the correct MIME type.");						}
+					else {
+						if (_logger.isDebugEnabled())
+							_logger.debug(imagePath + " exists but has the wrong MIME type.");
+						// 2020 May 27 CCH, not sure how to handle bad MIME type
+						// Currently, set imagePath to something completely different so the original image does not execute
+						imagePath = "../Images/Lancium/BAD_MIME";
+					}
+				}
+				else {
+					if (_logger.isDebugEnabled())
+						_logger.debug(imagePath + " does not exist.");
+				}
 				command.add(execName);
 				command.add(imagePath);
 			}

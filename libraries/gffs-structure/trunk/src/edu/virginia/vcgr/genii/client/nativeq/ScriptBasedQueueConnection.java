@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -195,7 +197,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
 		// CCH 2020 May 18
-		// Make executable the appropirate wrapper if executable is an image
+		// Make executable the appropriate wrapper if executable is an image
 		// Prepend image path to arguments list if executable is an image
 		String execName = application.getExecutableName();
 		if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
@@ -216,7 +218,27 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			}
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable: " + execName);
-			Vector arguments = new Vector(application.getArguments());
+			if (Files.exists(Paths.get(imagePath))) {
+				String MIME = Files.probeContentType(Paths.get(imagePath));
+				if (_logger.isDebugEnabled())
+					_logger.debug(imagePath + " exists with MIME type: " + MIME);
+				if (MIME.contains("QEMU QCOW Image") || MIME.contains("run-singularity script executable")) {
+					if (_logger.isDebugEnabled())
+						_logger.debug(imagePath + " exists and has the correct MIME type.");
+				}
+				else {
+					if (_logger.isDebugEnabled())
+						_logger.debug(imagePath + " exists but has the wrong MIME type.");
+					// 2020 May 27 CCH, not sure how to handle bad MIME type
+					// Currently, set imagePath to something completely different so the original image does not execute
+					imagePath = "../Images/Lancium/BAD_MIME";
+				}
+			}
+			else {
+				if (_logger.isDebugEnabled())
+					_logger.debug(imagePath + " does not exist.");
+			}
+			Vector<String> arguments = new Vector<String>(application.getArguments());
 			arguments.add(0, imagePath);
 			application.setArguments(arguments);
 		}
