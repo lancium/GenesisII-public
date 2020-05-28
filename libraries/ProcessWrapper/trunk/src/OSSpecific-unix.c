@@ -19,6 +19,10 @@
 #define GENII_INSTALL_DIR_VAR "GENII_INSTALL_DIR"
 #define GENII_USER_DIR_VAR "GENII_USER_DIR"
 #define FUSE_DEVICE "/dev/fuse"
+// 2020 May 28 CCH
+// NOTE: A job will run for at least as long as SLEEP_DURATION
+// As it is right now, all jobs run for at least 6 minutes (360 sec)
+// unless terminated via qkill, sending a SIGTERM
 #define SLEEP_DURATION 360
 
 #ifdef PWRAP_macosx
