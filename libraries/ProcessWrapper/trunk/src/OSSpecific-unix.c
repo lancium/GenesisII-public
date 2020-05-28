@@ -19,7 +19,7 @@
 #define GENII_INSTALL_DIR_VAR "GENII_INSTALL_DIR"
 #define GENII_USER_DIR_VAR "GENII_USER_DIR"
 #define FUSE_DEVICE "/dev/fuse"
-#define SLEEP_DURATION 1
+#define SLEEP_DURATION 360
 
 #ifdef PWRAP_macosx
 	#define UNMOUNT_BINARY_NAME "umount"
@@ -135,15 +135,15 @@ int dumpStats() {
 	gettimeofday(&stop, NULL);
 	/*
 	2019-08-22 by ASG. If the child is still running AND being killed,
-	set the exit code to 250. It means the enclosing environment, e.g.,
+	set the exit code to 143. It means the enclosing environment, e.g.,
 	the queueing system is terminating it, likely for too much time, processes, 
 	or memory.
 	*/
 	if (running==1 && beingKilled==1) 
 	{
 		teardownJob();
-
-		exitCode=250;
+		// 2020 May 28 CCH: Changing this error code to 143 to be consistent with bash
+		exitCode=143;
 	}
 	writeExitResults(CL->getResourceUsageFile(CL),
                	autorelease(createExitResults(exitCode,
