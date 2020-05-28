@@ -296,7 +296,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						// What we want is to be able to talk to the queue manager accounting system .. that is not possible right now on most resources. When it is 
 						// available we will pick it up in getExitCode.
 						jobDisapparedFromQueue=true;
-						exitCode=250;
+						exitCode=143;
 						context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
 						if (lastState == null || !lastState.equals(_state.toString())) {
 							if (_logger.isDebugEnabled())
@@ -308,7 +308,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				}	catch (IOException ioe) {
 					// See comments for catch above, they are the same
 					jobDisapparedFromQueue=true;
-					exitCode=250;
+					exitCode=143;
 					context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
 					if (lastState == null || !lastState.equals(_state.toString())) {
 						if (_logger.isDebugEnabled())

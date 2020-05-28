@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -144,7 +146,60 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 		synchronized (_processLock) {
 			command = new Vector<String>();
-			command.add(_executable.getAbsolutePath());
+
+			// 2020 May 26 CCH, if executable is an image, we set the new executable to be the appropriate wrapper and push the image path into the arguments
+			// To generate the image path, we use the preferred identity to fill in the path: ../Images/<identity>/<image>
+			// Images can be in the form Lancium/<image> or just <image>. 
+			// Currently, if it contains a slash we're only expected "Lancium", 
+			// but in future we might have organizations so image paths could be <Organization>/<image>
+			String execName = _executable.getAbsolutePath();
+			if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
+				// 2020 May 26 CCH, execName might be in the form Lancium/image.simg which is why we're splitting execName up here
+				String[] execNameArray = execName.split("/");
+				boolean usingLanciumImage = (execNameArray[0].equals("Lancium"));
+				execName = execNameArray[execNameArray.length-1];
+				String imageDir = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + userName + "/";
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling image executable (.sif/.simg or .qcow2)...");
+					_logger.debug("Executable: " + execName + ", Username: " + userName + ", Image directory: " + imageDir);
+				String imagePath = imageDir + execName;
+				// This should use getContainerProperty job BES directory
+				// Assigning the appropriate wrapper as the executable
+				if (imagePath.endsWith(".qcow2")) {
+					execName = "../vmwrapper.sh";
+				}
+				else {
+					execName = "../singularity-wrapper.sh";
+				}
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling image executable: " + execName);
+					_logger.debug("Adding executable: " + execName);
+					_logger.debug("Adding path to image: " + imagePath);
+				if (Files.exists(Paths.get(imagePath))) {
+					String MIME = Files.probeContentType(Paths.get(imagePath));
+					if (_logger.isDebugEnabled())
+						_logger.debug(imagePath + " exists with MIME type: " + MIME);
+					if (MIME.contains("QEMU QCOW Image") || MIME.contains("run-singularity script executable")) {
+						if (_logger.isDebugEnabled())
+							_logger.debug(imagePath + " exists and has the correct MIME type.");						}
+					else {
+						if (_logger.isDebugEnabled())
+							_logger.debug(imagePath + " exists but has the wrong MIME type.");
+						// 2020 May 27 CCH, not sure how to handle bad MIME type
+						// Currently, set imagePath to something completely different so the original image does not execute
+						imagePath = "../Images/Lancium/BAD_MIME";
+					}
+				}
+				else {
+					if (_logger.isDebugEnabled())
+						_logger.debug(imagePath + " does not exist.");
+				}
+				command.add(execName);
+				command.add(imagePath);
+			}
+			else {
+				command.add(execName);
+			}
 			for (String arg : _arguments)
 				command.add(arg);
 

@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
@@ -163,11 +166,6 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			for (UnixSignals signal : signals)
 				script.format("trap signalTrap %s\n", signal);
 		}
-
-		// LAK: 13 March: Added so that the batch script does not exit when it gets a SIG_TERM, instead it lets its children
-		// repond to the signal and then gracefully exit after the children processes 
-		script.format("trap : SIGTERM\n");
-
 		script.format("export QUEUE_SCRIPT_RESULT=0\n");
 	}
 
@@ -190,32 +188,62 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	{
 		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 		List<String> newCmdLine = new Vector<String>();
-
+		
+		// 2020 May 27 CCH, add trap handling in qsub script
+		// When scancel is called, slurm will send a SIGTERM (sent to this qsub script), then a SIGKILL if the job hasn't ended
+		// Added here is a function that essentially passes on the SIGTERM to pwrapper, otherwise VMs will continue running
+		script.println("\nterm_handler() { \n\tkill -TERM \"$pwrapperpid\" 2>/dev/null \necho \"Caught SIGTERM...\" >> ../Accounting/\"${PWD##*/}\"/vmwrapper_out.txt\n}");
+		script.println("trap term_handler SIGTERM");
+		
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
 		// CCH 2020 May 18
-		// Make executable the appropirate wrapper if executable is an image
+		// Make executable the appropriate wrapper if executable is an image
 		// Prepend image path to arguments list if executable is an image
 		String execName = application.getExecutableName();
-		if (execName.endsWith(".simg") || execName.endsWith(".qcow2")) {
+		if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable (.simg or .qcow2)...");
-		    String imagePath = execName;
-		    // This should use getContainerProperty job BES directory
-		    if (imagePath.endsWith(".simg")) {
-		        execName = "../singularity-wrapper.sh";
-		    }
-		    else {
-		        execName = "../vmwrapper.sh";
-		    }
+			String prefID = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
+			String username = (prefID == null ? "Lancium" : prefID.split("CN=")[1].split(",")[0]);
+			String[] execNameArray = execName.split("/");
+			boolean usingLanciumImage = execNameArray[0].equals("Lancium");
+			execName = execNameArray[execNameArray.length-1];
+			String imagePath = usingLanciumImage ? "../Images/Lancium/" + execName : "../Images/" + username +  execName;
+			// This should use getContainerProperty job BES directory
+			if (imagePath.endsWith(".qcow2")) {
+				execName = "../vmwrapper.sh";
+			}
+			else {
+				execName = "../singularity-wrapper.sh";
+			}
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable: " + execName);
-		    Vector arguments = new Vector(application.getArguments());
-		    arguments.add(0, imagePath);
-		    application.setArguments(arguments);
+			if (Files.exists(Paths.get(imagePath))) {
+				String MIME = Files.probeContentType(Paths.get(imagePath));
+				if (_logger.isDebugEnabled())
+					_logger.debug(imagePath + " exists with MIME type: " + MIME);
+				if (MIME.contains("QEMU QCOW Image") || MIME.contains("run-singularity script executable")) {
+					if (_logger.isDebugEnabled())
+						_logger.debug(imagePath + " exists and has the correct MIME type.");
+				}
+				else {
+					if (_logger.isDebugEnabled())
+						_logger.debug(imagePath + " exists but has the wrong MIME type.");
+					// 2020 May 27 CCH, not sure how to handle bad MIME type
+					// Currently, set imagePath to something completely different so the original image does not execute
+					imagePath = "../Images/Lancium/BAD_MIME";
+				}
+			}
+			else {
+				if (_logger.isDebugEnabled())
+					_logger.debug(imagePath + " does not exist.");
+			}
+			Vector<String> arguments = new Vector<String>(application.getArguments());
+			arguments.add(0, imagePath);
+			application.setArguments(arguments);
 		}
 		else {
-			// CCH 2020 May 18. Revisit later, does it make sense?
 			if (!execName.contains("/")) {
 				execName = String.format("./%s", execName);
 			}
@@ -332,9 +360,16 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			throw new NativeQueueException("Unable to generate submission script.", e);
 		}
 
-		if (signals.size() > 0)
-			script.print(" &");
-
+		// 2020 May 27 CCH, part of signal handling in the qsub script
+		// Commenting this out because we want to background the process so we can handle SLURM's SIGTERM
+		// But it looks like part of what we're trying to do has already been done, so we may very well add this line back in
+		//if (signals.size() > 0)
+		script.print(" &");
+		
+		// 2020 May 27 CCH, part of signal handling in the qsub script
+		script.println("\npwrapperpid=$!");
+		script.println("wait \"$pwrapperpid\"");
+		
 		script.println();
 		return newCmdLine;
 	}
