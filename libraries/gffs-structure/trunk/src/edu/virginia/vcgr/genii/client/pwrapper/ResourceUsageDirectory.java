@@ -11,6 +11,8 @@ public class ResourceUsageDirectory
 	private File _directory;
 	private File _accountingDir;
 	private File _rusage;
+	private File _finishedDir;
+	private File _archiveDir;
 	
 	synchronized File checkAccountingDir(File directory) throws ProcessWrapperException, IOException
 	{
@@ -19,12 +21,25 @@ public class ResourceUsageDirectory
 		File actDir = new File(parentPath+"/Accounting");
 		if (!actDir.exists()) {
 			actDir.mkdirs();
+			// 2020-05-28 by ASG -- Add Accounting/finished and Accounting/archive
+			File finishedDir = new File(actDir + "/finished");
+			File archiveDir = new File(actDir + "/archive");
 			// set permissions next
-			if (OperatingSystemType.isWindows())
+			if (OperatingSystemType.isWindows()) {
 				actDir.setWritable(true, false);
-			else
+				finishedDir.setWritable(true, false);
+				archiveDir.setWritable(true, false);
+			}
+			else {
 				FileSystemUtils.chmod(actDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
 						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				FileSystemUtils.chmod(finishedDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				FileSystemUtils.chmod(archiveDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+			}
+			_finishedDir=finishedDir;
+			_archiveDir=archiveDir;
 		}
 		if (!actDir.exists())
 			throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", actDir));
@@ -74,6 +89,14 @@ public class ResourceUsageDirectory
 	
 	public File getAcctDir() {
 		return _accountingDir;
+	}
+	
+	public File getfinishedDir() {
+		return _finishedDir;
+	}
+	
+	public File getarchiveDir() {
+		return _archiveDir;
 	}
 	
 	public File getJWD() {

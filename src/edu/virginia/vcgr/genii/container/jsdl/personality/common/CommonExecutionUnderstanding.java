@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CreateWorkingDirectoryPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupContextDirectoryPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupFUSEPhase;
@@ -233,7 +234,6 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 			cleanups.add(new CleanupPhase(new File(getWorkingDirectory().getWorkingDirectory().toString(), "scratch")));
 		}			
 		_logger.info("scratch path found for working dir to use is: " + scratchPath);
-
 		ret.add(new CreateWorkingDirectoryPhase(getWorkingDirectory(), scratchPath));
 
 		for (DataStagingUnderstanding stage : _stageIns) {
@@ -351,6 +351,17 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		for (DataStagingUnderstanding stage : _pureCleans)
 			cleanups.add(new CleanupPhase(_fsManager.lookup(stage.getFilePath())));
 
+		// 2020-05-29 by ASG
+		// Adding code to move the accounting directory to "Accounting/finished"
+		File f=getWorkingDirectory().getWorkingDirectory();
+		String JWD=f.getName();
+		String sharedDir=f.getParent();
+		File accountingDirectory= new File(sharedDir+"/Accounting/"+JWD);
+		File finishedDir=new File(sharedDir+"/Accounting/finished/" + JWD);
+		// CompleteAccountingPhase(File accountingDirectory, File finishedDir)
+		ret.add(new CompleteAccountingPhase(accountingDirectory,finishedDir));
+		// End of accounting dir updates
+		
 		ret.addAll(cleanups);
 		return ret;
 	}
