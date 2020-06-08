@@ -117,6 +117,7 @@ GFFS_TESTS=( \
 EMS_TESTS=( \
   EMS_Tests/besStatus/bes-attributes-and-activities.sh \
   #EMS_Tests/fileStagingTests/protocols-test.sh \
+  EMS_Tests/fileStagingTests/stageout-test.sh \
   EMS_Tests/besFunctionality/bes-submission-test-sync.sh \
   EMS_Tests/queueFunctionalityTests/queue-submission-test.sh \
   EMS_Tests/performanceTests/queue-performance-test.sh \
