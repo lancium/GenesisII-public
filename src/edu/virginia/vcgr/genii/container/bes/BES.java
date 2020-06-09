@@ -27,6 +27,7 @@ import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESPolicy;
@@ -34,9 +35,12 @@ import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResource;
@@ -45,6 +49,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.security.identity.Identity;
+import edu.virginia.vcgr.genii.client.bes.BESConstants;
 
 public class BES implements Closeable
 {
@@ -55,6 +60,8 @@ public class BES implements Closeable
 	static private HashMap<String, BES> _knownInstances = new HashMap<String, BES>();
 	static private HashMap<String, BES> _activityToBESMap = new HashMap<String, BES>();
 
+
+	
 	static private String findBESEPI(Connection connection, String besid) throws SQLException
 	{
 		return BasicDBResource.getEPI(connection, besid);
@@ -110,6 +117,7 @@ public class BES implements Closeable
 			return _activityToBESMap.get(activityid);
 		}
 	}
+
 
 	synchronized static public void loadAllInstances(ServerDatabaseConnectionPool connectionPool) throws SQLException, IOException
 	{

@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.container.bes;
 
+import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -56,12 +58,14 @@ import edu.virginia.cs.vcgr.genii.job_management.JobErrorPacket;
 import edu.virginia.cs.vcgr.genii.job_management.QueryErrorRequest;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobResponseType;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.algorithm.graph.GridDependency;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
+import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
@@ -71,9 +75,11 @@ import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.cloud.CloudAttributesHandler;
@@ -109,6 +115,8 @@ import edu.virginia.vcgr.jsdl.JobDefinition;
 public class GeniiBESServiceImpl extends ResourceForkBaseService implements GeniiBESPortType
 {
 	static private Log _logger = LogFactory.getLog(GeniiBESServiceImpl.class);
+	// 2020-06-01 by ASG
+	static private boolean _checkedDirs=false;
 
 	BESConstants bconsts = new BESConstants();
 
@@ -240,6 +248,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 			// Load cloud activities table
 			CloudMonitor.loadCloudActivities();
+			// 2020-06-04 ASG - try, try, again to find a place to check dirs safely
+			if (!_checkedDirs) checkDirs();
 		} catch (Exception e) {
 			_logger.error("Unable to start resource info managers.", e);
 		} finally {
@@ -267,6 +277,41 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	}
 
 	// static private EndpointReferenceType _localActivityServiceEPR = null;
+	
+	synchronized static private void checkDirs() {
+		File parentPath=BESUtilities.getBESWorkerDir();	
+		// We create the sharedDir/Accounting dir if it is not there.
+		_logger.debug("BESPortType checkDirs called. parentPath is "+parentPath.getAbsolutePath());
+		File actDir = new File(parentPath+"/Accounting");
+		if (!actDir.exists()) {
+			actDir.mkdirs();
+			// 2020-05-28 by ASG -- Add Accounting/finished and Accounting/archive
+			File finishedDir = new File(actDir + "/finished");
+			finishedDir.mkdir();
+			File archiveDir = new File(actDir + "/archive");
+			archiveDir.mkdir();
+			// set permissions next
+			if (OperatingSystemType.isWindows()) {
+				actDir.setWritable(true, false);
+				finishedDir.setWritable(true, false);
+				archiveDir.setWritable(true, false);
+			}
+			else {
+				try {
+				FileSystemUtils.chmod(actDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				FileSystemUtils.chmod(finishedDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				FileSystemUtils.chmod(archiveDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				} 
+				catch (IOException ioe) {
+					_logger.info("exception occurred in checkDirs, could not modify permisions of Accounting dirs",ioe);
+				}
+			}
+		}
+		_checkedDirs=true;
+	}
 
 	public GeniiBESServiceImpl() throws RemoteException
 	{
@@ -275,6 +320,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		addImplementedPortType(bconsts.BES_FACTORY_PORT_TYPE());
 		addImplementedPortType(bconsts.BES_MANAGEMENT_PORT_TYPE());
 		addImplementedPortType(bconsts.GENII_BES_PORT_TYPE());
+		_logger.debug("BESPortType constructor called.");
+
 	}
 
 	@Override
@@ -531,12 +578,33 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	static public TerminateActivityResponseType terminateActivity(EndpointReferenceType activity) throws RemoteException
 	{
-		try {
-			GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
-			client.destroy(new Destroy());
-			return new TerminateActivityResponseType(activity, true, null, null);
-		} catch (Throwable cause) {
-			return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
+		// 2020-06-07 by ASG - changing how we terminate activities from the outside; now we directly the activity.terminate function if 
+		// it "lives in this container.
+		AddressingParameters aps = new AddressingParameters(activity.getReferenceParameters());
+		String rKey=aps.getResourceKey();
+		BES ownerBES=BES.findBESForActivity(rKey);
+		BESActivity activity2 = ownerBES.findActivity(rKey);
+		if (activity2!=null) {
+			try {
+				activity2.terminate();
+				return new TerminateActivityResponseType(activity, true, null, null);
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(e), null);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(e), null);
+			}
+		}
+		// End of new code.
+		else {
+			try {
+				GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
+				client.destroy(new Destroy());
+				return new TerminateActivityResponseType(activity, true, null, null);
+			} catch (Throwable cause) {
+				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
+			}
 		}
 	}
 

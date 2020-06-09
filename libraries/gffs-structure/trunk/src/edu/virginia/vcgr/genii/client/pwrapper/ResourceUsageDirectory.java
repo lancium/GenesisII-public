@@ -14,16 +14,18 @@ public class ResourceUsageDirectory
 	private File _finishedDir;
 	private File _archiveDir;
 	
-	synchronized File checkAccountingDir(File directory) throws ProcessWrapperException, IOException
+	synchronized File checkAccountingDir(File directory) throws IOException
 	{
+
 		// We create the sharedDir/Accounting dir if it is not there.
 		String parentPath=directory.getParent();
 		File actDir = new File(parentPath+"/Accounting");
+		
 		if (!actDir.exists()) {
 			actDir.mkdirs();
 			// 2020-05-28 by ASG -- Add Accounting/finished and Accounting/archive
-			File finishedDir = new File(actDir + "/finished");
-			File archiveDir = new File(actDir + "/archive");
+			File finishedDir = new File(actDir.getAbsolutePath() + "/finished");
+			File archiveDir = new File(actDir.getAbsolutePath() + "/archive");
 			// set permissions next
 			if (OperatingSystemType.isWindows()) {
 				actDir.setWritable(true, false);
@@ -42,8 +44,10 @@ public class ResourceUsageDirectory
 			_archiveDir=archiveDir;
 		}
 		if (!actDir.exists())
-			throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", actDir));
+			throw new IOException(String.format("Unable to create directory \"%s\".", actDir));
+		
 		return actDir;
+
 	}
 
 	public ResourceUsageDirectory(File directory) throws ProcessWrapperException

@@ -270,9 +270,11 @@ int wrapJob(CommandLine *commandLine)
   		fprintf(stderr, "Can't catch SIGCHLD\n");
 	running=1;
 	int ticks=0;
+	
 	while (running==1 && beingKilled==0) {
-		sleep(SLEEP_DURATION);
+		// 2020-06-05 by ASG .. change the order to dumpstats first, then sleep
 		exitCode=dumpStats();
+		sleep(SLEEP_DURATION);
 		ticks++;
 	}
 	// End of updates

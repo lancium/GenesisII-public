@@ -61,8 +61,13 @@ public class DBBESActivityResource extends BasicDBResource implements IBESActivi
 					PersistentDelete.persistentDelete(dir.getWorkingDirectory());
 			}
 		} else {
+			// 2020-06-05 by ASG. This looks like a long-existing bug .. if you terminate a fork/exec job we delete the job dir
+			// before the later stages and the clean up .. no accounting, and causes a java equivelant of a seg fault later when
+			// trying to read the now non-existent rusage.xml. We may also need to write the exit results file in pwrapper
+			/*
 			if (BESUtilities.isDeletable(dir.getWorkingDirectory()) || dir.mustDelete())
 				PersistentDelete.persistentDelete(dir.getWorkingDirectory());
+			 */
 		}
 
 		try {
@@ -72,6 +77,7 @@ public class DBBESActivityResource extends BasicDBResource implements IBESActivi
 		} catch (SQLException sqe) {
 			throw new ResourceException("Unable to remove activity from database.", sqe);
 		}
+		
 	}
 
 	public DBBESActivityResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException

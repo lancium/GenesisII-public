@@ -42,11 +42,12 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 
 		history.createTraceWriter("Moving accounting directory").format("Moving accounting directory:  %s", _accountingDir).close();
 
-		_logger.info(String.format("Moving accounting dir \"%s to Accounting/finished\".", _accountingDir ));
+		_logger.info(String.format("Moving accounting dir \"%s to Accounting/finished\".", _accountingDir )+_finishedDir.getAbsolutePath());
 		try {
 			// First check that they both exist
 			if (_accountingDir.exists()) {
 				_accountingDir.renameTo(new File(_finishedDir.getAbsolutePath()));
+				/*
 				if (OperatingSystemType.isWindows()) {
 					_finishedDir.setWritable(true, false);
 				}
@@ -54,7 +55,8 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 					FileSystemUtils.chmod(_finishedDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
 							| FileSystemUtils.MODE_USER_EXECUTE);
 
-				}			
+				}
+				*/			
 			}
 			else throw new Throwable("Accounting Dir not there");
 
