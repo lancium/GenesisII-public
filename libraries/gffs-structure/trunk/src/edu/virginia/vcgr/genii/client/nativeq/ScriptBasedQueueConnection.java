@@ -231,11 +231,22 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		String execName = application.getExecutableName();
 		if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Handling image executable (.simg or .qcow2)...");
+				_logger.debug("Handling image executable (.simg or .qcow2): " + execName);
 			String prefID = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
 			String username = (prefID == null ? "Lancium" : prefID.split("CN=")[1].split(",")[0]);
 			String[] execNameArray = execName.split("/");
-			boolean usingLanciumImage = execNameArray[0].equals("Lancium");
+			// 2020 June 09 by CCH
+			// Turns out that the executable path is resolved at this point.
+			// Even though I could only give test.simg, the execName is the full path: /nfs/.../<ticket>/test.simg.
+			// As opposed to just test.simg. This wasn't a problem before, but we indicate Lancium images with Lancium/<lancium_image>.simg. 
+			// To check for Lancium images, we check for the second-to-last token and see if it equals Lancium.
+			boolean usingLanciumImage = false;
+			if (execNameArray.length >= 2)
+				usingLanciumImage = execNameArray[execNameArray.length-2].equals("Lancium");
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("First element in execNameArray: " + execNameArray[0]);
+				_logger.debug("Using Lancium image? " + usingLanciumImage);
+			}
 			execName = execNameArray[execNameArray.length-1];
 			String imagePath = usingLanciumImage ? "../Images/Lancium/" + execName : "../Images/" + username +  execName;
 			// This should use getContainerProperty job BES directory
