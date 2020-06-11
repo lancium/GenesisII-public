@@ -189,11 +189,39 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 		List<String> newCmdLine = new Vector<String>();
 		
-		// 2020 May 27 CCH, add trap handling in qsub script
-		// When scancel is called, slurm will send a SIGTERM (sent to this qsub script), then a SIGKILL if the job hasn't ended
-		// Added here is a function that essentially passes on the SIGTERM to pwrapper, otherwise VMs will continue running
-		script.println("\nterm_handler() { \n\tkill -TERM \"$pwrapperpid\" 2>/dev/null \necho \"Caught SIGTERM...\" >> ../Accounting/\"${PWD##*/}\"/vmwrapper_out.txt\n}");
-		script.println("trap term_handler SIGTERM");
+		// 2020 June 04 by CCH and LAK
+		// When scancel is called, slurm will send a SIGTERM (sent to this qsub script), then a SIGKILL if the job hasn't ended after 30 seconds
+		// Added some functions that safely passes on the SIGTERM to pwrapper, otherwise VMs will continue running
+		
+		// Really sorry for this block of script.printlns. I've kept it this way in an effort to keep this readable to a degree.
+		// In this block, we create 3 functions: prep_term, handle_term, and wait_term.
+		// prep_term and wait_term are called right before and right after the main "CmdLine" respectively.
+		// handle_term is called within prep_term, indicating that handle_term should be called when catching a SIG_TERM or SIG_INT.
+		
+		script.println("prep_term()");
+		script.println("{");
+		script.println("\tunset pwrapper_pid");
+		script.println("\tunset term_kill_needed");
+		script.println("\ttrap 'handle_term' TERM INT");
+		script.println("}");
+		script.println("handle_term()");
+		script.println("{");
+		script.println("\tif [ \"${pwrapper_pid}\" ]; then");
+		script.println("\t\tkill -TERM \"${pwrapper_pid}\" 2>/dev/null");
+		script.println("\telse");
+		script.println("\t\tterm_kill_needed=\"yes\"");
+		script.println("\tfi");
+		script.println("}");
+		script.println("wait_term()");
+		script.println("{");
+		script.println("\tpwrapper_pid=$!");
+		script.println("\tif [ \"${term_kill_needed}\" ]; then");
+		script.println("\t\t kill -TERM \"${pwrapper_pid}\" 2>/dev/null");
+		script.println("\tfi");
+		script.println("\twait ${pwrapper_pid}");
+		script.println("\ttrap - TERM INT");
+		script.println("\twait ${pwrapper_pid}");
+		script.println("}");
 		
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 
@@ -203,11 +231,22 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		String execName = application.getExecutableName();
 		if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("Handling image executable (.simg or .qcow2)...");
+				_logger.debug("Handling image executable (.simg or .qcow2): " + execName);
 			String prefID = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
 			String username = (prefID == null ? "Lancium" : prefID.split("CN=")[1].split(",")[0]);
 			String[] execNameArray = execName.split("/");
-			boolean usingLanciumImage = execNameArray[0].equals("Lancium");
+			// 2020 June 09 by CCH
+			// Turns out that the executable path is resolved at this point.
+			// Even though I could only give test.simg, the execName is the full path: /nfs/.../<ticket>/test.simg.
+			// As opposed to just test.simg. This wasn't a problem before, but we indicate Lancium images with Lancium/<lancium_image>.simg. 
+			// To check for Lancium images, we check for the second-to-last token and see if it equals Lancium.
+			boolean usingLanciumImage = false;
+			if (execNameArray.length >= 2)
+				usingLanciumImage = execNameArray[execNameArray.length-2].equals("Lancium");
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("First element in execNameArray: " + execNameArray[0]);
+				_logger.debug("Using Lancium image? " + usingLanciumImage);
+			}
 			execName = execNameArray[execNameArray.length-1];
 			String imagePath = usingLanciumImage ? "../Images/Lancium/" + execName : "../Images/" + username +  execName;
 			// This should use getContainerProperty job BES directory
@@ -349,6 +388,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			// if (_logger.isDebugEnabled())
 			// _logger.debug(String.format("Previous cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
 
+			script.println("\nprep_term");
 			boolean first = true;
 			for (String element : newCmdLine) {
 				if (!first)
@@ -367,8 +407,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		script.print(" &");
 		
 		// 2020 May 27 CCH, part of signal handling in the qsub script
-		script.println("\npwrapperpid=$!");
-		script.println("wait \"$pwrapperpid\"");
+		script.println("\nwait_term");
 		
 		script.println();
 		return newCmdLine;

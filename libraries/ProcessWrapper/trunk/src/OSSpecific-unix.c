@@ -58,63 +58,16 @@ pid_t pid;
 int running=1;
 int beingKilled=0;
 
-int isVMJob = 0;
-
 void teardownJob()
 {
 	//we are getting killed
-	//if we are a vm job, we need to handle this
-	if (isVMJob)
-	{
-		pid_t vmkillpid = fork();
+	int exitCode = -1;
 
-		if (vmkillpid < 0)
-		{
-			/* Couldn't fork */
-			fprintf(stderr, "Unable to fork new process to kill VM.\n");
-		}
-		else if (vmkillpid != 0)
-		{
-			//in parent
-			int exitCode = -1;
-			pid_t ret = waitpid(vmkillpid, &exitCode, 0);
+	//kill vmwrapper or container
+	kill(pid, SIGTERM);
 
-			//kill vmwrapper
-			kill(pid, SIGKILL);
-		}
-		else
-		{
-			char const *cwd = CL->getWorkingDirectory(CL);
-			char *ticket = &strrchr(cwd, '/')[1];
-
-			//~200 would overflow buffer
-			if (strlen(ticket) > 185)
-			{
-				fprintf(stderr, "Directory name is too long while building command to destroy VM.\n");
-			}
-
-			char tCmd[512];
-			strcpy(tCmd, "virsh --connect qemu:///system destroy ");
-			strcat(tCmd, ticket);
-			strcat(tCmd, " &> /dev/null && virsh --connect qemu:///system undefine ");
-			strcat(tCmd, ticket);
-			strcat(tCmd, " &> /dev/null");
-
-			char *cmd[] = {"/bin/bash", "-c", tCmd, 0};
-			execvp(cmd[0], cmd);
-
-			fprintf(stderr, "Exec failed while trying to destroy VM.\n");
-			// ASG 2020-04-01. Heart of the coronovirus.
-			// Added an exit as this processes will otherwise be an
-			// orphan.
-			exit(-1);
-		}
-	}
-	else
-	{
-		//regular job, we don't need to do anything nor wait for slurm to SIGKILL
-		kill(pid, SIGKILL);
-	}
+	//wait for vmwrapper/container to terminate
+	waitpid(pid, &exitCode, 0);
 }
 
 int dumpStats() {
@@ -192,9 +145,7 @@ int wrapJob(CommandLine *commandLine)
 		}
 	}
 
-	//LAK (11 March 2019): Changes made here to find out if the job is a VM job
 	const char *exec_str = commandLine->getExecutable(commandLine);
-	isVMJob = (strstr(exec_str, "vmwrapper.sh") != NULL);
 
 	if (!exec_str)
 		return 0;
@@ -271,8 +222,9 @@ int wrapJob(CommandLine *commandLine)
 	running=1;
 	int ticks=0;
 	while (running==1 && beingKilled==0) {
-		sleep(SLEEP_DURATION);
+		// 2020-06-05 by ASG .. change the order to dumpstats first, then sleep
 		exitCode=dumpStats();
+		sleep(SLEEP_DURATION);
 		ticks++;
 	}
 	// End of updates
@@ -453,14 +405,12 @@ void writeExitResults(const char *path, ExitResults *results)
     	char* token; 
     	char copy[2048];
 	sprintf(copy,"%s",path);
-printf("The parameter is %s\n", copy);
  
 
 	char *rest=copy;
   	int count=0;
 	char *tokens[512];
     	while ((token = strtok_r(rest, "/", &rest))) { 
-        	printf("%s\n", token);
 		tokens[count]=token;
 		count++;
 	}
@@ -474,7 +424,6 @@ printf("The parameter is %s\n", copy);
 	strcat(buf,B);strcat(buf,"/");
 
 	strcat(buf,C);
-	printf("%s\n",buf);
 // =====================
 
 /*	FILE *f=fopen("/home/dev/debug.txt","a+");
