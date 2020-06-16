@@ -271,7 +271,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			// =========================================================
 			// 2016-09-07 New code by ASG to probe every second until the post execution delay has passed rather than waiting for that long.
 			// First set up the delay; default to 10 seconds if not set
-			int delay=10;
+			int delay=1;
 			int secondsWaited=0;
 			if (_constructionParameters != null) {
 				Duration postDelay = _constructionParameters.postExecutionDelay();
