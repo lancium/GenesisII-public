@@ -580,7 +580,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{
 		// 2020-06-07 by ASG - changing how we terminate activities from the outside; now we directly the activity.terminate function if 
 		// it "lives in this container.
+		/*
 		AddressingParameters aps = new AddressingParameters(activity.getReferenceParameters());
+		 
 		String rKey=aps.getResourceKey();
 		BES ownerBES=BES.findBESForActivity(rKey);
 		BESActivity activity2 = ownerBES.findActivity(rKey);
@@ -598,6 +600,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		}
 		// End of new code.
 		else {
+		*/
 			try {
 				GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
 				client.destroy(new Destroy());
@@ -605,7 +608,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			} catch (Throwable cause) {
 				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
 			}
-		}
+		//}
 	}
 
 	@Override
