@@ -298,6 +298,9 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			_logger.info(String.format("Executing job for userID '%s' using command line:\n\t%s", userName, testCmdLine.toString()));
 
 			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, newCmdLine);
+			// ASG - TEST code remove if found
+			_process=token;
+			// End test
 		}
 
 		try {

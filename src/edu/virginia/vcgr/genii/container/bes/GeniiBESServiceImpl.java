@@ -62,6 +62,7 @@ import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
+import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
@@ -74,6 +75,7 @@ import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.cloud.CloudAttributesHandler;
@@ -531,6 +533,29 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	static public TerminateActivityResponseType terminateActivity(EndpointReferenceType activity) throws RemoteException
 	{
+        // 2020-06-07 by ASG - changing how we terminate activities from the outside; now we directly the activity.terminate function if
+        // it "lives in this container.
+        
+        AddressingParameters aps = new AddressingParameters(activity.getReferenceParameters());
+
+        String rKey=aps.getResourceKey();
+        BES ownerBES=BES.findBESForActivity(rKey);
+        BESActivity activity2 = ownerBES.findActivity(rKey);
+        if (activity2!=null) {
+                try {
+                        activity2.terminate();
+                        return new TerminateActivityResponseType(activity, true, null, null);
+                } catch (ExecutionException e) {
+                        e.printStackTrace();
+                        return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(e), null);
+                } catch (SQLException e) {
+                        e.printStackTrace();
+                        return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(e), null);
+                }
+        }
+        // End of new code.
+        else {
+
 		try {
 			GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
 			client.destroy(new Destroy());
@@ -538,6 +563,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		} catch (Throwable cause) {
 			return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
 		}
+        }
 	}
 
 	@Override
