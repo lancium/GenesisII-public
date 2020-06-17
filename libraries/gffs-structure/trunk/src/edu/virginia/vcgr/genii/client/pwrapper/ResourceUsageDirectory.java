@@ -16,33 +16,11 @@ public class ResourceUsageDirectory
 	
 	synchronized File checkAccountingDir(File directory) throws ProcessWrapperException, IOException
 	{
-		// We create the sharedDir/Accounting dir if it is not there.
+		// We check for the sharedDir/Accounting dir if it is not there.
 		String parentPath=directory.getParent();
 		File actDir = new File(parentPath+"/Accounting");
-		if (!actDir.exists()) {
-			actDir.mkdirs();
-			// 2020-05-28 by ASG -- Add Accounting/finished and Accounting/archive
-			File finishedDir = new File(actDir + "/finished");
-			File archiveDir = new File(actDir + "/archive");
-			// set permissions next
-			if (OperatingSystemType.isWindows()) {
-				actDir.setWritable(true, false);
-				finishedDir.setWritable(true, false);
-				archiveDir.setWritable(true, false);
-			}
-			else {
-				FileSystemUtils.chmod(actDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
-						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
-				FileSystemUtils.chmod(finishedDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
-						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
-				FileSystemUtils.chmod(archiveDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
-						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
-			}
-			_finishedDir=finishedDir;
-			_archiveDir=archiveDir;
-		}
 		if (!actDir.exists())
-			throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", actDir));
+			throw new ProcessWrapperException(String.format("ERROR: Accounting directory \"%s\" does not exist.", actDir));
 		return actDir;
 	}
 
@@ -55,7 +33,7 @@ public class ResourceUsageDirectory
 			File jobActDir = new File(actDir.getAbsolutePath()+ "/" + directory.getName());
 			jobActDir.mkdir();
 			if (!jobActDir.exists())
-				throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", jobActDir));		
+				throw new ProcessWrapperException(String.format("Unable to create job accounting directory \"%s\".", jobActDir));		
 			// set permissions next
 			// jobActDir is now .../Accounting/<jobID>
 			if (OperatingSystemType.isWindows())
@@ -69,7 +47,7 @@ public class ResourceUsageDirectory
 				directory.mkdirs();
 
 			if (!directory.exists())
-				throw new ProcessWrapperException(String.format("Unable to create directory \"%s\".", directory));
+				throw new ProcessWrapperException(String.format("Unable to create JWS directory \"%s\".", directory));
 
 			if (!directory.isDirectory())
 				throw new ProcessWrapperException(String.format("Path %s does not refer to a directory.", directory));
@@ -82,21 +60,13 @@ public class ResourceUsageDirectory
 						FileSystemUtils.MODE_WORLD_EXECUTE | FileSystemUtils.MODE_WORLD_READ );
 
 		} catch (IOException e){
-			throw new ProcessWrapperException(String.format("Unable to create rusage file in directory %s.", _directory), e);
+			throw new ProcessWrapperException(String.format("ERROR: Unable to create JWD/rusage file in directory %s.", _directory), e);
 		}
 		_directory = directory;
 	}
 	
 	public File getAcctDir() {
 		return _accountingDir;
-	}
-	
-	public File getfinishedDir() {
-		return _finishedDir;
-	}
-	
-	public File getarchiveDir() {
-		return _archiveDir;
 	}
 	
 	public File getJWD() {
