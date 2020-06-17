@@ -738,6 +738,7 @@ public class BESActivity implements Closeable
 						}
 
 						_currentPhase = _executionPlan.get(_nextPhase);
+						_logger.debug("BES Activity transitition to " + _currentPhase.getPhaseState().toString());
 						updateState(_nextPhase, _currentPhase.getPhaseState());
 					}
 
