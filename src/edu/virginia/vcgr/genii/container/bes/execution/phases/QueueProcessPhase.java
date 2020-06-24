@@ -165,11 +165,11 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		// CCH 2020 June 24
 		// POSIX Applications don't set these fields and cause a null pointer exception later if we don't set defaults
 		if (_numProcesses == null)
-			_numProcesses = 1;
+			_numProcesses = new Integer(1);
 		if (_numProcessesPerHost == null)
-			_numProcessesPerHost = 1;
+			_numProcessesPerHost = new Integer(1);
 		if (_threadsPerProcess == null) 
-			_threadsPerProcess = 1;
+			_threadsPerProcess = new Integer(1);
 
 		// End of updates
 
