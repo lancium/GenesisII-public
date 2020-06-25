@@ -106,6 +106,22 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.sweep.SweepException;
 
+import org.ggf.bes.factory.PersistActivitiesType;
+import org.ggf.bes.factory.PersistActivitiesResponseType;
+import org.ggf.bes.factory.PersistActivityResponseType;
+import org.ggf.bes.factory.GetStatePathsType;
+import org.ggf.bes.factory.GetStatePathsResponseType;
+import org.ggf.bes.factory.GetStatePathResponseType;
+import org.ggf.bes.factory.RestartActivitiesType;
+import org.ggf.bes.factory.RestartActivitiesResponseType;
+import org.ggf.bes.factory.RestartActivityResponseType;
+import org.ggf.bes.factory.StopActivitiesType;
+import org.ggf.bes.factory.StopActivitiesResponseType;
+import org.ggf.bes.factory.StopActivityResponseType;
+import org.ggf.bes.factory.ResumeActivitiesType;
+import org.ggf.bes.factory.ResumeActivitiesResponseType;
+import org.ggf.bes.factory.ResumeActivityResponseType;
+
 /**
  * This is the service class that the container redirects SOAP messages to.
  * 
@@ -675,5 +691,50 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		}
 		return AnyHelper.toAny(jit);
 
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public PersistActivitiesResponseType persistActivities(PersistActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType 
+	{
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public GetStatePathsResponseType getStatePaths(GetStatePathsType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public RestartActivitiesResponseType restartActivities(RestartActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public StopActivitiesResponseType stopActivities(StopActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public ResumeActivitiesResponseType resumeActivities(ResumeActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
 	}
 }

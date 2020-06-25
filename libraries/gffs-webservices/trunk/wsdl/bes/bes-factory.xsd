@@ -117,6 +117,56 @@
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
 	
+	<xsd:complexType name="PersistActivityResponseType">
+		<xsd:sequence>
+			<xsd:element name="ActivityIdentifier" type="xsd:string"/>
+			<xsd:element name="Persisting" type="xsd:boolean"/>
+			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="GetStatePathResponseType">
+		<xsd:sequence>
+			<xsd:element name="ActivityIdentifier" type="xsd:string"/>
+			<xsd:element name="Path" type="xsd:string"/>
+			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="RestartActivityResponseType">
+		<xsd:sequence>
+			<xsd:element name="ActivityIdentifier" type="xsd:string"/>
+			<xsd:element name="Path" type="xsd:string"/>
+			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="StopActivityResponseType">
+		<xsd:sequence>
+			<xsd:element name="ActivityIdentifier" type="xsd:string"/>
+			<xsd:element name="Stopped" type="xsd:boolean"/>
+			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="ResumeActivityResponseType">
+		<xsd:sequence>
+			<xsd:element name="ActivityIdentifier" type="xsd:string"/>
+			<xsd:element name="Resumed" type="xsd:boolean"/>
+			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
 	<!-- Message Helper Elements -->
 	<xsd:element name="BasicResourceAttributesDocument"
 		type="bes-factory:BasicResourceAttributesDocumentType"/>

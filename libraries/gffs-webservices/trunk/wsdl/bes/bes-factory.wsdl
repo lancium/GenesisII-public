@@ -14,7 +14,7 @@
 			targetNamespace="http://schemas.ggf.org/bes/2006/08/bes-factory">
 			
 			<xsd:include schemaLocation="bes-factory.xsd"/>
-			
+		
 			<!-- Message Types -->
 			<xsd:complexType name="CreateActivityType">
 				<xsd:sequence>
@@ -103,6 +103,92 @@
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
 			</xsd:complexType>
 			
+			<xsd:complexType name="PersistActivitiesType">
+				<xsd:sequence>
+					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="onNode" type="xsd:boolean"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="PersistActivitiesResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:PersistActivityResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="GetStatePathsType">
+				<xsd:sequence>
+					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="GetStatePathsResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:GetStatePathResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="RestartActivitiesType">
+				<xsd:sequence>
+					<xsd:element name="Path" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="RestartActivitiesResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:RestartActivityResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="StopActivitiesType">
+				<xsd:sequence>
+					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="StopActivitiesResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:StopActivityResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="ResumeActivitiesType">
+				<xsd:sequence>
+					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="ResumeActivitiesResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:ResumeActivityResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
 			<!-- Fault Types -->
 			<xsd:complexType name="NotAuthorizedFaultType">
 				<xsd:sequence>
@@ -183,6 +269,32 @@
 			<xsd:element name="GetFactoryAttributesDocumentResponse"
 				type="bes-factory:GetFactoryAttributesDocumentResponseType"/>
 				
+			<xsd:element name="PersistActivities"
+				type="bes-factory:PersistActivitiesType"/>
+			<xsd:element name="PersistActivitiesResponse"
+				type="bes-factory:PersistActivitiesResponseType"/>
+
+			<xsd:element name="GetStatePaths"
+				type="bes-factory:GetStatePathsType"/>
+			<xsd:element name="GetStatePathsResponse"
+				type="bes-factory:GetStatePathsResponseType"/>
+				
+			<xsd:element name="RestartActivities"
+				type="bes-factory:RestartActivitiesType"/>
+			<xsd:element name="RestartActivitiesResponse"
+				type="bes-factory:RestartActivitiesResponseType"/>
+				
+			<xsd:element name="StopActivities"
+				type="bes-factory:StopActivitiesType"/>
+			<xsd:element name="StopActivitiesResponse"
+				type="bes-factory:StopActivitiesResponseType"/>
+				
+			<xsd:element name="ResumeActivities"
+				type="bes-factory:ResumeActivitiesType"/>
+			<xsd:element name="ResumeActivitiesResponse"
+				type="bes-factory:ResumeActivitiesResponseType"/>
+				
+				
 			<!-- Fault Elements -->
 			<xsd:element name="NotAuthorizedFault"
 				type="bes-factory:NotAuthorizedFaultType"/>
@@ -252,6 +364,38 @@
 			element="bes-factory:GetFactoryAttributesDocumentResponse"/>
 	</wsdl:message>
 	
+		<!-- Port Type -->
+	<wsdl:message name="PersistActivitiesRequest">
+		<wsdl:part name="parameters" element="bes-factory:PersistActivities"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="PersistActivitiesResponse">
+		<wsdl:part name="parameters" element="bes-factory:PersistActivitiesResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="GetStatePathsRequest">
+		<wsdl:part name="parameters" element="bes-factory:GetStatePaths"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="GetStatePathsResponse">
+		<wsdl:part name="parameters" element="bes-factory:GetStatePathsResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="RestartActivitiesRequest">
+		<wsdl:part name="parameters" element="bes-factory:RestartActivities"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="RestartActivitiesResponse">
+		<wsdl:part name="parameters" element="bes-factory:RestartActivitiesResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="StopActivitiesRequest">
+		<wsdl:part name="parameters" element="bes-factory:StopActivities"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="StopActivitiesResponse">
+		<wsdl:part name="parameters" element="bes-factory:StopActivitiesResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="ResumeActivitiesRequest">
+		<wsdl:part name="parameters" element="bes-factory:ResumeActivities"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="ResumeActivitiesResponse">
+		<wsdl:part name="parameters" element="bes-factory:ResumeActivitiesResponse"></wsdl:part>
+	</wsdl:message>
+	
 	<!-- Fault Messages -->
 	<wsdl:message name="NotAuthorizedFault">
 		<wsdl:part name="Detail"
@@ -288,7 +432,7 @@
 			element="bes-factory:InvalidRequestMessageFault"/>
 	</wsdl:message>
 	
-	<!-- Port Type -->
+	
 	<wsdl:portType name="BESFactoryPortType">
 		
 		<wsdl:operation name="CreateActivity">
@@ -372,6 +516,81 @@
 				name="GetFactoryAttributesDocumentResponse"
 				message="bes-factory:GetFactoryAttributesDocumentResponse"
 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetFactoryAttributesDocumentResponse"/>
+		</wsdl:operation>
+        
+        <wsdl:operation name="PersistActivities">
+			<wsdl:input
+				name="PersistActivities"
+				message="bes-factory:PersistActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/PersistActivities"/>
+			<wsdl:output
+				name="PersistActivitiesResponse"
+				message="bes-factory:PersistActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/PersistActivitiesResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
+		</wsdl:operation>
+        
+        <wsdl:operation name="GetStatePaths">
+			<wsdl:input
+				name="GetStatePaths"
+				message="bes-factory:GetStatePathsRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetStatePaths"/>
+			<wsdl:output
+				name="GetStatePathsResponse"
+				message="bes-factory:GetStatePathsResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetStatePathsResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
+		</wsdl:operation>
+        
+        <wsdl:operation name="RestartActivities">
+			<wsdl:input
+				name="RestartActivities"
+				message="bes-factory:RestartActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/RestartActivities"/>
+			<wsdl:output
+				name="RestartActivitiesResponse"
+				message="bes-factory:RestartActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/RestartActivitiesResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
+		</wsdl:operation>
+        
+        <wsdl:operation name="StopActivities">
+			<wsdl:input
+				name="StopActivities"
+				message="bes-factory:StopActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/StopActivities"/>
+			<wsdl:output
+				name="StopActivitiesResponse"
+				message="bes-factory:StopActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/StopActivitiesResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="ResumeActivities">
+			<wsdl:input
+				name="ResumeActivities"
+				message="bes-factory:ResumeActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/ResumeActivities"/>
+			<wsdl:output
+				name="ResumeActivitiesResponse"
+				message="bes-factory:ResumeActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/ResumeActivitiesResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
 		</wsdl:operation>
 		
 	</wsdl:portType>

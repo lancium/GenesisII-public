@@ -35,6 +35,21 @@ import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.TerminateActivityResponseType;
+import org.ggf.bes.factory.PersistActivitiesType;
+import org.ggf.bes.factory.PersistActivitiesResponseType;
+import org.ggf.bes.factory.PersistActivityResponseType;
+import org.ggf.bes.factory.GetStatePathsType;
+import org.ggf.bes.factory.GetStatePathsResponseType;
+import org.ggf.bes.factory.GetStatePathResponseType;
+import org.ggf.bes.factory.RestartActivitiesType;
+import org.ggf.bes.factory.RestartActivitiesResponseType;
+import org.ggf.bes.factory.RestartActivityResponseType;
+import org.ggf.bes.factory.StopActivitiesType;
+import org.ggf.bes.factory.StopActivitiesResponseType;
+import org.ggf.bes.factory.StopActivityResponseType;
+import org.ggf.bes.factory.ResumeActivitiesType;
+import org.ggf.bes.factory.ResumeActivitiesResponseType;
+import org.ggf.bes.factory.ResumeActivityResponseType;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.bes.management.StartAcceptingNewActivitiesResponseType;
@@ -603,6 +618,106 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
 			}
 		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public PersistActivitiesResponseType persistActivities(PersistActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("persistActivities called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
+		Collection<PersistActivityResponseType> responses = new LinkedList<PersistActivityResponseType>();
+
+		for (String aepr : parameters.getActivityIdentifier()) {
+			responses.add(persistActivity(aepr));
+		}
+
+		return new PersistActivitiesResponseType(responses.toArray(new PersistActivityResponseType[0]), null);
+	}
+
+	static public PersistActivityResponseType persistActivity(String epi) throws RemoteException
+	{
+		return new PersistActivityResponseType(null, false, null, null);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public GetStatePathsResponseType getStatePaths(GetStatePathsType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("getStatePaths called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
+		Collection<GetStatePathResponseType> responses = new LinkedList<GetStatePathResponseType>();
+
+		for (String epi : parameters.getActivityIdentifier()) {
+			responses.add(getStatePath(epi));
+		}
+
+		return new GetStatePathsResponseType(responses.toArray(new GetStatePathResponseType[0]), null);
+	}
+
+	static public GetStatePathResponseType getStatePath(String epi) throws RemoteException
+	{
+		return new GetStatePathResponseType(null, null, null, null);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public RestartActivitiesResponseType restartActivities(RestartActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("restartActivities called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
+		Collection<RestartActivityResponseType> responses = new LinkedList<RestartActivityResponseType>();
+
+		for (String path : parameters.getPath()) {
+			responses.add(restartActivity(path));
+		}
+
+		return new RestartActivitiesResponseType(responses.toArray(new RestartActivityResponseType[0]), null);
+	}
+
+	static public RestartActivityResponseType restartActivity(String path) throws RemoteException
+	{
+		return new RestartActivityResponseType(null, null, null, null);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public StopActivitiesResponseType stopActivities(StopActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("stopActivities called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
+		Collection<StopActivityResponseType> responses = new LinkedList<StopActivityResponseType>();
+
+		for (String aepr : parameters.getActivityIdentifier()) {
+			responses.add(stopActivity(aepr));
+		}
+
+		return new StopActivitiesResponseType(responses.toArray(new StopActivityResponseType[0]), null);
+	}
+
+	static public StopActivityResponseType stopActivity(String epi) throws RemoteException
+	{
+		return new StopActivityResponseType(null, false, null, null);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public ResumeActivitiesResponseType resumeActivities(ResumeActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("resumeActivities called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
+		Collection<ResumeActivityResponseType> responses = new LinkedList<ResumeActivityResponseType>();
+
+		for (String aepr : parameters.getActivityIdentifier()) {
+			responses.add(resumeActivity(aepr));
+		}
+
+		return new ResumeActivitiesResponseType(responses.toArray(new ResumeActivityResponseType[0]), null);
+	}
+
+	static public ResumeActivityResponseType resumeActivity(String epi) throws RemoteException
+	{
+		return new ResumeActivityResponseType(null, false, null, null);
 	}
 
 	@Override
