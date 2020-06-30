@@ -1,0 +1,178 @@
+package edu.virginia.vcgr.genii.container.bes.execution.phases;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+
+import javax.xml.namespace.QName;
+
+import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.factory.ActivityStateEnumeration;
+import org.morgan.util.io.DataTransferStatistics;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
+
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
+import edu.virginia.vcgr.genii.client.io.URIManager;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
+import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
+import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
+
+public class CheckBinariesPhase extends AbstractExecutionPhase implements Serializable {
+	static final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(CheckBinariesPhase.class);
+
+	static private final String CHECKING_BINARIES_STATE = "checking-binaries";
+
+	private URI _source;
+	private RNSPath _sourceRNS;
+	private GeniiPath _sourceGeniiPath;
+	private File _target;
+	private String _execName;
+	private UsernamePasswordIdentity _usernamePassword;
+
+	public CheckBinariesPhase(String execName) {
+		super(new ActivityState(ActivityStateEnumeration.Running, CHECKING_BINARIES_STATE, false));
+		_execName = execName;
+	}
+
+	@Override
+	public void execute(ExecutionContext context) throws Throwable {
+		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.StageIn);
+		history.createInfoWriter("Entered CheckBinariesPhase...");
+		String[] _execNameArray = _execName.split("/");
+		_execName = _execNameArray[_execNameArray.length-1];
+		boolean usingLanciumImage = false;
+		if (_execNameArray.length >= 2)
+			usingLanciumImage = _execNameArray[_execNameArray.length-2].equals("Lancium");
+		
+		// The following is code to figure out the username
+		// We need to username because we build the local and grid paths to the images with it
+		ICallingContext callContext = context.getCallingContext();
+		String prefId = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
+		X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(callContext, prefId);
+		String userName = CredentialWallet.extractUsername(owner);
+		_logger.info("Calculated username: " + userName);
+		
+		String sharedDir ="/nfs/home/luser/.genesisII-2.0/shared/";
+		String imageSourceGeniiPathString = (usingLanciumImage ? "/bin/Lancium/Images/" : "/home/CCC/Lancium/" + userName + "/Images/") + _execName;
+		String imageTargetFileString = sharedDir + (usingLanciumImage ? "Images/Lancium/" : "Images/"+userName+"/") + _execName;
+		GeniiPath imageSource = new GeniiPath(imageSourceGeniiPathString);
+		File imageTarget = new File(imageTargetFileString);
+		URI imageSourceURI;
+		try {
+			imageSourceURI = new URI("rns:"+imageSourceGeniiPathString);
+		} catch (URISyntaxException e) {
+			imageSourceURI = null;
+		}
+		
+		_sourceGeniiPath = imageSource;
+		_sourceRNS = _sourceGeniiPath.lookupRNS();
+		_source = imageSourceURI;
+		_target = imageTarget;
+		if (_logger.isDebugEnabled()) {
+			_logger.debug("Finished initial setup of CheckBinariesPhase with the following information:"); 
+			if (_sourceRNS != null) _logger.debug("Source RNSPath: " + _sourceRNS); 
+			if (_sourceGeniiPath != null) _logger.debug("Source GeniiPath: " + _sourceGeniiPath); 
+			if (_source != null) _logger.debug("Source URI: " + _source); 
+			if (_target != null) _logger.debug("Target file: " + _target); 
+		}
+		if (_target.exists()) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Target file exists, checking last modified dates");
+			
+			// get source last modified time (in GFFS)
+			RNSPath path = _sourceRNS;
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, path.getEndpoint());
+			GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument(new GetResourcePropertyDocument());
+			MessageElement document = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
+			for (MessageElement child : resp.get_any()) {
+				document.addChild(child);
+			}
+			String sourceLastModified = document.toString().split("<ns32:ModificationTime")[1].split(">")[1].split("<")[0];
+			
+			// Get target last modified time (in local FS)
+			String targetLastModified = Files.readAttributes(_target.toPath(), BasicFileAttributes.class).lastModifiedTime().toString();
+			
+			// Check if _source is newer than _target
+			ISO8601DateFormat df = new ISO8601DateFormat();
+			Date sourceLMDate = df.parse(sourceLastModified.substring(0, sourceLastModified.length()-5)+"Z");
+			Date targetLMDate = df.parse(targetLastModified);
+			int sourceCompareToTargetDate = sourceLMDate.compareTo(targetLMDate);
+			
+			// Print debug info. both String and Date objects
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("Source last modified time: " + sourceLastModified);
+				_logger.debug("Target last modified time: " + targetLastModified);
+				_logger.debug("Source last modified date: " + sourceLMDate.toString());
+				_logger.debug("Target last modified date: " + targetLMDate.toString());
+				_logger.debug("Source.compareTo(Target): " + sourceCompareToTargetDate); 
+			}
+			
+			// If file in GFFS (Source) is older than file in local FS (Target), copy
+			// If not, no copy is required because local FS is up-to-date
+			if (sourceCompareToTargetDate > 0) {
+				if (_logger.isDebugEnabled())
+					_logger.debug("Source newer than target, deleting target file " + _target.toString());
+				_target.delete();
+				if (_logger.isDebugEnabled())
+					_logger.debug("Calling doStageInPhase to copy down newer source to target location " + _target.toString());
+				doStageInPhase(context, history);
+			}
+			else {
+				if (_logger.isDebugEnabled())
+					_logger.debug("Source older than target, no need to replace existing image.");
+			}
+		}
+		else {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Target file does not exist, call doStageInPhase to copy down newer source to target location " + _target.toString());
+			doStageInPhase(context, history);
+		}
+	}
+	
+	private void doStageInPhase(ExecutionContext context, HistoryContext history) throws Throwable {
+		DataTransferStatistics stats;
+		if (_logger.isDebugEnabled())
+			_logger.debug("Entering StageinPhase: execute '" + _source + "', target = " + _target);
+		try {
+			stats = URIManager.get(_source, _target, _usernamePassword);
+			// 2019-01-07 ASG - Fixed it to give group rw permissions
+			// List<String> commandLine = new LinkedList<String>();
+			FileSystemUtils.chmod(_target.getAbsolutePath(),
+					FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE | FileSystemUtils.MODE_USER_EXECUTE
+							| FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE | FileSystemUtils.MODE_GROUP_EXECUTE 
+							| FileSystemUtils.MODE_WORLD_READ);
+			// 2020-06-30 by CCH - Add o+r to permissions so copied qcow2 images can run properly
+			// End of updates
+			history.createTraceWriter("%s: %d Bytes Transferred", _target.getName(), stats.bytesTransferred())
+					.format("%d bytes were transferred in %d ms.", stats.bytesTransferred(), stats.transferTime())
+					.close();
+		} catch (Throwable cause) {
+			history.createErrorWriter(cause, "Error staging in to %s", _target.getName())
+					.format("Error staging in from %s to %s.", _source, _target).close();
+			throw cause;
+		}
+	}
+}
