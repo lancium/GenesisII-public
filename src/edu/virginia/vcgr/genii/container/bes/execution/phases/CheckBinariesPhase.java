@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.cert.X509Certificate;
-import java.util.Date;
 
 import javax.xml.namespace.QName;
 
@@ -19,7 +18,7 @@ import org.morgan.util.io.DataTransferStatistics;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat; // Apache 2.0 License
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
@@ -29,11 +28,11 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
-import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.container.bes.BESUtilities;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.downloadmgr.DownloadManagerContainerService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
@@ -44,6 +43,7 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 	static private Log _logger = LogFactory.getLog(CheckBinariesPhase.class);
 
 	static private final String CHECKING_BINARIES_STATE = "checking-binaries";
+	static private final long CLOCK_SHIFT_MARGIN = 600000; // 10 minutes
 
 	
 	// change these first 4 to locals, pass source and target to doStageInPhase as parameters rather than using globals
@@ -51,6 +51,12 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 
 	public CheckBinariesPhase(String execName) {
 		super(new ActivityState(ActivityStateEnumeration.Running, CHECKING_BINARIES_STATE, false));
+		// CCH 2020-07-01
+		// This phase is only created once in CommonExecutionUnderstanding.java
+		// It is created only when the executable name is an image (.simg, .qcow2, .sif)
+		// We also assume the execName is in the form Lancium/<image> or just <image>. 
+		// Lancium/ indicates if you want to use a Lancium image and we change the source and target paths accordingly
+		// We calculate the source and target paths from execName and the username
 		_execName = execName;
 	}
 
@@ -72,36 +78,34 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		String userName = CredentialWallet.extractUsername(owner);
 		_logger.info("Calculated username: " + userName);
 		
-		String sharedDir = BESUtilities.getBESWorkerDir().toString();
+		String sharedDir = context.getCurrentWorkingDirectory().getWorkingDirectory().getParent().toString();
+		if (_logger.isDebugEnabled())
+			_logger.debug("Shared directory: " + sharedDir); 
 		String imageSourceGeniiPathString = (usingLanciumImage ? "/bin/Lancium/Images/" : "/home/CCC/Lancium/" + userName + "/Images/") + _execName;
-		String imageTargetFileString = sharedDir + "Images/" + (usingLanciumImage ? "Lancium/" : userName+"/") + _execName;
-		GeniiPath imageSource = new GeniiPath(imageSourceGeniiPathString);
-		File imageTarget = new File(imageTargetFileString);
-		URI imageSourceURI;
+		String imageTargetFileString = sharedDir + "/Images/" + (usingLanciumImage ? "Lancium/" : userName+"/") + _execName;
+		RNSPath sourceRNS = new GeniiPath(imageSourceGeniiPathString).lookupRNS();
+		File target = new File(imageTargetFileString);
+		URI source;
 		try {
-			imageSourceURI = new URI("rns:"+imageSourceGeniiPathString);
+			source = new URI("rns:"+imageSourceGeniiPathString);
 		} catch (URISyntaxException e) {
-			imageSourceURI = null;
+			source = null;
 		}
 		
-		GeniiPath sourceGeniiPath = imageSource;
-		RNSPath sourceRNS = sourceGeniiPath.lookupRNS();
-		URI source = imageSourceURI;
-		File target = imageTarget;
 		if (_logger.isDebugEnabled()) {
 			_logger.debug("Finished initial setup of CheckBinariesPhase with the following information:"); 
 			if (sourceRNS != null) _logger.debug("Source RNSPath: " + sourceRNS); 
-			if (sourceGeniiPath != null) _logger.debug("Source GeniiPath: " + sourceGeniiPath); 
 			if (source != null) _logger.debug("Source URI: " + source); 
 			if (target != null) _logger.debug("Target file: " + target); 
 		}
 		if (target.exists()) {
+			// Note: The target file will only exist when the download is finished! The DownloadManager copies to a temporary file then moves it to target.
+			// If the download is in progress, we will send a request to the DownloadManger, which will handle waiting for the download to finish.
 			if (_logger.isDebugEnabled())
 				_logger.debug("Target file exists, checking last modified dates");
 			
 			// get source last modified time (in GFFS)
-			RNSPath path = sourceRNS;
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, path.getEndpoint());
+			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, sourceRNS.getEndpoint());
 			GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument(new GetResourcePropertyDocument());
 			MessageElement document = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
 			for (MessageElement child : resp.get_any()) {
@@ -114,22 +118,21 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 			
 			// Check if source is newer than target
 			ISO8601DateFormat df = new ISO8601DateFormat();
-			Date sourceLMDate = df.parse(sourceLastModified.substring(0, sourceLastModified.length()-5)+"Z");
-			Date targetLMDate = df.parse(targetLastModified);
-			int sourceCompareToTargetDate = sourceLMDate.compareTo(targetLMDate);
+			long sourceLMDateMillis = df.parse(sourceLastModified.substring(0, sourceLastModified.length()-5)+"Z").getTime();
+			long targetLMDateMillis = df.parse(targetLastModified).getTime();
 			
 			// Print debug info. both String and Date objects
 			if (_logger.isDebugEnabled()) {
 				_logger.debug("Source last modified time: " + sourceLastModified);
 				_logger.debug("Target last modified time: " + targetLastModified);
-				_logger.debug("Source last modified date: " + sourceLMDate.toString());
-				_logger.debug("Target last modified date: " + targetLMDate.toString());
-				_logger.debug("Source.compareTo(Target): " + sourceCompareToTargetDate); 
+				_logger.debug("Source last modified date in millis: " + sourceLMDateMillis);
+				_logger.debug("Target last modified date in millis: " + targetLMDateMillis);
+				_logger.debug("Source > (target + 10 minutes)? : " + (sourceLMDateMillis > (targetLMDateMillis + CLOCK_SHIFT_MARGIN))); 
 			}
 			
-			// If file in GFFS (Source) is older than file in local FS (Target), copy
+			// If file in GFFS (Source) is CLOCK_SHIFT_MARGIN+ minutes older than file in local FS (Target), copy
 			// If not, no copy is required because local FS is up-to-date
-			if (sourceCompareToTargetDate > 0) {
+			if (sourceLMDateMillis > (targetLMDateMillis + CLOCK_SHIFT_MARGIN)) {
 				if (_logger.isDebugEnabled())
 					_logger.debug("Source newer than target, deleting target file " + target.toString());
 				target.delete();
@@ -154,15 +157,13 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		if (_logger.isDebugEnabled())
 			_logger.debug("Entering StageinPhase: execute '" + source + "', target = " + target);
 		try {
-			stats = URIManager.get(source, target, null);
-			// 2019-01-07 ASG - Fixed it to give group rw permissions
-			// List<String> commandLine = new LinkedList<String>();
+			DownloadManagerContainerService service = ContainerServices.findService(DownloadManagerContainerService.class);
+			stats = service.download(source, target, null);
+			// 2020-06-30 by CCH - Add o+r to permissions so copied qcow2 images can run properly
 			FileSystemUtils.chmod(target.getAbsolutePath(),
 					FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE | FileSystemUtils.MODE_USER_EXECUTE
 							| FileSystemUtils.MODE_GROUP_READ | FileSystemUtils.MODE_GROUP_WRITE | FileSystemUtils.MODE_GROUP_EXECUTE 
 							| FileSystemUtils.MODE_WORLD_READ);
-			// 2020-06-30 by CCH - Add o+r to permissions so copied qcow2 images can run properly
-			// End of updates
 			history.createTraceWriter("%s: %d Bytes Transferred", target.getName(), stats.bytesTransferred())
 					.format("%d bytes were transferred in %d ms.", stats.bytesTransferred(), stats.transferTime())
 					.close();
