@@ -79,6 +79,14 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		_logger.info("Calculated username: " + userName);
 		
 		String sharedDir = context.getCurrentWorkingDirectory().getWorkingDirectory().getParent().toString();
+		File userImageDir = new File(sharedDir+"/Images/" + userName);
+		if (_logger.isDebugEnabled())
+			_logger.debug("User Image Directory: " + userImageDir.toString()); 
+		if (!userImageDir.exists()) {
+			if (_logger.isDebugEnabled())
+				_logger.debug("User Image Directory doesn't exist, creating it... "); 
+			userImageDir.mkdir();
+		}
 		if (_logger.isDebugEnabled())
 			_logger.debug("Shared directory: " + sharedDir); 
 		String imageSourceGeniiPathString = (usingLanciumImage ? "/bin/Lancium/Images/" : "/home/CCC/Lancium/" + userName + "/Images/") + _execName;
