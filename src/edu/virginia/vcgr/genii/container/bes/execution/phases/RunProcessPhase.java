@@ -202,6 +202,12 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			}
 			for (String arg : _arguments)
 				command.add(arg);
+			
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("The following is the command line sent to the pwrapper:");
+				for (String c : command)
+					_logger.debug(c);
+			}
 
 			File workingDirectory = context.getCurrentWorkingDirectory().getWorkingDirectory();
 
@@ -233,9 +239,9 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			stderrFile = _redirects.stderrSink(workingDirectory);
 
 			// assemble job properties for cmdline manipulators
-			Collection<String> args = new ArrayList<String>(_arguments.length);
-			for (String s : _arguments)
-				args.add(s);
+			Collection<String> args = new ArrayList<String>(command.size()-1);
+			for (int i = 1; i < command.size(); i++)
+				args.add(command.get(i));
 
 			// old code
 			// File resourceUsageFile = new ResourceUsageDirectory(workingDirectory).getNewResourceUsageFile();
@@ -297,7 +303,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			hWriter.close();
 			_logger.info(String.format("Executing job for userID '%s' using command line:\n\t%s", userName, testCmdLine.toString()));
 
-			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, newCmdLine);
+			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, testCmdLine);
 			// ASG - TEST code remove if found
 			_process=token;
 			// End test
