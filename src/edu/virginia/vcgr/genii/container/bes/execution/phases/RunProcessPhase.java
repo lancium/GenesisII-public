@@ -145,6 +145,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		// End of updates
 
 		synchronized (_processLock) {
+			File workingDirectory = context.getCurrentWorkingDirectory().getWorkingDirectory();
 			command = new Vector<String>();
 
 			// 2020 May 26 CCH, if executable is an image, we set the new executable to be the appropriate wrapper and push the image path into the arguments
@@ -171,6 +172,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				else {
 					execName = "../singularity-wrapper.sh";
 				}
+				_executable = new File(workingDirectory, execName);
 				if (_logger.isDebugEnabled())
 					_logger.debug("Handling image executable: " + execName);
 					_logger.debug("Adding executable: " + execName);
@@ -208,8 +210,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				for (String c : command)
 					_logger.debug(c);
 			}
-
-			File workingDirectory = context.getCurrentWorkingDirectory().getWorkingDirectory();
 
 			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(_commonDirectory);
 
@@ -303,7 +303,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			hWriter.close();
 			_logger.info(String.format("Executing job for userID '%s' using command line:\n\t%s", userName, testCmdLine.toString()));
 
-			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, testCmdLine);
+			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, newCmdLine);
 			// ASG - TEST code remove if found
 			_process=token;
 			// End test
