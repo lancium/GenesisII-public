@@ -9,6 +9,19 @@ cd "$WORKDIR"
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
+getAdminCredentials()
+{
+	grid login /users/xsede.org/admin --username=admin --password=admin
+}
+
+dropAdminCredentials()
+{
+	grid logout --pattern=admin
+	grid logout --pattern=gffs-users
+	grid logout --pattern=gffs-amie
+	grid login /groups/xsede.org/gffs-users --username=gffs-users --password=""
+}
+
 oneTimeSetUp()
 {
   sanity_test_and_init  # make sure test environment is good.
@@ -26,14 +39,11 @@ oneTimeSetUp()
   grid cp local:$PWD/inside-container.sh grid:$RNSPATH
 
 	echo "Logging into admin to create directories"
-	grid login /users/xsede.org/admin --username=admin --password=admin
+	getAdminCredentials
 	echo "Adding image to Images userX's Image dir"
 	grid mkdir -p /home/CCC/Lancium/userX/Images
-	grid chmod -R /home/CCC/ +rw /users/xsede.org/userX
-	grid logout --pattern=admin
-	grid logout --pattern=gffs-users
-	grid logout --pattern=gffs-aime
-	grid login /groups/xsede.org/gffs-users --username=gffs-users --password=""
+	grid chmod -R /home/CCC +rwx /users/xsede.org/userX
+	dropAdminCredentials
   grid cp local:$PWD/ubuntu18.04.simg grid:/home/CCC/Lancium/userX/Images/ubuntu18.04.simg
 
 	echo "Adding local FS Images dir"
@@ -62,7 +72,9 @@ testImageJob()
 oneTimeTearDown()
 {
   echo tearing down test.
+	getAdminCredentials
 	grid rm -r /home/CCC
+	dropAdminCredentials
 	rm -r ~/.genesisII-2.0/bes-activities/Images
 }
 
