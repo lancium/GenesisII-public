@@ -1911,14 +1911,19 @@ public class JobManager implements Closeable
 			JobData jobData = _jobsByTicket.get(jobTicket);
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
-			
+
 			if(jobData.getJobState() != QueueStates.RUNNING)
 			{
 				if(_logger.isErrorEnabled())
 					_logger.error(String.format("%s is not currently running, cannot persist.", jobData));
 				continue;
 			}
-			
+
+			HistoryContext history = jobData.history(HistoryEventCategory.Persisting);
+
+			history.createTraceWriter("Persisting Job")
+			.format("Persisting the job due to request.").close();
+
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
@@ -1926,7 +1931,7 @@ public class JobManager implements Closeable
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
-		
+
 		int newCount = _outcallThreadPool.size();
 
 		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
@@ -1938,20 +1943,25 @@ public class JobManager implements Closeable
 			throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		int originalCount = _outcallThreadPool.size();
-		
+
 		for (String jobTicket : jobs)
 		{
 			JobData jobData = _jobsByTicket.get(jobTicket);
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
-			
+
 			if(jobData.getJobState() != QueueStates.PERSISTED)
 			{
 				if(_logger.isErrorEnabled())
 					_logger.error(String.format("%s is not currently persisted, cannot restart.", jobData));
 				continue;
 			}
-			
+
+			HistoryContext history = jobData.history(HistoryEventCategory.Restarting);
+
+			history.createTraceWriter("Restarting Execution of Job")
+			.format("Restarting execution of the job due to request.").close();
+
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
@@ -1959,7 +1969,7 @@ public class JobManager implements Closeable
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
-		
+
 		int newCount = _outcallThreadPool.size();
 
 		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
@@ -1977,14 +1987,19 @@ public class JobManager implements Closeable
 			JobData jobData = _jobsByTicket.get(jobTicket);
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
-			
+
 			if(jobData.getJobState() != QueueStates.RUNNING)
 			{
 				if(_logger.isErrorEnabled())
 					_logger.error(String.format("%s is not currently running, cannot stop.", jobData));
 				continue;
 			}
-			
+
+			HistoryContext history = jobData.history(HistoryEventCategory.Stopping);
+
+			history.createTraceWriter("Stopping Execution of Job")
+			.format("Stopping execution of the job due to request.").close();
+
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
@@ -2010,13 +2025,18 @@ public class JobManager implements Closeable
 			JobData jobData = _jobsByTicket.get(jobTicket);
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
-			
+
 			if(jobData.getJobState() != QueueStates.STOPPED)
 			{
 				if(_logger.isErrorEnabled())
 					_logger.error(String.format("%s is not currently stopped, cannot resume.", jobData));
 				continue;
 			}
+			
+			HistoryContext history = jobData.history(HistoryEventCategory.Resuming);
+			
+			history.createTraceWriter("Resuming Execution of Job")
+			.format("Resuming execution of the job due to request.").close();
 			
 			Resolver resolver = new Resolver();
 
