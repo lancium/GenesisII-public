@@ -171,7 +171,16 @@
 		<wsdl:part name="CompleteResponse"
 			element="job-management:CompleteResponse"/>
 	</wsdl:message>
+	
+	<wsdl:message name="PersistRequest">
+		<wsdl:part name="PersistRequest"
+			element="job-management:PersistRequestType"/>
+	</wsdl:message>
 
+	<wsdl:message name="PersistResponse">
+		<wsdl:part name="PersistResponse"
+			element="job-management:PersistResponse"/>
+	</wsdl:message>
 
 	<wsdl:message name="ResetJobRequest">
 		<wsdl:part name="ResetJobRequest"
@@ -263,6 +272,11 @@
 		<wsdl:operation name="completeJobs">
 			<wsdl:input message="job-management:CompleteRequest"/>
 			<wsdl:output message="job-management:CompleteResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="persistJobs">
+			<wsdl:input message="job-management:PersistRequest"/>
+			<wsdl:output message="job-management:PersistResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="forceUpdate">

@@ -114,6 +114,23 @@ class QueueManipulation
 			return 0;
 		}
 	}
+	
+	static private class JobPersistTask extends TypicalTask<Integer>
+	{
+		private JobPersistTask(UIPluginContext context, Collection<String> jobTickets)
+		{
+			super(context, jobTickets);
+		}
+
+		@Override
+		final public Integer execute(TaskProgressListener progressListener) throws Exception
+		{
+			QueuePortType queue = queue();
+			queue.persistJobs(_jobTickets.toArray(new String[_jobTickets.size()]));
+			return 0;
+		}
+	}
+	
 	static private class OpenJobHistoryDumpTargetTask extends TypicalTask<OutputStream>
 	{
 		private GeniiPath _dumpPath;
@@ -261,6 +278,26 @@ class QueueManipulation
 			_model.refresh(_ownerComponent);
 		}
 	}
+	
+	static private class JobPersistCompletionListener extends TypicalTaskCompletionListener<Integer>
+	{
+		private JobPersistCompletionListener(Component ownerComponent, UIPluginContext context, QueueManagerTableModel model)
+		{
+			super(ownerComponent, context, model);
+		}
+
+		@Override
+		public void taskCancelled(Task<Integer> task)
+		{
+			_model.refresh(_ownerComponent);
+		}
+
+		@Override
+		public void taskCompleted(Task<Integer> task, Integer result)
+		{
+			_model.refresh(_ownerComponent);
+		}
+	}
 
 	static private class JobHistoryCompletionListener extends TypicalTaskCompletionListener<Collection<HistoryEvent>>
 	{
@@ -364,6 +401,12 @@ class QueueManipulation
 	{
 		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Rescheduling Jobs", "Asking queue to reschedule jobs", 1000L,
 			new JobResetTask(context, jobTickets), new JobRescheduleCompletionListener(ownerComponent, context, model)).start();
+	}
+	
+	static void JobPersistTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
+	{
+		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Persisting Jobs", "Asking queue to persist jobs", 1000L,
+			new JobPersistTask(context, jobTickets), new JobPersistCompletionListener(ownerComponent, context, model)).start();
 	}
 	
 	static void completeJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)

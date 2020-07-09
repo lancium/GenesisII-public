@@ -207,6 +207,18 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			throw new RemoteException("Unable to reset jobs in queue.", sqe);
 		}
 	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public Object persistJobs(String[] jobs) throws RemoteException
+	{
+		try {
+			_queueMgr.persistJobs(jobs);
+			return null;
+		} catch (SQLException sqe) {
+			throw new RemoteException("Unable to reset jobs in queue.", sqe);
+		}
+	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)

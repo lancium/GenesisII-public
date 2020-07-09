@@ -581,6 +581,18 @@ public class QueueManager implements Closeable
 			_connectionPool.release(connection);
 		}
 	}
+	
+	public void persistJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			_jobManager.persistJobs(connection, jobs);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
 
 	public void killJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
 	{

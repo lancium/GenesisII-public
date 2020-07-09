@@ -637,7 +637,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	static public PersistActivityResponseType persistActivity(String epi) throws RemoteException
 	{
-		return new PersistActivityResponseType(null, false, null, null);
+		return new PersistActivityResponseType("", false, null, null);
 	}
 	
 	@Override
@@ -657,7 +657,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	static public GetStatePathResponseType getStatePath(String epi) throws RemoteException
 	{
-		return new GetStatePathResponseType(null, null, null, null);
+		return new GetStatePathResponseType("", "", null, null);
 	}
 	
 	@Override
@@ -677,7 +677,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	static public RestartActivityResponseType restartActivity(String path) throws RemoteException
 	{
-		return new RestartActivityResponseType(null, null, null, null);
+		return new RestartActivityResponseType("", "", null, null);
 	}
 	
 	@Override
@@ -722,6 +722,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	@Override
 	public Object completeJobs(String[] completeRequest) throws RemoteException
+	{
+		return null;
+	}
+	
+	//LAK: This function should not be implemented. This is NOT a stub.
+	@Override
+	public Object persistJobs(String[] persistRequest) throws RemoteException
 	{
 		return null;
 	}

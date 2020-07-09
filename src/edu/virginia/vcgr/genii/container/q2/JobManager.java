@@ -1878,7 +1878,6 @@ public class JobManager implements Closeable
 			}
 			
 			// Now we need to move the job between queues
-
 			synchronized (jobData) {
 				HistoryContext history = jobData.history(HistoryEventCategory.ResetCount);
 				history.createTraceWriter("Resetting Job tries count to 0")
@@ -1896,13 +1895,63 @@ public class JobManager implements Closeable
 				_database.modifyJobState(connection, jobData.getJobID(), jobData.getRunAttempts(), QueueStates.REQUEUED, new Date(), null, null,
 						null);
 				connection2.commit();
-
-		
 			}
 			
 		}
 		_schedulingEvent.notifySchedulingEvent();
 	}
+	
+	synchronized public void persistJobs(Connection connection, String[] jobs) 
+			throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		int originalCount = _outcallThreadPool.size();
+		
+		for (String jobTicket : jobs) 
+		{
+			JobData jobData = _jobsByTicket.get(jobTicket);
+			if (jobData == null)
+				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+			
+			if(jobData.getJobState() != QueueStates.RUNNING)
+			{
+				if(_logger.isErrorEnabled())
+					_logger.error(String.format("%s is not currently running, cannot persist.", jobData));
+				continue;
+			}
+			
+			JobCommunicationInfo info = null;
+			try {
+				/*
+				 * For convenience, we bundle together the id's of the job to check, and the bes container on which it is running.
+				 */
+				info = new JobCommunicationInfo(jobData.getJobID(), jobData.getBESID().longValue());
+			} catch (Throwable cause) {
+				if(_logger.isErrorEnabled())
+					_logger.error("Saw unexpected exception when creating job communication info for job: " + jobData, cause);
+				return;
+			}
+			
+			/*
+			 * As in other places, we use a callback mechanism to allow outcall threads to late bind "large" information at the last minute. This
+			 * keeps us from putting too much into memory. In this particular case its something of a hack as we already had a type for getting
+			 * the bes information so we just bundled that with a second interface for getting the job's endpoint. This could have been done
+			 * cleaner, but it works fine.
+			 */
+			Resolver resolver = new Resolver();
+
+			/* Enqueue the worker into the outcall thread pool */
+			_outcallThreadPool.enqueue(new JobPersistWorker(resolver, resolver, _connectionPool, info, jobData));
+			_lastUpdate = Calendar.getInstance().getTime();
+		}
+		_schedulingEvent.notifySchedulingEvent();
+		
+		int newCount = _outcallThreadPool.size();
+
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
+	}
+	
 	synchronized public void rescheduleJobs(Connection connection, String[] jobs)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
