@@ -176,7 +176,7 @@
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="StopRequestType"
-		type="job-management:RestartRequestType"/>
+		type="job-management:StopRequestType"/>
 	<xsd:element name="StopResponse"/>
 	
 	<xsd:complexType name="ResumeRequestType">
