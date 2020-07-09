@@ -1919,22 +1919,43 @@ public class JobManager implements Closeable
 				continue;
 			}
 			
-			JobCommunicationInfo info = null;
-			try
-			{
-				info = new JobCommunicationInfo(jobData.getJobID(), jobData.getBESID().longValue());
-			}
-			catch (Throwable cause)
+			Resolver resolver = new Resolver();
+
+			/* Enqueue the worker into the outcall thread pool */
+			_outcallThreadPool.enqueue(new JobPersistWorker(resolver, resolver, _connectionPool, jobData));
+		}
+
+		_schedulingEvent.notifySchedulingEvent();
+		
+		int newCount = _outcallThreadPool.size();
+
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
+	}
+	
+	synchronized public void restartJobs(Connection connection, String[] jobs)
+			throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		int originalCount = _outcallThreadPool.size();
+		
+		for (String jobTicket : jobs)
+		{
+			JobData jobData = _jobsByTicket.get(jobTicket);
+			if (jobData == null)
+				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+			
+			if(jobData.getJobState() != QueueStates.PERSISTED)
 			{
 				if(_logger.isErrorEnabled())
-					_logger.error("Saw unexpected exception when creating job communication info for job: " + jobData, cause);
-				return;
+					_logger.error(String.format("%s is not currently persisted, cannot restart.", jobData));
+				continue;
 			}
 			
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobPersistWorker(resolver, resolver, _connectionPool, info, jobData));
+			_outcallThreadPool.enqueue(new JobRestartWorker(resolver, resolver, _connectionPool, jobData));
 		}
 
 		_schedulingEvent.notifySchedulingEvent();

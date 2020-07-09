@@ -181,6 +181,16 @@
 		<wsdl:part name="PersistResponse"
 			element="job-management:PersistResponse"/>
 	</wsdl:message>
+	
+	<wsdl:message name="RestartRequest">
+		<wsdl:part name="RestartRequest"
+			element="job-management:RestartRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="RestartResponse">
+		<wsdl:part name="RestartResponse"
+			element="job-management:RestartResponse"/>
+	</wsdl:message>
 
 	<wsdl:message name="ResetJobRequest">
 		<wsdl:part name="ResetJobRequest"
@@ -277,6 +287,11 @@
 		<wsdl:operation name="persistJobs">
 			<wsdl:input message="job-management:PersistRequest"/>
 			<wsdl:output message="job-management:PersistResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="restartJobs">
+			<wsdl:input message="job-management:RestartRequest"/>
+			<wsdl:output message="job-management:RestartResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="forceUpdate">

@@ -732,6 +732,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{
 		return null;
 	}
+	
+	//LAK: This function should not be implemented. This is NOT a stub.
+	@Override
+	public Object restartJobs(String[] restartRequest) throws RemoteException
+	{
+		return null;
+	}
 
 	@Override
 	public Object configureResource(ConfigureRequestType configureRequest) throws RemoteException

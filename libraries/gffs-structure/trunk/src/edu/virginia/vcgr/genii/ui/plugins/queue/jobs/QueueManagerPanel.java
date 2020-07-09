@@ -248,6 +248,30 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		}
 	}
 	
+	private class JobRestartAction extends AbstractAction
+	{
+		static final long serialVersionUID = 0L;
+
+		private JobRestartAction(int[] rows)
+		{
+			super("Restart Jobs");
+
+			setEnabled(rows.length > 0);
+		}
+
+		@Override
+		final public void actionPerformed(ActionEvent e)
+		{
+			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
+
+			Collection<String> jobTickets = new LinkedList<String>();
+			for (int row : _table.getSelectedRows())
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
+
+			QueueManipulation.JobRestartTask(_context, _table, _model, jobTickets);
+		}
+	}
+	
 	private UIPluginContext _context;
 	private JTable _table;
 	private QueueManagerTableModel _model;
@@ -266,6 +290,7 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		popup.add(new JobResetAction(rows));
 		popup.addSeparator();
 		popup.add(new JobPersistAction(rows));
+		popup.add(new JobRestartAction(rows));
 		popup.addSeparator();
 		popup.add(new RefreshAction());
 

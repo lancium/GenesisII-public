@@ -7,6 +7,7 @@ public enum QueueStates {
 	REQUEUED,
 	STARTING,
 	RUNNING,
+	PERSISTED,
 	FINISHED,
 	ERROR;
 
