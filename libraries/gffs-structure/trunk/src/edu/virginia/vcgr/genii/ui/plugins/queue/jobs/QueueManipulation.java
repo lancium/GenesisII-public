@@ -163,6 +163,22 @@ class QueueManipulation
 		}
 	}
 	
+	static private class JobResumeTask extends TypicalTask<Integer>
+	{
+		private JobResumeTask(UIPluginContext context, Collection<String> jobTickets)
+		{
+			super(context, jobTickets);
+		}
+
+		@Override
+		final public Integer execute(TaskProgressListener progressListener) throws Exception
+		{
+			QueuePortType queue = queue();
+			queue.resumeJobs(_jobTickets.toArray(new String[_jobTickets.size()]));
+			return 0;
+		}
+	}
+	
 	static private class OpenJobHistoryDumpTargetTask extends TypicalTask<OutputStream>
 	{
 		private GeniiPath _dumpPath;
@@ -370,6 +386,26 @@ class QueueManipulation
 			_model.refresh(_ownerComponent);
 		}
 	}
+	
+	static private class JobResumeCompletionListener extends TypicalTaskCompletionListener<Integer>
+	{
+		private JobResumeCompletionListener(Component ownerComponent, UIPluginContext context, QueueManagerTableModel model)
+		{
+			super(ownerComponent, context, model);
+		}
+
+		@Override
+		public void taskCancelled(Task<Integer> task)
+		{
+			_model.refresh(_ownerComponent);
+		}
+
+		@Override
+		public void taskCompleted(Task<Integer> task, Integer result)
+		{
+			_model.refresh(_ownerComponent);
+		}
+	}
 
 	static private class JobHistoryCompletionListener extends TypicalTaskCompletionListener<Collection<HistoryEvent>>
 	{
@@ -491,6 +527,12 @@ class QueueManipulation
 	{
 		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Stopping Jobs", "Asking queue to stop jobs", 1000L,
 			new JobStopTask(context, jobTickets), new JobStopCompletionListener(ownerComponent, context, model)).start();
+	}
+	
+	static void JobResumeTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
+	{
+		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Resuming Jobs", "Asking queue to resume jobs", 1000L,
+			new JobResumeTask(context, jobTickets), new JobResumeCompletionListener(ownerComponent, context, model)).start();
 	}
 	
 	static void completeJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)

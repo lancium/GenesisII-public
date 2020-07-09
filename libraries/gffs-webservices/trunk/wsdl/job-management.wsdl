@@ -201,6 +201,16 @@
 		<wsdl:part name="StopResponse"
 			element="job-management:StopResponse"/>
 	</wsdl:message>
+	
+	<wsdl:message name="ResumeRequest">
+		<wsdl:part name="ResumeRequest"
+			element="job-management:ResumeRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="ResumeResponse">
+		<wsdl:part name="ResumeResponse"
+			element="job-management:ResumeResponse"/>
+	</wsdl:message>
 
 	<wsdl:message name="ResetJobRequest">
 		<wsdl:part name="ResetJobRequest"
@@ -307,6 +317,11 @@
 		<wsdl:operation name="stopJobs">
 			<wsdl:input message="job-management:StopRequest"/>
 			<wsdl:output message="job-management:StopResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="resumeJobs">
+			<wsdl:input message="job-management:ResumeRequest"/>
+			<wsdl:output message="job-management:ResumeResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="forceUpdate">
