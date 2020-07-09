@@ -78,7 +78,7 @@ public class JobStopWorker implements OutcallHandler {
 				
 				StopActivityResponseType[] stopResponses;
 				/* call the BES container to start persisting the job. */
-				stopResponses = clientStub.stopActivities(new StopActivitiesType(new String[] {"FAKE EPI"}, null)).getResponse();
+				stopResponses = clientStub.stopActivities(new StopActivitiesType(new String[] { _data.getJobTicket() }, null)).getResponse();
 				
 				for(StopActivityResponseType sRes : stopResponses)
 				{

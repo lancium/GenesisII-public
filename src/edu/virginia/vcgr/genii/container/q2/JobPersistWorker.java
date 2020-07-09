@@ -78,7 +78,7 @@ public class JobPersistWorker implements OutcallHandler {
 				
 				PersistActivityResponseType[] persistResponses;
 				/* call the BES container to start persisting the job. */
-				persistResponses = clientStub.persistActivities(new PersistActivitiesType(new String[]{"FAKE EPI"}, false, null)).getResponse();
+				persistResponses = clientStub.persistActivities(new PersistActivitiesType(new String[]{_data.getJobTicket()}, false, null)).getResponse();
 				
 				for(PersistActivityResponseType pRes : persistResponses)
 				{

@@ -83,12 +83,12 @@ public class JobRestartWorker implements OutcallHandler {
 				GetStatePathResponseType[] getStatePathResponses;
 				
 				// call the BES container to get the location the job's persisted data is stored
-				getStatePathResponses = clientStub.getStatePaths(new GetStatePathsType(new String[]{"FAKE EPI"}, null)).getResponse();
+				getStatePathResponses = clientStub.getStatePaths(new GetStatePathsType(new String[]{_data.getJobTicket()}, null)).getResponse();
 				
 				if(getStatePathResponses.length != 1)
 				{
 					if(_logger.isErrorEnabled())
-						_logger.error(String.format("GetStatePath returned an invalid number of responses for JobRestartAction: %s", _data));
+						_logger.error(String.format("GetStatePath returned an invalid number of responses for JobRestartWorker: %s", _data));
 				}
 				
 				GetStatePathResponseType stateRes = getStatePathResponses[0];

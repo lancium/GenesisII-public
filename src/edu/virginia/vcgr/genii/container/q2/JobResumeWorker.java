@@ -78,7 +78,7 @@ public class JobResumeWorker implements OutcallHandler {
 				
 				ResumeActivityResponseType[] resumeResponses;
 				/* call the BES container to start persisting the job. */
-				resumeResponses = clientStub.resumeActivities(new ResumeActivitiesType(new String[] {"FAKE EPI"}, null)).getResponse();
+				resumeResponses = clientStub.resumeActivities(new ResumeActivitiesType(new String[] { _data.getJobTicket() }, null)).getResponse();
 				
 				for(ResumeActivityResponseType rRes : resumeResponses)
 				{
