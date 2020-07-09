@@ -64,6 +64,8 @@ public class JobPersistWorker implements OutcallHandler {
 				} catch (Throwable cause) {
 					String message = String.format("Failure to get job endpoint on job %s with connection=%s jobId=%s", _data, connection,
 						_data.getJobID());
+					if(_logger.isErrorEnabled())
+						_logger.error(message);
 					throw cause;
 				}
 				
@@ -82,7 +84,8 @@ public class JobPersistWorker implements OutcallHandler {
 				{
 					if(pRes.isPersisting() == false)
 					{
-						_logger.error(String.format("Request to persist job responded with a failure: %s", _data));
+						if(_logger.isErrorEnabled())
+							_logger.error(String.format("Request to persist job responded with a failure: %s", _data));
 					}
 				}
 			}
