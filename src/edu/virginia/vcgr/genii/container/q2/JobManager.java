@@ -1967,6 +1967,39 @@ public class JobManager implements Closeable
 		}
 	}
 	
+	synchronized public void stopJobs(Connection connection, String[] jobs)
+			throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		int originalCount = _outcallThreadPool.size();
+		
+		for (String jobTicket : jobs)
+		{
+			JobData jobData = _jobsByTicket.get(jobTicket);
+			if (jobData == null)
+				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+			
+			if(jobData.getJobState() != QueueStates.RUNNING)
+			{
+				if(_logger.isErrorEnabled())
+					_logger.error(String.format("%s is not currently running, cannot stop.", jobData));
+				continue;
+			}
+			
+			Resolver resolver = new Resolver();
+
+			/* Enqueue the worker into the outcall thread pool */
+			_outcallThreadPool.enqueue(new JobStopWorker(resolver, resolver, _connectionPool, jobData));
+		}
+
+		_schedulingEvent.notifySchedulingEvent();
+		
+		int newCount = _outcallThreadPool.size();
+
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
+	}
+	
 	synchronized public void rescheduleJobs(Connection connection, String[] jobs)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{

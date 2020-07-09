@@ -231,6 +231,18 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			throw new RemoteException("Unable to restart jobs in queue.", sqe);
 		}
 	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public Object stopJobs(String[] jobs) throws RemoteException
+	{
+		try {
+			_queueMgr.stopJobs(jobs);
+			return null;
+		} catch (SQLException sqe) {
+			throw new RemoteException("Unable to stop jobs in queue.", sqe);
+		}
+	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)

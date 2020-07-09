@@ -168,6 +168,16 @@
 	<xsd:element name="RestartRequestType"
 		type="job-management:RestartRequestType"/>
 	<xsd:element name="RestartResponse"/>
+	
+	<xsd:complexType name="StopRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="StopRequestType"
+		type="job-management:RestartRequestType"/>
+	<xsd:element name="StopResponse"/>
 
 	<xsd:complexType name="ResetJobRequestType">
 		<xsd:sequence>

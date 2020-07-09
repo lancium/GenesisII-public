@@ -697,7 +697,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	static public StopActivityResponseType stopActivity(String epi) throws RemoteException
 	{
-		return new StopActivityResponseType(null, false, null, null);
+		return new StopActivityResponseType("", false, null, null);
 	}
 	
 	@Override
@@ -736,6 +736,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	//LAK: This function should not be implemented. This is NOT a stub.
 	@Override
 	public Object restartJobs(String[] restartRequest) throws RemoteException
+	{
+		return null;
+	}
+	
+	//LAK: This function should not be implemented. This is NOT a stub.
+	@Override
+	public Object stopJobs(String[] restartRequest) throws RemoteException
 	{
 		return null;
 	}
