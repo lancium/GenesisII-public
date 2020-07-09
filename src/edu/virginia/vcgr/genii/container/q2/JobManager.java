@@ -1920,29 +1920,23 @@ public class JobManager implements Closeable
 			}
 			
 			JobCommunicationInfo info = null;
-			try {
-				/*
-				 * For convenience, we bundle together the id's of the job to check, and the bes container on which it is running.
-				 */
+			try
+			{
 				info = new JobCommunicationInfo(jobData.getJobID(), jobData.getBESID().longValue());
-			} catch (Throwable cause) {
+			}
+			catch (Throwable cause)
+			{
 				if(_logger.isErrorEnabled())
 					_logger.error("Saw unexpected exception when creating job communication info for job: " + jobData, cause);
 				return;
 			}
 			
-			/*
-			 * As in other places, we use a callback mechanism to allow outcall threads to late bind "large" information at the last minute. This
-			 * keeps us from putting too much into memory. In this particular case its something of a hack as we already had a type for getting
-			 * the bes information so we just bundled that with a second interface for getting the job's endpoint. This could have been done
-			 * cleaner, but it works fine.
-			 */
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobPersistWorker(resolver, resolver, _connectionPool, info, jobData));
-			_lastUpdate = Calendar.getInstance().getTime();
 		}
+
 		_schedulingEvent.notifySchedulingEvent();
 		
 		int newCount = _outcallThreadPool.size();
