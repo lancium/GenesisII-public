@@ -9,6 +9,11 @@ cd "$WORKDIR"
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then echo Please run prepare_tools.sh before testing.; exit 3; fi
 source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
 
+hidden_genii_dir=$GENII_USER_DIR
+if [ -z "$hidden_genii_dir" ]; then
+	hidden_genii_dir=$HOME/.genesisII-2.0
+fi
+
 getAdminCredentials()
 {
 	grid login /users/xsede.org/admin --username=admin --password=admin
@@ -33,12 +38,8 @@ oneTimeSetUp()
   fi
 
 	echo "Adding wrappers to bes-activities directory"
-	wrapper_base=$GENII_USER_DIR
-	if [ -z "$wrapper_base" ]; then
-		wrapper_base=$HOME/.genesisII-2.0
-	fi
-	cp singularity-wrapper.sh $wrapper_base/bes-activities/
-	cp vmwrapper.sh $wrapper_base/bes-activities/
+	cp singularity-wrapper.sh $hidden_genii_dir/bes-activities/
+	cp vmwrapper.sh $hidden_genii_dir/bes-activities/
 
   echo "Copying necessary file to Grid namespace:" $RNSPATH
   grid cp local:$PWD/inside-container.sh grid:$RNSPATH
@@ -53,7 +54,7 @@ oneTimeSetUp()
   grid cp local:$PWD/ubuntu18.04.qcow2 grid:/home/CCC/Lancium/userX/Images/ubuntu18.04.qcow2
 
 	echo "Adding local FS Images dir"
-	mkdir -p ~/.genesisII-2.0/bes-activities/Images/userX/
+	mkdir -p $hidden_genii_dir/bes-activities/Images/userX/
 }
 
 testQueueResourcesExist()
@@ -99,9 +100,9 @@ oneTimeTearDown()
 	grid rm grid:$RNSPATH/singularity-image-job.out
 	grid rm grid:$RNSPATH/singularity-image-job.err
 	grid rm grid:$RNSPATH/inside-container.sh
-	rm -r ~/.genesisII-2.0/bes-activities/Images
-	rm ~/.genesisII-2.0/bes-activities/singularity-wrapper.sh
-	rm ~/.genesisII-2.0/bes-activities/vmwrapper.sh
+	rm -r $hidden_genii_dir/bes-activities/Images
+	rm $hidden_genii_dir/bes-activities/singularity-wrapper.sh
+	rm $hidden_genii_dir/bes-activities/vmwrapper.sh
 }
 
 # load and run shUnit2
