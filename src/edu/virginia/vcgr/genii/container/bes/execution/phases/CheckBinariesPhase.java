@@ -85,7 +85,7 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		if (!userImageDir.exists()) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("User Image Directory doesn't exist, creating it... "); 
-			userImageDir.mkdir();
+			userImageDir.mkdirs();
 		}
 		if (_logger.isDebugEnabled())
 			_logger.debug("Shared directory: " + sharedDir); 
