@@ -3,20 +3,26 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.rmi.RemoteException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
@@ -30,8 +36,10 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPath.RNSPathApplyFunction;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class LsTool extends BaseGridTool
 {
@@ -48,6 +56,7 @@ public class LsTool extends BaseGridTool
 	private boolean _epr = false;
 	private boolean _certChain = false;
 	private boolean _multiline = false;
+	private boolean _dateInformation = false;
 
 	public LsTool()
 	{
@@ -96,6 +105,12 @@ public class LsTool extends BaseGridTool
 	{
 		_certChain = true;
 	}
+	
+	@Option({ "date-information", "i" })
+	public void setDateInformation()
+	{
+		_dateInformation = true;
+	}
 
 	@Override
 	protected int runCommand() throws ReloadShellException, ToolException, UserCancelException, RNSException, AuthZSecurityException,
@@ -108,6 +123,7 @@ public class LsTool extends BaseGridTool
 		boolean isEPR = _epr;
 		boolean isMultiline = _multiline;
 		boolean isCertChain = _certChain;
+		boolean isDateInformation = _dateInformation;
 
 		List<String> arguments = getArguments();
 		if (arguments.size() == 0)
@@ -142,12 +158,12 @@ public class LsTool extends BaseGridTool
 		for (RNSPath path : targets) {
 			TypeInformation type = new TypeInformation(path.getEndpoint());
 			if (isJustDirectory || !type.isRNS()) {
-				printEntry(stdout, path, isLong, isAll, isEPR, isMultiline, isCertChain);
+				printEntry(stdout, path, isLong, isAll, isEPR, isMultiline, isCertChain, isDateInformation);
 			} else
 				dirs.add(path);
 		}
 		for (RNSPath path : dirs) {
-			if (listDirectory(stdout, null, path, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive) !=true) returnValue++;;
+			if (listDirectory(stdout, null, path, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive, isDateInformation) !=true) returnValue++;;
 		}
 
 		// Third, output the local files specified on the command line.
@@ -202,7 +218,7 @@ public class LsTool extends BaseGridTool
 	}
 
 	static private void printEntry(PrintWriter out, RNSPath path, boolean isLong, boolean isAll, boolean isEPR, boolean isMultiline,
-		boolean isCertChain) throws RNSException, ResourceException, AuthZSecurityException
+		boolean isCertChain, boolean isDateInformation) throws RNSException, ResourceException, AuthZSecurityException
 	{
 		String name = path.getName();
 		if (name.startsWith(".") && !isAll)
@@ -217,6 +233,44 @@ public class LsTool extends BaseGridTool
 				typeDesc = "";
 
 			out.format("%1$-16s", typeDesc);
+		}
+		if (isDateInformation) {
+			String lastModified = "   ";
+			String createTime = "   ";
+			if (!(new GeniiPath(path.toString()).isDirectory())) {
+				GeniiCommon common = null;
+				try {
+					common = ClientUtils.createProxy(GeniiCommon.class, path.getEndpoint());
+				} catch (GenesisIISecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				GetResourcePropertyDocumentResponse resp = null;
+				try {
+					resp = common.getResourcePropertyDocument(new GetResourcePropertyDocument());
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				MessageElement document = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
+				for (MessageElement child : resp.get_any()) {
+					try {
+						document.addChild(child);
+					} catch (SOAPException e) {
+						try {
+							throw new ToolException("SOAP error: " + e.getLocalizedMessage(), e);
+						} catch (ToolException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+				_logger.debug(document.toString());
+				lastModified = document.toString().split("ns[0-9][0-9]:ModificationTime")[1].split(">")[1].split("<")[0];
+				createTime = document.toString().split("ns[0-9][0-9]:CreateTime")[1].split(">")[1].split("<")[0];
+				out.format("%1$-32s", lastModified);
+				out.format("%1$-32s", createTime);
+			}
 		}
 		out.println(name);
 		if (isEPR) {
@@ -261,9 +315,10 @@ public class LsTool extends BaseGridTool
 		boolean _isEPR;
 		boolean _isMultiline;
 		boolean _isCertChain;
+		boolean _isDateInformation;
 
 		DirLister(PrintWriter out, ArrayList<String> subdirs, boolean isLong, boolean isAll, boolean isEPR, boolean isMultiline,
-			boolean isCertChain)
+			boolean isCertChain, boolean isDateInformation)
 		{
 			_out = out;
 			_subdirs = subdirs;
@@ -272,13 +327,14 @@ public class LsTool extends BaseGridTool
 			_isEPR = isEPR;
 			_isMultiline = isMultiline;
 			_isCertChain = isCertChain;
+			_isDateInformation = isDateInformation;
 		}
 
 		@Override
 		public boolean applyToPath(RNSPath applyTo) throws RNSException, AuthZSecurityException
 		{
 			try {
-				printEntry(_out, applyTo, _isLong, _isAll, _isEPR, _isMultiline, _isCertChain);
+				printEntry(_out, applyTo, _isLong, _isAll, _isEPR, _isMultiline, _isCertChain, _isDateInformation);
 			} catch (ResourceException e) {
 				throw new RNSException("failed to print entry due to resource exception", e);
 			}
@@ -296,7 +352,7 @@ public class LsTool extends BaseGridTool
 	}
 
 	static private Boolean listDirectory(PrintWriter out, String prefix, RNSPath path, boolean isLong, boolean isAll, boolean isEPR,
-		boolean isMultiline, boolean isCertChain, boolean isRecursive) throws RNSException, ResourceException
+		boolean isMultiline, boolean isCertChain, boolean isRecursive, boolean isDateInformation) throws RNSException, ResourceException
 	{
 		String name = path.getName();
 		if (name == null)
@@ -307,7 +363,7 @@ public class LsTool extends BaseGridTool
 		Boolean ok=true;
 		try {
 			ArrayList<String> subdirs = new ArrayList<String>();
-			DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR, isMultiline, isCertChain);
+			DirLister dl = new DirLister(out, subdirs, isLong, isAll, isEPR, isMultiline, isCertChain, isDateInformation);
 			path.applyToContents(dl);
 
 			out.println();
@@ -316,7 +372,7 @@ public class LsTool extends BaseGridTool
 					RNSPath sub = new RNSPath(path, entry, null, false);
 					// 2018-11-07 ASG, as an "OR" this was not doing sub-dirs because of short-circuit evaluation.
 					//ok = ok || listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
-					ok = ok && listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive);
+					ok = ok && listDirectory(out, name, sub, isLong, isAll, isEPR, isMultiline, isCertChain, isRecursive, isDateInformation);
 
 				}
 			}
