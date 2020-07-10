@@ -35,10 +35,10 @@ oneTimeSetUp()
 	echo "Adding wrappers to bes-activities directory"
 	wrapper_base=$GENII_USER_DIR
 	if [ -z "$wrapper_base" ]; then
-		wrapper_base=$HOME
+		wrapper_base=$HOME/.genesisII-2.0
 	fi
-	cp singularity-wrapper.sh $wrapper_base/.genesisII-2.0/bes-activities/
-	cp vmwrapper.sh $wrapper_base/.genesisII-2.0/bes-activities/
+	cp singularity-wrapper.sh $wrapper_base/bes-activities/
+	cp vmwrapper.sh $wrapper_base/bes-activities/
 
   echo "Copying necessary file to Grid namespace:" $RNSPATH
   grid cp local:$PWD/inside-container.sh grid:$RNSPATH
