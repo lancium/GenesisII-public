@@ -120,8 +120,9 @@ EMS_TESTS=( \
   EMS_Tests/performanceTests/file-staging-performance-test.sh \
   EMS_Tests/faultJobsTests/bes-submission-sync-fault.sh \
   EMS_Tests/besStatus/bes-attributes-and-activities.sh \
-  #EMS_Tests/fileStagingTests/protocols-test.sh \
+  EMS_Tests/fileStagingTests/protocols-test.sh \
   #EMS_Tests/fileStagingTests/stageout-test.sh \
+  EMS_Tests/imageJobTests/image-job-test.sh \
   EMS_Tests/besFunctionality/bes-submission-test-sync.sh \
 )
 
