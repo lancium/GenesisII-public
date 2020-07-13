@@ -223,7 +223,7 @@ public class LsTool extends BaseGridTool
 		String name = path.getName();
 		if (name.startsWith(".") && !isAll)
 			return;
-		if (isLong) {
+		if (isLong || isDateInformation) {
 			TypeInformation type = new TypeInformation(path.getEndpoint());
 			String typeDesc = type.getTypeDescription();
 			if (typeDesc != null) {
@@ -234,45 +234,45 @@ public class LsTool extends BaseGridTool
 
 			out.format("%1$-16s", typeDesc);
 		}
+		out.print(name);
 		if (isDateInformation) {
-			String lastModified = "   ";
-			String createTime = "   ";
+			String lastModified = "";
+			String createTime = "";
 			if (!(new GeniiPath(path.toString()).isDirectory())) {
 				GeniiCommon common = null;
 				try {
 					common = ClientUtils.createProxy(GeniiCommon.class, path.getEndpoint());
 				} catch (GenesisIISecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.error("GenesisII Security Exception while trying to get date information", e);
 				}
 				GetResourcePropertyDocumentResponse resp = null;
 				try {
 					resp = common.getResourcePropertyDocument(new GetResourcePropertyDocument());
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.error("Remote Exception while trying to get date information", e);
 				}
 				MessageElement document = new MessageElement(new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
-				for (MessageElement child : resp.get_any()) {
-					try {
-						document.addChild(child);
-					} catch (SOAPException e) {
+				if (resp != null) {
+					for (MessageElement child : resp.get_any()) {
 						try {
-							throw new ToolException("SOAP error: " + e.getLocalizedMessage(), e);
-						} catch (ToolException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							document.addChild(child);
+						} catch (SOAPException e) {
+							_logger.error("SOAP Exception while trying to get date information", e);
+							try {
+								throw new ToolException("SOAP error: " + e.getLocalizedMessage(), e);
+							} catch (ToolException e1) {
+								_logger.error("Tool Exception while trying to get date information", e1);
+							}
 						}
 					}
+					lastModified = document.toString().split("ns[0-9][0-9]:ModificationTime")[1].split(">")[1].split("<")[0];
+					createTime = document.toString().split("ns[0-9][0-9]:CreateTime")[1].split(">")[1].split("<")[0];
+					out.print("\t" + createTime + "  ");
+					out.print("\t" + lastModified + "  ");
 				}
-				_logger.debug(document.toString());
-				lastModified = document.toString().split("ns[0-9][0-9]:ModificationTime")[1].split(">")[1].split("<")[0];
-				createTime = document.toString().split("ns[0-9][0-9]:CreateTime")[1].split(">")[1].split("<")[0];
-				out.format("%1$-32s", lastModified);
-				out.format("%1$-32s", createTime);
 			}
 		}
-		out.println(name);
+		out.println();
 		if (isEPR) {
 			out.println("\t" + ObjectSerializer.toString(path.getEndpoint(), new QName(GenesisIIConstants.GENESISII_NS, "endpoint"), false));
 		}
