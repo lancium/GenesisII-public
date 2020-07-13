@@ -73,20 +73,20 @@ public class CopyMachine
 		if (_logger.isDebugEnabled())
 			_logger.debug("into copyTree on " + _source);
 		_currentTarget = _target; // reset for this copy.
-		// we create paths in target on directory entry, and we copy files when
-		// we hit them.
-		GeniiPathRecurser cloner = new GeniiPathRecurser(new EnterDirectoryGeniiPath(this), new ExitDirectoryGeniiPath(this, _logLocation),
-			new CopyFileGeniiPath(this, _logLocation), null);
-		cloner.setMaximumRecursionDepth(MAX_COPY_DEPTH);
-		GeniiPath targetCheck = new GeniiPath(_target);
-		if (targetCheck.exists()) {
-			// copying to an existing destination is simpler.
-			return cloner.recursePath(new GeniiPath(_source));
-		}
-		// we do not have a target, so we need to create one.
 		GeniiPath sourceCheck = new GeniiPath(_source);
 		if (sourceCheck.isDirectory()) {
 			// our source is a directory, so we'll stuff things into it.
+			// we create paths in target on directory entry, and we copy files when
+			// we hit them.
+			GeniiPathRecurser cloner = new GeniiPathRecurser(new EnterDirectoryGeniiPath(this), new ExitDirectoryGeniiPath(this, _logLocation),
+				new CopyFileGeniiPath(this, _logLocation), null);
+			cloner.setMaximumRecursionDepth(MAX_COPY_DEPTH);
+			GeniiPath targetCheck = new GeniiPath(_target);
+			if (targetCheck.exists()) {
+				// copying to an existing destination is simpler.
+				return cloner.recursePath(new GeniiPath(_source));
+			}
+			// we do not have a target, so we need to create one.
 			try {
 				ArrayList<String> dirs = new ArrayList<String>();
 				dirs.add(_target);

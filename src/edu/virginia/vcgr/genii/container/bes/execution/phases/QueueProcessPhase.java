@@ -163,6 +163,15 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		String userName = CredentialWallet.extractUsername(owner);
 		if (userName == null)
 			userName = "UnKnown";
+		
+		// CCH 2020 June 24
+		// POSIX Applications don't set these fields and cause a null pointer exception later if we don't set defaults
+		if (_numProcesses == null)
+			_numProcesses = new Integer(1);
+		if (_numProcessesPerHost == null)
+			_numProcessesPerHost = new Integer(1);
+		if (_threadsPerProcess == null) 
+			_threadsPerProcess = new Integer(1);
 
 		// End of updates
 
@@ -209,6 +218,17 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
                 }
                 // End jobName updates
                 resourceUsageFile =tmp.getNewResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
+				if (_logger.isDebugEnabled()) {
+					_logger.debug("Generate Properties Constructor tmp: " + tmp);
+					_logger.debug("Generate Properties Constructor userName: " + userName);
+					_logger.debug("Generate Properties Constructor _executable (File): " + _executable);
+					_logger.debug("Generate Properties Constructor _executable.getAbsolutePath (String): " + _executable.getAbsolutePath());
+					_logger.debug("Generate Properties Constructor _memory: " + _memory);
+					_logger.debug("Generate Properties Constructor _numProcesses: " + _numProcesses);
+					_logger.debug("Generate Properties Constructor _numProcessesPerHost: " + _numProcessesPerHost);
+					_logger.debug("Generate Properties Constructor _threadsPerProcess: " + _threadsPerProcess);
+					_logger.debug("Generate Properties Constructor _jobName: " + _jobName);
+				}
 				generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
 						_numProcessesPerHost, _threadsPerProcess, _jobName,_jobAnnotation );
 
@@ -273,7 +293,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			// =========================================================
 			// 2016-09-07 New code by ASG to probe every second until the post execution delay has passed rather than waiting for that long.
 			// First set up the delay; default to 10 seconds if not set
-			int delay=10;
+			int delay=1;
 			int secondsWaited=0;
 			if (_constructionParameters != null) {
 				Duration postDelay = _constructionParameters.postExecutionDelay();

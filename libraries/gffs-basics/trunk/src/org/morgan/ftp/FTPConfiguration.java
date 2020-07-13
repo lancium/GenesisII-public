@@ -13,7 +13,7 @@ public class FTPConfiguration
 	public FTPConfiguration(int listenPort)
 	{
 		_listenPort = listenPort;
-		_idleTimeoutSeconds = 150;
+		_idleTimeoutSeconds = 21600;
 		_dataConnectionTimeout = 60;
 		_missedAuthenticationsLimit = 3;
 

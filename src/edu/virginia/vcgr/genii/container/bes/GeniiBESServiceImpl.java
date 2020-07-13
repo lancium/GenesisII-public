@@ -65,6 +65,7 @@ import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
+import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.Elementals;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
@@ -78,6 +79,7 @@ import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.cloud.CloudAttributesHandler;
@@ -260,7 +262,37 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		// _postponer = null; // done with the thread, so it can be trashed whenever.
 		//
 		// _logger.debug("now initiating BES services startup.");
+		File workingDir=BESUtilities.getBESWorkerDir();
+		_logger.debug("now initiating BES services startup." + workingDir.getAbsolutePath());
+		try {
+			File actDir = new File(workingDir+"/Accounting");
+			if (!actDir.exists()) {
+				actDir.mkdirs();
+				// 2020-05-28 by ASG -- Add Accounting/finished and Accounting/archive
+				File finishedDir = new File(actDir + "/finished");
+				finishedDir.mkdir();
+				File archiveDir = new File(actDir + "/archive");
+				archiveDir.mkdir();
+				// set permissions next
+				if (OperatingSystemType.isWindows()) {
+					actDir.setWritable(true, false);
+					finishedDir.setWritable(true, false);
+					archiveDir.setWritable(true, false);
+				}
+				else {
+					FileSystemUtils.chmod(actDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+							| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+					FileSystemUtils.chmod(finishedDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+							| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+					FileSystemUtils.chmod(archiveDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+							| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				}
+			}
+		}
+		catch (Exception e) {
+			_logger.error("Unable to create Accounting, finished, or archive directories.", e);
 
+		}
 		try {
 			/*
 			 * In order to make out calls, we have to have a working context so we go ahead and create an empty one.
@@ -271,7 +303,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			 * Now we get the database connection pool configured with this service
 			 */
 			ServerDatabaseConnectionPool connectionPool =
-				((DBBESResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory()).getConnectionPool();
+					((DBBESResourceFactory) ResourceManager.getServiceResource(_serviceName).getProvider().getFactory()).getConnectionPool();
 
 			// Set cloud connection DB pool
 			CloudMonitor.setConnectionPool((new CloudDBResourceFactory(connectionPool).getConnectionPool()));
@@ -572,12 +604,42 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	static public TerminateActivityResponseType terminateActivity(EndpointReferenceType activity) throws RemoteException
 	{
-		try {
-			GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
-			client.destroy(new Destroy());
-			return new TerminateActivityResponseType(activity, true, null, null);
-		} catch (Throwable cause) {
-			return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
+		// 2020-06-07 by ASG - changing how we terminate activities from the outside; now we directly the activity.terminate function if
+		// it "lives in this container.
+
+		AddressingParameters aps = new AddressingParameters(activity.getReferenceParameters());
+
+		String rKey=aps.getResourceKey();
+		BES ownerBES=BES.findBESForActivity(rKey);
+		BESActivity activity2 = ownerBES.findActivity(rKey);
+		if (activity2!=null) {
+			try {
+				activity2.terminate();
+				try {
+					GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
+					client.destroy(new Destroy());
+					return new TerminateActivityResponseType(activity, true, null, null);
+				} catch (Throwable cause) {
+					return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
+				}
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(e), null);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(e), null);
+			}
+		}
+		// End of new code.
+		else {
+
+			try {
+				GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
+				client.destroy(new Destroy());
+				return new TerminateActivityResponseType(activity, true, null, null);
+			} catch (Throwable cause) {
+				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
+			}
 		}
 	}
 

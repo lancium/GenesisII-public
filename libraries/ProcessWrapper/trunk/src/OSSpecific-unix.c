@@ -110,8 +110,11 @@ int dumpStats() {
 
 void sig_handler(int signo)
 {
-	if (signo == SIGTERM || signo == SIGCHLD) {
+	if (signo == SIGTERM) {
 		beingKilled=1;
+		dumpStats();
+	}
+	else if (signo == SIGCHLD) {
 		dumpStats();
 	}
 
@@ -223,8 +226,9 @@ int wrapJob(CommandLine *commandLine)
 	int ticks=0;
 	while (running==1 && beingKilled==0) {
 		// 2020-06-05 by ASG .. change the order to dumpstats first, then sleep
-		exitCode=dumpStats();
-		sleep(SLEEP_DURATION);
+		if ((ticks % SLEEP_DURATION) == 0)
+			exitCode=dumpStats();
+		sleep(1);
 		ticks++;
 	}
 	// End of updates

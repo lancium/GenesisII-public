@@ -21,6 +21,7 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLMatchException;
@@ -35,6 +36,7 @@ import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.CheckBinariesPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CreateWorkingDirectoryPhase;
@@ -45,7 +47,6 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.StageInPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StageOutPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StoreContextPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
-
 
 public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 {
@@ -268,6 +269,20 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stageFile));
 		}
+		
+		// CCH 2020-06-29: Check that images in local filesystem are sufficiently up-to-date
+		// Assumptions:
+		// Images in GFFS are either missing or completely stable (i.e. no partially written files)
+		// Images in GFFS are stored at /home/CCC/Lancium/<username>/Images/
+		// Images on local filesystem are stored under <JWD>/../Images/<username>
+		// The plan is to create a phase that will stage in newer images from the GFFS if the local FS is outdated
+		
+		FilesystemRelativePath execPath = _application.getExecutable();
+		String execName =  execPath.getString();
+		if (execName.endsWith(".qcow2") || execName.endsWith(".sif") || execName.endsWith(".simg")) {
+			ret.add(new CheckBinariesPhase(execName));
+		}
+		// CCH 2020-06-29, end of new code
 
 		ret.add(new SetupContextDirectoryPhase(".genesisII-bes-state"));
 		//CAK 2019-05-30: below was a bug before, where directory path was not included.
