@@ -364,7 +364,6 @@ public class BES implements Closeable
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
-
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
 				activityServiceName, jobName, false, false);
 			_containedActivities.put(activityid, activity);
@@ -468,11 +467,11 @@ public class BES implements Closeable
 					String activityServiceName = rs.getString(8);
 					String jobName = rs.getString(9);
 
-					_logger.info(String.format("Starting activity %d\n", count++));
-
+					_logger.info(String.format("Starting activity %d\n", count++));					
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-						activityServiceName, jobName, suspendRequested, terminateRequested);
+							activityServiceName, jobName, suspendRequested, terminateRequested);
 					_containedActivities.put(activityid, activity);
+
 					addActivityToBESMapping(activityid, this);
 				} catch (Throwable cause) {
 					_logger.error("Error loading activity from database.", cause);
