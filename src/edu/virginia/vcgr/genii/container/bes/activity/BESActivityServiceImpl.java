@@ -24,6 +24,8 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.ggf.jsdl.JobDescription_Type;
+import org.ggf.jsdl.JobIdentification_Type;
 import org.morgan.inject.MInject;
 import org.morgan.util.GUID;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -132,7 +134,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
-
+		String jobAnnotation=null;
 		try {
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
 			String jobName;
@@ -140,6 +142,8 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 			CloudConfiguration cConfig = ((BESConstructionParameters) cParams).getCloudConfiguration();
 
+			ExecutionUnderstanding executionUnderstanding;
+		
 			if (cConfig != null) {
 				PersonalityProvider provider = new ExecutionProvider();
 				JobRequest tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
@@ -149,7 +153,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			} else {
 
 				NativeQueueConfiguration qConf = ((BESConstructionParameters) cParams).getNativeQueueConfiguration();
-				ExecutionUnderstanding executionUnderstanding;
 
 				if (qConf != null) {
 					Object understanding = JSDLInterpreter.interpretJSDL(new QSubPersonalityProvider(fsManager, workingDirectory), jsdl);
@@ -159,9 +162,9 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
 
-				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams);
+				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl);
 				jobName = executionUnderstanding.getJobName();
-
+				
 			}
 
 			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, fsManager);
@@ -184,6 +187,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
 				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
+
 
 			if (_logger.isTraceEnabled()) {
 				_logger.debug("after creating job, context has these creds:\n"

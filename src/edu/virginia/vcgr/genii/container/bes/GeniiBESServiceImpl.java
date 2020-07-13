@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.bes;
 
 import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -116,10 +117,46 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	static private Log _logger = LogFactory.getLog(GeniiBESServiceImpl.class);
 
 	BESConstants bconsts = new BESConstants();
+	static private boolean _checkedDirs=false;
 
 	@MInject(lazy = true)
 	private IBESResource _resource;
 
+	synchronized static private void checkDirs() {
+		File parentPath=BESUtilities.getBESWorkerDir();	
+		// We create the sharedDir/Accounting dir if it is not there.
+		_logger.debug("BESPortType checkDirs called. parentPath is "+parentPath.getAbsolutePath());
+		File actDir = new File(parentPath+"/Accounting");
+		if (!actDir.exists()) {
+			actDir.mkdirs();
+			// 2020-05-28 by ASG -- Add Accounting/finished and Accounting/archive
+			File finishedDir = new File(actDir + "/finished");
+			finishedDir.mkdir();
+			File archiveDir = new File(actDir + "/archive");
+			archiveDir.mkdir();
+			// set permissions next
+			if (OperatingSystemType.isWindows()) {
+				actDir.setWritable(true, false);
+				finishedDir.setWritable(true, false);
+				archiveDir.setWritable(true, false);
+			}
+			else {
+				try {
+				FileSystemUtils.chmod(actDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				FileSystemUtils.chmod(finishedDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				FileSystemUtils.chmod(archiveDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
+						| FileSystemUtils.MODE_USER_EXECUTE| FileSystemUtils.MODE_GROUP_EXECUTE);
+				} 
+				catch (IOException ioe) {
+					_logger.info("exception occurred in checkDirs, could not modify permisions of Accounting dirs",ioe);
+				}
+			}
+		}
+		_checkedDirs=true;
+	}
+	
 	private void cleanupBadActivities()
 	{
 		Collection<BESActivity> allActivities = BES.getAllActivities();
@@ -270,7 +307,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 			// Set cloud connection DB pool
 			CloudMonitor.setConnectionPool((new CloudDBResourceFactory(connectionPool).getConnectionPool()));
-
+			// 2020-06-04 ASG - try, try, again to find a place to check dirs safely
+			if (!_checkedDirs) checkDirs();
 			BES.loadAllInstances(connectionPool);
 
 			// Load cloud activities table

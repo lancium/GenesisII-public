@@ -15,7 +15,6 @@ package edu.virginia.vcgr.genii.client.jsdl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
 
 
 import javax.xml.bind.JAXBException;

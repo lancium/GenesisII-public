@@ -10,6 +10,10 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.jsdl.JobDefinition_Type;
+import org.ggf.jsdl.JobDescription_Type;
+import org.ggf.jsdl.JobIdentification_Type;
+import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
@@ -31,6 +35,7 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
+import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CheckBinariesPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
@@ -131,6 +136,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	public void addFilesystem(FilesystemUnderstanding understanding) throws JSDLException
 	{
 		if (understanding.isScratchFileSystem()) {
+			// 2020-07-11 ASG. the parameter "_jobAnnotation does not seem right.
 			_fsManager.addFilesystem("SCRATCH", rememberScratch(understanding.createScratchFilesystem(_jobAnnotation)));
 		} else if (understanding.isGridFileSystem()) {
 			_fsManager.addFilesystem(understanding.getFileSystemName(), understanding.createGridFilesystem());
@@ -220,11 +226,28 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
  		_GPUMemoryPerNode = GPUMemoryPerNode;
      	}
 
-	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties) throws JSDLException
+	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
+		// 2020-07-10 by ASG
+		// A few things to note. Once the createActivity is called the activity is off to the races, so anything we want in place
+		// ahead of that must be done first. In particular, we will set up the accounting directory and 
 
+		JobDescription_Type jobDes=jsdl.getJobDescription(0);
+		if (jobDes!=null) {
+			JobIdentification_Type jobID=jobDes.getJobIdentification();
+			if (jobID!=null) {
+				String []annotations=jobID.getJobAnnotation();
+				if (annotations!=null) {
+					String portalID=jobID.getJobAnnotation(0);
+					_jobAnnotation=portalID;
+					if (portalID!=null ) System.out.println("Portal id is " + portalID);
+				}
+			}
+		}
+		// End of extracting jobAnnotation[0]
+		
 		if (MyProxyCertificate.isAvailable())
 			createCertificateFileonDisk();
 		
@@ -341,7 +364,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
  				}
 			}
 		}
-
+		
 		File fuseMountPoint = null;
 		JSDLFileSystem gridFs = _fsManager.getGridFilesystem();
 		if (gridFs != null)
@@ -350,7 +373,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName);
 
 		if (_application != null)
-			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext);
+			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation);
 
 		for (DataStagingUnderstanding stage : _stageOuts) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());

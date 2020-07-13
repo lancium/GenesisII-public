@@ -83,6 +83,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 	private ResourceConstraints _resourceConstraints;
 	private String _jobName=null;
+	private String _jobAnnotation=null;
 
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
@@ -90,7 +91,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	
 	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout,
-		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints, String jobName)
+		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints, String jobName, String jobAnnotation)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
 
@@ -108,6 +109,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		_stderr = stderr;
 		_resourceConstraints = resourceConstraints;
 		_jobName=jobName;
+		_jobAnnotation=jobAnnotation;
 	}
 
 	@Override
@@ -228,7 +230,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					_logger.debug("Generate Properties Constructor _jobName: " + _jobName);
 				}
 				generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
-						_numProcessesPerHost, _threadsPerProcess, _jobName );
+						_numProcessesPerHost, _threadsPerProcess, _jobName,_jobAnnotation );
 
 				// End of updates 2020-04-18
 

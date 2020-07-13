@@ -35,7 +35,7 @@ class QSubApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 
 	@Override
 	public void addExecutionPhases(BESConstructionParameters creationProperties, Vector<ExecutionPhase> executionPlan,
-		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext) throws JSDLException
+		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext, String jobAnnotation) throws JSDLException
 	{
 		File fuseMountPoint = jobContext.getFuseMountPoint();
 
@@ -63,7 +63,7 @@ class QSubApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		executionPlan.add(new QueueProcessPhase(fuseMountPoint, getSPMDVariation(), jobContext.getResourceConstraints().getTotalPhysicalMemory(), getNumProcesses(), getNumProcessesPerHost(),
 			getThreadsPerProcess(), fsManager.lookup(getExecutable()), stringArgs, stringEnv, fsManager.lookup(getStdinRedirect()),
 			fsManager.lookup(getStdoutRedirect()), fsManager.lookup(getStderrRedirect()), creationProperties,
-			jobContext.getResourceConstraints(), jobContext.getJobName()));
+			jobContext.getResourceConstraints(), jobContext.getJobName(),jobAnnotation));
 			
 	}
 }
