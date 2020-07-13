@@ -14,5 +14,5 @@ public interface ApplicationUnderstanding
 	public BESWorkingDirectory getWorkingDirectory();
 
 	public void addExecutionPhases(BESConstructionParameters creationProperties, Vector<ExecutionPhase> executionPlan,
-		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext) throws JSDLException;
+		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext, String jobAnnotation) throws JSDLException;
 }

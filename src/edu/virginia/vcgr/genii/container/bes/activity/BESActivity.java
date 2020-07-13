@@ -70,6 +70,7 @@ public class BESActivity implements Closeable
 	private String _jobName;
 	private ActivityRunner _runner;
 
+
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName,
 		boolean suspendRequested, boolean terminateRequested)
@@ -84,6 +85,7 @@ public class BESActivity implements Closeable
 		_nextPhase = nextPhase;
 		_activityServiceName = activityServiceName;
 		_jobName = jobName;
+
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
 

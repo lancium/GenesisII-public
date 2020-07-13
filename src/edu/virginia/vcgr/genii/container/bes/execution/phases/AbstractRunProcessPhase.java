@@ -57,7 +57,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 	}
 
 	final protected void generateProperties(ResourceUsageDirectory dir,String userName, String executable, Double memory, int numProcesses, 
-			int numProcessesPerHost, int threadsPerProcess, String jobName) {
+			int numProcessesPerHost, int threadsPerProcess, String jobName, String jobAnnotation) {
 		File propFile=new File(dir.getAcctDir(),"properties.json");
 		try {
 			if (propFile.createNewFile()) {
@@ -77,6 +77,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 					output.write("\"numProcesses\": \"" + numProcesses + "\",\n");
 					output.write("\"NumProcessorsPerHost\": \"" + numProcessesPerHost + "\",\n");
 					output.write("\"threadsPerProcess\": \"" + threadsPerProcess + "\"\n");
+					output.write("\"jobAnnotation\": \"" + jobAnnotation + "\"\n");
 					output.write("}\n");
 				} catch ( IOException e ) {
 					e.printStackTrace();
