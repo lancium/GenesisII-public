@@ -276,3 +276,15 @@ void writeResults(const char *path, ExitResults *results)
 
 	fclose(output);
 }
+
+int startBesListener()
+{
+    fprintf(stderr, "startBesListener() not implemented for Windows\n");
+    return -1;
+}
+
+int connectToBes()
+{
+    fprintf(stderr, "connectToBes() not implemented for Windows\n");
+    return -1;
+}
