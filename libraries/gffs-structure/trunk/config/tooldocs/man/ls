@@ -32,3 +32,6 @@ Show a brief summary of the EPR of each RNS entry
  
 Show the certificates associated with each entry
 
+-i | --date-information
+
+Show the date created and date modified of each entry
