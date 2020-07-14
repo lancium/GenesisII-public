@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
 import org.ggf.jsdl.JobIdentification_Type;
-import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
@@ -35,7 +34,6 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
-import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CheckBinariesPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
@@ -56,6 +54,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 
 	private String _jobAnnotation = null;
 	private String _jobName = null;
+	private String _ipport= null;
 
 	private Collection<DataStagingUnderstanding> _stageIns = new LinkedList<DataStagingUnderstanding>();
 	private Collection<DataStagingUnderstanding> _stageOuts = new LinkedList<DataStagingUnderstanding>();
@@ -90,6 +89,11 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	{
 		_jobName = jobName;
 	}
+	
+	public void setIPPort(String ipport)
+	{
+		_ipport = ipport;
+	}
 
 	public String getJobAnnotation()
 	{
@@ -99,6 +103,11 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	public String getJobName()
 	{
 		return _jobName;
+	}
+	
+	public String getIPPort()
+	{
+		return _ipport;
 	}
 
 	public void setFuseMountDirectory(String fuseDirectory)
@@ -370,7 +379,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		if (gridFs != null)
 			fuseMountPoint = gridFs.getMountPoint();
 		String jobName = getJobName();
-		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName);
+		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName, _ipport);
 
 		if (_application != null)
 			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation);
@@ -399,6 +408,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		// CompleteAccountingPhase(File accountingDirectory, File finishedDir)
 		ret.add(new CompleteAccountingPhase(accountingDirectory,finishedDir));
 		// End of accounting dir updates
+		
 		
 		ret.addAll(cleanups);
 		return ret;

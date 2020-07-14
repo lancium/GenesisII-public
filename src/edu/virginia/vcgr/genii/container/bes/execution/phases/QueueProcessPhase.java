@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -84,6 +83,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	private ResourceConstraints _resourceConstraints;
 	private String _jobName=null;
 	private String _jobAnnotation=null;
+	private String _ipport=null;
 
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
@@ -91,7 +91,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	
 	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout,
-		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints, String jobName, String jobAnnotation)
+		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints, String jobName, String jobAnnotation,
+		String ipport)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
 
@@ -110,6 +111,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		_resourceConstraints = resourceConstraints;
 		_jobName=jobName;
 		_jobAnnotation=jobAnnotation;
+		_ipport = ipport;
 	}
 
 	@Override
@@ -216,7 +218,22 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
                 		e.printStackTrace();
                 	}
                 }
-                // End jobName updates
+                // End jobName updates			
+                // 2020-07-14 by CCH
+				// Adding code to print out IP and assigned port so pwrapper can talk to it
+				// Part of the migration/persist project
+				File besIPPortInformation = new File (jwd, ".bes-info");
+				try {
+					if (besIPPortInformation.createNewFile()) {
+						FileWriter myWriter = new FileWriter(besIPPortInformation);
+						myWriter.write(_ipport+"\n");
+						myWriter.close();
+					}
+				} catch (IOException e) {
+					System.out.println("An error occurred .bes-info file.");
+					e.printStackTrace();
+				}
+				// end of updates 2020-07-14
                 resourceUsageFile =tmp.getNewResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
 				if (_logger.isDebugEnabled()) {
 					_logger.debug("Generate Properties Constructor tmp: " + tmp);

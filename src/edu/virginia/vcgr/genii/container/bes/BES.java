@@ -45,6 +45,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.security.identity.Identity;
+import edu.virginia.vcgr.appmgr.net.Hostname;
 
 public class BES implements Closeable
 {
@@ -230,8 +231,8 @@ public class BES implements Closeable
 	private String _besEPI;
 	private BESPolicyEnactor _enactor;
 	private HashMap<String, BESActivity> _containedActivities = new HashMap<String, BESActivity>();
-	private BESPWrapperConnection pwConnection;
-	private final int PWRAPPER_CONNECTION_PORT = 5555;
+	private BESPWrapperConnection _pwConnection;
+	private String _pwrapper_ipport;
 
 	private BES(Connection connection, String besid, BESPolicy policy) throws SQLException
 	{
@@ -242,14 +243,32 @@ public class BES implements Closeable
 			_besEPI = findBESEPI(connection, besid);
 		else
 			_besEPI = null;
-		pwConnection = new BESPWrapperConnection(PWRAPPER_CONNECTION_PORT);
+		String pwrapper_connection_ip_addr = Hostname.getCurrentIPAddress();
+		int pwrapper_connection_port = assignPort();
+		_pwrapper_ipport = pwrapper_connection_ip_addr + ":" + pwrapper_connection_port;
+		_pwConnection = new BESPWrapperConnection(pwrapper_connection_port);
+	}
+	
+	private static int assignPort() {
+		// TODO
+		return 5555;
 	}
 
 	public String getBESID()
 	{
 		return _besid;
 	}
-
+	
+	public BESPWrapperConnection getPWrapperConnection()
+	{
+		return _pwConnection;
+	}
+	
+	public String getIPPort()
+	{
+		return _pwrapper_ipport;
+	}
+	
 	protected void finalize() throws Throwable
 	{
 		close();
@@ -331,7 +350,7 @@ public class BES implements Closeable
 
 	synchronized public BESActivity createActivity(Connection parentConnection, String activityid, JobDefinition_Type jsdl,
 		Collection<Identity> owners, ICallingContext callingContext, BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan,
-		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName, String ipport) throws SQLException, ResourceException
+		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -364,12 +383,12 @@ public class BES implements Closeable
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR, "besactivitiestable", "activityepr"));
 			stmt.setString(14, activityServiceName);
 			stmt.setString(15, jobName);
-			stmt.setString(16, ipport);
+			stmt.setString(16, _pwrapper_ipport);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, false, false,ipport);
+				activityServiceName, jobName, false, false, _pwrapper_ipport);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;

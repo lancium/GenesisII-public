@@ -142,7 +142,23 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 			CloudConfiguration cConfig = ((BESConstructionParameters) cParams).getCloudConfiguration();
 
-			ExecutionUnderstanding executionUnderstanding;
+			ExecutionUnderstanding executionUnderstanding = null;
+
+			BES bes = null;
+			try {
+				bes = BES.getBES(initInfo.getContainerID());
+				WSName wsname = new WSName(activityEPR);
+				if (wsname.isValidWSName())
+					_logger
+						.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(), _resource.getKey()));
+			} catch (IllegalStateException e) {
+				_logger.error("caught illegal state exception trying to get BES information on container " + initInfo.getContainerID());
+			}
+			if (bes == null) {
+				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
+					null));
+			}
 		
 			if (cConfig != null) {
 				PersonalityProvider provider = new ExecutionProvider();
@@ -162,31 +178,16 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
 
+				executionUnderstanding.setIPPort(bes.getIPPort());
 				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl);
 				jobName = executionUnderstanding.getJobName();
 				
 			}
 
 			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, fsManager);
-
-			BES bes = null;
-			try {
-				bes = BES.getBES(initInfo.getContainerID());
-				WSName wsname = new WSName(activityEPR);
-				if (wsname.isValidWSName())
-					_logger
-						.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(), _resource.getKey()));
-			} catch (IllegalStateException e) {
-				_logger.error("caught illegal state exception trying to get BES information on container " + initInfo.getContainerID());
-			}
-			if (bes == null) {
-				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
-					null));
-			}
-
+			
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
-				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName, "undefined");
+				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
 
 
 			if (_logger.isTraceEnabled()) {
