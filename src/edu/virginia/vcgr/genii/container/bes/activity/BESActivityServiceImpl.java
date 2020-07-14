@@ -186,7 +186,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			}
 
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
-				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
+				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName, "undefined");
 
 
 			if (_logger.isTraceEnabled()) {

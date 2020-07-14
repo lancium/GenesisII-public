@@ -328,7 +328,7 @@ public class BES implements Closeable
 
 	synchronized public BESActivity createActivity(Connection parentConnection, String activityid, JobDefinition_Type jsdl,
 		Collection<Identity> owners, ICallingContext callingContext, BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan,
-		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName) throws SQLException, ResourceException
+		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName, String ipport) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -344,7 +344,7 @@ public class BES implements Closeable
 
 			stmt = connection.prepareStatement("INSERT INTO besactivitiestable " + "(activityid, besid, jsdl, owners, callingcontext, "
 				+ "state, submittime, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-				+ "nextphase, activityepr, activityservicename, jobname) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				+ "nextphase, activityepr, activityservicename, jobname, ipport) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
@@ -361,11 +361,12 @@ public class BES implements Closeable
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR, "besactivitiestable", "activityepr"));
 			stmt.setString(14, activityServiceName);
 			stmt.setString(15, jobName);
+			stmt.setString(16, ipport);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, false, false);
+				activityServiceName, jobName, false, false,ipport);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -441,7 +442,7 @@ public class BES implements Closeable
 		try {
 			stmt = connection
 				.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityservicename, jobname " + "FROM besactivitiestable WHERE besid = ?");
+					+ "nextphase, activityservicename, jobname ,ipport" + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
@@ -466,10 +467,11 @@ public class BES implements Closeable
 					int nextPhase = rs.getInt(7);
 					String activityServiceName = rs.getString(8);
 					String jobName = rs.getString(9);
+					String ipPort = rs.getString(10);
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, suspendRequested, terminateRequested);
+							activityServiceName, jobName, suspendRequested, terminateRequested, ipPort);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);

@@ -69,11 +69,12 @@ public class BESActivity implements Closeable
 	private String _activityServiceName;
 	private String _jobName;
 	private ActivityRunner _runner;
+	private String _IPPort;
 
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName,
-		boolean suspendRequested, boolean terminateRequested)
+		boolean suspendRequested, boolean terminateRequested, String IPPort)
 	{
 		_connectionPool = connectionPool;
 
@@ -85,6 +86,7 @@ public class BESActivity implements Closeable
 		_nextPhase = nextPhase;
 		_activityServiceName = activityServiceName;
 		_jobName = jobName;
+		_IPPort=IPPort;
 
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
@@ -248,6 +250,9 @@ public class BESActivity implements Closeable
 	public String getJobName()
 	{
 		return _jobName;
+	}
+	public String getIPPort() {
+		return _IPPort;
 	}
 
 	synchronized public void suspend() throws ExecutionException, SQLException
