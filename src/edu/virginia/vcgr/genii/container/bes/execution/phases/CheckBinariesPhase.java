@@ -119,7 +119,7 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 			for (MessageElement child : resp.get_any()) {
 				document.addChild(child);
 			}
-			String sourceLastModified = document.toString().split("ModificationTime")[1].split(">")[1].split("<")[0];
+			String sourceLastModified = document.toString().split("ns[0-9][0-9]:ModificationTime")[1].split(">")[1].split("<")[0];
 			
 			// Get target last modified time (in local FS)
 			String targetLastModified = Files.readAttributes(target.toPath(), BasicFileAttributes.class).lastModifiedTime().toString();
