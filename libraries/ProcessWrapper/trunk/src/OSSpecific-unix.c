@@ -681,7 +681,7 @@ void *_startBesConnection(void *arg)
     memset(&sa, 0, sizeof sa);
     sa.sin_family = AF_INET;
     sa.sin_port = htons(bes_conn_params.port);
-    inet_pton(AF_INET, bes_conn_params.host, &sa.sin_addr);
+    sa.sin_addr.s_addr = inet_addr(bes_conn_params.host);
 
     // Bind to port
     if(bind(bes_conn_socket, (struct sockaddr *)&sa, sizeof sa) == -1)
