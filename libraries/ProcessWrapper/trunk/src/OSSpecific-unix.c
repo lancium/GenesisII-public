@@ -188,7 +188,6 @@ int wrapJob(CommandLine *commandLine)
 	}
 
 	//LAK: Start up BES communication
-	startBesListener();
 	connectToBes();
 
 	gettimeofday(&start, NULL);
@@ -650,16 +649,7 @@ const char* getOverloadedEnvironment(const char *variableName,
 // NOTE: ALL OF THE SOCKET CODE IS NOT THREAD SAFE.
 
 static pthread_t bes_conn_pthread;
-static pthread_t bes_listener_pthread;
-static int bes_listen_socket = -1;
-static int bes_connect_socket = -1;
-
-//our own network information
-static struct BESListenerParameters
-{
-    char hostmask[128];
-    short port;
-} bes_listener_params;
+static int bes_conn_socket = -1;
 
 //network information of the BES
 static struct BESConnectionParameters
@@ -668,122 +658,72 @@ static struct BESConnectionParameters
     short port;
 } bes_conn_params;
 
-void *_startListener(void *arg)
+void *_startBesConnection(void *arg)
 {
-    // Open the main control socket
+	printf("starting bes connection\n");
+
+    // Open the socket
     struct sockaddr_in sa;
-    bes_listen_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (bes_listen_socket == -1)
+    bes_conn_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (bes_conn_socket == -1)
 	{
-        perror("bes_listener: cannot create socket");
+        perror("bes_connection: cannot create socket\n");
         return NULL;
     }
 
     // Allow re-use of the port
     const static int tr = 1;
-    setsockopt(bes_listen_socket,SOL_SOCKET,SO_REUSEADDR,&tr,sizeof(int));
+    setsockopt(bes_conn_socket,SOL_SOCKET,SO_REUSEADDR,&tr,sizeof(int));
 
-    // Set the host mask and port
+    // Set the host and port
     memset(&sa, 0, sizeof sa);
     sa.sin_family = AF_INET;
-    sa.sin_port = htons(bes_listener_params.port);
-    inet_pton(AF_INET, bes_listener_params.hostmask, &sa.sin_addr.s_addr);
+    sa.sin_port = htons(bes_conn_params.port);
+    inet_pton(AF_INET, bes_conn_params.host, &sa.sin_addr.s_addr);
 
     // Bind to port
-    if(bind(bes_listen_socket, (struct sockaddr *)&sa, sizeof sa) == -1)
+    if(bind(bes_conn_socket, (struct sockaddr *)&sa, sizeof sa) == -1)
 	{
-        perror("bes_listener: bind failed");
+        perror("bes_connection: bind failed\n");
         goto stop;
     }
 
-    // Listen for connections
-    if(listen(bes_listen_socket, 10) == -1)
+	printf("bound to our port\n");
+
+	if(connect(bes_conn_socket, (const struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0)
 	{
-        perror("bes_listener: listen failed");
+		char addrStr[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET, &(sa.sin_addr), addrStr, INET_ADDRSTRLEN);
+        fprintf(stderr, "bes_connection: could not connect to %s:%d\n", addrStr, sa.sin_port);
         goto stop;
     }
 
-    struct sockaddr_in client_addr;
-    socklen_t client_addr_size = sizeof(client_addr);
-    int connectfd = accept(bes_listen_socket, (struct sockaddr *)&client_addr,
-		&client_addr_size);
+	printf("connected to the BES\n");
 
-    if(connectfd < 0)
-	{
-        perror("bes_listener: accept failed");
-        close(connectfd);
-        goto stop;
-    }
-
-    char ip[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &client_addr, ip, client_addr_size);
-    printf("bes_listener: established connection to %s:%hu\n",
-        ip, ntohs(client_addr.sin_port));
+	//test write
+	printf("sending hello string to BES\n");
+	write(bes_conn_socket, "hello BES, are you there?\n", 27);
 
     while(1)
 	{
         // test reads
         char buffer[1024];
-        int numread = read(connectfd, buffer, 1023);
+        int numread = read(bes_conn_socket, buffer, 1023);
         buffer[numread] = '\0';
         printf("bes_listener: got string %s\n", buffer);
     }
 
     printf("bes_listener: closing connectfd...\n");
-    close(connectfd);
+    close(bes_conn_socket);
 
 stop:
-    close(bes_listen_socket);
+    close(bes_conn_socket);
     return NULL;
-}
-
-void *_startBesConnection(void *arg)
-{
-    struct sockaddr_in addr;
-    int port = bes_conn_params.port;
-    const char *ip = bes_conn_params.host;
-    memset(&addr, 0, sizeof(struct sockaddr_in));
-    inet_pton(AF_INET, ip, &addr.sin_addr);
-    addr.sin_port = htons(port);
-    addr.sin_family = AF_INET;
-
-    if(connect(bes_connect_socket, (const struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
-	{
-        fprintf(stderr, "bes_connection: could not connect to %s:%d\n", ip, port);
-        return NULL;
-    }
-
-	//test write
-	write(bes_connect_socket, "hello BES, are you there?", 27);
-
-    close(bes_connect_socket);
-
-    return NULL;
-}
-
-int startBesListener()
-{
-    printf("bes_listener: spawning bes listener thread\n");
-    strncpy(bes_listener_params.hostmask, "0.0.0.0", 128); // TODO: set hostmask to more restricted
-    int err = pthread_create(&bes_listener_pthread, NULL, &_startListener, NULL);
-    if(!err)
-	{
-        fprintf(stderr, "bes_listener: spawning bes listener thread failed: %d\n", err);
-        bes_listener_pthread = 0;
-        return -1;
-    }
-    return 0;
-}
-
-int stopBesListener()
-{
-    pthread_cancel(bes_listener_pthread);
-    return 0;
 }
 
 void _pipefail(int sig)
 {
-    fprintf(stderr, "bes_connection: pipefail -- not exiting");
+    fprintf(stderr, "bes_connection: pipefail -- not exiting\n");
 }
 
 void _setBesIPInfo()
