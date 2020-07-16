@@ -245,8 +245,9 @@ public class BES implements Closeable
 			_besEPI = null;
 		String pwrapper_connection_ip_addr = Hostname.getCurrentIPAddress();
 		int pwrapper_connection_port = assignPort();
-		_pwrapper_ipport = pwrapper_connection_ip_addr + ":" + pwrapper_connection_port;
-		_pwConnection = new BESPWrapperConnection(pwrapper_connection_port);
+		_pwConnection = new BESPWrapperConnection(pwrapper_connection_port, pwrapper_connection_port+10);
+		// Because we try a range of port numbers, we fetch the one that is actually assigned to the server
+		_pwrapper_ipport = pwrapper_connection_ip_addr + ":" + _pwConnection.getSocketPort();
 	}
 	
 	private static int assignPort() {
