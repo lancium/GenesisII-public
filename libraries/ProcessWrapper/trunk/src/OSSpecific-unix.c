@@ -676,10 +676,12 @@ void *_startBesConnection(void *arg)
     setsockopt(bes_conn_socket,SOL_SOCKET,SO_REUSEADDR,&tr,sizeof(int));
 
     // Set the host and port
+	printf("host=%s", bes_conn_params.host);
+	printf("port=%d", bes_conn_params.port);
     memset(&sa, 0, sizeof sa);
     sa.sin_family = AF_INET;
     sa.sin_port = htons(bes_conn_params.port);
-    inet_pton(AF_INET, bes_conn_params.host, &sa.sin_addr.s_addr);
+    inet_pton(AF_INET, bes_conn_params.host, &sa.sin_addr);
 
     // Bind to port
     if(bind(bes_conn_socket, (struct sockaddr *)&sa, sizeof sa) == -1)
