@@ -1,10 +1,14 @@
 package edu.virginia.vcgr.genii.container.bes;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -78,7 +82,7 @@ public class BESPWrapperConnection {
         {
             // takes input from the client socket 
             BufferedReader input = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
-
+            OutputStream output = clientSock.getOutputStream();
             //////All of the following block is temporary for testing///////
             while(clientSock.isConnected() && !clientSock.isClosed()) {
                 try {
@@ -92,6 +96,8 @@ public class BESPWrapperConnection {
                     {
                     	//temp
                     	_besLogger.info(clientSock.getRemoteSocketAddress() + " says >> " + line);
+                    	output.write(("PWrapper Connection Server: Sending back identical string: " + line).getBytes(Charset.forName("UTF-8")));
+                    	output.flush();
                     }
                 } catch (IOException e) {
                     _besLogger.error("PWrapper Connection Server: Lost Connection to Client. " + e);
@@ -105,6 +111,7 @@ public class BESPWrapperConnection {
             // close connection 
             clientSock.close(); 
             input.close(); 
+            output.close();
         }
         catch (IOException e) {
             System.out.println(e); 
