@@ -1,11 +1,9 @@
 package edu.virginia.vcgr.genii.container.bes;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
@@ -23,15 +21,22 @@ public class BESPWrapperConnection {
 	private Log _besLogger = LogFactory.getLog(BESPWrapperConnection.class);
 	
 	// Establishes a socket for communication between the BES and each ProccessWrapper 
-	public BESPWrapperConnection(int port)
+	public BESPWrapperConnection(int port, int max)
 	{
-		try
-        {
-            _server = new ServerSocket(port);                
-            _besLogger.info("PWrapper Connection Server: Started on port " + String.valueOf(port));
-        } catch (IOException e) {
-        	_besLogger.fatal("Could not start PWrapperConnection Server.", e);
-        }
+		if (port > max)
+			_besLogger.fatal("Port range start must be less than port range end. Bad port range: " + port + " to " + max);
+		for (; port <= max; port++) {
+			try
+			{
+				_server = new ServerSocket(port);
+				_besLogger.info("PWrapper Connection Server: Started on port " + String.valueOf(port));
+				break;
+			} catch (IOException e) {
+				if (port != max)_besLogger.error("Could not start PWrapperConnection Server.", e);
+				else
+					_besLogger.fatal("Could not start PWrapperConnection Server on any port between " + port + " and " + max);
+			}
+		}
 		
 		startListening();
 	}
@@ -116,5 +121,9 @@ public class BESPWrapperConnection {
         catch (IOException e) {
             System.out.println(e); 
         }
+	}
+	
+	public String getSocketPort() {
+		return new Integer(_server.getLocalPort()).toString();
 	}
 }
