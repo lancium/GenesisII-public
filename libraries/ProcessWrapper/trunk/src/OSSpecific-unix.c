@@ -750,7 +750,7 @@ int connectToBes() {
 	_setBesIPInfo();
     signal(SIGPIPE, &_pipefail);
     int err = pthread_create(&bes_conn_pthread, NULL, &_startBesConnection, NULL);
-    if(!err)
+    if(err)
 	{
         fprintf(stderr, "bes_connection: spawning bes connection thread failed: %d\n", err);
         bes_conn_pthread = 0;
