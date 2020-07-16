@@ -683,15 +683,6 @@ void *_startBesConnection(void *arg)
     sa.sin_port = htons(bes_conn_params.port);
     sa.sin_addr.s_addr = inet_addr(bes_conn_params.host);
 
-    // Bind to port
-    if(bind(bes_conn_socket, (struct sockaddr *)&sa, sizeof sa) == -1)
-	{
-        perror("bes_connection: bind failed\n");
-        goto stop;
-    }
-
-	printf("bound to our port\n");
-
 	if(connect(bes_conn_socket, (const struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0)
 	{
 		char addrStr[INET_ADDRSTRLEN];
