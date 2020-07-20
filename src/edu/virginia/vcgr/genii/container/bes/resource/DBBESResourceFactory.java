@@ -36,7 +36,8 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 	static private Log _logger = LogFactory.getLog(DBBESResourceFactory.class);
 
 	static private final String[] _CREATE_STMTS = new String[] { "CREATE TABLE bespolicytable (" + "besid VARCHAR(256) NOT NULL PRIMARY KEY,"
-		+ "userloggedinaction VARCHAR(64) NOT NULL," + "screensaverinactiveaction VARCHAR(64) NOT NULL)" };
+		+ "userloggedinaction VARCHAR(64) NOT NULL," + "screensaverinactiveaction VARCHAR(64) NOT NULL, ipaddr VARCHAR(40) NOT NULL  )" };
+	
 
 	public DBBESResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{

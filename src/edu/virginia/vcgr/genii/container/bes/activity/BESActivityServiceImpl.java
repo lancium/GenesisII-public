@@ -128,6 +128,25 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		}
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
+		
+		// 2020-07-17 by ASG. This block of code moved here from further below so that the _ipaddr can be acquired.
+		BES bes = null;
+		try {
+			bes = BES.getBES(initInfo.getContainerID());
+			WSName wsname = new WSName(activityEPR);
+			if (wsname.isValidWSName())
+				_logger
+					.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(), _resource.getKey()));
+		} catch (IllegalStateException e) {
+			_logger.error("caught illegal state exception trying to get BES information on container " + initInfo.getContainerID());
+		}
+		if (bes == null) {
+			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
+				null));
+		}
+		// End of moved block of code.
+		
 
 		BESWorkingDirectory workingDirectory =
 			new BESWorkingDirectory(chooseDirectory((BESConstructionParameters) _resource.constructionParameters(getClass()), 5), true);
@@ -178,14 +197,13 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
 
-				executionUnderstanding.setIPPort(bes.getIPPort());
-				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl);
+				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl,bes.getBESipaddr());
 				jobName = executionUnderstanding.getJobName();
 				
 			}
 
 			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, fsManager);
-			
+			// block of code getting the BES of the activity moved above.
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
 				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
 

@@ -4,46 +4,62 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
+
 public class BESPWrapperConnection {
 	
 	private ExecutorService _pool = Executors.newCachedThreadPool();
 	private ServerSocket _server;
+	private int _port;
+	private String _ipaddr;
 	
 	private Log _besLogger = LogFactory.getLog(BESPWrapperConnection.class);
+	private BES _bes;
 	
 	// Establishes a socket for communication between the BES and each ProccessWrapper 
-	public BESPWrapperConnection(int port, int max)
+	public BESPWrapperConnection(int port, BES bes)
 	{
-		if (port > max)
-			_besLogger.fatal("Port range start must be less than port range end. Bad port range: " + port + " to " + max);
-		for (; port <= max; port++) {
-			try
-			{
-				_server = new ServerSocket(port);
-				_besLogger.info("PWrapper Connection Server: Started on port " + String.valueOf(port));
-				break;
-			} catch (IOException e) {
-				if (port != max)_besLogger.error("Could not start PWrapperConnection Server.", e);
-				else
-					_besLogger.fatal("Could not start PWrapperConnection Server on any port between " + port + " and " + max);
-			}
+		// Constructor gives the port to use
+		_bes = bes;
+		try {
+
+			if (port==0) {
+			// There is no assigned port yet; get one
+
+			_server = new ServerSocket(0,10);
+			_port=_server.getLocalPort();
+			_ipaddr=_server.getInetAddress().getHostAddress() + ":"+_port;
+			return;
+		} else {
+			_server = new ServerSocket(port,10);
 		}
-		
-		startListening();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		_port=_server.getLocalPort();
+		_ipaddr=_server.getInetAddress().getHostAddress() + ":"+_port;
 	}
 	
 	public void stop()
 	{
 		_pool.shutdown();
+	}
+	
+	public void start()
+	{
+		startListening();
 	}
 	
 	private void startListening()
@@ -83,11 +99,13 @@ public class BESPWrapperConnection {
 	
 	private void handleConnection(Socket clientSock)
 	{
+		_besLogger.info("Hopefully the memory address of the clientSock reference: " + clientSock);
+		String command;
 		try
         {
             // takes input from the client socket 
             BufferedReader input = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
-            OutputStream output = clientSock.getOutputStream();
+			PrintWriter output = new PrintWriter(clientSock.getOutputStream(), true);
             //////All of the following block is temporary for testing///////
             while(clientSock.isConnected() && !clientSock.isClosed()) {
                 try {
@@ -95,15 +113,47 @@ public class BESPWrapperConnection {
                     
                     if(line.equals("close") || line == null)
                     {
-                        break;
+                    	break;
                     }
                     else
                     {
                     	//temp
                     	_besLogger.info(clientSock.getRemoteSocketAddress() + " says >> " + line);
-                    	output.write(("PWrapper Connection Server: Sending back identical string: " + line).getBytes(Charset.forName("UTF-8")));
+                    	output.println("PWrapper Connection Server: Sending back identical string: " + line);
                     	output.flush();
                     }
+					 while ((command = input.readLine()) != null) {
+						 // Now we process the commands. All commands are of the form <jobid> command parameters
+						 // For example "A0C34C26-BC59-09F7-DBA0-BF790D583FA9 register 192.3.4.211:45335
+						 // The first thing we do is lookup the activity and ensure that it exists
+						 if (command !=null && command.length() > 36 && command.length()< 256) {
+							 String toks[]=command.split(" ");
+							 if (toks.length <3 || toks.length > 8) {
+								 _besLogger.error("Invalid activity communication, tokens <3 or >8 with BES from "+toks[0]);
+								 break;
+							 }
+							 // Lookup toks[0]
+							 BESActivity activity=_bes.findActivity(toks[0]);
+							 if (activity==null) {
+								 _besLogger.error("Invalid activity ID in communication with BES from "+toks[0]);
+								 break;
+							 }
+							 if (toks[1].equalsIgnoreCase("register")) {
+								 try {
+									activity.updateIPPort(toks[2]);
+								} catch (SQLException e) {
+									// TODO Auto-generated catch block
+									 _besLogger.error("Could not set the new IPPort for "+toks[0] + " to " + toks[2]);
+									 e.printStackTrace();
+									 break;
+								}
+							 }
+							 
+						 }
+					        output.println(command);
+					        if (command.equals("Bye."))
+					            break;
+					    }
                 } catch (IOException e) {
                     _besLogger.error("PWrapper Connection Server: Lost Connection to Client. " + e);
                     return;
@@ -125,5 +175,8 @@ public class BESPWrapperConnection {
 	
 	public String getSocketPort() {
 		return new Integer(_server.getLocalPort()).toString();
+	}
+	public String getIPAddr() {
+		return _ipaddr;
 	}
 }

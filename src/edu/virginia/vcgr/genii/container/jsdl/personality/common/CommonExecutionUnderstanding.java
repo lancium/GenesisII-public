@@ -54,7 +54,6 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 
 	private String _jobAnnotation = null;
 	private String _jobName = null;
-	private String _ipport= null;
 
 	private Collection<DataStagingUnderstanding> _stageIns = new LinkedList<DataStagingUnderstanding>();
 	private Collection<DataStagingUnderstanding> _stageOuts = new LinkedList<DataStagingUnderstanding>();
@@ -90,11 +89,6 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		_jobName = jobName;
 	}
 	
-	public void setIPPort(String ipport)
-	{
-		_ipport = ipport;
-	}
-
 	public String getJobAnnotation()
 	{
 		return _jobAnnotation;
@@ -105,11 +99,6 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		return _jobName;
 	}
 	
-	public String getIPPort()
-	{
-		return _ipport;
-	}
-
 	public void setFuseMountDirectory(String fuseDirectory)
 	{
 		_fuseDirectory = fuseDirectory;
@@ -235,7 +224,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
  		_GPUMemoryPerNode = GPUMemoryPerNode;
      	}
 
-	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl) throws JSDLException
+	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl, String BESipaddr) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
@@ -382,7 +371,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName, _ipport);
 
 		if (_application != null)
-			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation);
+			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation, BESipaddr);
 
 		for (DataStagingUnderstanding stage : _stageOuts) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());
