@@ -318,6 +318,28 @@ public class BESActivity implements Closeable
 		}
 	}
 
+	public synchronized void updateIPPort(String IPPort) throws SQLException {
+		{
+			Connection connection = null;
+			PreparedStatement stmt = null;
+
+			try {
+				connection = _connectionPool.acquire(true);
+				stmt = connection.prepareStatement("UPDATE besactivitiestable SET ipport = ? " + "WHERE activityid = ?");
+				stmt.setString(1, IPPort);
+				stmt.setString(2, _activityid);
+				if (stmt.executeUpdate() != 1)
+					throw new SQLException("Unable to update database.");
+				connection.commit();
+
+				_IPPort=IPPort;
+			} finally {
+				StreamUtils.close(stmt);
+				_connectionPool.release(connection);
+			}
+		}	
+	}
+	
 	synchronized private void updateState(int nextPhase, ActivityState state) throws SQLException
 	{
 		Connection connection = null;

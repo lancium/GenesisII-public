@@ -10,7 +10,7 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 
 public interface ExecutionUnderstanding
 {
-	public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl) throws JSDLException;
+	public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl, String BESipaddr) throws JSDLException;
 
 	public String getJobName();
 }

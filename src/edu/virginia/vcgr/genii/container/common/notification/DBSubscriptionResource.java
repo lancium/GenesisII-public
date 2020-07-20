@@ -25,6 +25,12 @@ public class DBSubscriptionResource extends BasicDBResource
 	void createSubscription(EndpointReferenceType subscriptionReference, SubscriptionConstructionParameters cons) throws ResourceException
 	{
 		try {
+			if (_resourceKey==null) {
+				System.err.println("create subscription resource key is null");
+			}
+			else {
+				System.err.println("create subscription resource key is not null");
+			}
 			SubscriptionsDatabase.createSubscription(_connection, _resourceKey, cons.publisherResourceKey(), subscriptionReference,
 				cons.consumerReference(), cons.topicQuery(), cons.policies(), cons.additionalUserData());
 		} catch (SQLException e) {

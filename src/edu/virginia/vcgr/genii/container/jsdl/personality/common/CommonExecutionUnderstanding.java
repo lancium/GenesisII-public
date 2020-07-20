@@ -226,7 +226,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
  		_GPUMemoryPerNode = GPUMemoryPerNode;
      	}
 
-	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl) throws JSDLException
+	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl, String BESipaddr) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
@@ -373,7 +373,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName);
 
 		if (_application != null)
-			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation);
+			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation, BESipaddr);
 
 		for (DataStagingUnderstanding stage : _stageOuts) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());

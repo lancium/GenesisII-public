@@ -1,8 +1,11 @@
 package edu.virginia.vcgr.genii.container.bes;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,11 +16,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,19 +34,25 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
+import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.nativeq.QueueResultsException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
+import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
+import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResource;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
@@ -49,11 +64,107 @@ import edu.virginia.vcgr.genii.security.identity.Identity;
 public class BES implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(BES.class);
+	String _ipaddr="undefined";
+	int _port;
+	BESListener _comm=null;
 
 	static private ServerDatabaseConnectionPool _connectionPool;
 
 	static private HashMap<String, BES> _knownInstances = new HashMap<String, BES>();
 	static private HashMap<String, BES> _activityToBESMap = new HashMap<String, BES>();
+
+	private class BESListener extends Thread
+	{
+		ServerSocket sock =null;
+		
+		public BESListener(int port)
+		{
+			// Constructor gives the port to use
+			try {
+				InetAddress localhost = InetAddress.getLocalHost();
+
+
+				if (port==0) {
+				// There is no assigned port yet; get one
+
+				sock = new ServerSocket(0,10,localhost);
+				// Next, call updateIPPort on the BES to write it back to the DB
+				_port=sock.getLocalPort();
+				_ipaddr=sock.getInetAddress().getHostAddress() + ":"+_port;
+				updatePort(_ipaddr);
+				return;
+			} else {
+				sock = new ServerSocket(port,10,localhost);
+			}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			_port=sock.getLocalPort();
+			_ipaddr=sock.getInetAddress().getHostAddress() + ":"+_port;
+		}
+
+
+		public void run()
+		{
+			// 2020-07-16 by ASG
+			while (true) {
+
+				String command;
+				Socket clientSocket;
+				try {
+					clientSocket = sock.accept();
+					System.err.println("BESListener:got a connection on the BES socket");
+					PrintWriter out =
+							new PrintWriter(clientSocket.getOutputStream(), true);
+					BufferedReader in = new BufferedReader(
+							new InputStreamReader(clientSocket.getInputStream()));
+					 while ((command = in.readLine()) != null) {
+						 // Now we process the commands. All commands are of the form <jobid> command parameters
+						 // For example "A0C34C26-BC59-09F7-DBA0-BF790D583FA9 register 192.3.4.211:45335
+						 // The first thing we do is lookup the activity and ensure that it exists
+						 if (command !=null && command.length() > 36 && command.length()< 256) {
+							 String toks[]=command.split(" ");
+							 if (toks.length <3 || toks.length > 8) {
+								 _logger.error("Invalid activity communication, tokens <3 or >8 with BES from "+toks[0]);
+								 break;
+							 }
+							 // Lookup toks[0]
+							 BESActivity activity=findActivity(toks[0]);
+							 if (activity==null) {
+								 _logger.error("Invalid activity ID in communication with BES from "+toks[0]);
+								 break;
+							 }
+							 if (toks[1].equalsIgnoreCase("register")) {
+								 try {
+									activity.updateIPPort(toks[2]);
+								} catch (SQLException e) {
+									// TODO Auto-generated catch block
+									 _logger.error("Could not set the new IPPort for "+toks[0] + " to " + toks[2]);
+									 e.printStackTrace();
+									 break;
+								}
+							 }
+							 
+						 }
+					        out.println(command);
+					        if (command.equals("Bye."))
+					            break;
+					    }
+					 clientSocket.close();
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+
+			}
+
+
+		}
+	}
+
 
 	static private String findBESEPI(Connection connection, String besid) throws SQLException
 	{
@@ -128,15 +239,17 @@ public class BES implements Closeable
 		try {
 			connection = _connectionPool.acquire(false);
 			stmt = connection.createStatement();
-			rs = stmt.executeQuery("SELECT besid, userloggedinaction, screensaverinactiveaction " + "FROM bespolicytable");
+			//rs = stmt.executeQuery("SELECT besid, userloggedinaction, screensaverinactiveaction " + "FROM bespolicytable");
+			rs = stmt.executeQuery("SELECT besid, userloggedinaction, screensaverinactiveaction, ipaddr " + "FROM bespolicytable");
 			while (rs.next()) {
 				String besid = rs.getString(1);
 				BESPolicy policy = new BESPolicy(BESPolicyActions.valueOf(rs.getString(2)), BESPolicyActions.valueOf(rs.getString(3)));
-
+				String ipaddr=rs.getString(4);
+				if (ipaddr==null) ipaddr="undefined";
 				_logger.info(String.format("Loading BES with id: %s", besid));
 				supplementCreationParamsWithTweakerConfig(besid, connection);
 
-				BES bes = new BES(connection, besid, policy);
+				BES bes = new BES(connection, besid, policy, ipaddr);
 				_knownInstances.put(besid, bes);
 
 				// Load CloudMangaer if BES is a cloudBES
@@ -170,21 +283,51 @@ public class BES implements Closeable
 		return _knownInstances.get(besid);
 	}
 
+	synchronized private void updatePort(String ipAddr) {
+		// 2020-07-15 by ASG. Added to support BES/processwrapper communication.
+		Connection connection = null;
+		PreparedStatement stmt = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			stmt = connection.prepareStatement("UPDATE bespolicytable SET ipaddr = ? " + "WHERE besid = ?");
+			stmt.setString(1, ipAddr);
+
+			stmt.setString(2, _besid);
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException("Unable to update database.");
+			connection.commit();
+		} catch (SQLException e) {
+			_logger.error("Unable to set BES IP Address/port.", e);
+		} finally {
+			StreamUtils.close(stmt);
+			_connectionPool.release(connection);
+		}
+
+	}
+
+	
 	synchronized static public BES createBES(String besid, BESPolicy initialPolicy, ConstructionParameters params) throws SQLException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Entering CreateBES");
 			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
-				"INSERT INTO bespolicytable " + "(besid, userloggedinaction, screensaverinactiveaction) " + "VALUES (?, ?, ?)");
+			//	"INSERT INTO bespolicytable " + "(besid, userloggedinaction, screensaverinactiveaction) " + "VALUES (?, ?, ?)");
+			"INSERT INTO bespolicytable " + "(besid, userloggedinaction, screensaverinactiveaction, ipaddr) " + "VALUES (?, ?, ?, ?)");
 			stmt.setString(1, besid);
 			stmt.setString(2, initialPolicy.getUserLoggedInAction().name());
 			stmt.setString(3, initialPolicy.getScreenSaverInactiveAction().name());
+			stmt.setString(4, "undefined");
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database table for bes creation.");
 			connection.commit();
+			if (_logger.isDebugEnabled())
+				_logger.debug("Passed commit in CreateBES");
 
 			BES bes;
 
@@ -196,7 +339,7 @@ public class BES implements Closeable
 				}
 			}
 
-			_knownInstances.put(besid, bes = new BES(null, besid, initialPolicy));
+			_knownInstances.put(besid, bes = new BES(null, besid, initialPolicy, "undefined"));
 			return bes;
 		} finally {
 			StreamUtils.close(stmt);
@@ -231,15 +374,34 @@ public class BES implements Closeable
 	private BESPolicyEnactor _enactor;
 	private HashMap<String, BESActivity> _containedActivities = new HashMap<String, BESActivity>();
 
-	private BES(Connection connection, String besid, BESPolicy policy) throws SQLException
+	private BES(Connection connection, String besid, BESPolicy policy, String ipaddr) throws SQLException
 	{
 		_besid = besid;
 		_enactor = new BESPolicyEnactor(policy);
-
+		if (_logger.isDebugEnabled())
+			_logger.debug("Entering BES contructor");
+		if (ipaddr.equals("undefined")) {
+			// We need to fire up the listener with a null port
+			_comm=new BESListener(0);
+			// This sets the _ipaddr
+		}
+		else {
+			_ipaddr=ipaddr;	
+			// ipaddr is of the form "xxx.eee.sss.eee:port" We need to grab the port
+			String res[]=ipaddr.split(":");
+			int port = Integer.parseInt(res[1]);
+			_comm=new BESListener(port);
+		}
+		if (_logger.isDebugEnabled())
+			_logger.debug("BESListener: IPAddr/port is " + _ipaddr);
+		System.err.println("BESListener IPAddr/port is "+_ipaddr);
+		_comm.start();
 		if (connection != null)
 			_besEPI = findBESEPI(connection, besid);
 		else
 			_besEPI = null;
+		if (_logger.isDebugEnabled())
+			_logger.debug("Exiting BES contructor");
 	}
 
 	public String getBESID()
@@ -250,6 +412,10 @@ public class BES implements Closeable
 	protected void finalize() throws Throwable
 	{
 		close();
+	}
+	
+	public String getBESipaddr() {
+		return _ipaddr;
 	}
 
 	synchronized public boolean isAcceptingActivites(Integer threshold)
@@ -442,7 +608,7 @@ public class BES implements Closeable
 		try {
 			stmt = connection
 				.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityservicename, jobname ,ipport" + "FROM besactivitiestable WHERE besid = ?");
+					+ "nextphase, activityservicename, jobname ,ipport " + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
