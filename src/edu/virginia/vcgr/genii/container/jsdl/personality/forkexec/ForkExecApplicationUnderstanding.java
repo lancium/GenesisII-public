@@ -78,6 +78,6 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		}
 		executionPlan.add(new RunProcessPhase(fuseMountPoint, getSPMDVariation(),getMemory(), getNumProcesses(), getNumProcessesPerHost(),
 			getThreadsPerProcess(), BESActivityServiceImpl.getCommonDirectory(creationProperties), fsManager.lookup(getExecutable()),
-			stringArgs.toArray(new String[0]), stringEnv, redirection, creationProperties,jobContext.getJobName(), jobAnnotation, jobContext.getIPPort()));
+			stringArgs.toArray(new String[0]), stringEnv, redirection, creationProperties,jobContext.getJobName(), jobAnnotation));
 	}
 }

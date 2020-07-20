@@ -65,7 +65,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 	private String _processLock = new String();
 	private String _jobName=null;
 	private String _jobAnnotation=null;
-	private String _ipport =null;
 	transient private Boolean _hardTerminate = null;
 	transient private boolean _countAsFailedAttempt = true;
 
@@ -78,8 +77,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
-		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters, String jobName, String jobAnnotation,
-		String ipport)
+		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters, String jobName, String jobAnnotation)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
 
@@ -89,7 +87,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		_numProcessesPerHost = numProcessesPerHost;
 		_threadsPerProcess = threadsPerProcess;
 		_jobName=jobName;
-		_ipport = ipport;
 		_jobAnnotation=jobAnnotation;
 		// 2020-04-21 by ASG. Need to set these to a default of 1
 		if (numProcesses==null) {
@@ -270,21 +267,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
             	}
             }
             // End jobName updates
-            // 2020-07-14 by CCH
-			// Adding code to print out IP and assigned port so pwrapper can talk to it
-			// Part of the migration/persist project
-			File besIPPortInformation = new File (jwd, ".bes-info");
-			try {
-				if (besIPPortInformation.createNewFile()) {
-					FileWriter myWriter = new FileWriter(besIPPortInformation);
-					myWriter.write(_ipport+"\n");
-					myWriter.close();
-				}
-			} catch (IOException e) {
-				System.out.println("An error occurred .bes-info file.");
-				e.printStackTrace();
-			}
-			// end of updates 2020-07-14
 			generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
 					_numProcessesPerHost, _threadsPerProcess, _jobName, _jobAnnotation);
 

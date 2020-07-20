@@ -704,6 +704,7 @@ void *_startBesConnection(void *arg)
         int numread = read(bes_conn_socket, buffer, 1023);
         buffer[numread] = '\0';
         printf("bes_listener: got string %s\n", buffer);
+        fflush(stdout);
     }
 
     printf("bes_listener: closing connectfd...\n");

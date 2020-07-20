@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.jsdl.personality.common;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -368,7 +369,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		if (gridFs != null)
 			fuseMountPoint = gridFs.getMountPoint();
 		String jobName = getJobName();
-		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName, _ipport);
+		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName);
 
 		if (_application != null)
 			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation, BESipaddr);
@@ -397,6 +398,22 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		// CompleteAccountingPhase(File accountingDirectory, File finishedDir)
 		ret.add(new CompleteAccountingPhase(accountingDirectory,finishedDir));
 		// End of accounting dir updates
+		
+		// 2020-07-14 by CCH
+		// Adding code to print out IP and assigned port so pwrapper can talk to it
+		// Part of the migration/persist project
+		File besIPPortInformation = new File (f, ".bes-info");
+		try {
+			if (besIPPortInformation.createNewFile()) {
+				FileWriter myWriter = new FileWriter(besIPPortInformation);
+				myWriter.write(BESipaddr+"\n");
+				myWriter.close();
+			}
+		} catch (IOException e) {
+			System.out.println("An error occurred .bes-info file.");
+			e.printStackTrace();
+		}
+		// end of updates 2020-07-14
 		
 		
 		ret.addAll(cleanups);
