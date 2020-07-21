@@ -22,7 +22,7 @@ public class BESPWrapperConnection {
 	private ExecutorService _pool = Executors.newCachedThreadPool();
 	private ServerSocket _server;
 	private int _port;
-	private String _ipaddr;
+	private String _ipport;
 	
 	private Log _besLogger = LogFactory.getLog(BESPWrapperConnection.class);
 	private BES _bes;
@@ -39,7 +39,7 @@ public class BESPWrapperConnection {
 
 			_server = new ServerSocket(0,10);
 			_port=_server.getLocalPort();
-			_ipaddr=_server.getInetAddress().getHostAddress() + ":"+_port;
+			_ipport=_server.getInetAddress().getHostAddress() + ":"+_port;
 			return;
 		} else {
 			_server = new ServerSocket(port,10);
@@ -49,7 +49,7 @@ public class BESPWrapperConnection {
 			e.printStackTrace();
 		}
 		_port=_server.getLocalPort();
-		_ipaddr=_server.getInetAddress().getHostAddress() + ":"+_port;
+		_ipport=_server.getInetAddress().getHostAddress() + ":"+_port;
 	}
 	
 	public void stop()
@@ -176,7 +176,7 @@ public class BESPWrapperConnection {
 	public String getSocketPort() {
 		return new Integer(_server.getLocalPort()).toString();
 	}
-	public String getIPAddr() {
-		return _ipaddr;
+	public String getIPPort() {
+		return _ipport;
 	}
 }

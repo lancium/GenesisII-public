@@ -65,7 +65,7 @@ import edu.virginia.vcgr.appmgr.net.Hostname;
 public class BES implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(BES.class);
-	String _ipaddr="undefined";
+	String _ipport="undefined";
 	int _port;
 
 	static private ServerDatabaseConnectionPool _connectionPool;
@@ -146,17 +146,16 @@ public class BES implements Closeable
 		try {
 			connection = _connectionPool.acquire(false);
 			stmt = connection.createStatement();
-			//rs = stmt.executeQuery("SELECT besid, userloggedinaction, screensaverinactiveaction " + "FROM bespolicytable");
-			rs = stmt.executeQuery("SELECT besid, userloggedinaction, screensaverinactiveaction, ipaddr " + "FROM bespolicytable");
+			rs = stmt.executeQuery("SELECT besid, userloggedinaction, screensaverinactiveaction, ipport " + "FROM bespolicytable");
 			while (rs.next()) {
 				String besid = rs.getString(1);
 				BESPolicy policy = new BESPolicy(BESPolicyActions.valueOf(rs.getString(2)), BESPolicyActions.valueOf(rs.getString(3)));
-				String ipaddr=rs.getString(4);
-				if (ipaddr==null) ipaddr="undefined";
+				String ipport =rs.getString(4);
+				if (ipport ==null) ipport ="undefined";
 				_logger.info(String.format("Loading BES with id: %s", besid));
 				supplementCreationParamsWithTweakerConfig(besid, connection);
 
-				BES bes = new BES(connection, besid, policy, ipaddr);
+				BES bes = new BES(connection, besid, policy, ipport);
 				_knownInstances.put(besid, bes);
 
 				// Load CloudMangaer if BES is a cloudBES
@@ -197,7 +196,7 @@ public class BES implements Closeable
 
 		try {
 			connection = _connectionPool.acquire(true);
-			stmt = connection.prepareStatement("UPDATE bespolicytable SET ipaddr = ? " + "WHERE besid = ?");
+			stmt = connection.prepareStatement("UPDATE bespolicytable SET ipport = ? " + "WHERE besid = ?");
 			stmt.setString(1, ipAddr);
 
 			stmt.setString(2, _besid);
@@ -224,7 +223,7 @@ public class BES implements Closeable
 				_logger.debug("Entering CreateBES");
 			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
-			"INSERT INTO bespolicytable " + "(besid, userloggedinaction, screensaverinactiveaction, ipaddr) " + "VALUES (?, ?, ?, ?)");
+			"INSERT INTO bespolicytable " + "(besid, userloggedinaction, screensaverinactiveaction, ipport) " + "VALUES (?, ?, ?, ?)");
 			stmt.setString(1, besid);
 			stmt.setString(2, initialPolicy.getUserLoggedInAction().name());
 			stmt.setString(3, initialPolicy.getScreenSaverInactiveAction().name());
@@ -245,6 +244,8 @@ public class BES implements Closeable
 				}
 			}
 
+			if (_logger.isDebugEnabled())
+				_logger.debug("Trying to put a new bes with besid: " + besid);
 			_knownInstances.put(besid, bes = new BES(null, besid, initialPolicy, "undefined"));
 			return bes;
 		} finally {
@@ -280,32 +281,31 @@ public class BES implements Closeable
 	private BESPolicyEnactor _enactor;
 	private HashMap<String, BESActivity> _containedActivities = new HashMap<String, BESActivity>();
 	private BESPWrapperConnection _comm;
-	private String _pwrapper_ipport;
 
-	private BES(Connection connection, String besid, BESPolicy policy, String ipaddr) throws SQLException
+	private BES(Connection connection, String besid, BESPolicy policy, String ipport) throws SQLException
 	{
 		_besid = besid;
 		_enactor = new BESPolicyEnactor(policy);
 		if (_logger.isDebugEnabled())
 			_logger.debug("Entering BES contructor");
-		if (ipaddr.equals("undefined")) {
+		if (ipport.equals("undefined")) {
 			// We need to fire up the listener with a null port
 			// This sets the _ipaddr
 			_comm = new BESPWrapperConnection(0, this);
-			_ipaddr = _comm.getIPAddr();
-			updatePort(_ipaddr);
+			_ipport = _comm.getIPPort();
+			updatePort(_ipport);
 		}
 		else {
-			_ipaddr=ipaddr;	
+			_ipport=ipport;	
 			// ipaddr is of the form "xxx.eee.sss.eee:port" We need to grab the port
-			String res[]=ipaddr.split(":");
+			String res[]=ipport.split(":");
 			int port = Integer.parseInt(res[1]);
 			_comm = new BESPWrapperConnection(port, this);
 			// getIPAddr returns in form 192.168.0.0:5555, as an example
-			_ipaddr = _comm.getIPAddr();
+			_ipport = _comm.getIPPort();
 		}
 		if (_logger.isDebugEnabled()) {
-			_logger.debug("BESPWrapperConnection: IPAddr/port is " + _ipaddr);
+			_logger.debug("BESPWrapperConnection: IPAddr/port is " + _ipport);
 			_logger.debug("BESPWrapperConnection: starting listening...");
 		}
 		_comm.start();
@@ -328,8 +328,8 @@ public class BES implements Closeable
 		close();
 	}
 	
-	public String getBESipaddr() {
-		return _ipaddr;
+	public String getBESipport() {
+		return _ipport;
 	}
 
 	synchronized public boolean isAcceptingActivites(Integer threshold)
@@ -424,7 +424,7 @@ public class BES implements Closeable
 
 			stmt = connection.prepareStatement("INSERT INTO besactivitiestable " + "(activityid, besid, jsdl, owners, callingcontext, "
 				+ "state, submittime, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-				+ "nextphase, activityepr, activityservicename, jobname) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				+ "nextphase, activityepr, activityservicename, jobname, ipport) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
@@ -441,11 +441,12 @@ public class BES implements Closeable
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR, "besactivitiestable", "activityepr"));
 			stmt.setString(14, activityServiceName);
 			stmt.setString(15, jobName);
+			stmt.setString(16, _ipport);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, false, false, _pwrapper_ipport);
+				activityServiceName, jobName, false, false, _ipport);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -549,7 +550,7 @@ public class BES implements Closeable
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, suspendRequested, terminateRequested, _pwrapper_ipport);
+							activityServiceName, jobName, suspendRequested, terminateRequested, _ipport);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);

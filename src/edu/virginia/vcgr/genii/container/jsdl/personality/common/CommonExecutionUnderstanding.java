@@ -404,6 +404,9 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		// Part of the migration/persist project
 		File besIPPortInformation = new File (f, ".bes-info");
 		try {
+			// At this point, the JWD has been calculated but not yes created. 
+			// Creating it earlier than normal so I am able create .bes-info file
+			besIPPortInformation.getParentFile().mkdirs();
 			if (besIPPortInformation.createNewFile()) {
 				FileWriter myWriter = new FileWriter(besIPPortInformation);
 				myWriter.write(BESipaddr+"\n");

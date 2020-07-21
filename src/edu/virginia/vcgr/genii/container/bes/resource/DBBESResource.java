@@ -109,6 +109,8 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	{
 		BES bes = null;
 		try {
+			if (_logger.isDebugEnabled())
+				_logger.debug("Grabbing BES with resource key: " + _resourceKey);
 			bes = BES.getBES(_resourceKey);
 		} catch (IllegalStateException e) {
 			return null;
