@@ -351,8 +351,12 @@ public class BESActivity implements Closeable
 			stmt.setInt(1, nextPhase);
 			stmt.setBlob(2, DBSerializer.toBlob(state, "besactivitiestable", "state"));
 			stmt.setString(3, _activityid);
-			if (stmt.executeUpdate() != 1)
+			try {
+				stmt.executeUpdate();
+			} catch (SQLException sqe) {
+				_logger.error("Unable to update state of besactivitiestable.", sqe);
 				throw new SQLException("Unable to update database.");
+			}
 			connection.commit();
 
 			_nextPhase = nextPhase;

@@ -3,11 +3,9 @@ package edu.virginia.vcgr.genii.container.bes;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +13,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.appmgr.net.Hostname;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 
 public class BESPWrapperConnection {
@@ -35,21 +34,21 @@ public class BESPWrapperConnection {
 		try {
 
 			if (port==0) {
-			// There is no assigned port yet; get one
+				// There is no assigned port yet; get one
 
-			_server = new ServerSocket(0,10);
-			_port=_server.getLocalPort();
-			_ipport=_server.getInetAddress().getHostAddress() + ":"+_port;
-			return;
-		} else {
-			_server = new ServerSocket(port,10);
-		}
+				_server = new ServerSocket(0,10);
+				_port = _server.getLocalPort();
+				_ipport = Hostname.getCurrentIPAddress() + ":" + _port;
+				return;
+			} else {
+				_server = new ServerSocket(port,10);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		_port=_server.getLocalPort();
-		_ipport=_server.getInetAddress().getHostAddress() + ":"+_port;
+		_port = _server.getLocalPort();
+		_ipport = Hostname.getCurrentIPAddress() + ":" + _port;
 	}
 	
 	public void stop()
@@ -99,7 +98,7 @@ public class BESPWrapperConnection {
 	
 	private void handleConnection(Socket clientSock)
 	{
-		_besLogger.info("Hopefully the memory address of the clientSock reference: " + clientSock);
+		_besLogger.info("The hashCode of the clientSock reference: " + clientSock.hashCode());
 		String command;
 		try
         {

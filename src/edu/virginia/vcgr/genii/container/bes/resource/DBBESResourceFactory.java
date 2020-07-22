@@ -117,7 +117,7 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 				_logger.info("ipport column does not exist in bespolicytable");
 				 // ipport column does not exist
 				try {
-					alterStmt = conn.prepareStatement("ALTER TABLE " + "bespolicytable " + "ADD COLUMN " + "ipport " + "VARCHAR(40) NOT NULL");
+					alterStmt = conn.prepareStatement("ALTER TABLE " + "bespolicytable " + "ADD COLUMN " + "ipport " + "VARCHAR(40) NOT NULL " + "DEFAULT 'undefined'" );
 					alterStmt.execute();
 				} catch (SQLException sqe) {
 					_logger.error("Unable to upgrade bespolicytable with ipport column.", sqe);

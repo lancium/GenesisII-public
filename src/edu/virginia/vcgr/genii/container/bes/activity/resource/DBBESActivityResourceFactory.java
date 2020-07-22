@@ -13,10 +13,14 @@
 package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
@@ -27,7 +31,6 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class DBBESActivityResourceFactory extends BasicDBResourceFactory implements IBESActivityResourceFactory
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(DBBESActivityResourceFactory.class);
 
 		// 2020-07-13 ASG. Added IPPort to besactivity table. Contains IPADDR:port string
@@ -64,6 +67,33 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 			conn.commit();
 		} finally {
 			_pool.release(conn);
+		}
+	}
+	
+	@Override
+	protected void upgradeTables(Connection conn) throws SQLException
+	{
+		super.upgradeTables(conn);
+	
+		PreparedStatement alterStmt = null;
+		try {
+			DatabaseMetaData md = conn.getMetaData();
+			ResultSet checkBESPolicyTable_rs = md.getColumns(null, null, "BESACTIVITIESTABLE", "IPPORT");
+			if (checkBESPolicyTable_rs.next()) {
+				// ipport column exists
+				_logger.info("ipport column exists in besactivitestable");
+			} else {
+				_logger.info("ipport column does not exist in besactivitiestable");
+				 // ipport column does not exist
+				try {
+					alterStmt = conn.prepareStatement("ALTER TABLE " + "besactivitiestable " + "ADD COLUMN " + "ipport " + "VARCHAR(40) NOT NULL " + "DEFAULT 'undefined'" );
+					alterStmt.execute();
+				} catch (SQLException sqe) {
+					_logger.error("Unable to upgrade besactivitiestable with ipport column.", sqe);
+				}
+			}
+		} finally {
+			StreamUtils.close(alterStmt);
 		}
 	}
 
