@@ -35,7 +35,6 @@ static int setupChildEnvironment(HashMap *environmentVariables,
 static void setupEnvironmentVariables(HashMap *environmentVariables);
 static int handlePossibleRedirect(int desiredFD, const char *path, int oflag,
 	mode_t mode);
-static long long toMicroseconds(struct timeval tv);
 static void writeExitResults(const char *path, ExitResults*);
 static int checkMountPoint(const char *mountPoint);
 static int findGridBinary(HashMap *environmentOverload,
@@ -100,11 +99,11 @@ int dumpStats() {
 	}
 	writeExitResults(CL->getResourceUsageFile(CL),
                	autorelease(createExitResults(exitCode,
-               	toMicroseconds(usage.ru_utime),
-               	toMicroseconds(usage.ru_stime),
-               	(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
-                       	(long long)(stop.tv_usec - start.tv_usec),
-               	(long long)usage.ru_maxrss * 1024)));
+               	(double)usage.ru_utime.tv_sec + (double)usage.ru_utime.tv_usec / (double) 1000000,
+               	(double)usage.ru_stime.tv_sec + (double)usage.ru_utime.tv_usec / (double) 1000000,
+               	(double)(stop.tv_sec - start.tv_sec) + (double)(stop.tv_usec - start.tv_usec) / (double) 1000000,
+               	(long long)usage.ru_maxrss * 1024,
+				"undefined")));
 	return exitCode;
 }
 
@@ -117,7 +116,6 @@ void sig_handler(int signo)
 	else if (signo == SIGCHLD) {
 		dumpStats();
 	}
-
 }
 
 int wrapJob(CommandLine *commandLine)
@@ -376,13 +374,6 @@ int handlePossibleRedirect(int desiredFD, const char *path, int oflag,
 	return 0;
 }
 
-long long toMicroseconds(struct timeval tv)
-{
-	long long ret = tv.tv_usec;
-	ret += (long long)tv.tv_sec * 1000 * 1000;
-	return ret;
-}
-
 void writeExitResults(const char *path, ExitResults *results)
 {
 	FILE *out;
@@ -396,20 +387,19 @@ void writeExitResults(const char *path, ExitResults *results)
 			path);
 	}
 
-	results->toXML(results, out);
+	results->toJson(results, out);
 	fclose(out);
 	// Begin new code
-	// path has the following form /path-stuff/JWD/rusage.xml
+	// path has the following form /path-stuff/JWD/rusage.json
 	//	/A/JWD/C
 	//===== New code 2020-04-16
-	// The path is of the form /<path prefix>/<job-dir-name>/rusage.xml
+	// The path is of the form /<path prefix>/<job-dir-name>/rusage.json
 	// or - /A/B/C    we turn it into
 	//	/A/Accounting/B/C
 //===================
-    	char* token; 
-    	char copy[2048];
+    char* token;
+    char copy[2048];
 	sprintf(copy,"%s",path);
- 
 
 	char *rest=copy;
   	int count=0;
@@ -441,7 +431,7 @@ void writeExitResults(const char *path, ExitResults *results)
 			buf);
 	}
 
-	results->toXML(results, out);
+	results->toJson(results, out);
 	fclose(out);
 	//====  end of new code
 

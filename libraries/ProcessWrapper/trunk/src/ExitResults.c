@@ -1,36 +1,41 @@
 #include "ExitResults.h"
 #include "Memory.h"
 
+#include <stdio.h>
+
 static int exitCodeImpl(struct ExitResults*);
-static void toXMLImpl(struct ExitResults*, FILE*);
+static void toJsonImpl(struct ExitResults*, FILE*);
 
 typedef struct ExitResultsImpl
 {
 	ExitResults interface;
 
 	int _exitCode;
-	long long _userTimeMicroSeconds;
-	long long _systemTimeMicroSeconds;
-	long long _wallclockTimeMicroSeconds;
+	double _userTimeSeconds;
+	double _systemTimeSeconds;
+	double _wallclockTimeSeconds;
 	long long _maximumRSSBytes;
+	char _processorID[256];
 } ExitResultsImpl;
 
 ExitResults* createExitResults(int exitCode,
-	long long userTimeMicroSeconds,
-	long long systemTimeMicroSeconds,
-	long long wallclockTimeMicroSeconds,
-	long long maximumRSSBytes)
+	double userTimeSeconds,
+	double systemTimeSeconds,
+	double wallclockTimeSeconds,
+	long long maximumRSSBytes,
+	char* processorID)
 {
 	ExitResultsImpl *impl = allocate(sizeof(ExitResultsImpl), NULL);
 
 	impl->interface.exitCode = exitCodeImpl;
-	impl->interface.toXML = toXMLImpl;
+	impl->interface.toJson = toJsonImpl;
 
 	impl->_exitCode = exitCode;
-	impl->_userTimeMicroSeconds = userTimeMicroSeconds;
-	impl->_systemTimeMicroSeconds = systemTimeMicroSeconds;
-	impl->_wallclockTimeMicroSeconds = wallclockTimeMicroSeconds;
+	impl->_userTimeSeconds = userTimeSeconds;
+	impl->_systemTimeSeconds = systemTimeSeconds;
+	impl->_wallclockTimeSeconds = wallclockTimeSeconds;
 	impl->_maximumRSSBytes = maximumRSSBytes;
+	strncpy(impl->_processorID, processorID, 255);
 
 	return (ExitResults*)impl;
 }
@@ -42,19 +47,16 @@ int exitCodeImpl(struct ExitResults *er)
 	return impl->_exitCode;
 }
 
-void toXMLImpl(struct ExitResults *er, FILE *out)
+void toJsonImpl(struct ExitResults *er, FILE *out)
 {
 	ExitResultsImpl *impl = (ExitResultsImpl*)er;
 
-	fprintf(out, "<exit-results exit-code=\"%d\">\n",
-		impl->_exitCode);
-	fprintf(out, "\t<user-time value=\"%lld\" units=\"MICROSECONDS\"/>\n",
-		impl->_userTimeMicroSeconds);
-	fprintf(out, "\t<system-time value=\"%lld\" units=\"MICROSECONDS\"/>\n",
-		impl->_systemTimeMicroSeconds);
-	fprintf(out, "\t<wallclock-time value=\"%lld\" units=\"MICROSECONDS\"/>\n",
-		impl->_wallclockTimeMicroSeconds);
-	fprintf(out, "\t<maximum-rss>%lld</maximum-rss>\n",
-		impl->_maximumRSSBytes);
-	fprintf(out, "</exit-results>\n");
+	fprintf(out, "{\n    \"location\": {\n");
+	fprintf(out, "         \"exit-code\": \"%d\",\n", impl->_exitCode);
+	fprintf(out, "         \"user-time\": \"%f\",\n", impl->_userTimeSeconds);
+	fprintf(out, "         \"system-time\": \"%f\",\n", impl->_systemTimeSeconds);
+	fprintf(out, "         \"wallclock-time\": \"%f\",\n", impl->_wallclockTimeSeconds);
+	fprintf(out, "         \"maximum-rss\": \"%lld\",\n", impl->_maximumRSSBytes);
+	fprintf(out, "         \"processor-id\": \"%s\"\n", impl->_processorID);
+	fprintf(out, "    }\n}");
 }
