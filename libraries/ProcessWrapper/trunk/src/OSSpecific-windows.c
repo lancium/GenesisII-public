@@ -288,3 +288,9 @@ int connectToBes()
     fprintf(stderr, "connectToBes() not implemented for Windows\n");
     return -1;
 }
+
+int registerToBes(const char* ticket)
+{
+	fprintf(stderr, "registerToBes(char* ticket) not implemented for Windows\n");
+    return -1;
+}
