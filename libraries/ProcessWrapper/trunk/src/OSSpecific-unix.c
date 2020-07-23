@@ -73,14 +73,12 @@ int beingKilled=0;
 
 void teardownJob()
 {
-	//we are getting killed
-	int exitCode = -1;
-
 	//kill vmwrapper or container
 	kill(pid, SIGTERM);
 
 	//wait for vmwrapper/container to terminate
-	waitpid(pid, &exitCode, 0);
+	int tempExitCode;
+	waitpid(pid, &tempExitCode, 0);
 }
 
 procInfo getProcInfo(){
@@ -224,6 +222,7 @@ int wrapJob(CommandLine *commandLine)
 
 	//LAK: Start up BES communication
 	connectToBes();
+	registerToBes(commandLine->getWorkingDirectory(commandLine));
 
 	gettimeofday(&start, NULL);
 	pid = fork();
@@ -742,21 +741,17 @@ void *_startBesConnection(void *arg)
 
 	printf("connected to the BES\n");
 
-	//test write
-	printf("sending register command to BES\n");
-	write(bes_conn_socket, "hello BES, are you there?\n", 27);
-
     while(1)
 	{
         // test reads
         char buffer[1024];
         int numread = read(bes_conn_socket, buffer, 1023);
         buffer[numread] = '\0';
-        printf("bes_listener: got string %s\n", buffer);
+        printf("bes_connection: got string %s\n", buffer);
         fflush(stdout);
     }
 
-    printf("bes_listener: closing connectfd...\n");
+    printf("bes_connection: closing connectfd...\n");
     close(bes_conn_socket);
 }
 
@@ -791,7 +786,16 @@ void _setBesIPInfo()
 	strncpy(bes_conn_params.host, ip, 128);
 }
 
-int connectToBes() {
+int registerToBes(const char* ticket)
+{
+	printf("register_to_bes: sending register command\n");
+	char command[64];
+	snprintf(command, 64, "%s register\n", ticket);
+	write(bes_conn_socket, command, strlen(command));
+}
+
+int connectToBes()
+{
     printf("bes_connection: spawning bes connection thread\n");
 	_setBesIPInfo();
     signal(SIGPIPE, &_pipefail);

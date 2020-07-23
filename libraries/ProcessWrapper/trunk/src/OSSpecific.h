@@ -23,5 +23,6 @@ void fillInOsSpecificFuseInformation(HashMap *environmentOverload,
 
 int startBesListener();
 int connectToBes();
+int registerToBes(const char* ticket);
 
 #endif
