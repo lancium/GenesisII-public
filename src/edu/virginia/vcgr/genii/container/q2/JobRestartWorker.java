@@ -30,6 +30,7 @@ import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -83,7 +84,9 @@ public class JobRestartWorker implements OutcallHandler {
 				GetStatePathResponseType[] getStatePathResponses;
 				
 				// call the BES container to get the location the job's persisted data is stored
-				getStatePathResponses = clientStub.getStatePaths(new GetStatePathsType(new String[]{_data.getJobTicket()}, null)).getResponse();
+				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
+				String epi = aps.getResourceKey();
+				getStatePathResponses = clientStub.getStatePaths(new GetStatePathsType(new String[]{epi}, null)).getResponse();
 				
 				if(getStatePathResponses.length != 1)
 				{

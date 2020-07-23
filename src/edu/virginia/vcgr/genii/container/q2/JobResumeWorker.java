@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -78,7 +79,9 @@ public class JobResumeWorker implements OutcallHandler {
 				
 				ResumeActivityResponseType[] resumeResponses;
 				/* call the BES container to start persisting the job. */
-				resumeResponses = clientStub.resumeActivities(new ResumeActivitiesType(new String[] { _data.getJobTicket() }, null)).getResponse();
+				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
+				String epi = aps.getResourceKey();
+				resumeResponses = clientStub.resumeActivities(new ResumeActivitiesType(new String[] { epi }, null)).getResponse();
 				
 				for(ResumeActivityResponseType rRes : resumeResponses)
 				{

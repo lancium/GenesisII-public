@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
@@ -25,7 +26,9 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -78,7 +81,9 @@ public class JobPersistWorker implements OutcallHandler {
 				
 				PersistActivityResponseType[] persistResponses;
 				/* call the BES container to start persisting the job. */
-				persistResponses = clientStub.persistActivities(new PersistActivitiesType(new String[]{_data.getJobTicket()}, false, null)).getResponse();
+				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
+				String epi = aps.getResourceKey();
+				persistResponses = clientStub.persistActivities(new PersistActivitiesType(new String[]{epi}, false, null)).getResponse();
 				
 				for(PersistActivityResponseType pRes : persistResponses)
 				{
