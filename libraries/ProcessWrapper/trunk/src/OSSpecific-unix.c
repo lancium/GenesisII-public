@@ -208,6 +208,11 @@ int wrapJob(CommandLine *commandLine)
 			commandLine->getStandardError(commandLine)))
 			return -1;
 		
+		// 2020-07-22 by JAA -- wait for cgroup to be setup
+		// this allows all children off of our child to be
+		// contained in freezer
+		raise(SIGSTOP);
+
 		execvp(cmdLine[0], cmdLine);
 
 		/* If we got this far, the something went wrong with the exec. */
@@ -231,6 +236,22 @@ int wrapJob(CommandLine *commandLine)
 	// the accounting records.
 	if (signal(SIGCHLD, sig_handler) == SIG_ERR)
   		fprintf(stderr, "Can't catch SIGCHLD\n");
+
+	// 2020-07-22 by JAA -- create cgroup using secondary program
+	// should be set up in path, requires sudoers setup if not in same group
+	char freezeCMD[50] = "sudo freeze create ";
+	// PID to char*, buffer is size of length of pid_max
+	// We'll say 4194304 possible PIDs on 64-bit, so length is 7+1
+	char pidStr[8]; 
+	sprintf(pidStr, "%d", pid);
+	// Call "freeze" program with the PID and create param.
+	strcat(freezeCMD, pidStr);
+	system(freezeCMD);
+	// Wait for child to signal if it hasn't already
+	waitpid(pid, NULL, WUNTRACED);
+	// Signal child to continue
+	kill(pid, SIGCONT);
+
 	running=1;
 	int ticks=0;
 	while (running==1 && beingKilled==0) {
@@ -758,4 +779,29 @@ int connectToBes() {
         return -1;
     }
     return 0;
+}
+
+void freeze(){
+	// 2020-07-22 by JAA -- freeze process's cgroup
+	// should be set up at fork
+	char freezeCMD[50] = "sudo freeze freeze ";
+	// PID to char*, buffer is size of length of pid_max
+	// We'll say 4194304 possible PIDs on 64-bit, so length is 7+1
+	char pidStr[8]; 
+	sprintf(pidStr, "%d", pid);
+	// Call "freeze" program with the PID and create param.
+	strcat(freezeCMD, pidStr);
+	system(freezeCMD);
+	return;
+}
+
+void thaw(){
+	// 2020-07-22 by JAA -- thaws process's cgroup
+	// should be set up at fork
+	char freezeCMD[50] = "sudo freeze thaw ";
+	char pidStr[8]; 
+	sprintf(pidStr, "%d", pid);
+	strcat(freezeCMD, pidStr);
+	system(freezeCMD);
+	return;
 }
