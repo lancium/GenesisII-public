@@ -6,31 +6,34 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "exit-results")
+//@XmlRootElement(name = "exit-results")
 public class ExitResults
 {
-	@XmlAttribute(name = "exit-code", required = true)
+	//@XmlAttribute(name = "exit-code", required = true)
 	private int _exitCode;
 
-	@XmlElement(name = "user-time", nillable = true, required = true)
+	//@XmlElement(name = "user-time", nillable = true, required = true)
 	private ElapsedTime _userTime;
 
-	@XmlElement(name = "system-time", nillable = true, required = true)
+	//@XmlElement(name = "system-time", nillable = true, required = true)
 	private ElapsedTime _kernelTime;
 
-	@XmlElement(name = "wallclock-time", nillable = true, required = true)
+	//@XmlElement(name = "wallclock-time", nillable = true, required = true)
 	private ElapsedTime _wallclockTime;
 
-	@XmlElement(name = "maximum-rss", nillable = false, required = true)
+	//@XmlElement(name = "maximum-rss", nillable = false, required = true)
 	private long _maximumRSS;
 
-	private ExitResults()
+	private String _processorID;
+
+	public ExitResults(int exitCode, long userTime, long kernelTime, long wallclockTime, long maxRSS, String processorID)
 	{
-		_exitCode = -1;
-		_userTime = null;
-		_kernelTime = null;
-		_wallclockTime = null;
-		_maximumRSS = -1L;
+		_exitCode = exitCode;
+		_userTime = new ElapsedTime(userTime);
+		_kernelTime = new ElapsedTime(kernelTime);
+		_wallclockTime = new ElapsedTime(wallclockTime);
+		_maximumRSS = maxRSS;
+		_processorID = processorID;
 	}
 
 	final public int exitCode()
@@ -58,11 +61,16 @@ public class ExitResults
 		return _maximumRSS;
 	}
 
+	final public String processorID()
+	{
+		return _processorID;
+	}
+
 	@Override
 	public String toString()
 	{
-		return String.format("Exit Code:  %d, User Time:  %d us, " + "Kernel Time:  %d us, Wallclock Time: %d us, " + "Max RSS:  %d bytes.\n",
+		return String.format("Exit Code:  %d, User Time:  %d ms, " + "Kernel Time:  %d ms, Wallclock Time: %d ms, " + "Max RSS:  %d bytes, " + "Processor ID: %s\n",
 			_exitCode, _userTime.as(TimeUnit.MICROSECONDS), _kernelTime.as(TimeUnit.MICROSECONDS), _wallclockTime.as(TimeUnit.MICROSECONDS),
-			_maximumRSS);
+			_maximumRSS, _processorID);
 	}
 }

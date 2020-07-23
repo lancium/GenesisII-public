@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.client.pwrapper;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
@@ -14,7 +16,11 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.io.IOUtils;
 import org.morgan.util.configuration.ConfigurationException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.procmgmt.ProcessManager;
@@ -23,33 +29,46 @@ public class ProcessWrapper
 {
 	static private Log _logger = LogFactory.getLog(ProcessWrapper.class);
 
-	static private JAXBContext _context;
-
-	static {
-		try {
-			_context = JAXBContext.newInstance(ExitResults.class);
-		} catch (JAXBException e) {
-			throw new ConfigurationException("Unable to initialize JAXBContext for ExitResults class.", e);
-		}
-	}
+//	static private JAXBContext _context;
+//
+//	static {
+//		try {
+//			_context = JAXBContext.newInstance(ExitResults.class);
+//		} catch (JAXBException e) {
+//			throw new ConfigurationException("Unable to initialize JAXBContext for ExitResults class.", e);
+//		}
+//	}
 
 	static public ExitResults readResults(File file) throws ProcessWrapperException
 	{
-		try {
-			Unmarshaller u = _context.createUnmarshaller();
-			return (ExitResults) u.unmarshal(file);
-		} catch (JAXBException e) {
-			throw new ProcessWrapperException("Unable to read exit results from file.", e);
-		} 
-		/* 2019-06-07 by ASG. Removed the delete as we are now letting the user stage it out.
-		   finally {
-			try {
-				file.delete();
-			} catch (Throwable cause) {
-				_logger.warn(String.format("Unable to cleanup resource usage file \"%s\".", file), cause);
-			}
+		try
+		{
+			FileInputStream fio = new FileInputStream(file);
+			String jsonText = IOUtils.toString(fio, "UTF-8");
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode obj = mapper.readTree(jsonText).get("location");
+			int exitCode = obj.get("exit-code").asInt();
+			_logger.debug(obj.get("user-time").asDouble());
+			long userTime = (long)(obj.get("user-time").asDouble() * 1000000L); //need to convert all of these into microseconds
+			long systemTime = (long)(obj.get("system-time").asDouble() * 1000000L); //need to convert all of these into microseconds
+			long wallclockTime = (long)(obj.get("wallclock-time").asDouble() * 10000000L); //need to convert all of these into microseconds
+			long maxrss = obj.get("maximum-rss").asLong();
+			String processor = obj.get("processor-id").asText();
+
+			ExitResults ret = new ExitResults(exitCode, userTime, systemTime, wallclockTime, maxrss, processor);
+			_logger.debug(ret.toString());
+			return ret;
 		}
-		*/
+		catch(java.io.FileNotFoundException e)
+		{
+			_logger.error("Resource file not found: " + e);
+			return null;
+		}
+		catch(java.io.IOException e)
+		{
+			_logger.error("Failed to parse resource json file with error: " + e);
+			return null;
+		}
 	}
 
 	private Collection<ProcessWrapperListener> _listeners = new LinkedList<ProcessWrapperListener>();
