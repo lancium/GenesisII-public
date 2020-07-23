@@ -1,7 +1,11 @@
 package edu.virginia.vcgr.genii.container.bes;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -115,6 +119,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventSink;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.q2.QueueManager;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -723,19 +728,24 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	public StopActivitiesResponseType stopActivities(StopActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		_logger.debug("stopActivities called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
+		_logger.debug("stopActivities called on GeniiBESServiceImpl.");
 		Collection<StopActivityResponseType> responses = new LinkedList<StopActivityResponseType>();
 
-		for (String aepr : parameters.getActivityIdentifier()) {
-			responses.add(stopActivity(aepr));
+		for (String epi : parameters.getActivityIdentifier()) {
+			responses.add(stopActivity(epi));
 		}
 
 		return new StopActivitiesResponseType(responses.toArray(new StopActivityResponseType[0]), null);
 	}
 
-	static public StopActivityResponseType stopActivity(String epi) throws RemoteException
+	static public StopActivityResponseType stopActivity(String activityid) throws RemoteException
 	{
-		return new StopActivityResponseType("", false, null, null);
+		BES bes = BES.findBESForActivity(activityid);
+		BESPWrapperConnection conn = bes.getBESPWrapperConnection();
+		if (conn == null)
+			return new StopActivityResponseType(activityid, false, null, null);
+		String commandToSend = activityid + " freeze";
+		return new StopActivityResponseType(activityid, conn.sendCommand(activityid, commandToSend), null, null);
 	}
 	
 	@Override
@@ -753,9 +763,14 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		return new ResumeActivitiesResponseType(responses.toArray(new ResumeActivityResponseType[0]), null);
 	}
 
-	static public ResumeActivityResponseType resumeActivity(String epi) throws RemoteException
+	static public ResumeActivityResponseType resumeActivity(String activityid) throws RemoteException
 	{
-		return new ResumeActivityResponseType("", false, null, null);
+		BES bes = BES.findBESForActivity(activityid);
+		BESPWrapperConnection conn = bes.getBESPWrapperConnection();
+		if (conn == null)
+			return new ResumeActivityResponseType(activityid, false, null, null);
+		String commandToSend = activityid + " thaw";
+		return new ResumeActivityResponseType(activityid, conn.sendCommand(activityid, commandToSend), null, null);
 	}
 
 	@Override

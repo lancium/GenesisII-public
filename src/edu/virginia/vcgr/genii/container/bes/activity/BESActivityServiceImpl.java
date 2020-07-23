@@ -181,7 +181,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
 
-				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl,bes.getBESipport());
+				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl,bes.getBESipport(), _resource.getKey().toString());
 				jobName = executionUnderstanding.getJobName();
 				
 			}

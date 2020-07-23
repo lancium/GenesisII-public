@@ -225,7 +225,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
  		_GPUMemoryPerNode = GPUMemoryPerNode;
      	}
 
-	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl, String BESipaddr) throws JSDLException
+	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl, String BESipaddr, String activityid) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
@@ -404,12 +404,13 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		// Part of the migration/persist project
 		File besIPPortInformation = new File (f, ".bes-info");
 		try {
-			// At this point, the JWD has been calculated but not yes created. 
+			// At this point, the JWD has been calculated but not yet created. 
 			// Creating it earlier than normal so I am able create .bes-info file
 			besIPPortInformation.getParentFile().mkdirs();
 			if (besIPPortInformation.createNewFile()) {
 				FileWriter myWriter = new FileWriter(besIPPortInformation);
 				myWriter.write(BESipaddr+"\n");
+				myWriter.write(activityid+"\n");
 				myWriter.close();
 			}
 		} catch (IOException e) {

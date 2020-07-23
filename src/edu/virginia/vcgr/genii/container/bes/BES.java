@@ -150,7 +150,7 @@ public class BES implements Closeable
 
 				// Load CloudMangaer if BES is a cloudBES
 				BESConstructionParameters cParam =
-					(BESConstructionParameters) DBBESResource.constructionParameters(connection, GeniiBESServiceImpl.class, besid);
+						(BESConstructionParameters) DBBESResource.constructionParameters(connection, GeniiBESServiceImpl.class, besid);
 				if (cParam.getCloudConfiguration() != null) {
 					try {
 						CloudMonitor.loadCloudInstance(besid, cParam.getCloudConfiguration());
@@ -202,7 +202,7 @@ public class BES implements Closeable
 
 	}
 
-	
+
 	synchronized static public BES createBES(String besid, BESPolicy initialPolicy, ConstructionParameters params) throws SQLException
 	{
 		Connection connection = null;
@@ -213,7 +213,7 @@ public class BES implements Closeable
 				_logger.debug("Entering CreateBES");
 			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
-			"INSERT INTO bespolicytable " + "(besid, userloggedinaction, screensaverinactiveaction, ipport) " + "VALUES (?, ?, ?, ?)");
+					"INSERT INTO bespolicytable " + "(besid, userloggedinaction, screensaverinactiveaction, ipport) " + "VALUES (?, ?, ?, ?)");
 			stmt.setString(1, besid);
 			stmt.setString(2, initialPolicy.getUserLoggedInAction().name());
 			stmt.setString(3, initialPolicy.getScreenSaverInactiveAction().name());
@@ -306,18 +306,18 @@ public class BES implements Closeable
 		if (_logger.isDebugEnabled())
 			_logger.debug("Exiting BES contructor");
 	}
-	
+
 	public String getBESID()
 	{
 		return _besid;
 	}
-	
-	
+
+
 	protected void finalize() throws Throwable
 	{
 		close();
 	}
-	
+
 	public String getBESipport() {
 		return _ipport;
 	}
@@ -397,12 +397,13 @@ public class BES implements Closeable
 	}
 
 	synchronized public BESActivity createActivity(Connection parentConnection, String activityid, JobDefinition_Type jsdl,
-		Collection<Identity> owners, ICallingContext callingContext, BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan,
-		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName) throws SQLException, ResourceException
+			Collection<Identity> owners, ICallingContext callingContext, BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan,
+			EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
+		_logger.info("Activity id: " + activityid);
 		String jobName = findJobName(suggestedJobName);
 		ActivityState state = new ActivityState(ActivityStateEnumeration.Pending, null, false);
 
@@ -413,8 +414,8 @@ public class BES implements Closeable
 				connection = _connectionPool.acquire(false);
 
 			stmt = connection.prepareStatement("INSERT INTO besactivitiestable " + "(activityid, besid, jsdl, owners, callingcontext, "
-				+ "state, submittime, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-				+ "nextphase, activityepr, activityservicename, jobname, ipport) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					+ "state, submittime, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
+					+ "nextphase, activityepr, activityservicename, jobname, ipport) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
@@ -425,7 +426,7 @@ public class BES implements Closeable
 			stmt.setShort(8, (short) 0);
 			stmt.setShort(9, (short) 0);
 			stmt.setString(10,
-				String.format("%s|%s", activityCWD.mustDelete() ? "d" : "k", activityCWD.getWorkingDirectory().getAbsolutePath()));
+					String.format("%s|%s", activityCWD.mustDelete() ? "d" : "k", activityCWD.getWorkingDirectory().getAbsolutePath()));
 			stmt.setBlob(11, DBSerializer.toBlob(executionPlan, "besactivitiestable", "executionplan"));
 			stmt.setInt(12, 0);
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR, "besactivitiestable", "activityepr"));
@@ -436,7 +437,7 @@ public class BES implements Closeable
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, false, false, _ipport);
+					activityServiceName, jobName, false, false, _ipport);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -459,7 +460,7 @@ public class BES implements Closeable
 		if (_logger.isDebugEnabled())
 			_logger.debug("BES: deleteActivity " + activityid);
 		BESActivity activity = _containedActivities.get(activityid);
-		
+
 		if (activity == null)
 			fault = new UnknownActivityIdentifierFaultType("Couldn't find activity \"" + activityid + "\".", null);
 		else
@@ -484,6 +485,8 @@ public class BES implements Closeable
 
 			_containedActivities.remove(activityid);
 			removeActivityToBESMapping(activityid);
+			
+			_comm.removeSocketInfo(activityid);
 
 			if (fault != null)
 				throw fault;
@@ -511,8 +514,8 @@ public class BES implements Closeable
 
 		try {
 			stmt = connection
-				.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityservicename, jobname, ipport " + "FROM besactivitiestable WHERE besid = ?");
+					.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
+							+ "nextphase, activityservicename, jobname, ipport " + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
@@ -570,5 +573,9 @@ public class BES implements Closeable
 		}
 
 		return _besEPI;
+	}
+
+	public BESPWrapperConnection getBESPWrapperConnection() {
+		return _comm;
 	}
 }
