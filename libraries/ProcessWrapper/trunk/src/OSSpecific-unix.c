@@ -31,7 +31,7 @@
 // This is currently designed around Intel processors.
 // AMD CPUs may not provide GHz, so changes will be necessary
 typedef struct {
-	char processorType[40]; // This should be enough, let me know. Also, null terminated
+	char processorType[64]; // This should be enough, let me know. Also, null terminated
 	float GHz; // in GHZ, e.g., 2.5
 } procInfo;
 
@@ -82,6 +82,7 @@ procInfo getProcInfo(){
 	size_t len = 0;
 	ssize_t read;
 	procInfo p = {};
+	int isIntel = 0;
 
 	FILE *cpuinfo = fopen("/proc/cpuinfo", "rb");
 
@@ -91,13 +92,27 @@ procInfo getProcInfo(){
 	}
 
 	while ((read = getline(&line, &len, cpuinfo)) != -1){
+		if (strstr(line, "vendor_id	:") != NULL){
+			strtok(line, ":\n");
+			char * vendor = strtok(NULL, ":\n");
+			if(strcmp(vendor+1, "GenuineIntel\n") == 0){
+				printf("Is Intel\n");
+				isIntel = 1;
+			}
+		}
 		if (strstr(line, "model name	:") != NULL){
 			strtok(line, ":\n");
 			char * processor = strtok(NULL, ":\n");
-			strtok(processor, "@");
-			char * freq = strtok(NULL, "@");
-			snprintf(p.processorType, 40, "%s", processor+1);
-			p.GHz = strtof(freq, NULL);
+			if(isIntel){
+				strtok(processor, "@");
+				char * freq = strtok(NULL, "@");
+				snprintf(p.processorType, 64, "%s", processor+1);
+				p.GHz = strtof(freq, NULL);
+			}
+			else{
+				snprintf(p.processorType, 64, "%s", processor+1);
+				p.GHz = 0.0;
+			}
 			break;
 		}
 	}
