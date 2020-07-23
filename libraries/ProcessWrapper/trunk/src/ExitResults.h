@@ -6,13 +6,14 @@
 typedef struct ExitResults
 {
 	int (*exitCode)(struct ExitResults*);
-	void (*toXML)(struct ExitResults*, FILE*);
+	void (*toJson)(struct ExitResults*, FILE*);
 } ExitResults;
 
 ExitResults* createExitResults(int exitCode,
-	long long userTimeMicroseconds,
-	long long systemTimeMicroseconds,
-	long long wallclockTimeMicroseconds,
-	long long maximumRSSBytes);
+	double userTimeSeconds,
+	double systemTimeSeconds,
+	double wallclockTimeSeconds,
+	long long maximumRSSBytes,
+	char* processorID);
 
 #endif
