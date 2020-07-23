@@ -6,16 +6,16 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 public class ElapsedTime
 {
-	@XmlAttribute(name = "value", required = true)
+	//@XmlAttribute(name = "value", required = true)
 	private long _value;
 
-	@XmlAttribute(name = "units", required = true)
+	//@XmlAttribute(name = "units", required = true)
 	private TimeUnit _units;
 
-	private ElapsedTime()
+	public ElapsedTime(long value)
 	{
-		_value = 0;
-		_units = TimeUnit.NANOSECONDS;
+		_value = value;
+		_units = TimeUnit.MICROSECONDS;
 	}
 
 	final public long value()
