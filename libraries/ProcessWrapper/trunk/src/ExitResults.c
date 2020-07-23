@@ -2,6 +2,7 @@
 #include "Memory.h"
 
 #include <stdio.h>
+#include <string.h>
 
 static int exitCodeImpl(struct ExitResults*);
 static void toJsonImpl(struct ExitResults*, FILE*);

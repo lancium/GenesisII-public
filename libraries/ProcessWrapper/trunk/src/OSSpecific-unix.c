@@ -27,6 +27,14 @@
 	#define UNMOUNT_BINARY_NAME "fusermount"
 #endif
 
+// 2020-07-23 by JAA -- just a quick struct for the CPU info
+// This is currently designed around Intel processors.
+// AMD CPUs may not provide GHz, so changes will be necessary
+typedef struct {
+	char processorType[40]; // This should be enough, let me know. Also, null terminated
+	float GHz; // in GHZ, e.g., 2.5
+} procInfo;
+
 static void commandLineDestructor(void *ptr);
 static char** formCommandLine(const char *executable, LinkedList *arguments);
 static int setupChildEnvironment(HashMap *environmentVariables,
@@ -69,6 +77,34 @@ void teardownJob()
 	waitpid(pid, &exitCode, 0);
 }
 
+procInfo getProcInfo(){
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	procInfo p = {};
+
+	FILE *cpuinfo = fopen("/proc/cpuinfo", "rb");
+
+	if (cpuinfo == NULL){
+		perror("Failed to open file");
+		return p;
+	}
+
+	while ((read = getline(&line, &len, cpuinfo)) != -1){
+		if (strstr(line, "model name	:") != NULL){
+			strtok(line, ":\n");
+			char * processor = strtok(NULL, ":\n");
+			strtok(processor, "@");
+			char * freq = strtok(NULL, "@");
+			snprintf(p.processorType, 40, "%s", processor+1);
+			p.GHz = strtof(freq, NULL);
+			break;
+		}
+	}
+	fclose(cpuinfo);
+	return p;
+}
+
 int dumpStats() {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
 	Note that it is using global variables. This is unfortunate, but the 
@@ -97,13 +133,14 @@ int dumpStats() {
 		// 2020 May 28 CCH: Changing this error code to 143 to be consistent with bash
 		exitCode=143;
 	}
+	procInfo p = getProcInfo();
 	writeExitResults(CL->getResourceUsageFile(CL),
                	autorelease(createExitResults(exitCode,
                	(double)usage.ru_utime.tv_sec + (double)usage.ru_utime.tv_usec / (double) 1000000,
                	(double)usage.ru_stime.tv_sec + (double)usage.ru_utime.tv_usec / (double) 1000000,
                	(double)(stop.tv_sec - start.tv_sec) + (double)(stop.tv_usec - start.tv_usec) / (double) 1000000,
                	(long long)usage.ru_maxrss * 1024,
-				"undefined")));
+				p.processorType)));
 	return exitCode;
 }
 
