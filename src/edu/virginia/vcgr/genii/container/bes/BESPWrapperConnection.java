@@ -54,6 +54,7 @@ public class BESPWrapperConnection {
 		}
 		_port = _server.getLocalPort();
 		_ipport = Hostname.getCurrentIPAddress() + ":" + _port;
+		_pwrapperSocketsInfo = new HashMap<String, String>();
 	}
 
 	public void stop()
