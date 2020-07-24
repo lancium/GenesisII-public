@@ -21,8 +21,4 @@ int wrapJob(CommandLine *commandLine);
 void fillInOsSpecificFuseInformation(HashMap *environmentOverload,
 	char **errorMessage, char **gridBinary, char **unmountBinary);
 
-int startBesListener();
-int connectToBes();
-int registerToBes(const char* ticket);
-
 #endif
