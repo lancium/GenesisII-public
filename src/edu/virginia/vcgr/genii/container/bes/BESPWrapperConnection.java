@@ -35,9 +35,9 @@ public class BESPWrapperConnection {
 	public BESPWrapperConnection(int port, BES bes)
 	{
 		// Constructor gives the port to use
+		_pwrapperSocketsInfo = new HashMap<String, String>(1);
 		_bes = bes;
 		try {
-
 			if (port==0) {
 				// There is no assigned port yet; get one
 
@@ -54,7 +54,6 @@ public class BESPWrapperConnection {
 		}
 		_port = _server.getLocalPort();
 		_ipport = Hostname.getCurrentIPAddress() + ":" + _port;
-		_pwrapperSocketsInfo = new HashMap<String, String>();
 	}
 
 	public void stop()
