@@ -116,8 +116,6 @@ public class BESPWrapperConnection {
 				try {
 					while ((command = input.readLine()) != null) {
 						_besLogger.info(clientSock.getRemoteSocketAddress() + " says >> " + command);
-						output.println("PWrapper Connection Server: Sending back identical string: " + command);
-						output.flush();
 						// Now we process the commands. All commands are of the form <jobid> command parameters
 						// For example "A0C34C26-BC59-09F7-DBA0-BF790D583FA9 register 192.3.4.211:45335
 						// The first thing we do is lookup the activity and ensure that it exists
@@ -140,10 +138,9 @@ public class BESPWrapperConnection {
 								try {
 									activity.updateIPPort(toks[2]);
 								} catch (SQLException e) {
-									// TODO Auto-generated catch block
-									_besLogger.error("Could not set the new IPPort for "+toks[0] + " to " + toks[2]);
-									e.printStackTrace();
-									break;
+									_besLogger.error("Could not set the new IPPort for "+toks[0] + " to " + toks[2], e);
+									output.println(activityid + " OK");
+									output.flush();
 								}
 							}
 
@@ -173,7 +170,8 @@ public class BESPWrapperConnection {
 	
 
 	public boolean sendCommand(String activityid, String commandToSend) {
-		// commandToSend should also contain activityid 
+		// commandToSend should also contain activityid
+		_besLogger.info("SendCommand called with command: " + commandToSend);
 		String socketInfo = getSocketInfo(activityid);
 		if (socketInfo == null) return false;
 		String[] ipport = socketInfo.split(":");
@@ -183,7 +181,7 @@ public class BESPWrapperConnection {
 		try {
 			socket = new Socket(ipaddr, port);
 		} catch (IOException e) {
-			_besLogger.error("Exception occurred while handling " + commandToSend, e);
+			_besLogger.error("Unable to set up socket connection with " + ipaddr + ":" + port + ".", e);
 		}
 		boolean success = false;
 		try
@@ -194,7 +192,7 @@ public class BESPWrapperConnection {
 			output.println(commandToSend);
 			output.flush();
 			while ((response = input.readLine()) != null) {
-				success = response.equals("OK");
+				success = response.equals(activityid + " OK");
 				if (success) break;
 			}
 			socket.close();
