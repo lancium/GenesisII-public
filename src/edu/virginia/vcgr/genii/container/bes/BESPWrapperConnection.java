@@ -134,21 +134,20 @@ public class BESPWrapperConnection {
 							if (toks[1].equalsIgnoreCase("register")) {
 								activityid = toks[0];
 								int port = Integer.parseInt(toks[2]);
-								String ipport = clientSock.getInetAddress().toString() + ":" + port;
+								String ipport = clientSock.getInetAddress().toString().substring(1) + ":" + port;
 								
 								putSocketInfo(activityid, ipport);
-								_besLogger.error("Attempting to set new IPPORT column for "+toks[0] + " to " + toks[2]);
+								_besLogger.info("Attempting to set new IPPORT column for "+toks[0] + " to " + ipport);
 								try {
-									activity.updateIPPort(toks[2]);
-								} catch (SQLException e) {
-									_besLogger.error("Could not set the new IPPort for "+toks[0] + " to " + toks[2], e);
+									activity.updateIPPort(ipport);
 									output.println(activityid + " OK");
 									output.flush();
+								} catch (SQLException e) {
+									_besLogger.error("Could not set the new IPPort for "+toks[0] + " to " + ipport, e);
 								}
 							}
 
 						}
-						output.println(command);
 						if (command.equals("Bye."))
 							break;
 					}
@@ -182,22 +181,26 @@ public class BESPWrapperConnection {
 		int port = Integer.parseInt(ipport[1]);
 		Socket socket = null;
 		try {
+			_besLogger.info("Attempting to connect to: " + ipaddr + ":" + port);
 			socket = new Socket(ipaddr, port);
+			_besLogger.info("Connected to: " + ipaddr + ":" + port);
 		} catch (IOException e) {
 			_besLogger.error("Unable to set up socket connection with " + ipaddr + ":" + port + ".", e);
+			return false;
+		} catch (Exception e) {
+			_besLogger.error("Caught unknown exception while trying to set up socket connection with " + ipaddr + ":" + port + ".", e);
+			return false;
 		}
 		boolean success = false;
 		try
 		{
 			BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-			String response = null;
 			output.println(commandToSend);
-			output.flush();
-			while ((response = input.readLine()) != null) {
-				success = response.equals(activityid + " OK");
-				if (success) break;
-			}
+			String response = input.readLine();
+			_besLogger.info("Received message from: " +  socketInfo + ". Msg: " + response);
+			success = response.equals(activityid + " OK");
+			_besLogger.info("Success? " + success);
 			socket.close();
 		}
 		catch (IOException e) {
