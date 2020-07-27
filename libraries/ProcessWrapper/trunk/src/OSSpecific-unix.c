@@ -10,12 +10,14 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <errno.h>
 
 #include <pthread.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <semaphore.h>
 
 #include "Memory.h"
 #include "OSSpecific.h"
@@ -59,9 +61,7 @@ static int findUnmountBinary(char **unmountBinary, char **errorMessage);
 static const char* getOverloadedEnvironment(const char *variableName,
 	HashMap *environmentOverload);
 
-int startBesListener();
 int sendBesMessage(const char* message);
-int registerWithBes();
 int connectionSetup();
 
 #ifndef PWRAP_macosx
@@ -242,8 +242,6 @@ int wrapJob(CommandLine *commandLine)
 
 	// //LAK: Start up BES communication
 	connectionSetup();
-	startBesListener();
-	registerWithBes();
 
 	gettimeofday(&start, NULL);
 	pid = fork();
@@ -735,18 +733,19 @@ static pthread_t bes_conn_pthread;
 static int bes_listen_socket = -1;
 static int bes_send_socket = -1;
 
-FILE * temp;
+sem_t port_sem;
 
-void *_startBesListener(void *arg)
+void *_startBesListenerThread(void *arg)
 {
-	fprintf(temp, "starting bes listener\n");
+	printf("starting bes listener\n");
 
     // Open the main listener socket
     struct sockaddr_in sa;
     bes_listen_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (bes_listen_socket == -1)
 	{
-        fprintf(temp, "bes_listener: cannot create socket");
+        printf("bes_listener: cannot create socket");
+		sem_post(&port_sem);
         return NULL;
     }
 
@@ -763,8 +762,10 @@ void *_startBesListener(void *arg)
 	// Bind to port
     if(bind(bes_listen_socket, (struct sockaddr *)&sa, sizeof sa) == -1)
 	{
-        fprintf(temp,"bes_listener: bind failed");
+        printf("bes_listener: bind failed");
         close(bes_listen_socket);
+		sem_post(&port_sem);
+		return NULL;
     }
 
 	// Listen for connections
@@ -773,6 +774,8 @@ void *_startBesListener(void *arg)
         perror("bes_listener: listen failed");
         close(bes_listen_socket);
     }
+
+	sem_post(&port_sem);
 
 	struct sockaddr_in client_addr;
     socklen_t client_addr_size = sizeof(client_addr);
@@ -789,17 +792,17 @@ void *_startBesListener(void *arg)
 
     	char ip[INET_ADDRSTRLEN];
     	inet_ntop(AF_INET, &client_addr, ip, client_addr_size);
-    	fprintf(temp, "bes_listener: established connection to %s:%hu\n",
+		printf("bes_listener: established connection to %s:%hu\n",
     	    ip, ntohs(client_addr.sin_port));
 
     	// test reads
     	char buffer[1024];
     	int numread = read(connectfd, buffer, 1023);
     	buffer[numread] = '\0';
-    	fprintf(temp, "bes_listener: got string %s\n", buffer);
+		printf("bes_listener: got string %s\n", buffer);
 		write(connectfd, "OK", 3);
 
-    	fprintf(temp, "bes_listener: closing sockects...\n");
+		printf("bes_listener: closing sockects...\n");
     	close(connectfd);
 	}
 	close(bes_listen_socket);
@@ -807,7 +810,7 @@ void *_startBesListener(void *arg)
 
 void _pipefail(int sig)
 {
-    fprintf(temp, "bes_connection: pipefail -- not exiting\n");
+    fprintf(stderr, "bes_connection: pipefail -- not exiting\n");
 }
 
 int _readBesInfo()
@@ -822,9 +825,9 @@ int _readBesInfo()
 	//parse file
 	char *search_ptr;
 	char *ip = strtok_r(buff, ":\n", &search_ptr);
-	fprintf(temp, "ip is %s\n", ip);
+	strncpy(bes_conn_params.host, ip, 128);
 	int port = (int)strtol(strtok_r(NULL, ":\n", &search_ptr), NULL, 10);
-	fprintf(temp, "port is %d\n", port);
+	bes_conn_params.port = port;
 
 	//get second line
 	fgets(buff, 256, bes_info_file);
@@ -834,38 +837,75 @@ int _readBesInfo()
 
 	if (port == 0)
 	{
-		fprintf(temp, "set_bes_ip_info: Failed to parse port number\n");
+		printf("set_bes_ip_info: Failed to parse port number\n");
 		return -1;
 	}
 
 	if (ip == NULL)
 	{
-        fprintf(temp, "set_bes_ip_info: Failed to parse IP address from bes info file\n");
+        printf("set_bes_ip_info: Failed to parse IP address from bes info file\n");
 		return -1;
 	}
-
-	fprintf(temp, "here\n");
 	
-	bes_conn_params.port = port;
-	strncpy(bes_conn_params.host, ip, 128);
-	fprintf(temp, "b.host is %s\n", bes_conn_params.host);
-	fprintf(temp, "b.port is %d\n", bes_conn_params.port);
+	printf("b.host is %s\n", bes_conn_params.host);
+	printf("b.port is %d\n", bes_conn_params.port);
+	printf("nonce is %s\n", nonce);
 }
 
 int _setLocalIPInfo()
 {
-	strncpy(bes_listener_params.hostmask, "0.0.0.0", 128); // TODO: set hostmask to more restricted
+	strncpy(bes_listener_params.hostmask, "0.0.0.0", 128); // default
 	bes_listener_params.port = 0; //random port
 	return 0;
 }
 
-int connectionSetup()
+int _registerWithBes(int port)
 {
-	temp = fopen("pwrapper_out.txt", "w");
-	return _readBesInfo() + _setLocalIPInfo();
+	char cmd[256];
+	snprintf(cmd, 256, "register %d", port);
+	return sendBesMessage(cmd);
 }
 
-#include <errno.h>
+int _startBesListener()
+{
+    printf("bes_listener: spawning bes listerner thread\n");
+	_setLocalIPInfo();
+    signal(SIGPIPE, &_pipefail);
+    int err = pthread_create(&bes_conn_pthread, NULL, &_startBesListenerThread, NULL);
+    if(err)
+	{
+        fprintf(stderr, "bes_listener: spawning bes listerner thread failed: %d\n", err);
+        bes_conn_pthread = 0;
+        return -1;
+    }
+    return 0;
+}
+
+int connectionSetup()
+{
+	sem_init(&port_sem, 0, 0);
+
+	int fd = open("pwrapper_out.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+	dup2(fd, STDERR_FILENO);
+	dup2(fd, STDOUT_FILENO);
+	_readBesInfo();
+	_startBesListener();
+
+	sem_wait(&port_sem);
+
+	//now get our information
+	struct sockaddr_in sa;
+	int addrlen = sizeof(sa);
+	getsockname(bes_listen_socket, (struct sockaddr *)&sa, &addrlen);
+	int port = ntohs(sa.sin_port);
+	char ip[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &(sa.sin_addr), ip, INET_ADDRSTRLEN);
+
+	_registerWithBes(port);
+
+	sem_destroy(&port_sem);
+}
+
 int sendBesMessage(const char* message)
 {
 	struct sockaddr_in addr;
@@ -884,8 +924,8 @@ int sendBesMessage(const char* message)
     	bes_send_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
    		if (bes_send_socket == -1)
 		{
-        	fprintf(temp, "sendBesMessage: cannot create socket");
-        	return NULL;
+			printf("sendBesMessage: cannot create socket");
+			return -1;
     	}
 
 		// Allow re-use of the port
@@ -895,67 +935,35 @@ int sendBesMessage(const char* message)
 
     if(connect(bes_send_socket, (const struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
 	{
-        fprintf(temp, "sendBesMessage: could not connect to %s:%d with error: %s\n", ip, port, strerror(errno));
+        fprintf(stderr, "sendBesMessage: could not connect to %s:%d with error: %s\n", ip, port, strerror(errno));
         return -1;
     }
 
 	if (snprintf(NULL, 0, "%s %s\n", nonce, message) >= 255)
 	{
-		fprintf(temp, "sendBesMessage: message is too long for 256 byte buffer.\n");
+		fprintf(stderr, "sendBesMessage: message is too long for 256 byte buffer.\n");
 		return -1;
 	}
 
-	fprintf(temp, "sendBesMessage: sending %s %s\n", nonce, message);
 	char command[256];
 	snprintf(command, 256, "%s %s\n", nonce, message);
+	printf("sendBesMessage: sending %s to %s:%d\n", command, ip, port);
 	write(bes_send_socket, command, strlen(command));
 
 	read(bes_send_socket, command, 256);
+
+	printf("got back from bes: %s\n", command);
 
 	char okMess[64];
 	snprintf(okMess, 64, "%s %s\n", nonce, "OK");
 	if (strcmp(command, okMess) != 0)
 	{
-		fprintf(temp, "sendBesMessage: response to command did not match expected acknowledgement. message: %s vs expected: %s\n", command, okMess);
+		fprintf(stderr, "sendBesMessage: response to command did not match expected acknowledgement. message: %s vs expected: %s\n", command, okMess);
 	}
 
 	close(bes_send_socket);
 
 	return 0;
-}
-
-int registerWithBes()
-{
-	//get our information to send to the bes
-	struct sockaddr_in listener_info;
-	memset(&listener_info, 0, sizeof(listener_info));
-	int len = sizeof(listener_info);
-	getsockname(bes_listen_socket, (struct sockaddr*)&listener_info, &len);
-	char ip[128];
-	inet_ntop(AF_INET, &listener_info.sin_addr, ip, sizeof(ip));
-	int port = ntohs(listener_info.sin_port);
-
-	fprintf(temp, "our ip: %s", ip);
-	fprintf(temp, "our port: %d", port);
-
-	char cmd[256];
-	snprintf(cmd, 256, "register %s:%d", ip, port);
-	return sendBesMessage(cmd);
-}
-
-int startBesListener()
-{
-    fprintf(temp, "bes_listener: spawning bes listerner thread\n");
-	_setLocalIPInfo();
-    signal(SIGPIPE, &_pipefail);
-    int err = pthread_create(&bes_conn_pthread, NULL, &_startBesListener, NULL);
-    if(err)
-	{
-        fprintf(stderr, "bes_listener: spawning bes listerner thread failed: %d\n", err);
-        bes_conn_pthread = 0;
-        return -1;
-    }
-    return 0;
 }
 
 void freeze(){

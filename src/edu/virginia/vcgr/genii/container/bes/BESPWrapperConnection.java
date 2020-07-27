@@ -133,7 +133,10 @@ public class BESPWrapperConnection {
 							}
 							if (toks[1].equalsIgnoreCase("register")) {
 								activityid = toks[0];
-								putSocketInfo(activityid, toks[2]);
+								int port = Integer.parseInt(toks[2]);
+								String ipport = clientSock.getInetAddress().toString() + ":" + port;
+								
+								putSocketInfo(activityid, ipport);
 								_besLogger.error("Attempting to set new IPPORT column for "+toks[0] + " to " + toks[2]);
 								try {
 									activity.updateIPPort(toks[2]);
