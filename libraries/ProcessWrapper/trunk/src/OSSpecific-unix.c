@@ -797,12 +797,31 @@ void *_startBesListenerThread(void *arg)
 
     	// test reads
     	char buffer[1024];
-    	int numread = read(connectfd, buffer, 1023);
-    	buffer[numread] = '\0';
+		int numread = read(connectfd, buffer, 1024);
 		printf("bes_listener: got string %s\n", buffer);
-		write(connectfd, "OK", 3);
 
-		printf("bes_listener: closing sockects...\n");
+		//check if freeze command
+		char command[256];
+		snprintf(command, 256, "%s freeze\n", nonce);
+		if(strncmp(buffer, command, 256) == 0)
+		{
+			//this is a freeze command
+			printf("this is a freeze command\n");
+		}
+		memset(&command, 0, 256);
+		snprintf(command, 256, "%s thraw\n", nonce);
+		if(strncmp(buffer, command, 256) == 0)
+		{
+			//this is a thaw command
+			printf("this is a thaw command\n");
+		}
+
+		//clear buffer
+		memset(&command, 0, 256);
+		snprintf(command, 256, "%s OK\n", nonce);
+		write(connectfd, command, 256);
+
+		printf("bes_listener: closing connection socket...\n");
     	close(connectfd);
 	}
 	close(bes_listen_socket);
@@ -950,6 +969,7 @@ int sendBesMessage(const char* message)
 	printf("sendBesMessage: sending %s to %s:%d\n", command, ip, port);
 	write(bes_send_socket, command, strlen(command));
 
+	memset(command, 0, 256);
 	read(bes_send_socket, command, 256);
 
 	printf("got back from bes: %s\n", command);
