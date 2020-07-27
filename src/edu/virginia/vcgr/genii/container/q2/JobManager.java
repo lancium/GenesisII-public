@@ -1988,12 +1988,12 @@ public class JobManager implements Closeable
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-			if(jobData.getJobState() != QueueStates.RUNNING)
-			{
-				if(_logger.isErrorEnabled())
-					_logger.error(String.format("%s is not currently running, cannot stop.", jobData));
-				continue;
-			}
+//			if(jobData.getJobState() != QueueStates.RUNNING)
+//			{
+//				if(_logger.isErrorEnabled())
+//					_logger.error(String.format("%s is not currently running, cannot stop.", jobData));
+//				continue;
+//			}
 
 			HistoryContext history = jobData.history(HistoryEventCategory.Stopping);
 
@@ -2004,6 +2004,11 @@ public class JobManager implements Closeable
 
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobStopWorker(resolver, resolver, _connectionPool, jobData));
+			
+//			synchronized(jobData)
+//			{
+//				jobData.setJobState(QueueStates.STOPPED);
+//			}
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -2026,12 +2031,12 @@ public class JobManager implements Closeable
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-			if(jobData.getJobState() != QueueStates.STOPPED)
-			{
-				if(_logger.isErrorEnabled())
-					_logger.error(String.format("%s is not currently stopped, cannot resume.", jobData));
-				continue;
-			}
+			//if(jobData.getJobState() != QueueStates.STOPPED)
+			//{
+			//	if(_logger.isErrorEnabled())
+			//		_logger.error(String.format("%s is not currently stopped, cannot resume.", jobData));
+			//	continue;
+			//}
 			
 			HistoryContext history = jobData.history(HistoryEventCategory.Resuming);
 			
@@ -2042,6 +2047,11 @@ public class JobManager implements Closeable
 
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobResumeWorker(resolver, resolver, _connectionPool, jobData));
+			
+//			synchronized(jobData)
+//			{
+//				jobData.setJobState(QueueStates.RUNNING);
+//			}
 		}
 
 		_schedulingEvent.notifySchedulingEvent();

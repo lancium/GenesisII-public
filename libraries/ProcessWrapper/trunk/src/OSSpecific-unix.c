@@ -63,6 +63,8 @@ static const char* getOverloadedEnvironment(const char *variableName,
 
 int sendBesMessage(const char* message);
 int connectionSetup();
+void freeze();
+void thaw();
 
 #ifndef PWRAP_macosx
 	static int verifyFuseDevice(char **errorMessage);
@@ -264,7 +266,7 @@ int wrapJob(CommandLine *commandLine)
 		// 2020-07-22 by JAA -- wait for cgroup to be setup
 		// this allows all children off of our child to be
 		// contained in freezer
-		// raise(SIGSTOP);
+		raise(SIGSTOP);
 
 		execvp(cmdLine[0], cmdLine);
 
@@ -290,20 +292,20 @@ int wrapJob(CommandLine *commandLine)
 	if (signal(SIGCHLD, sig_handler) == SIG_ERR)
   		fprintf(stderr, "Can't catch SIGCHLD\n");
 
-	// // 2020-07-22 by JAA -- create cgroup using secondary program
-	// // should be set up in path, requires sudoers setup if not in same group
-	// char freezeCMD[50] = "sudo freeze create ";
-	// // PID to char*, buffer is size of length of pid_max
-	// // We'll say 4194304 possible PIDs on 64-bit, so length is 7+1
-	// char pidStr[8]; 
-	// sprintf(pidStr, "%d", pid);
-	// // Call "freeze" program with the PID and create param.
-	// strcat(freezeCMD, pidStr);
-	// system(freezeCMD);
-	// // Wait for child to signal if it hasn't already
-	// waitpid(pid, NULL, WUNTRACED);
-	// // Signal child to continue
-	// kill(pid, SIGCONT);
+	// 2020-07-22 by JAA -- create cgroup using secondary program
+	// should be set up in path, requires sudoers setup if not in same group
+	char freezeCMD[50] = "sudo freeze create ";
+	// PID to char*, buffer is size of length of pid_max
+	// We'll say 4194304 possible PIDs on 64-bit, so length is 7+1
+	char pidStr[8]; 
+	sprintf(pidStr, "%d", pid);
+	// Call "freeze" program with the PID and create param.
+	strcat(freezeCMD, pidStr);
+	system(freezeCMD);
+	// Wait for child to signal if it hasn't already
+	waitpid(pid, NULL, WUNTRACED);
+	// Signal child to continue
+	kill(pid, SIGCONT);
 
 	running=1;
 	int ticks=0;
@@ -796,24 +798,28 @@ void *_startBesListenerThread(void *arg)
     	    ip, ntohs(client_addr.sin_port));
 
     	// test reads
-    	char buffer[1024];
-		int numread = read(connectfd, buffer, 1024);
+    	char buffer[256];
+		memset(&buffer, 0, 256);
+		int numread = read(connectfd, buffer, 256);
 		printf("bes_listener: got string %s\n", buffer);
 
 		//check if freeze command
 		char command[256];
+		memset(&command, 0, 256);
 		snprintf(command, 256, "%s freeze\n", nonce);
 		if(strncmp(buffer, command, 256) == 0)
 		{
 			//this is a freeze command
 			printf("this is a freeze command\n");
+			freeze();
 		}
 		memset(&command, 0, 256);
-		snprintf(command, 256, "%s thraw\n", nonce);
+		snprintf(command, 256, "%s thaw\n", nonce);
 		if(strncmp(buffer, command, 256) == 0)
 		{
 			//this is a thaw command
 			printf("this is a thaw command\n");
+			thaw();
 		}
 
 		//clear buffer
@@ -836,6 +842,7 @@ int _readBesInfo()
 {
 	FILE *bes_info_file;
 	char buff[256];
+	memset(&buff, 0, 256);
 
 	bes_info_file = fopen(".bes-info", "r");
 
@@ -849,9 +856,11 @@ int _readBesInfo()
 	bes_conn_params.port = port;
 
 	//get second line
+	memset(&buff, 0, 256);
 	fgets(buff, 256, bes_info_file);
 	fclose(bes_info_file);
 
+	//read in nonce
 	strncpy(nonce, strtok(buff, "\n"), 64);
 
 	if (port == 0)
@@ -881,6 +890,7 @@ int _setLocalIPInfo()
 int _registerWithBes(int port)
 {
 	char cmd[256];
+	memset(&cmd, 0, 256);
 	snprintf(cmd, 256, "register %d", port);
 	return sendBesMessage(cmd);
 }
@@ -965,16 +975,18 @@ int sendBesMessage(const char* message)
 	}
 
 	char command[256];
+	memset(&command, 0, 256);
 	snprintf(command, 256, "%s %s\n", nonce, message);
 	printf("sendBesMessage: sending %s to %s:%d\n", command, ip, port);
 	write(bes_send_socket, command, strlen(command));
 
-	memset(command, 0, 256);
+	memset(&command, 0, 256);
 	read(bes_send_socket, command, 256);
 
 	printf("got back from bes: %s\n", command);
 
 	char okMess[64];
+	memset(&okMess, 0, 64);
 	snprintf(okMess, 64, "%s %s\n", nonce, "OK");
 	if (strcmp(command, okMess) != 0)
 	{
@@ -986,7 +998,8 @@ int sendBesMessage(const char* message)
 	return 0;
 }
 
-void freeze(){
+void freeze()
+{
 	// 2020-07-22 by JAA -- freeze process's cgroup
 	// should be set up at fork
 	char freezeCMD[50] = "sudo freeze freeze ";
@@ -1000,7 +1013,8 @@ void freeze(){
 	return;
 }
 
-void thaw(){
+void thaw()
+{
 	// 2020-07-22 by JAA -- thaws process's cgroup
 	// should be set up at fork
 	char freezeCMD[50] = "sudo freeze thaw ";
