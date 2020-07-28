@@ -4,15 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,13 +25,11 @@ public class BESPWrapperConnection {
 
 	private Log _besLogger = LogFactory.getLog(BESPWrapperConnection.class);
 	private BES _bes;
-	private HashMap<String, String> _pwrapperSocketsInfo;
 
 	// Establishes a socket for communication between the BES and each ProccessWrapper 
 	public BESPWrapperConnection(int port, BES bes)
 	{
 		// Constructor gives the port to use
-		_pwrapperSocketsInfo = new HashMap<String, String>(1);
 		_bes = bes;
 		try {
 			if (port==0) {
@@ -101,136 +95,92 @@ public class BESPWrapperConnection {
 		}
 	}
 
+	/*
+	 * 2020 July 28 by CCH
+	 * 
+	 * This implementation of handleConnection checks for a single command,
+	 * handles it, then sends the appropriate response. We do not leave
+	 * the socket open afterwards.
+	 * 
+	 * A different implementation would be required if multiple commands 
+	 * were being sent with the same socket connection
+	 * 
+	 * Arguments: Socket created by ServerSocket.accept
+	 * handleConnection runs in a new thread
+	 */
 	private void handleConnection(Socket clientSock)
 	{
 		_besLogger.info("The hashCode of the clientSock reference: " + clientSock.hashCode());
-		String command;
-		String activityid = null;
-		try
-		{
-			// takes input from the client socket 
+		try {
+			if (_besLogger.isDebugEnabled())
+				_besLogger.debug("Setting up input/output streams in handleConnection...");
 			BufferedReader input = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
 			PrintWriter output = new PrintWriter(clientSock.getOutputStream(), true);
-			//////All of the following block is temporary for testing///////
-			while(clientSock.isConnected() && !clientSock.isClosed()) {
-				try {
-					while ((command = input.readLine()) != null) {
-						_besLogger.info(clientSock.getRemoteSocketAddress() + " says >> " + command);
-						// Now we process the commands. All commands are of the form <jobid> command parameters
-						// For example "A0C34C26-BC59-09F7-DBA0-BF790D583FA9 register 192.3.4.211:45335
-						// The first thing we do is lookup the activity and ensure that it exists
-						if (command !=null && command.length() > 36 && command.length()< 256) {
-							String toks[]=command.split(" ");
-							if (toks.length <2 || toks.length > 8) {
-								_besLogger.error("Invalid activity communication, tokens <3 or >8 with BES from "+toks[0]);
-								break;
-							}
-							// Lookup toks[0]
-							BESActivity activity=_bes.findActivity(toks[0]);
-							if (activity==null) {
-								_besLogger.error("Invalid activity ID in communication with BES from "+toks[0]);
-								break;
-							}
-							if (toks[1].equalsIgnoreCase("register")) {
-								activityid = toks[0];
-								int port = Integer.parseInt(toks[2]);
-								String ipport = clientSock.getInetAddress().toString().substring(1) + ":" + port;
-								
-								putSocketInfo(activityid, ipport);
-								_besLogger.info("Attempting to set new IPPORT column for "+toks[0] + " to " + ipport);
-								try {
-									activity.updateIPPort(ipport);
-									output.println(activityid + " OK");
-									output.flush();
-								} catch (SQLException e) {
-									_besLogger.error("Could not set the new IPPort for "+toks[0] + " to " + ipport, e);
-								}
-							}
-
-						}
-						if (command.equals("Bye."))
-							break;
+			if (_besLogger.isDebugEnabled())
+				_besLogger.debug("Input/output streams setup.");
+			try {
+				// takes input from the client socket 
+				// input.readLine() is a blocking call. We will not proceed until we get input or the socket closes.
+				String command = input.readLine();
+				_besLogger.info(clientSock.getRemoteSocketAddress() + " says >> " + command);
+				// Now we process the commands. All commands are of the form <jobid> command parameters
+				// For example "A0C34C26-BC59-09F7-DBA0-BF790D583FA9 register 45335
+				// The first thing we do is lookup the activity and ensure that it exists
+				if (command !=null && command.length() > 36 && command.length()< 256) {
+					String toks[]=command.split(" ");
+					if (toks.length <2 || toks.length > 8) {
+						_besLogger.error("Invalid activity communication, tokens <3 or >8 with BES from "+toks[0]);
 					}
-				} catch (IOException e) {
-					_besLogger.error("PWrapper Connection Server: Lost Connection to Client. " + e);
-					return;
+					else {
+						// Grab activityid, first token. With activityid, grab activity
+						String activityid = toks[0];
+						BESActivity activity=_bes.findActivity(activityid);
+						if (activity==null) {
+							_besLogger.error("Invalid activity ID in communication with BES from "+toks[0]);
+						}
+						// Handle register command
+						// Expected format: "<activityid> register <port>"
+						// Rather than having the pwrapper send IP, we grab that from Socket info (easier to implement, no other reason)
+						else if (toks[1].equalsIgnoreCase("register")) {
+							int port = Integer.parseInt(toks[2]);
+							// The following gives us back an IP in form /0.0.0.0.
+							// We need to strip the leading "/", or Socket creation will fail later on
+							String ipport = clientSock.getInetAddress().toString().substring(1) + ":" + port;
+							_besLogger.info("Attempting to set new IPPORT column for "+toks[0] + " to " + ipport);
+							try {
+								activity.updateIPPort(ipport);
+								// Expected result to send back to pwrapper: "<activityid> OK"
+								output.println(activityid + " OK");
+								output.flush();
+							} catch (SQLException e) {
+								_besLogger.error("Could not set the new IPPort for "+toks[0] + " to " + ipport, e);
+								output.println(activityid + " FAILED");
+								output.flush();
+							}
+						}
+					}
 				}
+			} catch (IOException e) {
+				_besLogger.error("PWrapper Connection Server: Lost Connection to Client. " + e);
+				return;
 			}
-			///////////////////////////////////////////////////////////////
 
 			_besLogger.info("PWrapper Connection Server: Closing connection from: " + clientSock.getRemoteSocketAddress());
 
-			// close connection 
+			// close connection
 			clientSock.close(); 
 			input.close(); 
 			output.close();
 		}
 		catch (IOException e) {
-			System.out.println(e); 
+			_besLogger.error("PWrapper Connection Server: Could not handle connection. " + e);
 		}
 	}
 	
-
-	public boolean sendCommand(String activityid, String commandToSend) {
-		// commandToSend should also contain activityid
-		_besLogger.info("SendCommand called with command: " + commandToSend);
-		String socketInfo = getSocketInfo(activityid);
-		if (socketInfo == null) return false;
-		String[] ipport = socketInfo.split(":");
-		String ipaddr = ipport[0];
-		int port = Integer.parseInt(ipport[1]);
-		Socket socket = null;
-		try {
-			_besLogger.info("Attempting to connect to: " + ipaddr + ":" + port);
-			socket = new Socket(ipaddr, port);
-			_besLogger.info("Connected to: " + ipaddr + ":" + port);
-		} catch (IOException e) {
-			_besLogger.error("Unable to set up socket connection with " + ipaddr + ":" + port + ".", e);
-			return false;
-		} catch (Exception e) {
-			_besLogger.error("Caught unknown exception while trying to set up socket connection with " + ipaddr + ":" + port + ".", e);
-			return false;
-		}
-		boolean success = false;
-		try
-		{
-			BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-			output.println(commandToSend);
-			String response = input.readLine();
-			_besLogger.info("Received message from: " +  socketInfo + ". Msg: " + response);
-			success = response.equals(activityid + " OK");
-			_besLogger.info("Success? " + success);
-			socket.close();
-		}
-		catch (IOException e) {
-			_besLogger.error("Exception occurred while handling " + commandToSend, e);
-			return false;
-		}
-		return success;
-	}
-
 	public String getSocketPort() {
 		return new Integer(_server.getLocalPort()).toString();
 	}
 	public String getIPPort() {
 		return _ipport;
-	}
-	private void putSocketInfo(String activityid, String socket) {
-		synchronized(_pwrapperSocketsInfo) {
-			if (!_pwrapperSocketsInfo.containsKey(activityid))
-				_pwrapperSocketsInfo.put(activityid, socket);
-		}
-	}
-	public void removeSocketInfo(String activityid) {
-		synchronized(_pwrapperSocketsInfo) {
-			if (_pwrapperSocketsInfo.containsKey(activityid))
-				_pwrapperSocketsInfo.remove(activityid);
-		}
-	}
-	private String getSocketInfo(String activityid) {
-		synchronized(_pwrapperSocketsInfo) {
-			return _pwrapperSocketsInfo.get(activityid);
-		}
 	}
 }

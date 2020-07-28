@@ -1950,13 +1950,13 @@ public class JobManager implements Closeable
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-			if(jobData.getJobState() != QueueStates.PERSISTED)
-			{
-				if(_logger.isErrorEnabled())
-					_logger.error(String.format("%s is not currently persisted, cannot restart.", jobData));
-				continue;
-			}
-
+//			if(jobData.getJobState() != QueueStates.PERSISTED)
+//			{
+//				if(_logger.isErrorEnabled())
+//					_logger.error(String.format("%s is not currently persisted, cannot restart.", jobData));
+//				continue;
+//			}
+			
 			HistoryContext history = jobData.history(HistoryEventCategory.Restarting);
 
 			history.createTraceWriter("Restarting Execution of Job")

@@ -486,8 +486,6 @@ public class BES implements Closeable
 			_containedActivities.remove(activityid);
 			removeActivityToBESMapping(activityid);
 			
-			_comm.removeSocketInfo(activityid);
-
 			if (fault != null)
 				throw fault;
 		} finally {
@@ -540,10 +538,11 @@ public class BES implements Closeable
 					int nextPhase = rs.getInt(7);
 					String activityServiceName = rs.getString(8);
 					String jobName = rs.getString(9);
+					String ipport = rs.getString(10);
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, suspendRequested, terminateRequested, _ipport);
+							activityServiceName, jobName, suspendRequested, terminateRequested, ipport);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);
@@ -577,5 +576,13 @@ public class BES implements Closeable
 
 	public BESPWrapperConnection getBESPWrapperConnection() {
 		return _comm;
+	}
+	public boolean sendCommand(String activityid, String command) {
+		if (_containedActivities.containsKey(activityid)) {
+			return _containedActivities.get(activityid).sendCommand(command);
+		} else {
+			_logger.info("BES sendCommand call: BES does not have BESActivity with activityid: " + activityid);
+			return false;
+		}
 	}
 }

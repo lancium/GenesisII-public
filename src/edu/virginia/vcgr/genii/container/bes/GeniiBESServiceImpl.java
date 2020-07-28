@@ -741,11 +741,10 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	static public StopActivityResponseType stopActivity(String activityid) throws RemoteException
 	{
 		BES bes = BES.findBESForActivity(activityid);
-		BESPWrapperConnection conn = bes.getBESPWrapperConnection();
-		if (conn == null)
+		if (bes == null)
 			return new StopActivityResponseType(activityid, false, null, null);
 		String commandToSend = activityid + " freeze";
-		return new StopActivityResponseType(activityid, conn.sendCommand(activityid, commandToSend), null, null);
+		return new StopActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
 	}
 	
 	@Override
@@ -766,11 +765,10 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	static public ResumeActivityResponseType resumeActivity(String activityid) throws RemoteException
 	{
 		BES bes = BES.findBESForActivity(activityid);
-		BESPWrapperConnection conn = bes.getBESPWrapperConnection();
-		if (conn == null)
+		if (bes == null)
 			return new ResumeActivityResponseType(activityid, false, null, null);
 		String commandToSend = activityid + " thaw";
-		return new ResumeActivityResponseType(activityid, conn.sendCommand(activityid, commandToSend), null, null);
+		return new ResumeActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
 	}
 
 	@Override

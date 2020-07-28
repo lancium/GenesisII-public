@@ -1,8 +1,12 @@
 package edu.virginia.vcgr.genii.container.bes.activity;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.net.Socket;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -253,6 +257,44 @@ public class BESActivity implements Closeable
 	}
 	public String getIPPort() {
 		return _IPPort;
+	}
+	
+	public boolean sendCommand(String commandToSend) {
+		// commandToSend should also contain activityid
+		_logger.info("SendCommand called with command: " + commandToSend);
+		// _IPPort must be in the form <ip>:<port>
+		if (_IPPort == null || _IPPort.equals("undefined") || !_IPPort.contains(":")) return false;
+		String[] ipport = _IPPort.split(":");
+		String ipaddr = ipport[0];
+		int port = Integer.parseInt(ipport[1]);
+		Socket socket = null;
+		try {
+			_logger.info("Attempting to connect to: " + ipaddr + ":" + port);
+			socket = new Socket(ipaddr, port);
+			_logger.info("Connected to: " + ipaddr + ":" + port);
+		} catch (IOException e) {
+			_logger.error("Unable to set up socket connection with " + ipaddr + ":" + port + ".", e);
+			return false;
+		} catch (Exception e) {
+			_logger.error("Caught unknown exception while trying to set up socket connection with " + ipaddr + ":" + port + ".", e);
+			return false;
+		}
+		boolean success = false;
+		try
+		{
+			BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+			output.println(commandToSend);
+			String response = input.readLine();
+			_logger.info("Received message from: " +  _IPPort + ". Msg: " + response);
+			success = response.equals(_activityid + " OK");
+			_logger.info("Success? " + success);
+			socket.close();
+		}
+		catch (IOException e) {
+			_logger.error("Lost connection to socket while handing " + commandToSend, e);
+		}
+		return success;
 	}
 
 	synchronized public void suspend() throws ExecutionException, SQLException
