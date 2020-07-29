@@ -590,6 +590,7 @@ public class JobManager implements Closeable
 		synchronized (job) {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Killing a running job:" + jobID);
+		
 
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database. The reason for this
@@ -1988,12 +1989,13 @@ public class JobManager implements Closeable
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-//			if(jobData.getJobState() != QueueStates.RUNNING)
-//			{
-//				if(_logger.isErrorEnabled())
-//					_logger.error(String.format("%s is not currently running, cannot stop.", jobData));
-//				continue;
-//			}
+			if(jobData.getJobState() != QueueStates.RUNNING)
+			{
+				if(_logger.isErrorEnabled())
+					_logger.error(String.format("%s is not currently running, cannot stop.", jobData));
+				continue;
+			}
+			
 
 			HistoryContext history = jobData.history(HistoryEventCategory.Stopping);
 
@@ -2005,10 +2007,10 @@ public class JobManager implements Closeable
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobStopWorker(resolver, resolver, _connectionPool, jobData));
 			
-//			synchronized(jobData)
-//			{
-//				jobData.setJobState(QueueStates.STOPPED);
-//			}
+			synchronized(jobData)
+			{
+				jobData.setJobState(QueueStates.STOPPED);
+			}
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -2031,12 +2033,12 @@ public class JobManager implements Closeable
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-			//if(jobData.getJobState() != QueueStates.STOPPED)
-			//{
-			//	if(_logger.isErrorEnabled())
-			//		_logger.error(String.format("%s is not currently stopped, cannot resume.", jobData));
-			//	continue;
-			//}
+			if(jobData.getJobState() != QueueStates.STOPPED)
+			{
+				if(_logger.isErrorEnabled())
+					_logger.error(String.format("%s is not currently stopped, cannot resume.", jobData));
+				continue;
+			}
 			
 			HistoryContext history = jobData.history(HistoryEventCategory.Resuming);
 			
@@ -2048,10 +2050,10 @@ public class JobManager implements Closeable
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobResumeWorker(resolver, resolver, _connectionPool, jobData));
 			
-//			synchronized(jobData)
-//			{
-//				jobData.setJobState(QueueStates.RUNNING);
-//			}
+			synchronized(jobData)
+			{
+				jobData.setJobState(QueueStates.RUNNING);
+			}
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -2143,6 +2145,8 @@ public class JobManager implements Closeable
 		long finished = 0;
 		long error = 0;
 		long requeued = 0;
+		long stopped = 0;
+		long persisted = 0;
 
 		for (JobData jobData : _jobsByID.values()) {
 			QueueStates state = jobData.getJobState();
@@ -2158,6 +2162,10 @@ public class JobManager implements Closeable
 				error++;
 			else if (state == QueueStates.FINISHED)
 				finished++;
+			else if (state == QueueStates.STOPPED)
+				stopped++;
+			else if (state == QueueStates.PERSISTED)
+				persisted++;
 		}
 
 		ret.put("Queued", queued);
@@ -2166,6 +2174,8 @@ public class JobManager implements Closeable
 		ret.put("Running", running);
 		ret.put("Error", error);
 		ret.put("Finished", finished);
+		ret.put("Stopped", stopped);
+		ret.put("Persisted", persisted);
 
 		return ret;
 	}
@@ -2561,6 +2571,7 @@ public class JobManager implements Closeable
 			return;
 
 		Collection<Long> jobsToKill = new LinkedList<Long>();
+		ArrayList<String> jobsToResume = new ArrayList<String>(0);
 		HashMap<Long, PartialJobInfo> ownerMap;
 
 		/*
@@ -2575,6 +2586,13 @@ public class JobManager implements Closeable
 				.format("Request to terminate job from outside the queue").close();
 
 			jobsToKill.add(new Long(data.getJobID()));
+			if (data.getJobState() == QueueStates.STOPPED) {
+				jobsToResume.add(jobTicket);
+			}
+		}
+		
+		if (jobsToResume.size() > 0) {
+			resumeJobs(connection, jobsToResume.toArray(new String[0]));
 		}
 
 		/*
