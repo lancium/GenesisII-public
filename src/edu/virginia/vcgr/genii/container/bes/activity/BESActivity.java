@@ -43,6 +43,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionExcep
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -714,6 +715,20 @@ public class BESActivity implements Closeable
 							break;
 
 						if (_terminateRequested) {
+							
+							// 2020-07-30 by CCH
+							// This is an ugly hack to fix doing the Accounting -> finished move even if a job is terminated early.
+							// This is to do the Accounting -> finished move even if the job is terminated early.
+							// Currently, early terminated jobs will just sit in Accounting.
+							// This code will search for a CompleteAccountingPhase in the ExecutionPlan and execute it, if found.
+							// That way, the phase doesn't get skipped over by the termination call.
+							for (ExecutionPhase e : _executionPlan) {
+								if (e instanceof CompleteAccountingPhase) {
+									execute(e);
+									break;
+								}
+							}
+							
 							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null, false));
 
 							// Ensure Cloud Resources Cleaned up
@@ -730,15 +745,6 @@ public class BESActivity implements Closeable
 							}
 						}
 						_suspended = false;
-
-						if (_terminateRequested) {
-							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null, false));
-
-							// Ensure Cloud Resource cleaned up
-							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
-							break;
-						}
-
 						_currentPhase = _executionPlan.get(_nextPhase);
 						_logger.debug("BES Activity transitition to " + _currentPhase.getPhaseState().toString());
 						updateState(_nextPhase, _currentPhase.getPhaseState());
