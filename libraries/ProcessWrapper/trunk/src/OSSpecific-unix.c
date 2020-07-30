@@ -127,6 +127,9 @@ void dumpStats(int exitCode) {
 void sig_handler(int signo)
 {
 	if (signo == SIGTERM) {
+		// LAK: we write out a preliminary dumpStats json file. The reason why we do this is in case our child does not terminate or respond to the SIGTERM, we do not lose the wallclock time.
+		// However, we will NOT get a correct exit code, system/user time, or max memory usage unless the post child termination dumpStats also runs.
+		dumpStats(143);
 		externalKill = 1;
 		kill(pid, SIGTERM);
 	}
