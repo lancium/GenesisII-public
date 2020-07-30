@@ -1,16 +1,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <signal.h>
-
-#ifndef PWRAP_windows
-	#include <sys/param.h>
-#endif
-
 #include <sys/types.h>
-
-#ifdef PWRAP_linux
-	#include <sys/wait.h>
-#endif
+#include <sys/wait.h>
+#include <sys/param.h>
 
 #include "Fuse.h"
 #include "Memory.h"
