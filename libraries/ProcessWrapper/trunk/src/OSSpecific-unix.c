@@ -82,7 +82,6 @@ procInfo getProcInfo(){
 			strtok(line, ":\n");
 			char * vendor = strtok(NULL, ":\n");
 			if(strcmp(vendor+1, "GenuineIntel\n") == 0){
-				printf("Is Intel\n");
 				isIntel = 1;
 			}
 		}
@@ -115,10 +114,6 @@ void dumpStats(int exitCode) {
 	getrusage(RUSAGE_CHILDREN,&usage);
 	gettimeofday(&stop, NULL);
 
-	printf("in dumpstats\n");
-	printf("ruitime: %ld.%06ld\n", usage.ru_utime.tv_sec, usage.ru_utime.tv_usec);
-	printf("ruitime: %ld.%06ld\n", usage.ru_stime.tv_sec, usage.ru_stime.tv_usec);
-
 	procInfo p = getProcInfo();
 	writeExitResults(CL->getResourceUsageFile(CL),
 				autorelease(createExitResults(exitCode,
@@ -132,7 +127,6 @@ void dumpStats(int exitCode) {
 void sig_handler(int signo)
 {
 	if (signo == SIGTERM) {
-		printf("got sigterm\n");
 		externalKill = 1;
 		kill(pid, SIGTERM);
 	}
@@ -226,11 +220,6 @@ int wrapJob(CommandLine *commandLine)
 	}
 
 	release(cmdLine);
-
-	//temp
-	int fd = open("pout.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-	dup2(fd, STDERR_FILENO);
-	dup2(fd, STDOUT_FILENO);
 
 	dumpStats(228); //create empty rusage file
 
