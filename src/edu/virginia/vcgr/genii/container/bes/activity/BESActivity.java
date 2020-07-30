@@ -718,7 +718,6 @@ public class BESActivity implements Closeable
 							
 							// 2020-07-30 by CCH
 							// This is an ugly hack to fix doing the Accounting -> finished move even if a job is terminated early.
-							// This is to do the Accounting -> finished move even if the job is terminated early.
 							// Currently, early terminated jobs will just sit in Accounting.
 							// This code will search for a CompleteAccountingPhase in the ExecutionPlan and execute it, if found.
 							// That way, the phase doesn't get skipped over by the termination call.
