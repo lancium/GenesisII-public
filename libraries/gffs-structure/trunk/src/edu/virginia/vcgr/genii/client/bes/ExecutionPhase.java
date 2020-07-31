@@ -7,5 +7,4 @@ public interface ExecutionPhase
 	public ActivityState getPhaseState();
 
 	public void execute(ExecutionContext context) throws Throwable;
-	public boolean getNeedsWorkingContext();
 }

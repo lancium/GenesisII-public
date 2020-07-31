@@ -35,13 +35,6 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 		_finishedDir = finishedDir;
 	}
 	
-	//LAK: This execution phase is ran AFTER the job is terminated and deleted from the DB
-	@Override
-	public boolean getNeedsWorkingContext()
-	{
-		return false;
-	}
-
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
