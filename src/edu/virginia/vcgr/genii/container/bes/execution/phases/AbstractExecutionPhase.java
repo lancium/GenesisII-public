@@ -10,6 +10,7 @@ public abstract class AbstractExecutionPhase implements ExecutionPhase, Serializ
 	static final long serialVersionUID = 0L;
 
 	private ActivityState _phaseState;
+	private boolean _needsWorkingContext = true;
 
 	protected AbstractExecutionPhase(ActivityState phaseState)
 	{
@@ -20,5 +21,12 @@ public abstract class AbstractExecutionPhase implements ExecutionPhase, Serializ
 	public ActivityState getPhaseState()
 	{
 		return _phaseState;
+	}
+	
+	//LAK: This method allows an execution phase to skip creating the workingContext. This is currently used for CompleteAccountingPhase.
+	@Override
+	public boolean getNeedsWorkingContext()
+	{
+		return _needsWorkingContext;
 	}
 }

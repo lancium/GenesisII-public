@@ -34,6 +34,13 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 		_accountingDir = accountingDirectory;
 		_finishedDir = finishedDir;
 	}
+	
+	//LAK: This execution phase is ran AFTER the job is terminated and deleted from the DB
+	@Override
+	public boolean getNeedsWorkingContext()
+	{
+		return false;
+	}
 
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
@@ -63,7 +70,5 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 			.format("Unable to move accounting directory %s.", _accountingDir).close();
 			throw cause;
 		}
-
-
 	}
 }
