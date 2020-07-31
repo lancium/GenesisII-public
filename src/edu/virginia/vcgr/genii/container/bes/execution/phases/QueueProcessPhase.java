@@ -293,15 +293,16 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			// =========================================================
 			// 2016-09-07 New code by ASG to probe every second until the post execution delay has passed rather than waiting for that long.
 			// First set up the delay; default to 10 seconds if not set
-			int delay=1;
+			int delay=30;
 			int secondsWaited=0;
 			if (_constructionParameters != null) {
 				Duration postDelay = _constructionParameters.postExecutionDelay();
 				if (postDelay != null) {
 					delay=(int) postDelay.as(DurationUnits.Seconds);
-
+					_logger.debug("delay is now " + delay + " from construct_props");
 				}
 			}
+			_logger.debug("delay is " + delay);
 			int exitCode=0;
 			// Wait until the data is there or time is expired.
 			while (secondsWaited <= delay) {				
@@ -309,7 +310,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					exitCode = queue.getExitCode(_jobToken);
 					break;
 				} catch (QueueResultsException | NativeQueueException  exe) {
-					if (secondsWaited==delay){  
+					if (secondsWaited==delay){
+						_logger.debug("hit max delay to wait for job to terminate [1]");
 						// ASG 2019-01-13 Ok, if we get here we have been unable to get queue.script.result. That most likely means it disappeared and did not exit.
 						// This can happen if the job is terminated by the scheduling system, or the node died. So we want to throw an exception, though not
 						// necessarily a fatal one.
@@ -328,6 +330,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						}
 					}
 				}	catch (IOException ioe) {
+					_logger.debug("hit max delay to wait for job to terminate [2]");
 					// See comments for catch above, they are the same
 					jobDisapparedFromQueue=true;
 					exitCode=143;
