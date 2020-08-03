@@ -375,17 +375,12 @@ public class BESActivity implements Closeable
 
 	private void execute(ExecutionPhase phase) throws Throwable
 	{
-		WorkingContext ctxt = null;
-		if(!(phase instanceof CompleteAccountingPhase))
-			ctxt = createWorkingContext();
+		WorkingContext ctxt = createWorkingContext();
 
 		try {
-			if(!(phase instanceof CompleteAccountingPhase))
-			{
-				ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
-						new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
-					WorkingContext.setCurrentWorkingContext(ctxt);
-			}
+			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
+				new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
+				WorkingContext.setCurrentWorkingContext(ctxt);
 			phase.execute(getExecutionContext());
 		} finally {
 			WorkingContext.setCurrentWorkingContext(null);
