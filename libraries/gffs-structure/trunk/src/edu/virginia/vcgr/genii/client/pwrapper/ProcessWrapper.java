@@ -48,7 +48,6 @@ public class ProcessWrapper
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode obj = mapper.readTree(jsonText).get("location");
 			int exitCode = obj.get("exit-code").asInt();
-			_logger.debug(obj.get("user-time").asDouble());
 			long userTime = (long)(obj.get("user-time").asDouble() * 1000000L); //need to convert all of these into microseconds
 			long systemTime = (long)(obj.get("system-time").asDouble() * 1000000L); //need to convert all of these into microseconds
 			long wallclockTime = (long)(obj.get("wallclock-time").asDouble() * 10000000L); //need to convert all of these into microseconds
