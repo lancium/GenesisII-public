@@ -74,7 +74,12 @@ CommandLine *CL=0;
 struct timeval start;
 struct timeval stop;
 pid_t pid;
+
 int externalKill = 0;
+int listenerThreadStop = 0;
+pthread_mutex_t listenerThreadStopMutex;
+static pthread_t bes_conn_pthread;
+
 
 procInfo getProcInfo(){
 	char * line = NULL;
@@ -275,6 +280,12 @@ int wrapJob(CommandLine *commandLine)
 	}
 
 	dumpStats(exitCode);
+
+	pthread_mutex_lock(&listenerThreadStopMutex);
+	listenerThreadStop = 1;
+	pthread_mutex_unlock(&listenerThreadStopMutex);
+
+	pthread_join(bes_conn_pthread, NULL);
 
 	if (mount)
 		mount->unmount(mount);
@@ -683,11 +694,10 @@ static struct BESConnectionParameters
 } bes_conn_params;
 
 static char nonce[64];
-static pthread_t bes_conn_pthread;
 static int bes_listen_socket = -1;
 static int bes_send_socket = -1;
 
-sem_t port_sem;
+static sem_t port_sem;
 
 void *_startBesListenerThread(void *arg)
 {
@@ -733,7 +743,8 @@ void *_startBesListenerThread(void *arg)
 
 	struct sockaddr_in client_addr;
     socklen_t client_addr_size = sizeof(client_addr);
-	while (running==1 && beingKilled==0)
+	pthread_mutex_lock(&listenerThreadStopMutex);
+	while (listenerThreadStop == 0)
 	{
     	int connectfd = accept(bes_listen_socket, (struct sockaddr *)&client_addr,
 			&client_addr_size);
@@ -782,6 +793,7 @@ void *_startBesListenerThread(void *arg)
 		printf("bes_listener: closing connection socket...\n");
     	close(connectfd);
 	}
+	pthread_mutex_unlock(&listenerThreadStopMutex);
 	close(bes_listen_socket);
 }
 
@@ -864,7 +876,12 @@ int _startBesListener()
 
 int connectionSetup()
 {
+	//this is called once from the main thread, so this is ok
 	sem_init(&port_sem, 0, 0);
+	if (pthread_mutex_init(&listenerThreadStopMutex, NULL) != 0) {
+        printf("\n mutex init has failed\n");
+        return 1;
+    }
 
 	int fd = open("pwrapper_out.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 	dup2(fd, STDERR_FILENO);
