@@ -399,7 +399,6 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		ret.add(new CompleteAccountingPhase(accountingDirectory,finishedDir));
 		// End of accounting dir updates
 		
-<<<<<<< HEAD
 		// 2020-07-14 by CCH
 		// Adding code to print out IP and assigned port so pwrapper can talk to it
 		// Part of the migration/persist project
@@ -420,10 +419,8 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		}
 		// end of updates 2020-07-14
 		
-=======
 		//LAK: Delete job working directory
 		cleanups.add(new CleanupPhase(new File(getWorkingDirectory().getWorkingDirectory().toString())));
->>>>>>> origin/accounting_json
 		
 		ret.addAll(cleanups);
 		return ret;
