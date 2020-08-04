@@ -26,15 +26,15 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 	private File _accountingDir;
 	private File _finishedDir;
 
-	static private final String CREATE_WORKINGDIR_STATE = "create-workingdir";
+	static private final String COMPLETE_ACCOUNTINGDIR_STATE = "complete-accountingdir";
 
 	public CompleteAccountingPhase(File accountingDirectory, File finishedDir)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, CREATE_WORKINGDIR_STATE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, COMPLETE_ACCOUNTINGDIR_STATE, false));
 		_accountingDir = accountingDirectory;
 		_finishedDir = finishedDir;
 	}
-
+	
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
@@ -63,7 +63,5 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 			.format("Unable to move accounting directory %s.", _accountingDir).close();
 			throw cause;
 		}
-
-
 	}
 }

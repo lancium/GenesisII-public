@@ -255,7 +255,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 			scratchPath = _scratchFS.getMountPoint();
 			// pre-remove the scratch link before the working dir cleanup hits it.
 			cleanups.add(new CleanupPhase(new File(getWorkingDirectory().getWorkingDirectory().toString(), "scratch")));
-		}			
+		}
 		_logger.info("scratch path found for working dir to use is: " + scratchPath);
 		ret.add(new CreateWorkingDirectoryPhase(getWorkingDirectory(), scratchPath));
 
@@ -399,6 +399,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		ret.add(new CompleteAccountingPhase(accountingDirectory,finishedDir));
 		// End of accounting dir updates
 		
+<<<<<<< HEAD
 		// 2020-07-14 by CCH
 		// Adding code to print out IP and assigned port so pwrapper can talk to it
 		// Part of the migration/persist project
@@ -419,6 +420,10 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		}
 		// end of updates 2020-07-14
 		
+=======
+		//LAK: Delete job working directory
+		cleanups.add(new CleanupPhase(new File(getWorkingDirectory().getWorkingDirectory().toString())));
+>>>>>>> origin/accounting_json
 		
 		ret.addAll(cleanups);
 		return ret;

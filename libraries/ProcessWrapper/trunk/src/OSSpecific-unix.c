@@ -27,7 +27,6 @@
 #define GENII_INSTALL_DIR_VAR "GENII_INSTALL_DIR"
 #define GENII_USER_DIR_VAR "GENII_USER_DIR"
 #define FUSE_DEVICE "/dev/fuse"
-#define SLEEP_DURATION 360
 
 #ifdef PWRAP_macosx
 	#define UNMOUNT_BINARY_NAME "umount"
@@ -75,18 +74,7 @@ CommandLine *CL=0;
 struct timeval start;
 struct timeval stop;
 pid_t pid;
-int running=1;
-int beingKilled=0;
-
-void teardownJob()
-{
-	//kill vmwrapper or container
-	kill(pid, SIGTERM);
-
-	//wait for vmwrapper/container to terminate
-	int tempExitCode;
-	waitpid(pid, &tempExitCode, 0);
-}
+int externalKill = 0;
 
 procInfo getProcInfo(){
 	char * line = NULL;
@@ -107,7 +95,6 @@ procInfo getProcInfo(){
 			strtok(line, ":\n");
 			char * vendor = strtok(NULL, ":\n");
 			if(strcmp(vendor+1, "GenuineIntel\n") == 0){
-				printf("Is Intel\n");
 				isIntel = 1;
 			}
 		}
@@ -131,53 +118,33 @@ procInfo getProcInfo(){
 	return p;
 }
 
-int dumpStats() {
+void dumpStats(int exitCode) {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
 	Note that it is using global variables. This is unfortunate, but the 
 	only way to get the data into a signal handler.
 */
-	int exitCode=100;
 	struct rusage usage;
-	// Check if it is still running, if not set running=0
-	pid_t tp=waitpid(pid,&exitCode,WNOHANG);
-	if (tp==pid) running=0;
 	getrusage(RUSAGE_CHILDREN,&usage);
-	if (WIFSIGNALED(exitCode))
-		exitCode = 128 + WTERMSIG(exitCode);
-	else
-		exitCode = WEXITSTATUS(exitCode);
 	gettimeofday(&stop, NULL);
-	/*
-	2019-08-22 by ASG. If the child is still running AND being killed,
-	set the exit code to 143. It means the enclosing environment, e.g.,
-	the queueing system is terminating it, likely for too much time, processes, 
-	or memory.
-	*/
-	if (running==1 && beingKilled==1) 
-	{
-		teardownJob();
-		// 2020 May 28 CCH: Changing this error code to 143 to be consistent with bash
-		exitCode=143;
-	}
+
 	procInfo p = getProcInfo();
 	writeExitResults(CL->getResourceUsageFile(CL),
-               	autorelease(createExitResults(exitCode,
-               	(double)usage.ru_utime.tv_sec + (double)usage.ru_utime.tv_usec / (double) 1000000,
-               	(double)usage.ru_stime.tv_sec + (double)usage.ru_utime.tv_usec / (double) 1000000,
-               	(double)(stop.tv_sec - start.tv_sec) + (double)(stop.tv_usec - start.tv_usec) / (double) 1000000,
-               	(long long)usage.ru_maxrss * 1024,
+				autorelease(createExitResults(exitCode,
+				(double)usage.ru_utime.tv_sec + (double)usage.ru_utime.tv_usec / (double) 1000000,
+				(double)usage.ru_stime.tv_sec + (double)usage.ru_stime.tv_usec / (double) 1000000,
+				(double)(stop.tv_sec - start.tv_sec) + (double)(stop.tv_usec - start.tv_usec) / (double) 1000000,
+				(long long)usage.ru_maxrss * 1024,
 				p.processorType)));
-	return exitCode;
 }
 
 void sig_handler(int signo)
 {
 	if (signo == SIGTERM) {
-		beingKilled=1;
-		dumpStats();
-	}
-	else if (signo == SIGCHLD) {
-		dumpStats();
+		// LAK: we write out a preliminary dumpStats json file. The reason why we do this is in case our child does not terminate or respond to the SIGTERM, we do not lose the wallclock time.
+		// However, we will NOT get a correct exit code, system/user time, or max memory usage unless the post child termination dumpStats also runs.
+		dumpStats(143);
+		externalKill = 1;
+		kill(pid, SIGTERM);
 	}
 }
 
@@ -188,11 +155,10 @@ int wrapJob(CommandLine *commandLine)
 	FuseMounter *mounter = NULL;
 	FuseMount *mount = NULL;
 	char **cmdLine;
-	// 2019--5-27 by ASG. Put in signal handler for SIGTERM
 	CL=commandLine;
+
 	if (signal(SIGTERM, sig_handler) == SIG_ERR)
   		fprintf(stderr, "Can't catch SIGTERM\n");
-	// End updates
 
 	/* Now, if a grid file system was requested, we try and set that up.
 	 */
@@ -279,18 +245,7 @@ int wrapJob(CommandLine *commandLine)
 
 	release(cmdLine);
 
-	/* I am the parent process */
-/*		Old code
-	if (wait4(pid, &exitCode, 0x0, &usage) != pid)
-	{
-		fprintf(stderr, "Unable to wait for child to exit.\n");
-		return -1;
-	}
-*/
-	// 2019-05-27 by ASG. Code to deal with the process getting killed and losing 
-	// the accounting records.
-	if (signal(SIGCHLD, sig_handler) == SIG_ERR)
-  		fprintf(stderr, "Can't catch SIGCHLD\n");
+	dumpStats(228); //create empty rusage file
 
 	// 2020-07-22 by JAA -- create cgroup using secondary program
 	// should be set up in path, requires sudoers setup if not in same group
@@ -307,16 +262,19 @@ int wrapJob(CommandLine *commandLine)
 	// Signal child to continue
 	kill(pid, SIGCONT);
 
-	running=1;
-	int ticks=0;
-	while (running==1 && beingKilled==0) {
-		// 2020-06-05 by ASG .. change the order to dumpstats first, then sleep
-		if ((ticks % SLEEP_DURATION) == 0)
-			exitCode=dumpStats();
-		sleep(1);
-		ticks++;
+	waitpid(pid, &exitCode, WUNTRACED);
+
+	if (WIFSIGNALED(exitCode))
+		exitCode = 128 + WTERMSIG(exitCode);
+	else
+		exitCode = WEXITSTATUS(exitCode);
+
+	if(externalKill && exitCode == 0)
+	{
+		exitCode = 143; //set to be consistent with bash early termination exit code
 	}
-	// End of updates
+
+	dumpStats(exitCode);
 
 	if (mount)
 		mount->unmount(mount);
@@ -506,11 +464,6 @@ void writeExitResults(const char *path, ExitResults *results)
 
 	strcat(buf,C);
 // =====================
-
-/*	FILE *f=fopen("/home/dev/debug.txt","a+");
-	fprintf(f,"The directory is: %s\n",buf);
-	fclose(f);
-*/
 	out = fopen(buf, "w+");
 	if (!out)
 	{
@@ -521,7 +474,6 @@ void writeExitResults(const char *path, ExitResults *results)
 	results->toJson(results, out);
 	fclose(out);
 	//====  end of new code
-
 }
 
 int checkMountPoint(const char *mountPoint)

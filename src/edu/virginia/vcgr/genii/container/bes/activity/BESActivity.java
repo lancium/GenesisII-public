@@ -47,6 +47,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionExcep
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -452,7 +453,7 @@ public class BESActivity implements Closeable
 		try {
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
 				new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
-			WorkingContext.setCurrentWorkingContext(ctxt);
+				WorkingContext.setCurrentWorkingContext(ctxt);
 			phase.execute(getExecutionContext());
 		} finally {
 			WorkingContext.setCurrentWorkingContext(null);
@@ -787,11 +788,9 @@ public class BESActivity implements Closeable
 							break;
 
 						if (_terminateRequested) {
-							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null, false));
 
 							// Ensure Cloud Resources Cleaned up
 							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
-							break;
 						}
 
 						while (_suspendRequested) {
@@ -803,15 +802,6 @@ public class BESActivity implements Closeable
 							}
 						}
 						_suspended = false;
-
-						if (_terminateRequested) {
-							updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Cancelled, null, false));
-
-							// Ensure Cloud Resource cleaned up
-							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
-							break;
-						}
-
 						_currentPhase = _executionPlan.get(_nextPhase);
 						_logger.debug("BES Activity transitition to " + _currentPhase.getPhaseState().toString());
 						updateState(_nextPhase, _currentPhase.getPhaseState());
@@ -823,7 +813,7 @@ public class BESActivity implements Closeable
 						// Ok, the job terminated without a queue results file being generated, therefore the pwrapper did not complete.
 						// So, basically the system lost the job, the queue system killed it, the node died, something like that
 						// We want to move to the next phase. But do we want it to count against tries?		
-						_logger.debug("BES Activity faulted with QueueResultsException - ontinuing as planned.", qre);
+						_logger.debug("BES Activity faulted with QueueResultsException - continuing as planned.", qre);
 						addFault(qre, 3);
 					} catch (ContinuableExecutionException cee) {
 						addFault(cee, 3);
@@ -832,9 +822,6 @@ public class BESActivity implements Closeable
 					}
 
 					synchronized (_phaseLock) {
-						if (_terminateRequested)
-							continue;
-
 						_currentPhase = null;
 						updateState(_nextPhase + 1, _state);
 					}
