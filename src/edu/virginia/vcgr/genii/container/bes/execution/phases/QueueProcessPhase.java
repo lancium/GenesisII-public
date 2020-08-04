@@ -42,6 +42,7 @@ import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -82,8 +83,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	private Map<String, String> _environment;
 
 	private ResourceConstraints _resourceConstraints;
-	private String _jobName=null;
-	private String _jobAnnotation=null;
 
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
@@ -91,7 +90,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	
 	public QueueProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout,
-		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints, String jobName, String jobAnnotation)
+		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
 
@@ -108,8 +107,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		_stdout = stdout;
 		_stderr = stderr;
 		_resourceConstraints = resourceConstraints;
-		_jobName=jobName;
-		_jobAnnotation=jobAnnotation;
 	}
 
 	@Override
@@ -140,8 +137,9 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		}
 	}
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
+		BESActivity activity = (BESActivity) activityObject;
 		String stderrPath = null;
 		File resourceUsageFile;
 		// 2019-04-04 ASG. Added to handle jobs disappearing from the queu. We're going to make them as complete for now.
@@ -209,7 +207,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
                 {                             
                 	try {
                 		FileWriter myWriter = new FileWriter(hostName);
-                		myWriter.write(_jobName+"\n");
+                		myWriter.write(activity.getJobName()+"\n");
                 		myWriter.close();
                 	} catch (IOException e) {
                 		System.out.println("An error occurred writting the HOSTNAME file.");
@@ -227,10 +225,10 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					_logger.debug("Generate Properties Constructor _numProcesses: " + _numProcesses);
 					_logger.debug("Generate Properties Constructor _numProcessesPerHost: " + _numProcessesPerHost);
 					_logger.debug("Generate Properties Constructor _threadsPerProcess: " + _threadsPerProcess);
-					_logger.debug("Generate Properties Constructor _jobName: " + _jobName);
+					_logger.debug("Generate Properties Constructor _jobName: " + activity.getJobName());
 				}
 				generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
-						_numProcessesPerHost, _threadsPerProcess, _jobName,_jobAnnotation );
+						_numProcessesPerHost, _threadsPerProcess, activity);
 
 				// End of updates 2020-04-18
 

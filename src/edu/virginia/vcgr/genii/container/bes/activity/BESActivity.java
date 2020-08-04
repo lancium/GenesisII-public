@@ -69,6 +69,7 @@ public class BESActivity implements Closeable
 	private String _activityServiceName;
 	private String _jobName;
 	private ActivityRunner _runner;
+	private String _jobAnnotation;
 
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
@@ -249,6 +250,13 @@ public class BESActivity implements Closeable
 	{
 		return _jobName;
 	}
+	public void setJobAnnotation(String jobAnnotation) {
+		_jobAnnotation = jobAnnotation;
+	}
+	public String getJobAnnotation()
+	{
+		return _jobAnnotation;
+	}
 
 	synchronized public void suspend() throws ExecutionException, SQLException
 	{
@@ -380,7 +388,7 @@ public class BESActivity implements Closeable
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
 				new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
 			WorkingContext.setCurrentWorkingContext(ctxt);
-			phase.execute(getExecutionContext());
+			phase.execute(getExecutionContext(), this);
 		} finally {
 			WorkingContext.setCurrentWorkingContext(null);
 		}

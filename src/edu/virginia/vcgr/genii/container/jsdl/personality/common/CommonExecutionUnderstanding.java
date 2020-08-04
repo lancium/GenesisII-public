@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CheckBinariesPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
@@ -56,6 +57,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 
 	private String _jobAnnotation = null;
 	private String _jobName = null;
+	private BESActivity activity = null;
 
 	private Collection<DataStagingUnderstanding> _stageIns = new LinkedList<DataStagingUnderstanding>();
 	private Collection<DataStagingUnderstanding> _stageOuts = new LinkedList<DataStagingUnderstanding>();
@@ -84,6 +86,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	public void setJobAnnotation(String jobAnnotation)
 	{
 		_jobAnnotation = jobAnnotation;
+		if (activity != null) activity.setJobAnnotation(jobAnnotation);
 	}
 
 	public void setJobName(String jobName)
@@ -373,7 +376,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName);
 
 		if (_application != null)
-			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation);
+			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext);
 
 		for (DataStagingUnderstanding stage : _stageOuts) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());
@@ -414,5 +417,13 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		} catch (Exception e) {
 		}
 
+	}
+
+	public BESActivity getBESActivity() {
+		return activity;
+	}
+
+	public void setBESActivity(BESActivity activity) {
+		this.activity = activity;
 	}
 }

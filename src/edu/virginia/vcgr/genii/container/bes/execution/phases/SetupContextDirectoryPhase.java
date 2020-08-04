@@ -9,6 +9,7 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.context.ClientContextResolver;
 import edu.virginia.vcgr.genii.client.context.ContextFileSystem;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
@@ -26,8 +27,9 @@ public class SetupContextDirectoryPhase extends AbstractExecutionPhase
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
+		BESActivity activity = (BESActivity) activityObject;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
 		history.trace("Creating Grid Context");

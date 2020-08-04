@@ -25,6 +25,7 @@ import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
 import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 
 abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
@@ -57,7 +58,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 	}
 
 	final protected void generateProperties(ResourceUsageDirectory dir,String userName, String executable, Double memory, int numProcesses, 
-			int numProcessesPerHost, int threadsPerProcess, String jobName, String jobAnnotation) {
+			int numProcessesPerHost, int threadsPerProcess, BESActivity activity) {
 		File propFile=new File(dir.getAcctDir(),"properties.json");
 		try {
 			if (propFile.createNewFile()) {
@@ -67,7 +68,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 					output = new BufferedWriter(new FileWriter(propFile));
 					output.write("{\n");
 					output.write("\"userName\": \"" + userName + "\",\n");
-					output.write("\"jobName\": \"" + jobName + "\",\n");
+					output.write("\"jobName\": \"" + activity.getJobName()+ "\",\n");
 					Date today = Calendar.getInstance().getTime();
 					output.write("\"date\": \"" + today.toString() + "\",\n");
 					output.write("\"executable\": \"" + executable + "\",\n" ); 
@@ -77,7 +78,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 					output.write("\"numProcesses\": \"" + numProcesses + "\",\n");
 					output.write("\"NumProcessorsPerHost\": \"" + numProcessesPerHost + "\",\n");
 					output.write("\"threadsPerProcess\": \"" + threadsPerProcess + "\"\n");
-					output.write("\"jobAnnotation\": \"" + jobAnnotation + "\"\n");
+					output.write("\"jobAnnotation\": \"" + activity.getJobAnnotation() + "\"\n");
 					output.write("}\n");
 				} catch ( IOException e ) {
 					e.printStackTrace();

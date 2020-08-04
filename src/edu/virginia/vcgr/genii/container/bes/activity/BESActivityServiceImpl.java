@@ -142,7 +142,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 			CloudConfiguration cConfig = ((BESConstructionParameters) cParams).getCloudConfiguration();
 
-			ExecutionUnderstanding executionUnderstanding;
+			ExecutionUnderstanding executionUnderstanding = null;
 		
 			if (cConfig != null) {
 				PersonalityProvider provider = new ExecutionProvider();
@@ -185,10 +185,11 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					null));
 			}
 
-			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
+			BESActivity activity = bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
 				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
-
-
+			if (executionUnderstanding != null)
+				activity.setJobAnnotation(executionUnderstanding.getJobAnnotation());
+			
 			if (_logger.isTraceEnabled()) {
 				_logger.debug("after creating job, context has these creds:\n"
 					+ TransientCredentials.getTransientCredentials(ContextManager.getExistingContext()).toString());

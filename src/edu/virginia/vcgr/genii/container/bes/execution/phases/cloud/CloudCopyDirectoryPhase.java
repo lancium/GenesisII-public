@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
@@ -40,8 +41,9 @@ public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase impleme
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
+		BESActivity activity = (BESActivity) activityObject;
 		File lDir = new File(_localDir);
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID = tManage.aquireResource(_activityID);

@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 
 public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 {
@@ -59,10 +60,13 @@ public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
 		try {
 
+			@SuppressWarnings("unused")
+			BESActivity activity = (BESActivity) activityObject;
+			
 			FileOutputStream tStream = new FileOutputStream(_scratchDir + _runScript);
 			CloudJobWrapper.generateWrapperScript(tStream, new File(_workingDir), new File(_workingDir + _resourceFile), _job,
 				new File(_scratchDir), _manipulatorConfiguration);

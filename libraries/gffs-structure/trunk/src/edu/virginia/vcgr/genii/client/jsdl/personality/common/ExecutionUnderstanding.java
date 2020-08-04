@@ -13,4 +13,5 @@ public interface ExecutionUnderstanding
 	public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl) throws JSDLException;
 
 	public String getJobName();
+	public String getJobAnnotation();
 }

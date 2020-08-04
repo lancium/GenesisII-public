@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.downloadmgr.DownloadManagerContainerService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -61,7 +62,9 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable {
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	{
+		BESActivity activity = (BESActivity) activityObject;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.StageIn);
 		history.createInfoWriter("Entered CheckBinariesPhase...");
 		String[] _execNameArray = _execName.split("/");

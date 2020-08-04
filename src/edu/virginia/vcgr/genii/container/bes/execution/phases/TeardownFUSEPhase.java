@@ -10,6 +10,7 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.fuse.GeniiFuse;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import fuse.FuseException;
 
 public class TeardownFUSEPhase extends AbstractFUSEPhases
@@ -24,8 +25,9 @@ public class TeardownFUSEPhase extends AbstractFUSEPhases
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
+		BESActivity activity = (BESActivity) activityObject;
 		long sleepTime = 250L;
 
 		try {

@@ -12,6 +12,7 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 
 public class StoreContextPhase extends AbstractExecutionPhase implements ExecutionPhase, Serializable
 {
@@ -29,8 +30,10 @@ public class StoreContextPhase extends AbstractExecutionPhase implements Executi
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
+		BESActivity activity = (BESActivity) activityObject;
+		
 		File callingContextFile = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), _filename);
 		FileOutputStream fos = null;
 

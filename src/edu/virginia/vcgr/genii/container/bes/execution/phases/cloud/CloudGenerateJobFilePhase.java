@@ -34,7 +34,7 @@ public class CloudGenerateJobFilePhase implements ExecutionPhase, Serializable
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
 		FileOutputStream fOut = new FileOutputStream(_workingDir + _jobFile);
 		ObjectOutputStream oOut = new ObjectOutputStream(fOut);

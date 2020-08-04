@@ -41,7 +41,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 
 	@Override
 	public void addExecutionPhases(BESConstructionParameters creationProperties, Vector<ExecutionPhase> executionPlan,
-		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext, String jobAnnotation) throws JSDLException
+		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext) throws JSDLException
 	{
 		File fuseMountPoint = jobContext.getFuseMountPoint();
 
@@ -79,6 +79,6 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 
 		executionPlan.add(new RunProcessPhase(fuseMountPoint, getSPMDVariation(),getMemory(), getNumProcesses(), getNumProcessesPerHost(),
 			getThreadsPerProcess(), BESActivityServiceImpl.getCommonDirectory(creationProperties), fsManager.lookup(getExecutable()),
-			stringArgs.toArray(new String[0]), stringEnv, redirection, creationProperties,jobContext.getJobName(), jobAnnotation));
+			stringArgs.toArray(new String[0]), stringEnv, redirection, creationProperties));
 	}
 }

@@ -18,6 +18,7 @@ import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.downloadmgr.DownloadManagerContainerService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -197,8 +198,9 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
+		BESActivity activity = (BESActivity) activityObject;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.StageIn);
 
 		history.createInfoWriter("Staging in to %s", _target.getName()).format("Staging in from %s to %s.", _source, _target).close();
