@@ -64,6 +64,7 @@ int sendBesMessage(const char* message);
 int connectionSetup();
 void freeze();
 void thaw();
+void persist();
 
 #ifndef PWRAP_macosx
 	static int verifyFuseDevice(char **errorMessage);
@@ -754,7 +755,7 @@ void *_startBesListenerThread(void *arg)
 		printf("bes_listener: established connection to %s:%hu\n",
     	    ip, ntohs(client_addr.sin_port));
 
-    	// reads
+		// read
     	char buffer[256];
 		memset(&buffer, 0, 256);
 		int numread = read(connectfd, buffer, 256);
@@ -770,6 +771,7 @@ void *_startBesListenerThread(void *arg)
 			printf("this is a freeze command\n");
 			freeze();
 		}
+		//check if thaw command
 		memset(&command, 0, 256);
 		snprintf(command, 256, "%s thaw\n", nonce);
 		if(strncmp(buffer, command, 256) == 0)
@@ -777,6 +779,15 @@ void *_startBesListenerThread(void *arg)
 			//this is a thaw command
 			printf("this is a thaw command\n");
 			thaw();
+		}
+		//check if persist command
+		memset(&command, 0, 256);
+		snprintf(command, 256, "%s persist\n", nonce);
+		if(strncmp(buffer, command, 256) == 0)
+		{
+			//this is a persist command
+			printf("this is a persist command\n");
+			persist();
 		}
 
 		//clear buffer
@@ -983,5 +994,11 @@ void thaw()
 	sprintf(pidStr, "%d", pid);
 	strcat(freezeCMD, pidStr);
 	system(freezeCMD);
+	return;
+}
+
+void persist()
+{
+	// 2020 Aug 04 by LAK: Added initial persist functionality
 	return;
 }

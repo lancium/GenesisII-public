@@ -665,9 +665,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		return new PersistActivitiesResponseType(responses.toArray(new PersistActivityResponseType[0]), null);
 	}
 
-	static public PersistActivityResponseType persistActivity(String epi) throws RemoteException
+	static public PersistActivityResponseType persistActivity(String activityid) throws RemoteException
 	{
-		return new PersistActivityResponseType("", false, null, null);
+		BES bes = BES.findBESForActivity(activityid);
+		if (bes == null)
+			return new PersistActivityResponseType(activityid, false, null, null);
+		String commandToSend = activityid + " persist";
+		return new PersistActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
 	}
 	
 	@Override
