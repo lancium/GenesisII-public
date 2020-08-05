@@ -73,7 +73,7 @@ public class BESActivity implements Closeable
 
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
-		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName,
+		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
 		boolean suspendRequested, boolean terminateRequested)
 	{
 		_connectionPool = connectionPool;
@@ -89,6 +89,7 @@ public class BESActivity implements Closeable
 
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
+		_jobAnnotation = jobAnnotation;
 
 		_runner = new ActivityRunner(_suspendRequested, _terminateRequested);
 		_policyListener = new PolicyListener();
@@ -249,9 +250,6 @@ public class BESActivity implements Closeable
 	public String getJobName()
 	{
 		return _jobName;
-	}
-	public void setJobAnnotation(String jobAnnotation) {
-		_jobAnnotation = jobAnnotation;
 	}
 	public String getJobAnnotation()
 	{

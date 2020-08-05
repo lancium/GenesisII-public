@@ -24,6 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.ggf.jsdl.JobDescription_Type;
+import org.ggf.jsdl.JobIdentification_Type;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -328,7 +330,7 @@ public class BES implements Closeable
 
 	synchronized public BESActivity createActivity(Connection parentConnection, String activityid, JobDefinition_Type jsdl,
 		Collection<Identity> owners, ICallingContext callingContext, BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan,
-		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName) throws SQLException, ResourceException
+		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName, String jobAnnotation) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -365,7 +367,7 @@ public class BES implements Closeable
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, false, false);
+				activityServiceName, jobName, jobAnnotation, false, false);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -441,7 +443,7 @@ public class BES implements Closeable
 		try {
 			stmt = connection
 				.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityservicename, jobname " + "FROM besactivitiestable WHERE besid = ?");
+					+ "nextphase, activityservicename, jobname, jsdl " + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
@@ -466,10 +468,27 @@ public class BES implements Closeable
 					int nextPhase = rs.getInt(7);
 					String activityServiceName = rs.getString(8);
 					String jobName = rs.getString(9);
+					
+					// 2020 August 5 by CCH - Part of BES dataflow cleanup`
+					// The plan: Put everything (jobName, jobAnnotation, etc) into BESActivity and pass reference to activity to each phase
+					// Because jobAnnotation is now being stored in the BESActivity rather than in the phases we need to reload it from the JSDL
+					// Previously, we wouldn't need to reload it because it would already be in the phases inside the executionPlan
+					String jobAnnotation = null;
+					JobDescription_Type jsdl =(JobDescription_Type) DBSerializer.fromBlob(rs.getBlob(10));
+					if (jsdl !=null) {
+						JobIdentification_Type jobID=jsdl.getJobIdentification();
+						if (jobID!=null) {
+							String []annotations=jobID.getJobAnnotation();
+							if (annotations!=null) {
+								jobAnnotation=jobID.getJobAnnotation(0);
+							}
+						}
+					}
+					// End of extracting jobAnnotation[0]
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, suspendRequested, terminateRequested);
+							activityServiceName, jobName, jobAnnotation, suspendRequested, terminateRequested);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);

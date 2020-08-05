@@ -186,9 +186,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			}
 
 			BESActivity activity = bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
-				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
-			if (executionUnderstanding != null)
-				activity.setJobAnnotation(executionUnderstanding.getJobAnnotation());
+				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName, executionUnderstanding.getJobAnnotation());
 			
 			if (_logger.isTraceEnabled()) {
 				_logger.debug("after creating job, context has these creds:\n"
