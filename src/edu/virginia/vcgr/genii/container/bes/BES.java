@@ -474,8 +474,10 @@ public class BES implements Closeable
 					// Because jobAnnotation is now being stored in the BESActivity rather than in the phases we need to reload it from the JSDL
 					// Previously, we wouldn't need to reload it because it would already be in the phases inside the executionPlan
 					String jobAnnotation = null;
-					JobDescription_Type jsdl =(JobDescription_Type) DBSerializer.fromBlob(rs.getBlob(10));
+					JobDescription_Type jsdl = DBSerializer.xmlFromBlob(JobDescription_Type.class, rs.getBlob(10));
 					if (jsdl !=null) {
+						// Bug: When an entry is inserted into the table the jobID is not null
+						//		but when we pull it out here, it is! :(
 						JobIdentification_Type jobID=jsdl.getJobIdentification();
 						if (jobID!=null) {
 							String []annotations=jobID.getJobAnnotation();
@@ -484,6 +486,8 @@ public class BES implements Closeable
 							}
 						}
 					}
+					if (_logger.isDebugEnabled())
+						_logger.debug("Job annotation: " + jobAnnotation +". For job " + activityid +".");
 					// End of extracting jobAnnotation[0]
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
