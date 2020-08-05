@@ -163,7 +163,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				if (execNameArray.length >= 2)
 					usingLanciumImage = execNameArray[execNameArray.length-2].equals("Lancium");
 				if (_logger.isDebugEnabled()) {
-					_logger.debug("First element in execNameArray: " + execNameArray[0]);
+					_logger.debug("Second to last element in execNameArray: " + execNameArray[execNameArray.length-2]);
 					_logger.debug("Using Lancium image? " + usingLanciumImage);
 				}
 				execName = execNameArray[execNameArray.length-1];
