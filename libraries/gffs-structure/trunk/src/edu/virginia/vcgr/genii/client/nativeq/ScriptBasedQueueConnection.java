@@ -253,9 +253,6 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			if (imagePath.endsWith(".qcow2")) {
 				execName = "../vmwrapper.sh";
 			}
-			else {
-				execName = "../singularity-wrapper.sh";
-			}
 			if (_logger.isDebugEnabled())
 				_logger.debug("Handling image executable: " + execName);
 			if (Files.exists(Paths.get(imagePath))) {
