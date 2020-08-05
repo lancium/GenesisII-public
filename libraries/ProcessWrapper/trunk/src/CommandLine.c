@@ -1,5 +1,7 @@
 #include "CommandLine.h"
 
+#include <regex.h>
+
 #include "Memory.h"
 #include "LinkedList.h"
 #include "StringFunctions.h"
@@ -191,9 +193,57 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 			return 0;
 	}
 
-	impl->_executable = createStringFromCopy(*argv);
-	argc--;
-	argv++;
+	//check if the executable is a singularity image; if so, we need to switch to a singularity command
+	// char exec_buf[256]; //on ext4 filenames are at most 255 bytes
+	regex_t regex;
+	int reti;
+	reti = regcomp(&regex, ".simg$|.sif$|.img$", REG_EXTENDED);
+	if (reti)
+	{
+		fprintf(stderr, "Could not compile regex\n");
+	}
+	/* Execute regular expression */
+	reti = regexec(&regex, *argv, 0, NULL, 0);
+	if (!reti)
+	{
+		printf("%s is a singularity image\n", *argv);
+
+		// should build equivalent of : singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
+
+		impl->_executable = createStringFromCopy("singularity");
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("run")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--nv")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-c")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--ipc")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--pid")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-B")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(".:/tmp")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-W")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-H")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
+
+		//the first argument is the name of the image (executable place), the second is the path to the image. We need to skip over the name and use the path instead.
+		argc--;
+		argv++;
+
+		//this is the image path
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(*argv)));
+
+		//we don't want to add the above argument again, so move the argument pointer forward
+		argc--;
+		argv++;
+	}
+	else if (reti == REG_NOMATCH) {
+		printf("%s is not a singularity image\n", *argv);
+		impl->_executable = createStringFromCopy(*argv);
+		argc--;
+		argv++;
+	}
+	else {
+		fprintf(stderr, "Regex match failed: %s\n", *argv);
+	}
+	regfree(&regex);
 
 	while (argc > 0)
 	{

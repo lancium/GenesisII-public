@@ -159,7 +159,13 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
 				// 2020 May 26 CCH, execName might be in the form Lancium/image.simg which is why we're splitting execName up here
 				String[] execNameArray = execName.split("/");
-				boolean usingLanciumImage = (execNameArray[0].equals("Lancium"));
+				boolean usingLanciumImage = false;
+				if (execNameArray.length >= 2)
+					usingLanciumImage = execNameArray[execNameArray.length-2].equals("Lancium");
+				if (_logger.isDebugEnabled()) {
+					_logger.debug("First element in execNameArray: " + execNameArray[0]);
+					_logger.debug("Using Lancium image? " + usingLanciumImage);
+				}
 				execName = execNameArray[execNameArray.length-1];
 				String imageDir = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + userName + "/";
 				if (_logger.isDebugEnabled())
@@ -170,9 +176,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				// Assigning the appropriate wrapper as the executable
 				if (imagePath.endsWith(".qcow2")) {
 					execName = "../vmwrapper.sh";
-				}
-				else {
-					execName = "../singularity-wrapper.sh";
 				}
 				_executable = new File(workingDirectory, execName);
 				if (_logger.isDebugEnabled())
