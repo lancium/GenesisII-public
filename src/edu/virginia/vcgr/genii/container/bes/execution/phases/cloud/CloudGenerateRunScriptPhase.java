@@ -63,10 +63,7 @@ public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
 		try {
-
-			@SuppressWarnings("unused")
 			BESActivity activity = (BESActivity) activityObject;
-			
 			FileOutputStream tStream = new FileOutputStream(_scratchDir + _runScript);
 			CloudJobWrapper.generateWrapperScript(tStream, new File(_workingDir), new File(_workingDir + _resourceFile), _job,
 				new File(_scratchDir), _manipulatorConfiguration);

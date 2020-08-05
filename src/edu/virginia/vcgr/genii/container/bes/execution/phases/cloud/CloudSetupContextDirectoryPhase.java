@@ -33,7 +33,6 @@ public class CloudSetupContextDirectoryPhase implements ExecutionPhase, Serializ
 	@Override
 	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
-		@SuppressWarnings("unused")
 		BESActivity activity = (BESActivity) activityObject;
 
 		File dir = new File(_localWorkingDirectory);

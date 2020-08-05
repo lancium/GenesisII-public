@@ -37,7 +37,6 @@ public class CloudReleaseResourcePhase implements ExecutionPhase, Serializable
 	@Override
 	public void execute(ExecutionContext context, Object activityObject) throws Throwable
 	{
-		@SuppressWarnings("unused")
 		BESActivity activity = (BESActivity) activityObject;
 		
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Cleanup);
