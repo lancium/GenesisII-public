@@ -23,9 +23,14 @@ import java.util.Vector;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.jsdl.Exact_Type;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
 import org.ggf.jsdl.JobIdentification_Type;
+import org.ggf.jsdl.RangeValue_Type;
+import org.ggf.jsdl.Resources_Type;
 import org.morgan.inject.MInject;
 import org.morgan.util.GUID;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -184,9 +189,34 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
 					null));
 			}
+			String gpuType = null;
+			int gpuCount = 0;
+			JobDescription_Type jobDesc = jsdl.getJobDescription(0);
+			if (jobDesc != null) {
+				Resources_Type resources = jobDesc.getResources();
+				if (resources != null) {
+					GPUArchitecture_Type gpuArch = resources.getGPUArchitecture();
+					if (gpuArch != null) {
+						GPUArchitectureEnumeration gpuArchName = gpuArch.getGPUArchitectureName();
+						if (gpuArchName != null) {
+							gpuType = gpuArchName.getValue();
+						}
+					}
+					RangeValue_Type gpuCountPerNode = resources.getGPUCountPerNode();
+					if (gpuCountPerNode != null) {
+						Exact_Type[] exactArray = gpuCountPerNode.getExact();
+						if (exactArray != null) {
+							Exact_Type exactValue = exactArray[0];
+							if (exactValue != null) {
+								gpuCount = (int) exactValue.get_value();
+							}
+						}
+					}
+				}
+			}
 
 			BESActivity activity = bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
-				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName, executionUnderstanding.getJobAnnotation());
+				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName, executionUnderstanding.getJobAnnotation(), gpuType, gpuCount);
 			
 			if (_logger.isTraceEnabled()) {
 				_logger.debug("after creating job, context has these creds:\n"

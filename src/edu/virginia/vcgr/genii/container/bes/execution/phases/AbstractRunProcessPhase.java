@@ -79,6 +79,8 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 					output.write("\"NumProcessorsPerHost\": \"" + numProcessesPerHost + "\",\n");
 					output.write("\"threadsPerProcess\": \"" + threadsPerProcess + "\"\n");
 					output.write("\"jobAnnotation\": \"" + activity.getJobAnnotation() + "\"\n");
+					output.write("\"gpuType\": \"" + activity.getGPUType() + "\"\n");
+					output.write("\"gpuCount\": \"" + activity.getGPUCount() + "\"\n");
 					output.write("}\n");
 				} catch ( IOException e ) {
 					e.printStackTrace();

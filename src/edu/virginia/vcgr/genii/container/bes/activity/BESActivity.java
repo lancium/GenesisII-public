@@ -70,11 +70,13 @@ public class BESActivity implements Closeable
 	private String _jobName;
 	private ActivityRunner _runner;
 	private String _jobAnnotation;
+	private String _gpuType;
+	private int _gpuCount;
 
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
-		boolean suspendRequested, boolean terminateRequested)
+		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested)
 	{
 		_connectionPool = connectionPool;
 
@@ -90,6 +92,8 @@ public class BESActivity implements Closeable
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
 		_jobAnnotation = jobAnnotation;
+		_gpuType = gpuType;
+		_gpuCount = gpuCount;
 
 		_runner = new ActivityRunner(_suspendRequested, _terminateRequested);
 		_policyListener = new PolicyListener();
@@ -631,6 +635,22 @@ public class BESActivity implements Closeable
 			return true;
 		} else
 			return false;
+	}
+
+	public String getGPUType() {
+		return _gpuType;
+	}
+
+	public void setGPUType(String gpuType) {
+		this._gpuType = gpuType;
+	}
+
+	public int getGPUCount() {
+		return _gpuCount;
+	}
+
+	public void setGPUCount(int gpuCount) {
+		this._gpuCount = gpuCount;
 	}
 
 	private class ActivityRunner implements Runnable
