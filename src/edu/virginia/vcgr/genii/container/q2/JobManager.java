@@ -683,6 +683,9 @@ public class JobManager implements Closeable
 		_whenToProcessNotifications = Calendar.getInstance();
 		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
 
+		// LAK: synchronized to keep this from running while createActivity is also running
+		synchronized(_jobsByTicket)
+		{
 		try {
 
 			/*
@@ -799,6 +802,7 @@ public class JobManager implements Closeable
 			if (_logger.isDebugEnabled())
 				_logger.debug("Failed to submit job from jsdl: " + jsdl.toString());
 			throw new ResourceException("Unable to submit job.", ioe);
+		}
 		}
 	}
 
@@ -2410,15 +2414,18 @@ public class JobManager implements Closeable
 		/*
 		 * Iterate through all job tickets and get the associated in-memory job information.
 		 */
-		for (String jobTicket : tickets) {
-			JobData data = _jobsByTicket.get(jobTicket);
-			if (data == null)
-				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+		// LAK: Added mutex on _jobsByTickets to stop the race condition for killing a job while it is being created.
+		synchronized (_jobsByTicket){
+			for (String jobTicket : tickets) {
+				JobData data = _jobsByTicket.get(jobTicket);
+				if (data == null)
+					throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-			data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
-				.format("Request to terminate job from outside the queue").close();
+				data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
+					.format("Request to terminate job from outside the queue").close();
 
-			jobsToKill.add(new Long(data.getJobID()));
+				jobsToKill.add(new Long(data.getJobID()));
+			}
 		}
 
 		/*
