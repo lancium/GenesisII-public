@@ -581,6 +581,7 @@ public class JobManager implements Closeable
 	{
 		/* Find the job in the in-memory maps */
 		JobData job = _jobsByID.get(new Long(jobID));
+		
 		if (job == null) {
 			// don't know where it went, but it's no longer our responsibility.
 			if (_logger.isDebugEnabled())
@@ -590,6 +591,9 @@ public class JobManager implements Closeable
 		synchronized (job) {
 		if (_logger.isDebugEnabled())
 			_logger.debug("Killing a running job:" + jobID);
+		
+		//LAK: Mark the job as killed. This is important if early in the creation phase. This will stop the jobs from being created.
+		job.kill();
 
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database. The reason for this
