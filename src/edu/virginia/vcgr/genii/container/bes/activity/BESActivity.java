@@ -732,6 +732,18 @@ public class BESActivity implements Closeable
 						_currentPhase = _executionPlan.get(_nextPhase);
 						_logger.debug("BES Activity transitition to " + _currentPhase.getPhaseState().toString());
 						updateState(_nextPhase, _currentPhase.getPhaseState());
+						
+						if (_terminateRequested)
+						{
+							if (_currentPhase != null) {
+								//LAK: we ONLY want to skip the phases that are marked as a TerminateableExecutionPhase
+								if (_currentPhase instanceof TerminateableExecutionPhase)
+								{
+									((TerminateableExecutionPhase) _currentPhase).terminate(false);
+									break;
+								}
+							}
+						}
 					}
 
 					try {
