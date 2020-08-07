@@ -79,7 +79,7 @@ public class ResourceUsageDirectory
 			// 2019-06-05 ASG. Changing the nameing scheme for resource usage files to be constant, without 
 			// any random bits. That way we can always stage it out.
 			// File tempFile = File.createTempFile("rusage-", ".xml", _directory);
-			File tempFile = new File(_directory,"rusage.xml");
+			File tempFile = new File(_directory,"rusage.json");
 			tempFile.createNewFile();
 			if (OperatingSystemType.isWindows())
 				tempFile.setWritable(true, false);
