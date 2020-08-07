@@ -23,12 +23,11 @@ import java.util.Vector;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.jsdl.Exact_Type;
+import org.ggf.jsdl.Boundary_Type;
 import org.ggf.jsdl.GPUArchitectureEnumeration;
 import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
-import org.ggf.jsdl.JobIdentification_Type;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Resources_Type;
 import org.morgan.inject.MInject;
@@ -139,7 +138,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
-		String jobAnnotation=null;
 		try {
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
 			String jobName;
@@ -204,18 +202,15 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					}
 					RangeValue_Type gpuCountPerNode = resources.getGPUCountPerNode();
 					if (gpuCountPerNode != null) {
-						Exact_Type[] exactArray = gpuCountPerNode.getExact();
-						if (exactArray != null) {
-							Exact_Type exactValue = exactArray[0];
-							if (exactValue != null) {
-								gpuCount = (int) exactValue.get_value();
-							}
+						Boundary_Type upperBound = gpuCountPerNode.getUpperBoundedRange();
+						if (upperBound != null) {
+							gpuCount = (int) upperBound.get_value();
 						}
 					}
 				}
 			}
 
-			BESActivity activity = bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
+			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
 				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName, executionUnderstanding.getJobAnnotation(), gpuType, gpuCount);
 			
 			if (_logger.isTraceEnabled()) {

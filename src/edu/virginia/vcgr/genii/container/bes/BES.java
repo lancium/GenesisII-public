@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
+import org.ggf.jsdl.Boundary_Type;
 import org.ggf.jsdl.Exact_Type;
 import org.ggf.jsdl.GPUArchitectureEnumeration;
 import org.ggf.jsdl.GPUArchitecture_Type;
@@ -503,12 +504,9 @@ public class BES implements Closeable
 								}
 								RangeValue_Type gpuCountPerNode = resources.getGPUCountPerNode();
 								if (gpuCountPerNode != null) {
-									Exact_Type[] exactArray = gpuCountPerNode.getExact();
-									if (exactArray != null) {
-										Exact_Type exactValue = exactArray[0];
-										if (exactValue != null) {
-											gpuCount = (int) exactValue.get_value();
-										}
+									Boundary_Type upperBound = gpuCountPerNode.getUpperBoundedRange();
+									if (upperBound != null) {
+										gpuCount = (int) upperBound.get_value();
 									}
 								}
 							}
