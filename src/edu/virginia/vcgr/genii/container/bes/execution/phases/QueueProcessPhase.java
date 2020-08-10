@@ -115,6 +115,11 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	@Override
 	public void terminate(boolean countAsFailedAttempt) throws ExecutionException
 	{
+		if(_state == null || _state.isFinalState())
+		{
+			_logger.debug("Called terminate on a job that has already ended. This is likely because the job was terminated before reaching execution.");
+		}
+
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Terminating);
 
 		history.createTraceWriter("BES Terminating Job")
@@ -309,7 +314,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					break;
 				} catch (QueueResultsException | NativeQueueException  exe) {
 					if (secondsWaited==delay){
-						_logger.debug("hit max delay to wait for job to terminate [1]");
 						// ASG 2019-01-13 Ok, if we get here we have been unable to get queue.script.result. That most likely means it disappeared and did not exit.
 						// This can happen if the job is terminated by the scheduling system, or the node died. So we want to throw an exception, though not
 						// necessarily a fatal one.
@@ -328,7 +332,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						}
 					}
 				}	catch (IOException ioe) {
-					_logger.debug("hit max delay to wait for job to terminate [2]");
 					// See comments for catch above, they are the same
 					jobDisapparedFromQueue=true;
 					exitCode=143;

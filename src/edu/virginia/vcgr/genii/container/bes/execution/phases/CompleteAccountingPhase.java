@@ -53,10 +53,12 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 				else {
 					FileSystemUtils.chmod(_finishedDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
 							| FileSystemUtils.MODE_USER_EXECUTE);
-
 				}			
 			}
-			else throw new Throwable("Accounting Dir not there");
+			else
+			{
+				_logger.debug("Accounting Dir not there");
+			}
 
 		} catch (Throwable cause) {
 			history.createErrorWriter(cause, "Unable to move accounting directory.")

@@ -29,16 +29,6 @@ public class ProcessWrapper
 {
 	static private Log _logger = LogFactory.getLog(ProcessWrapper.class);
 
-//	static private JAXBContext _context;
-//
-//	static {
-//		try {
-//			_context = JAXBContext.newInstance(ExitResults.class);
-//		} catch (JAXBException e) {
-//			throw new ConfigurationException("Unable to initialize JAXBContext for ExitResults class.", e);
-//		}
-//	}
-
 	static public ExitResults readResults(File file) throws ProcessWrapperException
 	{
 		try
@@ -231,6 +221,12 @@ public class ProcessWrapper
 		@Override
 		public void cancel()
 		{
+			if (_process == null || _process.isAlive() == false)
+			{
+				_logger.debug("Cancel called on a fork/exec job that is not running. This job was probably terminated before it reached execution.");
+				return;
+			}
+
 			synchronized (_lockObject) {
 				_done = true;
 				if (_process != null) {

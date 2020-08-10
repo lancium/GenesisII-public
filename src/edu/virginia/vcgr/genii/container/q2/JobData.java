@@ -49,10 +49,10 @@ public class JobData
 
 	private Object _jobActionLock = new Object();
 
-	/**
-	 * An internal flag used to indicate that the job has been killed and needs to be cleaned up.
-	 */
-	private boolean _killed;
+//	/**
+//	 * An internal flag used to indicate that the job has been killed and needs to be cleaned up.
+//	 */
+//	private boolean _killed;
 
 	/**
 	 * The number of attempts that have unsuccessfully tried to run this job.
@@ -139,7 +139,7 @@ public class JobData
 		Long besID, HistoryContext history, int numOfCores, long besQueueTime, long besStartTime, EndpointReferenceType EPR)
 	{
 		_jobName = jobName;
-		_killed = false;
+//		_killed = false;
 		_jobID = jobID;
 		_jobTicket = jobTicket;
 		_priority = priority;
@@ -248,7 +248,7 @@ public class JobData
 		_historyToken = historyToken;
 	}
 
-	public boolean killed()
+/*	public boolean killed()
 	{
 		return _killed;
 	}
@@ -256,7 +256,7 @@ public class JobData
 	public void kill()
 	{
 		_killed = true;
-	}
+	}*/
 
 	public long getJobID()
 	{
@@ -354,7 +354,7 @@ public class JobData
 
 	synchronized public void resetJob() {
 		_runAttempts=0;
-		_killed = false;
+//		_killed = false;
 		_jobState=QueueStates.REQUEUED;
 		clearBESID();
 	}

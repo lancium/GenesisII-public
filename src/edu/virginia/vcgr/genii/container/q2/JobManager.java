@@ -68,6 +68,7 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
+import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -592,8 +593,8 @@ public class JobManager implements Closeable
 		if (_logger.isDebugEnabled())
 			_logger.debug("Killing a running job:" + jobID);
 		
-		//LAK: Mark the job as killed. This is important if early in the creation phase. This will stop the jobs from being created.
-		job.kill();
+//		//LAK: Mark the job as killed. This is important if early in the creation phase. This will stop the jobs from being created.
+//		job.kill();
 
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database. The reason for this
@@ -2455,7 +2456,7 @@ public class JobManager implements Closeable
 			 * so it will have to check this flag and abort (or kill) as necessary.
 			 */
 			if (jobData.getJobState().equals(QueueStates.STARTING)) {
-				jobData.kill();
+//				jobData.kill();
 			} else if (jobData.getJobState().equals(QueueStates.RUNNING)) {
 				/*
 				 * If the job is running, we have to finish the job (which will kill it for us)
@@ -2611,12 +2612,14 @@ public class JobManager implements Closeable
 					/*
 					 * If the thing was marked as killed, then we simply won't start it. Instead, we will finish it early.
 					 */
-					if (data.killed()) {
-						history.debug("Job Terminated Before Create");
 
-						finishJob(_jobID);
-						return;
-					}
+				//LAK: Removed as we no longer need to manually clean up these jobs
+//					if (data.killed()) {
+//						history.error("Job Terminated Before Create." + data.getJobTicket());
+//
+//						finishJob(_jobID);
+//						return;
+//					}
 				// TEMP }
 
 
@@ -2701,8 +2704,12 @@ public class JobManager implements Closeable
 					 * Finally, we check one last time to see if it was "killed" while we were starting it. If so, then we will immediately
 					 * kill it and finish it.
 					 */
-					if (data.killed())
-						finishJob(_jobID);
+//					if (data.killed())
+//					{
+//						_logger.error("We are about to finishJob on a job that has been flagged as killed. " + data.getJobTicket());
+//						finishJob(_jobID);
+//					}
+						
 					// TEMP }
 			} catch (Throwable cause) {
 				history.error(cause, "Exception Thrown During Create Activity");
