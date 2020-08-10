@@ -256,7 +256,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 			scratchPath = _scratchFS.getMountPoint();
 			// pre-remove the scratch link before the working dir cleanup hits it.
 			cleanups.add(new CleanupPhase(new File(getWorkingDirectory().getWorkingDirectory().toString(), "scratch")));
-		}			
+		}
 		_logger.info("scratch path found for working dir to use is: " + scratchPath);
 		ret.add(new CreateWorkingDirectoryPhase(getWorkingDirectory(), scratchPath));
 
@@ -399,6 +399,9 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		// CompleteAccountingPhase(File accountingDirectory, File finishedDir)
 		ret.add(new CompleteAccountingPhase(accountingDirectory,finishedDir));
 		// End of accounting dir updates
+		
+		//LAK: Delete job working directory
+		cleanups.add(new CleanupPhase(new File(getWorkingDirectory().getWorkingDirectory().toString())));
 		
 		ret.addAll(cleanups);
 		return ret;

@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.client.bes;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 
 public interface ExecutionPhase
-{
+{	
 	public ActivityState getPhaseState();
 
 	// 2020 August 04 by CCH: Ugly hack so each phase has a reference to the BESActivity that is executing that phase
