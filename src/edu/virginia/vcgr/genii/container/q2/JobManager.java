@@ -581,6 +581,7 @@ public class JobManager implements Closeable
 	{
 		/* Find the job in the in-memory maps */
 		JobData job = _jobsByID.get(new Long(jobID));
+		
 		if (job == null) {
 			// don't know where it went, but it's no longer our responsibility.
 			if (_logger.isDebugEnabled())
@@ -591,6 +592,8 @@ public class JobManager implements Closeable
 		if (_logger.isDebugEnabled())
 			_logger.debug("Killing a running job:" + jobID);
 		
+		//LAK: Mark the job as killed. This is important if early in the creation phase. This will stop the jobs from being created.
+		job.kill();
 
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database. The reason for this
@@ -680,6 +683,9 @@ public class JobManager implements Closeable
 		_whenToProcessNotifications = Calendar.getInstance();
 		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
 
+		// LAK: synchronized to keep this from running while createActivity is also running
+		synchronized(_jobsByTicket)
+		{
 		try {
 
 			/*
@@ -796,6 +802,7 @@ public class JobManager implements Closeable
 			if (_logger.isDebugEnabled())
 				_logger.debug("Failed to submit job from jsdl: " + jsdl.toString());
 			throw new ResourceException("Unable to submit job.", ioe);
+		}
 		}
 	}
 
@@ -2577,14 +2584,17 @@ public class JobManager implements Closeable
 		/*
 		 * Iterate through all job tickets and get the associated in-memory job information.
 		 */
-		for (String jobTicket : tickets) {
-			JobData data = _jobsByTicket.get(jobTicket);
-			if (data == null)
-				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+		// LAK: Added mutex on _jobsByTickets to stop the race condition for killing a job while it is being created.
+		synchronized (_jobsByTicket){
+			for (String jobTicket : tickets) {
+				JobData data = _jobsByTicket.get(jobTicket);
+				if (data == null)
+					throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-			data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
-				.format("Request to terminate job from outside the queue").close();
+				data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
+					.format("Request to terminate job from outside the queue").close();
 
+<<<<<<< HEAD
 			jobsToKill.add(new Long(data.getJobID()));
 			if (data.getJobState() == QueueStates.STOPPED) {
 				jobsToResume.add(jobTicket);
@@ -2593,6 +2603,10 @@ public class JobManager implements Closeable
 		
 		if (jobsToResume.size() > 0) {
 			resumeJobs(connection, jobsToResume.toArray(new String[0]));
+=======
+				jobsToKill.add(new Long(data.getJobID()));
+			}
+>>>>>>> master
 		}
 
 		/*
