@@ -19,13 +19,20 @@
 #define GENII_INSTALL_DIR_VAR "GENII_INSTALL_DIR"
 #define GENII_USER_DIR_VAR "GENII_USER_DIR"
 #define FUSE_DEVICE "/dev/fuse"
-#define SLEEP_DURATION 360
 
 #ifdef PWRAP_macosx
 	#define UNMOUNT_BINARY_NAME "umount"
 #else
 	#define UNMOUNT_BINARY_NAME "fusermount"
 #endif
+
+// 2020-07-23 by JAA -- just a quick struct for the CPU info
+// This is currently designed around Intel processors.
+// AMD CPUs may not provide GHz, so changes will be necessary
+typedef struct {
+	char processorType[64]; // This should be enough, let me know. Also, null terminated
+	float GHz; // in GHZ, e.g., 2.5
+} procInfo;
 
 static void commandLineDestructor(void *ptr);
 static char** formCommandLine(const char *executable, LinkedList *arguments);
@@ -35,7 +42,6 @@ static int setupChildEnvironment(HashMap *environmentVariables,
 static void setupEnvironmentVariables(HashMap *environmentVariables);
 static int handlePossibleRedirect(int desiredFD, const char *path, int oflag,
 	mode_t mode);
-static long long toMicroseconds(struct timeval tv);
 static void writeExitResults(const char *path, ExitResults*);
 static int checkMountPoint(const char *mountPoint);
 static int findGridBinary(HashMap *environmentOverload,
@@ -55,69 +61,78 @@ CommandLine *CL=0;
 struct timeval start;
 struct timeval stop;
 pid_t pid;
-int running=1;
-int beingKilled=0;
+int externalKill = 0;
 
-void teardownJob()
-{
-	//we are getting killed
-	int exitCode = -1;
+procInfo getProcInfo(){
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	procInfo p = {};
+	int isIntel = 0;
 
-	//kill vmwrapper or container
-	kill(pid, SIGTERM);
+	FILE *cpuinfo = fopen("/proc/cpuinfo", "rb");
 
-	//wait for vmwrapper/container to terminate
-	waitpid(pid, &exitCode, 0);
+	if (cpuinfo == NULL){
+		perror("Failed to open file");
+		return p;
+	}
+
+	while ((read = getline(&line, &len, cpuinfo)) != -1){
+		if (strstr(line, "vendor_id	:") != NULL){
+			strtok(line, ":\n");
+			char * vendor = strtok(NULL, ":\n");
+			if(strcmp(vendor+1, "GenuineIntel\n") == 0){
+				isIntel = 1;
+			}
+		}
+		if (strstr(line, "model name	:") != NULL){
+			strtok(line, ":\n");
+			char * processor = strtok(NULL, ":\n");
+			if(isIntel){
+				strtok(processor, "@");
+				char * freq = strtok(NULL, "@");
+				snprintf(p.processorType, 64, "%s", processor+1);
+				p.GHz = strtof(freq, NULL);
+			}
+			else{
+				snprintf(p.processorType, 64, "%s", processor+1);
+				p.GHz = 0.0;
+			}
+			break;
+		}
+	}
+	fclose(cpuinfo);
+	return p;
 }
 
-int dumpStats() {
+void dumpStats(int exitCode) {
 /* 2019-05-28 by ASG. dump-stats gets the rusage info and dumps it to a file.
 	Note that it is using global variables. This is unfortunate, but the 
 	only way to get the data into a signal handler.
 */
-	int exitCode=100;
 	struct rusage usage;
-	// Check if it is still running, if not set running=0
-	pid_t tp=waitpid(pid,&exitCode,WNOHANG);
-	if (tp==pid) running=0;
 	getrusage(RUSAGE_CHILDREN,&usage);
-	if (WIFSIGNALED(exitCode))
-		exitCode = 128 + WTERMSIG(exitCode);
-	else
-		exitCode = WEXITSTATUS(exitCode);
 	gettimeofday(&stop, NULL);
-	/*
-	2019-08-22 by ASG. If the child is still running AND being killed,
-	set the exit code to 143. It means the enclosing environment, e.g.,
-	the queueing system is terminating it, likely for too much time, processes, 
-	or memory.
-	*/
-	if (running==1 && beingKilled==1) 
-	{
-		teardownJob();
-		// 2020 May 28 CCH: Changing this error code to 143 to be consistent with bash
-		exitCode=143;
-	}
+
+	procInfo p = getProcInfo();
 	writeExitResults(CL->getResourceUsageFile(CL),
-               	autorelease(createExitResults(exitCode,
-               	toMicroseconds(usage.ru_utime),
-               	toMicroseconds(usage.ru_stime),
-               	(long long)(stop.tv_sec - start.tv_sec) * (1000 * 1000) +
-                       	(long long)(stop.tv_usec - start.tv_usec),
-               	(long long)usage.ru_maxrss * 1024)));
-	return exitCode;
+				autorelease(createExitResults(exitCode,
+				(double)usage.ru_utime.tv_sec + (double)usage.ru_utime.tv_usec / (double) 1000000,
+				(double)usage.ru_stime.tv_sec + (double)usage.ru_stime.tv_usec / (double) 1000000,
+				(double)(stop.tv_sec - start.tv_sec) + (double)(stop.tv_usec - start.tv_usec) / (double) 1000000,
+				(long long)usage.ru_maxrss * 1024,
+				p.processorType)));
 }
 
 void sig_handler(int signo)
 {
 	if (signo == SIGTERM) {
-		beingKilled=1;
-		dumpStats();
+		// LAK: we write out a preliminary dumpStats json file. The reason why we do this is in case our child does not terminate or respond to the SIGTERM, we do not lose the wallclock time.
+		// However, we will NOT get a correct exit code, system/user time, or max memory usage unless the post child termination dumpStats also runs.
+		dumpStats(143);
+		externalKill = 1;
+		kill(pid, SIGTERM);
 	}
-	else if (signo == SIGCHLD) {
-		dumpStats();
-	}
-
 }
 
 int wrapJob(CommandLine *commandLine)
@@ -127,11 +142,10 @@ int wrapJob(CommandLine *commandLine)
 	FuseMounter *mounter = NULL;
 	FuseMount *mount = NULL;
 	char **cmdLine;
-	// 2019--5-27 by ASG. Put in signal handler for SIGTERM
 	CL=commandLine;
+
 	if (signal(SIGTERM, sig_handler) == SIG_ERR)
   		fprintf(stderr, "Can't catch SIGTERM\n");
-	// End updates
 
 	/* Now, if a grid file system was requested, we try and set that up.
 	 */
@@ -210,28 +224,21 @@ int wrapJob(CommandLine *commandLine)
 
 	release(cmdLine);
 
-	/* I am the parent process */
-/*		Old code
-	if (wait4(pid, &exitCode, 0x0, &usage) != pid)
+	dumpStats(228); //create empty rusage file
+
+	waitpid(pid, &exitCode, WUNTRACED);
+
+	if (WIFSIGNALED(exitCode))
+		exitCode = 128 + WTERMSIG(exitCode);
+	else
+		exitCode = WEXITSTATUS(exitCode);
+
+	if(externalKill && exitCode == 0)
 	{
-		fprintf(stderr, "Unable to wait for child to exit.\n");
-		return -1;
+		exitCode = 143; //set to be consistent with bash early termination exit code
 	}
-*/
-	// 2019-05-27 by ASG. Code to deal with the process getting killed and losing 
-	// the accounting records.
-	if (signal(SIGCHLD, sig_handler) == SIG_ERR)
-  		fprintf(stderr, "Can't catch SIGCHLD\n");
-	running=1;
-	int ticks=0;
-	while (running==1 && beingKilled==0) {
-		// 2020-06-05 by ASG .. change the order to dumpstats first, then sleep
-		if ((ticks % SLEEP_DURATION) == 0)
-			exitCode=dumpStats();
-		sleep(1);
-		ticks++;
-	}
-	// End of updates
+
+	dumpStats(exitCode);
 
 	if (mount)
 		mount->unmount(mount);
@@ -376,13 +383,6 @@ int handlePossibleRedirect(int desiredFD, const char *path, int oflag,
 	return 0;
 }
 
-long long toMicroseconds(struct timeval tv)
-{
-	long long ret = tv.tv_usec;
-	ret += (long long)tv.tv_sec * 1000 * 1000;
-	return ret;
-}
-
 void writeExitResults(const char *path, ExitResults *results)
 {
 	FILE *out;
@@ -396,20 +396,19 @@ void writeExitResults(const char *path, ExitResults *results)
 			path);
 	}
 
-	results->toXML(results, out);
+	results->toJson(results, out);
 	fclose(out);
 	// Begin new code
-	// path has the following form /path-stuff/JWD/rusage.xml
+	// path has the following form /path-stuff/JWD/rusage.json
 	//	/A/JWD/C
 	//===== New code 2020-04-16
-	// The path is of the form /<path prefix>/<job-dir-name>/rusage.xml
+	// The path is of the form /<path prefix>/<job-dir-name>/rusage.json
 	// or - /A/B/C    we turn it into
 	//	/A/Accounting/B/C
 //===================
-    	char* token; 
-    	char copy[2048];
+    char* token;
+    char copy[2048];
 	sprintf(copy,"%s",path);
- 
 
 	char *rest=copy;
   	int count=0;
@@ -429,11 +428,6 @@ void writeExitResults(const char *path, ExitResults *results)
 
 	strcat(buf,C);
 // =====================
-
-/*	FILE *f=fopen("/home/dev/debug.txt","a+");
-	fprintf(f,"The directory is: %s\n",buf);
-	fclose(f);
-*/
 	out = fopen(buf, "w+");
 	if (!out)
 	{
@@ -441,10 +435,9 @@ void writeExitResults(const char *path, ExitResults *results)
 			buf);
 	}
 
-	results->toXML(results, out);
+	results->toJson(results, out);
 	fclose(out);
 	//====  end of new code
-
 }
 
 int checkMountPoint(const char *mountPoint)

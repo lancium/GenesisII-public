@@ -39,10 +39,10 @@ public class SLURMQueueState implements NativeQueueState
 		 * (completed), F (failed), TO (timeout), and NF (node failure). See the JOB STATE CODES section below for more information. (Valid
 		 * for jobs only)
 		 */
-		if (symbol.equalsIgnoreCase("PD") || symbol.equalsIgnoreCase("CF") || symbol.equalsIgnoreCase("CG")) {
+		if (symbol.equalsIgnoreCase("PD") || symbol.equalsIgnoreCase("CF")) {
 			// these are considered queued states, since we're not running the job yet.
 			return new SLURMQueueState("Queued", false, false);
-		} else if (symbol.equalsIgnoreCase("R")) {
+		} else if (symbol.equalsIgnoreCase("R") || symbol.equalsIgnoreCase("CG")) {
 			// running is the same as executing.
 			return new SLURMQueueState("Executing", false, false);
 		} else if (symbol.equalsIgnoreCase("CA") || symbol.equalsIgnoreCase("CD")) {

@@ -615,13 +615,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		if (activity2!=null) {
 			try {
 				activity2.terminate();
-				try {
-					GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
-					client.destroy(new Destroy());
-					return new TerminateActivityResponseType(activity, true, null, null);
-				} catch (Throwable cause) {
-					return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
-				}
+				return new TerminateActivityResponseType(activity, true, null, null);
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(e), null);
@@ -630,16 +624,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(e), null);
 			}
 		}
-		// End of new code.
 		else {
-
-			try {
-				GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, activity);
-				client.destroy(new Destroy());
-				return new TerminateActivityResponseType(activity, true, null, null);
-			} catch (Throwable cause) {
-				return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(cause), null);
-			}
+			_logger.error("Activity not found in BES when trying to call terminateActivity.");
+			return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(new Throwable("Activity not found in BES when trying to call terminateActivity.")), null);
 		}
 	}
 
