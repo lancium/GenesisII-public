@@ -2594,19 +2594,15 @@ public class JobManager implements Closeable
 				data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
 					.format("Request to terminate job from outside the queue").close();
 
-<<<<<<< HEAD
-			jobsToKill.add(new Long(data.getJobID()));
-			if (data.getJobState() == QueueStates.STOPPED) {
-				jobsToResume.add(jobTicket);
-			}
-		}
-		
-		if (jobsToResume.size() > 0) {
-			resumeJobs(connection, jobsToResume.toArray(new String[0]));
-=======
 				jobsToKill.add(new Long(data.getJobID()));
+				if (data.getJobState() == QueueStates.STOPPED) {
+					jobsToResume.add(jobTicket);
+				}
 			}
->>>>>>> master
+		
+			if (jobsToResume.size() > 0) {
+				resumeJobs(connection, jobsToResume.toArray(new String[0]));
+			}
 		}
 
 		/*
