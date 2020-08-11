@@ -194,7 +194,6 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 	}
 
 	//check if the executable is a singularity image; if so, we need to switch to a singularity command
-	// char exec_buf[256]; //on ext4 filenames are at most 255 bytes
 	regex_t regex;
 	int reti;
 	reti = regcomp(&regex, ".simg$|.sif$|.img$", REG_EXTENDED);
@@ -208,16 +207,24 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 	{
 		printf("%s is a singularity image\n", *argv);
 
-		// should build equivalent of : singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
+		// OLD: should build equivalent of : singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
+		// NEW: should build equivalent of : singularity checkpoint job_start --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $instance_name $@
 
 		impl->_executable = createStringFromCopy("singularity");
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("run")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--nv")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("checkpoint")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("job_run")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--ipc")));
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--pid")));
+		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--nv")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-c")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--ipc")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--pid")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-B")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(".:/tmp")));
+		char bindings[1024];
+		strcpy(bindings, ".:/tmp,");
+		strncat(bindings, impl->_workingDirectory, 997);
+		strcat(bindings, ":/.checkpoint/");
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(bindings)));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-W")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-H")));
@@ -233,6 +240,9 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 		//we don't want to add the above argument again, so move the argument pointer forward
 		argc--;
 		argv++;
+
+		//this is the job working directory (the instance name)
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(strrchr(impl->_workingDirectory, '/')+1))); //get just the last part of the path
 	}
 	else if (reti == REG_NOMATCH) {
 		printf("%s is not a singularity image\n", *argv);
