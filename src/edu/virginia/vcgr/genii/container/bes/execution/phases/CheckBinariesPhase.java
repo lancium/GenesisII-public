@@ -81,12 +81,25 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		_logger.info("Calculated username: " + userName);
 		
 		String sharedDir = context.getCurrentWorkingDirectory().getWorkingDirectory().getParent().toString();
+
+		//LAK: Check if Lancium image directory exists
+		if (usingLanciumImage)
+		{
+			File lanciumDir = new File(sharedDir+"/Images/Lancium");
+			if (!lanciumDir.exists())
+			{
+				if (_logger.isDebugEnabled())
+					_logger.debug("Lancium Image Directory doesn't exist, creating it... ");
+				lanciumDir.mkdirs();
+			}
+		}
+
 		File userImageDir = new File(sharedDir+"/Images/" + userName);
 		if (_logger.isDebugEnabled())
 			_logger.debug("User Image Directory: " + userImageDir.toString()); 
 		if (!userImageDir.exists()) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("User Image Directory doesn't exist, creating it... "); 
+				_logger.debug("User Image Directory doesn't exist, creating it... ");
 			userImageDir.mkdirs();
 		}
 		if (_logger.isDebugEnabled())
