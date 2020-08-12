@@ -25,9 +25,8 @@ public class TeardownFUSEPhase extends AbstractFUSEPhases
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		long sleepTime = 250L;
 
 		try {

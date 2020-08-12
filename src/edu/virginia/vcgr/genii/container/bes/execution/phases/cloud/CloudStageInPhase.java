@@ -39,9 +39,8 @@ public class CloudStageInPhase extends AbstractCloudExecutionPhase implements Se
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.StageIn);
 
 		history.createInfoWriter("Sending Stage in command").close();

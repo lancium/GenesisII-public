@@ -16,7 +16,7 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.QueueProcessPhase;
 import edu.virginia.vcgr.genii.container.jsdl.personality.common.PosixLikeApplicationUnderstanding;

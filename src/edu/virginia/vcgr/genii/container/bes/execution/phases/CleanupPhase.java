@@ -50,9 +50,8 @@ public class CleanupPhase extends AbstractExecutionPhase implements Serializable
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Cleanup);
 
 		try {

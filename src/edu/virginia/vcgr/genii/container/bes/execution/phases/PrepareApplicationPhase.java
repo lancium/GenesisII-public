@@ -30,9 +30,8 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase implements S
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		File executable = null;
 
 		if (_executable.getFileSystemName() != null) {

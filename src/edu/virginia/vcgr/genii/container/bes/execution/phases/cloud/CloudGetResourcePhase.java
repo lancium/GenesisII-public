@@ -8,7 +8,7 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
@@ -39,9 +39,8 @@ public class CloudGetResourcePhase implements ExecutionPhase, Serializable
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Scheduling);
 

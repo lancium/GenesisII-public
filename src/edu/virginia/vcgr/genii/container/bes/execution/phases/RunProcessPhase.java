@@ -125,9 +125,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		File stderrFile = null;
 		List<String> command, newCmdLine;
 		ProcessWrapperToken token;

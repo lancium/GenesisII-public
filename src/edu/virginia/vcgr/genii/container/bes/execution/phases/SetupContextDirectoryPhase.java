@@ -27,9 +27,8 @@ public class SetupContextDirectoryPhase extends AbstractExecutionPhase
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
 		history.trace("Creating Grid Context");

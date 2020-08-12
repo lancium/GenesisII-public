@@ -137,9 +137,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		}
 	}
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		String stderrPath = null;
 		File resourceUsageFile;
 		// 2019-04-04 ASG. Added to handle jobs disappearing from the queu. We're going to make them as complete for now.

@@ -1,9 +1,9 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.Serializable;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
 
 public abstract class AbstractExecutionPhase implements ExecutionPhase, Serializable
 {

@@ -41,9 +41,8 @@ public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase impleme
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		File lDir = new File(_localDir);
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID = tManage.aquireResource(_activityID);

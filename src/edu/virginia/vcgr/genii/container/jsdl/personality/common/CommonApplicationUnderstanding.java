@@ -8,7 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
-import edu.virginia.vcgr.genii.client.jsdl.personality.common.ApplicationUnderstanding;
+import edu.virginia.vcgr.genii.container.jsdl.personality.common.ApplicationUnderstanding;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.tty.TTYConstants;

@@ -32,9 +32,8 @@ public class SetupFUSEPhase extends AbstractFUSEPhases
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
 		File mountPoint = getMountPoint(context);

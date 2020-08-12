@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.jsdl.personality.common;
+package edu.virginia.vcgr.genii.container.jsdl.personality.common;
 
 import java.util.Vector;
 
@@ -6,7 +6,9 @@ import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.client.jsdl.personality.common.JobUnderstandingContext;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 
 public interface ApplicationUnderstanding
 {

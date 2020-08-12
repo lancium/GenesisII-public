@@ -28,9 +28,8 @@ public class SetupOGRSHPhase extends AbstractExecutionPhase
 	}
 
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		File configFile = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), _configFilename);
 		File contextFile = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), _storedContextFilename);
 		PrintStream config = null;

@@ -37,9 +37,8 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 	}
 	
 	@Override
-	public void execute(ExecutionContext context, Object activityObject) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
-		BESActivity activity = (BESActivity) activityObject;
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
 		history.createTraceWriter("Moving accounting directory").format("Moving accounting directory:  %s", _accountingDir).close();
