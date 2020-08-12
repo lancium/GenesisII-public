@@ -267,6 +267,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
             // End jobName updates
 			generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
 					_numProcessesPerHost, _threadsPerProcess, activity);
+			generateJSDL(tmp, activity);
 
 			// End of updates 2020-04-18
 

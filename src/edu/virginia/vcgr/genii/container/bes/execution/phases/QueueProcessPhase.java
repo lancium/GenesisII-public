@@ -229,6 +229,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				}
 				generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
 						_numProcessesPerHost, _threadsPerProcess, activity);
+				generateJSDL(tmp, activity);
 
 				// End of updates 2020-04-18
 

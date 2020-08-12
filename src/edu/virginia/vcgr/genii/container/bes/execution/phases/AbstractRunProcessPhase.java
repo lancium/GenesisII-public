@@ -102,6 +102,8 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	final protected void generateJSDL(ResourceUsageDirectory dir, BESActivity activity) {
 		File jsdlFile =new File(dir.getAcctDir(),"JSDL.jsdl");
 		try {
 			if (jsdlFile.createNewFile()) {
