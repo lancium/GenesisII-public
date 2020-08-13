@@ -23,9 +23,13 @@ import java.util.Vector;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.jsdl.Boundary_Type;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
-import org.ggf.jsdl.JobIdentification_Type;
+import org.ggf.jsdl.RangeValue_Type;
+import org.ggf.jsdl.Resources_Type;
 import org.morgan.inject.MInject;
 import org.morgan.util.GUID;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -38,7 +42,7 @@ import edu.virginia.vcgr.genii.bes.activity.BESActivityGetErrorResponseType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -50,7 +54,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
-import edu.virginia.vcgr.genii.client.jsdl.personality.common.ExecutionUnderstanding;
+import edu.virginia.vcgr.genii.container.jsdl.personality.common.ExecutionUnderstanding;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -134,7 +138,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
-		String jobAnnotation=null;
 		try {
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
 			String jobName;
@@ -142,7 +145,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 			CloudConfiguration cConfig = ((BESConstructionParameters) cParams).getCloudConfiguration();
 
-			ExecutionUnderstanding executionUnderstanding;
+			ExecutionUnderstanding executionUnderstanding = null;
 		
 			if (cConfig != null) {
 				PersonalityProvider provider = new ExecutionProvider();
@@ -184,11 +187,32 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
 					null));
 			}
+			String gpuType = null;
+			int gpuCount = 0;
+			JobDescription_Type jobDesc = jsdl.getJobDescription(0);
+			if (jobDesc != null) {
+				Resources_Type resources = jobDesc.getResources();
+				if (resources != null) {
+					GPUArchitecture_Type gpuArch = resources.getGPUArchitecture();
+					if (gpuArch != null) {
+						GPUArchitectureEnumeration gpuArchName = gpuArch.getGPUArchitectureName();
+						if (gpuArchName != null) {
+							gpuType = gpuArchName.getValue();
+						}
+					}
+					RangeValue_Type gpuCountPerNode = resources.getGPUCountPerNode();
+					if (gpuCountPerNode != null) {
+						Boundary_Type upperBound = gpuCountPerNode.getUpperBoundedRange();
+						if (upperBound != null) {
+							gpuCount = (int) upperBound.get_value();
+						}
+					}
+				}
+			}
 
 			bes.createActivity(_resource.getConnection(), _resource.getKey().toString(), jsdl, owners, ContextManager.getExistingContext(),
-				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName);
-
-
+				workingDirectory, executionPlan, activityEPR, activityServiceName, jobName, executionUnderstanding.getJobAnnotation(), gpuType, gpuCount);
+			
 			if (_logger.isTraceEnabled()) {
 				_logger.debug("after creating job, context has these creds:\n"
 					+ TransientCredentials.getTransientCredentials(ContextManager.getExistingContext()).toString());

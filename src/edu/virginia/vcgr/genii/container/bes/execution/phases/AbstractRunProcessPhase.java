@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,18 +16,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
 import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
+import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 
 abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
@@ -57,7 +66,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 	}
 
 	final protected void generateProperties(ResourceUsageDirectory dir,String userName, String executable, Double memory, int numProcesses, 
-			int numProcessesPerHost, int threadsPerProcess, String jobName, String jobAnnotation) {
+			int numProcessesPerHost, int threadsPerProcess, BESActivity activity) {
 		File propFile=new File(dir.getAcctDir(),"properties.json");
 		try {
 			if (propFile.createNewFile()) {
@@ -67,7 +76,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 					output = new BufferedWriter(new FileWriter(propFile));
 					output.write("{\n");
 					output.write("\"userName\": \"" + userName + "\",\n");
-					output.write("\"jobName\": \"" + jobName + "\",\n");
+					output.write("\"jobName\": \"" + activity.getJobName()+ "\",\n");
 					Date today = Calendar.getInstance().getTime();
 					output.write("\"date\": \"" + today.toString() + "\",\n");
 					output.write("\"executable\": \"" + executable + "\",\n" ); 
@@ -76,8 +85,10 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 
 					output.write("\"numProcesses\": \"" + numProcesses + "\",\n");
 					output.write("\"NumProcessorsPerHost\": \"" + numProcessesPerHost + "\",\n");
-					output.write("\"threadsPerProcess\": \"" + threadsPerProcess + "\"\n");
-					output.write("\"jobAnnotation\": \"" + jobAnnotation + "\"\n");
+					output.write("\"threadsPerProcess\": \"" + threadsPerProcess + "\",\n");
+					output.write("\"jobAnnotation\": \"" + activity.getJobAnnotation() + "\",\n");
+					output.write("\"gpuType\": \"" + activity.getGPUType() + "\",\n");
+					output.write("\"gpuCount\": \"" + activity.getGPUCount() + "\"\n");
 					output.write("}\n");
 				} catch ( IOException e ) {
 					e.printStackTrace();
@@ -87,11 +98,47 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 					}
 				}
 			}
-
-			else {
-
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	final protected void generateJSDL(ResourceUsageDirectory dir, BESActivity activity) {
+		File jsdlFile =new File(dir.getAcctDir(),"JSDL.jsdl");
+		try {
+			if (jsdlFile.createNewFile()) {
+				// Grab understood JSDL object
+				JobDefinition_Type jsdl = null;
+				jsdl = activity.getJobDefinition();
+				
+				// Serialize the JSDL object. The serializer spits back out a JSDL document
+				Writer writer = new StringWriter();
+				ObjectSerializer.serialize(writer, jsdl, new QName(GenesisIIConstants.GENESISII_NS, "jsdl-document"));
+				writer.flush();
+				String jsdlStr = writer.toString();
+				if (_logger.isDebugEnabled())
+					_logger.debug("JSDL string: " + jsdlStr);
+				
+				// Write JSDL to JSDL.jsdl
+				BufferedWriter output = null;
+				try {           
+					output = new BufferedWriter(new FileWriter(jsdlFile));
+					output.write(jsdlStr);
+				} catch ( IOException e ) {
+					e.printStackTrace();
+				} finally {
+					if ( output != null ) {
+						output.close();
+					}
+				}
 			}
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

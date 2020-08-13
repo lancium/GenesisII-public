@@ -14,6 +14,15 @@ if [ -z "$hidden_genii_dir" ]; then
 	hidden_genii_dir=$HOME/.genesisII-2.0
 fi
 
+singularity_installed=0
+
+if ! command -v singularity &> /dev/null
+then
+    singularity_installed=0
+else
+    singularity_installed=1
+fi
+
 getAdminCredentials()
 {
 	grid login /users/xsede.org/admin --username=admin --password=admin
@@ -38,7 +47,6 @@ oneTimeSetUp()
   fi
 
 	echo "Adding wrappers to bes-activities directory"
-	cp singularity-wrapper.sh $hidden_genii_dir/bes-activities/
 	cp vmwrapper.sh $hidden_genii_dir/bes-activities/
 
   echo "Copying necessary file to Grid namespace:" $RNSPATH
@@ -49,9 +57,16 @@ oneTimeSetUp()
 	echo "Adding image to Images userX's Image dir"
 	grid mkdir -p /home/CCC/Lancium/userX/Images
 	grid chmod -R /home/CCC +rwx /users/xsede.org/userX
-	dropAdminCredentials
-  grid cp local:$PWD/ubuntu18.04.simg grid:/home/CCC/Lancium/userX/Images/ubuntu18.04.simg
-  grid cp local:$PWD/ubuntu18.04.qcow2 grid:/home/CCC/Lancium/userX/Images/ubuntu18.04.qcow2
+    dropAdminCredentials
+    if [ $singularity_installed -eq 0 ]; then
+        echo Singularity not installed!
+        echo Skipping singularity one time setup. 
+    else
+        singularity pull docker://ubuntu:18.04
+        grid cp local:$PWD/ubuntu_18.04.sif grid:/home/CCC/Lancium/userX/Images/ubuntu_18.04.sif
+    fi
+
+    grid cp local:$PWD/ubuntu18.04.qcow2 grid:/home/CCC/Lancium/userX/Images/ubuntu18.04.qcow2
 
 	echo "Adding local FS Images dir"
 	mkdir -p $hidden_genii_dir/bes-activities/Images/userX/
@@ -65,15 +80,20 @@ testQueueResourcesExist()
 
 testSingularityImageJob()
 {
-	submit="$(grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/singularity-image-job.jsdl)"
-	assertEquals "Submitting singularity image job" 0 $?
-	echo "Waiting 15 seconds for job to finish and data to be staged out."
-	sleep 15
-	grid ls grid:$RNSPATH
-	grid cat grid:$RNSPATH/singularity-image-job.out
-	hostname_sleep_output="$(grid cat grid:$RNSPATH/singularity-image-job.out)"
-	echo $hostname_sleep_output | grep -q "singularity-wrapper, image: ../Images/userX/ubuntu18.04.simg, args: /bin/bash inside-container.sh"
-	assertEquals "Image job should be using the wrapper and have the arguments /bin/bash inside-container.sh." 0 $?
+    if [ $singularity_installed -eq 0 ]; then
+        echo Singularity not installed!
+        echo Skipping singularity test!
+    else
+        submit="$(grid qsub $QUEUE_PATH local:$GENERATED_JSDL_FOLDER/singularity-image-job.jsdl)"
+        assertEquals "Submitting singularity image job" 0 $?
+        echo "Waiting 15 seconds for job to finish and data to be staged out."
+        sleep 15
+        grid ls grid:$RNSPATH
+        grid cat grid:$RNSPATH/singularity-image-job.out
+        hostname_sleep_output="$(grid cat grid:$RNSPATH/singularity-image-job.out)"
+        echo $hostname_sleep_output | grep -q "inside container!"
+        assertEquals "Image job should complete normally inside the container" 0 $?
+    fi
 }
 
 testVMImageJob()
@@ -103,6 +123,7 @@ oneTimeTearDown()
 	rm -r $hidden_genii_dir/bes-activities/Images
 	rm $hidden_genii_dir/bes-activities/singularity-wrapper.sh
 	rm $hidden_genii_dir/bes-activities/vmwrapper.sh
+    rm ubuntu_18.04.sif
 }
 
 # load and run shUnit2

@@ -10,6 +10,7 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 
 public class SetupOGRSHPhase extends AbstractExecutionPhase
 {
@@ -27,7 +28,7 @@ public class SetupOGRSHPhase extends AbstractExecutionPhase
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
 		File configFile = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), _configFilename);
 		File contextFile = new File(context.getCurrentWorkingDirectory().getWorkingDirectory(), _storedContextFilename);

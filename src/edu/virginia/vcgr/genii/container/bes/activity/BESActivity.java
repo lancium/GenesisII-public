@@ -23,7 +23,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
@@ -70,11 +70,14 @@ public class BESActivity implements Closeable
 	private String _activityServiceName;
 	private String _jobName;
 	private ActivityRunner _runner;
+	private String _jobAnnotation;
+	private String _gpuType;
+	private int _gpuCount;
 
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
-		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName,
-		boolean suspendRequested, boolean terminateRequested)
+		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
+		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested)
 	{
 		_connectionPool = connectionPool;
 
@@ -89,6 +92,9 @@ public class BESActivity implements Closeable
 
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
+		_jobAnnotation = jobAnnotation;
+		_gpuType = gpuType;
+		_gpuCount = gpuCount;
 
 		_runner = new ActivityRunner(_suspendRequested, _terminateRequested);
 		_policyListener = new PolicyListener();
@@ -250,6 +256,10 @@ public class BESActivity implements Closeable
 	{
 		return _jobName;
 	}
+	public String getJobAnnotation()
+	{
+		return _jobAnnotation;
+	}
 
 	synchronized public void suspend() throws ExecutionException, SQLException
 	{
@@ -380,8 +390,8 @@ public class BESActivity implements Closeable
 		try {
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
 				new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
-				WorkingContext.setCurrentWorkingContext(ctxt);
-			phase.execute(getExecutionContext());
+			WorkingContext.setCurrentWorkingContext(ctxt);
+			phase.execute(getExecutionContext(), this);
 		} finally {
 			WorkingContext.setCurrentWorkingContext(null);
 		}
@@ -626,6 +636,22 @@ public class BESActivity implements Closeable
 			return true;
 		} else
 			return false;
+	}
+
+	public String getGPUType() {
+		return _gpuType;
+	}
+
+	public void setGPUType(String gpuType) {
+		this._gpuType = gpuType;
+	}
+
+	public int getGPUCount() {
+		return _gpuCount;
+	}
+
+	public void setGPUCount(int gpuCount) {
+		this._gpuCount = gpuCount;
 	}
 
 	private class ActivityRunner implements Runnable
