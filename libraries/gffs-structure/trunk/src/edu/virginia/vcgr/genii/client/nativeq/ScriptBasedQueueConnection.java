@@ -112,27 +112,27 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		} finally {
 			StreamUtils.close(ps);
 
-			// hmmm: abstract this as a function in gffs-basics for filesystem helper, but support passing a stream for the output to go to.
-			if (_logger.isDebugEnabled()) {
-				_logger.debug("full script about to be sent is:");
-				int line = 0;
-				BufferedReader br = null;
-				try {
-					FileInputStream fi = new FileInputStream(submitScript);
-					br = new BufferedReader(new InputStreamReader(fi));
-					String text;
-					while ((text = br.readLine()) != null) {
-						line++;
-						_logger.debug(line + ": " + text);
-					}
-				} catch (FileNotFoundException e) {
-					_logger.error("failed to show the contents of the submit script: " + submitScript, e);
-				} catch (IOException e) {
-					_logger.error("IOException while showing contents of the submit script: " + submitScript, e);
-				} finally {
-					StreamUtils.close(br);
-				}
-			}
+//			// hmmm: abstract this as a function in gffs-basics for filesystem helper, but support passing a stream for the output to go to.
+//			if (_logger.isDebugEnabled()) {
+//				_logger.debug("full script about to be sent is:");
+//				int line = 0;
+//				BufferedReader br = null;
+//				try {
+//					FileInputStream fi = new FileInputStream(submitScript);
+//					br = new BufferedReader(new InputStreamReader(fi));
+//					String text;
+//					while ((text = br.readLine()) != null) {
+//						line++;
+//						_logger.debug(line + ": " + text);
+//					}
+//				} catch (FileNotFoundException e) {
+//					_logger.error("failed to show the contents of the submit script: " + submitScript, e);
+//				} catch (IOException e) {
+//					_logger.error("IOException while showing contents of the submit script: " + submitScript, e);
+//				} finally {
+//					StreamUtils.close(br);
+//				}
+//			}
 		}
 	}
 
