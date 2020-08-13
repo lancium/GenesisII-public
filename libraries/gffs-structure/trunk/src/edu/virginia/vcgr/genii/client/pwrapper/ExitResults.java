@@ -6,24 +6,13 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-//@XmlRootElement(name = "exit-results")
 public class ExitResults
 {
-	//@XmlAttribute(name = "exit-code", required = true)
 	private int _exitCode;
-
-	//@XmlElement(name = "user-time", nillable = true, required = true)
 	private ElapsedTime _userTime;
-
-	//@XmlElement(name = "system-time", nillable = true, required = true)
 	private ElapsedTime _kernelTime;
-
-	//@XmlElement(name = "wallclock-time", nillable = true, required = true)
 	private ElapsedTime _wallclockTime;
-
-	//@XmlElement(name = "maximum-rss", nillable = false, required = true)
 	private long _maximumRSS;
-
 	private String _processorID;
 
 	public ExitResults(int exitCode, long userTime, long kernelTime, long wallclockTime, long maxRSS, String processorID)
