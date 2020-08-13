@@ -354,7 +354,22 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			history.info("Job Exited with Exit Code %d", exitCode);
 			if (!jobDisapparedFromQueue && resourceUsageFile != null) {
 				try {
-					ExitResults eResults = ProcessWrapper.readResults(resourceUsageFile);
+					ExitResults eResults;
+					try
+					{
+						eResults = ProcessWrapper.readResults(resourceUsageFile);
+					}
+					catch (ProcessWrapperException e)
+					{
+						// LAK 2020 Aug 12: Since early termination no longer short circuits job execution, we can have the case where the rusage.json file does not exist.
+						// This will happen when the job is terminated before the job starts execution.
+						// In this case, we set the exit code simply to 143 and default ExitResults -
+						// this is consistent with the exit code that the pwrapper would have set if it had run and terminated before job execution
+						// (besides the "None" processor tag).
+						_logger.debug("No exit results found, generating default values");
+						eResults = new ExitResults(143, 0L, 0L, 0L, 0L, "None");
+					}
+					
 					exitCode = eResults.exitCode();
 
 					AccountingService acctService = ContainerServices.findService(AccountingService.class);
@@ -374,9 +389,9 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						//	history.info("Job wallclocktime is: " + eResults.wallclockTime().toString() + " and the job executed with %d procesoors", _numProcesses);
 					}
 
-				} catch (ProcessWrapperException pwe) {
-					history.warn(pwe, "Error Acquiring Accounting Info");
-					throw new IgnoreableFault("Error trying to read resource usage information.", pwe);
+				} catch (Exception e) {
+					history.warn(e, "Error While Handling Accounting Info");
+					throw new IgnoreableFault("Unhandled error trying to handle resource usage information.", e);
 				}
 			}
 

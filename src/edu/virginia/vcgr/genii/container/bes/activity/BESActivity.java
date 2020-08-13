@@ -680,6 +680,7 @@ public class BESActivity implements Closeable
 				_suspendRequested = false;
 				_terminateRequested = true;
 
+				//LAK: 2020 Aug 13: We have to call this to interrupt any terminateable phase that is currently running
 				if (_currentPhase != null) {
 					if (_currentPhase instanceof TerminateableExecutionPhase)
 						((TerminateableExecutionPhase) _currentPhase).terminate(countAsFailedAttempt);
