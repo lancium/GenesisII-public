@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.downloadmgr.DownloadManagerContainerService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -61,7 +62,8 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable {
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
+	{
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.StageIn);
 		history.createInfoWriter("Entered CheckBinariesPhase...");
 		String[] _execNameArray = _execName.split("/");
@@ -79,12 +81,25 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		_logger.info("Calculated username: " + userName);
 		
 		String sharedDir = context.getCurrentWorkingDirectory().getWorkingDirectory().getParent().toString();
+
+		//LAK: Check if Lancium image directory exists
+		if (usingLanciumImage)
+		{
+			File lanciumDir = new File(sharedDir+"/Images/Lancium");
+			if (!lanciumDir.exists())
+			{
+				if (_logger.isDebugEnabled())
+					_logger.debug("Lancium Image Directory doesn't exist, creating it... ");
+				lanciumDir.mkdirs();
+			}
+		}
+
 		File userImageDir = new File(sharedDir+"/Images/" + userName);
 		if (_logger.isDebugEnabled())
 			_logger.debug("User Image Directory: " + userImageDir.toString()); 
 		if (!userImageDir.exists()) {
 			if (_logger.isDebugEnabled())
-				_logger.debug("User Image Directory doesn't exist, creating it... "); 
+				_logger.debug("User Image Directory doesn't exist, creating it... ");
 			userImageDir.mkdirs();
 		}
 		if (_logger.isDebugEnabled())

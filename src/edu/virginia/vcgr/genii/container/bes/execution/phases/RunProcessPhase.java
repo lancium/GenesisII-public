@@ -34,6 +34,7 @@ import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperToken;
 import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
 import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -63,8 +64,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 	private Map<String, String> _environment;
 	transient private ProcessWrapperToken _process = null;
 	private String _processLock = new String();
-	private String _jobName=null;
-	private String _jobAnnotation=null;
 	transient private Boolean _hardTerminate = null;
 	transient private boolean _countAsFailedAttempt = true;
 
@@ -77,7 +76,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
-		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters, String jobName, String jobAnnotation)
+		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
 
@@ -86,8 +85,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
 		_threadsPerProcess = threadsPerProcess;
-		_jobName=jobName;
-		_jobAnnotation=jobAnnotation;
 		// 2020-04-21 by ASG. Need to set these to a default of 1
 		if (numProcesses==null) {
 			_numProcesses=new Integer(1);
@@ -128,7 +125,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
 		File stderrFile = null;
 		List<String> command, newCmdLine;
@@ -159,7 +156,13 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
 				// 2020 May 26 CCH, execName might be in the form Lancium/image.simg which is why we're splitting execName up here
 				String[] execNameArray = execName.split("/");
-				boolean usingLanciumImage = (execNameArray[0].equals("Lancium"));
+				boolean usingLanciumImage = false;
+				if (execNameArray.length >= 2)
+					usingLanciumImage = execNameArray[execNameArray.length-2].equals("Lancium");
+				if (_logger.isDebugEnabled()) {
+					_logger.debug("Second to last element in execNameArray: " + execNameArray[execNameArray.length-2]);
+					_logger.debug("Using Lancium image? " + usingLanciumImage);
+				}
 				execName = execNameArray[execNameArray.length-1];
 				String imageDir = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + userName + "/";
 				if (_logger.isDebugEnabled())
@@ -170,9 +173,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				// Assigning the appropriate wrapper as the executable
 				if (imagePath.endsWith(".qcow2")) {
 					execName = "../vmwrapper.sh";
-				}
-				else {
-					execName = "../singularity-wrapper.sh";
 				}
 				_executable = new File(workingDirectory, execName);
 				if (_logger.isDebugEnabled())
@@ -259,7 +259,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
             {                             
             	try {
             		FileWriter myWriter = new FileWriter(hostName);
-            		myWriter.write(_jobName+"\n");
+            		myWriter.write(activity.getJobName()+"\n");
             		myWriter.close();
             	} catch (IOException e) {
             		System.out.println("An error occurred writting the HOSTNAME file.");
@@ -268,7 +268,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
             }
             // End jobName updates
 			generateProperties(tmp,userName,_executable.getAbsolutePath(), _memory, _numProcesses,
-					_numProcessesPerHost, _threadsPerProcess, _jobName, _jobAnnotation);
+					_numProcessesPerHost, _threadsPerProcess, activity);
+			generateJSDL(tmp, activity);
 
 			// End of updates 2020-04-18
 

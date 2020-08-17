@@ -17,7 +17,7 @@ import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
@@ -25,10 +25,10 @@ import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLMatchException;
-import edu.virginia.vcgr.genii.client.jsdl.personality.common.ApplicationUnderstanding;
+import edu.virginia.vcgr.genii.container.jsdl.personality.common.ApplicationUnderstanding;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.DataStagingUnderstanding;
-import edu.virginia.vcgr.genii.client.jsdl.personality.common.ExecutionUnderstanding;
+import edu.virginia.vcgr.genii.container.jsdl.personality.common.ExecutionUnderstanding;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.JobUnderstandingContext;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.ResourceConstraints;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
@@ -373,7 +373,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		JobUnderstandingContext jobContext = new JobUnderstandingContext(fuseMountPoint, resourceConstraints, jobName);
 
 		if (_application != null)
-			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext, _jobAnnotation);
+			_application.addExecutionPhases(creationProperties, ret, cleanups, jobContext);
 
 		for (DataStagingUnderstanding stage : _stageOuts) {
 			File stageFile = _fsManager.lookup(stage.getFilePath());
@@ -416,6 +416,5 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 			out.close();
 		} catch (Exception e) {
 		}
-
 	}
 }

@@ -8,8 +8,9 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 
 public class CloudGenerateJobFilePhase implements ExecutionPhase, Serializable
 {
@@ -34,7 +35,7 @@ public class CloudGenerateJobFilePhase implements ExecutionPhase, Serializable
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
 		FileOutputStream fOut = new FileOutputStream(_workingDir + _jobFile);
 		ObjectOutputStream oOut = new ObjectOutputStream(fOut);
