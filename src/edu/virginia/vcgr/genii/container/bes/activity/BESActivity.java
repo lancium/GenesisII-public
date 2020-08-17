@@ -71,7 +71,6 @@ public class BESActivity implements Closeable
 	private String _jobName;
 	private ActivityRunner _runner;
 
-
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName,
 		boolean suspendRequested, boolean terminateRequested)
@@ -270,6 +269,13 @@ public class BESActivity implements Closeable
 		if (_runner != null)
 			_runner.requestTerminate(false);
 	}
+	
+	synchronized public void stopExecutionThread() throws ExecutionException, SQLException
+	{
+		updateState(false, true);
+		if(_runner != null)
+			_runner.requestDestrution();
+	}
 
 	synchronized public void resume() throws ExecutionException, SQLException
 	{
@@ -398,7 +404,9 @@ public class BESActivity implements Closeable
 			TopicPath topicPath;
 
 			if (state.isFinalState())
+			{
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC;
+			}
 			else
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TOPIC;
 
@@ -632,6 +640,7 @@ public class BESActivity implements Closeable
 	{
 		private boolean _terminateRequested = false;
 		private boolean _suspendRequested = false;
+		private boolean _destroyRequested = false;
 
 		private boolean _suspended = false;
 
@@ -680,13 +689,27 @@ public class BESActivity implements Closeable
 				_suspendRequested = false;
 				_terminateRequested = true;
 
-				//LAK: 2020 Aug 13: We have to call this to interrupt any terminateable phase that is currently running
-				if (_currentPhase != null) {
-					if (_currentPhase instanceof TerminateableExecutionPhase)
-						((TerminateableExecutionPhase) _currentPhase).terminate(countAsFailedAttempt);
+				//LAK: 2020 Aug 13: We have to call this to interrupt any terminateable phase that is currently running.
+				if (_currentPhase != null && _currentPhase instanceof TerminateableExecutionPhase) {
+					((TerminateableExecutionPhase) _currentPhase).terminate(countAsFailedAttempt);
 				} else {
 					_phaseLock.notify();
 				}
+			}
+		}
+		
+		//LAK 2020 Aug 17: Since we removed _terminateRequested causing this thread to exit.
+		//We had to add a new flag to have it exit immediately when job short-circuiting is required. 
+		//Currently this is only used for requeuing jobs since we don't continue with the normal job cycle
+		//and instead immediately destroy the job. This should replicate the previous behavior seem when terminate
+		//was called in the past. 
+		public void requestDestrution() throws ExecutionException
+		{
+			synchronized (_phaseLock)
+			{
+				_suspendRequested = false;
+				_terminateRequested = false;
+				_destroyRequested = true;
 			}
 		}
 
@@ -752,7 +775,13 @@ public class BESActivity implements Closeable
 							}
 						}
 					}
-
+					
+					synchronized(_phaseLock)
+					{
+						if(_destroyRequested)
+							return;
+					}
+					
 					try {
 						execute(_currentPhase);
 					} catch (QueueResultsException qre) {
@@ -768,6 +797,8 @@ public class BESActivity implements Closeable
 					}
 
 					synchronized (_phaseLock) {
+						if(_destroyRequested)
+							return;
 						_currentPhase = null;
 						updateState(_nextPhase + 1, _state);
 					}

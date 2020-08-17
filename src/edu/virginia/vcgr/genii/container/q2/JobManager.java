@@ -541,8 +541,6 @@ public class JobManager implements Closeable
 		 */
 //		QueueStates _newState=QueueStates.FINISHED;
 		if (besName != null) {
-			_logger.debug("We are inside finishJob and the besName is not null. This means that we need to delete this activity from the bes by calling destroyJob");
-			
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Creating a JobKiller for finished job %s to clean up.", job));
 
@@ -600,10 +598,10 @@ public class JobManager implements Closeable
 		String besName = null;
 		if (besID != null)
 			besName = _besManager.getBESName(besID);
-		
-		// LAK 2020 Aug 13: This event doesn't change the QueueState so we don't need to call the schedulerEvent notify
+
 		_outcallThreadPool.enqueue(new JobKiller(job, job.getJobState(), besName, besID, true, false));
-//		_schedulingEvent.notifySchedulingEvent();
+
+		_schedulingEvent.notifySchedulingEvent();
 		}
 	}
 
@@ -655,11 +653,10 @@ public class JobManager implements Closeable
 		_whenToProcessNotifications = Calendar.getInstance();
 		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
 
-		// LAK: synchronized to keep this from running while createActivity is also running
-		synchronized(_jobsByTicket)
-		{
 		try {
-
+			// LAK: synchronized to keep this from running while createActivity is also running
+			synchronized(_jobsByTicket)
+			{
 			/*
 			 * Go ahead and get the current caller's calling context. We store this so that we can make outcalls in the future on his/her
 			 * behalf.
@@ -741,7 +738,6 @@ public class JobManager implements Closeable
 			if (_logger.isTraceEnabled())
 				_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
-
 			/*
 			 * Added by ASG 4/25/2016. Add the username, and start/finish to the job record.
 			 */
@@ -770,11 +766,11 @@ public class JobManager implements Closeable
 			_schedulingEvent.notifySchedulingEvent();
 
 			return ticket;
+			}
 		} catch (IOException ioe) {
 			if (_logger.isDebugEnabled())
 				_logger.debug("Failed to submit job from jsdl: " + jsdl.toString());
 			throw new ResourceException("Unable to submit job.", ioe);
-		}
 		}
 	}
 
@@ -2429,6 +2425,10 @@ public class JobManager implements Closeable
 				if (jobData.getJobState().equals(QueueStates.STARTING) || jobData.getJobState().equals(QueueStates.RUNNING)) {
 					killJob(connection, jobID);
 				}
+				else if (jobData.getJobState().equals(QueueStates.QUEUED))
+				{
+					finishJob(jobID);
+				}
 				else if (jobData.getJobState().isFinalState()) {
 					_logger.debug("killJobs called on job that is already finished");
 				}
@@ -2806,8 +2806,6 @@ public class JobManager implements Closeable
 			 */
 			KillInformation killInfo = _database.getKillInfo(connection, _jobData.getJobID(), _besID);
 			connection.commit();
-			
-			_logger.error("Job EPR is = " + killInfo.getJobEndpoint() + " inside terminateActivity");
 
 			String oldAction = _jobData.currentJobAction();
 			while (oldAction != null) {
@@ -2865,16 +2863,11 @@ public class JobManager implements Closeable
 		{
 			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
 
-			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("JobKiller in \"destroyActivity\" for %s.", _jobData));
-
 			/*
 			 * Ask the database for all information needed to destroy the activity at the BES container.
 			 */
 			KillInformation destroyInfo = _database.getKillInfo(connection, _jobData.getJobID(), _besID);
 			connection.commit();
-			
-			_logger.error("Job EPR is = " + destroyInfo.getJobEndpoint() + " inside destroyActivity");
 
 			try {
 				history.category(HistoryEventCategory.Terminating);
@@ -2939,21 +2932,6 @@ public class JobManager implements Closeable
 					_jobData.setJobState(_newState);
 					_jobData.clearBESID();
 				}
-
-//				/* If the job is running, then we have to terminate it */
-//				if (_jobData.getJobState().equals(QueueStates.RUNNING)) {
-//					if (_logger.isDebugEnabled())
-//						_logger.debug(String.format("JobKiller has to terminate %s because the job is marked as running.", _jobData));
-//					terminateActivity(connection);
-//				}
-				
-//				if (_newState.equals(QueueStates.REQUEUED)) {
-//					
-//					//LAK: 2020 Aug 13: Since we are REQUEUED, we need to make sure we actually delete the old bes activity (REQUEUED is an immediate kill). This is done with calling terminateActivity again.
-//					if (_logger.isDebugEnabled())
-//						_logger.debug("Cleaning up old activity before putting job back into queue.");
-//					destroyActivity(connection);
-//				}
 
 				/*
 				 * If we were asked to re-queue the job, then put it back in the queued jobs list.

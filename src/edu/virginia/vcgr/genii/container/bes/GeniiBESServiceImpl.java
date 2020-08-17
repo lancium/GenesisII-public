@@ -616,7 +616,6 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		BESActivity activity2 = ownerBES.findActivity(rKey);
 		if (activity2!=null) {
 			try {
-				_logger.error("WE ARE IN TERMINATE ACTIVITY. ONLY CALLING TERMINATE ON ACTIVITY");
 				activity2.terminate();
 				return new TerminateActivityResponseType(activity, true, null, null);
 			} catch (ExecutionException e) {
@@ -657,6 +656,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		_logger.debug("destroying activity: " + activity.getJobName());
 		
 		try {
+			//LAK 2020 Aug 17: We need to explicitly tell the activity to stop the job execution (since terminate no longer does this)
+			// If we did not call this, the job would continue to execute its phases which puts the job in a strange state.
+			activity.stopExecutionThread();
 			GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, epr);
 			client.destroy(new Destroy());
 			return new DestroyActivityResponseType(epr, true, null, null);

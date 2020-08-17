@@ -115,9 +115,13 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	@Override
 	public void terminate(boolean countAsFailedAttempt) throws ExecutionException
 	{
-		if(_state == null || _state.isFinalState())
+		if (_state == null)
 		{
-			_logger.debug("Called terminate on a job that has already ended. This is likely because the job was terminated before reaching execution.");
+			_logger.debug("Calling terminate on the job before execution.");
+		}
+		else if(_state.isFinalState())
+		{
+			_logger.debug("Called terminate on a job that has already ended.");
 		}
 
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Terminating);
@@ -323,7 +327,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						// available we will pick it up in getExitCode.
 						jobDisapparedFromQueue=true;
 						exitCode=143;
-						context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
+						context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
 						if (lastState == null || !lastState.equals(_state.toString())) {
 							if (_logger.isDebugEnabled())
 								_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
@@ -335,7 +339,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					// See comments for catch above, they are the same
 					jobDisapparedFromQueue=true;
 					exitCode=143;
-					context.updateState(new ActivityState(ActivityStateEnumeration.Finished, _state.toString(), false));
+					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
 					if (lastState == null || !lastState.equals(_state.toString())) {
 						if (_logger.isDebugEnabled())
 							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
@@ -369,7 +373,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						_logger.debug("No exit results found, generating default values");
 						eResults = new ExitResults(143, 0L, 0L, 0L, 0L, "None");
 					}
-					
+
 					exitCode = eResults.exitCode();
 
 					AccountingService acctService = ContainerServices.findService(AccountingService.class);
