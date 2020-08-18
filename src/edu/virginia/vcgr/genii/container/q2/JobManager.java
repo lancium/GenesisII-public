@@ -2575,14 +2575,6 @@ public class JobManager implements Closeable
 					/*
 					 * If the thing was marked as killed, then we simply won't start it. Instead, we will finish it early.
 					 */
-
-				//LAK: Removed as we no longer need to manually clean up these jobs
-//					if (data.killed()) {
-//						history.error("Job Terminated Before Create." + data.getJobTicket());
-//
-//						finishJob(_jobID);
-//						return;
-//					}
 				// TEMP }
 
 
@@ -2663,15 +2655,6 @@ public class JobManager implements Closeable
 					// TEMP data = _jobsByID.get(new Long(_jobID));
 					data.setJobState(QueueStates.RUNNING);
 
-					/*
-					 * Finally, we check one last time to see if it was "killed" while we were starting it. If so, then we will immediately
-					 * kill it and finish it.
-					 */
-//					if (data.killed())
-//					{
-//						_logger.error("We are about to finishJob on a job that has been flagged as killed. " + data.getJobTicket());
-//						finishJob(_jobID);
-//					}
 						
 					// TEMP }
 			} catch (Throwable cause) {

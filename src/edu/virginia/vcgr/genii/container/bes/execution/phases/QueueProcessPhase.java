@@ -112,15 +112,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 	@Override
 	public void terminate(boolean countAsFailedAttempt) throws ExecutionException
 	{
-		if (_state == null)
-		{
-			_logger.debug("Calling terminate on the job before execution.");
-		}
-		else if(_state.isFinalState())
-		{
-			_logger.debug("Called terminate on a job that has already ended.");
-		}
-
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Terminating);
 
 		history.createTraceWriter("BES Terminating Job")

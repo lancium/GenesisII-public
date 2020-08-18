@@ -58,7 +58,7 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 			}
 			else
 			{
-				_logger.debug("Accounting Dir not there");
+				_logger.debug("Accounting directory is not there. The job was likely early terminated.");
 			}
 
 		} catch (Throwable cause) {
