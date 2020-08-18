@@ -24,6 +24,7 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
@@ -73,6 +74,8 @@ public class BESActivity implements Closeable
 	private String _jobAnnotation;
 	private String _gpuType;
 	private int _gpuCount;
+	//LAK 2020 Aug 18: This is set to true when the execution environment is fully setup before the phase is executed
+	private boolean _executionContextSet = false;
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
@@ -284,7 +287,7 @@ public class BESActivity implements Closeable
 	{
 		updateState(false, true);
 		if(_runner != null)
-			_runner.requestDestrution();
+			_runner.requestDestruction();
 	}
 
 	synchronized public void resume() throws ExecutionException, SQLException
@@ -397,8 +400,10 @@ public class BESActivity implements Closeable
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
 				new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
 			WorkingContext.setCurrentWorkingContext(ctxt);
+			_executionContextSet = true;
 			phase.execute(getExecutionContext(), this);
 		} finally {
+			_executionContextSet = false;
 			WorkingContext.setCurrentWorkingContext(null);
 		}
 	}
@@ -706,6 +711,28 @@ public class BESActivity implements Closeable
 			return true;
 		}
 
+		//LAK 2020 Aug 18: This method will handle creating a working context for the terminate call if execute() has not already ran (and done so).
+		private boolean setupWorkingContextForTerminate()
+		{
+			if (_executionContextSet)
+			{
+				return false;
+			}
+			else
+			{
+				_logger.debug("Having to generate a working context before calling terminate.");
+				try {
+					WorkingContext ctxt = createWorkingContext();
+					ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
+							new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
+					WorkingContext.setCurrentWorkingContext(ctxt);
+				} catch (SQLException | ResourceUnknownFaultType | ResourceException e1) {
+					_logger.error("Error while creating a working context in BESActivity:terminate.");
+				}
+				return true;
+			}
+		}
+
 		public void requestTerminate(boolean countAsFailedAttempt) throws ExecutionException
 		{
 			synchronized (_phaseLock) {
@@ -717,8 +744,21 @@ public class BESActivity implements Closeable
 
 				//LAK: 2020 Aug 13: We have to call this to interrupt any terminateable phase that is currently running.
 				if (_currentPhase != null && _currentPhase instanceof TerminateableExecutionPhase) {
-					((TerminateableExecutionPhase) _currentPhase).terminate(countAsFailedAttempt);
-				} else {
+					boolean selfManagedContext = false;
+					try
+					{
+						//if setupWorkingContextForTerminate returns true, then this means that we have to also clear the created context
+						selfManagedContext = setupWorkingContextForTerminate();
+						((TerminateableExecutionPhase) _currentPhase).terminate(countAsFailedAttempt);
+					}
+					finally
+					{
+						if (selfManagedContext)
+							WorkingContext.setCurrentWorkingContext(null);
+					}
+				}
+				else
+				{
 					_phaseLock.notify();
 				}
 			}
@@ -727,9 +767,9 @@ public class BESActivity implements Closeable
 		//LAK 2020 Aug 17: Since we removed _terminateRequested causing this thread to exit.
 		//We had to add a new flag to have it exit immediately when job short-circuiting is required. 
 		//Currently this is only used for requeuing jobs since we don't continue with the normal job cycle
-		//and instead immediately destroy the job. This should replicate the previous behavior seem when terminate
+		//and instead immediately destroy the job. This should replicate the previous behavior seen when terminate
 		//was called in the past. 
-		public void requestDestrution() throws ExecutionException
+		public void requestDestruction() throws ExecutionException
 		{
 			synchronized (_phaseLock)
 			{
@@ -789,10 +829,22 @@ public class BESActivity implements Closeable
 							if (_currentPhase != null) {
 								_logger.debug("about to check if currentPhase=" + _currentPhase.getPhaseState() + " is a TerminateableExecutionPhase");
 								//LAK: we ONLY want to skip the phases that are marked as a TerminateableExecutionPhase
-								if (_currentPhase instanceof TerminateableExecutionPhase)
-								{
-									_logger.debug("currentPhase=" + _currentPhase.getPhaseState() + " is a TerminateableExecutionPhase; calling terminate on it");
-									((TerminateableExecutionPhase) _currentPhase).terminate(false);
+								if (_currentPhase instanceof TerminateableExecutionPhase) {
+									//check if there is a valid current working context
+									boolean selfManagedContext = false;
+									try
+									{
+										selfManagedContext = setupWorkingContextForTerminate();
+										((TerminateableExecutionPhase) _currentPhase).terminate(false);
+									}
+									finally
+									{
+										if (selfManagedContext)
+										{
+											WorkingContext.setCurrentWorkingContext(null);
+										}
+									}
+									
 									//LAK: Now we want to just skip to the next phase
 									_currentPhase = null;
 									updateState(_nextPhase + 1, _state);
