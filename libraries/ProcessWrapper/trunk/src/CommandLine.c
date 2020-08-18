@@ -206,8 +206,6 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 	reti = regexec(&regex, *argv, 0, NULL, 0);
 	if (!reti)
 	{
-		printf("%s is a singularity image\n", *argv);
-
 		// should build equivalent of : singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
 
 		impl->_executable = createStringFromCopy("singularity");
@@ -235,7 +233,6 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 		argv++;
 	}
 	else if (reti == REG_NOMATCH) {
-		printf("%s is not a singularity image\n", *argv);
 		impl->_executable = createStringFromCopy(*argv);
 		argc--;
 		argv++;
