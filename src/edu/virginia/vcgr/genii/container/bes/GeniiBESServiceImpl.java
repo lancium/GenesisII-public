@@ -763,6 +763,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		String commandToSend = activityid + " thaw";
 		return new ResumeActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
 	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
 	public DestroyActivitiesResponseType destroyActivities(DestroyActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
