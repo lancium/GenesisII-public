@@ -21,6 +21,9 @@ import org.ggf.bes.factory.ActivityDocumentType;
 import org.ggf.bes.factory.BasicResourceAttributesDocumentType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
+import org.ggf.bes.factory.DestroyActivitiesResponseType;
+import org.ggf.bes.factory.DestroyActivitiesType;
+import org.ggf.bes.factory.DestroyActivityResponseType;
 import org.ggf.bes.factory.FactoryResourceAttributesDocumentType;
 import org.ggf.bes.factory.GetActivityDocumentResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsResponseType;
@@ -601,12 +604,11 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 		return new TerminateActivitiesResponseType(responses.toArray(new TerminateActivityResponseType[0]), null);
 	}
-
+	
+	// LAK 2020 Aug 13: we are early terminating. We call terminate on the activity to have it shut itself down. This function no longer "finishes" jobs anymore.
+	// This function previously played the role that the new function destroyActivity now does.
 	static public TerminateActivityResponseType terminateActivity(EndpointReferenceType activity) throws RemoteException
 	{
-		// 2020-06-07 by ASG - changing how we terminate activities from the outside; now we directly the activity.terminate function if
-		// it "lives in this container.
-
 		AddressingParameters aps = new AddressingParameters(activity.getReferenceParameters());
 
 		String rKey=aps.getResourceKey();
@@ -627,6 +629,41 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		else {
 			_logger.error("Activity not found in BES when trying to call terminateActivity.");
 			return new TerminateActivityResponseType(activity, false, BESFaultManager.constructFault(new Throwable("Activity not found in BES when trying to call terminateActivity.")), null);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public DestroyActivitiesResponseType destroyActivities(DestroyActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		Collection<DestroyActivityResponseType> responses = new LinkedList<DestroyActivityResponseType>();
+
+		for (EndpointReferenceType aepr : parameters.getActivityIdentifier()) {
+			responses.add(destroyActivity(aepr));
+		}
+
+		return new DestroyActivitiesResponseType(responses.toArray(new DestroyActivityResponseType[0]), null);
+	}
+	
+	static public DestroyActivityResponseType destroyActivity(EndpointReferenceType epr) throws RemoteException
+	{
+		AddressingParameters aps = new AddressingParameters(epr.getReferenceParameters());
+		String rKey=aps.getResourceKey();
+		BES ownerBES=BES.findBESForActivity(rKey);
+		BESActivity activity = ownerBES.findActivity(rKey);
+		
+		_logger.debug("destroying activity: " + activity.getJobName());
+		
+		try {
+			//LAK 2020 Aug 17: We need to explicitly tell the activity to stop the job execution (since terminate no longer does this)
+			// If we did not call this, the job would continue to execute its phases which puts the job in a strange state.
+			activity.stopExecutionThread();
+			GeniiCommon client = ClientUtils.createProxy(GeniiCommon.class, epr);
+			client.destroy(new Destroy());
+			return new DestroyActivityResponseType(epr, true, null, null);
+		} catch (Throwable cause) {
+			return new DestroyActivityResponseType(epr, false, BESFaultManager.constructFault(cause), null);
 		}
 	}
 

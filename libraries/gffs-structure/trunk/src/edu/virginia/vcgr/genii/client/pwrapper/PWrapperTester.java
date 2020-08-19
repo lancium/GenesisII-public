@@ -16,7 +16,7 @@ public class PWrapperTester
 				try {
 					System.err.println(token.results());
 				} catch (ProcessWrapperException pwe) {
-					pwe.printStackTrace(System.err);
+					System.err.println(new ExitResults(143, 0L, 0L, 0L, 0L, "None"));
 				}
 			}
 		});

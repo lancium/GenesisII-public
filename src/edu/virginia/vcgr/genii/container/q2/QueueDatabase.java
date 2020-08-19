@@ -900,7 +900,7 @@ public class QueueDatabase
 	 * @throws ResourceException
 	 */
 	public void completeJobs(Connection connection, Collection<Long> jobIDs) throws SQLException, ResourceException
-	{
+	{		
 		PreparedStatement stmt1 = null;
 		PreparedStatement stmt2 = null;
 		PreparedStatement stmt3 = null;

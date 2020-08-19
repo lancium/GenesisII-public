@@ -7,6 +7,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.cservices.percall.AttemptScheduler;
+import edu.virginia.vcgr.genii.container.cservices.percall.BESActivityDestroyActor;
 import edu.virginia.vcgr.genii.container.cservices.percall.BESActivityTerminatorActor;
 import edu.virginia.vcgr.genii.container.cservices.percall.ExponentialBackoffScheduler;
 import edu.virginia.vcgr.genii.container.cservices.percall.PersistentOutcallContainerService;
@@ -36,4 +37,10 @@ class PersistentOutcallJobKiller
 		return PersistentOutcallContainerService.schedulePersistentOutcall(
 			new BESActivityTerminatorActor(historyKey, historyToken, besName, activity), SCHEDULER(), bes, context);
 	}
+	
+	static boolean destroyJob(EndpointReferenceType bes, EndpointReferenceType activity, ICallingContext context)
+		{
+			return PersistentOutcallContainerService.schedulePersistentOutcall(
+				new BESActivityDestroyActor(activity), SCHEDULER(), bes, context);
+		}
 }

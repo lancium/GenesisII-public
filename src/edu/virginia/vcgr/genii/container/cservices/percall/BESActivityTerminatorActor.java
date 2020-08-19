@@ -59,7 +59,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 	public boolean enactOutcall(ICallingContext callingContext, EndpointReferenceType target, GeniiAttachment attachment) throws Throwable
 	{
 		if (_logger.isDebugEnabled())
-			_logger.debug("Persistent Outcall Actor attempting to kill a bes activity.");
+			_logger.debug("Persistent Outcall Actor attempting to terminate a bes activity.");
 
 		Closeable assumedContextToken = null;
 
@@ -103,7 +103,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 				}
 			}
 
-			// Now, go ahead and kill it.
+			// Now, go ahead and terminate it.
 			TerminateActivitiesResponseType resp =
 				bes.terminateActivities(new TerminateActivitiesType(new EndpointReferenceType[] { _activityEPR }, null));
 			if (resp != null) {
@@ -115,7 +115,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 				}
 			}
 
-			_logger.warn("Tried to kill activity, but didn't get right number of response values back.");
+			_logger.warn("Tried to terminate activity, but didn't get right number of response values back.");
 			return false;
 		} finally {
 			StreamUtils.close(assumedContextToken);
