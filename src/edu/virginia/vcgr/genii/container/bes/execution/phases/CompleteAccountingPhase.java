@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
@@ -36,7 +37,7 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 	}
 	
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity);
 
@@ -53,10 +54,12 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 				else {
 					FileSystemUtils.chmod(_finishedDir.getAbsolutePath(), FileSystemUtils.MODE_USER_READ | FileSystemUtils.MODE_USER_WRITE
 							| FileSystemUtils.MODE_USER_EXECUTE);
-
 				}			
 			}
-			else throw new Throwable("Accounting Dir not there");
+			else
+			{
+				_logger.debug("Accounting directory is not there. The job was likely early terminated.");
+			}
 
 		} catch (Throwable cause) {
 			history.createErrorWriter(cause, "Unable to move accounting directory.")

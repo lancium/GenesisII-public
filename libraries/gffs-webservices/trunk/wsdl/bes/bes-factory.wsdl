@@ -70,6 +70,24 @@
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
 			</xsd:complexType>
 			
+			<xsd:complexType name="DestroyActivitiesType">
+				<xsd:sequence>
+					<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="DestroyActivitiesResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:DestroyActivityResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
 			<xsd:complexType name="GetActivityDocumentsType">
 				<xsd:sequence>
 					<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"
@@ -260,6 +278,10 @@
 				type="bes-factory:TerminateActivitiesType"/>
 			<xsd:element name="TerminateActivitiesResponse"
 				type="bes-factory:TerminateActivitiesResponseType"/>
+			<xsd:element name="DestroyActivities"
+				type="bes-factory:DestroyActivitiesType"/>
+			<xsd:element name="DestroyActivitiesResponse"
+				type="bes-factory:DestroyActivitiesResponseType"/>
 			<xsd:element name="GetActivityDocuments"
 				type="bes-factory:GetActivityDocumentsType"/>
 			<xsd:element name="GetActivityDocumentsResponse"
@@ -342,6 +364,16 @@
 	<wsdl:message name="TerminateActivitiesResponse">
 		<wsdl:part name="parameters"
 			element="bes-factory:TerminateActivitiesResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="DestroyActivitiesRequest">
+		<wsdl:part name="parameters"
+			element="bes-factory:DestroyActivities"/>
+	</wsdl:message>
+	
+	<wsdl:message name="DestroyActivitiesResponse">
+		<wsdl:part name="parameters"
+			element="bes-factory:DestroyActivitiesResponse"/>
 	</wsdl:message>
 	
 	<wsdl:message name="GetActivityDocumentsRequest">
@@ -486,6 +518,21 @@
 				name="TerminateActivitiesResponse"
 				message="bes-factory:TerminateActivitiesResponse"
 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/TerminateActivitiesResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="DestroyActivities">
+			<wsdl:input
+				name="DestroyActivities"
+				message="bes-factory:DestroyActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/DestroyActivities"/>
+			<wsdl:output
+				name="DestroyActivitiesResponse"
+				message="bes-factory:DestroyActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/DestroyActivitiesResponse"/>
 			<wsdl:fault
 				name="UnknownActivityIdentifierFault"
 				message="bes-factory:UnknownActivityIdentifierFault"

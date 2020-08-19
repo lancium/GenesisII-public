@@ -23,7 +23,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
+import org.ggf.jsdl.Boundary_Type;
+import org.ggf.jsdl.Exact_Type;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
+import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.ggf.jsdl.JobDescription_Type;
+import org.ggf.jsdl.JobIdentification_Type;
+import org.ggf.jsdl.RangeValue_Type;
+import org.ggf.jsdl.Resources_Type;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -32,8 +40,7 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
-import edu.virginia.vcgr.genii.client.bes.ExecutionException;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -397,8 +404,8 @@ public class BES implements Closeable
 	}
 
 	synchronized public BESActivity createActivity(Connection parentConnection, String activityid, JobDefinition_Type jsdl,
-			Collection<Identity> owners, ICallingContext callingContext, BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan,
-			EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName) throws SQLException, ResourceException
+		Collection<Identity> owners, ICallingContext callingContext, BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan,
+		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName, String jobAnnotation, String gpuType, int gpuCount) throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -437,7 +444,7 @@ public class BES implements Closeable
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-					activityServiceName, jobName, false, false, _ipport);
+				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, _ipport);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -512,8 +519,8 @@ public class BES implements Closeable
 
 		try {
 			stmt = connection
-					.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-							+ "nextphase, activityservicename, jobname, ipport " + "FROM besactivitiestable WHERE besid = ?");
+				.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
+					+ "nextphase, activityservicename, jobname, jsdl, ipport " + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
@@ -538,11 +545,54 @@ public class BES implements Closeable
 					int nextPhase = rs.getInt(7);
 					String activityServiceName = rs.getString(8);
 					String jobName = rs.getString(9);
-					String ipport = rs.getString(10);
+					
+					// 2020 August 5 by CCH - Part of BES dataflow cleanup`
+					// The plan: Put everything (jobName, jobAnnotation, gpuCount + Type, etc) into BESActivity and pass reference to activity to each phase
+					// Because jobAnnotation is now being stored in the BESActivity rather than in the phases we need to reload it from the JSDL
+					// Previously, we wouldn't need to reload it because it would already be in the phases inside the executionPlan
+					String jobAnnotation = null;
+					String gpuType = null;
+					int gpuCount = 0;
+					JobDefinition_Type jsdl = DBSerializer.xmlFromBlob(JobDefinition_Type.class, rs.getBlob(10));
+					if (jsdl !=null) {
+						JobDescription_Type jobDesc = jsdl.getJobDescription(0);
+						if (jobDesc != null) {
+							JobIdentification_Type jobID=jobDesc.getJobIdentification();
+							if (jobID!=null) {
+								String []annotations=jobID.getJobAnnotation();
+								if (annotations!=null) {
+									jobAnnotation=jobID.getJobAnnotation(0);
+								}
+							}
+							Resources_Type resources = jobDesc.getResources();
+							if (resources != null) {
+								GPUArchitecture_Type gpuArch = resources.getGPUArchitecture();
+								if (gpuArch != null) {
+									GPUArchitectureEnumeration gpuArchName = gpuArch.getGPUArchitectureName();
+									if (gpuArchName != null) {
+										gpuType = gpuArchName.getValue();
+									}
+								}
+								RangeValue_Type gpuCountPerNode = resources.getGPUCountPerNode();
+								if (gpuCountPerNode != null) {
+									Boundary_Type upperBound = gpuCountPerNode.getUpperBoundedRange();
+									if (upperBound != null) {
+										gpuCount = (int) upperBound.get_value();
+									}
+								}
+							}
+						}
+					}
+					if (_logger.isDebugEnabled()) {
+						_logger.debug("Job annotation: " + jobAnnotation +". For job " + activityid +".");
+						_logger.debug("GPU type: " + gpuType +". For job " + activityid +".");
+						_logger.debug("GPU count: " + gpuCount +". For job " + activityid +".");
+					}
+					String ipport = rs.getString(11);
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, suspendRequested, terminateRequested, ipport);
+							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, ipport);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);

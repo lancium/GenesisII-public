@@ -205,11 +205,9 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 	reti = regexec(&regex, *argv, 0, NULL, 0);
 	if (!reti)
 	{
-		printf("%s is a singularity image\n", *argv);
-
 		// OLD: should build equivalent of : singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
 		// NEW: should build equivalent of : singularity checkpoint job_start --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $instance_name $@
-
+		// should build equivalent of : singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
 		impl->_executable = createStringFromCopy("singularity");
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("checkpoint")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("job_run")));
@@ -245,7 +243,6 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(strrchr(impl->_workingDirectory, '/')+1))); //get just the last part of the path
 	}
 	else if (reti == REG_NOMATCH) {
-		printf("%s is not a singularity image\n", *argv);
 		impl->_executable = createStringFromCopy(*argv);
 		argc--;
 		argv++;

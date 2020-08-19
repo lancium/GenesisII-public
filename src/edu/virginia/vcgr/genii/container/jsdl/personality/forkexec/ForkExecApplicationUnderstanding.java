@@ -19,7 +19,7 @@ import edu.virginia.vcgr.genii.client.jsdl.DirBasedGridFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PassiveStreamRedirectionDescription;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.RunProcessPhase;
@@ -41,7 +41,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 
 	@Override
 	public void addExecutionPhases(BESConstructionParameters creationProperties, Vector<ExecutionPhase> executionPlan,
-		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext, String jobAnnotation, String BESipaddr) throws JSDLException
+		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext) throws JSDLException
 	{
 		File fuseMountPoint = jobContext.getFuseMountPoint();
 
@@ -78,6 +78,6 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		}
 		executionPlan.add(new RunProcessPhase(fuseMountPoint, getSPMDVariation(),getMemory(), getNumProcesses(), getNumProcessesPerHost(),
 			getThreadsPerProcess(), BESActivityServiceImpl.getCommonDirectory(creationProperties), fsManager.lookup(getExecutable()),
-			stringArgs.toArray(new String[0]), stringEnv, redirection, creationProperties,jobContext.getJobName(), jobAnnotation));
+			stringArgs.toArray(new String[0]), stringEnv, redirection, creationProperties));
 	}
 }

@@ -6,7 +6,7 @@
         </JobIdentification>
         <Application>
             <ns2:POSIXApplication>
-                <ns2:Executable>ubuntu18.04.simg</ns2:Executable>
+                <ns2:Executable>ubuntu_18.04.sif</ns2:Executable>
 								<ns2:Argument>/bin/bash</ns2:Argument>
                 <ns2:Argument>inside-container.sh</ns2:Argument>
                 <ns2:Output>image-job.out</ns2:Output>

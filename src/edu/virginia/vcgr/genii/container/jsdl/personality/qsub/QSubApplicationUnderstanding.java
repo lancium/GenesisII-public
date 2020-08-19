@@ -16,7 +16,7 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.QueueProcessPhase;
 import edu.virginia.vcgr.genii.container.jsdl.personality.common.PosixLikeApplicationUnderstanding;
@@ -35,7 +35,7 @@ class QSubApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 
 	@Override
 	public void addExecutionPhases(BESConstructionParameters creationProperties, Vector<ExecutionPhase> executionPlan,
-		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext, String jobAnnotation, String BESipaddr) throws JSDLException
+		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext) throws JSDLException
 	{
 		File fuseMountPoint = jobContext.getFuseMountPoint();
 
@@ -63,6 +63,6 @@ class QSubApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		executionPlan.add(new QueueProcessPhase(fuseMountPoint, getSPMDVariation(), jobContext.getResourceConstraints().getTotalPhysicalMemory(), getNumProcesses(), getNumProcessesPerHost(),
 			getThreadsPerProcess(), fsManager.lookup(getExecutable()), stringArgs, stringEnv, fsManager.lookup(getStdinRedirect()),
 			fsManager.lookup(getStdoutRedirect()), fsManager.lookup(getStderrRedirect()), creationProperties,
-			jobContext.getResourceConstraints(), jobContext.getJobName(),jobAnnotation)); 
+			jobContext.getResourceConstraints())); 
 	}
 }

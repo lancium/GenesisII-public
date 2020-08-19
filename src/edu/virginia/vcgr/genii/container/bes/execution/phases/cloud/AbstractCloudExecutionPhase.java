@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import com.jcraft.jsch.JSchException;
 
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;

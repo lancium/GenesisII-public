@@ -12,6 +12,7 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 
 public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase implements Serializable
 {
@@ -36,7 +37,7 @@ public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase implem
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
 
 		CloudManager tManage = CloudMonitor.getManager(_besid);

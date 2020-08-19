@@ -27,7 +27,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
-import edu.virginia.vcgr.genii.client.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
@@ -75,11 +75,15 @@ public class BESActivity implements Closeable
 	private String _jobName;
 	private ActivityRunner _runner;
 	private String _IPPort;
-
+	private String _jobAnnotation;
+	private String _gpuType;
+	private int _gpuCount;
+	//LAK 2020 Aug 18: This is set to true when the execution environment is fully setup before the phase is executed
+	private boolean _executionContextSet = false;
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
-		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName,
-		boolean suspendRequested, boolean terminateRequested, String IPPort)
+		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
+		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested, String IPPort)
 	{
 		_connectionPool = connectionPool;
 
@@ -95,6 +99,9 @@ public class BESActivity implements Closeable
 
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
+		_jobAnnotation = jobAnnotation;
+		_gpuType = gpuType;
+		_gpuCount = gpuCount;
 
 		_runner = new ActivityRunner(_suspendRequested, _terminateRequested);
 		_policyListener = new PolicyListener();
@@ -297,6 +304,10 @@ public class BESActivity implements Closeable
 		}
 		return success;
 	}
+	public String getJobAnnotation()
+	{
+		return _jobAnnotation;
+	}
 
 	synchronized public void suspend() throws ExecutionException, SQLException
 	{
@@ -316,6 +327,13 @@ public class BESActivity implements Closeable
 		updateState(false, true);
 		if (_runner != null)
 			_runner.requestTerminate(false);
+	}
+	
+	synchronized public void stopExecutionThread() throws ExecutionException, SQLException
+	{
+		updateState(false, true);
+		if(_runner != null)
+			_runner.requestDestruction();
 	}
 
 	synchronized public void resume() throws ExecutionException, SQLException
@@ -453,9 +471,11 @@ public class BESActivity implements Closeable
 		try {
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
 				new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
-				WorkingContext.setCurrentWorkingContext(ctxt);
-			phase.execute(getExecutionContext());
+			WorkingContext.setCurrentWorkingContext(ctxt);
+			_executionContextSet = true;
+			phase.execute(getExecutionContext(), this);
 		} finally {
+			_executionContextSet = false;
 			WorkingContext.setCurrentWorkingContext(null);
 		}
 	}
@@ -471,7 +491,9 @@ public class BESActivity implements Closeable
 			TopicPath topicPath;
 
 			if (state.isFinalState())
+			{
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC;
+			}
 			else
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TOPIC;
 
@@ -701,10 +723,27 @@ public class BESActivity implements Closeable
 			return false;
 	}
 
+	public String getGPUType() {
+		return _gpuType;
+	}
+
+	public void setGPUType(String gpuType) {
+		this._gpuType = gpuType;
+	}
+
+	public int getGPUCount() {
+		return _gpuCount;
+	}
+
+	public void setGPUCount(int gpuCount) {
+		this._gpuCount = gpuCount;
+	}
+
 	private class ActivityRunner implements Runnable
 	{
 		private boolean _terminateRequested = false;
 		private boolean _suspendRequested = false;
+		private boolean _destroyRequested = false;
 
 		private boolean _suspended = false;
 
@@ -744,6 +783,28 @@ public class BESActivity implements Closeable
 			return true;
 		}
 
+		//LAK 2020 Aug 18: This method will handle creating a working context for the terminate call if execute() has not already ran (and done so).
+		private boolean setupWorkingContextForTerminate()
+		{
+			if (_executionContextSet)
+			{
+				return false;
+			}
+			else
+			{
+				_logger.debug("Having to generate a working context before calling terminate.");
+				try {
+					WorkingContext ctxt = createWorkingContext();
+					ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
+							new ResourceKey(_activityServiceName, new AddressingParameters(_activityid, null, null)));
+					WorkingContext.setCurrentWorkingContext(ctxt);
+				} catch (SQLException | ResourceUnknownFaultType | ResourceException e1) {
+					_logger.error("Error while creating a working context in BESActivity:terminate.");
+				}
+				return true;
+			}
+		}
+
 		public void requestTerminate(boolean countAsFailedAttempt) throws ExecutionException
 		{
 			synchronized (_phaseLock) {
@@ -753,12 +814,40 @@ public class BESActivity implements Closeable
 				_suspendRequested = false;
 				_terminateRequested = true;
 
-				if (_currentPhase != null) {
-					if (_currentPhase instanceof TerminateableExecutionPhase)
+				//LAK: 2020 Aug 13: We have to call this to interrupt any terminateable phase that is currently running.
+				if (_currentPhase != null && _currentPhase instanceof TerminateableExecutionPhase) {
+					boolean selfManagedContext = false;
+					try
+					{
+						//if setupWorkingContextForTerminate returns true, then this means that we have to also clear the created context
+						selfManagedContext = setupWorkingContextForTerminate();
 						((TerminateableExecutionPhase) _currentPhase).terminate(countAsFailedAttempt);
-				} else {
+					}
+					finally
+					{
+						if (selfManagedContext)
+							WorkingContext.setCurrentWorkingContext(null);
+					}
+				}
+				else
+				{
 					_phaseLock.notify();
 				}
+			}
+		}
+		
+		//LAK 2020 Aug 17: Since we removed _terminateRequested causing this thread to exit.
+		//We had to add a new flag to have it exit immediately when job short-circuiting is required. 
+		//Currently this is only used for requeuing jobs since we don't continue with the normal job cycle
+		//and instead immediately destroy the job. This should replicate the previous behavior seen when terminate
+		//was called in the past. 
+		public void requestDestruction() throws ExecutionException
+		{
+			synchronized (_phaseLock)
+			{
+				_suspendRequested = false;
+				_terminateRequested = false;
+				_destroyRequested = true;
 			}
 		}
 
@@ -806,19 +895,43 @@ public class BESActivity implements Closeable
 						_logger.debug("BES Activity transitition to " + _currentPhase.getPhaseState().toString());
 						updateState(_nextPhase, _currentPhase.getPhaseState());
 						
+						_logger.debug("checking terminate requested flag before executing plan=" + _currentPhase.getPhaseState() + " with _terminateRequested=" + _terminateRequested);
 						if (_terminateRequested)
 						{
 							if (_currentPhase != null) {
+								_logger.debug("about to check if currentPhase=" + _currentPhase.getPhaseState() + " is a TerminateableExecutionPhase");
 								//LAK: we ONLY want to skip the phases that are marked as a TerminateableExecutionPhase
-								if (_currentPhase instanceof TerminateableExecutionPhase)
-								{
-									((TerminateableExecutionPhase) _currentPhase).terminate(false);
-									break;
+								if (_currentPhase instanceof TerminateableExecutionPhase) {
+									//check if there is a valid current working context
+									boolean selfManagedContext = false;
+									try
+									{
+										selfManagedContext = setupWorkingContextForTerminate();
+										((TerminateableExecutionPhase) _currentPhase).terminate(false);
+									}
+									finally
+									{
+										if (selfManagedContext)
+										{
+											WorkingContext.setCurrentWorkingContext(null);
+										}
+									}
+									
+									//LAK: Now we want to just skip to the next phase
+									_currentPhase = null;
+									updateState(_nextPhase + 1, _state);
+									continue;
 								}
 							}
 						}
 					}
-
+					
+					synchronized(_phaseLock)
+					{
+						if(_destroyRequested)
+							return;
+					}
+					
 					try {
 						execute(_currentPhase);
 					} catch (QueueResultsException qre) {
@@ -834,6 +947,8 @@ public class BESActivity implements Closeable
 					}
 
 					synchronized (_phaseLock) {
+						if(_destroyRequested)
+							return;
 						_currentPhase = null;
 						updateState(_nextPhase + 1, _state);
 					}

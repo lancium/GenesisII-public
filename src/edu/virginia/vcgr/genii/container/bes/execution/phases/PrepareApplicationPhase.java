@@ -10,6 +10,7 @@ import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.container.appmgr.ApplicationManager;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 
 public class PrepareApplicationPhase extends AbstractExecutionPhase implements Serializable
 {
@@ -29,7 +30,7 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase implements S
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
 		File executable = null;
 

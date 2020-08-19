@@ -18,6 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
+import org.ggf.bes.factory.DestroyActivitiesResponseType;
+import org.ggf.bes.factory.DestroyActivitiesType;
 import org.ggf.bes.factory.GetActivityDocumentResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsType;
@@ -608,7 +610,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		try {
 			String jobTicket = getJobTicketFromActivityEPR(activity);
 			killJobs(new String[] { jobTicket });
-			completeJobs(new String[] { jobTicket });
+//			completeJobs(new String[] { jobTicket });
 			terminated = true;
 		} catch (Throwable cause) {
 			fault = new Fault(new QName("http://tempuri.org", "fault"), cause.getLocalizedMessage(), null, null);
@@ -783,6 +785,13 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
 		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	//LAK 2020 Aug 13: This is a stub that should not be implemented in the queue.
+	@Override
+	public DestroyActivitiesResponseType destroyActivities(DestroyActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

@@ -11,6 +11,7 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
@@ -49,7 +50,7 @@ public class CleanupPhase extends AbstractExecutionPhase implements Serializable
 	}
 
 	@Override
-	public void execute(ExecutionContext context) throws Throwable
+	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.Cleanup);
 
