@@ -444,7 +444,7 @@ public class BES implements Closeable
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, _ipport);
+				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, false, _ipport);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -591,8 +591,11 @@ public class BES implements Closeable
 					String ipport = rs.getString(11);
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
+					
+					// TODO: Add persisted column to DB
+					boolean persistRequested = false;
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, ipport);
+							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, persistRequested, ipport);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);

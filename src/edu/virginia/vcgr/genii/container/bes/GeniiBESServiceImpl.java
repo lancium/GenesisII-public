@@ -657,7 +657,6 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	public PersistActivitiesResponseType persistActivities(PersistActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		_logger.debug("persistActivities called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
 		Collection<PersistActivityResponseType> responses = new LinkedList<PersistActivityResponseType>();
 
 		for (String aepr : parameters.getActivityIdentifier()) {
@@ -673,7 +672,20 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		if (bes == null)
 			return new PersistActivityResponseType(activityid, false, null, null);
 		String commandToSend = activityid + " persist";
-		return new PersistActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
+		boolean success = bes.sendCommand(activityid, commandToSend);
+		if (success) {
+			BESActivity activity = bes.findActivity(activityid);
+			if (activity!=null) {
+				try {
+					activity.persist();
+				} catch (ExecutionException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					success = false;
+				}
+			}
+		}
+		return new PersistActivityResponseType(activityid, success, null, null);
 	}
 	
 	@Override
@@ -701,7 +713,6 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	public RestartActivitiesResponseType restartActivities(RestartActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		_logger.debug("restartActivities called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
 		Collection<RestartActivityResponseType> responses = new LinkedList<RestartActivityResponseType>();
 
 		for (String path : parameters.getPath()) {
@@ -711,8 +722,20 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		return new RestartActivitiesResponseType(responses.toArray(new RestartActivityResponseType[0]), null);
 	}
 
-	static public RestartActivityResponseType restartActivity(String path) throws RemoteException
+	static public RestartActivityResponseType restartActivity(String activityid) throws RemoteException
 	{
+		BES bes = BES.findBESForActivity(activityid);
+		if (bes == null)
+			return new RestartActivityResponseType("", "", null, null);
+		BESActivity activity = bes.findActivity(activityid);
+		if (activity!=null)
+			try {
+				activity.restart();
+			} catch (ExecutionException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		// TODO: Change RestartActivityResponseType to take (activityid, true, null, null); 
 		return new RestartActivityResponseType("", "", null, null);
 	}
 	
@@ -745,7 +768,6 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	public ResumeActivitiesResponseType resumeActivities(ResumeActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		_logger.debug("resumeActivities called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");
 		Collection<ResumeActivityResponseType> responses = new LinkedList<ResumeActivityResponseType>();
 
 		for (String aepr : parameters.getActivityIdentifier()) {

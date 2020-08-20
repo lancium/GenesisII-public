@@ -48,6 +48,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.AbstractRunProcessPhase;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -68,6 +69,7 @@ public class BESActivity implements Closeable
 	private ActivityState _state;
 	private boolean _suspendRequested;
 	private boolean _terminateRequested;
+	public boolean _persistRequested;
 	private BESWorkingDirectory _activityCWD;
 	private Vector<ExecutionPhase> _executionPlan;
 	private int _nextPhase;
@@ -81,9 +83,10 @@ public class BESActivity implements Closeable
 	//LAK 2020 Aug 18: This is set to true when the execution environment is fully setup before the phase is executed
 	private boolean _executionContextSet = false;
 
+
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
-		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested, String IPPort)
+		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested, boolean persistRequested, String IPPort)
 	{
 		_connectionPool = connectionPool;
 
@@ -99,6 +102,7 @@ public class BESActivity implements Closeable
 
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
+		_persistRequested = persistRequested;
 		_jobAnnotation = jobAnnotation;
 		_gpuType = gpuType;
 		_gpuCount = gpuCount;
@@ -106,7 +110,11 @@ public class BESActivity implements Closeable
 		_runner = new ActivityRunner(_suspendRequested, _terminateRequested);
 		_policyListener = new PolicyListener();
 		_bes.getPolicyEnactor().addBESPolicyListener(_policyListener);
-
+		
+		startRunner();
+	}
+	
+	public void startRunner() {
 		if (!handleFinishedCase()) {
 			Thread thread = new Thread(_runner, "BES Activity Runner Thread");
 			thread.setDaemon(true);
@@ -327,6 +335,28 @@ public class BESActivity implements Closeable
 		updateState(false, true);
 		if (_runner != null)
 			_runner.requestTerminate(false);
+	}
+
+	synchronized public void persist() throws ExecutionException, SQLException
+	{
+		if (_persistRequested)
+			return;
+
+		// TODO: Add persisted column to DB
+		//updateState(false, true);
+		if (_runner != null)
+			_runner.requestPersist();
+	}
+	
+	synchronized public void restart() throws ExecutionException, SQLException
+	{
+		if (!_persistRequested)
+			return;
+
+		// TODO: Add persisted column to DB
+		//updateState(false, true);
+		if (_runner != null)
+			_runner.requestRestart();
 	}
 	
 	synchronized public void stopExecutionThread() throws ExecutionException, SQLException
@@ -836,6 +866,39 @@ public class BESActivity implements Closeable
 			}
 		}
 		
+		// 2020 August 20 by CCH
+		// requestPersist sets a boolean, _persisted to true
+		// During the execution loop, if _persisted is true, we won't proceed to the next phase.
+		public void requestPersist() throws ExecutionException
+		{
+			synchronized (_phaseLock) {
+				if (_persistRequested)
+					return;
+
+				_persistRequested = true;
+				_terminateRequested = true;
+			}
+		}
+		
+		public void requestRestart() throws ExecutionException
+		{
+			synchronized (_phaseLock) {
+				if (!_persistRequested)
+					return;
+
+				_persistRequested = false;
+				_terminateRequested = false;
+				
+				ExecutionPhase currentPhase = _runner._currentPhase;
+				
+				if (currentPhase instanceof AbstractRunProcessPhase) {
+					_executionPlan.insertElementAt(currentPhase, _nextPhase);
+				}
+				
+				startRunner();
+			}
+		}
+		
 		//LAK 2020 Aug 17: Since we removed _terminateRequested causing this thread to exit.
 		//We had to add a new flag to have it exit immediately when job short-circuiting is required. 
 		//Currently this is only used for requeuing jobs since we don't continue with the normal job cycle
@@ -901,6 +964,7 @@ public class BESActivity implements Closeable
 							if (_currentPhase != null) {
 								_logger.debug("about to check if currentPhase=" + _currentPhase.getPhaseState() + " is a TerminateableExecutionPhase");
 								//LAK: we ONLY want to skip the phases that are marked as a TerminateableExecutionPhase
+								//CCH: Only skip this phase if we don't want to persist
 								if (_currentPhase instanceof TerminateableExecutionPhase) {
 									//check if there is a valid current working context
 									boolean selfManagedContext = false;
@@ -918,9 +982,11 @@ public class BESActivity implements Closeable
 									}
 									
 									//LAK: Now we want to just skip to the next phase
-									_currentPhase = null;
-									updateState(_nextPhase + 1, _state);
-									continue;
+									if (!_persistRequested) {
+										_currentPhase = null;
+										updateState(_nextPhase + 1, _state);
+										continue;
+									}
 								}
 							}
 						}
@@ -928,7 +994,9 @@ public class BESActivity implements Closeable
 					
 					synchronized(_phaseLock)
 					{
-						if(_destroyRequested)
+						// 2020 August 20 by CCH
+						// if we want to persist, we need to stop phase execution.
+						if(_destroyRequested || _persistRequested)
 							return;
 					}
 					
@@ -947,7 +1015,9 @@ public class BESActivity implements Closeable
 					}
 
 					synchronized (_phaseLock) {
-						if(_destroyRequested)
+						// 2020 August 20 by CCH
+						// if we want to persist, we let the job end execution.
+						if(_destroyRequested || _persistRequested)
 							return;
 						_currentPhase = null;
 						updateState(_nextPhase + 1, _state);
