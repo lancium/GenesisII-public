@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.queue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -8,6 +10,7 @@ import java.util.TimeZone;
 
 import org.apache.axis.message.MessageElement;
 import org.ggf.bes.factory.ActivityStatusType;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
@@ -32,6 +35,7 @@ public class QStatTool extends BaseGridTool
 	static final private String _MANPAGE = "config/tooldocs/man/qstat";
 
 	private boolean _full = false;
+	private boolean _vm = false;
 
 	public QStatTool()
 	{
@@ -43,6 +47,12 @@ public class QStatTool extends BaseGridTool
 	public void setFull()
 	{
 		_full = true;
+	}
+
+	@Option({ "v", "vm_info" })
+	public void setVMInfo()
+	{
+		_vm = true;
 	}
 
 	@Override
@@ -66,7 +76,7 @@ public class QStatTool extends BaseGridTool
 		Iterator<JobInformation> info = manipulator.status(tickets);
 		printHeader();
 		while (info.hasNext()) {
-			printJobInformation(info.next());
+			printJobInformation(info.next(), gPath);
 		}
 
 		return 0;
@@ -81,13 +91,20 @@ public class QStatTool extends BaseGridTool
 
 	private void printHeader()
 	{
-		stdout.println(String.format("%1$-40s   %2$-21s   %3$-4s   %4$-8s", "Ticket", "Submit Time", "Tries", "State"));
+		if(!_vm)
+			stdout.println(String.format("%1$-40s   %2$-21s   %3$-4s   %4$-8s", "Ticket", "Submit Time", "Tries", "State"));
 	}
 
 	static private final String _FORMAT = "%1$-40s   %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY   %3$-4d   %4$s";
 
-	private void printJobInformation(JobInformation jobInfo)
+	private void printJobInformation(JobInformation jobInfo, GeniiPath qPath)
 	{
+		if(_vm)
+		{
+			printVMJobInformation(jobInfo, qPath);
+			return;
+		}
+
 		String stateString = jobInfo.getScheduledOn();
 		if (stateString != null)
 			stateString = String.format("On %s", stateString);
@@ -99,9 +116,10 @@ public class QStatTool extends BaseGridTool
 		submitTime.setTimeZone(tz);
 
 		stdout.println(String.format(_FORMAT, jobInfo.getTicket(), submitTime, jobInfo.getFailedAttempts(), stateString));
-		ActivityStatusType ast = jobInfo.besActivityStatus();
+
 		if (_full) {
 			stdout.format("\tJob Name:  %s\n", jobInfo.jobName());
+			ActivityStatusType ast = jobInfo.besActivityStatus();
 			if (ast != null) {
 				stdout.format("\tBES Status:  %s\n", ast.getState().getValue());
 				MessageElement[] any = ast.get_any();
@@ -112,5 +130,64 @@ public class QStatTool extends BaseGridTool
 				}
 			}
 		}
+	}
+
+	//LAK 2020 Aug 20: The VM flag instead outputs a less human friendly, but more information along with easier parsing for a program.
+	private void printVMJobInformation(JobInformation jobInfo, GeniiPath qPath)
+	{
+		String scheduledOn = jobInfo.getScheduledOn();
+		String stateString = String.format("%s", jobInfo.getJobState());
+		String statusString = "State: None";
+		String ipString = "IP: None";
+
+		TimeZone tz = TimeZone.getDefault();
+		Calendar submitTime = jobInfo.getSubmitTime();
+		submitTime.setTimeZone(tz);
+
+		if(scheduledOn != null)
+		{
+			String jobDir = qPath.path() + "/resources/" + scheduledOn + "/activities/" + jobInfo.jobName() + "/working-dir/";
+			try
+			{
+				String statusFile = readFile(jobDir + "../status");
+				statusString = statusFile.replace("\n", "");
+			}
+			catch(IOException e) {}
+
+			try
+			{
+				String ipAddrFile = readFile(jobDir + ".IPADDR");
+				ipString = String.format("IP: %s", ipAddrFile);
+			}
+			catch(IOException e) {}
+		}
+
+		stdout.println(String.format("%1s %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY %3$d %4$s %5$s %6$s", jobInfo.getTicket(), submitTime, jobInfo.getFailedAttempts(), stateString, statusString, ipString));
+	}
+
+	//LAK 2020 Aug 20: Added this helper method to read some grid files. We use this for the VM information flag requests.
+	private String readFile(String filePath) throws IOException
+	{
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+		InputStream inputStream = null;
+		byte[] buffer = new byte[1024];
+		int length;
+
+		try
+		{
+			GeniiPath path = new GeniiPath(filePath);
+			inputStream = path.openInputStream();
+			while ((length = inputStream.read(buffer)) != -1) {
+			    result.write(buffer, 0, length);
+			}
+		}
+		finally
+		{
+			//LAK: We do not need to close the ByteArrayOutputStream (see source file)
+			StreamUtils.close(inputStream);
+		}
+
+		// StandardCharsets.UTF_8.name() > JDK 7
+		return result.toString("UTF-8");
 	}
 }

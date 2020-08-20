@@ -279,7 +279,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			_queueMgr.killJobs(killRequest);
 			return null;
 		} catch (SQLException sqe) {
-			throw new RemoteException("Unable to list jobs in queue.", sqe);
+			throw new RemoteException("Unable to kill jobs in queue.", sqe);
 		}
 	}
 
