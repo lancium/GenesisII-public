@@ -137,7 +137,6 @@ public class QStatTool extends BaseGridTool
 	{
 		String scheduledOn = jobInfo.getScheduledOn();
 		String stateString = String.format("%s", jobInfo.getJobState());
-		String statusString = "State: None";
 		String ipString = "IP: None";
 
 		TimeZone tz = TimeZone.getDefault();
@@ -147,22 +146,16 @@ public class QStatTool extends BaseGridTool
 		if(scheduledOn != null)
 		{
 			String jobDir = qPath.path() + "/resources/" + scheduledOn + "/activities/" + jobInfo.jobName() + "/working-dir/";
-			try
-			{
-				String statusFile = readFile(jobDir + "../status");
-				statusString = statusFile.replace("\n", "");
-			}
-			catch(IOException e) {}
 
 			try
 			{
 				String ipAddrFile = readFile(jobDir + ".IPADDR");
-				ipString = String.format("IP: %s", ipAddrFile);
+				ipString = String.format("IP: %s", ipAddrFile.replaceAll(System.lineSeparator(),","));
 			}
 			catch(IOException e) {}
 		}
 
-		stdout.println(String.format("%1s %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY %3$d %4$s %5$s %6$s", jobInfo.getTicket(), submitTime, jobInfo.getFailedAttempts(), stateString, statusString, ipString));
+		stdout.println(String.format("Job: %1s %2s %3$tH:%3$tM %3$tZ %3$td %3$tb %3$tY %4$d %5$s %6$s", jobInfo.jobName(), jobInfo.getTicket(), submitTime, jobInfo.getFailedAttempts(), stateString, ipString));
 	}
 
 	//LAK 2020 Aug 20: Added this helper method to read some grid files. We use this for the VM information flag requests.
