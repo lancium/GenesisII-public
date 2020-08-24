@@ -442,10 +442,14 @@ public class JobManager implements Closeable
 		SortableJobKey jobKey = new SortableJobKey(job);
 		_runningJobs.remove(new Long(jobID));
 		_queuedJobs.remove(jobKey);
+		
+		
 		// Remove the job from _users with jobs, and move it to _usersNotReadyJobs
 		// The job should already be in notReady bucket
-		// removeFromUserBucket(_usersWithJobs, job);
-		// putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
+		
+		//LAK 2020 Aug 21: It does not appear that the above comments are correct. We need to move these ourselves.
+		removeFromUserBucket(_usersWithJobs, job);
+		putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
 
 		/*
 		 * In order to fail a job that was running, we need to make an outcall to this BES container. This is because, unless we terminate the
@@ -531,8 +535,10 @@ public class JobManager implements Closeable
 		SortableJobKey jobKey = new SortableJobKey(job);
 		_queuedJobs.remove(jobKey);
 		_runningJobs.remove(new Long(jobID));
-		// removeFromUserBucket(_usersWithJobs, job);
-		// putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
+		
+		// LAK 2020 Aug 21: This should already be done in killJobs
+		//removeFromUserBucket(_usersWithJobs, job);
+		//putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
 
 		job.incrementRunAttempts();
 
@@ -570,6 +576,9 @@ public class JobManager implements Closeable
 		} else {
 			if (_logger.isDebugEnabled())
 				_logger.debug(String.format("Setting job %s to finished state without job killer (non-BES job).", job));
+			
+			_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
+					null);
 
 			job.setJobState(QueueStates.FINISHED);
 			job.history(HistoryEventCategory.Terminating).debug("Finishing non-BES Job without JobKiller");
@@ -2256,7 +2265,14 @@ public class JobManager implements Closeable
 			/* Find the job data for the match */
 			JobData data = _jobsByID.get(new Long(match.getJobID()));
 			synchronized (data) {
-
+			
+			if(data.getTerminated())
+			{
+				_logger.debug("Trying to start job " + data + " but it is already terminated. Skipping.");
+				badMatches.add(match);
+				continue;
+			}
+				
 			if (data.isSweepingJob()) {
 				_logger.debug("saw that job is sweeping type; not sending to bes.");
 				badMatches.add(match);
@@ -2417,6 +2433,11 @@ public class JobManager implements Closeable
 						.format("Denying termination request.  Caller not authorized.").close();
 					throw t;
 				}
+				
+				//LAK 2020 Aug 21: This stops the scheduler from starting the job in the future.
+				jobData.setTerminated(true);
+				removeFromUserBucket(_usersWithJobs, jobData);
+				putInUserBucket(_usersNotReadyJobs, jobData, jobData.getUserName());
 
 				/*
 				 * If the job is starting, we mark it as being killed. Starting implies that another thread is about to try and start the thing up
@@ -2514,6 +2535,13 @@ public class JobManager implements Closeable
 			// REMOVE }
 			
 			synchronized (data) {
+				
+				if(data.getTerminated())
+				{
+					_logger.debug("Not creating the actual activity due to a termination request for job: " + data);
+					return;
+				}
+				
 				String oldAction = data.setJobAction("Creating");
 				if (oldAction != null) {
 					_logger.error("We're trying to create an activity for job " + data.getJobTicket() + " that " + "is already undergoing some action:  " + oldAction);
@@ -2824,13 +2852,12 @@ public class JobManager implements Closeable
 					_logger.debug(
 						String.format("JobKiller::terminateActivity killing request for %s a persistent outcall.", _jobData));
 				// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
-				BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(_database.historyKey(_jobData.getJobTicket()), _jobData.historyToken(), _besName, killInfo.getJobEndpoint());
+				BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(killInfo.getJobEndpoint());
 				if (!firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null)) {
 					if (_logger.isDebugEnabled())
 						_logger.debug(
 							String.format("JobKiller::terminateActivity making a request for %s a persistent outcall.", _jobData));
-					PersistentOutcallJobKiller.killJob(_besName, killInfo.getBESEndpoint(), _database.historyKey(_jobData.getJobTicket()),
-						_jobData.historyToken(), killInfo.getJobEndpoint(), killInfo.getCallingContext());
+					PersistentOutcallJobKiller.killJob(killInfo.getBESEndpoint(), killInfo.getJobEndpoint(), killInfo.getCallingContext());
 				}
 
 				return ctxt;
@@ -2859,12 +2886,13 @@ public class JobManager implements Closeable
 				ICallingContext ctxt = destroyInfo.getCallingContext();
 
 				// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
-				BESActivityDestroyActor firstTry=new BESActivityDestroyActor(destroyInfo.getJobEndpoint());
+				BESActivityDestroyActor firstTry=new BESActivityDestroyActor(_database.historyKey(_jobData.getJobTicket()), _jobData.historyToken(), _besName, destroyInfo.getJobEndpoint());
 				if (!firstTry.enactOutcall(destroyInfo.getCallingContext(), destroyInfo.getBESEndpoint(), null)) {
 						if (_logger.isDebugEnabled())
 							_logger.debug(
 								String.format("JobKiller::destroyActivity making a request for %s a persistent outcall.", _jobData));
-						PersistentOutcallJobKiller.destroyJob(destroyInfo.getBESEndpoint(), destroyInfo.getJobEndpoint(), destroyInfo.getCallingContext());
+						PersistentOutcallJobKiller.destroyJob(_besName, destroyInfo.getBESEndpoint(), _database.historyKey(_jobData.getJobTicket()),
+								_jobData.historyToken(), destroyInfo.getJobEndpoint(), destroyInfo.getCallingContext());
 					}
 
 				return ctxt;
@@ -2944,6 +2972,7 @@ public class JobManager implements Closeable
 							_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
 						SortableJobKey jobKey = new SortableJobKey(_jobData);
+						_jobData.setTerminated(false);
 						_queuedJobs.put(jobKey, _jobData);
 						removeFromUserBucket(_usersNotReadyJobs, _jobData);
 						putInUserBucket(_usersWithJobs, _jobData, _jobData.getUserName());
