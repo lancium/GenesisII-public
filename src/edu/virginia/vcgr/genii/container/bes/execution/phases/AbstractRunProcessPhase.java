@@ -75,6 +75,13 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 				try {           
 					output = new BufferedWriter(new FileWriter(propFile));
 					output.write("{\n");
+					// 2020 August 27 by CCH
+					// If userName is surrounded by " ", we want to remove the quotes before printing it to properties.json
+					// This comes up with at least one username: cushing+qa@bitlathe.com
+					if (userName.charAt(0) == ('\"') && userName.charAt(userName.length()-1) == '\"') {
+						userName = userName.substring(1, userName.length()-1);
+					}
+					// End quote stripping changes
 					output.write("\"userName\": \"" + userName + "\",\n");
 					output.write("\"jobName\": \"" + activity.getJobName()+ "\",\n");
 					Date today = Calendar.getInstance().getTime();
@@ -116,8 +123,6 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 				ObjectSerializer.serialize(writer, jsdl, new QName(GenesisIIConstants.GENESISII_NS, "jsdl-document"));
 				writer.flush();
 				String jsdlStr = writer.toString();
-				if (_logger.isDebugEnabled())
-					_logger.debug("JSDL string: " + jsdlStr);
 				
 				// Write JSDL to JSDL.jsdl
 				BufferedWriter output = null;
