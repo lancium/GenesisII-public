@@ -129,6 +129,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				_logger.info(String.format("Asking batch system (%s) to cancel the job.", queue));
 				queue.cancel(_jobToken);
 
+				_terminate = Boolean.TRUE;
+
 				_phaseShiftLock.notifyAll();
 			}
 		} catch (NativeQueueException nqe) {
@@ -136,6 +138,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			throw new ExecutionException("Unable to cancel job in queue.", nqe);
 		}
 	}
+
 	@Override
 	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
