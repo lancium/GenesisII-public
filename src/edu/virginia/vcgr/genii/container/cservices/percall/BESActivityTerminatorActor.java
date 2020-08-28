@@ -41,7 +41,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 		
 		if (target == null)
 		{
-			_logger.warn("LAK: calling terminate activity on a null activity, we are doing nothing.");
+			_logger.warn("Calling terminate activity on a null activity, we are doing nothing.");
 			return true;
 		}
 		
