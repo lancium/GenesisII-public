@@ -77,7 +77,7 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 		PreparedStatement alterStmt = null;
 		try {
 			DatabaseMetaData md = conn.getMetaData();
-			ResultSet checkBESPolicyTable_rs = md.getColumns(null, null, "BESACTIVITIESTABLE", "destroyrequested");
+			ResultSet checkBESPolicyTable_rs = md.getColumns(null, null, "BESACTIVITIESTABLE", "DESTROYREQUESTED");
 			if (checkBESPolicyTable_rs.next()) {
 				// destroyrequested column exists
 				_logger.info("destroyrequested column exists in besactivitestable");
@@ -85,7 +85,7 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 				_logger.info("destroyrequested column does not exist in besactivitiestable");
 				 // destroyrequested column does not exist
 				try {
-					alterStmt = conn.prepareStatement("ALTER TABLE " + "besactivitiestable " + "ADD COLUMN " + "destroyrequested " + "SMALLINT NOT NULL " + "DEFAULT 0" );
+					alterStmt = conn.prepareStatement("ALTER TABLE " + "besactivitiestable " + "ADD COLUMN " + "destroyrequested " + "SMALLINT NOT NULL " + "DEFAULT 0");
 					alterStmt.execute();
 				} catch (SQLException sqe) {
 					_logger.error("Unable to upgrade besactivitiestable with destroyrequested column.", sqe);
