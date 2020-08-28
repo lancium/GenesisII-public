@@ -671,8 +671,8 @@ public class JobManager implements Closeable
 		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
 
 		try {
-			// LAK: synchronized to keep this from running while createActivity is also running
-			synchronized(_jobsByTicket)
+			// LAK: synchronized to keep this from running while killJob is also running
+			synchronized(this)
 			{
 			/*
 			 * Go ahead and get the current caller's calling context. We store this so that we can make outcalls in the future on his/her
@@ -2408,16 +2408,16 @@ public class JobManager implements Closeable
 		/*
 		 * Iterate through all job tickets and get the associated in-memory job information.
 		 */
-		// LAK: Added mutex on _jobsByTickets to stop the race condition for killing a job while it is being created.
-		synchronized (_jobsByTicket){
+		// LAK: Added mutex on this to stop the race condition for killing a job while it is being created.
+		synchronized (this){
 			for (String jobTicket : tickets) {
 				JobData data = _jobsByTicket.get(jobTicket);
 
+				if (data == null)
+					throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+
 				synchronized(data)
 				{
-					if (data == null)
-						throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
-
 					if(data.getTerminated())
 					{
 						_logger.debug("Job Termination already requested. Skipping.");

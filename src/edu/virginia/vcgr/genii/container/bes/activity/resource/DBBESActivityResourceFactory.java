@@ -13,10 +13,14 @@
 package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.client.resource.IResource;
@@ -38,7 +42,7 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 			+ "jsdl BLOB(2G) NOT NULL," + "owners BLOB(2G) NOT NULL," + "callingcontext BLOB(2G) NOT NULL," + "state BLOB(2G) NOT NULL,"
 			+ "submittime TIMESTAMP NOT NULL," + "suspendrequested SMALLINT NOT NULL," + "terminaterequested SMALLINT NOT NULL,"
 			+ "activitycwd VARCHAR(256) NOT NULL," + "executionplan BLOB(2G) NOT NULL," + "nextphase INTEGER NOT NULL,"
-			+ "activityepr BLOB(2G) NOT NULL," + "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL)" + "destroyrequested SMALLINT NOT NULL",
+			+ "activityepr BLOB(2G) NOT NULL," + "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL," + "destroyrequested SMALLINT NOT NULL)",
 		"CREATE TABLE besactivitypropertiestable (" + "activityid VARCHAR(256) NOT NULL," + "propertyname VARCHAR(256) NOT NULL,"
 			+ "propertyvalue BLOB(2G)," + "CONSTRAINT besactivitypropertiesconstraint1 " + "PRIMARY KEY (activityid, propertyname))",
 		"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",
@@ -62,6 +66,33 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 			conn.commit();
 		} finally {
 			_pool.release(conn);
+		}
+	}
+
+	@Override
+	protected void upgradeTables(Connection conn) throws SQLException
+	{
+		super.upgradeTables(conn);
+
+		PreparedStatement alterStmt = null;
+		try {
+			DatabaseMetaData md = conn.getMetaData();
+			ResultSet checkBESPolicyTable_rs = md.getColumns(null, null, "BESACTIVITIESTABLE", "destroyrequested");
+			if (checkBESPolicyTable_rs.next()) {
+				// destroyrequested column exists
+				_logger.info("destroyrequested column exists in besactivitestable");
+			} else {
+				_logger.info("destroyrequested column does not exist in besactivitiestable");
+				 // destroyrequested column does not exist
+				try {
+					alterStmt = conn.prepareStatement("ALTER TABLE " + "besactivitiestable " + "ADD COLUMN " + "destroyrequested " + "SMALLINT NOT NULL " + "DEFAULT 0" );
+					alterStmt.execute();
+				} catch (SQLException sqe) {
+					_logger.error("Unable to upgrade besactivitiestable with destroyrequested column.", sqe);
+				}
+			}
+		} finally {
+			StreamUtils.close(alterStmt);
 		}
 	}
 
