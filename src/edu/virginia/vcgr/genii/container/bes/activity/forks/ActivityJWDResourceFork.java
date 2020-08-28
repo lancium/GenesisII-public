@@ -20,11 +20,11 @@ import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ActivitySummaryResourceFork extends AbstractStreamableByteIOFactoryResourceFork
+public class ActivityJWDResourceFork extends AbstractStreamableByteIOFactoryResourceFork
 {
-	static private Log _logger = LogFactory.getLog(ActivitySummaryResourceFork.class);
+	static private Log _logger = LogFactory.getLog(ActivityJWDResourceFork.class);
 
-	public ActivitySummaryResourceFork(ResourceForkService service, String forkPath)
+	public ActivityJWDResourceFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
 	}
@@ -33,12 +33,11 @@ public class ActivitySummaryResourceFork extends AbstractStreamableByteIOFactory
 	@RWXMapping(RWXCategory.WRITE)
 	public void modifyState(InputStream source) throws IOException
 	{
-		throw new IOException("Not allowed to modify the job working directory - JWD.");
+		throw new IOException("Not allowed to modify the the queue summary.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)
-
 	public void snapshotState(OutputStream sink) throws IOException
 	{
 		ResourceKey rKey = getService().getResourceKey();
@@ -46,24 +45,12 @@ public class ActivitySummaryResourceFork extends AbstractStreamableByteIOFactory
 		PrintStream ps = new PrintStream(sink);
 
 		BESActivity activity = resource.findActivity();
-		ActivityState state = activity.getState();
-
-		ps.format("State:  %s\n", state);
-		if (state.isFailedState()) {
-			ps.print("\nFaults:");
-			int lcv = 0;
-			try {
-				for (Throwable t : activity.getFaults()) {
-					ps.format("\nFault #%d\n", lcv++);
-					t.printStackTrace(ps);
-					ps.println();
-				}
-			} catch (SQLException sqe) {
-				ps.format("Unable to open data base to get list of faults.");
-				_logger.info("exception occurred in snapshotState", sqe);
-			}
-		}
-
-		ps.flush();
+		BESWorkingDirectory workingDir = activity.getActivityCWD();
+		File ret = workingDir.getWorkingDirectory();
+		String dirname=ret.getName();
+		//ActivityState state = activity.getState();
+		ps.println(dirname);
+			ps.flush();
 	}
+	
 }

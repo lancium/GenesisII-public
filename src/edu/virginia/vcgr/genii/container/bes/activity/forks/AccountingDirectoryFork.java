@@ -10,7 +10,6 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
-import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRNSResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
@@ -18,9 +17,9 @@ import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 
-public class WorkingDirectoryFork extends AbstractRNSResourceFork
+public class AccountingDirectoryFork extends AbstractRNSResourceFork
 {
-	static public final String FORK_BASE_PATH_NAME = "working-dir";
+	static public final String FORK_BASE_PATH_NAME = "accounting-dir";
 	static public final String FORK_BASE_PATH = "/" + FORK_BASE_PATH_NAME;
 
 	private File getTargetDirectory() throws IOException
@@ -37,21 +36,15 @@ public class WorkingDirectoryFork extends AbstractRNSResourceFork
 		IBESActivityResource resource = (IBESActivityResource) getService().getResourceKey().dereference();
 
 		BESActivity activity = resource.findActivity();
-		BESWorkingDirectory workingDir = activity.getActivityCWD();
-		if (relativePath.length() == 0)
-			ret = workingDir.getWorkingDirectory();
-		else
-			ret = new File(workingDir.getWorkingDirectory(), relativePath);
-
+		ret = activity.getAccountingDir();
 		if (!ret.exists())
 			throw new FileNotFoundException(String.format("Couldn't find path \"%s\".", getForkPath()));
 		if (!ret.isDirectory())
 			throw new IOException(String.format("Target \"%s\" is not a directory.", getForkPath()));
-
 		return ret;
 	}
 
-	public WorkingDirectoryFork(ResourceForkService service, String forkPath)
+	public AccountingDirectoryFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
 	}
@@ -60,23 +53,15 @@ public class WorkingDirectoryFork extends AbstractRNSResourceFork
 	@RWXMapping(RWXCategory.WRITE)
 	public EndpointReferenceType add(EndpointReferenceType exemplarEPR, String entryName, EndpointReferenceType entry) throws IOException
 	{
-		throw new IOException("Not allowed to add arbitrary endpoints to a " + "bes-activity working directory.");
+		throw new IOException("Not allowed to add arbitrary endpoints to a " + "bes-activity accounting directory.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public EndpointReferenceType createFile(EndpointReferenceType exemplarEPR, String newFileName) throws IOException
 	{
-		File targetDir = getTargetDirectory();
-		File newFile = new File(targetDir, newFileName);
-		if (newFile.createNewFile()) {
-			String forkPath = formForkPath(newFileName);
-			ResourceForkService service = getService();
+		throw new IOException("Not allowed to add files to a " + "bes-activity accounting directory.");
 
-			return service.createForkEPR(forkPath, new WorkingDirFileFork(service, forkPath).describe());
-		}
-
-		throw new IOException("Unable to create new file.");
 	}
 
 	@Override
@@ -91,9 +76,9 @@ public class WorkingDirectoryFork extends AbstractRNSResourceFork
 		for (File entry : targetDir.listFiles()) {
 			if (entryName == null || entry.getName().equals(entryName)) {
 				if (entry.isDirectory())
-					info = new WorkingDirectoryFork(getService(), formForkPath(entry.getName())).describe();
+					info = new AccountingDirectoryFork(getService(), formForkPath(entry.getName())).describe();
 				else
-					info = new WorkingDirFileFork(getService(), formForkPath(entry.getName())).describe();
+					info = new AccountingDirFileFork(getService(), formForkPath(entry.getName())).describe();
 
 				entries.add(createInternalEntry(exemplarEPR, entry.getName(), info));
 			}
@@ -106,27 +91,15 @@ public class WorkingDirectoryFork extends AbstractRNSResourceFork
 	@RWXMapping(RWXCategory.WRITE)
 	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR, String newDirectoryName) throws IOException
 	{
-		File targetDir = getTargetDirectory();
-		File newFile = new File(targetDir, newDirectoryName);
-		if (newFile.mkdir()) {
-			String forkPath = formForkPath(newDirectoryName);
-			ResourceForkService service = getService();
+		throw new IOException("Not allowed to create new directories in a bes-activity accounting directory.");
 
-			return service.createForkEPR(forkPath, new WorkingDirectoryFork(service, forkPath).describe());
-		}
-
-		throw new IOException("Unable to create new directory.");
 	}
 
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public boolean remove(String entryName) throws IOException
 	{
-		File targetDir = getTargetDirectory();
-		File newFile = new File(targetDir, entryName);
-		if (newFile.delete())
-			return true;
+		throw new IOException("Not allowed to remove anything in a bes-activity accounting directory.");
 
-		return false;
 	}
 }

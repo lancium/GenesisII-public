@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.bes.activity;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -151,6 +152,15 @@ public class BESActivity implements Closeable
 		return _activityid;
 	}
 
+	public File getAccountingDir() 
+	{
+		File f=getActivityCWD().getWorkingDirectory();
+		String JWD=f.getName();
+		String sharedDir=f.getParent();
+		File accountingDirectory= new File(sharedDir+"/Accounting/"+JWD);
+		return accountingDirectory;
+	}
+	
 	public BESWorkingDirectory getActivityCWD()
 	{
 		return _activityCWD;
