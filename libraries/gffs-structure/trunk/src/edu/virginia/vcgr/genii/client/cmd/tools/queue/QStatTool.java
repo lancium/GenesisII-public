@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools.queue;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -147,19 +148,16 @@ public class QStatTool extends BaseGridTool
 		{
 			String jobDir = qPath.path() + "/resources/" + scheduledOn + "/activities/" + jobInfo.jobName() + "/working-dir/";
 
-			try
-			{
-				String ipAddrFile = readFile(jobDir + ".IPADDR");
+			String ipAddrFile = readFile(jobDir + ".IPADDR");
+			if(ipAddrFile != null)
 				ipString = String.format("IP: %s", ipAddrFile.replaceAll(System.lineSeparator(),","));
-			}
-			catch(IOException e) {}
 		}
 
 		stdout.println(String.format("Job: %1s %2s %3$tH:%3$tM %3$tZ %3$td %3$tb %3$tY %4$d %5$s %6$s", jobInfo.jobName(), jobInfo.getTicket(), submitTime, jobInfo.getFailedAttempts(), stateString, ipString));
 	}
 
 	//LAK 2020 Aug 20: Added this helper method to read some grid files. We use this for the VM information flag requests.
-	private String readFile(String filePath) throws IOException
+	private String readFile(String filePath)
 	{
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 		InputStream inputStream = null;
@@ -174,6 +172,10 @@ public class QStatTool extends BaseGridTool
 			    result.write(buffer, 0, length);
 			}
 		}
+		catch(IOException e)
+		{
+			return null;
+		}
 		finally
 		{
 			//LAK: We do not need to close the ByteArrayOutputStream (see source file)
@@ -181,6 +183,10 @@ public class QStatTool extends BaseGridTool
 		}
 
 		// StandardCharsets.UTF_8.name() > JDK 7
-		return result.toString("UTF-8");
+		try {
+			return result.toString("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
 	}
 }
