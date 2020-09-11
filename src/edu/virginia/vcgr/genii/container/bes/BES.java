@@ -352,7 +352,7 @@ public class BES implements Closeable
 
 			stmt = connection.prepareStatement("INSERT INTO besactivitiestable " + "(activityid, besid, jsdl, owners, callingcontext, "
 				+ "state, submittime, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-				+ "nextphase, activityepr, activityservicename, jobname) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				+ "nextphase, activityepr, activityservicename, jobname, destroyrequested) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
@@ -369,11 +369,13 @@ public class BES implements Closeable
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR, "besactivitiestable", "activityepr"));
 			stmt.setString(14, activityServiceName);
 			stmt.setString(15, jobName);
+			//LAK 2020 Aug 28: Default destroyrequested to zero
+			stmt.setShort(16, (short)0);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false);
+				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, false);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -449,7 +451,7 @@ public class BES implements Closeable
 		try {
 			stmt = connection
 				.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityservicename, jobname, jsdl " + "FROM besactivitiestable WHERE besid = ?");
+					+ "nextphase, activityservicename, jobname, jsdl, destroyrequested " + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
@@ -461,6 +463,8 @@ public class BES implements Closeable
 					ActivityState state = (ActivityState) DBSerializer.fromBlob(rs.getBlob(2));
 					boolean suspendRequested = (rs.getShort(3) == 0) ? false : true;
 					boolean terminateRequested = (rs.getShort(4) == 0) ? false : true;
+					//LAK 2020 Aug 28: Read in destroyrequested flag from the DB
+					boolean destroyRequested = (rs.getShort(11) == 0) ? false : true;
 
 					String activityCWDString = rs.getString(5);
 					BESWorkingDirectory activityCWD;
@@ -520,7 +524,7 @@ public class BES implements Closeable
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested);
+							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, destroyRequested);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);
