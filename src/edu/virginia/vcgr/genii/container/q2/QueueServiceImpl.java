@@ -29,6 +29,8 @@ import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
+import org.ggf.bes.factory.MigrateActivitiesToResponseType;
+import org.ggf.bes.factory.MigrateActivitiesToType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
@@ -787,9 +789,20 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
 		return null;
 	}
+	
 	//LAK 2020 Aug 13: This is a stub that should not be implemented in the queue.
 	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
 	public DestroyActivitiesResponseType destroyActivities(DestroyActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	//LAK 2020 Sept 10: This is a stub that should not be implemented in the queue.
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public MigrateActivitiesToResponseType migrateActivitiesTo(MigrateActivitiesToType parameters)
 			throws RemoteException, UnknownActivityIdentifierFaultType {
 		// TODO Auto-generated method stub
 		return null;

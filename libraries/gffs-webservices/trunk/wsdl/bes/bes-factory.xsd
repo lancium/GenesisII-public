@@ -166,10 +166,21 @@
 		</xsd:sequence>
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
+	
 	<xsd:complexType name="DestroyActivityResponseType">
 		<xsd:sequence>
 			<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"/>
 			<xsd:element name="Destroyed" type="xsd:boolean"/>
+			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="MigrateActivityToResponseType">
+		<xsd:sequence>
+			<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"/>
+			<xsd:element name="Migrated" type="xsd:boolean"/>
 			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>

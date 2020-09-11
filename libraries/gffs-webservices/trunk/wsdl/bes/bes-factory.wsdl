@@ -88,6 +88,24 @@
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
 			</xsd:complexType>
 			
+			<xsd:complexType name="MigrateActivitiesToType">
+				<xsd:sequence>
+					<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="MigrateActivitiesToResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:MigrateActivityToResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
 			<xsd:complexType name="GetActivityDocumentsType">
 				<xsd:sequence>
 					<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"
@@ -316,6 +334,10 @@
 			<xsd:element name="ResumeActivitiesResponse"
 				type="bes-factory:ResumeActivitiesResponseType"/>
 				
+			<xsd:element name="MigrateActivitiesTo"
+				type="bes-factory:MigrateActivitiesToType"/>
+			<xsd:element name="MigrateActivitiesToResponse"
+				type="bes-factory:MigrateActivitiesToResponseType"/>
 				
 			<!-- Fault Elements -->
 			<xsd:element name="NotAuthorizedFault"
@@ -426,6 +448,12 @@
 	</wsdl:message>
 	<wsdl:message name="ResumeActivitiesResponse">
 		<wsdl:part name="parameters" element="bes-factory:ResumeActivitiesResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="MigrateActivitiesToRequest">
+		<wsdl:part name="parameters" element="bes-factory:MigrateActivitiesTo"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="MigrateActivitiesToResponse">
+		<wsdl:part name="parameters" element="bes-factory:MigrateActivitiesToResponse"></wsdl:part>
 	</wsdl:message>
 	
 	<!-- Fault Messages -->
@@ -634,6 +662,21 @@
 				name="ResumeActivitiesResponse"
 				message="bes-factory:ResumeActivitiesResponse"
 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/ResumeActivitiesResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="MigrateActivitiesTo">
+			<wsdl:input
+				name="MigrateActivitiesTo"
+				message="bes-factory:MigrateActivitiesToRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/MigrateActivitiesTo"/>
+			<wsdl:output
+				name="MigrateActivitiesToResponse"
+				message="bes-factory:MigrateActivitiesToResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/MigrateActivitiesToResponse"/>
 			<wsdl:fault
 				name="UnknownActivityIdentifierFault"
 				message="bes-factory:UnknownActivityIdentifierFault"

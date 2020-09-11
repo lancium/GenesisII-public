@@ -38,6 +38,9 @@ import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
+import org.ggf.bes.factory.MigrateActivitiesToResponseType;
+import org.ggf.bes.factory.MigrateActivitiesToType;
+import org.ggf.bes.factory.MigrateActivityToResponseType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
@@ -819,6 +822,25 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		} catch (Throwable cause) {
 			return new DestroyActivityResponseType(epr, false, BESFaultManager.constructFault(cause), null);
 		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public MigrateActivitiesToResponseType migrateActivitiesTo(MigrateActivitiesToType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType 
+	{
+		Collection<MigrateActivityToResponseType> responses = new LinkedList<MigrateActivityToResponseType>();
+
+		for (EndpointReferenceType aepr : parameters.getActivityIdentifier()) {
+			responses.add(migrateActivityTo(aepr));
+		}
+
+		return new MigrateActivitiesToResponseType(responses.toArray(new MigrateActivityToResponseType[0]), null);
+	}
+	
+	static public MigrateActivityToResponseType migrateActivityTo(EndpointReferenceType epr) throws RemoteException
+	{
+		return new MigrateActivityToResponseType(null, false, null, null);
 	}
 
 	@Override
