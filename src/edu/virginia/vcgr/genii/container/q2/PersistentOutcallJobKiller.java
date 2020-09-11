@@ -31,16 +31,16 @@ class PersistentOutcallJobKiller
 			BACKOFF_JITTER_BASE, BACKOFF_JITTER_BASE_UNITS);
 	}
 
-	static boolean killJob(String besName, EndpointReferenceType bes, String historyKey, HistoryEventToken historyToken,
-		EndpointReferenceType activity, ICallingContext context)
+	static boolean killJob(EndpointReferenceType bes, EndpointReferenceType activity, ICallingContext context)
 	{
 		return PersistentOutcallContainerService.schedulePersistentOutcall(
-			new BESActivityTerminatorActor(historyKey, historyToken, besName, activity), SCHEDULER(), bes, context);
+			new BESActivityTerminatorActor(activity), SCHEDULER(), bes, context);
 	}
 	
-	static boolean destroyJob(EndpointReferenceType bes, EndpointReferenceType activity, ICallingContext context)
+	static boolean destroyJob(String besName, EndpointReferenceType bes, String historyKey, HistoryEventToken historyToken,
+			EndpointReferenceType activity, ICallingContext context)
 		{
 			return PersistentOutcallContainerService.schedulePersistentOutcall(
-				new BESActivityDestroyActor(activity), SCHEDULER(), bes, context);
+				new BESActivityDestroyActor(historyKey, historyToken, besName, activity), SCHEDULER(), bes, context);
 		}
 }

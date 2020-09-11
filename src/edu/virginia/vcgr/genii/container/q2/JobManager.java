@@ -441,10 +441,14 @@ public class JobManager implements Closeable
 		SortableJobKey jobKey = new SortableJobKey(job);
 		_runningJobs.remove(new Long(jobID));
 		_queuedJobs.remove(jobKey);
+		
+		
 		// Remove the job from _users with jobs, and move it to _usersNotReadyJobs
 		// The job should already be in notReady bucket
-		// removeFromUserBucket(_usersWithJobs, job);
-		// putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
+		
+		//LAK 2020 Aug 21: It does not appear that the above comments are correct. We need to move these ourselves.
+		removeFromUserBucket(_usersWithJobs, job);
+		putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
 
 		/*
 		 * In order to fail a job that was running, we need to make an outcall to this BES container. This is because, unless we terminate the
@@ -491,88 +495,101 @@ public class JobManager implements Closeable
 			return;
 		}
 		synchronized (job) {
-		if (_logger.isDebugEnabled())
-			_logger.debug("Finishing job " + job);
-		
-		Connection connection = null;
-
-		// get info about the BES if there is one.
-		String besName = null;
-		Long besID = job.getBESID();
-		if (besID != null)
-			besName = _besManager.getBESName(besID);
-		// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
-		connection = _connectionPool.acquire(false);
-		// TEMP KillInformation killInfo = _database.getKillInfo(connection, job.getJobID(), besID);
-
-		try {
-			_database.incrementFinishCount(connection);
-
-			if (besName == null) {
-				/*
-				 * handle a non-BES job by setting the state right now. this is because there is no job killer to deal with this later for us.
-				 */
-				_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
-					null);
-			}
-			connection.commit();
-		} catch (SQLException sqe) {
-			_logger.warn("Unable to update total jobs finished count.", sqe);
-		} finally {
-			_connectionPool.release(connection);
-		}
-
-		// This is one of the few times we are going to break our pattern and
-		// modify the in memory state before the database. The reason for this
-		// is that we can't afford to forget that the BES container has a job
-		// on it that it's managing. If we do, we will eventually leak memory
-		// on that container.
-		SortableJobKey jobKey = new SortableJobKey(job);
-		_queuedJobs.remove(jobKey);
-		_runningJobs.remove(new Long(jobID));
-		// removeFromUserBucket(_usersWithJobs, job);
-		// putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
-
-		job.incrementRunAttempts();
-
-		/*
-		 * See failJob for a complete discussion of why we enqueue an outcall worker at this point -- the reasons are the same.
-		 */
-//		QueueStates _newState=QueueStates.FINISHED;
-		if (besName != null) {
-			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Creating a JobKiller for finished job %s to clean up.", job));
-
-			job.history(HistoryEventCategory.Terminating).debug("Cleaning up job with JobKiller");
-			
-			_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, besName, besID, false, true));
-/* TEMP boolean successfullCall=false;
-			BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(_database.historyKey(job.getJobTicket()), 
-				job.historyToken(), _besManager.getBESName(besID), killInfo.getJobEndpoint());
-			try {
-				successfullCall=firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null);
-				}
-			catch (Throwable e) {
-			}
-			if (!successfullCall) {
-				_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, besName, null));
+			//LAK 2020 Aug 28: Added check that this is the first time we are finishing the job.
+			if(job.getJobState().isFinalState())
+			{
+				if (_logger.isDebugEnabled())
+					_logger.debug("Called finished on job that was already finished; skipping: " + job);
 				return;
 			}
-			else
-			{
-				_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), _newState, new Date(), null, null, null);
-				connection.commit();
-				job.setJobState(_newState);
-				job.clearBESID();
-			}
-			*/
-		} else {
-			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Setting job %s to finished state without job killer (non-BES job).", job));
 
-			job.setJobState(QueueStates.FINISHED);
-			job.history(HistoryEventCategory.Terminating).debug("Finishing non-BES Job without JobKiller");
-		}
+			if (_logger.isDebugEnabled())
+				_logger.debug("Finishing job " + job);
+		
+			Connection connection = null;
+
+			// get info about the BES if there is one.
+			String besName = null;
+			Long besID = job.getBESID();
+			if (besID != null)
+				besName = _besManager.getBESName(besID);
+			// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
+			connection = _connectionPool.acquire(false);
+			// TEMP KillInformation killInfo = _database.getKillInfo(connection, job.getJobID(), besID);
+
+			try {
+				_database.incrementFinishCount(connection);
+
+				if (besName == null) {
+					/*
+					 * handle a non-BES job by setting the state right now. this is because there is no job killer to deal with this later for us.
+					 */
+					_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
+							null);
+				}
+				connection.commit();
+			} catch (SQLException sqe) {
+				_logger.warn("Unable to update total jobs finished count.", sqe);
+			} finally {
+				_connectionPool.release(connection);
+			}
+
+			// This is one of the few times we are going to break our pattern and
+			// modify the in memory state before the database. The reason for this
+			// is that we can't afford to forget that the BES container has a job
+			// on it that it's managing. If we do, we will eventually leak memory
+			// on that container.
+			SortableJobKey jobKey = new SortableJobKey(job);
+			_queuedJobs.remove(jobKey);
+			_runningJobs.remove(new Long(jobID));
+
+			// LAK 2020 Aug 21: This should already be done in killJobs
+			//removeFromUserBucket(_usersWithJobs, job);
+			//putInUserBucket(_usersNotReadyJobs, job, job.getUserName());
+
+			job.incrementRunAttempts();
+
+			/*
+			 * See failJob for a complete discussion of why we enqueue an outcall worker at this point -- the reasons are the same.
+			 */
+			//		QueueStates _newState=QueueStates.FINISHED;
+			if (besName != null) {
+				if (_logger.isDebugEnabled())
+					_logger.debug(String.format("Creating a JobKiller for finished job %s to clean up.", job));
+
+				job.history(HistoryEventCategory.Terminating).debug("Cleaning up job with JobKiller");
+			
+				_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, besName, besID, false, true));
+				/* TEMP boolean successfullCall=false;
+				BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(_database.historyKey(job.getJobTicket()),
+					job.historyToken(), _besManager.getBESName(besID), killInfo.getJobEndpoint());
+				try {
+					successfullCall=firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null);
+					}
+				catch (Throwable e) {
+				}
+				if (!successfullCall) {
+					_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, besName, null));
+					return;
+				}
+				else
+				{
+					_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), _newState, new Date(), null, null, null);
+					connection.commit();
+					job.setJobState(_newState);
+					job.clearBESID();
+				}
+				 */
+			} else {
+				if (_logger.isDebugEnabled())
+					_logger.debug(String.format("Setting job %s to finished state without job killer (non-BES job).", job));
+			
+				_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
+					null);
+
+				job.setJobState(QueueStates.FINISHED);
+				job.history(HistoryEventCategory.Terminating).debug("Finishing non-BES Job without JobKiller");
+			}
 		}
 		//LAK 2020 Aug 13: Enabling scheduling event since this is where the job state will become FINISHED
 		_schedulingEvent.notifySchedulingEvent();
@@ -653,8 +670,8 @@ public class JobManager implements Closeable
 		_whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
 
 		try {
-			// LAK: synchronized to keep this from running while createActivity is also running
-			synchronized(_jobsByTicket)
+			// LAK: synchronized to keep this from running while killJob is also running
+			synchronized(this)
 			{
 			/*
 			 * Go ahead and get the current caller's calling context. We store this so that we can make outcalls in the future on his/her
@@ -2018,51 +2035,53 @@ public class JobManager implements Closeable
 		}
 
 		for (JobData job : _runningJobs.values()) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("considering job: " + job);
+			synchronized(job){
+				if (_logger.isDebugEnabled())
+					_logger.debug("considering job: " + job);
 
-			if (job == null || job.getBESID() == null) {
-				if (job == null) {
-					if (_logger.isDebugEnabled())
-						_logger.debug(String.format("Can't check a job that is NULL."));
+				if (job == null || job.getBESID() == null) {
+					if (job == null) {
+						if (_logger.isDebugEnabled())
+							_logger.debug(String.format("Can't check a job that is NULL."));
+					} else {
+						if (_logger.isDebugEnabled())
+							_logger.debug(String.format(
+									"Last minute decision not to check on job %s " + "status because it doesn't have a BES associated.", job));
+						// Added 7/13/2017 by ASG  .. should have already been removed, but for some reason it is still there, so get rid of it.
+						if (job.getJobState()==QueueStates.FINISHED) {
+							SortableJobKey jobKey = new SortableJobKey(job);
+							//FIXME wants a long not a jobkey object
+							_runningJobs.remove(jobKey.getJobID());
+						}
+					}
+					continue;
 				} else {
 					if (_logger.isDebugEnabled())
-						_logger.debug(String.format(
-							"Last minute decision not to check on job %s " + "status because it doesn't have a BES associated.", job));
-					// Added 7/13/2017 by ASG  .. should have already been removed, but for some reason it is still there, so get rid of it.
-					if (job.getJobState()==QueueStates.FINISHED) {
-						SortableJobKey jobKey = new SortableJobKey(job);
-						//FIXME wants a long not a jobkey object
-						_runningJobs.remove(jobKey.getJobID());
-					}
+						_logger.debug(String.format("Starting process of checking status of running job %s", job));
 				}
-				continue;
-			} else {
-				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Starting process of checking status of running job %s", job));
+
+				HistoryContext history = job.history(HistoryEventCategory.Checking);
+
+				history.createTraceWriter("Checking Running Job Status")
+					.format("Checking job status as the result of a received asynchronous notification.").close();
+
+				/*
+				 * For convenience, we bundle together the id's of the job to check, and the bes container on which it is running.
+				 */
+				JobCommunicationInfo info = new JobCommunicationInfo(job.getJobID(), job.getBESID().longValue());
+
+				/*
+				 * As in other places, we use a callback mechanism to allow outcall threads to late bind "large" information at the last minute.
+				 * This keeps us from putting too much into memory. In this particular case its something of a hack as we already had a type for
+				 * getting the bes information so we just bundled that with a second interface for getting the job's endpoint. This could have
+				 * been done cleaner, but it works fine.
+				 */
+				Resolver resolver = new Resolver();
+
+				/* Enqueue the worker into the outcall thread pool */
+				_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job, _lastUpdate));
+				_lastUpdate = Calendar.getInstance().getTime();
 			}
-
-			HistoryContext history = job.history(HistoryEventCategory.Checking);
-
-			history.createTraceWriter("Checking Running Job Status")
-				.format("Checking job status as the result of a received asynchronous notification.").close();
-
-			/*
-			 * For convenience, we bundle together the id's of the job to check, and the bes container on which it is running.
-			 */
-			JobCommunicationInfo info = new JobCommunicationInfo(job.getJobID(), job.getBESID().longValue());
-
-			/*
-			 * As in other places, we use a callback mechanism to allow outcall threads to late bind "large" information at the last minute.
-			 * This keeps us from putting too much into memory. In this particular case its something of a hack as we already had a type for
-			 * getting the bes information so we just bundled that with a second interface for getting the job's endpoint. This could have
-			 * been done cleaner, but it works fine.
-			 */
-			Resolver resolver = new Resolver();
-
-			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job, _lastUpdate));
-			_lastUpdate = Calendar.getInstance().getTime();
 		}
 
 		int newCount = _outcallThreadPool.size();
@@ -2255,7 +2274,14 @@ public class JobManager implements Closeable
 			/* Find the job data for the match */
 			JobData data = _jobsByID.get(new Long(match.getJobID()));
 			synchronized (data) {
-
+			
+			if(data.getTerminated())
+			{
+				_logger.debug("Trying to start job " + data + " but it is already terminated. Skipping.");
+				badMatches.add(match);
+				continue;
+			}
+				
 			if (data.isSweepingJob()) {
 				_logger.debug("saw that job is sweeping type; not sending to bes.");
 				badMatches.add(match);
@@ -2381,17 +2407,29 @@ public class JobManager implements Closeable
 		/*
 		 * Iterate through all job tickets and get the associated in-memory job information.
 		 */
-		// LAK: Added mutex on _jobsByTickets to stop the race condition for killing a job while it is being created.
-		synchronized (_jobsByTicket){
+		// LAK: Added mutex on this to stop the race condition for killing a job while it is being created.
+		synchronized (this){
 			for (String jobTicket : tickets) {
 				JobData data = _jobsByTicket.get(jobTicket);
+
 				if (data == null)
 					throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-				data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
-					.format("Request to terminate job from outside the queue").close();
+				synchronized(data)
+				{
+					if(data.getTerminated())
+					{
+						_logger.debug("Job Termination already requested. Skipping.");
+						data.history(HistoryEventCategory.Terminating).createInfoWriter("Termination Requested While Already Terminating")
+						.format("Request to terminate job from outside the queue came while we are already terminating").close();
+						return;
+					}
 
-				jobsToKill.add(new Long(data.getJobID()));
+					data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
+						.format("Request to terminate job from outside the queue").close();
+
+					jobsToKill.add(new Long(data.getJobID()));
+				}
 			}
 		}
 
@@ -2416,6 +2454,11 @@ public class JobManager implements Closeable
 						.format("Denying termination request.  Caller not authorized.").close();
 					throw t;
 				}
+				
+				//LAK 2020 Aug 21: This stops the scheduler from starting the job in the future.
+				jobData.setTerminated(true);
+				removeFromUserBucket(_usersWithJobs, jobData);
+				putInUserBucket(_usersNotReadyJobs, jobData, jobData.getUserName());
 
 				/*
 				 * If the job is starting, we mark it as being killed. Starting implies that another thread is about to try and start the thing up
@@ -2424,7 +2467,7 @@ public class JobManager implements Closeable
 				if (jobData.getJobState().equals(QueueStates.STARTING) || jobData.getJobState().equals(QueueStates.RUNNING)) {
 					killJob(connection, jobID);
 				}
-				else if (jobData.getJobState().equals(QueueStates.QUEUED))
+				else if (jobData.getJobState().equals(QueueStates.QUEUED) || jobData.getJobState().equals(QueueStates.REQUEUED))
 				{
 					finishJob(jobID);
 				}
@@ -2513,6 +2556,13 @@ public class JobManager implements Closeable
 			// REMOVE }
 			
 			synchronized (data) {
+				
+				if(data.getTerminated())
+				{
+					_logger.debug("Not creating the actual activity due to a termination request for job: " + data);
+					return;
+				}
+				
 				String oldAction = data.setJobAction("Creating");
 				if (oldAction != null) {
 					_logger.error("We're trying to create an activity for job " + data.getJobTicket() + " that " + "is already undergoing some action:  " + oldAction);
@@ -2823,13 +2873,12 @@ public class JobManager implements Closeable
 					_logger.debug(
 						String.format("JobKiller::terminateActivity killing request for %s a persistent outcall.", _jobData));
 				// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
-				BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(_database.historyKey(_jobData.getJobTicket()), _jobData.historyToken(), _besName, killInfo.getJobEndpoint());
+				BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(killInfo.getJobEndpoint());
 				if (!firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null)) {
 					if (_logger.isDebugEnabled())
 						_logger.debug(
 							String.format("JobKiller::terminateActivity making a request for %s a persistent outcall.", _jobData));
-					PersistentOutcallJobKiller.killJob(_besName, killInfo.getBESEndpoint(), _database.historyKey(_jobData.getJobTicket()),
-						_jobData.historyToken(), killInfo.getJobEndpoint(), killInfo.getCallingContext());
+					PersistentOutcallJobKiller.killJob(killInfo.getBESEndpoint(), killInfo.getJobEndpoint(), killInfo.getCallingContext());
 				}
 
 				return ctxt;
@@ -2858,12 +2907,13 @@ public class JobManager implements Closeable
 				ICallingContext ctxt = destroyInfo.getCallingContext();
 
 				// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
-				BESActivityDestroyActor firstTry=new BESActivityDestroyActor(destroyInfo.getJobEndpoint());
+				BESActivityDestroyActor firstTry=new BESActivityDestroyActor(_database.historyKey(_jobData.getJobTicket()), _jobData.historyToken(), _besName, destroyInfo.getJobEndpoint());
 				if (!firstTry.enactOutcall(destroyInfo.getCallingContext(), destroyInfo.getBESEndpoint(), null)) {
 						if (_logger.isDebugEnabled())
 							_logger.debug(
 								String.format("JobKiller::destroyActivity making a request for %s a persistent outcall.", _jobData));
-						PersistentOutcallJobKiller.destroyJob(destroyInfo.getBESEndpoint(), destroyInfo.getJobEndpoint(), destroyInfo.getCallingContext());
+						PersistentOutcallJobKiller.destroyJob(_besName, destroyInfo.getBESEndpoint(), _database.historyKey(_jobData.getJobTicket()),
+								_jobData.historyToken(), destroyInfo.getJobEndpoint(), destroyInfo.getCallingContext());
 					}
 
 				return ctxt;
@@ -2943,6 +2993,7 @@ public class JobManager implements Closeable
 							_logger.debug("chose username using CLIENT_IDENTITY_PATTERN: " + username);
 
 						SortableJobKey jobKey = new SortableJobKey(_jobData);
+						_jobData.setTerminated(false);
 						_queuedJobs.put(jobKey, _jobData);
 						removeFromUserBucket(_usersNotReadyJobs, _jobData);
 						putInUserBucket(_usersWithJobs, _jobData, _jobData.getUserName());
