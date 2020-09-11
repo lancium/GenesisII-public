@@ -43,7 +43,6 @@ import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionExcep
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
