@@ -188,8 +188,11 @@ public class BESActivity implements Closeable
 			_connectionPool.release(connection);
 		}
 	}
-
-	synchronized public JobDefinition_Type getJobDefinition() throws SQLException, IOException, ClassNotFoundException
+	
+	// LAK 2020 Sept 17: Removed synchronized keyword from this function. This caused deadlocks and is not needed.
+	// See the stack trace uploaded to https://drive.google.com/file/d/16uKyFUsv42p_a3LhmA9FWKisujLtC-2T/view?usp=sharing for
+	// more information about WHY this caused issues.
+	public JobDefinition_Type getJobDefinition() throws SQLException, IOException, ClassNotFoundException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
