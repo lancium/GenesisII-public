@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,8 +61,8 @@ public class BES implements Closeable
 
 	static private ServerDatabaseConnectionPool _connectionPool;
 
-	static private HashMap<String, BES> _knownInstances = new HashMap<String, BES>();
-	static private HashMap<String, BES> _activityToBESMap = new HashMap<String, BES>();
+	static private ConcurrentHashMap<String, BES> _knownInstances = new ConcurrentHashMap<String, BES>();
+	static private ConcurrentHashMap<String, BES> _activityToBESMap = new ConcurrentHashMap<String, BES>();
 
 	static private String findBESEPI(Connection connection, String besid) throws SQLException
 	{
@@ -237,7 +238,7 @@ public class BES implements Closeable
 	private String _besid;
 	private String _besEPI;
 	private BESPolicyEnactor _enactor;
-	private HashMap<String, BESActivity> _containedActivities = new HashMap<String, BESActivity>();
+	private ConcurrentHashMap<String, BESActivity> _containedActivities = new ConcurrentHashMap<String, BESActivity>();
 
 	private BES(Connection connection, String besid, BESPolicy policy) throws SQLException
 	{

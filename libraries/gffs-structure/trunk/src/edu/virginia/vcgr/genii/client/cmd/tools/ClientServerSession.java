@@ -124,8 +124,8 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 		PrintWriter outwriter = null;
 
 		String line;
-		// 2020-20-20 by ASG. Added to serialize calls while we figure out the race.
-		synchronized(sync) {
+		// 2020-10-10 by ASG. Added to serialize calls while we figure out the race.
+//		synchronized(sync) {
 			// End of update
 		try {
 			// get the local identity's key material (or create one if necessary)
@@ -253,7 +253,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 
 			_sessionState.getListenerManager().fireSessionClosed(_sessionState.getSessionID());
 		}
-		}
+//		}
 	}
 
 	public long getIdleTime()
