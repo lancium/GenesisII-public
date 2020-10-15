@@ -1,11 +1,12 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -234,6 +235,57 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				generateJSDL(tmp, activity);
 
 				// End of updates 2020-04-18
+				
+				// CCH 2020 October 14
+				String execName = _executable.getAbsolutePath();
+				Vector<String> args = new Vector<String>(_arguments);
+				if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
+					if (_logger.isDebugEnabled())
+						_logger.debug("Handling image executable (.simg or .qcow2): " + execName);
+					String[] execNameArray = execName.split("/");
+					// 2020 June 09 by CCH
+					// Turns out that the executable path is resolved at this point.
+					// Even though I could only give test.simg, the execName is the full path: /nfs/.../<ticket>/test.simg.
+					// As opposed to just test.simg. This wasn't a problem before, but we indicate Lancium images with Lancium/<lancium_image>.simg. 
+					// To check for Lancium images, we check for the second-to-last token and see if it equals Lancium.
+					boolean usingLanciumImage = false;
+					if (execNameArray.length >= 2)
+						usingLanciumImage = execNameArray[execNameArray.length-2].equals("Lancium");
+					if (_logger.isDebugEnabled()) {
+						_logger.debug("Second to last element in execNameArray: " + execNameArray[execNameArray.length-2]);
+						_logger.debug("Using Lancium image? " + usingLanciumImage);
+					}
+					execName = execNameArray[execNameArray.length-1];
+					boolean developmentNamespace = activity.getLanciumEnvironment().equals("Development");
+					String imagePath = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + (developmentNamespace ? "development/" : "") + userName + "/" + execName;
+					// This should use getContainerProperty job BES directory
+					if (imagePath.endsWith(".qcow2")) {
+						execName = "../vmwrapper.sh";
+					}
+					if (_logger.isDebugEnabled())
+						_logger.debug("Handling image executable: " + execName);
+					if (Files.exists(Paths.get(imagePath))) {
+						String MIME = Files.probeContentType(Paths.get(imagePath));
+						if (_logger.isDebugEnabled())
+							_logger.debug(imagePath + " exists with MIME type: " + MIME);
+						if (MIME.contains("QEMU QCOW Image") || MIME.contains("run-singularity script executable")) {
+							if (_logger.isDebugEnabled())
+								_logger.debug(imagePath + " exists and has the correct MIME type.");
+						}
+						else {
+							if (_logger.isDebugEnabled())
+								_logger.debug(imagePath + " exists but has the wrong MIME type.");
+							// 2020 May 27 CCH, not sure how to handle bad MIME type
+							// Currently, set imagePath to something completely different so the original image does not execute
+							imagePath = "../Images/Lancium/BAD_MIME";
+						}
+					}
+					else {
+						if (_logger.isDebugEnabled())
+							_logger.debug(imagePath + " does not exist.");
+					}
+					args.add(0, imagePath);
+				}
 
 
 				preDelay();
@@ -246,7 +298,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				hWriter.close();
 
 				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
-						_threadsPerProcess, _executable.getAbsolutePath(), _arguments, _environment, fileToPath(_stdin, null),
+						_threadsPerProcess, _executable.getAbsolutePath(), args, _environment, fileToPath(_stdin, null),
 						fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
 
 				_logger.info(String.format("Queue submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,
