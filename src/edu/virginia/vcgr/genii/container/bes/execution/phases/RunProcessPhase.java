@@ -164,7 +164,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 					_logger.debug("Using Lancium image? " + usingLanciumImage);
 				}
 				execName = execNameArray[execNameArray.length-1];
-				boolean developmentNamespace = activity.getLanciumEnvironment().equals("Development");
+				String lanciumEnvironment = activity.getLanciumEnvironment();
+				boolean developmentNamespace = lanciumEnvironment != null && lanciumEnvironment.equals("Development");
 				String imageDir = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + (developmentNamespace ? "development/" : "") + userName + "/";
 				if (_logger.isDebugEnabled())
 					_logger.debug("Handling image executable (.sif/.simg or .qcow2)...");

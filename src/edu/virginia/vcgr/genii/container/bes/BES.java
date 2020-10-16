@@ -382,9 +382,12 @@ public class BES implements Closeable
 			if (jobDesc != null) {
 				Resources_Type resources = jobDesc.getResources();
 				if (resources != null) {
-					LanciumEnvironment lanciumEnv = resources.getLanciumEnvironment(0);
-					if (lanciumEnv != null) {
-						lanciumEnvironment = lanciumEnv.toString();
+					LanciumEnvironment[] lanciumEnvArray = resources.getLanciumEnvironment();
+					if (lanciumEnvArray != null) {
+						LanciumEnvironment lanciumEnv = lanciumEnvArray[0];
+						if (lanciumEnv != null) {
+							lanciumEnvironment = lanciumEnv.toString();
+						}
 					}
 				}
 			}
@@ -521,9 +524,12 @@ public class BES implements Closeable
 										gpuType = gpuArchName.getValue();
 									}
 								}
-								LanciumEnvironment lanciumEnv = resources.getLanciumEnvironment(0);
-								if (lanciumEnv != null) {
-									lanciumEnvironment = lanciumEnv.toString();
+								LanciumEnvironment[] lanciumEnvArray = resources.getLanciumEnvironment();
+								if (lanciumEnvArray != null) {
+									LanciumEnvironment lanciumEnv = lanciumEnvArray[0];
+									if (lanciumEnv != null) {
+										lanciumEnvironment = lanciumEnv.toString();
+									}
 								}
 								RangeValue_Type gpuCountPerNode = resources.getGPUCountPerNode();
 								if (gpuCountPerNode != null) {
