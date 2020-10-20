@@ -1110,6 +1110,11 @@ public class RNSPath implements Serializable, Cloneable
 			WSResourceConfig resourceConfig = new WSResourceConfig(wsName, pwd());
 			CacheManager.putItemInCache(wsName.getEndpointIdentifier(), resourceConfig);
 		}
+		else {
+			if (_logger.isDebugEnabled())
+				_logger.debug("StoreResourceConfigInCache: CachedEPR WSName is not valid" + pwd());
+		}
+		_cachedEPR.getAddress();
 		CacheManager.putItemInCache(pwd(), _cachedEPR);
 	}
 
