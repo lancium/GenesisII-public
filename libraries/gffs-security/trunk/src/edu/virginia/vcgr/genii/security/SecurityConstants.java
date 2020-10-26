@@ -16,7 +16,8 @@ public class SecurityConstants
 	static public final long CredentialCacheTimeout = 1000L * 60L * 60L; // 1 hour lifetime in cache
 
 	// temporary credentials for our client connection TLS certificate lifetime.
-	static public final long defaultCredentialExpirationMillis = oneDayInMs * 32L;
+	// 2020-10-20 by ASG 0 increased session cert lifetime to one year at request of GridMarkets
+	static public final long defaultCredentialExpirationMillis = oneDayInMs * 365L;
 
 	// maximum number of delegations we accept in a delegation chain.
 	// cak: upped to 14 due to changes in delegation chains.
