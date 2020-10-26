@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -43,8 +44,8 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 {
 	static private Log _logger = LogFactory.getLog(WSIteratorDBResource.class);
 
-	static Map<String, InMemoryIteratorWrapper> mapper = new HashMap<String, InMemoryIteratorWrapper>();
-	static Map<String, Boolean> type = new HashMap<String, Boolean>();
+	static Map<String, InMemoryIteratorWrapper> mapper = new ConcurrentHashMap<String, InMemoryIteratorWrapper>();
+	static Map<String, Boolean> type = new ConcurrentHashMap<String, Boolean>();
 	static Object _lock = new Object();
 
 	WSIteratorDBResource(ResourceKey parentKey, ServerDatabaseConnectionPool connectionPool) throws SQLException

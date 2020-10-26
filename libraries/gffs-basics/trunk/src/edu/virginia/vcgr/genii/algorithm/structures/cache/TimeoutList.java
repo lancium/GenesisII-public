@@ -8,7 +8,7 @@ class TimeoutList<KeyType, DataType> extends CacheList<KeyType, DataType>
 	}
 
 	@Override
-	public void insert(RoleBasedCacheNode<KeyType, DataType> node)
+	public synchronized void insert(RoleBasedCacheNode<KeyType, DataType> node)
 	{
 		// We'll start at the end because most likely we're adding to the end
 		if (_tail == null) {

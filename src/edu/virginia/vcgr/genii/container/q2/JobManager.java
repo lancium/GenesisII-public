@@ -221,8 +221,10 @@ public class JobManager implements Closeable
 	{
 		SortableJobKey jobKey = new SortableJobKey(job);
 		// Remove the job from _users with jobs, and move it to _usersNotReadyJobs
-		for (TreeMap<SortableJobKey, JobData> user : bucket.values()) {
-			user.remove(jobKey);
+		synchronized (bucket) {
+			for (TreeMap<SortableJobKey, JobData> user : bucket.values()) {
+				user.remove(jobKey);
+			}
 		}
 	}
 
@@ -967,42 +969,45 @@ public class JobManager implements Closeable
 		/*
 		 * We have to ask the database for some information about the jobs that isn't kept in memory (the owner identities for example).
 		 */
-		Set<Long> keySet = null;
-		if (ticket != null) {
-			keySet = new HashSet<Long>();
-			JobData data = _jobsByTicket.get(ticket);
-			if (data != null)
-				keySet.add(new Long(data.getJobID()));
-		} else
-			keySet = _jobsByID.keySet();
+		//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
+		synchronized (_jobsByID) {
+			Set<Long> keySet = null;
+			if (ticket != null) {
+				keySet = new HashSet<Long>();
+				JobData data = _jobsByTicket.get(ticket);
+				if (data != null)
+					keySet.add(new Long(data.getJobID()));
+			} else
+				keySet = _jobsByID.keySet();
 
-		/*
-		 * 2016-04-29 by ASG. Updated logic to not use partial job info. Instead, use the newly updated JobData definition that has the
-		 * partial job info in it already, eliminating the need to go to the database.
-		 */
-		try {
-			/* For each job in the queue... */
-			// for (Long jobID : ownerMap.keySet()) {
-			for (Long jobID : keySet) {
-				/* Get the in-memory data for the job */
-				JobData jobData = _jobsByID.get(jobID.longValue());
+			/*
+			 * 2016-04-29 by ASG. Updated logic to not use partial job info. Instead, use the newly updated JobData definition that has the
+			 * partial job info in it already, eliminating the need to go to the database.
+			 */
+			try {
+				/* For each job in the queue... */
+				// for (Long jobID : ownerMap.keySet()) {
+				for (Long jobID : keySet) {
+					/* Get the in-memory data for the job */
+					JobData jobData = _jobsByID.get(jobID.longValue());
 
-				/* Find the corresponding database information */
+					/* Find the corresponding database information */
 
-				byte[][] owners = _userIDs.get(jobData.getUserName());
-				if (owners == null) {
-					// Big problem
-					throw new ResourceException("Job owners not found.");
+					byte[][] owners = _userIDs.get(jobData.getUserName());
+					if (owners == null) {
+						// Big problem
+						throw new ResourceException("Job owners not found.");
+					}
+
+					/* And add the sum of that too the return list */
+					ret.add(new ReducedJobInformationType(jobData.getJobTicket(), owners,
+							JobStateEnumerationType.fromString(jobData.getJobState().name())));
 				}
 
-				/* And add the sum of that too the return list */
-				ret.add(new ReducedJobInformationType(jobData.getJobTicket(), owners,
-					JobStateEnumerationType.fromString(jobData.getJobState().name())));
+				return ret;
+			} catch (IOException ioe) {
+				throw new ResourceException("Unable to serialize owner information.", ioe);
 			}
-
-			return ret;
-		} catch (IOException ioe) {
-			throw new ResourceException("Unable to serialize owner information.", ioe);
 		}
 	}
 
@@ -1123,43 +1128,47 @@ public class JobManager implements Closeable
 		String uname = identities.iterator().next().toString();
 
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
+		//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
+		synchronized (_jobsByID) {
 
-		for (Long jobID : _jobsByID.keySet()) {
+			for (Long jobID : _jobsByID.keySet()) {
 
-			/* Get the in-memory information for this job */
-			String scheduledOn = null;
-			JobData jobData = _jobsByID.get(jobID);
-			String username = jobData.getUserName();
+				/* Get the in-memory information for this job */
+				String scheduledOn = null;
+				JobData jobData = _jobsByID.get(jobID);
+				String username = jobData.getUserName();
 
-			BESData besData = _besManager.findBES(jobData.getBESID());
-			if (besData != null)
-				scheduledOn = besData.getName();
-			/* Get the database information for this job */
-			// Commented out by ASG 2016-4-29 PartialJobInfo pji = ownerMap.get(jobID);
-			byte[][] owners = _userIDs.get(jobData.getUserName());
-			if (isAdmin) {
-				ret.add(
-					new JobInformationType(jobData.getJobTicket(), owners, JobStateEnumerationType.fromString(jobData.getJobState().name()),
-						(byte) jobData.getPriority(), QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(jobData.getStartTime()),
-						QueueUtils.convert(jobData.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-						jobData.getBESActivityStatus(), jobData.jobName()));
-			}
-
-			/*
-			 * If the caller owns this jobs, then add the status information for the job to the result list.
-			 */
-			else {
-				// Here we want to only get jobs for this owner.
-
-				if (username.equalsIgnoreCase(uname)) {
-					ret.add(new JobInformationType(jobData.getJobTicket(), owners,
-						JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
-						QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(jobData.getStartTime()),
-						QueueUtils.convert(jobData.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
-						jobData.getBESActivityStatus(), jobData.jobName()));
+				BESData besData = _besManager.findBES(jobData.getBESID());
+				if (besData != null)
+					scheduledOn = besData.getName();
+				/* Get the database information for this job */
+				// Commented out by ASG 2016-4-29 PartialJobInfo pji = ownerMap.get(jobID);
+				byte[][] owners = _userIDs.get(jobData.getUserName());
+				System.out.println("getJobStatus: " + jobData.jobName() + ": " + JobStateEnumerationType.fromString(jobData.getJobState().name()) + ": " + scheduledOn);
+				if (isAdmin) {
+					ret.add(
+							new JobInformationType(jobData.getJobTicket(), owners, JobStateEnumerationType.fromString(jobData.getJobState().name()),
+									(byte) jobData.getPriority(), QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(jobData.getStartTime()),
+									QueueUtils.convert(jobData.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
+									jobData.getBESActivityStatus(), jobData.jobName()));
 				}
-			}
 
+				/*
+				 * If the caller owns this jobs, then add the status information for the job to the result list.
+				 */
+				else {
+					// Here we want to only get jobs for this owner.
+
+					if (username.equalsIgnoreCase(uname)) {
+						ret.add(new JobInformationType(jobData.getJobTicket(), owners,
+								JobStateEnumerationType.fromString(jobData.getJobState().name()), (byte) jobData.getPriority(),
+								QueueUtils.convert(jobData.getSubmitTime()), QueueUtils.convert(jobData.getStartTime()),
+								QueueUtils.convert(jobData.getFinishTime()), new UnsignedShort(jobData.getRunAttempts()), scheduledOn,
+								jobData.getBESActivityStatus(), jobData.jobName()));
+					}
+				}
+
+			}
 		}
 
 		return ret;
@@ -1518,31 +1527,40 @@ public class JobManager implements Closeable
 			if (_usersWithJobs.keySet().contains(username) || _usersNotReadyJobs.keySet().contains(username)) {
 				// Add the job to this user's set
 				TreeMap<SortableJobKey, JobData> usersJobs = _usersWithJobs.get(username);
-				if (usersJobs != null) {
-					Iterator<SortableJobKey> jobKeys = usersJobs.keySet().iterator();
-					while (jobKeys.hasNext()) {
-						SortableJobKey job = jobKeys.next();
-						batchSubset.add(job.getJobID());
+				
+				synchronized (usersJobs) {
+					if (usersJobs != null) {
+						Iterator<SortableJobKey> jobKeys = usersJobs.keySet().iterator();
+						while (jobKeys.hasNext()) {
+							SortableJobKey job = jobKeys.next();
+							batchSubset.add(job.getJobID());
+						}
 					}
 				}
 
 				// Now add their not ready to run jobs, i.e., old jobs or running jobs
 				usersJobs = _usersNotReadyJobs.get(username);
 				if (usersJobs != null) {
-					Iterator<SortableJobKey> jobKeys = usersJobs.keySet().iterator();
+					synchronized (usersJobs) {
+						Iterator<SortableJobKey> jobKeys = usersJobs.keySet().iterator();
 
-					while (jobKeys.hasNext()) {
-						SortableJobKey job = jobKeys.next();
-						batchSubset.add(job.getJobID());
+						while (jobKeys.hasNext()) {
+							SortableJobKey job = jobKeys.next();
+							batchSubset.add(job.getJobID());
+						}
 					}
 				}
 			}
 		} else {
 			// Admin gets all the jobs
-			it = _jobsByID.keySet().iterator();
-			for (int i = 0; i < _jobsByID.size(); i++) {
-				// grabs the first batch-size amount of jobs
-				batchSubset.add(it.next());
+			//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
+			synchronized (_jobsByID) {
+
+				it = _jobsByID.keySet().iterator();
+				for (int i = 0; i < _jobsByID.size(); i++) {
+					// grabs the first batch-size amount of jobs
+					batchSubset.add(it.next());
+				}
 			}
 		}
 		// We now have all of the jobs we want to iterate over in batchSubset
@@ -1555,7 +1573,7 @@ public class JobManager implements Closeable
 			String scheduledOn = null;
 			JobData job = _jobsByID.get(jobID);
 			if (job == null)
-				continue; // This seems to happen sometimes.
+				continue; // This seems to happen sometimes.  Likely because the job has been removed in the interim
 			BESData besData = _besManager.findBES(job.getBESID());
 			if (besData != null) {
 				scheduledOn = besData.getName();
@@ -1709,8 +1727,10 @@ public class JobManager implements Closeable
 		HashMap<Long, PartialJobInfo> ownerMap;
 		_logger.debug("Entering jobManager::completeJobs 3");
 		/* Get information needed from the database (like owner id) */
-		ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
-
+		//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
+		synchronized (_jobsByID) {
+			ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
+		}
 		/*
 		 * Find all jobs that are owend by the caller and that are in a final state.
 		 */
@@ -1719,6 +1739,8 @@ public class JobManager implements Closeable
 
 		for (Long jobID : ownerMap.keySet()) {
 			JobData jobData = _jobsByID.get(jobID);
+			// ASG. The job may have been deleted since we found out about it above, so check.
+			if (jobData==null) continue;
 			PartialJobInfo pji = ownerMap.get(jobID);
 
 			try {
@@ -1790,8 +1812,10 @@ public class JobManager implements Closeable
 		/*
 		 * Check that every job indicated is owned by the caller and is in a final state.
 		 */
+		
 		for (Long jobID : ownerMap.keySet()) {
 			JobData jobData = _jobsByID.get(jobID);
+			if (jobData==null) continue; // 2020-10-21 by ASG
 			PartialJobInfo pji = ownerMap.get(jobID);
 
 			/* If the job isn't in a final state, throw an exception. */
@@ -1838,6 +1862,7 @@ public class JobManager implements Closeable
 		 */
 		for (Long jobID : ownerMap.keySet()) {
 			JobData jobData = _jobsByID.get(jobID);
+			if (jobData==null) continue;
 			PartialJobInfo pji = ownerMap.get(jobID);
 
 			QueueStates state = jobData.getJobState();
@@ -1862,6 +1887,7 @@ public class JobManager implements Closeable
 		Collection<Long> jobsToReset = checkOwnershipAndGenerateJobID(connection, jobs,true,"Don't have permission to reset job \"");
 		for (Long jobID : jobsToReset) {
 			JobData jobData = _jobsByID.get(jobID);
+			if (jobData==null) continue;
 
 			QueueStates state = jobData.getJobState();
 			if (state == QueueStates.RUNNING || state == QueueStates.STARTING) {	
@@ -1975,21 +2001,24 @@ public class JobManager implements Closeable
 		long finished = 0;
 		long error = 0;
 		long requeued = 0;
+		//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
+		synchronized (_jobsByID) {
 
-		for (JobData jobData : _jobsByID.values()) {
-			QueueStates state = jobData.getJobState();
-			if (state == QueueStates.QUEUED)
-				queued++;
-			else if (state == QueueStates.REQUEUED)
-				requeued++;
-			else if (state == QueueStates.STARTING)
-				starting++;
-			else if (state == QueueStates.RUNNING)
-				running++;
-			else if (state == QueueStates.ERROR)
-				error++;
-			else if (state == QueueStates.FINISHED)
-				finished++;
+			for (JobData jobData : _jobsByID.values()) {
+				QueueStates state = jobData.getJobState();
+				if (state == QueueStates.QUEUED)
+					queued++;
+				else if (state == QueueStates.REQUEUED)
+					requeued++;
+				else if (state == QueueStates.STARTING)
+					starting++;
+				else if (state == QueueStates.RUNNING)
+					running++;
+				else if (state == QueueStates.ERROR)
+					error++;
+				else if (state == QueueStates.FINISHED)
+					finished++;
+			}
 		}
 
 		ret.put("Queued", queued);
@@ -2033,54 +2062,55 @@ public class JobManager implements Closeable
 		if (_logger.isDebugEnabled() && (_runningJobs.size() > 0)) {
 			_logger.debug("checking on " + _runningJobs.size() + " running jobs.");
 		}
+		synchronized(_runningJobs) {
+			for (JobData job : _runningJobs.values()) {
+				synchronized(job){
+					if (_logger.isDebugEnabled())
+						_logger.debug("considering job: " + job);
 
-		for (JobData job : _runningJobs.values()) {
-			synchronized(job){
-				if (_logger.isDebugEnabled())
-					_logger.debug("considering job: " + job);
-
-				if (job == null || job.getBESID() == null) {
-					if (job == null) {
-						if (_logger.isDebugEnabled())
-							_logger.debug(String.format("Can't check a job that is NULL."));
+					if (job == null || job.getBESID() == null) {
+						if (job == null) {
+							if (_logger.isDebugEnabled())
+								_logger.debug(String.format("Can't check a job that is NULL."));
+						} else {
+							if (_logger.isDebugEnabled())
+								_logger.debug(String.format(
+										"Last minute decision not to check on job %s " + "status because it doesn't have a BES associated.", job));
+							// Added 7/13/2017 by ASG  .. should have already been removed, but for some reason it is still there, so get rid of it.
+							if (job.getJobState()==QueueStates.FINISHED) {
+								SortableJobKey jobKey = new SortableJobKey(job);
+								//FIXME wants a long not a jobkey object
+								_runningJobs.remove(jobKey.getJobID());
+							}
+						}
+						continue;
 					} else {
 						if (_logger.isDebugEnabled())
-							_logger.debug(String.format(
-									"Last minute decision not to check on job %s " + "status because it doesn't have a BES associated.", job));
-						// Added 7/13/2017 by ASG  .. should have already been removed, but for some reason it is still there, so get rid of it.
-						if (job.getJobState()==QueueStates.FINISHED) {
-							SortableJobKey jobKey = new SortableJobKey(job);
-							//FIXME wants a long not a jobkey object
-							_runningJobs.remove(jobKey.getJobID());
-						}
+							_logger.debug(String.format("Starting process of checking status of running job %s", job));
 					}
-					continue;
-				} else {
-					if (_logger.isDebugEnabled())
-						_logger.debug(String.format("Starting process of checking status of running job %s", job));
-				}
 
-				HistoryContext history = job.history(HistoryEventCategory.Checking);
+					HistoryContext history = job.history(HistoryEventCategory.Checking);
 
-				history.createTraceWriter("Checking Running Job Status")
+					history.createTraceWriter("Checking Running Job Status")
 					.format("Checking job status as the result of a received asynchronous notification.").close();
 
-				/*
-				 * For convenience, we bundle together the id's of the job to check, and the bes container on which it is running.
-				 */
-				JobCommunicationInfo info = new JobCommunicationInfo(job.getJobID(), job.getBESID().longValue());
+					/*
+					 * For convenience, we bundle together the id's of the job to check, and the bes container on which it is running.
+					 */
+					JobCommunicationInfo info = new JobCommunicationInfo(job.getJobID(), job.getBESID().longValue());
 
-				/*
-				 * As in other places, we use a callback mechanism to allow outcall threads to late bind "large" information at the last minute.
-				 * This keeps us from putting too much into memory. In this particular case its something of a hack as we already had a type for
-				 * getting the bes information so we just bundled that with a second interface for getting the job's endpoint. This could have
-				 * been done cleaner, but it works fine.
-				 */
-				Resolver resolver = new Resolver();
+					/*
+					 * As in other places, we use a callback mechanism to allow outcall threads to late bind "large" information at the last minute.
+					 * This keeps us from putting too much into memory. In this particular case its something of a hack as we already had a type for
+					 * getting the bes information so we just bundled that with a second interface for getting the job's endpoint. This could have
+					 * been done cleaner, but it works fine.
+					 */
+					Resolver resolver = new Resolver();
 
-				/* Enqueue the worker into the outcall thread pool */
-				_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job, _lastUpdate));
-				_lastUpdate = Calendar.getInstance().getTime();
+					/* Enqueue the worker into the outcall thread pool */
+					_outcallThreadPool.enqueue(new JobUpdateWorker(this, resolver, resolver, _connectionPool, info, job, _lastUpdate));
+					_lastUpdate = Calendar.getInstance().getTime();
+				}
 			}
 		}
 
@@ -2117,31 +2147,33 @@ public class JobManager implements Closeable
 		/*
 		 * Iterate through all running jobs and reduce the slot count from resources that they are using.
 		 */
-		for (JobData job : _runningJobs.values()) {
-			/* Get the bes id that the job is running on */
-			Long besID = job.getBESID();
-			if (besID == null) {
-				_logger.warn(job + "is marked as running which isn't " + "assigned to a BES container.");
-				continue;
-			}
+		synchronized (_runningJobs) {
+			for (JobData job : _runningJobs.values()) {
+				/* Get the bes id that the job is running on */
+				Long besID = job.getBESID();
+				if (besID == null) {
+					_logger.warn(job + "is marked as running which isn't " + "assigned to a BES container.");
+					continue;
+				}
 
-			ResourceSlots rs = slots.get(besID);
-			if (rs != null) {
-				/* Go ahead and "reserve" the slots for use */
-				rs.reserveSlot();
+				ResourceSlots rs = slots.get(besID);
+				if (rs != null) {
+					/* Go ahead and "reserve" the slots for use */
+					rs.reserveSlot();
 
-				/*
-				 * Update the available cores of the BES container.
-				 */
+					/*
+					 * Update the available cores of the BES container.
+					 */
 
-				rs.reserveCores(job.getNumOfCores());
+					rs.reserveCores(job.getNumOfCores());
 
-				/*
-				 * If the resource now has no slots available, remove it complete from the list.
-				 */
-				if ((rs.slotsAvailable() <= 0) || (rs.coresAvailable() <= 0))
-					slots.remove(besID);
+					/*
+					 * If the resource now has no slots available, remove it complete from the list.
+					 */
+					if ((rs.slotsAvailable() <= 0) || (rs.coresAvailable() <= 0))
+						slots.remove(besID);
 
+				}
 			}
 		}
 	}
@@ -2151,16 +2183,18 @@ public class JobManager implements Closeable
 		/*
 		 * Iterate through all running jobs and reduce the slot count from resources that they are using.
 		 */
-		for (JobData job : _runningJobs.values()) {
-			/* Get the bes id that the job is running on */
-			Long besID = job.getBESID();
-			if (besID == null)
-				continue;
+		synchronized (_runningJobs) {
+			for (JobData job : _runningJobs.values()) {
+				/* Get the bes id that the job is running on */
+				Long besID = job.getBESID();
+				if (besID == null)
+					continue;
 
-			SlotSummary summary = slots.get(besID);
-			if (summary != null) {
-				summary.add(-1, 1);
-				summary.addCores(-1, 1);
+				SlotSummary summary = slots.get(besID);
+				if (summary != null) {
+					summary.add(-1, 1);
+					summary.addCores(-1, 1);
+				}
 			}
 		}
 	}
@@ -2207,6 +2241,7 @@ public class JobManager implements Closeable
 			// Get a copy of the current job lists
 			HashMap<String, Iterator<JobData>> userJobs = new HashMap<String, Iterator<JobData>>();
 			for (String user : users) {
+				// 2020-10-21 ASG. WARNING .. THESE ITERATORS ARE BEGING GIVEN AWAY YET THERE MAY BE RACES!!!
 				userJobs.put(user, _usersWithJobs.get(user).values().iterator());
 			}
 
