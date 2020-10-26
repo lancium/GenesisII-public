@@ -1573,7 +1573,7 @@ public class JobManager implements Closeable
 			String scheduledOn = null;
 			JobData job = _jobsByID.get(jobID);
 			if (job == null)
-				continue; // This seems to happen sometimes.
+				continue; // This seems to happen sometimes.  Likely because the job has been removed in the interim
 			BESData besData = _besManager.findBES(job.getBESID());
 			if (besData != null) {
 				scheduledOn = besData.getName();
