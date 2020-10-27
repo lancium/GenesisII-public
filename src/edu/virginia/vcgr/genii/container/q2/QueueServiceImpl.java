@@ -305,7 +305,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			col.add(AnyHelper.toAny(rjit));
 
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
-		builder.preferredBatchSize(100);
+		// 2020-10-26 by ASG changed from 100 to existing constant.
+		builder.preferredBatchSize(QueueConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(col);
 		return new IterateListResponseType(builder.create());
 	}

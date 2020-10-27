@@ -258,8 +258,12 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					execName = execNameArray[execNameArray.length-1];
 					String lanciumEnvironment = activity.getLanciumEnvironment();
 					boolean developmentNamespace = lanciumEnvironment != null && lanciumEnvironment.equals("Development");
+					if (_logger.isDebugEnabled())
+						_logger.debug("developmentNamespace: " + developmentNamespace);
 					String imagePath = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + (developmentNamespace ? "development/" : "") + userName + "/" + execName;
 					// This should use getContainerProperty job BES directory
+					if (_logger.isDebugEnabled())
+						_logger.debug("imagePath: " + imagePath);
 					if (imagePath.endsWith(".qcow2")) {
 						execName = "../vmwrapper.sh";
 					}
