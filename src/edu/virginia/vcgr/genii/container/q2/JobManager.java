@@ -1527,13 +1527,15 @@ public class JobManager implements Closeable
 			if (_usersWithJobs.keySet().contains(username) || _usersNotReadyJobs.keySet().contains(username)) {
 				// Add the job to this user's set
 				TreeMap<SortableJobKey, JobData> usersJobs = _usersWithJobs.get(username);
-				
-				synchronized (usersJobs) {
-					if (usersJobs != null) {
-						Iterator<SortableJobKey> jobKeys = usersJobs.keySet().iterator();
-						while (jobKeys.hasNext()) {
-							SortableJobKey job = jobKeys.next();
-							batchSubset.add(job.getJobID());
+		
+				if (usersJobs != null) {
+					synchronized (usersJobs) {
+						if (usersJobs != null) {
+							Iterator<SortableJobKey> jobKeys = usersJobs.keySet().iterator();
+							while (jobKeys.hasNext()) {
+								SortableJobKey job = jobKeys.next();
+								batchSubset.add(job.getJobID());
+							}
 						}
 					}
 				}
@@ -2308,20 +2310,22 @@ public class JobManager implements Closeable
 
 			/* Find the job data for the match */
 			JobData data = _jobsByID.get(new Long(match.getJobID()));
-			synchronized (data) {
-			
-			if(data.getTerminated())
-			{
-				_logger.debug("Trying to start job " + data + " but it is already terminated. Skipping.");
-				badMatches.add(match);
-				continue;
-			}
-				
-			if (data.isSweepingJob()) {
-				_logger.debug("saw that job is sweeping type; not sending to bes.");
-				badMatches.add(match);
-				continue;
-			}
+			if (data!=null) {
+				synchronized (data) {
+
+					if(data.getTerminated())
+					{
+						_logger.debug("Trying to start job " + data + " but it is already terminated. Skipping.");
+						badMatches.add(match);
+						continue;
+					}
+
+					if (data.isSweepingJob()) {
+						_logger.debug("saw that job is sweeping type; not sending to bes.");
+						badMatches.add(match);
+						continue;
+					}
+				}
 
 			/*
 			 * Get the job off of the queued list and instead put him on the running list. Also, note which bes the jobs is assigned to.
@@ -2476,38 +2480,40 @@ public class JobManager implements Closeable
 		/* Iterate through the job information */
 		for (Long jobID : ownerMap.keySet()) {
 			JobData jobData = _jobsByID.get(jobID);
-			synchronized (jobData) {
-				PartialJobInfo pji = ownerMap.get(jobID);
+			if (jobData!=null) {
+				synchronized (jobData) {
+					PartialJobInfo pji = ownerMap.get(jobID);
 
-				/*
-			 	* If the caller doesn't own the job, it's a security exception
-			 	*/
-				if (!QueueSecurity.isOwner(pji.getOwners())) {
-					GenesisIISecurityException t =
-						new GenesisIISecurityException("Don't have permission to kill job \"" + jobData.getJobTicket() + "\".");
-					jobData.history(HistoryEventCategory.Terminating).createWarnWriter("Termination Request Denied")
+					/*
+					 * If the caller doesn't own the job, it's a security exception
+					 */
+					if (!QueueSecurity.isOwner(pji.getOwners())) {
+						GenesisIISecurityException t =
+								new GenesisIISecurityException("Don't have permission to kill job \"" + jobData.getJobTicket() + "\".");
+						jobData.history(HistoryEventCategory.Terminating).createWarnWriter("Termination Request Denied")
 						.format("Denying termination request.  Caller not authorized.").close();
-					throw t;
-				}
-				
-				//LAK 2020 Aug 21: This stops the scheduler from starting the job in the future.
-				jobData.setTerminated(true);
-				removeFromUserBucket(_usersWithJobs, jobData);
-				putInUserBucket(_usersNotReadyJobs, jobData, jobData.getUserName());
+						throw t;
+					}
 
-				/*
-				 * If the job is starting, we mark it as being killed. Starting implies that another thread is about to try and start the thing up
-				 * so it will have to check this flag and abort (or kill) as necessary.
-				 */
-				if (jobData.getJobState().equals(QueueStates.STARTING) || jobData.getJobState().equals(QueueStates.RUNNING)) {
-					killJob(connection, jobID);
-				}
-				else if (jobData.getJobState().equals(QueueStates.QUEUED) || jobData.getJobState().equals(QueueStates.REQUEUED))
-				{
-					finishJob(jobID);
-				}
-				else if (jobData.getJobState().isFinalState()) {
-					_logger.debug("killJobs called on job that is already finished");
+					//LAK 2020 Aug 21: This stops the scheduler from starting the job in the future.
+					jobData.setTerminated(true);
+					removeFromUserBucket(_usersWithJobs, jobData);
+					putInUserBucket(_usersNotReadyJobs, jobData, jobData.getUserName());
+
+					/*
+					 * If the job is starting, we mark it as being killed. Starting implies that another thread is about to try and start the thing up
+					 * so it will have to check this flag and abort (or kill) as necessary.
+					 */
+					if (jobData.getJobState().equals(QueueStates.STARTING) || jobData.getJobState().equals(QueueStates.RUNNING)) {
+						killJob(connection, jobID);
+					}
+					else if (jobData.getJobState().equals(QueueStates.QUEUED) || jobData.getJobState().equals(QueueStates.REQUEUED))
+					{
+						finishJob(jobID);
+					}
+					else if (jobData.getJobState().isFinalState()) {
+						_logger.debug("killJobs called on job that is already finished");
+					}
 				}
 			}
 		}
