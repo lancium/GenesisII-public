@@ -63,7 +63,11 @@ public class CleanupPhase extends AbstractExecutionPhase implements Serializable
 		} catch (Throwable cause) {
 			history.error(cause, "Unable to Cleanup %s", _fileToCleanup.getName());
 			_logger.error("Unable to clean up file.", cause);
-			throw new ContinuableExecutionException("A continuable exception has occurred while " + "running a BES activity.", cause);
+			// 2020-10-29 by ASG. When using sudo lrun if an application creates files/directories with no group write permissions, the
+			// BES running as luser cannot delete the files. We want to just bail. We are going to change how we get rid of those files,
+			// and will be cleaning up by hand until we get a root level process on the NFS server to clear them out.
+			return;
+			//throw new ContinuableExecutionException("A continuable exception has occurred while " + "running a BES activity.", cause);
 		}
 	}
 }
