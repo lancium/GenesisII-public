@@ -8,7 +8,7 @@ class LRUList<KeyType, DataType> extends CacheList<KeyType, DataType>
 	}
 
 	@Override
-	public void insert(RoleBasedCacheNode<KeyType, DataType> node)
+	public synchronized void insert(RoleBasedCacheNode<KeyType, DataType> node)
 	{
 		// LRU inserts ALWAYS go at the tail
 		if (_tail == null) {
@@ -21,7 +21,7 @@ class LRUList<KeyType, DataType> extends CacheList<KeyType, DataType>
 		_tail = node;
 	}
 
-	public void noteUse(RoleBasedCacheNode<KeyType, DataType> node)
+	public synchronized void noteUse(RoleBasedCacheNode<KeyType, DataType> node)
 	{
 		remove(node);
 		insert(node);
