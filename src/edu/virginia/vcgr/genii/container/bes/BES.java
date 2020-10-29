@@ -31,6 +31,7 @@ import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
 import org.ggf.jsdl.JobIdentification_Type;
+import org.ggf.jsdl.LanciumEnvironment;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Resources_Type;
 import org.morgan.util.io.StreamUtils;
@@ -375,8 +376,24 @@ public class BES implements Closeable
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
+			
+			String lanciumEnvironment = null;
+			JobDefinition_Type jobDef = jsdl;
+			JobDescription_Type jobDesc = jobDef.getJobDescription(0);
+			if (jobDesc != null) {
+				Resources_Type resources = jobDesc.getResources();
+				if (resources != null) {
+					LanciumEnvironment[] lanciumEnvArray = resources.getLanciumEnvironment();
+					if (lanciumEnvArray != null) {
+						LanciumEnvironment lanciumEnv = lanciumEnvArray[0];
+						if (lanciumEnv != null) {
+							lanciumEnvironment = lanciumEnv.toString();
+						}
+					}
+				}
+			}
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, false);
+				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, false, lanciumEnvironment);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -486,6 +503,7 @@ public class BES implements Closeable
 					// Previously, we wouldn't need to reload it because it would already be in the phases inside the executionPlan
 					String jobAnnotation = null;
 					String gpuType = null;
+					String lanciumEnvironment = null;
 					int gpuCount = 0;
 					JobDefinition_Type jsdl = DBSerializer.xmlFromBlob(JobDefinition_Type.class, rs.getBlob(10));
 					if (jsdl !=null) {
@@ -507,6 +525,13 @@ public class BES implements Closeable
 										gpuType = gpuArchName.getValue();
 									}
 								}
+								LanciumEnvironment[] lanciumEnvArray = resources.getLanciumEnvironment();
+								if (lanciumEnvArray != null) {
+									LanciumEnvironment lanciumEnv = lanciumEnvArray[0];
+									if (lanciumEnv != null) {
+										lanciumEnvironment = lanciumEnv.toString();
+									}
+								}
 								RangeValue_Type gpuCountPerNode = resources.getGPUCountPerNode();
 								if (gpuCountPerNode != null) {
 									Boundary_Type upperBound = gpuCountPerNode.getUpperBoundedRange();
@@ -525,7 +550,7 @@ public class BES implements Closeable
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, destroyRequested);
+							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, destroyRequested, lanciumEnvironment);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);

@@ -30,6 +30,14 @@ This document and the information contained herein is provided on an "AS IS" bas
 		</xsd:restriction>
 	</xsd:simpleType>
 	<!--========================================================================-->
+	<!-- Charlie: 9-29-2020: LanciumEnvironment variable so we have development and production users + images -->
+	<xsd:simpleType name="LanciumEnvironment">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Development"/>
+			<xsd:enumeration value="Production"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--========================================================================-->
 	<xsd:simpleType name="ProcessorArchitectureEnumeration">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="sparc"/>
@@ -236,6 +244,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 			<xsd:element ref="jsdl:TotalVirtualMemory" minOccurs="0"/>
 			<xsd:element ref="jsdl:TotalDiskSpace" minOccurs="0"/>
 			<xsd:element ref="jsdl:TotalResourceCount" minOccurs="0"/>
+			<xsd:element ref="jsdl:LanciumEnvironment" minOccurs="0" maxOccurs="unbounded"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
@@ -346,6 +355,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 	<xsd:element name="GPUArchitectureName" type="jsdl:GPUArchitectureEnumeration"/>
 	<xsd:element name="GPUCountPerNode" type="jsdl:RangeValue_Type"/>
 	<xsd:element name="GPUMemoryPerNode" type="jsdl:RangeValue_Type"/>
+	<xsd:element name="LanciumEnvironment" type="jsdl:LanciumEnvironment"/>
 	<xsd:element name="FileSystem" type="jsdl:FileSystem_Type"/>
 	<xsd:element name="FileSystemType" type="jsdl:FileSystemTypeEnumeration"/>
 	<xsd:element name="MountPoint" type="xsd:string"/>

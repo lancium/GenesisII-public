@@ -75,10 +75,11 @@ public class BESActivity implements Closeable
 	private int _gpuCount;
 	//LAK 2020 Aug 18: This is set to true when the execution environment is fully setup before the phase is executed
 	private boolean _executionContextSet = false;
+	private String _lanciumEnvironment;
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
-		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested, boolean destroyRequested)
+		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested, boolean destroyRequested, String lanciumEnvironment)
 	{
 		_connectionPool = connectionPool;
 
@@ -97,6 +98,7 @@ public class BESActivity implements Closeable
 		_jobAnnotation = jobAnnotation;
 		_gpuType = gpuType;
 		_gpuCount = gpuCount;
+		_lanciumEnvironment = lanciumEnvironment;
 
 		_runner = new ActivityRunner(_suspendRequested, _terminateRequested, _destroyRequested);
 		_policyListener = new PolicyListener();
@@ -670,6 +672,9 @@ public class BESActivity implements Closeable
 
 	public void setGPUCount(int gpuCount) {
 		this._gpuCount = gpuCount;
+	}
+	public String getLanciumEnvironment() {
+		return _lanciumEnvironment;
 	}
 
 	private class ActivityRunner implements Runnable

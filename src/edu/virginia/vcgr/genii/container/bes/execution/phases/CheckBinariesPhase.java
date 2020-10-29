@@ -72,6 +72,7 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		if (_execNameArray.length >= 2)
 			usingLanciumImage = _execNameArray[_execNameArray.length-2].equals("Lancium");
 		
+		
 		// The following is code to figure out the username
 		// We need to username because we build the local and grid paths to the images with it
 		ICallingContext callContext = context.getCallingContext();
@@ -94,7 +95,13 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 			}
 		}
 
-		File userImageDir = new File(sharedDir+"/Images/" + userName);
+		String lanciumEnvironment = activity.getLanciumEnvironment();
+		boolean developmentNamespace = lanciumEnvironment != null && lanciumEnvironment.equals("Development");
+		String imageSourceGeniiPathString = usingLanciumImage ? "/bin/Lancium/Images/" : ("/home/CCC/Lancium/" + (developmentNamespace ? "development/" : "") + userName + "/Images/") + _execName;
+		String userImageDirString = sharedDir + "/Images/" + (usingLanciumImage ? "Lancium/" : ((developmentNamespace ? "development/" : "") + userName+"/"));
+		String imageTargetFileString = userImageDirString + _execName;
+		
+		File userImageDir = new File(userImageDirString);
 		if (_logger.isDebugEnabled())
 			_logger.debug("User Image Directory: " + userImageDir.toString()); 
 		if (!userImageDir.exists()) {
@@ -104,8 +111,6 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		}
 		if (_logger.isDebugEnabled())
 			_logger.debug("Shared directory: " + sharedDir); 
-		String imageSourceGeniiPathString = (usingLanciumImage ? "/bin/Lancium/Images/" : "/home/CCC/Lancium/" + userName + "/Images/") + _execName;
-		String imageTargetFileString = sharedDir + "/Images/" + (usingLanciumImage ? "Lancium/" : userName+"/") + _execName;
 		RNSPath sourceRNS = new GeniiPath(imageSourceGeniiPathString).lookupRNS();
 		File target = new File(imageTargetFileString);
 		URI source;
