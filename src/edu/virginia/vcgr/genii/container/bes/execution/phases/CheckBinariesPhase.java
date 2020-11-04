@@ -79,6 +79,7 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 		String prefId = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
 		X509Certificate owner = GffsExportConfiguration.findPreferredIdentityServerSide(callContext, prefId);
 		String userName = CredentialWallet.extractUsername(owner);
+		userName=userName.replaceAll("\"","");
 		_logger.info("Calculated username: " + userName);
 		
 		String sharedDir = context.getCurrentWorkingDirectory().getWorkingDirectory().getParent().toString();
@@ -97,11 +98,20 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 
 		String lanciumEnvironment = activity.getLanciumEnvironment();
 		boolean developmentNamespace = lanciumEnvironment != null && lanciumEnvironment.equals("Development");
-		String imageSourceGeniiPathString = usingLanciumImage ? "/bin/Lancium/Images/" : ("/home/CCC/Lancium/" + (developmentNamespace ? "development/" : "") + userName + "/Images/") + _execName;
+//		String imageSourceGeniiPathString = usingLanciumImage ? "/bin/Lancium/Images/" : ("/home/CCC/Lancium/" + (developmentNamespace ? "development/" : "") + userName + "/Images/") + _execName;
+		String imageSourceGeniiPathString = null;
+
+		if (usingLanciumImage) {
+			imageSourceGeniiPathString="/bin/Lancium/Images/" + _execName;
+		} else {
+			imageSourceGeniiPathString="/home/CCC/Lancium/" + (developmentNamespace ? "development/" : "") + userName +  "/Images/" + _execName;
+		}
 		String userImageDirString = sharedDir + "/Images/" + (usingLanciumImage ? "Lancium/" : ((developmentNamespace ? "development/" : "") + userName+"/"));
 		String imageTargetFileString = userImageDirString + _execName;
 		
 		File userImageDir = new File(userImageDirString);
+		if (_logger.isDebugEnabled())
+			_logger.debug("Genii source Image Directory: " + imageSourceGeniiPathString.toString());
 		if (_logger.isDebugEnabled())
 			_logger.debug("User Image Directory: " + userImageDir.toString()); 
 		if (!userImageDir.exists()) {

@@ -260,26 +260,36 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					boolean developmentNamespace = lanciumEnvironment != null && lanciumEnvironment.equals("Development");
 					if (_logger.isDebugEnabled())
 						_logger.debug("developmentNamespace: " + developmentNamespace);
-					String imagePath = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + (developmentNamespace ? "development/" : "") + userName + "/" + execName;
+					// 2020-11-04 by ASG. This code did not work, updated
+					// String imagePath = usingLanciumImage ? "../Images/Lancium/" : "../Images/" + (developmentNamespace ? "development/" : "") + userName + "/" + execName;
+					String imagePath=null;
+					if (usingLanciumImage) {
+						imagePath="../Images/Lancium/" + execName;
+					}
+					else {
+						imagePath="../Images/" + (developmentNamespace ? "development/" : "") + userName + "/" + execName;
+					}
 					// This should use getContainerProperty job BES directory
 					if (_logger.isDebugEnabled())
 						_logger.debug("imagePath: " + imagePath);
 					if (imagePath.endsWith(".qcow2")) {
 						execName = "../vmwrapper.sh";
 					}
+					String fullPath = jwd.getAbsolutePath()+ "/" + imagePath;
 					if (_logger.isDebugEnabled())
-						_logger.debug("Handling image executable: " + execName);
-					if (Files.exists(Paths.get(imagePath))) {
-						String MIME = Files.probeContentType(Paths.get(imagePath));
+						_logger.debug("Handling image executable: " + fullPath);
+
+					if (Files.exists(Paths.get(fullPath))) {
+						String MIME = Files.probeContentType(Paths.get(fullPath));
 						if (_logger.isDebugEnabled())
-							_logger.debug(imagePath + " exists with MIME type: " + MIME);
-						if (MIME.contains("QEMU QCOW Image") || MIME.contains("run-singularity script executable")) {
+							_logger.debug(fullPath + " exists with MIME type: " + MIME);
+						if (MIME.contains("QEMU QCOW Image") || MIME.contains("run-singularity script executable")|| MIME.contains("model/x.stl-binary")) {
 							if (_logger.isDebugEnabled())
-								_logger.debug(imagePath + " exists and has the correct MIME type.");
+								_logger.debug(fullPath + " exists and has the correct MIME type.");
 						}
 						else {
 							if (_logger.isDebugEnabled())
-								_logger.debug(imagePath + " exists but has the wrong MIME type.");
+								_logger.debug(fullPath + " exists but has the wrong MIME type.");
 							// 2020 May 27 CCH, not sure how to handle bad MIME type
 							// Currently, set imagePath to something completely different so the original image does not execute
 							imagePath = "../Images/Lancium/BAD_MIME";
@@ -287,7 +297,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					}
 					else {
 						if (_logger.isDebugEnabled())
-							_logger.debug(imagePath + " does not exist.");
+							_logger.debug(fullPath + " does not exist.");
 					}
 					args.add(0, imagePath);
 				}
