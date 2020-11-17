@@ -273,7 +273,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					if (_logger.isDebugEnabled())
 						_logger.debug("imagePath: " + imagePath);
 					if (imagePath.endsWith(".qcow2")) {
-						execName = "../vmwrapper.sh";
+						execName = jwd.getAbsolutePath() + "/" + "../vmwrapper.sh";
 					}
 					String fullPath = jwd.getAbsolutePath()+ "/" + imagePath;
 					if (_logger.isDebugEnabled())
@@ -301,6 +301,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					}
 					args.add(0, imagePath);
 				}
+				// End of "if qcow2 or singularity
 
 
 				preDelay();
@@ -312,8 +313,12 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					hWriter.format(" %s", arg);
 				hWriter.close();
 
-				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
+			/*	_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
 						_threadsPerProcess, _executable.getAbsolutePath(), args, _environment, fileToPath(_stdin, null),
+						fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
+			*/
+				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
+						_threadsPerProcess, execName, args, _environment, fileToPath(_stdin, null),
 						fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
 
 				_logger.info(String.format("Queue submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,
