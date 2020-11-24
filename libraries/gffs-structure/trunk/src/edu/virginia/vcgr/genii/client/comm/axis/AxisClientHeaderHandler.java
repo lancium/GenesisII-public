@@ -209,6 +209,30 @@ public class AxisClientHeaderHandler extends BasicHandler
 			throw new AxisFault(se.getLocalizedMessage(), se);
 		}
 	}
+	
+	static private boolean delegateTo(EndpointReferenceType epr) 
+	{
+		// =======================================================
+		// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export.
+		// Don't delegate if the endpoint is a LightweightExport, and RNS or a byteIO
+		boolean delegate=true;
+		if (epr == null) {
+			_logger.warn("could not find EPR target in message context; cannot check whether to delegate.");
+			return true;
+		} else {
+			String serviceName=null;
+			try {
+				serviceName=EPRUtils.extractServiceName(epr);
+			} catch (AxisFault e) {
+				return true;
+			}
+			if (serviceName!=null) 
+				if ((serviceName.indexOf("EnhancedRNSPortType")>=0)||
+						(serviceName.indexOf("RandomByteIOPortType")>=0) ||
+						(serviceName.indexOf("LightWeightExportPortType")>=0)) delegate=false;									
+		}
+		return delegate;
+	}
 
 	public static void delegateCredentials(CredentialWallet wallet, ICallingContext callingContext, MessageContext messageContext,
 		MessageSecurity msgSecData) throws Exception
@@ -227,10 +251,14 @@ public class AxisClientHeaderHandler extends BasicHandler
 		
 		EndpointReferenceType target = (EndpointReferenceType) messageContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
 		GUID containerGUID = null;
+		// =======================================================
+		// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
+		boolean delegate = true;
 		if (target == null) {
 			_logger.warn("could not find EPR target in message context; cannot use this for container id.");
 		} else {
 			containerGUID = EPRUtils.getGeniiContainerID(target);
+			delegate=delegateTo(target);
 		}
 
 		long beginTime = System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset;
@@ -303,8 +331,12 @@ public class AxisClientHeaderHandler extends BasicHandler
 							}
 
 							// then delegate from the tls cert to the remote resource.
-							walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER, tlsKey._certChain,
-								tlsKey._privateKey, restrictions, accessCategories, newCred);
+							// =======================================================
+							// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
+							// if (delegate) added
+							if (delegate) 
+								walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER, tlsKey._certChain,
+										tlsKey._privateKey, restrictions, accessCategories, newCred);
 
 							handledThisAlready = true;
 						} else {
@@ -314,7 +346,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 					}
 
 					// if no delegation step performed at some point above, do it here.
-					if (!handledThisAlready) {
+					// =======================================================
+					// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
+					// if && delegate added 
+					if (!handledThisAlready&&delegate) {
 						if (_logger.isTraceEnabled())
 							_logger
 								.debug("outcall, normal trust delegation by: " + clientKeyAndCertificate._clientCertChain[0].getSubjectDN());
@@ -448,9 +483,12 @@ public class AxisClientHeaderHandler extends BasicHandler
 		 * process the transient credentials to prepare the serializable portion of the calling context for them.
 		 */
 		MessageSecurity msgSecData = (MessageSecurity) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
-
 		try {
-			delegateCredentials(wallet, callContext, msgContext, msgSecData);
+			// =======================================================
+			// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
+			// EndpointReferenceType target = (EndpointReferenceType) msgContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
+			// if (delegateTo(target))
+				delegateCredentials(wallet, callContext, msgContext, msgSecData);
 		} catch (Exception ex) {
 			_logger.warn("ERROR: Failed to delegate SAML credentials.", ex);
 		}
