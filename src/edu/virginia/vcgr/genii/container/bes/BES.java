@@ -336,7 +336,7 @@ public class BES implements Closeable
 		return suggestedJobName;
 	}
 
-	synchronized public BESActivity createActivity(Connection parentConnection, String activityid, JobDefinition_Type jsdl,
+	public BESActivity createActivity(Connection parentConnection, String activityid, JobDefinition_Type jsdl,
 		Collection<Identity> owners, ICallingContext callingContext, BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan,
 		EndpointReferenceType activityEPR, String activityServiceName, String suggestedJobName, String jobAnnotation, String gpuType, int gpuCount) throws SQLException, ResourceException
 	{
@@ -391,9 +391,13 @@ public class BES implements Closeable
 						}
 					}
 				}
-			}
+			}			
+			long startTime=System.currentTimeMillis();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
 				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, false, lanciumEnvironment);
+			long endTime=System.currentTimeMillis();
+			long totalTime=endTime-startTime;
+			_logger.debug(new String("Time to new BES activity " + jobName + " = " + totalTime));
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;

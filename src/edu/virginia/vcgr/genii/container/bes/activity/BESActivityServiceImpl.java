@@ -118,7 +118,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, activityEPR, cParams, creationParameters, resolverCreationParams);
-
+		long startTime=System.currentTimeMillis();
 		if (_logger.isDebugEnabled())
 			_logger.debug(String.format("Post creating a BES Activity with resource key \"%s\".", rKey.getResourceKey()));
 
@@ -138,9 +138,10 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
+		String jobName = "NoName";
 		try {
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
-			String jobName;
+
 			Vector<ExecutionPhase> executionPlan;
 
 			CloudConfiguration cConfig = ((BESConstructionParameters) cParams).getCloudConfiguration();
@@ -221,6 +222,9 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			Calendar future = Calendar.getInstance();
 			future.setTimeInMillis(System.currentTimeMillis() + BES_ACTIVITY_LIFETIME);
 			_logger.debug(String.format("Setting term. time for BES Activity with resource key \"%s\".", rKey.getResourceKey()));
+			long endTime=System.currentTimeMillis();
+			long totalTime=endTime-startTime;
+			_logger.debug(new String("Time to postCreate BES activity " + jobName + " = " + totalTime));
 			setScheduledTerminationTime(future, rKey);
 		} catch (IOException fnfe) {
 			throw new RemoteException("Unable to create new activity.", fnfe);

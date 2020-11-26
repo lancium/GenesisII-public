@@ -366,7 +366,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{
 		InMemoryHistoryEventSink historySink = new InMemoryHistoryEventSink();
 		HistoryContext history = HistoryContextFactory.createContext(HistoryEventCategory.CreatingActivity, historySink);
-
+		long startTime=System.currentTimeMillis();
+		_logger.info(String.format("BES with resource key \"%s\" is creating an activity.", _resource.getKey()));
 		ActivityDocumentType adt = parameters.getActivityDocument();
 		JobDefinition_Type jdt = adt.getJobDefinition();
 
@@ -417,12 +418,17 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		history.info("BES Creating Activity Instance");
-
+		long createEPRTime=System.currentTimeMillis();
 		EndpointReferenceType entryReference = new BESActivityServiceImpl().CreateEPR(
 			BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
 				(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
 			Container.getServiceURL("BESActivityPortType"));
+		long endTime=System.currentTimeMillis();
 
+		long totalTime=endTime-createEPRTime;
+		_logger.debug(new String("Time to createEPR " + _resource.getKey() + " = " + totalTime));
+		totalTime=endTime-startTime;
+		_logger.debug(new String("Time to create BES activity " + _resource.getKey() + " = " + totalTime));
 		return new CreateActivityResponseType(entryReference, adt, historySink.eventMessages());
 
 	}
