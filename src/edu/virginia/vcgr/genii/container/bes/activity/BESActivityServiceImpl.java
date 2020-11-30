@@ -165,9 +165,11 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					Object understanding = JSDLInterpreter.interpretJSDL(new ForkExecPersonalityProvider(fsManager, workingDirectory), jsdl);
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
-
+				long startPlanTime=System.currentTimeMillis();
 				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl);
 				jobName = executionUnderstanding.getJobName();
+				long PlanTime=System.currentTimeMillis()-startPlanTime;
+				_logger.debug(new String("Time to plan BES activity " + jobName + " = " + PlanTime));
 				
 			}
 

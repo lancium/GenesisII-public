@@ -172,7 +172,8 @@ public class BES implements Closeable
 		}
 	}
 
-	synchronized static public BES getBES(String besid) throws IllegalStateException
+	// synchronized 
+	static public BES getBES(String besid) throws IllegalStateException
 	{
 		if (_connectionPool == null) {
 			throw new IllegalStateException("BES instances not initialized.");
@@ -262,7 +263,8 @@ public class BES implements Closeable
 		close();
 	}
 
-	synchronized public boolean isAcceptingActivites(Integer threshold)
+	// synchronized 
+	public boolean isAcceptingActivites(Integer threshold)
 	{
 		if (threshold != null)
 			if (_containedActivities.size() >= threshold.intValue())
@@ -342,6 +344,7 @@ public class BES implements Closeable
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
+		long startTime=System.currentTimeMillis();
 
 		String jobName = findJobName(suggestedJobName);
 		ActivityState state = new ActivityState(ActivityStateEnumeration.Pending, null, false);
@@ -392,14 +395,13 @@ public class BES implements Closeable
 					}
 				}
 			}			
-			long startTime=System.currentTimeMillis();
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
 				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, false, lanciumEnvironment);
-			long endTime=System.currentTimeMillis();
-			long totalTime=endTime-startTime;
-			_logger.debug(new String("Time to new BES activity " + jobName + " = " + totalTime));
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
+			long endTime=System.currentTimeMillis();
+			long totalTime=endTime-startTime;
+			_logger.debug(new String("Time to execute BES.createActivity " + jobName + " = " + totalTime));
 			return activity;
 		} finally {
 			StreamUtils.close(stmt);
@@ -409,12 +411,14 @@ public class BES implements Closeable
 		}
 	}
 
-	synchronized public BESActivity findActivity(String activityid)
+	// synchronized 
+	public BESActivity findActivity(String activityid)
 	{
 		return _containedActivities.get(activityid);
 	}
 
-	synchronized public void deleteActivity(Connection connection, String activityid) throws UnknownActivityIdentifierFaultType, SQLException
+	// synchronized 
+	public void deleteActivity(Connection connection, String activityid) throws UnknownActivityIdentifierFaultType, SQLException
 	{
 		UnknownActivityIdentifierFaultType fault = null;
 		if (_logger.isDebugEnabled())
