@@ -36,6 +36,8 @@ import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
+import com.sun.prism.impl.Disposer.Target;
+
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher;
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
 import edu.virginia.vcgr.appmgr.version.Version;
@@ -486,8 +488,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 		try {
 			// =======================================================
 			// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
-			// EndpointReferenceType target = (EndpointReferenceType) msgContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
-			// if (delegateTo(target))
+			EndpointReferenceType target = (EndpointReferenceType) msgContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
+			//if (delegateTo(target))
+			X509Certificate[] certChain=EPRUtils.extractCertChain(target);
+			// Temp removal, if (certChain!=null)
 				delegateCredentials(wallet, callContext, msgContext, msgSecData);
 		} catch (Exception ex) {
 			_logger.warn("ERROR: Failed to delegate SAML credentials.", ex);

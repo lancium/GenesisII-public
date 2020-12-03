@@ -117,6 +117,14 @@ public class GeniiResolverServiceImpl extends GenesisIIBase implements GeniiReso
 		new VersionedResourceAttributeHandlers(getAttributePackage());
 	}
 
+	// 2020-12-1 by ASG
+	// keyInEPR is intended as a replacement for instanceof(GeniiNoOutcalls) which was a bit hacky.
+	// If it is "true", we will not put key material in the X.509. This will in turn prevent delegation to instances
+	// of a type that returns true, and will make transporting and storing EPR's consume MUCH less space.
+	public boolean keyInEPR() {
+		return true;
+	}
+	
 	public GeniiResolverServiceImpl() throws RemoteException
 	{
 		this("GeniiResolverPortType");

@@ -375,13 +375,13 @@ public class GenesisIIFilesystem implements FSFilesystem
 			if (info.isEnhancedRNS()) {
 				_logger.trace("Using Short form for Enhanced-RNS handle.");
 				ICallingContext context = ContextManager.getCurrentContext().getParent();
-				//context.setSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN, true);
+				context.setSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN, true);
 
 				EnhancedRNSPortType pt = ClientUtils.createProxy(EnhancedRNSPortType.class, target.getEndpoint());
 				RNSIterable entries = new RNSIterable(fullPath, pt.lookup(null), context, RNSConstants.PREFERRED_BATCH_SIZE);
 				directoryHandle = new EnhancedRNSHandle(this, entries, fullPath);
 
-				//context.removeProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
+				context.removeProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
 			} else if (info.isRNS()) {
 				directoryHandle = new DefaultRNSHandle(this, target.listContents(true));
 			} else {

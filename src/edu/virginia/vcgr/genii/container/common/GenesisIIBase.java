@@ -216,6 +216,12 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 	private IResolverFactoryProxy _defaultResolverFactoryProxy = null;
 
 	public abstract PortType getFinalWSResourceInterface();
+	
+	// 2020-12-1 by ASG
+	// keyInEPR is intended as a replacement for instanceof(GeniiNoOutcalls) which was a bit hacky.
+	// If it is "true", we will not put key material in the X.509. This will in turn prevent delegation to instances
+	// of a type that returns true, and will make transporting and storing EPR's consume MUCH less space.
+	public abstract boolean keyInEPR();
 
 	final private NotificationMultiplexer notificationMultiplexer()
 	{
@@ -287,7 +293,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		if (!creationParameters.containsKey(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM))
 			creationParameters.put(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, WSName.generateNewEPI());
 
-		if (!(this instanceof GeniiNoOutCalls)) {
+		//if (!(this instanceof GeniiNoOutCalls)) {
+		if (keyInEPR()) {
 
 			CertCreationSpec spec = getChildCertSpec();
 			if (spec != null) {
@@ -740,7 +747,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		WorkingContext.getCurrentWorkingContext().setProperty(WorkingContext.CURRENT_RESOURCE_KEY, rKey);
 
 		try {
-			if (!(this instanceof GeniiNoOutCalls)) {
+			// if (!(this instanceof GeniiNoOutCalls)) {
+			if (keyInEPR()) {
+
 				try {
 					CallingContextImpl context = new CallingContextImpl((CallingContextImpl) null);
 					context.setActiveKeyAndCertMaterial(
@@ -835,7 +844,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 		EndpointReferenceType epr =
 			ResourceManager.createEPR(rKey, targetAddress.toString(), getImplementedPortTypes(rKey), getMasterType(rKey));
 
-		if (!(this instanceof GeniiNoOutCalls)) {
+		//if (!(this instanceof GeniiNoOutCalls)) {
+		if (keyInEPR()) {
+
 			try {
 				CallingContextImpl context = new CallingContextImpl((CallingContextImpl) null);
 				context.setActiveKeyAndCertMaterial(
