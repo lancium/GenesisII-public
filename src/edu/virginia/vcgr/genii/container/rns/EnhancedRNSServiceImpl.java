@@ -456,6 +456,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		// responsibility.
 		// ---------------------------------------------------------------------------------------------------
 		boolean requestedShortForm = false;
+		// 2020-12-4 ASG turning off shortForm
+		/*
 		try {
 			ICallingContext context = ContextManager.getCurrentContext();
 			Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
@@ -466,6 +468,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		} catch (Exception e) {
 			_logger.trace("could not get information about the short form");
 		}
+		*/
 		// ---------------------------------------------------------------------------------------------------
 
 		AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();

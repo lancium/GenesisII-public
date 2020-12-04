@@ -633,6 +633,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 
 			// Check if short form is requested by the client.
 			boolean requestedShortForm = false;
+			// 2020-12-4 ASG turning off shortForm
+			/*
 			try {
 				ICallingContext context = ContextManager.getCurrentContext();
 				Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
@@ -643,6 +645,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			} catch (Exception e) {
 				_logger.trace("could not get information about the short form");
 			}
+			*/
 
 			Collection<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
 			timer = tSink.getTimer("Prepare Entries");

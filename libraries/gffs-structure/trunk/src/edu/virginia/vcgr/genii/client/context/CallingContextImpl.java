@@ -224,8 +224,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		
 		if (toReturn == null) {
 			if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
-				_logger.error("failure: no active key material for container role!  this is a problem.");
-				new Exception().printStackTrace();
+				//_logger.error("failure: no active key material for container role!  this is a problem.");
+				//new Exception().printStackTrace();
 			}
 		}
 		
