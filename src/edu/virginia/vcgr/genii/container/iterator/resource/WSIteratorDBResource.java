@@ -183,7 +183,9 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 			// is Prof.'s
 			// responsibility. ASG
 			// ---------------------------------------------------------------------------------------------------
+			// 2020-12-4 ASG turning off shortForm
 			boolean ShortForm = false;
+			/*
 			try {
 				ICallingContext context = ContextManager.getCurrentContext();
 				Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
@@ -194,6 +196,7 @@ public class WSIteratorDBResource extends BasicDBResource implements WSIteratorR
 			} catch (Exception e) {
 				_logger.trace("could not get information about the short form");
 			}
+			*/
 			// ---------------------------------------------------------------------------------------------------
 
 			firstElement = Math.max(firstElement, 0);

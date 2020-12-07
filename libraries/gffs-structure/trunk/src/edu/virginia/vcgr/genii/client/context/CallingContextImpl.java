@@ -218,11 +218,17 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	public synchronized KeyAndCertMaterial getActiveKeyAndCertMaterial() throws AuthZSecurityException
 	{
 		KeyAndCertMaterial toReturn = (KeyAndCertMaterial) getTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA);
+		// 2020-12-2 by ASG
+		// Since we have no made it possible that there is no active key and cert material for this object, as it may
+		// have no X.509 at all, I am commenting out the whole next block.
+		
 		if (toReturn == null) {
 			if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
-				_logger.error("failure: no active key material for container role!  this is a problem.");
+				//_logger.error("failure: no active key material for container role!  this is a problem.");
+				//new Exception().printStackTrace();
 			}
 		}
+		
 		return toReturn;
 	}
 

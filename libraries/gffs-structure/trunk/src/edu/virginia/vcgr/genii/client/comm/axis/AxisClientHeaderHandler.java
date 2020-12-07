@@ -36,6 +36,8 @@ import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
+import com.sun.prism.impl.Disposer.Target;
+
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher;
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
 import edu.virginia.vcgr.appmgr.version.Version;
@@ -245,7 +247,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 		X509Certificate[] resourceCertChain = msgSecData._resourceCertChain;
 		KeyAndCertMaterial clientKeyAndCertificate = callingContext.getActiveKeyAndCertMaterial();
 		if (clientKeyAndCertificate == null) {
-			_logger.error("no active key and cert material available: not performing delegation");
+			// 2020-012-04 - this was formerly an error .. till we took X.509's out of some EPRS
+			//_logger.error("no active key and cert material available: not performing delegation");
 			return;
 		}
 		
@@ -318,26 +321,27 @@ public class AxisClientHeaderHandler extends BasicHandler
 						CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
 						if (tlsKey != null) {
 							// first delegate from the credential's resource to our tls cert.
-							TrustCredential newCred = walletForResource.getRealCreds().delegateTrust(tlsKey._certChain,
-								IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
-								restrictions, accessCategories, trustDelegation);
-							if (newCred == null) {
-								if (_logger.isTraceEnabled()) {
-									_logger.debug(
-										"failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
-											+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
-								}
-								continue;
-							}
+							if (delegate) {
+								// then delegate from the tls cert to the remote resource.
+								// =======================================================
+								// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
+								// if (delegate) added
 
-							// then delegate from the tls cert to the remote resource.
-							// =======================================================
-							// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
-							// if (delegate) added
-							if (delegate) 
+								TrustCredential newCred = walletForResource.getRealCreds().delegateTrust(tlsKey._certChain,
+										IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
+										restrictions, accessCategories, trustDelegation);
+								if (newCred == null) {
+									if (_logger.isTraceEnabled()) {
+										_logger.debug(
+												"failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
+														+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+									}
+									continue;
+								}
+
 								walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER, tlsKey._certChain,
 										tlsKey._privateKey, restrictions, accessCategories, newCred);
-
+							}
 							handledThisAlready = true;
 						} else {
 							_logger.error("failed to find a tls certificate for delegating in the outcall");
@@ -484,11 +488,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		 */
 		MessageSecurity msgSecData = (MessageSecurity) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
 		try {
-			// =======================================================
-			// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
-			// EndpointReferenceType target = (EndpointReferenceType) msgContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
-			// if (delegateTo(target))
-				delegateCredentials(wallet, callContext, msgContext, msgSecData);
+			delegateCredentials(wallet, callContext, msgContext, msgSecData);
 		} catch (Exception ex) {
 			_logger.warn("ERROR: Failed to delegate SAML credentials.", ex);
 		}

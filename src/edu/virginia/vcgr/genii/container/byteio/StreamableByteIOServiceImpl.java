@@ -64,6 +64,14 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements Stream
 	static private final long SBYTEIO_LIFETIME = 1000L * 60 * 60;
 
 	static private Log _logger = LogFactory.getLog(StreamableByteIOServiceImpl.class);
+	
+	// 2020-12-1 by ASG
+	// keyInEPR is intended as a replacement for instanceof(GeniiNoOutcalls) which was a bit hacky.
+	// If it is "true", we will not put key material in the X.509. This will in turn prevent delegation to instances
+	// of a type that returns true, and will make transporting and storing EPR's consume MUCH less space.
+	public boolean keyInEPR() {
+		return false;
+	}
 
 	@MInject(lazy = true)
 	private ISByteIOResource _resource;

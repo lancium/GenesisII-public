@@ -765,6 +765,8 @@ public class RNSPath implements Serializable, Cloneable
 		 * --old:For the same reason an explicit store is invoked after setting the property.old:-- As a general rule, doing context update
 		 * before proxy creation is advisable to avoid similar unwanted problems.
 		 */
+		// 2020-12-4 ASG turning off shortForm
+		shortForm=false;
 		ICallingContext context = null;
 		try {
 			context = ContextManager.getCurrentContext();
@@ -863,7 +865,9 @@ public class RNSPath implements Serializable, Cloneable
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
 		RNSIterable entries = null;
 		SingleResourcePropertyTranslator translator = new DefaultSingleResourcePropertyTranslator();
-		boolean getShortForm = applier.canWorkWithShortForm();
+		// 2020-12-4 ASG turning off shortForm
+		//boolean getShortForm = applier.canWorkWithShortForm();
+		boolean getShortForm=false;
 		ICallingContext context = null;
 
 		try {
