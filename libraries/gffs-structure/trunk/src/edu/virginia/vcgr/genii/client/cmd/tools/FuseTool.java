@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -93,6 +94,9 @@ public class FuseTool extends BaseGridTool
 		} else {
 			try {
 				GeniiFuse.unmountGenesisII(new File(gPath.path()));
+				// 2020-12-6 by ASG. The underlying caches are somehow confused when we unmount, 
+				// so, lets clear them
+				CacheManager.resetCachingSystem();
 			} catch (FuseException e) {
 				throw new IOException("fuse error: " + e.getLocalizedMessage(), e);
 			}
