@@ -26,7 +26,7 @@ oneTimeSetUp()
   createRandomFile "$TEST_TEMP/random5KB.dat" 5120
 
   echo "creating large file for staging, this may take a couple minutes..."
-  createRandomFile "$HUGE_TEST_FILE" $((1048576 * 512))
+  createRandomFile "$HUGE_TEST_FILE" $((1048576 * 64))
 }
 
 testCopyFilesToGFFS()
@@ -41,11 +41,11 @@ testCopyFilesToGFFS()
   exitCode=$?
   result=`expr $exitCode + $result`
   assertEquals "Copied 5KB file" 0 $exitCode
-  echo "Copying half GB file to GFFS"
+  echo "Copying 64MB file to GFFS"
   grid cp local:$HUGE_TEST_FILE grid:$RNSPATH/randomhalfgig.dat
   exitCode=$?
   result=`expr $exitCode + $result`
-  assertEquals "Copied half GB file" 0 $exitCode
+  assertEquals "Copied 64MB file" 0 $exitCode
   if [ $result -ne 0 ]; then
     echo "Copying input files to GFFS failed, failing test.."
     exit 1
