@@ -102,6 +102,33 @@ public class LogoutTool extends BaseGridTool
 		logoutByPattern(callContext, "");
 	}
 	
+	public static void removeByPattern(ArrayList<NuCredential> credentials, String pattern) throws IOException
+	{		
+		int flags = 0;
+		Pattern p = Pattern.compile("^.*" + Pattern.quote(pattern) + ".*$", flags);
+
+		int numMatched = 0;
+		Iterator<NuCredential> itr = credentials.iterator();
+		while (itr.hasNext()) {
+			NuCredential cred = itr.next();
+			String toMatch = null;
+			if (cred instanceof Identity) {
+				toMatch = cred.toString();
+			} else if (cred instanceof TrustCredential) {
+				toMatch = ((TrustCredential) cred).getRootIdentity().toString();
+			}
+
+			Matcher matcher = p.matcher(toMatch);
+			if (matcher.matches()) {
+				if (_logger.isDebugEnabled()) {
+					_logger.debug("Removing credential from current calling context credentials:" + cred.toString());
+				}
+				itr.remove();
+				numMatched++;
+			}
+		}
+	}
+	
 	/**
 	 * logs out credentials by regular expression.
 	 */
@@ -137,7 +164,6 @@ public class LogoutTool extends BaseGridTool
 				}
 			}
 		}
-
 		if (numMatched == 0) {
 			throw new IOException("No credentials matched the pattern \"" + pattern + "\".");
 		}
