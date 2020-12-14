@@ -33,16 +33,19 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 {
 	static private Log _logger = LogFactory.getLog(DBBESActivityResourceFactory.class);
 
-		// 2020-07-13 ASG. Added IPPort to besactivity table. Contains IPADDR:port string
+	// 2020-07-13 ASG. Added IPPort to besactivity table. Contains IPADDR:port string
+	//LAK: 2020 Aug 27: Added destroyrequested to the DB
 	static private final String[] _CREATE_STMTS = new String[] {
 		"CREATE TABLE besactivityfaultstable (" + "faultid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,"
 			+ "besactivityid VARCHAR(256) NOT NULL," + "fault BLOB(2G))",
+		
 		"CREATE TABLE besactivitiestable (" + "activityid VARCHAR(256) NOT NULL PRIMARY KEY," + "besid VARCHAR(256) NOT NULL,"
 			+ "jsdl BLOB(2G) NOT NULL," + "owners BLOB(2G) NOT NULL," + "callingcontext BLOB(2G) NOT NULL," + "state BLOB(2G) NOT NULL,"
 			+ "submittime TIMESTAMP NOT NULL," + "suspendrequested SMALLINT NOT NULL," + "terminaterequested SMALLINT NOT NULL,"
 			+ "activitycwd VARCHAR(256) NOT NULL," + "executionplan BLOB(2G) NOT NULL," + "nextphase INTEGER NOT NULL,"
-			+ "activityepr BLOB(2G) NOT NULL," + "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL," + "ipport VARCHAR(40) NOT NULL)",
-			
+			+ "activityepr BLOB(2G) NOT NULL," + "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL,"
+			+ "destroyrequested SMALLINT NOT NULL)," + "ipport VARCHAR(40) NOT NULL)",
+		
 		"CREATE TABLE besactivitypropertiestable (" + "activityid VARCHAR(256) NOT NULL," + "propertyname VARCHAR(256) NOT NULL,"
 			+ "propertyvalue BLOB(2G)," + "CONSTRAINT besactivitypropertiesconstraint1 " + "PRIMARY KEY (activityid, propertyname))",
 			
@@ -90,6 +93,27 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 					alterStmt.execute();
 				} catch (SQLException sqe) {
 					_logger.error("Unable to upgrade besactivitiestable with ipport column.", sqe);
+				}
+			}
+		} finally {
+			StreamUtils.close(alterStmt);
+		}
+		
+		alterStmt = null;
+		try {
+			DatabaseMetaData md = conn.getMetaData();
+			ResultSet checkBESPolicyTable_rs = md.getColumns(null, null, "BESACTIVITIESTABLE", "DESTROYREQUESTED");
+			if (checkBESPolicyTable_rs.next()) {
+				// destroyrequested column exists
+				_logger.info("destroyrequested column exists in besactivitestable");
+			} else {
+				_logger.info("destroyrequested column does not exist in besactivitiestable");
+				 // destroyrequested column does not exist
+				try {
+					alterStmt = conn.prepareStatement("ALTER TABLE " + "besactivitiestable " + "ADD COLUMN " + "destroyrequested " + "SMALLINT NOT NULL " + "DEFAULT 0");
+					alterStmt.execute();
+				} catch (SQLException sqe) {
+					_logger.error("Unable to upgrade besactivitiestable with destroyrequested column.", sqe);
 				}
 			}
 		} finally {

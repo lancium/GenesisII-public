@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +28,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 {
 	static Log _logger = LogFactory.getLog(TimedOutLRUCache.class);
 
-	private HashMap<KeyType, RoleBasedCacheNode<KeyType, DataType>> _map;
+	private ConcurrentHashMap<KeyType, RoleBasedCacheNode<KeyType, DataType>> _map;
 	private LRUList<KeyType, DataType> _lruList;
 	private TimeoutList<KeyType, DataType> _timeoutList;
 
@@ -47,7 +48,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 
 		_maxElements = maxElements;
 		_defaultTimeoutMS = defaultTimeoutMS;
-		_map = new HashMap<KeyType, RoleBasedCacheNode<KeyType, DataType>>(_maxElements);
+		_map = new ConcurrentHashMap<KeyType, RoleBasedCacheNode<KeyType, DataType>>(_maxElements);
 		_lruList = new LRUList<KeyType, DataType>();
 		_timeoutList = new TimeoutList<KeyType, DataType>();
 	}

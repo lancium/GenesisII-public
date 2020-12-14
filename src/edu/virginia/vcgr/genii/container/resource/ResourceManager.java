@@ -205,6 +205,7 @@ public class ResourceManager
 			if (serviceName.equalsIgnoreCase(className))
 				matches = true;
 		}
+		
 		if (!matches) { // this EPR should get an X.509 in it
 			try {
 				// Go ahead and put in the security stuff

@@ -16,7 +16,7 @@ abstract class CacheList<KeyType, DataType>
 
 	public abstract void insert(RoleBasedCacheNode<KeyType, DataType> node);
 
-	public RoleBasedCacheNode<KeyType, DataType> removeFirst()
+	public synchronized RoleBasedCacheNode<KeyType, DataType> removeFirst()
 	{
 		if (_head == null)
 			return null;
@@ -33,7 +33,7 @@ abstract class CacheList<KeyType, DataType>
 		return ret;
 	}
 
-	public RoleBasedCacheNode<KeyType, DataType> peekFirst()
+	public synchronized RoleBasedCacheNode<KeyType, DataType> peekFirst()
 	{
 		if (_head == null)
 			return null;
@@ -41,7 +41,7 @@ abstract class CacheList<KeyType, DataType>
 		return _head;
 	}
 
-	public void remove(RoleBasedCacheNode<KeyType, DataType> node)
+	public synchronized void remove(RoleBasedCacheNode<KeyType, DataType> node)
 	{
 		if (node.getPrevious(_myRole) == null) // At the head of the list
 			_head = node.getNext(_myRole);
@@ -56,7 +56,7 @@ abstract class CacheList<KeyType, DataType>
 		node.clearLinks(_myRole);
 	}
 
-	public void clear()
+	public synchronized void clear()
 	{
 		_head = null;
 		_tail = null;

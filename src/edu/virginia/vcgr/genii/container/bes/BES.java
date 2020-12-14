@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,7 @@ import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
 import org.ggf.jsdl.JobIdentification_Type;
+import org.ggf.jsdl.LanciumEnvironment;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Resources_Type;
 import org.morgan.util.io.StreamUtils;
@@ -67,8 +69,8 @@ public class BES implements Closeable
 
 	static private ServerDatabaseConnectionPool _connectionPool;
 
-	static private HashMap<String, BES> _knownInstances = new HashMap<String, BES>();
-	static private HashMap<String, BES> _activityToBESMap = new HashMap<String, BES>();
+	static private ConcurrentHashMap<String, BES> _knownInstances = new ConcurrentHashMap<String, BES>();
+	static private ConcurrentHashMap<String, BES> _activityToBESMap = new ConcurrentHashMap<String, BES>();
 
 	static private String findBESEPI(Connection connection, String besid) throws SQLException
 	{
@@ -276,7 +278,8 @@ public class BES implements Closeable
 	private String _besid;
 	private String _besEPI;
 	private BESPolicyEnactor _enactor;
-	private HashMap<String, BESActivity> _containedActivities = new HashMap<String, BESActivity>();
+
+	private ConcurrentHashMap<String, BESActivity> _containedActivities = new ConcurrentHashMap<String, BESActivity>();
 	private BESPWrapperConnection _comm;
 
 	private BES(Connection connection, String besid, BESPolicy policy, String ipport) throws SQLException
@@ -422,7 +425,7 @@ public class BES implements Closeable
 
 			stmt = connection.prepareStatement("INSERT INTO besactivitiestable " + "(activityid, besid, jsdl, owners, callingcontext, "
 					+ "state, submittime, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityepr, activityservicename, jobname, ipport) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					+ "nextphase, activityepr, activityservicename, jobname, destroyrequested, ipport) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
@@ -439,12 +442,30 @@ public class BES implements Closeable
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR, "besactivitiestable", "activityepr"));
 			stmt.setString(14, activityServiceName);
 			stmt.setString(15, jobName);
-			stmt.setString(16, _ipport);
+			//LAK 2020 Aug 28: Default destroyrequested to zero
+			stmt.setShort(16, (short)0);
+			stmt.setString(17, _ipport);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
+			
+			String lanciumEnvironment = null;
+			JobDefinition_Type jobDef = jsdl;
+			JobDescription_Type jobDesc = jobDef.getJobDescription(0);
+			if (jobDesc != null) {
+				Resources_Type resources = jobDesc.getResources();
+				if (resources != null) {
+					LanciumEnvironment[] lanciumEnvArray = resources.getLanciumEnvironment();
+					if (lanciumEnvArray != null) {
+						LanciumEnvironment lanciumEnv = lanciumEnvArray[0];
+						if (lanciumEnv != null) {
+							lanciumEnvironment = lanciumEnv.toString();
+						}
+					}
+				}
+			}
 			BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, 0,
-				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, false, _ipport);
+				activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, false, false, false, false, lanciumEnvironment, _ipport);
 			_containedActivities.put(activityid, activity);
 			addActivityToBESMapping(activityid, this);
 			return activity;
@@ -520,7 +541,7 @@ public class BES implements Closeable
 		try {
 			stmt = connection
 				.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityservicename, jobname, jsdl, ipport " + "FROM besactivitiestable WHERE besid = ?");
+					+ "nextphase, activityservicename, jobname, jsdl, destroyrequested, ipport " + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
@@ -532,6 +553,8 @@ public class BES implements Closeable
 					ActivityState state = (ActivityState) DBSerializer.fromBlob(rs.getBlob(2));
 					boolean suspendRequested = (rs.getShort(3) == 0) ? false : true;
 					boolean terminateRequested = (rs.getShort(4) == 0) ? false : true;
+					//LAK 2020 Aug 28: Read in destroyrequested flag from the DB
+					boolean destroyRequested = (rs.getShort(11) == 0) ? false : true;
 
 					String activityCWDString = rs.getString(5);
 					BESWorkingDirectory activityCWD;
@@ -552,6 +575,7 @@ public class BES implements Closeable
 					// Previously, we wouldn't need to reload it because it would already be in the phases inside the executionPlan
 					String jobAnnotation = null;
 					String gpuType = null;
+					String lanciumEnvironment = null;
 					int gpuCount = 0;
 					JobDefinition_Type jsdl = DBSerializer.xmlFromBlob(JobDefinition_Type.class, rs.getBlob(10));
 					if (jsdl !=null) {
@@ -573,6 +597,13 @@ public class BES implements Closeable
 										gpuType = gpuArchName.getValue();
 									}
 								}
+								LanciumEnvironment[] lanciumEnvArray = resources.getLanciumEnvironment();
+								if (lanciumEnvArray != null) {
+									LanciumEnvironment lanciumEnv = lanciumEnvArray[0];
+									if (lanciumEnv != null) {
+										lanciumEnvironment = lanciumEnv.toString();
+									}
+								}
 								RangeValue_Type gpuCountPerNode = resources.getGPUCountPerNode();
 								if (gpuCountPerNode != null) {
 									Boundary_Type upperBound = gpuCountPerNode.getUpperBoundedRange();
@@ -588,14 +619,15 @@ public class BES implements Closeable
 						_logger.debug("GPU type: " + gpuType +". For job " + activityid +".");
 						_logger.debug("GPU count: " + gpuCount +". For job " + activityid +".");
 					}
-					String ipport = rs.getString(11);
+					String ipport = rs.getString(12);
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					
 					// TODO: Add persisted column to DB
 					boolean persistRequested = false;
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
-							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, persistRequested, ipport);
+							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, persistRequested, destroyRequested, 
+								lanciumEnvironment, ipport);
 					_containedActivities.put(activityid, activity);
 
 					addActivityToBESMapping(activityid, this);

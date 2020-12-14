@@ -137,20 +137,24 @@ public class NotificationRateController
 					sleep(1000); // iterate in every second interval
 					long tooOldNotificationThreshold = System.currentTimeMillis() - BURST_PERIOD_TIME_SPAN;
 					List<String> publishersWithEmptyLists = new ArrayList<String>();
-					for (Map.Entry<String, List<Long>> entry : publisherToRecentNotificationTimeMappings.entrySet()) {
-						String publisherKey = entry.getKey();
-						List<Long> recentNotificationTimes = entry.getValue();
-						synchronized (recentNotificationTimes) {
-							Iterator<Long> iterator = recentNotificationTimes.iterator();
-							while (iterator.hasNext()) {
-								long notificationTime = iterator.next();
-								if (notificationTime < tooOldNotificationThreshold) {
-									iterator.remove();
+					// 2020-10-21 by ASG. Making sure this is properly synh'd
+					//for (Map.Entry<String, List<Long>> entry : publisherToRecentNotificationTimeMappings.entrySet()) {
+					synchronized (publisherToRecentNotificationTimeMappings) {
+						for (Map.Entry<String, List<Long>> entry : publisherToRecentNotificationTimeMappings.entrySet()) {
+							String publisherKey = entry.getKey();
+							List<Long> recentNotificationTimes = entry.getValue();
+							synchronized (recentNotificationTimes) {
+								Iterator<Long> iterator = recentNotificationTimes.iterator();
+								while (iterator.hasNext()) {
+									long notificationTime = iterator.next();
+									if (notificationTime < tooOldNotificationThreshold) {
+										iterator.remove();
+									}
 								}
 							}
+							if (recentNotificationTimes.isEmpty())
+								publishersWithEmptyLists.add(publisherKey);
 						}
-						if (recentNotificationTimes.isEmpty())
-							publishersWithEmptyLists.add(publisherKey);
 					}
 					for (String publisherKey : publishersWithEmptyLists) {
 						publisherToRecentNotificationTimeMappings.remove(publisherKey);
@@ -172,19 +176,23 @@ public class NotificationRateController
 					sleep(5000); // iterate in every five seconds
 					long currentTime = System.currentTimeMillis();
 					List<String> releasedPublishers = new ArrayList<String>();
-					for (Map.Entry<String, Long> entry : blockedPublisherToBlockageExpiryTimeMappings.entrySet()) {
-						String publisherKey = entry.getKey();
-						long blockageExpiryTime = entry.getValue();
-						if (blockageExpiryTime < currentTime) {
-							releasedPublishers.add(publisherKey);
+					// 2020-10-21 by ASG. Synchronizing as per documentation
+					synchronized (blockedPublisherToBlockageExpiryTimeMappings) {
+						for (Map.Entry<String, Long> entry : blockedPublisherToBlockageExpiryTimeMappings.entrySet()) {
+							String publisherKey = entry.getKey();
+							long blockageExpiryTime = entry.getValue();
+							if (blockageExpiryTime < currentTime) {
+								releasedPublishers.add(publisherKey);
+							}
 						}
-					}
-					for (String publisherKey : releasedPublishers) {
-						blockedPublisherToBlockageExpiryTimeMappings.remove(publisherKey);
+						for (String publisherKey : releasedPublishers) {
+							blockedPublisherToBlockageExpiryTimeMappings.remove(publisherKey);
+						}
 					}
 				} catch (Exception ex) {
 					_logger.info("blockade lifter thread faced some problem", ex);
 				}
+
 			}
 		}
 	}

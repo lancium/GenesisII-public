@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -61,8 +62,8 @@ public class BESManager implements Closeable
 	private InformationPortal<BESInformation> _informationPortal;
 	private QueueDatabase _database;
 
-	private Map<Long, BESInformation> _besInformation;
-	private HashMap<Long, EndpointReferenceType> _besEPRs=new HashMap<Long, EndpointReferenceType>();
+	private ConcurrentHashMap<Long, BESInformation> _besInformation;
+	private ConcurrentHashMap<Long, EndpointReferenceType> _besEPRs=new ConcurrentHashMap<Long, EndpointReferenceType>();
 
 	/**
 	 * The scheduling event is an object which allows code to raise and wait on events indicating that a good opportunity exists to schedule a
@@ -78,22 +79,22 @@ public class BESManager implements Closeable
 	private SchedulingEvent _schedulingEvent;
 
 	/** A map of container IDs to their in-memory data. */
-	private HashMap<Long, BESData> _containersByID = new HashMap<Long, BESData>();
+	private ConcurrentHashMap<Long, BESData> _containersByID = new ConcurrentHashMap<Long, BESData>();
 
 	/** A map of container names to their in-memory data. */
-	private HashMap<String, BESData> _containersByName = new HashMap<String, BESData>();
+	private ConcurrentHashMap<String, BESData> _containersByName = new ConcurrentHashMap<String, BESData>();
 
 	/**
 	 * A map of container ID to update information. Right now this is basically information about when it was updated and what the result was,
 	 * but eventually it could help us determine what the "characteristics" of that container are.
 	 */
-	private HashMap<Long, BESUpdateInformation> _updateInformation = new HashMap<Long, BESUpdateInformation>();
+	private ConcurrentHashMap<Long, BESUpdateInformation> _updateInformation = new ConcurrentHashMap<Long, BESUpdateInformation>();
 
 	/**
 	 * This list gives all of the containers which are currently responsive. Note that it DOES NOT indicate that you have slots available,
 	 * only that you are responsive to messages.
 	 */
-	private HashMap<Long, BESData> _scheduleableContainers = new HashMap<Long, BESData>();
+	private ConcurrentHashMap<Long, BESData> _scheduleableContainers = new ConcurrentHashMap<Long, BESData>();
 
 	/**
 	 * This is the worker object (java.lang.Runnable) used to request updates from BES containers.
@@ -104,7 +105,7 @@ public class BESManager implements Closeable
 		InformationPortal<BESInformation> informationPortal, ServerDatabaseConnectionPool connectionPool)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
-		_besInformation = new HashMap<Long, BESInformation>();
+		_besInformation = new ConcurrentHashMap<Long, BESInformation>();
 
 		_informationPortal = informationPortal;
 		_database = database;

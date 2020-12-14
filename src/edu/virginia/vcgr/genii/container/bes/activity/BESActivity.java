@@ -48,7 +48,6 @@ import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionExcep
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.AbstractRunProcessPhase;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
@@ -71,6 +70,7 @@ public class BESActivity implements Closeable
 	private boolean _suspendRequested;
 	private boolean _terminateRequested;
 	public boolean _persistRequested;
+	private boolean _destroyRequested;
 	private BESWorkingDirectory _activityCWD;
 	private Vector<ExecutionPhase> _executionPlan;
 	private int _nextPhase;
@@ -83,11 +83,13 @@ public class BESActivity implements Closeable
 	private int _gpuCount;
 	//LAK 2020 Aug 18: This is set to true when the execution environment is fully setup before the phase is executed
 	private boolean _executionContextSet = false;
+	private String _lanciumEnvironment;
 
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
-		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested, boolean persistRequested, String IPPort)
+		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested, boolean destroyRequested, boolean persistRequested, 
+		String lanciumEnvironment, String IPPort)
 	{
 		_connectionPool = connectionPool;
 
@@ -104,11 +106,13 @@ public class BESActivity implements Closeable
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
 		_persistRequested = persistRequested;
+		_destroyRequested = destroyRequested;
 		_jobAnnotation = jobAnnotation;
 		_gpuType = gpuType;
 		_gpuCount = gpuCount;
+		_lanciumEnvironment = lanciumEnvironment;
 
-		_runner = new ActivityRunner(_suspendRequested, _terminateRequested);
+		_runner = new ActivityRunner(_suspendRequested, _terminateRequested, _destroyRequested);
 		_policyListener = new PolicyListener();
 		_bes.getPolicyEnactor().addBESPolicyListener(_policyListener);
 		
@@ -211,8 +215,11 @@ public class BESActivity implements Closeable
 			_connectionPool.release(connection);
 		}
 	}
-
-	synchronized public JobDefinition_Type getJobDefinition() throws SQLException, IOException, ClassNotFoundException
+	
+	// LAK 2020 Sept 17: Removed synchronized keyword from this function. This caused deadlocks and is not needed.
+	// See the stack trace uploaded to https://drive.google.com/file/d/16uKyFUsv42p_a3LhmA9FWKisujLtC-2T/view?usp=sharing for
+	// more information about WHY this caused issues.
+	public JobDefinition_Type getJobDefinition() throws SQLException, IOException, ClassNotFoundException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -332,7 +339,7 @@ public class BESActivity implements Closeable
 		if (_suspendRequested)
 			return;
 
-		updateState(true, _terminateRequested);
+		updateState(true, _terminateRequested, _destroyRequested);
 		if (_runner != null)
 			_runner.requestSuspend();
 	}
@@ -341,8 +348,8 @@ public class BESActivity implements Closeable
 	{
 		if (_terminateRequested)
 			return;
-
-		updateState(false, true);
+		
+		updateState(false, true, _destroyRequested);
 		if (_runner != null)
 			_runner.requestTerminate(false);
 	}
@@ -371,7 +378,6 @@ public class BESActivity implements Closeable
 	
 	synchronized public void stopExecutionThread() throws ExecutionException, SQLException
 	{
-		updateState(false, true);
 		if(_runner != null)
 			_runner.requestDestruction();
 	}
@@ -381,7 +387,7 @@ public class BESActivity implements Closeable
 		if (!_suspendRequested)
 			return;
 
-		updateState(false, _terminateRequested);
+		updateState(false, _terminateRequested, _destroyRequested);
 		if (_runner != null)
 			_runner.requestResume();
 	}
@@ -395,24 +401,27 @@ public class BESActivity implements Closeable
 		return retState;
 	}
 
-	synchronized private void updateState(boolean suspendRequested, boolean terminateRequested) throws SQLException
+	synchronized private void updateState(boolean suspendRequested, boolean terminateRequested, boolean destroyRequested) throws SQLException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
+			//LAK: 2020 Aug 27: Added destroyrequested to the DB
 			stmt = connection.prepareStatement(
-				"UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ? " + "WHERE activityid = ?");
+				"UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ?, destroyrequested = ?" + "WHERE activityid = ?");
 			stmt.setShort(1, suspendRequested ? (short) 1 : (short) 0);
 			stmt.setShort(2, terminateRequested ? (short) 1 : (short) 0);
-			stmt.setString(3, _activityid);
+			stmt.setShort(3, destroyRequested ? (short) 1 : (short) 0);
+			stmt.setString(4, _activityid);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database.");
 			connection.commit();
 
 			_suspendRequested = suspendRequested;
 			_terminateRequested = terminateRequested;
+			_destroyRequested = destroyRequested;
 		} finally {
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);
@@ -778,6 +787,9 @@ public class BESActivity implements Closeable
 	public void setGPUCount(int gpuCount) {
 		this._gpuCount = gpuCount;
 	}
+	public String getLanciumEnvironment() {
+		return _lanciumEnvironment;
+	}
 
 	private class ActivityRunner implements Runnable
 	{
@@ -790,11 +802,12 @@ public class BESActivity implements Closeable
 		private Object _phaseLock;
 		private ExecutionPhase _currentPhase = null;
 
-		public ActivityRunner(boolean suspendRequested, boolean terminateRequested)
+		public ActivityRunner(boolean suspendRequested, boolean terminateRequested, boolean destroyRequested)
 		{
 			_phaseLock = BESActivity.this;
 			_terminateRequested = terminateRequested;
 			_suspendRequested = suspendRequested;
+			_destroyRequested = destroyRequested;
 		}
 
 		final public boolean isSuspended()
@@ -853,6 +866,7 @@ public class BESActivity implements Closeable
 
 				_suspendRequested = false;
 				_terminateRequested = true;
+				_destroyRequested = false;
 
 				//LAK: 2020 Aug 13: We have to call this to interrupt any terminateable phase that is currently running.
 				if (_currentPhase != null && _currentPhase instanceof TerminateableExecutionPhase) {
@@ -950,7 +964,6 @@ public class BESActivity implements Closeable
 							break;
 
 						if (_terminateRequested) {
-
 							// Ensure Cloud Resources Cleaned up
 							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
 						}

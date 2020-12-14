@@ -194,6 +194,13 @@ public class Scheduler implements Closeable
 					if (noMoreSlots)
 						break; // Added 2016-05-05 by ASG
 					match = null;
+					
+					if(queuedJob.getTerminated())
+					{
+						_logger.debug("LAK: skipping queued job " + queuedJob + " because it has been marked as terminated");
+						continue;
+					}
+					
 					if (!queuedJob.canRun(now)) {
 						Date nextRun = queuedJob.getNextCanRun();
 						if (nextRun != null) {

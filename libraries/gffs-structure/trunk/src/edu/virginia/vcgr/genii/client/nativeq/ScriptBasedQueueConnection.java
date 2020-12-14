@@ -11,8 +11,6 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +31,6 @@ import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
-import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
@@ -229,60 +226,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 		// Make executable the appropriate wrapper if executable is an image
 		// Prepend image path to arguments list if executable is an image
 		String execName = application.getExecutableName();
-		if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
-			if (_logger.isDebugEnabled())
-				_logger.debug("Handling image executable (.simg or .qcow2): " + execName);
-			String prefID = (PreferredIdentity.getCurrent() != null ? PreferredIdentity.getCurrent().getIdentityString() : null);
-			String username = (prefID == null ? "Lancium" : prefID.split("CN=")[1].split(",")[0]);
-			String[] execNameArray = execName.split("/");
-			// 2020 June 09 by CCH
-			// Turns out that the executable path is resolved at this point.
-			// Even though I could only give test.simg, the execName is the full path: /nfs/.../<ticket>/test.simg.
-			// As opposed to just test.simg. This wasn't a problem before, but we indicate Lancium images with Lancium/<lancium_image>.simg. 
-			// To check for Lancium images, we check for the second-to-last token and see if it equals Lancium.
-			boolean usingLanciumImage = false;
-			if (execNameArray.length >= 2)
-				usingLanciumImage = execNameArray[execNameArray.length-2].equals("Lancium");
-			if (_logger.isDebugEnabled()) {
-				_logger.debug("Second to last element in execNameArray: " + execNameArray[execNameArray.length-2]);
-				_logger.debug("Using Lancium image? " + usingLanciumImage);
-			}
-			execName = execNameArray[execNameArray.length-1];
-			String imagePath = usingLanciumImage ? "../Images/Lancium/" + execName : "../Images/" + username +  execName;
-			// This should use getContainerProperty job BES directory
-			if (imagePath.endsWith(".qcow2")) {
-				execName = "../vmwrapper.sh";
-			}
-			if (_logger.isDebugEnabled())
-				_logger.debug("Handling image executable: " + execName);
-			if (Files.exists(Paths.get(imagePath))) {
-				String MIME = Files.probeContentType(Paths.get(imagePath));
-				if (_logger.isDebugEnabled())
-					_logger.debug(imagePath + " exists with MIME type: " + MIME);
-				if (MIME.contains("QEMU QCOW Image") || MIME.contains("run-singularity script executable")) {
-					if (_logger.isDebugEnabled())
-						_logger.debug(imagePath + " exists and has the correct MIME type.");
-				}
-				else {
-					if (_logger.isDebugEnabled())
-						_logger.debug(imagePath + " exists but has the wrong MIME type.");
-					// 2020 May 27 CCH, not sure how to handle bad MIME type
-					// Currently, set imagePath to something completely different so the original image does not execute
-					imagePath = "../Images/Lancium/BAD_MIME";
-				}
-			}
-			else {
-				if (_logger.isDebugEnabled())
-					_logger.debug(imagePath + " does not exist.");
-			}
-			Vector<String> arguments = new Vector<String>(application.getArguments());
-			arguments.add(0, imagePath);
-			application.setArguments(arguments);
-		}
-		else {
-			if (!execName.contains("/")) {
-				execName = String.format("./%s", execName);
-			}
+		if (!execName.contains("/")) {
+			execName = String.format("./%s", execName);
 		}
 
 		try {

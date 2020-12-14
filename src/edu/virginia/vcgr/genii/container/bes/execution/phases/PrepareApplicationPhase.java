@@ -7,6 +7,7 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
+import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.container.appmgr.ApplicationManager;
@@ -33,7 +34,6 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase implements S
 	public void execute(ExecutionContext context, BESActivity activity) throws Throwable
 	{
 		File executable = null;
-
 		if (_executable.getFileSystemName() != null) {
 			executable = _fsManager.lookup(_executable);
 		} else {

@@ -392,6 +392,9 @@ public class ClientUtils
 	static public <IFace> IFace createProxy(Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
 		throws ResourceException, GenesisIISecurityException
 	{
+		if (epr==null || epr.getAddress()==null) {
+			throw new ResourceException("ClientUtils:CreateProxy received a null EPR or it has a null Address");
+		}
 		return createProxy(GenesisClassLoader.classLoaderFactory(), iface, epr, callContext);
 	}
 

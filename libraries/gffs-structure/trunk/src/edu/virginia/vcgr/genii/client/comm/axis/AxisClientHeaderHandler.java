@@ -36,6 +36,8 @@ import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
+import com.sun.prism.impl.Disposer.Target;
+
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher;
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
 import edu.virginia.vcgr.appmgr.version.Version;
@@ -209,6 +211,30 @@ public class AxisClientHeaderHandler extends BasicHandler
 			throw new AxisFault(se.getLocalizedMessage(), se);
 		}
 	}
+	
+	static private boolean delegateTo(EndpointReferenceType epr) 
+	{
+		// =======================================================
+		// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export.
+		// Don't delegate if the endpoint is a LightweightExport, and RNS or a byteIO
+		boolean delegate=true;
+		if (epr == null) {
+			_logger.warn("could not find EPR target in message context; cannot check whether to delegate.");
+			return true;
+		} else {
+			String serviceName=null;
+			try {
+				serviceName=EPRUtils.extractServiceName(epr);
+			} catch (AxisFault e) {
+				return true;
+			}
+			if (serviceName!=null) 
+				if ((serviceName.indexOf("EnhancedRNSPortType")>=0)||
+						(serviceName.indexOf("RandomByteIOPortType")>=0) ||
+						(serviceName.indexOf("LightWeightExportPortType")>=0)) delegate=false;									
+		}
+		return delegate;
+	}
 
 	public static void delegateCredentials(CredentialWallet wallet, ICallingContext callingContext, MessageContext messageContext,
 		MessageSecurity msgSecData) throws Exception
@@ -221,16 +247,21 @@ public class AxisClientHeaderHandler extends BasicHandler
 		X509Certificate[] resourceCertChain = msgSecData._resourceCertChain;
 		KeyAndCertMaterial clientKeyAndCertificate = callingContext.getActiveKeyAndCertMaterial();
 		if (clientKeyAndCertificate == null) {
-			_logger.error("no active key and cert material available: not performing delegation");
+			// 2020-012-04 - this was formerly an error .. till we took X.509's out of some EPRS
+			//_logger.error("no active key and cert material available: not performing delegation");
 			return;
 		}
 		
 		EndpointReferenceType target = (EndpointReferenceType) messageContext.getProperty(CommConstants.TARGET_EPR_PROPERTY_NAME);
 		GUID containerGUID = null;
+		// =======================================================
+		// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
+		boolean delegate = true;
 		if (target == null) {
 			_logger.warn("could not find EPR target in message context; cannot use this for container id.");
 		} else {
 			containerGUID = EPRUtils.getGeniiContainerID(target);
+			delegate=delegateTo(target);
 		}
 
 		long beginTime = System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset;
@@ -290,22 +321,27 @@ public class AxisClientHeaderHandler extends BasicHandler
 						CertEntry tlsKey = ContainerConfiguration.getContainerTLSCert();
 						if (tlsKey != null) {
 							// first delegate from the credential's resource to our tls cert.
-							TrustCredential newCred = walletForResource.getRealCreds().delegateTrust(tlsKey._certChain,
-								IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
-								restrictions, accessCategories, trustDelegation);
-							if (newCred == null) {
-								if (_logger.isTraceEnabled()) {
-									_logger.debug(
-										"failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
-											+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+							if (delegate) {
+								// then delegate from the tls cert to the remote resource.
+								// =======================================================
+								// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
+								// if (delegate) added
+
+								TrustCredential newCred = walletForResource.getRealCreds().delegateTrust(tlsKey._certChain,
+										IdentityType.CONNECTION, clientKeyAndCertificate._clientCertChain, clientKeyAndCertificate._clientPrivateKey,
+										restrictions, accessCategories, trustDelegation);
+								if (newCred == null) {
+									if (_logger.isTraceEnabled()) {
+										_logger.debug(
+												"failure in first level of trust delegation, to tls cert.  dropping this credential on floor:\n"
+														+ trustDelegation + "\nbecause we received a null delegated assertion for our tls cert.");
+									}
+									continue;
 								}
-								continue;
+
+								walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER, tlsKey._certChain,
+										tlsKey._privateKey, restrictions, accessCategories, newCred);
 							}
-
-							// then delegate from the tls cert to the remote resource.
-							walletForResource.getRealCreds().delegateTrust(resourceCertChain, IdentityType.OTHER, tlsKey._certChain,
-								tlsKey._privateKey, restrictions, accessCategories, newCred);
-
 							handledThisAlready = true;
 						} else {
 							_logger.error("failed to find a tls certificate for delegating in the outcall");
@@ -314,7 +350,10 @@ public class AxisClientHeaderHandler extends BasicHandler
 					}
 
 					// if no delegation step performed at some point above, do it here.
-					if (!handledThisAlready) {
+					// =======================================================
+					// 2020-11-18 ASG. Part of eliminating delegation to RNS, ByteIO, and Lightweight export
+					// if && delegate added 
+					if (!handledThisAlready&&delegate) {
 						if (_logger.isTraceEnabled())
 							_logger
 								.debug("outcall, normal trust delegation by: " + clientKeyAndCertificate._clientCertChain[0].getSubjectDN());
@@ -448,7 +487,6 @@ public class AxisClientHeaderHandler extends BasicHandler
 		 * process the transient credentials to prepare the serializable portion of the calling context for them.
 		 */
 		MessageSecurity msgSecData = (MessageSecurity) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
-
 		try {
 			delegateCredentials(wallet, callContext, msgContext, msgSecData);
 		} catch (Exception ex) {

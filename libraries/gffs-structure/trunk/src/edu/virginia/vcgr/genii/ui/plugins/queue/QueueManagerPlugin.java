@@ -13,12 +13,14 @@ import org.morgan.utils.gui.GUIUtils;
 
 import edu.virginia.vcgr.genii.ui.plugins.AbstractCombinedUIMenusPlugin;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
+import edu.virginia.vcgr.genii.ui.plugins.EndpointRetriever;
 import edu.virginia.vcgr.genii.ui.plugins.LazilyLoadedTab;
 import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
 import edu.virginia.vcgr.genii.ui.plugins.queue.jobs.QueueManagerPanel;
 import edu.virginia.vcgr.genii.ui.plugins.queue.resources.ResourcesPanel;
+import edu.virginia.vcgr.genii.ui.rns.RNSTree;
 
 public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin
 {
@@ -26,7 +28,17 @@ public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin
 	protected void performMenuAction(UIPluginContext context, MenuType menuType) throws UIPluginException
 	{
 		try {
-			JFrame frame = new JFrame("Queue Manager");
+			// 2020-11-17 ASG. Added the path to the queue to the JFrame .. so the 
+			// user (usually me), can figure out which queue this is.
+			RNSTree owner=(RNSTree) context.endpointRetriever();
+			int plen=owner.getAnchorSelectionPath().getPathCount();
+			String s="";
+			for (int i=0;i<plen;i++) {
+				if (i>1) s+="/";
+				s+= owner.getAnchorSelectionPath().getPathComponent(i);
+			}
+			JFrame frame = new JFrame("Queue Manager -- " + s);
+			// End of 2020-11-17 updates
 
 			QueueManagerPanel qPanel = new QueueManagerPanel(context);
 			ResourcesPanel rPanel = new ResourcesPanel(context);

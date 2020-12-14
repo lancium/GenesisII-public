@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Stack;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+import org.eclipse.jetty.util.log.StdErrLog;
 import org.ggf.rns.LookupResponseType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -239,6 +242,61 @@ public class ReplicateTool extends BaseGridTool
 		return 0;
 	}
 
+	public static RNSEntryResponseType[] listReplicas(EndpointReferenceType replicaEPR, PrintWriter stdout) {
+		int[] list = null;
+		RNSEntryResponseType[] response=null;
+		// First get the vector or replica numbers
+		list = ResolverUtils.getEndpoints(replicaEPR);
+		// Now look them all up and get their EPRs
+		LookupResponseType dir = ResolverUtils.getEndpointEntries(replicaEPR);
+		if (dir != null && list != null) {
+			response = dir.getEntryResponse();
+			for (int j = 0; j < response.length; j++) {
+				String temp = response[j].getEndpoint().getAddress().toString();
+				int axisIndex = temp.indexOf("/axis");
+				int containerID = temp.indexOf("container-id");
+				if (axisIndex >= 0 && containerID >= 0)
+					stdout.println("Replica " + list[j] + ": " + temp.substring(0, axisIndex) + ": " + temp.substring(containerID));
+				WSName name= new WSName(response[j].getEndpoint());
+				List<ResolverDescription> resolvers=name.getResolvers();
+				if (resolvers.size() <=0) stdout.println("\tThe EPR returned had no resolvers.");
+				for (ResolverDescription tR : resolvers) {
+					stdout.println("\tResolver EPR address is " + tR.getEPR().getAddress().toString());
+				}
+				
+			}
+		} else {
+			stdout.println("There are no replicas of resource");
+		}
+		return response;
+	}
+	
+	public static EndpointReferenceType replicaPicker(EndpointReferenceType replicaEPR, PrintWriter stdout, BufferedReader stdin) {
+		int result=-1;
+		// List replicas and get back a vector of entries with EPRs
+		RNSEntryResponseType[] replicants=listReplicas(replicaEPR, stdout);
+		// If there were none, exit
+		if (replicants==null || replicants.length<2) return null;
+		stdout.println("Select replica in the range 0.." + (replicants.length-1));
+		try {
+			String inS;
+			inS=stdin.readLine();
+			if (inS.equalsIgnoreCase("q")) return null;
+			result=Integer.parseInt(inS);
+			stdout.println("You typed " + result);
+			if (result <0 || result > replicants.length-1) {
+				stdout.println("Selection out of range!");
+				return null;
+			}
+			return replicants[result].getEndpoint();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			result=-1;
+		}
+		return null;
+	
+	}
 	/*
 	 * Print the list of replicas to the console.
 	 */
@@ -261,23 +319,7 @@ public class ReplicateTool extends BaseGridTool
 				RNSPath current = RNSPath.getCurrent();
 				RNSPath replicaRNS = current.lookup(replicaPath, RNSPathQueryFlags.MUST_EXIST);
 				EndpointReferenceType replicaEPR = replicaRNS.getEndpoint();
-				int[] list = null;
-				// First get the vector or replica numbers
-				list = ResolverUtils.getEndpoints(replicaEPR);
-				// Now look them all up and get their EPRs
-				LookupResponseType dir = ResolverUtils.getEndpointEntries(replicaEPR);
-				if (dir != null && list != null) {
-					RNSEntryResponseType[] response = dir.getEntryResponse();
-					for (int j = 0; j < response.length; j++) {
-						String temp = response[j].getEndpoint().getAddress().toString();
-						int axisIndex = temp.indexOf("/axis");
-						int containerID = temp.indexOf("container-id");
-						if (axisIndex >= 0 && containerID >= 0)
-							stdout.println("Replica " + list[j] + ": " + temp.substring(0, axisIndex) + ": " + temp.substring(containerID));
-					}
-				} else {
-					stdout.println("There are no replicas of resource " + replicaPath);
-				}
+				listReplicas(replicaEPR, stdout);
 			}
 		}
 		// End ASG updates

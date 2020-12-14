@@ -266,6 +266,7 @@ public class CredentialWallet implements Externalizable, Describable
 			return null;
 		// This is a USER assertion of the form A->B->... where A is a USER.
 		String userName = X500PrincipalUtilities.getCN(cert.getSubjectX500Principal());
+		userName=userName.replaceAll("\"","");
 		if (_logger.isDebugEnabled())
 			_logger.debug("calculated user name: '" + userName + "'");
 		return userName;

@@ -82,6 +82,15 @@ public class RExportResolverServiceImpl extends GenesisIIBase implements RExport
 	static public QName REXPORT_PATH_ELEM_NAME = new QName(GenesisIIConstants.GENESISII_NS, "path");
 	static public QName REXPORT_RESOLVER_SERVICE_EPR_NAME = new QName(GenesisIIConstants.GENESISII_NS, "rexport-resolver-service-epr");
 	static public QName REXPORT_RESOLVER_TYPE = new QName(GenesisIIConstants.GENESISII_NS, "rexport-resolver-type");
+	
+	// 2020-12-1 by ASG
+	// keyInEPR is intended as a replacement for instanceof(GeniiNoOutcalls) which was a bit hacky.
+	// If it is "true", we will not put key material in the X.509. This will in turn prevent delegation to instances
+	// of a type that returns true, and will make transporting and storing EPR's consume MUCH less space.
+	public boolean keyInEPR() {
+		return true;
+	}
+	
 
 	public RExportResolverServiceImpl() throws RemoteException
 	{

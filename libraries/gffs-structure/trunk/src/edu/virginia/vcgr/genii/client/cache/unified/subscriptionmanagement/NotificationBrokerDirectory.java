@@ -197,10 +197,13 @@ public class NotificationBrokerDirectory
 
 	public static void clearDirectory()
 	{
-		for (NotificationBrokerWrapper broker : containerIdToBrokerMapping.values()) {
-			broker.destroyBroker();
+		// 2020-10-21 by ASG. According to the Java documentation, we need to synchronize on iterators of synchronized maps.
+		synchronized (containerIdToBrokerMapping) {
+			for (NotificationBrokerWrapper broker : containerIdToBrokerMapping.values()) {
+				broker.destroyBroker();
+			}
+			containerIdToBrokerMapping.clear();
 		}
-		containerIdToBrokerMapping.clear();
 	}
 
 	public static void removeBrokerForContainer(String containerId)

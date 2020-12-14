@@ -48,6 +48,12 @@ import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
 public class ClientServerSession extends ConnectionSession implements Runnable, Closeable
 {
 	static private Logger _logger = Logger.getLogger(FTPSession.class);
+	// 2020-10-10 by ASG. 
+	// We are having a race condition when multiple client server sessions are active at a time. We do not know why. We
+	// are looking into it. Until then we will serialize the sessions by performing a schronized block around the actual 
+	// implementation code.
+	static private String sync=new String("sync var");
+	// end of update
 
 //	private int _authAttemptCount = 0;
 	private FTPConfiguration _configuration;
@@ -118,7 +124,9 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 		PrintWriter outwriter = null;
 
 		String line;
-		
+		// 2020-10-10 by ASG. Added to serialize calls while we figure out the race.
+//		synchronized(sync) {
+			// End of update
 		try {
 			// get the local identity's key material (or create one if necessary)
 			ICallingContext initialCallingContext = ContextManager.getCurrentOrMakeNewContext();
@@ -245,6 +253,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 
 			_sessionState.getListenerManager().fireSessionClosed(_sessionState.getSessionID());
 		}
+//		}
 	}
 
 	public long getIdleTime()

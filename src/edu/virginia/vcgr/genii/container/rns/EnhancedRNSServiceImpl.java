@@ -124,6 +124,14 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		new RNSAttributesHandler(getAttributePackage());
 	}
 
+	// 2020-12-1 by ASG
+	// keyInEPR is intended as a replacement for instanceof(GeniiNoOutcalls) which was a bit hacky.
+	// If it is "true", we will not put key material in the X.509. This will in turn prevent delegation to instances
+	// of a type that returns true, and will make transporting and storing EPR's consume MUCH less space.
+	public boolean keyInEPR() {
+		return false;
+	}
+	
 	public EnhancedRNSServiceImpl() throws RemoteException
 	{
 		this("EnhancedRNSPortType");
@@ -448,6 +456,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		// responsibility.
 		// ---------------------------------------------------------------------------------------------------
 		boolean requestedShortForm = false;
+		// 2020-12-4 ASG turning off shortForm
+		/*
 		try {
 			ICallingContext context = ContextManager.getCurrentContext();
 			Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
@@ -458,6 +468,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		} catch (Exception e) {
 			_logger.trace("could not get information about the short form");
 		}
+		*/
 		// ---------------------------------------------------------------------------------------------------
 
 		AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();

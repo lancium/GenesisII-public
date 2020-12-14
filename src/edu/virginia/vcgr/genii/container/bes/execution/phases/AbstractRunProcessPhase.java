@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -65,6 +66,36 @@ public abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		}
 	}
 
+	// 2020 September 11 by CCH, as part of guaranteed correct JSON output
+	/*
+	 * Takes a list of potentially problematic Strings that will appear in properties.json
+	 * Returns 'validated' Strings that will have all problematic characters escaped
+	 */
+	private static String[] validateJSONStrings(String[] strs) {
+		HashMap<Character, String> badChars = new HashMap<Character, String>(0);
+		badChars.put('\b', "\\b");
+		badChars.put('\f', "\\f");
+		badChars.put('\n', "\\n");
+		badChars.put('\r', "\\r");	
+		badChars.put('\t', "\\t");
+		badChars.put('"', "\\\"");
+		badChars.put('\\', "\\\\");
+		String[] validatedStrs = new String[strs.length];
+		int index = 0;
+		for (String str : strs) {
+			String validatedString = "";
+			for (int i = 0; i < str.length(); i++) {
+				char charToMap = str.charAt(i);
+				String mappedString = badChars.get(charToMap);
+				if (mappedString != null)
+					validatedString += mappedString;
+				else
+					validatedString += charToMap;
+			}
+			validatedStrs[index++] = validatedString;
+		}
+		return validatedStrs;
+	}
 	final protected void generateProperties(ResourceUsageDirectory dir,String userName, String executable, Double memory, int numProcesses, 
 			int numProcessesPerHost, int threadsPerProcess, BESActivity activity) {
 		File propFile=new File(dir.getAcctDir(),"properties.json");
@@ -73,13 +104,22 @@ public abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 				// We now have the properties file, lets put the user name in
 				BufferedWriter output = null;
 				try {           
+					String[] validatedStrings = validateJSONStrings(new String[] 
+							{ userName, activity.getJobName(), executable });
+					//			^^^			^^^^^^^				^^^^^^
+					// The order of parameters here determines the indices defined below
+					// 2020 September 11 by CCH, as part of guaranteed correct JSON output
+					int userNameIndex = 0;
+					int jobNameIndex = 1;
+					int executableIndex = 2;
+					
 					output = new BufferedWriter(new FileWriter(propFile));
 					output.write("{\n");
-					output.write("\"userName\": \"" + userName + "\",\n");
-					output.write("\"jobName\": \"" + activity.getJobName()+ "\",\n");
+					output.write("\"userName\": \"" + validatedStrings[userNameIndex] + "\",\n");
+					output.write("\"jobName\": \"" + validatedStrings[jobNameIndex] + "\",\n");
 					Date today = Calendar.getInstance().getTime();
 					output.write("\"date\": \"" + today.toString() + "\",\n");
-					output.write("\"executable\": \"" + executable + "\",\n" ); 
+					output.write("\"executable\": \"" + validatedStrings[executableIndex] + "\",\n" ); 
 					if (memory==null) memory=new Double(2.0*1024.0*1024.0*1024.0);
 					output.write("\"memory\": \"" + String.format("%1$,.0f", memory) + "\",\n" ); 
 
@@ -116,8 +156,6 @@ public abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 				ObjectSerializer.serialize(writer, jsdl, new QName(GenesisIIConstants.GENESISII_NS, "jsdl-document"));
 				writer.flush();
 				String jsdlStr = writer.toString();
-				if (_logger.isDebugEnabled())
-					_logger.debug("JSDL string: " + jsdlStr);
 				
 				// Write JSDL to JSDL.jsdl
 				BufferedWriter output = null;

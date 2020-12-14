@@ -136,6 +136,15 @@ import org.ggf.bes.factory.ResumeActivityResponseType;
 public class QueueServiceImpl extends ResourceForkBaseService implements QueuePortType
 {
 	static private Log _logger = LogFactory.getLog(QueueServiceImpl.class);
+	
+	// 2020-12-1 by ASG
+	// keyInEPR is intended as a replacement for instanceof(GeniiNoOutcalls) which was a bit hacky.
+	// If it is "true", we will not put key material in the X.509. This will in turn prevent delegation to instances
+	// of a type that returns true, and will make transporting and storing EPR's consume MUCH less space.
+	public boolean keyInEPR() {
+		return true;
+	}
+	
 
 	// static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
 	static public QName _JOBID_QNAME = new QName(GenesisIIConstants.GENESISII_NS, "job-id");
@@ -343,7 +352,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			_queueMgr.killJobs(killRequest);
 			return null;
 		} catch (SQLException sqe) {
-			throw new RemoteException("Unable to list jobs in queue.", sqe);
+			throw new RemoteException("Unable to kill jobs in queue.", sqe);
 		}
 	}
 
@@ -369,7 +378,8 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			col.add(AnyHelper.toAny(rjit));
 
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
-		builder.preferredBatchSize(100);
+		// 2020-10-26 by ASG changed from 100 to existing constant.
+		builder.preferredBatchSize(QueueConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(col);
 		return new IterateListResponseType(builder.create());
 	}

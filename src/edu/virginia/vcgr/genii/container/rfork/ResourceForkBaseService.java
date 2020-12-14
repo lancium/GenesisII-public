@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.rfork;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -615,8 +616,14 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 
 				if (!inMemoryIterable) {
 					IterableIterable<InternalEntry> entryConglomerate = new IterableIterable<InternalEntry>();
-					for (String request : lookupRequest)
+					for (String request : lookupRequest) {
+						try {
 						entryConglomerate.add(fork.list(getExemplarEPR(), request));
+						} 
+						catch (FileNotFoundException fnf) {
+							//throw new RemoteException("File not found", fnf);
+						}
+					}
 					entries = entryConglomerate;
 
 					_logger.debug("specific listing does not have in-memory iterable, no dirPath calculated");
@@ -626,6 +633,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 
 			// Check if short form is requested by the client.
 			boolean requestedShortForm = false;
+			// 2020-12-4 ASG turning off shortForm
+			/*
 			try {
 				ICallingContext context = ContextManager.getCurrentContext();
 				Object form = context.getSingleValueProperty(GenesisIIConstants.RNS_SHORT_FORM_TOKEN);
@@ -636,6 +645,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 			} catch (Exception e) {
 				_logger.trace("could not get information about the short form");
 			}
+			*/
 
 			Collection<RNSEntryResponseType> resultEntries = new LinkedList<RNSEntryResponseType>();
 			timer = tSink.getTimer("Prepare Entries");
@@ -656,9 +666,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 					if (internalEntry.isExistent()) {
 						EndpointReferenceType epr = internalEntry.getEntryReference();
 						RNSEntryResponseType entry = new RNSEntryResponseType(epr,
-							RNSUtilities.createMetadata(epr,
-								Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm)),
-							null, internalEntry.getName());
+								RNSUtilities.createMetadata(epr,
+										Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null, requestedShortForm)),
+								null, internalEntry.getName());
 						// Remove EPR from entry when short form is requested.
 						if (requestedShortForm) {
 							entry.setEndpoint(null);
@@ -667,13 +677,13 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 					} else {
 						String name = internalEntry.getName();
 						RNSEntryResponseType entry =
-							new RNSEntryResponseType(null, null,
-								FaultManipulator
-									.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
-										new BaseFaultTypeDescription[] {
-											new BaseFaultTypeDescription(String.format("Entry %s does not exist!", name)) },
-										null, name)),
-								name);
+								new RNSEntryResponseType(null, null,
+										FaultManipulator
+										.fillInFault(new RNSEntryDoesNotExistFaultType(null, null, null, null,
+												new BaseFaultTypeDescription[] {
+														new BaseFaultTypeDescription(String.format("Entry %s does not exist!", name)) },
+												null, name)),
+										name);
 						resultEntries.add(entry);
 					}
 				}
@@ -682,10 +692,16 @@ public abstract class ResourceForkBaseService extends GenesisIIBase implements R
 
 			}
 			return RNSContainerUtilities.indexedTranslate(resultEntries, iteratorBuilder(RNSEntryResponseType.getTypeDesc().getXmlType()),
-				wrapper);
-		} catch (IOException ioe) {
+					wrapper);
+		} 
+
+		catch (IOException ioe) {
 			throw new RemoteException("Unable to list contents.", ioe);
-		} finally {
+		}
+
+
+		finally {
+
 			if (timer != null)
 				timer.noteTime();
 		}

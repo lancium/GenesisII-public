@@ -53,6 +53,9 @@ public class JobData
 	 * The number of attempts that have unsuccessfully tried to run this job.
 	 */
 	private short _runAttempts;
+	
+	//LAK 2020 Aug 24: We add this flag to signal some of the other async services.
+	private boolean _terminated = false;
 
 	/**
 	 * The job's ID in the database.
@@ -177,10 +180,18 @@ public class JobData
 	}
 	
 	public EndpointReferenceType getJobEPR() {
-		return _jobEPR;
-		
+		return _jobEPR;	
+	}
+	
+	public void setTerminated(boolean value)
+	{
+		_terminated = value;
 	}
 
+	public boolean getTerminated()
+	{
+		return _terminated;
+	}
 	
 	public void setJobEPR(EndpointReferenceType EPR) {
 		_jobEPR=EPR;
