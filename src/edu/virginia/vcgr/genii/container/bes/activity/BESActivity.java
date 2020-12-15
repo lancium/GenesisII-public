@@ -811,6 +811,7 @@ public class BESActivity implements Closeable
 			_destroyRequested = destroyRequested;
 		}
 
+		//LAK: This is NOT part of the freeze/thaw code. This is some legacy functionality.
 		final public boolean isSuspended()
 		{
 			synchronized (_phaseLock) {
@@ -818,6 +819,8 @@ public class BESActivity implements Closeable
 			}
 		}
 
+		//LAK: This is NOT part of the freeze/thaw code. This is some legacy functionality. The freeze/thaw functionality talks directly to the bes
+		//		to issue the command.
 		public boolean requestSuspend() throws ExecutionException
 		{
 			synchronized (_phaseLock) {
@@ -905,6 +908,7 @@ public class BESActivity implements Closeable
 			}
 		}
 		
+		//LAK: WIP, does not work. Meant to handle restarting a persisted job.
 		public void requestRestart() throws ExecutionException
 		{
 			synchronized (_phaseLock) {
@@ -939,6 +943,8 @@ public class BESActivity implements Closeable
 			}
 		}
 
+		//LAK: This is NOT part of the freeze/thaw code. This is some legacy functionality. The freeze/thaw functionality talks directly to the bes
+		//		to issue the command.
 		public void requestResume() throws ExecutionException
 		{
 			synchronized (_phaseLock) {
