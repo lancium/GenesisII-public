@@ -339,7 +339,7 @@ public class BESActivity implements Closeable
 		if (_suspendRequested)
 			return;
 
-		updateState(true, _terminateRequested, _destroyRequested);
+		updateState(true, _terminateRequested, _destroyRequested, _persistRequested);
 		if (_runner != null)
 			_runner.requestSuspend();
 	}
@@ -349,7 +349,7 @@ public class BESActivity implements Closeable
 		if (_terminateRequested)
 			return;
 		
-		updateState(false, true, _destroyRequested);
+		updateState(false, true, _destroyRequested, _persistRequested);
 		if (_runner != null)
 			_runner.requestTerminate(false);
 	}
@@ -359,8 +359,7 @@ public class BESActivity implements Closeable
 		if (_persistRequested)
 			return;
 
-		// TODO: Add persisted column to DB
-		//updateState(false, true);
+		updateState(false, true, false, true);
 		if (_runner != null)
 			_runner.requestPersist();
 	}
@@ -370,7 +369,7 @@ public class BESActivity implements Closeable
 		if (!_persistRequested)
 			return;
 
-		// TODO: Add persisted column to DB
+		// TODO: Handle restart state
 		//updateState(false, true);
 		if (_runner != null)
 			_runner.requestRestart();
@@ -387,7 +386,7 @@ public class BESActivity implements Closeable
 		if (!_suspendRequested)
 			return;
 
-		updateState(false, _terminateRequested, _destroyRequested);
+		updateState(false, _terminateRequested, _destroyRequested, _persistRequested);
 		if (_runner != null)
 			_runner.requestResume();
 	}
@@ -401,7 +400,7 @@ public class BESActivity implements Closeable
 		return retState;
 	}
 
-	synchronized private void updateState(boolean suspendRequested, boolean terminateRequested, boolean destroyRequested) throws SQLException
+	synchronized private void updateState(boolean suspendRequested, boolean terminateRequested, boolean destroyRequested, boolean persistRequested) throws SQLException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -410,10 +409,11 @@ public class BESActivity implements Closeable
 			connection = _connectionPool.acquire(true);
 			//LAK: 2020 Aug 27: Added destroyrequested to the DB
 			stmt = connection.prepareStatement(
-				"UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ?, destroyrequested = ?" + "WHERE activityid = ?");
+				"UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ?, destroyrequested = ?, persistrequested = ?" + "WHERE activityid = ?");
 			stmt.setShort(1, suspendRequested ? (short) 1 : (short) 0);
 			stmt.setShort(2, terminateRequested ? (short) 1 : (short) 0);
 			stmt.setShort(3, destroyRequested ? (short) 1 : (short) 0);
+			stmt.setShort(3, persistRequested ? (short) 1 : (short) 0);
 			stmt.setString(4, _activityid);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database.");
@@ -422,6 +422,7 @@ public class BESActivity implements Closeable
 			_suspendRequested = suspendRequested;
 			_terminateRequested = terminateRequested;
 			_destroyRequested = destroyRequested;
+			_persistRequested = persistRequested;
 		} finally {
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);

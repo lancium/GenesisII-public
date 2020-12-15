@@ -44,7 +44,7 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 			+ "submittime TIMESTAMP NOT NULL," + "suspendrequested SMALLINT NOT NULL," + "terminaterequested SMALLINT NOT NULL,"
 			+ "activitycwd VARCHAR(256) NOT NULL," + "executionplan BLOB(2G) NOT NULL," + "nextphase INTEGER NOT NULL,"
 			+ "activityepr BLOB(2G) NOT NULL," + "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL,"
-			+ "destroyrequested SMALLINT NOT NULL," + "ipport VARCHAR(40) NOT NULL)",
+			+ "destroyrequested SMALLINT NOT NULL," + "ipport VARCHAR(40) NOT NULL," + "persistrequested SMALLINT NOT NULL)",
 		
 		"CREATE TABLE besactivitypropertiestable (" + "activityid VARCHAR(256) NOT NULL," + "propertyname VARCHAR(256) NOT NULL,"
 			+ "propertyvalue BLOB(2G)," + "CONSTRAINT besactivitypropertiesconstraint1 " + "PRIMARY KEY (activityid, propertyname))",
@@ -114,6 +114,27 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 					alterStmt.execute();
 				} catch (SQLException sqe) {
 					_logger.error("Unable to upgrade besactivitiestable with destroyrequested column.", sqe);
+				}
+			}
+		} finally {
+			StreamUtils.close(alterStmt);
+		}
+		
+		alterStmt = null;
+		try {
+			DatabaseMetaData md = conn.getMetaData();
+			ResultSet checkBESPolicyTable_rs = md.getColumns(null, null, "BESACTIVITIESTABLE", "PERSISTREQUESTED");
+			if (checkBESPolicyTable_rs.next()) {
+				// destroyrequested column exists
+				_logger.info("persistrequested column exists in besactivitestable");
+			} else {
+				_logger.info("persistrequested column does not exist in besactivitiestable");
+				 // destroyrequested column does not exist
+				try {
+					alterStmt = conn.prepareStatement("ALTER TABLE " + "besactivitiestable " + "ADD COLUMN " + "persistrequested " + "SMALLINT NOT NULL " + "DEFAULT 0");
+					alterStmt.execute();
+				} catch (SQLException sqe) {
+					_logger.error("Unable to upgrade besactivitiestable with persistrequested column.", sqe);
 				}
 			}
 		} finally {

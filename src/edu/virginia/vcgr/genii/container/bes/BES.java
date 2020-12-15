@@ -425,7 +425,7 @@ public class BES implements Closeable
 
 			stmt = connection.prepareStatement("INSERT INTO besactivitiestable " + "(activityid, besid, jsdl, owners, callingcontext, "
 					+ "state, submittime, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityepr, activityservicename, jobname, destroyrequested, ipport) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					+ "nextphase, activityepr, activityservicename, jobname, destroyrequested, ipport, persistrequested) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
@@ -442,9 +442,11 @@ public class BES implements Closeable
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR, "besactivitiestable", "activityepr"));
 			stmt.setString(14, activityServiceName);
 			stmt.setString(15, jobName);
-			//LAK 2020 Aug 28: Default destroyrequested to zero
+			//LAK 2020 Aug 28: Default destroyrequested to false
 			stmt.setShort(16, (short)0);
 			stmt.setString(17, _ipport);
+			//LAK 2020 Dec 15: Default persistrequested to false
+			stmt.setShort(18, (short)0);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
@@ -541,7 +543,7 @@ public class BES implements Closeable
 		try {
 			stmt = connection
 				.prepareStatement("SELECT activityid, state, suspendrequested, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityservicename, jobname, jsdl, destroyrequested, ipport " + "FROM besactivitiestable WHERE besid = ?");
+					+ "nextphase, activityservicename, jobname, jsdl, destroyrequested, ipport, persistrequested" + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
@@ -555,6 +557,8 @@ public class BES implements Closeable
 					boolean terminateRequested = (rs.getShort(4) == 0) ? false : true;
 					//LAK 2020 Aug 28: Read in destroyrequested flag from the DB
 					boolean destroyRequested = (rs.getShort(11) == 0) ? false : true;
+					//LAK 2020 Dec 15: Read in persistrequested flag from DB
+					boolean persistRequested = (rs.getShort(13) == 0) ? false : true;
 
 					String activityCWDString = rs.getString(5);
 					BESWorkingDirectory activityCWD;
@@ -623,8 +627,6 @@ public class BES implements Closeable
 
 					_logger.info(String.format("Starting activity %d\n", count++));					
 					
-					// TODO: Add persisted column to DB
-					boolean persistRequested = false;
 					BESActivity activity = new BESActivity(_connectionPool, this, activityid, state, activityCWD, executionPlan, nextPhase,
 							activityServiceName, jobName, jobAnnotation, gpuType, gpuCount, suspendRequested, terminateRequested, persistRequested, destroyRequested, 
 								lanciumEnvironment, ipport);
