@@ -41,7 +41,7 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory impleme
 		
 		"CREATE TABLE besactivitiestable (" + "activityid VARCHAR(256) NOT NULL PRIMARY KEY," + "besid VARCHAR(256) NOT NULL,"
 			+ "jsdl BLOB(2G) NOT NULL," + "owners BLOB(2G) NOT NULL," + "callingcontext BLOB(2G) NOT NULL," + "state BLOB(2G) NOT NULL,"
-			+ "submittime TIMESTAMP NOT NULL," + "suspendrequested SMALLINT NOT NULL," + "terminaterequested SMALLINT NOT NULL,"
+			+ "submittime TIMESTAMP NOT NULL," + "terminaterequested SMALLINT NOT NULL,"
 			+ "activitycwd VARCHAR(256) NOT NULL," + "executionplan BLOB(2G) NOT NULL," + "nextphase INTEGER NOT NULL,"
 			+ "activityepr BLOB(2G) NOT NULL," + "activityservicename VARCHAR(128) NOT NULL," + "jobname VARCHAR(256) NOT NULL,"
 			+ "destroyrequested SMALLINT NOT NULL," + "ipport VARCHAR(40) NOT NULL," + "persistrequested SMALLINT NOT NULL)",

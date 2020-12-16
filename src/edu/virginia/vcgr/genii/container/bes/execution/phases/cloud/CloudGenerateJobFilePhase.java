@@ -31,7 +31,7 @@ public class CloudGenerateJobFilePhase implements ExecutionPhase, Serializable
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "generating-job-file", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "generating-job-file");
 	}
 
 	@Override

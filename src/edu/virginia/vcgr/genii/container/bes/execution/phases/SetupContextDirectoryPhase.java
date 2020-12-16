@@ -26,7 +26,7 @@ public class SetupContextDirectoryPhase extends AbstractExecutionPhase
 
 	public SetupContextDirectoryPhase(String contextDirectoryName)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, "context-directory-store", false));
+		super(new ActivityState(ActivityStateEnumeration.Running, "context-directory-store"));
 
 		_contextDirectoryName = contextDirectoryName;
 	}

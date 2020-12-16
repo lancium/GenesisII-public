@@ -13,28 +13,20 @@
 package edu.virginia.vcgr.genii.container.bes.resource;
 
 import java.rmi.RemoteException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
-import org.morgan.util.io.StreamUtils;
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
-import edu.virginia.vcgr.genii.client.bes.BESPolicy;
-import edu.virginia.vcgr.genii.client.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.wsrf.FaultManipulator;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
@@ -57,7 +49,7 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 
 		try {
 			if (!isServiceResource())
-				BES.createBES(_resourceKey, new BESPolicy(BESPolicyActions.NOACTION, BESPolicyActions.NOACTION), cParams);
+				BES.createBES(_resourceKey, cParams);
 		} catch (SQLException sqe) {
 			throw new ResourceException("Unable to create resource -- database error.", sqe);
 		}
@@ -80,31 +72,6 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		super(parentKey, connectionPool);
 	}
 
-	@Override
-	public BESPolicy getPolicy() throws RemoteException
-	{
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-
-		try {
-			stmt =
-				_connection.prepareStatement("SELECT userloggedinaction, screensaverinactiveaction " + "FROM bespolicytable WHERE besid = ?");
-			stmt.setString(1, _resourceKey);
-
-			rs = stmt.executeQuery();
-			if (!rs.next())
-				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Resource is unknown.") }, null));
-
-			return new BESPolicy(BESPolicyActions.valueOf(rs.getString(1)), BESPolicyActions.valueOf(rs.getString(2)));
-		} catch (SQLException sqe) {
-			throw new RemoteException("Unable to get BES policy.", sqe);
-		} finally {
-			StreamUtils.close(rs);
-			StreamUtils.close(stmt);
-		}
-	}
-
 	public BES getBES() throws RemoteException
 	{
 		BES bes = null;
@@ -120,32 +87,6 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 			throw new RemoteException("Couldn't find active BES entity.");
 		}
 		return bes;
-	}
-
-	@Override
-	public void setPolicy(BESPolicy policy) throws RemoteException
-	{
-		PreparedStatement stmt = null;
-
-		try {
-			stmt = _connection.prepareStatement(
-				"UPDATE bespolicytable " + "SET userloggedinaction = ?, " + "screensaverinactiveaction = ? " + "WHERE besid = ?");
-			stmt.setString(1, policy.getUserLoggedInAction().name());
-			stmt.setString(2, policy.getScreenSaverInactiveAction().name());
-			stmt.setString(3, _resourceKey);
-			if (stmt.executeUpdate() != 1)
-				throw new ResourceException("Unable to update bes policy.");
-			BES bes = getBES();
-			if (bes != null) {
-				bes.getPolicyEnactor().setPolicy(policy);
-			} else {
-				_logger.error("could not load BES instances to set policy!");
-			}
-		} catch (SQLException sqe) {
-			throw new RemoteException("Unable to update bes policy in database.", sqe);
-		} finally {
-			StreamUtils.close(stmt);
-		}
 	}
 
 	@Override

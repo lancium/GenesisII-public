@@ -39,7 +39,7 @@ public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "generating-wrapper-scripts", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "generating-wrapper-scripts");
 	}
 
 	public CloudGenerateRunScriptPhase(String scratchDir, String runScript, String workingDir, String resourceFile, JobRequest job,

@@ -22,7 +22,7 @@ public class CloudSetupContextDirectoryPhase implements ExecutionPhase, Serializ
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "setting-up-context", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "setting-up-context");
 	}
 
 	public CloudSetupContextDirectoryPhase(String lWorkingDirectory)

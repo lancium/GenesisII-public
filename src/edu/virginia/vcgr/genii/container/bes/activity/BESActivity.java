@@ -43,10 +43,8 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityStateChangedContents;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.BES;
-import edu.virginia.vcgr.genii.container.bes.BESPolicyListener;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
-import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.AbstractRunProcessPhase;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
@@ -64,10 +62,8 @@ public class BESActivity implements Closeable
 
 	private boolean _finishCaseHandled = false;
 	private BES _bes;
-	private PolicyListener _policyListener;
 	private String _activityid;
 	private ActivityState _state;
-	private boolean _suspendRequested;
 	private boolean _terminateRequested;
 	public boolean _persistRequested;
 	private boolean _destroyRequested;
@@ -88,7 +84,7 @@ public class BESActivity implements Closeable
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
 		BESWorkingDirectory activityCWD, Vector<ExecutionPhase> executionPlan, int nextPhase, String activityServiceName, String jobName, String jobAnnotation,
-		String gpuType, int gpuCount, boolean suspendRequested, boolean terminateRequested, boolean destroyRequested, boolean persistRequested, 
+		String gpuType, int gpuCount, boolean terminateRequested, boolean destroyRequested, boolean persistRequested, 
 		String lanciumEnvironment, String IPPort)
 	{
 		_connectionPool = connectionPool;
@@ -103,7 +99,6 @@ public class BESActivity implements Closeable
 		_jobName = jobName;
 		_IPPort=IPPort;
 
-		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
 		_persistRequested = persistRequested;
 		_destroyRequested = destroyRequested;
@@ -112,9 +107,7 @@ public class BESActivity implements Closeable
 		_gpuCount = gpuCount;
 		_lanciumEnvironment = lanciumEnvironment;
 
-		_runner = new ActivityRunner(_suspendRequested, _terminateRequested, _destroyRequested);
-		_policyListener = new PolicyListener();
-		_bes.getPolicyEnactor().addBESPolicyListener(_policyListener);
+		_runner = new ActivityRunner(_terminateRequested, _destroyRequested);
 		
 		startRunner();
 	}
@@ -272,11 +265,6 @@ public class BESActivity implements Closeable
 
 	synchronized public void close() throws IOException
 	{
-		if (_policyListener != null) {
-			_bes.getPolicyEnactor().removeBESPolicyListener(_policyListener);
-			_policyListener = null;
-		}
-
 		try {
 			terminate();
 		} catch (Throwable ee) {
@@ -334,22 +322,12 @@ public class BESActivity implements Closeable
 		return _jobAnnotation;
 	}
 
-	synchronized public void suspend() throws ExecutionException, SQLException
-	{
-		if (_suspendRequested)
-			return;
-
-		updateState(true, _terminateRequested, _destroyRequested, _persistRequested);
-		if (_runner != null)
-			_runner.requestSuspend();
-	}
-
 	synchronized public void terminate() throws ExecutionException, SQLException
 	{
 		if (_terminateRequested)
 			return;
 		
-		updateState(false, true, _destroyRequested, _persistRequested);
+		updateState(true, _destroyRequested, _persistRequested);
 		if (_runner != null)
 			_runner.requestTerminate(false);
 	}
@@ -359,7 +337,7 @@ public class BESActivity implements Closeable
 		if (_persistRequested)
 			return;
 
-		updateState(false, true, false, true);
+		updateState(true, false, true);
 		if (_runner != null)
 			_runner.requestPersist();
 	}
@@ -380,27 +358,15 @@ public class BESActivity implements Closeable
 		if(_runner != null)
 			_runner.requestDestruction();
 	}
-
-	synchronized public void resume() throws ExecutionException, SQLException
-	{
-		if (!_suspendRequested)
-			return;
-
-		updateState(false, _terminateRequested, _destroyRequested, _persistRequested);
-		if (_runner != null)
-			_runner.requestResume();
-	}
-
+	
 	synchronized public ActivityState getState()
 	{
 		ActivityState retState = (ActivityState) _state.clone();
-		if (_runner != null && _runner.isSuspended())
-			retState.suspend(true);
 
 		return retState;
 	}
 
-	synchronized private void updateState(boolean suspendRequested, boolean terminateRequested, boolean destroyRequested, boolean persistRequested) throws SQLException
+	synchronized private void updateState(boolean terminateRequested, boolean destroyRequested, boolean persistRequested) throws SQLException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -409,17 +375,15 @@ public class BESActivity implements Closeable
 			connection = _connectionPool.acquire(true);
 			//LAK: 2020 Aug 27: Added destroyrequested to the DB
 			stmt = connection.prepareStatement(
-				"UPDATE besactivitiestable " + "SET suspendrequested = ?, terminaterequested = ?, destroyrequested = ?, persistrequested = ?" + "WHERE activityid = ?");
-			stmt.setShort(1, suspendRequested ? (short) 1 : (short) 0);
-			stmt.setShort(2, terminateRequested ? (short) 1 : (short) 0);
-			stmt.setShort(3, destroyRequested ? (short) 1 : (short) 0);
+				"UPDATE besactivitiestable " + "SET terminaterequested = ?, destroyrequested = ?, persistrequested = ?" + "WHERE activityid = ?");
+			stmt.setShort(1, terminateRequested ? (short) 1 : (short) 0);
+			stmt.setShort(2, destroyRequested ? (short) 1 : (short) 0);
 			stmt.setShort(3, persistRequested ? (short) 1 : (short) 0);
 			stmt.setString(4, _activityid);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database.");
 			connection.commit();
 
-			_suspendRequested = suspendRequested;
 			_terminateRequested = terminateRequested;
 			_destroyRequested = destroyRequested;
 			_persistRequested = persistRequested;
@@ -703,13 +667,9 @@ public class BESActivity implements Closeable
 
 		/*
 		 * These either can't be free'd (they aren't objects), or they are merely references to objects that are held in other places:
-		 * _connectionPool; _suspendRequested; _terminateRequested; _nextPhase; _bes
+		 * _connectionPool; _terminateRequested; _nextPhase; _bes
 		 */
 
-		if (_policyListener != null) {
-			_bes.getPolicyEnactor().removeBESPolicyListener(_policyListener);
-			_policyListener = null;
-		}
 
 		_executionPlan.clear();
 		_executionPlan = null;
@@ -749,17 +709,17 @@ public class BESActivity implements Closeable
 				Collection<Throwable> faults = getFaults();
 				if (getFaults().size() > 0) {
 					if (!containsIgnoreableFault(faults)) {
-						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null, false));
+						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null));
 					} else {
-						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, "Ignoreable", false));
+						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, "Ignoreable"));
 					}
 				} else
-					updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Finished, null, false));
+					updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Finished, null));
 			} catch (SQLException cause) {
 				_logger.error("BES Activity Unrecoverably Faulted.", cause);
 				addFault(cause, 3);
 				try {
-					updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null, false));
+					updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null));
 				} catch (Throwable cause2) {
 					_logger.error("Unexpected exception occured in bes activity.", cause2);
 					return true;
@@ -795,50 +755,18 @@ public class BESActivity implements Closeable
 	private class ActivityRunner implements Runnable
 	{
 		private boolean _terminateRequested = false;
-		private boolean _suspendRequested = false;
 		private boolean _destroyRequested = false;
-
-		private boolean _suspended = false;
 
 		private Object _phaseLock;
 		private ExecutionPhase _currentPhase = null;
 
-		public ActivityRunner(boolean suspendRequested, boolean terminateRequested, boolean destroyRequested)
+		public ActivityRunner(boolean terminateRequested, boolean destroyRequested)
 		{
 			_phaseLock = BESActivity.this;
 			_terminateRequested = terminateRequested;
-			_suspendRequested = suspendRequested;
 			_destroyRequested = destroyRequested;
 		}
 
-		//LAK: This is NOT part of the freeze/thaw code. This is some legacy functionality.
-		final public boolean isSuspended()
-		{
-			synchronized (_phaseLock) {
-				return _suspended || (_currentPhase != null && _currentPhase instanceof SuspendableExecutionPhase);
-			}
-		}
-
-		//LAK: This is NOT part of the freeze/thaw code. This is some legacy functionality. The freeze/thaw functionality talks directly to the bes
-		//		to issue the command.
-		public boolean requestSuspend() throws ExecutionException
-		{
-			synchronized (_phaseLock) {
-				if (_suspendRequested || _terminateRequested)
-					return true;
-
-				_suspendRequested = true;
-				if (_currentPhase != null) {
-					if (_currentPhase instanceof SuspendableExecutionPhase)
-						((SuspendableExecutionPhase) _currentPhase).suspend();
-					else
-						return false;
-				} else
-					return true;
-			}
-
-			return true;
-		}
 
 		//LAK 2020 Aug 18: This method will handle creating a working context for the terminate call if execute() has not already ran (and done so).
 		private boolean setupWorkingContextForTerminate()
@@ -868,7 +796,6 @@ public class BESActivity implements Closeable
 				if (_terminateRequested)
 					return;
 
-				_suspendRequested = false;
 				_terminateRequested = true;
 				_destroyRequested = false;
 
@@ -937,28 +864,8 @@ public class BESActivity implements Closeable
 		{
 			synchronized (_phaseLock)
 			{
-				_suspendRequested = false;
 				_terminateRequested = false;
 				_destroyRequested = true;
-			}
-		}
-
-		//LAK: This is NOT part of the freeze/thaw code. This is some legacy functionality. The freeze/thaw functionality talks directly to the bes
-		//		to issue the command.
-		public void requestResume() throws ExecutionException
-		{
-			synchronized (_phaseLock) {
-				if (!_suspendRequested && !_suspended)
-					return;
-
-				_suspendRequested = false;
-
-				if (_currentPhase != null) {
-					if (_currentPhase instanceof SuspendableExecutionPhase)
-						((SuspendableExecutionPhase) _currentPhase).resume();
-				}
-
-				_phaseLock.notify();
 			}
 		}
 
@@ -975,15 +882,6 @@ public class BESActivity implements Closeable
 							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
 						}
 
-						while (_suspendRequested) {
-							_suspended = true;
-							try {
-								_phaseLock.wait();
-							} catch (InterruptedException ie) {
-								Thread.currentThread().isInterrupted();
-							}
-						}
-						_suspended = false;
 						_currentPhase = _executionPlan.get(_nextPhase);
 						_logger.debug("BES Activity transitition to " + _currentPhase.getPhaseState().toString());
 						updateState(_nextPhase, _currentPhase.getPhaseState());
@@ -1060,41 +958,13 @@ public class BESActivity implements Closeable
 						// Ensure Cloud Resource cleaned up
 						CloudMonitor.freeActivity(_activityid, _bes.getBESID());
 
-						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null, false));
+						updateState(_executionPlan.size(), new ActivityState(ActivityStateEnumeration.Failed, null));
 					} catch (Throwable cause2) {
 						_logger.error("Unexpected exception occured in bes activity.", cause2);
 						return;
 					}
 				}
 			}
-		}
-	}
-
-	private class PolicyListener implements BESPolicyListener
-	{
-		@Override
-		public void kill() throws ExecutionException
-		{
-			_runner.requestTerminate(true);
-		}
-
-		@Override
-		public void resume() throws ExecutionException
-		{
-			_runner.requestResume();
-		}
-
-		@Override
-		public void suspend() throws ExecutionException
-		{
-			_runner.requestSuspend();
-		}
-
-		@Override
-		public void suspendOrKill() throws ExecutionException
-		{
-			if (!_runner.requestSuspend())
-				kill();
 		}
 	}
 }

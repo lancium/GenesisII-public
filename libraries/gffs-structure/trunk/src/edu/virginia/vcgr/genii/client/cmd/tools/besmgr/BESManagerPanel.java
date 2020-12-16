@@ -10,7 +10,6 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -27,7 +26,6 @@ import org.morgan.util.gui.progress.ProgressMonitor;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 
 @SuppressWarnings("rawtypes")
 public class BESManagerPanel extends JPanel
@@ -44,10 +42,6 @@ public class BESManagerPanel extends JPanel
 	private ManagementData _data;
 
 	private String _lastThresholdString = "";
-	@SuppressWarnings("unchecked")
-	private JComboBox _screenSaverInactiveCombo = new JComboBox(BESPolicyActionWrapper.values());
-	@SuppressWarnings("unchecked")
-	private JComboBox _userLoggedInCombo = new JComboBox(BESPolicyActionWrapper.values());
 	private JTextField _thresholdField = new JTextField(8);
 	private JCheckBox _isAccepting = new JCheckBox("Accept New Activities");
 	private JLabel _statusLabel = new JLabel(" ");
@@ -56,14 +50,6 @@ public class BESManagerPanel extends JPanel
 	{
 		JPanel ret = new JPanel(new GridBagLayout());
 
-		ret.add(new JLabel("Screen Saver Inactive"),
-			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		ret.add(_screenSaverInactiveCombo, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-			GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 5, 5));
-		ret.add(new JLabel("User Logged In"),
-			new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		ret.add(_userLoggedInCombo, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-			new Insets(5, 5, 5, 5), 5, 5));
 		ret.add(new JLabel("Activity Threshold"),
 			new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		ret.add(_thresholdField, new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
@@ -76,8 +62,6 @@ public class BESManagerPanel extends JPanel
 
 	private void acquireState()
 	{
-		_screenSaverInactiveCombo.setEnabled(false);
-		_userLoggedInCombo.setEnabled(false);
 		_thresholdField.setEnabled(false);
 		_isAccepting.setEnabled(false);
 		_applyAction.setEnabled(false);
@@ -106,8 +90,7 @@ public class BESManagerPanel extends JPanel
 				JOptionPane.showMessageDialog(this, "Threshold value is invalid.", "Invalid Threshold Value", JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		_screenSaverInactiveCombo.setEnabled(false);
-		_userLoggedInCombo.setEnabled(false);
+
 		_thresholdField.setEnabled(false);
 		_isAccepting.setEnabled(false);
 		_applyAction.setEnabled(false);
@@ -120,12 +103,8 @@ public class BESManagerPanel extends JPanel
 		monitor.addProgressNotifier(new DefaultProgressNotifier(this, "Applying BES Configuration", "Applying new BES configuration.", 1000L),
 			false);
 
-		monitor
-			.startTask(new BESManagerConfigurationTask(_callingContext, _target,
-				new ManagementData(
-					new BESPolicy(((BESPolicyActionWrapper) _userLoggedInCombo.getSelectedItem()).action(),
-						((BESPolicyActionWrapper) _screenSaverInactiveCombo.getSelectedItem()).action()),
-					threshold, _isAccepting.isSelected())));
+		monitor.startTask(new BESManagerConfigurationTask(_callingContext, _target,
+			new ManagementData(threshold, _isAccepting.isSelected())));
 	}
 
 	public BESManagerPanel(ICallingContext callingContext, EndpointReferenceType target)
@@ -137,8 +116,6 @@ public class BESManagerPanel extends JPanel
 
 		ChangeListener changeListener = new ChangeListener();
 
-		_userLoggedInCombo.addActionListener(changeListener);
-		_screenSaverInactiveCombo.addActionListener(changeListener);
 		_thresholdField.addCaretListener(changeListener);
 		_isAccepting.addActionListener(changeListener);
 
@@ -199,8 +176,6 @@ public class BESManagerPanel extends JPanel
 		{
 			_statusLabel.setText("Cancelled");
 
-			_screenSaverInactiveCombo.setEnabled(false);
-			_userLoggedInCombo.setEnabled(false);
 			_thresholdField.setEnabled(false);
 			_isAccepting.setEnabled(false);
 			_applyAction.setEnabled(false);
@@ -213,14 +188,10 @@ public class BESManagerPanel extends JPanel
 			_data = result;
 			_statusLabel.setText(" ");
 
-			_screenSaverInactiveCombo.setSelectedItem(BESPolicyActionWrapper.wrap(_data.policy().getScreenSaverInactiveAction()));
-			_userLoggedInCombo.setSelectedItem(BESPolicyActionWrapper.wrap(_data.policy().getUserLoggedInAction()));
 			_thresholdField.setText(_data.threshold() == null ? "" : _data.threshold().toString());
 			_isAccepting.setSelected(_data.isAcceptingActivities());
 			_lastThresholdString = _thresholdField.getText();
 
-			_screenSaverInactiveCombo.setEnabled(true);
-			_userLoggedInCombo.setEnabled(true);
 			_thresholdField.setEnabled(true);
 			_isAccepting.setEnabled(true);
 			_applyAction.setEnabled(false);
@@ -232,8 +203,6 @@ public class BESManagerPanel extends JPanel
 		{
 			_statusLabel.setText("Error");
 
-			_screenSaverInactiveCombo.setEnabled(false);
-			_userLoggedInCombo.setEnabled(false);
 			_thresholdField.setEnabled(false);
 			_isAccepting.setEnabled(false);
 			_applyAction.setEnabled(false);
@@ -253,8 +222,6 @@ public class BESManagerPanel extends JPanel
 		{
 			_statusLabel.setText("Cancelled");
 
-			_screenSaverInactiveCombo.setEnabled(false);
-			_userLoggedInCombo.setEnabled(false);
 			_thresholdField.setEnabled(false);
 			_isAccepting.setEnabled(false);
 			_applyAction.setEnabled(false);
@@ -269,14 +236,10 @@ public class BESManagerPanel extends JPanel
 			_data = result;
 			_statusLabel.setText(" ");
 
-			_screenSaverInactiveCombo.setSelectedItem(BESPolicyActionWrapper.wrap(_data.policy().getScreenSaverInactiveAction()));
-			_userLoggedInCombo.setSelectedItem(BESPolicyActionWrapper.wrap(_data.policy().getUserLoggedInAction()));
 			_thresholdField.setText(_data.threshold() == null ? "" : _data.threshold().toString());
 			_isAccepting.setSelected(_data.isAcceptingActivities());
 			_lastThresholdString = _thresholdField.getText();
 
-			_screenSaverInactiveCombo.setEnabled(true);
-			_userLoggedInCombo.setEnabled(true);
 			_thresholdField.setEnabled(true);
 			_isAccepting.setEnabled(true);
 			_applyAction.setEnabled(false);
@@ -288,8 +251,6 @@ public class BESManagerPanel extends JPanel
 		{
 			_statusLabel.setText("Error");
 
-			_screenSaverInactiveCombo.setEnabled(true);
-			_userLoggedInCombo.setEnabled(true);
 			_thresholdField.setEnabled(true);
 			_isAccepting.setEnabled(true);
 			_applyAction.setEnabled(true);

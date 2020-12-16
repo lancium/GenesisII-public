@@ -93,7 +93,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		Integer threadsPerProcess, File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout,
 		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
+		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing"), constructionParameters);
 
 		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
@@ -345,7 +345,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					_logger.error("caught exception while asking for queue state; ignoring result", e);
 				}
 				if (stateIsUsable) {
-					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
+					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString()));
 					if (lastState == null || !lastState.equals(_state.toString())) {
 						if (_logger.isDebugEnabled())
 							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
@@ -392,7 +392,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						// available we will pick it up in getExitCode.
 						jobDisapparedFromQueue=true;
 						exitCode=143;
-						context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
+						context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString()));
 						if (lastState == null || !lastState.equals(_state.toString())) {
 							if (_logger.isDebugEnabled())
 								_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
@@ -404,7 +404,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					// See comments for catch above, they are the same
 					jobDisapparedFromQueue=true;
 					exitCode=143;
-					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
+					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString()));
 					if (lastState == null || !lastState.equals(_state.toString())) {
 						if (_logger.isDebugEnabled())
 							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
@@ -495,7 +495,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			if (_state == null)
 				return super.getPhaseState();
 
-			return new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false);
+			return new ActivityState(ActivityStateEnumeration.Running, _state.toString());
 		}
 	}
 

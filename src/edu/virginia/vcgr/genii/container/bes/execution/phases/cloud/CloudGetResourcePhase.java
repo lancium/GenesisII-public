@@ -35,7 +35,7 @@ public class CloudGetResourcePhase implements ExecutionPhase, Serializable
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "acquiring-resource", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "acquiring-resource");
 	}
 
 	@Override

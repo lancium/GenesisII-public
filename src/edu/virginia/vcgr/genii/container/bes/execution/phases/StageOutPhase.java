@@ -38,7 +38,7 @@ public class StageOutPhase extends AbstractExecutionPhase implements Serializabl
 
 	public StageOutPhase(File source, URI target, boolean handleAsArchive, boolean alwaysStageOut, UsernamePasswordIdentity usernamePassword)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, STAGING_OUT_STATE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, STAGING_OUT_STATE));
 		_handleAsArchive = handleAsArchive;
 		_alwaysStageOut = alwaysStageOut;
 		_usernamePassword = usernamePassword;

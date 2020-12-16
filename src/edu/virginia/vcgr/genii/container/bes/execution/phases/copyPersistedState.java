@@ -55,7 +55,7 @@ public class copyPersistedState extends AbstractExecutionPhase implements Serial
 	private EndpointReferenceType _src=null;
 
 	public copyPersistedState(EndpointReferenceType src) {
-		super(new ActivityState(ActivityStateEnumeration.Running, COPY_PERSISTED_STATE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, COPY_PERSISTED_STATE));
 		// 2020-09-01 ASG. This copies the persisted data of a job from a source EPR to the current container.
 		_src=src;
 	}

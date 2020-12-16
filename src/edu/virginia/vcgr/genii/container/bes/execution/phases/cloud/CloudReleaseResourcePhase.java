@@ -31,7 +31,7 @@ public class CloudReleaseResourcePhase implements ExecutionPhase, Serializable
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "releasing-resource", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "releasing-resource");
 	}
 
 	@Override

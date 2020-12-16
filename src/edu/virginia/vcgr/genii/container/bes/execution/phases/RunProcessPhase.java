@@ -78,7 +78,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		Integer threadsPerProcess, File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
 		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
+		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE), constructionParameters);
 
 		_spmdVariation = spmdVariation;
 		_memory=memory;

@@ -35,7 +35,7 @@ public class CloudExecutePhase extends AbstractCloudExecutionPhase implements Se
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "sending-execution-command", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "sending-execution-command");
 	}
 
 	@Override

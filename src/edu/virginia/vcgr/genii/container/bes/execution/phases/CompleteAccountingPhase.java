@@ -30,7 +30,7 @@ public class CompleteAccountingPhase extends AbstractExecutionPhase
 
 	public CompleteAccountingPhase(File accountingDirectory, File finishedDir)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, COMPLETE_ACCOUNTINGDIR_STATE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, COMPLETE_ACCOUNTINGDIR_STATE));
 		_accountingDir = accountingDirectory;
 		_finishedDir = finishedDir;
 	}

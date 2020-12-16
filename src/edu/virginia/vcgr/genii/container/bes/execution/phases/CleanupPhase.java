@@ -28,7 +28,7 @@ public class CleanupPhase extends AbstractExecutionPhase implements Serializable
 
 	public CleanupPhase(File fileToCleanup)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, CLEANUP_STAGE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, CLEANUP_STAGE));
 
 		_fileToCleanup = fileToCleanup;
 	}

@@ -21,7 +21,7 @@ public class TeardownFUSEPhase extends AbstractFUSEPhases
 
 	public TeardownFUSEPhase(String mountPoint)
 	{
-		super(mountPoint, new ActivityState(ActivityStateEnumeration.Running, "fuse-teardown", false));
+		super(mountPoint, new ActivityState(ActivityStateEnumeration.Running, "fuse-teardown"));
 	}
 
 	@Override

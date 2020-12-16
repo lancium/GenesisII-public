@@ -24,7 +24,7 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase implements S
 
 	public PrepareApplicationPhase(FilesystemManager fsManager, FilesystemRelativePath executable)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, PREPARE_STATE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, PREPARE_STATE));
 
 		_fsManager = fsManager;
 		_executable = executable;

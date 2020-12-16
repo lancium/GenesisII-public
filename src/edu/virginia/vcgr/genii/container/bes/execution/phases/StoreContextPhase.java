@@ -24,7 +24,7 @@ public class StoreContextPhase extends AbstractExecutionPhase implements Executi
 
 	public StoreContextPhase(String filename)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, STORING_CONTEXT_PHASE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, STORING_CONTEXT_PHASE));
 
 		_filename = filename;
 	}

@@ -18,7 +18,6 @@ import java.util.Collection;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 import edu.virginia.vcgr.genii.client.resource.IResource;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
@@ -28,9 +27,6 @@ public interface IBESResource extends IResource
 	static public final String STORED_ACCEPTING_NEW_ACTIVITIES = "edu.virginia.bes.resource.stored-accepting-new-activities";
 	static public final String THRESHOLD_DB_PROPERTY_NAME = "edu.virginia.bes.resource.threshold";
 
-	public BESPolicy getPolicy() throws RemoteException;
-
-	public void setPolicy(BESPolicy policy) throws RemoteException;
 
 	public BES getBES() throws RemoteException;
 
