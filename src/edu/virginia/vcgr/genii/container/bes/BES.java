@@ -405,7 +405,7 @@ public class BES
 
 			stmt = connection.prepareStatement("INSERT INTO besactivitiestable " + "(activityid, besid, jsdl, owners, callingcontext, "
 					+ "state, submittime, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityepr, activityservicename, jobname, destroyrequested, ipport, persistrequested) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					+ "nextphase, activityepr, activityservicename, jobname, destroyrequested, ipport, persistrequested, suspendrequested) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
@@ -426,6 +426,10 @@ public class BES
 			stmt.setString(16, _ipport);
 			//LAK 2020 Dec 15: Default persistrequested to false
 			stmt.setShort(17, (short)0);
+			
+			//LAK 2020 Dec 16: suspendrequested should always be false, it is legacy and not used.
+			stmt.setShort(18, (short)0);
+			
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database for bes activity creation.");
 			connection.commit();
