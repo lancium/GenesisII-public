@@ -511,7 +511,7 @@ public class BES
 		try {
 			stmt = connection
 				.prepareStatement("SELECT activityid, state, " + "terminaterequested, activitycwd, executionplan, "
-					+ "nextphase, activityservicename, jobname, jsdl, destroyrequested, ipport, persistrequested" + "FROM besactivitiestable WHERE besid = ?");
+					+ "nextphase, activityservicename, jobname, jsdl, destroyrequested, ipport, persistrequested " + "FROM besactivitiestable WHERE besid = ?");
 
 			int count = 0;
 			stmt.setString(1, _besid);
