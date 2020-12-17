@@ -14,7 +14,6 @@ import edu.virginia.vcgr.genii.gjt.data.JobDocument;
 import edu.virginia.vcgr.genii.gjt.data.SizeValue;
 import edu.virginia.vcgr.genii.gjt.gui.util.TitledPanel;
 import edu.virginia.vcgr.genii.gjt.units.SizeUnit;
-import edu.virginia.vcgr.jsdl.GPUArchitecture;
 import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 class GPUPanel extends TitledPanel

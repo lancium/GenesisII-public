@@ -1,1 +1,7 @@
-Creates a new root RNS.
+create-rns-root [--protocol={http|https}] [--host=<host>]
+	[--port=<port>] [--base-path=<base-url-path>] [--dirPath=<path-to-RNS> --selectReplica] <default-context-file>
+Creates a new root RNS.There are several options: 
+First, create a new root by providing a protocol, host, port, and service URL. This is the original option and is used when a new grid is begin bootstraped.
+The second option is to select an RNS path to an RNS service and create a root context that points to it. With this option you can also select a replica if the RNS is replicated.
+
+In both cases a default context.xml will be created UNLESS it is over-ridden.

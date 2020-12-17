@@ -52,7 +52,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 	// We are having a race condition when multiple client server sessions are active at a time. We do not know why. We
 	// are looking into it. Until then we will serialize the sessions by performing a schronized block around the actual 
 	// implementation code.
-	static private String sync=new String("sync var");
+	//static private String sync=new String("sync var");
 	// end of update
 
 //	private int _authAttemptCount = 0;

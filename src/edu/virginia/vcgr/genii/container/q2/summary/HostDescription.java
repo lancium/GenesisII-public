@@ -4,8 +4,6 @@ import java.util.Comparator;
 
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
-import org.ggf.jsdl.GPUArchitectureEnumeration;
-
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType.OperatingSystemTypes;
 import edu.virginia.vcgr.appmgr.os.ProcessorArchitecture;
 import edu.virginia.vcgr.appmgr.os.GPUArchitecture;

@@ -4,13 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-import org.eclipse.jetty.util.log.StdErrLog;
 import org.ggf.rns.LookupResponseType;
 import org.ggf.rns.RNSEntryResponseType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -133,6 +134,15 @@ public class ReplicateTool extends BaseGridTool
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath sourceRNS = current.lookup(sourcePath, RNSPathQueryFlags.MUST_EXIST);
 		EndpointReferenceType sourceEPR = sourceRNS.getEndpoint();
+		// 2020-12-16 by ASG. Before we go on we MUST ensure that sourceEPR has 
+		// an X.509 SecurityTokenReference in the metadata. If it does not, we MUST add one first to the sourceEPR,
+		// AND make sure that we update the RNS entry.
+		X509Certificate []cert = EPRUtils.extractCertChain(sourceEPR);
+		if (cert==null) {
+			// There is no X509, we will have to acquire one
+			//sourceRNS=current.acquireX509(sourcePath);
+			sourceEPR = sourceRNS.getEndpoint();
+		}
 		WSName sourceName = new WSName(sourceEPR);
 		URI endpointIdentifier = sourceName.getEndpointIdentifier();
 		if (endpointIdentifier == null) {
@@ -166,6 +176,7 @@ public class ReplicateTool extends BaseGridTool
 				addPolicy(currentRNS, stack);
 			}
 		}
+
 		MessageElement[] elementArr = new MessageElement[2];
 		elementArr[0] = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, endpointIdentifier);
 		elementArr[1] = new MessageElement(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM, sourceEPR);

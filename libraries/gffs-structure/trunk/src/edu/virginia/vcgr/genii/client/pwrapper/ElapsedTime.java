@@ -2,8 +2,6 @@ package edu.virginia.vcgr.genii.client.pwrapper;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.annotation.XmlAttribute;
-
 public class ElapsedTime
 {
 	//@XmlAttribute(name = "value", required = true)

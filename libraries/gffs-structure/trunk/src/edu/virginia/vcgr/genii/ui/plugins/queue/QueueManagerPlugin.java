@@ -13,7 +13,6 @@ import org.morgan.utils.gui.GUIUtils;
 
 import edu.virginia.vcgr.genii.ui.plugins.AbstractCombinedUIMenusPlugin;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
-import edu.virginia.vcgr.genii.ui.plugins.EndpointRetriever;
 import edu.virginia.vcgr.genii.ui.plugins.LazilyLoadedTab;
 import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;

@@ -2,10 +2,6 @@ package edu.virginia.vcgr.genii.client.pwrapper;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 public class ExitResults
 {
 	private int _exitCode;
