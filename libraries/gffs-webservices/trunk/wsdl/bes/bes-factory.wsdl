@@ -173,7 +173,7 @@
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
 			</xsd:complexType>
 			
-			<xsd:complexType name="StopActivitiesType">
+			<xsd:complexType name="FreezeActivitiesType">
 				<xsd:sequence>
 					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -181,16 +181,16 @@
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
 			</xsd:complexType>
 			
-			<xsd:complexType name="StopActivitiesResponseType">
+			<xsd:complexType name="FreezeActivitiesResponseType">
 				<xsd:sequence>
-					<xsd:element name="Response" type="bes-factory:StopActivityResponseType"
+					<xsd:element name="Response" type="bes-factory:FreezeActivityResponseType"
 						minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
 			</xsd:complexType>
 			
-			<xsd:complexType name="ResumeActivitiesType">
+			<xsd:complexType name="ThawActivitiesType">
 				<xsd:sequence>
 					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -198,9 +198,9 @@
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
 			</xsd:complexType>
 			
-			<xsd:complexType name="ResumeActivitiesResponseType">
+			<xsd:complexType name="ThawActivitiesResponseType">
 				<xsd:sequence>
-					<xsd:element name="Response" type="bes-factory:ResumeActivityResponseType"
+					<xsd:element name="Response" type="bes-factory:ThawActivityResponseType"
 						minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
@@ -306,15 +306,15 @@
 			<xsd:element name="RestartActivitiesResponse"
 				type="bes-factory:RestartActivitiesResponseType"/>
 				
-			<xsd:element name="StopActivities"
-				type="bes-factory:StopActivitiesType"/>
-			<xsd:element name="StopActivitiesResponse"
-				type="bes-factory:StopActivitiesResponseType"/>
+			<xsd:element name="FreezeActivities"
+				type="bes-factory:FreezeActivitiesType"/>
+			<xsd:element name="FreezeActivitiesResponse"
+				type="bes-factory:FreezeActivitiesResponseType"/>
 				
-			<xsd:element name="ResumeActivities"
-				type="bes-factory:ResumeActivitiesType"/>
-			<xsd:element name="ResumeActivitiesResponse"
-				type="bes-factory:ResumeActivitiesResponseType"/>
+			<xsd:element name="ThawActivities"
+				type="bes-factory:ThawActivitiesType"/>
+			<xsd:element name="ThawActivitiesResponse"
+				type="bes-factory:ThawActivitiesResponseType"/>
 				
 				
 			<!-- Fault Elements -->
@@ -415,17 +415,17 @@
 	<wsdl:message name="RestartActivitiesResponse">
 		<wsdl:part name="parameters" element="bes-factory:RestartActivitiesResponse"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="StopActivitiesRequest">
-		<wsdl:part name="parameters" element="bes-factory:StopActivities"></wsdl:part>
+	<wsdl:message name="FreezeActivitiesRequest">
+		<wsdl:part name="parameters" element="bes-factory:FreezeActivities"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="StopActivitiesResponse">
-		<wsdl:part name="parameters" element="bes-factory:StopActivitiesResponse"></wsdl:part>
+	<wsdl:message name="FreezeActivitiesResponse">
+		<wsdl:part name="parameters" element="bes-factory:FreezeActivitiesResponse"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="ResumeActivitiesRequest">
-		<wsdl:part name="parameters" element="bes-factory:ResumeActivities"></wsdl:part>
+	<wsdl:message name="ThawActivitiesRequest">
+		<wsdl:part name="parameters" element="bes-factory:ThawActivities"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="ResumeActivitiesResponse">
-		<wsdl:part name="parameters" element="bes-factory:ResumeActivitiesResponse"></wsdl:part>
+	<wsdl:message name="ThawActivitiesResponse">
+		<wsdl:part name="parameters" element="bes-factory:ThawActivitiesResponse"></wsdl:part>
 	</wsdl:message>
 	
 	<!-- Fault Messages -->
@@ -610,30 +610,30 @@
 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
 		</wsdl:operation>
         
-        <wsdl:operation name="StopActivities">
+        <wsdl:operation name="FreezeActivities">
 			<wsdl:input
-				name="StopActivities"
-				message="bes-factory:StopActivitiesRequest"
-				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/StopActivities"/>
+				name="FreezeActivities"
+				message="bes-factory:FreezeActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/FreezeActivities"/>
 			<wsdl:output
-				name="StopActivitiesResponse"
-				message="bes-factory:StopActivitiesResponse"
-				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/StopActivitiesResponse"/>
+				name="FreezeActivitiesResponse"
+				message="bes-factory:FreezeActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/FreezeActivitiesResponse"/>
 			<wsdl:fault
 				name="UnknownActivityIdentifierFault"
 				message="bes-factory:UnknownActivityIdentifierFault"
 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
 		</wsdl:operation>
 		
-		<wsdl:operation name="ResumeActivities">
+		<wsdl:operation name="ThawActivities">
 			<wsdl:input
-				name="ResumeActivities"
-				message="bes-factory:ResumeActivitiesRequest"
-				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/ResumeActivities"/>
+				name="ThawActivities"
+				message="bes-factory:ThawActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/ThawActivities"/>
 			<wsdl:output
-				name="ResumeActivitiesResponse"
-				message="bes-factory:ResumeActivitiesResponse"
-				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/ResumeActivitiesResponse"/>
+				name="ThawActivitiesResponse"
+				message="bes-factory:ThawActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/ThawActivitiesResponse"/>
 			<wsdl:fault
 				name="UnknownActivityIdentifierFault"
 				message="bes-factory:UnknownActivityIdentifierFault"

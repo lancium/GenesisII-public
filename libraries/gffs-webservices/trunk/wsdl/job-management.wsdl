@@ -192,24 +192,24 @@
 			element="job-management:RestartResponse"/>
 	</wsdl:message>
 	
-	<wsdl:message name="StopRequest">
-		<wsdl:part name="StopRequest"
-			element="job-management:StopRequestType"/>
+	<wsdl:message name="FreezeRequest">
+		<wsdl:part name="FreezeRequest"
+			element="job-management:FreezeRequestType"/>
 	</wsdl:message>
 
-	<wsdl:message name="StopResponse">
-		<wsdl:part name="StopResponse"
-			element="job-management:StopResponse"/>
+	<wsdl:message name="FreezeResponse">
+		<wsdl:part name="FreezeResponse"
+			element="job-management:FreezeResponse"/>
 	</wsdl:message>
 	
-	<wsdl:message name="ResumeRequest">
-		<wsdl:part name="ResumeRequest"
-			element="job-management:ResumeRequestType"/>
+	<wsdl:message name="ThawRequest">
+		<wsdl:part name="ThawRequest"
+			element="job-management:ThawRequestType"/>
 	</wsdl:message>
 
-	<wsdl:message name="ResumeResponse">
-		<wsdl:part name="ResumeResponse"
-			element="job-management:ResumeResponse"/>
+	<wsdl:message name="ThawResponse">
+		<wsdl:part name="ThawResponse"
+			element="job-management:ThawResponse"/>
 	</wsdl:message>
 
 	<wsdl:message name="ResetJobRequest">
@@ -314,14 +314,14 @@
 			<wsdl:output message="job-management:RestartResponse"/>
 		</wsdl:operation>
 		
-		<wsdl:operation name="stopJobs">
-			<wsdl:input message="job-management:StopRequest"/>
-			<wsdl:output message="job-management:StopResponse"/>
+		<wsdl:operation name="freezeJobs">
+			<wsdl:input message="job-management:FreezeRequest"/>
+			<wsdl:output message="job-management:FreezeResponse"/>
 		</wsdl:operation>
 		
-		<wsdl:operation name="resumeJobs">
-			<wsdl:input message="job-management:ResumeRequest"/>
-			<wsdl:output message="job-management:ResumeResponse"/>
+		<wsdl:operation name="thawJobs">
+			<wsdl:input message="job-management:ThawRequest"/>
+			<wsdl:output message="job-management:ThawResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="forceUpdate">

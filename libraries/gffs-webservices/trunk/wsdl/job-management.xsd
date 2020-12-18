@@ -171,25 +171,25 @@
 		type="job-management:RestartRequestType"/>
 	<xsd:element name="RestartResponse"/>
 	
-	<xsd:complexType name="StopRequestType">
+	<xsd:complexType name="FreezeRequestType">
 		<xsd:sequence>
 			<xsd:element name="job-ticket" type="xsd:string"
 				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="StopRequestType"
-		type="job-management:StopRequestType"/>
-	<xsd:element name="StopResponse"/>
+	<xsd:element name="FreezeRequestType"
+		type="job-management:FreezeRequestType"/>
+	<xsd:element name="FreezeResponse"/>
 	
-	<xsd:complexType name="ResumeRequestType">
+	<xsd:complexType name="ThawRequestType">
 		<xsd:sequence>
 			<xsd:element name="job-ticket" type="xsd:string"
 				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="ResumeRequestType"
-		type="job-management:ResumeRequestType"/>
-	<xsd:element name="ResumeResponse"/>
+	<xsd:element name="ThawRequestType"
+		type="job-management:ThawRequestType"/>
+	<xsd:element name="ThawResponse"/>
 
 	<xsd:complexType name="ResetJobRequestType">
 		<xsd:sequence>

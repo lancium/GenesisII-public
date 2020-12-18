@@ -110,19 +110,14 @@ import edu.virginia.vcgr.jsdl.sweep.SweepException;
 
 import org.ggf.bes.factory.PersistActivitiesType;
 import org.ggf.bes.factory.PersistActivitiesResponseType;
-import org.ggf.bes.factory.PersistActivityResponseType;
 import org.ggf.bes.factory.GetStatePathsType;
 import org.ggf.bes.factory.GetStatePathsResponseType;
-import org.ggf.bes.factory.GetStatePathResponseType;
 import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.RestartActivitiesResponseType;
-import org.ggf.bes.factory.RestartActivityResponseType;
-import org.ggf.bes.factory.StopActivitiesType;
-import org.ggf.bes.factory.StopActivitiesResponseType;
-import org.ggf.bes.factory.StopActivityResponseType;
-import org.ggf.bes.factory.ResumeActivitiesType;
-import org.ggf.bes.factory.ResumeActivitiesResponseType;
-import org.ggf.bes.factory.ResumeActivityResponseType;
+import org.ggf.bes.factory.FreezeActivitiesType;
+import org.ggf.bes.factory.FreezeActivitiesResponseType;
+import org.ggf.bes.factory.ThawActivitiesType;
+import org.ggf.bes.factory.ThawActivitiesResponseType;
 
 /**
  * This is the service class that the container redirects SOAP messages to.
@@ -245,25 +240,25 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public Object stopJobs(String[] jobs) throws RemoteException
+	public Object freezeJobs(String[] jobs) throws RemoteException
 	{
 		try {
-			_queueMgr.stopJobs(jobs);
+			_queueMgr.freezeJobs(jobs);
 			return null;
 		} catch (SQLException sqe) {
-			throw new RemoteException("Unable to stop jobs in queue.", sqe);
+			throw new RemoteException("Unable to freeze jobs in queue.", sqe);
 		}
 	}
 	
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public Object resumeJobs(String[] jobs) throws RemoteException
+	public Object thawJobs(String[] jobs) throws RemoteException
 	{
 		try {
-			_queueMgr.resumeJobs(jobs);
+			_queueMgr.thawJobs(jobs);
 			return null;
 		} catch (SQLException sqe) {
-			throw new RemoteException("Unable to resume jobs in queue.", sqe);
+			throw new RemoteException("Unable to thaw jobs in queue.", sqe);
 		}
 	}
 
@@ -782,21 +777,22 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public StopActivitiesResponseType stopActivities(StopActivitiesType parameters)
+	public FreezeActivitiesResponseType freezeActivities(FreezeActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		_logger.debug("freezeActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
 		return null;
 	}
 	
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public ResumeActivitiesResponseType resumeActivities(ResumeActivitiesType parameters)
+	public ThawActivitiesResponseType thawActivities(ThawActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		_logger.debug("thawActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
 		return null;
 	}
+	
 	//LAK 2020 Aug 13: This is a stub that should not be implemented in the queue.
 	@Override
 	public DestroyActivitiesResponseType destroyActivities(DestroyActivitiesType parameters)

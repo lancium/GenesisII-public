@@ -635,6 +635,7 @@ public class BES
 	public BESPWrapperConnection getBESPWrapperConnection() {
 		return _comm;
 	}
+	
 	public boolean sendCommand(String activityid, String command) {
 		if (_containedActivities.containsKey(activityid)) {
 			return _containedActivities.get(activityid).sendCommand(command);

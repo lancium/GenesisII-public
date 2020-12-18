@@ -276,6 +276,7 @@ public class BESActivity implements Closeable
 	{
 		return _jobName;
 	}
+	
 	public String getIPPort() {
 		return _IPPort;
 	}
@@ -317,6 +318,7 @@ public class BESActivity implements Closeable
 		}
 		return success;
 	}
+	
 	public String getJobAnnotation()
 	{
 		return _jobAnnotation;

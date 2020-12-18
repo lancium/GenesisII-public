@@ -52,12 +52,12 @@ import org.ggf.bes.factory.GetStatePathResponseType;
 import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.RestartActivitiesResponseType;
 import org.ggf.bes.factory.RestartActivityResponseType;
-import org.ggf.bes.factory.StopActivitiesType;
-import org.ggf.bes.factory.StopActivitiesResponseType;
-import org.ggf.bes.factory.StopActivityResponseType;
-import org.ggf.bes.factory.ResumeActivitiesType;
-import org.ggf.bes.factory.ResumeActivitiesResponseType;
-import org.ggf.bes.factory.ResumeActivityResponseType;
+import org.ggf.bes.factory.FreezeActivitiesType;
+import org.ggf.bes.factory.FreezeActivitiesResponseType;
+import org.ggf.bes.factory.FreezeActivityResponseType;
+import org.ggf.bes.factory.ThawActivitiesType;
+import org.ggf.bes.factory.ThawActivitiesResponseType;
+import org.ggf.bes.factory.ThawActivityResponseType;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.bes.management.StartAcceptingNewActivitiesResponseType;
@@ -749,49 +749,48 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public StopActivitiesResponseType stopActivities(StopActivitiesType parameters)
+	public FreezeActivitiesResponseType freezeActivities(FreezeActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		_logger.debug("stopActivities called on GeniiBESServiceImpl.");
-		Collection<StopActivityResponseType> responses = new LinkedList<StopActivityResponseType>();
+		Collection<FreezeActivityResponseType> responses = new LinkedList<FreezeActivityResponseType>();
 
 		for (String epi : parameters.getActivityIdentifier()) {
-			responses.add(stopActivity(epi));
+			responses.add(freezeActivity(epi));
 		}
 
-		return new StopActivitiesResponseType(responses.toArray(new StopActivityResponseType[0]), null);
+		return new FreezeActivitiesResponseType(responses.toArray(new FreezeActivityResponseType[0]), null);
 	}
 
-	static public StopActivityResponseType stopActivity(String activityid) throws RemoteException
+	static public FreezeActivityResponseType freezeActivity(String activityid) throws RemoteException
 	{
 		BES bes = BES.findBESForActivity(activityid);
 		if (bes == null)
-			return new StopActivityResponseType(activityid, false, null, null);
+			return new FreezeActivityResponseType(activityid, false, null, null);
 		String commandToSend = activityid + " freeze";
-		return new StopActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
+		return new FreezeActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
 	}
 	
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
-	public ResumeActivitiesResponseType resumeActivities(ResumeActivitiesType parameters)
+	public ThawActivitiesResponseType thawActivities(ThawActivitiesType parameters)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		Collection<ResumeActivityResponseType> responses = new LinkedList<ResumeActivityResponseType>();
+		Collection<ThawActivityResponseType> responses = new LinkedList<ThawActivityResponseType>();
 
 		for (String aepr : parameters.getActivityIdentifier()) {
-			responses.add(resumeActivity(aepr));
+			responses.add(thawActivity(aepr));
 		}
 
-		return new ResumeActivitiesResponseType(responses.toArray(new ResumeActivityResponseType[0]), null);
+		return new ThawActivitiesResponseType(responses.toArray(new ThawActivityResponseType[0]), null);
 	}
 
-	static public ResumeActivityResponseType resumeActivity(String activityid) throws RemoteException
+	static public ThawActivityResponseType thawActivity(String activityid) throws RemoteException
 	{
 		BES bes = BES.findBESForActivity(activityid);
 		if (bes == null)
-			return new ResumeActivityResponseType(activityid, false, null, null);
+			return new ThawActivityResponseType(activityid, false, null, null);
 		String commandToSend = activityid + " thaw";
-		return new ResumeActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
+		return new ThawActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
 	}
 	
 	@Override
@@ -851,14 +850,14 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	
 	//LAK: This function should not be implemented. This is NOT a stub.
 	@Override
-	public Object stopJobs(String[] stopRequest) throws RemoteException
+	public Object freezeJobs(String[] stopRequest) throws RemoteException
 	{
 		return null;
 	}
 	
 	//LAK: This function should not be implemented. This is NOT a stub.
 	@Override
-	public Object resumeJobs(String[] resumeRequest) throws RemoteException
+	public Object thawJobs(String[] resumeRequest) throws RemoteException
 	{
 		return null;
 	}

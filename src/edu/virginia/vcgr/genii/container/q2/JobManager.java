@@ -1997,7 +1997,7 @@ public class JobManager implements Closeable
 		}
 	}
 	
-	synchronized public void stopJobs(Connection connection, String[] jobs)
+	synchronized public void freezeJobs(Connection connection, String[] jobs)
 			throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		int originalCount = _outcallThreadPool.size();
@@ -2011,7 +2011,7 @@ public class JobManager implements Closeable
 			if(jobData.getJobState() != QueueStates.RUNNING)
 			{
 				if(_logger.isErrorEnabled())
-					_logger.error(String.format("%s is not currently running, cannot stop.", jobData));
+					_logger.error(String.format("%s is not currently running, cannot freeze.", jobData));
 				continue;
 			}
 			
@@ -2024,7 +2024,7 @@ public class JobManager implements Closeable
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobStopWorker(resolver, resolver, _connectionPool, jobData));
+			_outcallThreadPool.enqueue(new JobFreezeWorker(resolver, resolver, _connectionPool, jobData));
 			
 			synchronized(jobData)
 			{
@@ -2041,7 +2041,7 @@ public class JobManager implements Closeable
 		}
 	}
 	
-	synchronized public void resumeJobs(Connection connection, String[] jobs)
+	synchronized public void thawJobs(Connection connection, String[] jobs)
 			throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		int originalCount = _outcallThreadPool.size();
@@ -2055,7 +2055,7 @@ public class JobManager implements Closeable
 			if(jobData.getJobState() != QueueStates.STOPPED)
 			{
 				if(_logger.isErrorEnabled())
-					_logger.error(String.format("%s is not currently stopped, cannot resume.", jobData));
+					_logger.error(String.format("%s is not currently frozen, cannot thaw.", jobData));
 				continue;
 			}
 			
@@ -2067,7 +2067,7 @@ public class JobManager implements Closeable
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobResumeWorker(resolver, resolver, _connectionPool, jobData));
+			_outcallThreadPool.enqueue(new JobThawWorker(resolver, resolver, _connectionPool, jobData));
 			
 			synchronized(jobData)
 			{
@@ -2645,7 +2645,7 @@ public class JobManager implements Closeable
 			}
 			
 			if (jobsToResume.size() > 0) {
-				resumeJobs(connection, jobsToResume.toArray(new String[0]));
+				thawJobs(connection, jobsToResume.toArray(new String[0]));
 			}
 		}
 

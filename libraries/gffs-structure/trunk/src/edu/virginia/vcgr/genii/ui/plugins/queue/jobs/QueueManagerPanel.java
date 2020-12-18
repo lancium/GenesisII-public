@@ -272,13 +272,13 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		}
 	}
 	
-	private class JobStopAction extends AbstractAction
+	private class JobFreezeAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
 
-		private JobStopAction(int[] rows)
+		private JobFreezeAction(int[] rows)
 		{
-			super("Stop Jobs");
+			super("Freeze Jobs");
 
 			setEnabled(rows.length > 0);
 		}
@@ -292,17 +292,17 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 			for (int row : _table.getSelectedRows())
 				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
 
-			QueueManipulation.JobStopTask(_context, _table, _model, jobTickets);
+			QueueManipulation.JobFreezeTask(_context, _table, _model, jobTickets);
 		}
 	}
 	
-	private class JobResumeAction extends AbstractAction
+	private class JobThawAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
 
-		private JobResumeAction(int[] rows)
+		private JobThawAction(int[] rows)
 		{
-			super("Resume Jobs");
+			super("Thaw Jobs");
 
 			setEnabled(rows.length > 0);
 		}
@@ -316,7 +316,7 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 			for (int row : _table.getSelectedRows())
 				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
 
-			QueueManipulation.JobResumeTask(_context, _table, _model, jobTickets);
+			QueueManipulation.JobThawTask(_context, _table, _model, jobTickets);
 		}
 	}
 	
@@ -337,10 +337,11 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		popup.add(new JobRescheduleAction(rows));
 		popup.add(new JobResetAction(rows));
 		popup.addSeparator();
-		popup.add(new JobPersistAction(rows));
-		popup.add(new JobRestartAction(rows));
-		popup.add(new JobStopAction(rows));
-		popup.add(new JobResumeAction(rows));
+		//LAK 18 Dec 2020: Temp disable persist and restart options in gui
+		/*popup.add(new JobPersistAction(rows));
+		popup.add(new JobRestartAction(rows));*/
+		popup.add(new JobFreezeAction(rows));
+		popup.add(new JobThawAction(rows));
 		popup.addSeparator();
 		popup.add(new RefreshAction());
 

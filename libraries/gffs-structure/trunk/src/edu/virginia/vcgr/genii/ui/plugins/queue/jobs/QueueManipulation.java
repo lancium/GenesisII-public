@@ -147,9 +147,9 @@ class QueueManipulation
 		}
 	}
 	
-	static private class JobStopTask extends TypicalTask<Integer>
+	static private class JobFreezeTask extends TypicalTask<Integer>
 	{
-		private JobStopTask(UIPluginContext context, Collection<String> jobTickets)
+		private JobFreezeTask(UIPluginContext context, Collection<String> jobTickets)
 		{
 			super(context, jobTickets);
 		}
@@ -158,14 +158,14 @@ class QueueManipulation
 		final public Integer execute(TaskProgressListener progressListener) throws Exception
 		{
 			QueuePortType queue = queue();
-			queue.stopJobs(_jobTickets.toArray(new String[_jobTickets.size()]));
+			queue.freezeJobs(_jobTickets.toArray(new String[_jobTickets.size()]));
 			return 0;
 		}
 	}
 	
-	static private class JobResumeTask extends TypicalTask<Integer>
+	static private class JobThawTask extends TypicalTask<Integer>
 	{
-		private JobResumeTask(UIPluginContext context, Collection<String> jobTickets)
+		private JobThawTask(UIPluginContext context, Collection<String> jobTickets)
 		{
 			super(context, jobTickets);
 		}
@@ -174,7 +174,7 @@ class QueueManipulation
 		final public Integer execute(TaskProgressListener progressListener) throws Exception
 		{
 			QueuePortType queue = queue();
-			queue.resumeJobs(_jobTickets.toArray(new String[_jobTickets.size()]));
+			queue.thawJobs(_jobTickets.toArray(new String[_jobTickets.size()]));
 			return 0;
 		}
 	}
@@ -367,9 +367,9 @@ class QueueManipulation
 		}
 	}
 	
-	static private class JobStopCompletionListener extends TypicalTaskCompletionListener<Integer>
+	static private class JobFreezeCompletionListener extends TypicalTaskCompletionListener<Integer>
 	{
-		private JobStopCompletionListener(Component ownerComponent, UIPluginContext context, QueueManagerTableModel model)
+		private JobFreezeCompletionListener(Component ownerComponent, UIPluginContext context, QueueManagerTableModel model)
 		{
 			super(ownerComponent, context, model);
 		}
@@ -387,9 +387,9 @@ class QueueManipulation
 		}
 	}
 	
-	static private class JobResumeCompletionListener extends TypicalTaskCompletionListener<Integer>
+	static private class JobThawCompletionListener extends TypicalTaskCompletionListener<Integer>
 	{
-		private JobResumeCompletionListener(Component ownerComponent, UIPluginContext context, QueueManagerTableModel model)
+		private JobThawCompletionListener(Component ownerComponent, UIPluginContext context, QueueManagerTableModel model)
 		{
 			super(ownerComponent, context, model);
 		}
@@ -523,16 +523,16 @@ class QueueManipulation
 			new JobRestartTask(context, jobTickets), new JobRestartCompletionListener(ownerComponent, context, model)).start();
 	}
 	
-	static void JobStopTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
+	static void JobFreezeTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
 	{
-		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Stopping Jobs", "Asking queue to stop jobs", 1000L,
-			new JobStopTask(context, jobTickets), new JobStopCompletionListener(ownerComponent, context, model)).start();
+		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Freezing Jobs", "Asking queue to freeze jobs", 1000L,
+			new JobFreezeTask(context, jobTickets), new JobFreezeCompletionListener(ownerComponent, context, model)).start();
 	}
 	
-	static void JobResumeTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
+	static void JobThawTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
 	{
-		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Resuming Jobs", "Asking queue to resume jobs", 1000L,
-			new JobResumeTask(context, jobTickets), new JobResumeCompletionListener(ownerComponent, context, model)).start();
+		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Thawing Jobs", "Asking queue to thaw jobs", 1000L,
+			new JobThawTask(context, jobTickets), new JobThawCompletionListener(ownerComponent, context, model)).start();
 	}
 	
 	static void completeJobs(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)

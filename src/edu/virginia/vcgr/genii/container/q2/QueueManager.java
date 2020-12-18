@@ -606,25 +606,25 @@ public class QueueManager implements Closeable
 		}
 	}
 	
-	public void stopJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
+	public void freezeJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			_jobManager.stopJobs(connection, jobs);
+			_jobManager.freezeJobs(connection, jobs);
 		} finally {
 			_connectionPool.release(connection);
 		}
 	}
 	
-	public void resumeJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
+	public void thawJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 
 		try {
 			connection = _connectionPool.acquire(true);
-			_jobManager.resumeJobs(connection, jobs);
+			_jobManager.thawJobs(connection, jobs);
 		} finally {
 			_connectionPool.release(connection);
 		}

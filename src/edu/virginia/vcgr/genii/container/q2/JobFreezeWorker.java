@@ -1,48 +1,27 @@
 package edu.virginia.vcgr.genii.container.q2;
 
-import java.io.PrintWriter;
 import java.sql.Connection;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-
-import javax.xml.namespace.QName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.bes.factory.ActivityStateEnumeration;
-import org.ggf.bes.factory.StopActivitiesType;
-import org.ggf.bes.factory.StopActivityResponseType;
-import org.ggf.bes.factory.StopActivitiesResponseType;
-import org.morgan.util.io.StreamUtils;
+import org.ggf.bes.factory.FreezeActivitiesType;
+import org.ggf.bes.factory.FreezeActivityResponseType;
 import org.ws.addressing.EndpointReferenceType;
-import org.xmlsoap.schemas.soap.envelope.Fault;
-
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
-import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
-import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
-import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
-//LAK (08 July 2020): Created to mimic the format of JobUpdateWorker for adding Stop outcalls from the QueueManager GUI
-public class JobStopWorker implements OutcallHandler {
+//LAK (08 July 2020): Created to mimic the format of JobUpdateWorker for adding Freeze outcalls from the QueueManager GUI
+public class JobFreezeWorker implements OutcallHandler {
 
-	static private Log _logger = LogFactory.getLog(JobStopWorker.class);
+	static private Log _logger = LogFactory.getLog(JobFreezeWorker.class);
 
 	private IBESPortTypeResolver _clientStubResolver;
 	private IJobEndpointResolver _jobEndpointResolver;
 	private ServerDatabaseConnectionPool _connectionPool;
 	private JobData _data;
 	
-	public JobStopWorker(IBESPortTypeResolver clientStubResolver, IJobEndpointResolver jobEndpointResolver, ServerDatabaseConnectionPool connectionPool, JobData data)
+	public JobFreezeWorker(IBESPortTypeResolver clientStubResolver, IJobEndpointResolver jobEndpointResolver, ServerDatabaseConnectionPool connectionPool, JobData data)
 		{
 			_clientStubResolver = clientStubResolver;
 			_jobEndpointResolver = jobEndpointResolver;
@@ -75,26 +54,26 @@ public class JobStopWorker implements OutcallHandler {
 				ClientUtils.setTimeout(clientStub, 30 * 1000); //Changed to 30 seconds from 120 by ASG 2017-08-01
 
 				if (_logger.isDebugEnabled())
-					_logger.debug(String.format("Making grid outcall to stop job %s", _data));
+					_logger.debug(String.format("Making grid outcall to freeze job %s", _data));
 				
-				StopActivityResponseType[] stopResponses;
+				FreezeActivityResponseType[] freezeResponses;
 				/* call the BES container to start persisting the job. */
 				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
 				String epi = aps.getResourceKey();
-				stopResponses = clientStub.stopActivities(new StopActivitiesType(new String[] { epi }, null)).getResponse();
+				freezeResponses = clientStub.freezeActivities(new FreezeActivitiesType(new String[] { epi }, null)).getResponse();
 				
-				for(StopActivityResponseType sRes : stopResponses)
+				for(FreezeActivityResponseType sRes : freezeResponses)
 				{
-					if(sRes.isStopped() == false)
+					if(sRes.isFrozen() == false)
 					{
-						_logger.error(String.format("Request to stop job responded with a failure: %s", _data));
+						_logger.error(String.format("Request to freeze job responded with a failure: %s", _data));
 					}
 				}
 			}
 			catch (Throwable cause) 
 			{
 				if (_logger.isErrorEnabled())
-					_logger.error(String.format("Failed to call stopActivities with exception %s", cause.toString()));
+					_logger.error(String.format("Failed to call freezeActivities with exception %s", cause.toString()));
 			}
 		}
 	}
@@ -102,8 +81,8 @@ public class JobStopWorker implements OutcallHandler {
 	@Override
 	public boolean equals(OutcallHandler other)
 	{
-		if (other instanceof JobStopWorker)
-			return (_data.getJobID() == ((JobStopWorker)other)._data.getJobID());
+		if (other instanceof JobFreezeWorker)
+			return (_data.getJobID() == ((JobFreezeWorker)other)._data.getJobID());
 
 		return false;
 	}

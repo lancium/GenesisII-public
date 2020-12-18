@@ -147,25 +147,26 @@
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
 	
-	<xsd:complexType name="StopActivityResponseType">
+	<xsd:complexType name="FreezeActivityResponseType">
 		<xsd:sequence>
 			<xsd:element name="ActivityIdentifier" type="xsd:string"/>
-			<xsd:element name="Stopped" type="xsd:boolean"/>
+			<xsd:element name="Frozen" type="xsd:boolean"/>
 			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
 	
-	<xsd:complexType name="ResumeActivityResponseType">
+	<xsd:complexType name="ThawActivityResponseType">
 		<xsd:sequence>
 			<xsd:element name="ActivityIdentifier" type="xsd:string"/>
-			<xsd:element name="Resumed" type="xsd:boolean"/>
+			<xsd:element name="Thawed" type="xsd:boolean"/>
 			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
+	
 	<xsd:complexType name="DestroyActivityResponseType">
 		<xsd:sequence>
 			<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"/>
