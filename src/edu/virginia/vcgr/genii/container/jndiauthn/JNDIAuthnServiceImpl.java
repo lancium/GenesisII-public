@@ -42,7 +42,7 @@ import org.apache.ws.security.components.crypto.CredentialException;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.ggf.rns.LookupResponseType;
 import org.ggf.rns.MetadataMappingType;
 import org.ggf.rns.NameMappingType;
@@ -535,7 +535,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements JNDIAuthnPort
 					// get UID for cert
 					String uid = (attrs.get("uidnumber") == null) ? null : (String) attrs.get("uidnumber").get();
 
-					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields =
+					Map.Entry<List<ASN1ObjectIdentifier>, List<String>> additionalFields =
 						CertTool.constructCommonDnFields(epiString, null, cnList, uid);
 
 					return CertTool.createResourceCertChain(certSpec, additionalFields);

@@ -42,18 +42,18 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
-import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
 import edu.virginia.vcgr.genii.security.utils.SecurityUtilities;
 
@@ -136,9 +136,9 @@ public class CertTool
 		//
 		// extensions
 		//
-		v3CertGen.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(pubKey));
-		v3CertGen.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(caCert));
-		v3CertGen.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(true));
+		v3CertGen.addExtension(Extension.subjectKeyIdentifier, false, SubjectKeyIdentifier.getInstance(pubKey));
+		v3CertGen.addExtension(Extension.authorityKeyIdentifier, false, AuthorityKeyIdentifier.getInstance(caCert));
+		v3CertGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
 		X509Certificate cert = v3CertGen.generate(caPrivKey, "BC");
 
 		cert.checkValidity(new Date());
@@ -157,12 +157,12 @@ public class CertTool
 	public static String getSN(X509Certificate cert)
 	{
 		X509Name dn = new X509Name(cert.getSubjectDN().toString());
-		Vector<DERObjectIdentifier> oids = dn.getOIDs();
+		Vector<ASN1ObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
-		Iterator<DERObjectIdentifier> oidItr = oids.iterator();
+		Iterator<ASN1ObjectIdentifier> oidItr = oids.iterator();
 		Iterator<String> valItr = values.listIterator();
 		while (oidItr.hasNext()) {
-			DERObjectIdentifier oid = oidItr.next();
+			ASN1ObjectIdentifier oid = oidItr.next();
 			String value = valItr.next();
 			if (oid.equals(X509Name.SN)) {
 				return value;
@@ -175,12 +175,12 @@ public class CertTool
 	public static String getCN(X509Certificate cert)
 	{
 		X509Name dn = new X509Name(cert.getSubjectDN().toString());
-		Vector<DERObjectIdentifier> oids = dn.getOIDs();
+		Vector<ASN1ObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
-		Iterator<DERObjectIdentifier> oidItr = oids.iterator();
+		Iterator<ASN1ObjectIdentifier> oidItr = oids.iterator();
 		Iterator<String> valItr = values.listIterator();
 		while (oidItr.hasNext()) {
-			DERObjectIdentifier oid = oidItr.next();
+			ASN1ObjectIdentifier oid = oidItr.next();
 			String value = valItr.next();
 			if (oid.equals(X509Name.CN)) {
 				return value;
@@ -192,10 +192,10 @@ public class CertTool
 	/**
 	 * Construct a structure-of-arrays of distinguished-name fields and paired values
 	 */
-	public static Map.Entry<List<DERObjectIdentifier>, List<String>> constructCommonDnFields(String epi, ArrayList<String> newOrgs,
+	public static Map.Entry<List<ASN1ObjectIdentifier>, List<String>> constructCommonDnFields(String epi, ArrayList<String> newOrgs,
 		ArrayList<String> newCNs, String uid) throws GeneralSecurityException
 	{
-		ArrayList<DERObjectIdentifier> fields = new ArrayList<DERObjectIdentifier>();
+		ArrayList<ASN1ObjectIdentifier> fields = new ArrayList<ASN1ObjectIdentifier>();
 		ArrayList<String> values = new ArrayList<String>();
 
 		if (epi != null) {
@@ -219,23 +219,23 @@ public class CertTool
 			}
 		}
 
-		return new AbstractMap.SimpleEntry<List<DERObjectIdentifier>, List<String>>(fields, values);
+		return new AbstractMap.SimpleEntry<List<ASN1ObjectIdentifier>, List<String>>(fields, values);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static X509Certificate[] createResourceCertChain(CertCreationSpec certSpec,
-		Map.Entry<List<DERObjectIdentifier>, List<String>> additional_fields) throws GeneralSecurityException
+		Map.Entry<List<ASN1ObjectIdentifier>, List<String>> additional_fields) throws GeneralSecurityException
 	{
 		// replace the SN and the old CNs, if necessary
 		X509Name dn = new X509Name(certSpec.issuerChain[0].getSubjectDN().toString());
-		Vector<DERObjectIdentifier> oids = dn.getOIDs();
+		Vector<ASN1ObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
 
-		Iterator<DERObjectIdentifier> oidItr = oids.iterator();
+		Iterator<ASN1ObjectIdentifier> oidItr = oids.iterator();
 		ListIterator<String> valItr = values.listIterator();
 
 		while (oidItr.hasNext()) {
-			DERObjectIdentifier oid = oidItr.next();
+			ASN1ObjectIdentifier oid = oidItr.next();
 			valItr.next();
 			if (oid.equals(X509Name.SN)) {
 				valItr.remove();
