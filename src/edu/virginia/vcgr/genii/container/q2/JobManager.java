@@ -585,9 +585,20 @@ public class JobManager implements Closeable
 			} else {
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Setting job %s to finished state without job killer (non-BES job).", job));
-			
-				_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
-					null);
+				
+				connection = _connectionPool.acquire(false);
+				
+				try {
+					_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
+							null);
+					
+					connection.commit();
+				}
+				catch (SQLException sqe) {
+					_logger.warn("Unable to update job status in databse.", sqe);
+				} finally {
+					_connectionPool.release(connection);
+				}
 
 				job.setJobState(QueueStates.FINISHED);
 				job.history(HistoryEventCategory.Terminating).debug("Finishing non-BES Job without JobKiller");
@@ -1909,12 +1920,9 @@ public class JobManager implements Closeable
 				SortableJobKey jobKey = new SortableJobKey(jobData);
 				_queuedJobs.put(jobKey, jobData);
 
-				Connection connection2 = _connectionPool.acquire(false);
-
 				/* Ask the database to update the job state */
-				_database.modifyJobState(connection, jobData.getJobID(), jobData.getRunAttempts(), QueueStates.REQUEUED, new Date(), null, null,
-						null);
-				connection2.commit();
+				_database.modifyJobState(connection, jobData.getJobID(), jobData.getRunAttempts(), QueueStates.REQUEUED, new Date(), null, null, null);
+				connection.commit();
 			}
 			
 		}
@@ -2025,6 +2033,10 @@ public class JobManager implements Closeable
 
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobFreezeWorker(resolver, resolver, _connectionPool, jobData));
+			
+			_database.modifyJobState(connection, jobData.getJobID(), jobData.getRunAttempts(), QueueStates.FROZEN, new Date(), null, null,
+					null);
+			connection.commit();
 			
 			synchronized(jobData)
 			{
