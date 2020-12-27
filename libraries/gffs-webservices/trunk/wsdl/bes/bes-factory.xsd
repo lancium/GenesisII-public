@@ -76,6 +76,7 @@
 			<xsd:enumeration value="Cancelled"/>
 			<xsd:enumeration value="Failed"/>
 			<xsd:enumeration value="Finished"/>
+			<xsd:enumeration value="Frozen"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	

@@ -18,7 +18,6 @@ import org.ggf.bes.factory.PersistActivityResponseType;
 import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.GetStatePathsType;
 import org.ggf.bes.factory.RestartActivityResponseType;
-import org.ggf.bes.factory.GetStatePathResponseType;
 import org.ggf.bes.factory.RestartActivitiesResponseType;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;

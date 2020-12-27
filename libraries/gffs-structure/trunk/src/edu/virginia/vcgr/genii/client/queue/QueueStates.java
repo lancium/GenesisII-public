@@ -8,7 +8,7 @@ public enum QueueStates {
 	STARTING,
 	RUNNING,
 	PERSISTED,
-	STOPPED,
+	FROZEN,
 	FINISHED,
 	ERROR;
 

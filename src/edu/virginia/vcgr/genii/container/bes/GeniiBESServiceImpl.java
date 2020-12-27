@@ -762,7 +762,21 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		if (bes == null)
 			return new FreezeActivityResponseType(activityid, false, null, null);
 		String commandToSend = activityid + " freeze";
-		return new FreezeActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
+		
+		Boolean success = bes.sendCommand(activityid, commandToSend);
+		if (success) {
+			BESActivity activity = bes.findActivity(activityid);
+			if (activity!=null) {
+				try {
+					activity.freeze();
+				} catch (ExecutionException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return new FreezeActivityResponseType(activityid, success, null, null);
 	}
 	
 	@Override
@@ -785,7 +799,21 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		if (bes == null)
 			return new ThawActivityResponseType(activityid, false, null, null);
 		String commandToSend = activityid + " thaw";
-		return new ThawActivityResponseType(activityid, bes.sendCommand(activityid, commandToSend), null, null);
+		
+		Boolean success = bes.sendCommand(activityid, commandToSend);
+		if (success) {
+			BESActivity activity = bes.findActivity(activityid);
+			if (activity!=null) {
+				try {
+					activity.thaw();
+				} catch (ExecutionException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return new ThawActivityResponseType(activityid, success, null, null);
 	}
 	
 	@Override

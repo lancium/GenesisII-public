@@ -887,6 +887,67 @@ public class QueueDatabase
 			StreamUtils.close(stmt);
 		}
 	}
+	
+	/**
+	 * Mark in the database information about a job that is now frozen.
+	 * 
+	 * @param connection
+	 *            The database connection to use.
+	 * @param jobID
+	 *            The database key of the job.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
+	public void markFrozen(Connection connection, long jobID) throws SQLException, ResourceException
+	{
+		changeOnlyState(connection, jobID, QueueStates.FROZEN.name());
+	}
+	
+	/**
+	 * Mark in the database information about a job that is now thawed.
+	 * 
+	 * @param connection
+	 *            The database connection to use.
+	 * @param jobID
+	 *            The database key of the job.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
+	public void markThaw(Connection connection, long jobID) throws SQLException, ResourceException
+	{
+		changeOnlyState(connection, jobID, QueueStates.RUNNING.name());
+	}
+	
+	/**
+	 * Mark in the database information that a job has changed state. This is currently only used for freeze and thaw.
+	 * 
+	 * @param connection
+	 *            The database connection to use.
+	 * @param jobID
+	 *            The database key of the job.
+	 * @param newState
+	 * 			  The new state of the job.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
+	public void changeOnlyState(Connection connection, long jobID, String newState) throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+
+		try {
+			stmt = connection.prepareStatement("UPDATE q2jobs SET state = ? WHERE jobid = ?");
+			stmt.setString(1, newState);
+			stmt.setLong(2, jobID);
+
+			if (stmt.executeUpdate() != 1)
+				throw new ResourceException("Unable to update database for running job " + jobID);
+		} finally {
+			StreamUtils.close(stmt);
+		}
+	}
 
 	/**
 	 * Complete the listed jobs (remove them from the database).

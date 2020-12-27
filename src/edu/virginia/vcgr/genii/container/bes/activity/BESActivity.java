@@ -344,6 +344,16 @@ public class BESActivity implements Closeable
 			_runner.requestPersist();
 	}
 	
+	synchronized public void freeze() throws ExecutionException, SQLException
+	{
+		updateState(new ActivityState(ActivityStateEnumeration.Frozen, null));
+	}
+	
+	synchronized public void thaw() throws ExecutionException, SQLException
+	{
+		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
+	}
+	
 	synchronized public void restart() throws ExecutionException, SQLException
 	{
 		if (!_persistRequested)
@@ -389,6 +399,37 @@ public class BESActivity implements Closeable
 			_terminateRequested = terminateRequested;
 			_destroyRequested = destroyRequested;
 			_persistRequested = persistRequested;
+		} finally {
+			StreamUtils.close(stmt);
+			_connectionPool.release(connection);
+		}
+	}
+	
+	synchronized private void updateState(ActivityState state) throws SQLException
+	{
+		Connection connection = null;
+		PreparedStatement stmt = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			stmt = connection.prepareStatement("UPDATE besactivitiestable SET state = ? " + "WHERE activityid = ?");
+			stmt.setBlob(1, DBSerializer.toBlob(state, "besactivitiestable", "state"));
+			stmt.setString(2, _activityid);
+			try {
+				stmt.executeUpdate();
+			} catch (SQLException sqe) {
+				_logger.error("Unable to update state of besactivitiestable.", sqe);
+				throw new SQLException("Unable to update database.");
+			}
+			connection.commit();
+
+			_state = state;
+
+			notifyStateChange();
+		} catch (ResourceException e) {
+			_logger.warn("Unable to send notification for status change.", e);
+		} catch (ResourceUnknownFaultType e) {
+			_logger.warn("Unable to send notification for status change.", e);
 		} finally {
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);

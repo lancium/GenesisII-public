@@ -2024,23 +2024,22 @@ public class JobManager implements Closeable
 			}
 			
 
-			HistoryContext history = jobData.history(HistoryEventCategory.Stopping);
+			HistoryContext history = jobData.history(HistoryEventCategory.Freezing);
 
-			history.createTraceWriter("Stopping Execution of Job")
-			.format("Stopping execution of the job due to request.").close();
+			history.createTraceWriter("Freezing Execution of Job")
+			.format("Freezing execution of the job due to request.").close();
 
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobFreezeWorker(resolver, resolver, _connectionPool, jobData));
 			
-			_database.modifyJobState(connection, jobData.getJobID(), jobData.getRunAttempts(), QueueStates.FROZEN, new Date(), null, null,
-					null);
+			_database.markFrozen(connection, jobData.getJobID());
 			connection.commit();
 			
 			synchronized(jobData)
 			{
-				jobData.setJobState(QueueStates.STOPPED);
+				jobData.setJobState(QueueStates.FROZEN);
 			}
 		}
 
@@ -2064,22 +2063,25 @@ public class JobManager implements Closeable
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-			if(jobData.getJobState() != QueueStates.STOPPED)
+			if(jobData.getJobState() != QueueStates.FROZEN)
 			{
 				if(_logger.isErrorEnabled())
 					_logger.error(String.format("%s is not currently frozen, cannot thaw.", jobData));
 				continue;
 			}
 			
-			HistoryContext history = jobData.history(HistoryEventCategory.Resuming);
+			HistoryContext history = jobData.history(HistoryEventCategory.Thawing);
 			
-			history.createTraceWriter("Resuming Execution of Job")
-			.format("Resuming execution of the job due to request.").close();
+			history.createTraceWriter("Thawing Execution of Job")
+			.format("Thawing execution of the job due to request.").close();
 			
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobThawWorker(resolver, resolver, _connectionPool, jobData));
+			
+			_database.markThaw(connection, jobData.getJobID());
+			connection.commit();
 			
 			synchronized(jobData)
 			{
@@ -2176,7 +2178,7 @@ public class JobManager implements Closeable
 		long finished = 0;
 		long error = 0;
 		long requeued = 0;
-		long stopped = 0;
+		long frozen = 0;
 		long persisted = 0;
 
 		//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
@@ -2195,8 +2197,8 @@ public class JobManager implements Closeable
 					error++;
 				else if (state == QueueStates.FINISHED)
 					finished++;
-				else if (state == QueueStates.STOPPED)
-					stopped++;
+				else if (state == QueueStates.FROZEN)
+					frozen++;
 				else if (state == QueueStates.PERSISTED)
 					persisted++;
 			}
@@ -2208,7 +2210,7 @@ public class JobManager implements Closeable
 		ret.put("Running", running);
 		ret.put("Error", error);
 		ret.put("Finished", finished);
-		ret.put("Stopped", stopped);
+		ret.put("Frozen", frozen);
 		ret.put("Persisted", persisted);
 
 		return ret;
@@ -2650,7 +2652,7 @@ public class JobManager implements Closeable
 						.format("Request to terminate job from outside the queue").close();
 
 					jobsToKill.add(new Long(data.getJobID()));
-					if (data.getJobState() == QueueStates.STOPPED) {
+					if (data.getJobState() == QueueStates.FROZEN) {
 						jobsToResume.add(jobTicket);
 					}
 				}

@@ -17,8 +17,8 @@ public enum HistoryEventCategory {
 	CloudSetup(new DefaultHistoryCategoryInformation("Cloud-Setup", new StandardIconProvider("create-job.png"))),
 	Persisting(new DefaultHistoryCategoryInformation("Persisting", new StandardIconProvider("terminating.png"))),
 	Restarting(new DefaultHistoryCategoryInformation("Restarting", new StandardIconProvider("create-job.png"))),
-	Stopping(new DefaultHistoryCategoryInformation("Stopping", new StandardIconProvider("terminating.png"))),
-	Resuming(new DefaultHistoryCategoryInformation("Resuming", new StandardIconProvider("create-job.png")));
+	Freezing(new DefaultHistoryCategoryInformation("Freezing", new StandardIconProvider("terminating.png"))),
+	Thawing(new DefaultHistoryCategoryInformation("Thawing", new StandardIconProvider("create-job.png")));
 
 	private HistoryCategoryInformation _info;
 
