@@ -12,12 +12,12 @@ import org.apache.axis.types.URI.MalformedURIException;
 import org.ggf.bes.factory.BasicResourceAttributesDocumentType;
 import org.ggf.bes.factory.FactoryResourceAttributesDocumentType;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.GPUArchitectureEnumeration;
 import org.ggf.jsdl.GPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
-import org.ggf.jsdl.GPUArchitectureEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.ResourceManagerType;
@@ -35,9 +35,9 @@ import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameter;
 import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameters;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
-import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 class QueueAsBESFactoryAttributesUtilities
 {

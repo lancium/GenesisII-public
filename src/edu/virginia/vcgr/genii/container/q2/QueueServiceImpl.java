@@ -20,6 +20,8 @@ import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.bes.factory.DestroyActivitiesResponseType;
 import org.ggf.bes.factory.DestroyActivitiesType;
+import org.ggf.bes.factory.FreezeActivitiesResponseType;
+import org.ggf.bes.factory.FreezeActivitiesType;
 import org.ggf.bes.factory.GetActivityDocumentResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsType;
@@ -28,12 +30,20 @@ import org.ggf.bes.factory.GetActivityStatusesResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
+import org.ggf.bes.factory.GetStatePathsResponseType;
+import org.ggf.bes.factory.GetStatePathsType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
+import org.ggf.bes.factory.PersistActivitiesResponseType;
+import org.ggf.bes.factory.PersistActivitiesType;
+import org.ggf.bes.factory.RestartActivitiesResponseType;
+import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.TerminateActivityResponseType;
+import org.ggf.bes.factory.ThawActivitiesResponseType;
+import org.ggf.bes.factory.ThawActivitiesType;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.bes.management.StartAcceptingNewActivitiesResponseType;
@@ -107,17 +117,6 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.sweep.SweepException;
-
-import org.ggf.bes.factory.PersistActivitiesType;
-import org.ggf.bes.factory.PersistActivitiesResponseType;
-import org.ggf.bes.factory.GetStatePathsType;
-import org.ggf.bes.factory.GetStatePathsResponseType;
-import org.ggf.bes.factory.RestartActivitiesType;
-import org.ggf.bes.factory.RestartActivitiesResponseType;
-import org.ggf.bes.factory.FreezeActivitiesType;
-import org.ggf.bes.factory.FreezeActivitiesResponseType;
-import org.ggf.bes.factory.ThawActivitiesType;
-import org.ggf.bes.factory.ThawActivitiesResponseType;
 
 /**
  * This is the service class that the container redirects SOAP messages to.

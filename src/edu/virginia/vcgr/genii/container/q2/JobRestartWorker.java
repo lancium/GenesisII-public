@@ -1,13 +1,15 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.sql.Connection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.GetStatePathResponseType;
-import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.GetStatePathsType;
+import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.RestartActivityResponseType;
 import org.ws.addressing.EndpointReferenceType;
+
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;

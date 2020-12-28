@@ -49,9 +49,9 @@ import edu.virginia.vcgr.genii.container.q2.summary.HostDescription;
 import edu.virginia.vcgr.genii.container.q2.summary.ResourceSummary;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
-import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 
 /**

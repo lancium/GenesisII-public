@@ -1,11 +1,13 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.sql.Connection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ThawActivitiesType;
 import org.ggf.bes.factory.ThawActivityResponseType;
 import org.ws.addressing.EndpointReferenceType;
+
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
