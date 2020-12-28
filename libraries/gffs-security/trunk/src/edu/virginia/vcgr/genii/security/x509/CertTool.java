@@ -49,6 +49,7 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.jce.PrincipalUtil;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;
@@ -136,8 +137,9 @@ public class CertTool
 		//
 		// extensions
 		//
-		v3CertGen.addExtension(Extension.subjectKeyIdentifier, false, SubjectKeyIdentifier.getInstance(pubKey));
-		v3CertGen.addExtension(Extension.authorityKeyIdentifier, false, AuthorityKeyIdentifier.getInstance(caCert));
+		JcaX509ExtensionUtils utils = new JcaX509ExtensionUtils();
+		v3CertGen.addExtension(Extension.subjectKeyIdentifier, false, utils.createSubjectKeyIdentifier(pubKey));
+		v3CertGen.addExtension(Extension.authorityKeyIdentifier, false, utils.createAuthorityKeyIdentifier(caCert));
 		v3CertGen.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
 		X509Certificate cert = v3CertGen.generate(caPrivKey, "BC");
 
