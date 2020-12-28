@@ -52,9 +52,9 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
-import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 public class QueueProcessPhase extends AbstractRunProcessPhase implements TerminateableExecutionPhase
 {
