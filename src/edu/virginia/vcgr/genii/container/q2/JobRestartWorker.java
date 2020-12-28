@@ -1,38 +1,16 @@
 package edu.virginia.vcgr.genii.container.q2;
 
-import java.io.PrintWriter;
 import java.sql.Connection;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-
-import javax.xml.namespace.QName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.bes.factory.GetStatePathResponseType;
-import org.ggf.bes.factory.PersistActivityResponseType;
 import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.GetStatePathsType;
 import org.ggf.bes.factory.RestartActivityResponseType;
-import org.ggf.bes.factory.RestartActivitiesResponseType;
-import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
-import org.xmlsoap.schemas.soap.envelope.Fault;
-
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
-import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
-import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
-import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
 //LAK (08 July 2020): Created to mimic the format of JobUpdateWorker for adding Restart outcalls from the QueueManager GUI

@@ -2036,11 +2036,6 @@ public class JobManager implements Closeable
 			
 			_database.markFrozen(connection, jobData.getJobID());
 			connection.commit();
-			
-			synchronized(jobData)
-			{
-				jobData.setJobState(QueueStates.FROZEN);
-			}
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -2082,11 +2077,6 @@ public class JobManager implements Closeable
 			
 			_database.markThaw(connection, jobData.getJobID());
 			connection.commit();
-			
-			synchronized(jobData)
-			{
-				jobData.setJobState(QueueStates.RUNNING);
-			}
 		}
 
 		_schedulingEvent.notifySchedulingEvent();

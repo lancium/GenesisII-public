@@ -309,7 +309,7 @@ public class BESActivity implements Closeable
 			output.println(commandToSend);
 			String response = input.readLine();
 			_logger.info("Received message from: " +  _IPPort + ". Msg: " + response);
-			success = response.equals(_activityid + " OK");
+			success = response == null ? false : response.equals(_activityid + " OK");
 			_logger.info("Success? " + success);
 			socket.close();
 		}

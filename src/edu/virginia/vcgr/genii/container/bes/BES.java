@@ -640,7 +640,7 @@ public class BES
 		if (_containedActivities.containsKey(activityid)) {
 			return _containedActivities.get(activityid).sendCommand(command);
 		} else {
-			_logger.info("BES sendCommand call: BES does not have BESActivity with activityid: " + activityid);
+			_logger.error("BES sendCommand call: BES does not have BESActivity with activityid: " + activityid);
 			return false;
 		}
 	}
