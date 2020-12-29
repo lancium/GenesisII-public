@@ -59,6 +59,7 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 	}
 
 	private JobStateCache _statusCache;
+	BulkSLURMStatusFetcher _statusFetcher = new BulkSLURMStatusFetcher();
 
 	private String _qName;
 	private String _destination = null;
@@ -189,11 +190,11 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 			return ret;
 		}
 	}
-
+	
 	@Override
 	public NativeQueueState getStatus(JobToken token) throws NativeQueueException
 	{
-		NativeQueueState state = _statusCache.get(token, new BulkSLURMStatusFetcher(), DEFAULT_CACHE_WINDOW);
+		NativeQueueState state = _statusCache.get(token, _statusFetcher, DEFAULT_CACHE_WINDOW);
 		if (_logger.isTraceEnabled())
 			_logger.debug("received a parsed queue state of: " + state);
 		if (state == null) {
