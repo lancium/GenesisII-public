@@ -158,6 +158,15 @@ public class BESPWrapperConnection {
 								output.flush();
 							}
 						}
+						//LAK: 29 Dec 2020: handle terminating command
+						// Expected format: <activityid> terminating
+						else if(toks[1].equalsIgnoreCase("terminating"))
+						{
+							activity.notifiyPwrapperIsTerminating();
+							
+							output.println(activityid + " OK");
+							output.flush();
+						}
 					}
 				}
 			} catch (IOException e) {

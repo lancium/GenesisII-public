@@ -521,6 +521,12 @@ public class BESActivity implements Closeable
 			_connectionPool.release(connection);
 		}
 	}
+	
+	synchronized public void notifiyPwrapperIsTerminating() {
+		if(_logger.isDebugEnabled())
+			_logger.debug("BESActivity has been notified by pwrapper that it is terminating");
+		_runner.notifiyPwrapperIsTerminating();
+	}
 
 	private void execute(ExecutionPhase phase) throws Throwable
 	{
@@ -895,6 +901,19 @@ public class BESActivity implements Closeable
 				}
 				
 				startRunner();
+			}
+		}
+		
+		//This handles informing the execution environment that the pwrapper is terminating
+		public void notifiyPwrapperIsTerminating() //throws ExecutionException
+		{
+			synchronized(_phaseLock)
+			{
+				if(_runner._currentPhase instanceof AbstractRunProcessPhase)
+				{
+					AbstractRunProcessPhase phase = (AbstractRunProcessPhase)_runner._currentPhase;
+					phase.notifyPwrapperIsTerminating();
+				}
 			}
 		}
 		

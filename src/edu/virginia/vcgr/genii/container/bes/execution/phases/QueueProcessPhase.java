@@ -515,4 +515,15 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			throw new RuntimeException("Unable to acquire connection to native queue.", nqe);
 		}
 	}
+
+	@Override
+	public void notifyPwrapperIsTerminating() {
+		NativeQueueConnection queue = connectQueue(_workingDirectory.getWorkingDirectory());
+		try {
+			queue.updateStatusToTerminated(_jobToken);
+		} catch (NativeQueueException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

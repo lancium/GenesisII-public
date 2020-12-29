@@ -34,6 +34,8 @@
 	#define UNMOUNT_BINARY_NAME "fusermount"
 #endif
 
+#define VM_DEV_ENVIRONMENT 0
+
 // 2020-07-23 by JAA -- just a quick struct for the CPU info
 // This is currently designed around Intel processors.
 // AMD CPUs may not provide GHz, so changes will be necessary
@@ -62,6 +64,7 @@ static const char* getOverloadedEnvironment(const char *variableName,
 
 int sendBesMessage(const char* message);
 int connectionSetup();
+int _tellBESWeAreTerminating();
 void freeze();
 void thaw();
 void persist();
@@ -153,6 +156,14 @@ void sig_handler(int signo)
 
 int wrapJob(CommandLine *commandLine)
 {
+	#if VM_DEV_ENVIRONMENT
+		int errorfd = open("/home/dev/pwrapper_error.txt", O_WRONLY|O_CREAT, 0666);
+		dup2(errorfd, STDERR_FILENO);
+
+		int stdoutfd = open("/home/dev/pwrapper_out.txt", O_WRONLY|O_CREAT, 0666);
+		dup2(stdoutfd, STDOUT_FILENO);
+	#endif
+
 	int exitCode;
 
 	FuseMounter *mounter = NULL;
@@ -266,6 +277,9 @@ int wrapJob(CommandLine *commandLine)
 	kill(pid, SIGCONT);
 
 	waitpid(pid, &exitCode, WUNTRACED);
+
+	//LAK: 29 Dec 2020: Tell the BES through our communication channel that we are terminating
+	_tellBESWeAreTerminating();
 
 	if (WIFSIGNALED(exitCode))
 		exitCode = 128 + WTERMSIG(exitCode);
@@ -863,6 +877,11 @@ int _registerWithBes(int port)
 	memset(&cmd, 0, 256);
 	snprintf(cmd, 256, "register %d", port);
 	return sendBesMessage(cmd);
+}
+
+int _tellBESWeAreTerminating()
+{
+	return sendBesMessage("terminating");
 }
 
 int _startBesListener()

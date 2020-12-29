@@ -401,4 +401,9 @@ public class SLURMQueueConnection extends ScriptBasedQueueConnection<SLURMQueueC
 		}
 
 	}
+
+	@Override
+	public void updateStatusToTerminated(JobToken token) throws NativeQueueException {
+		_statusCache.update(token, SLURMQueueState.fromStateSymbol("CD"));
+	}
 }

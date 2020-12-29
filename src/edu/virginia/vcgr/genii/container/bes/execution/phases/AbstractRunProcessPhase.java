@@ -65,6 +65,9 @@ public abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 			}
 		}
 	}
+	
+	//LAK 29 Dec 2020: This function will handle actually updating the state
+	public abstract void notifyPwrapperIsTerminating();
 
 	// 2020 September 11 by CCH, as part of guaranteed correct JSON output
 	/*

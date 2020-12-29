@@ -374,4 +374,10 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			destroyProcess(_process);
 		}
 	}
+
+	@Override
+	public void notifyPwrapperIsTerminating() {
+		//LAK 29 Dec 2020: We don't have to do anything with this information since we will know when the process fully quits
+		return;
+	}
 }
