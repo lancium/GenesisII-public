@@ -966,6 +966,7 @@ int sendBesMessage(const char* message)
 	}
 
 	close(bes_send_socket);
+	bes_send_socket = -1;
 
 	return 0;
 }
