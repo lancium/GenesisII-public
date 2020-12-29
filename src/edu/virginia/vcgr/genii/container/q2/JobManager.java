@@ -2254,7 +2254,6 @@ public class JobManager implements Closeable
 							// Added 7/13/2017 by ASG  .. should have already been removed, but for some reason it is still there, so get rid of it.
 							if (job.getJobState()==QueueStates.FINISHED) {
 								SortableJobKey jobKey = new SortableJobKey(job);
-								//FIXME wants a long not a jobkey object
 								_runningJobs.remove(jobKey.getJobID());
 							}
 						}

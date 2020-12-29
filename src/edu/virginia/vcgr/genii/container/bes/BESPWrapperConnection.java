@@ -129,12 +129,12 @@ public class BESPWrapperConnection {
 				if (command !=null && command.length() > 36 && command.length()< 256) {
 					String toks[]=command.split(" ");
 					if (toks.length <2 || toks.length > 8) {
-						_besLogger.error("Invalid activity communication, tokens <3 or >8 with BES from "+toks[0]);
+						_besLogger.error("Invalid activity communication, tokens <2 or >8 with BES from "+toks[0]);
 					}
 					else {
 						// Grab activityid, first token. With activityid, grab activity
 						String activityid = toks[0];
-						BESActivity activity=_bes.findActivity(activityid);
+						BESActivity activity = _bes.findActivity(activityid);
 						if (activity==null) {
 							_besLogger.error("Invalid activity ID in communication with BES from "+toks[0]);
 						}
@@ -146,7 +146,7 @@ public class BESPWrapperConnection {
 							// The following gives us back an IP in form /0.0.0.0.
 							// We need to strip the leading "/", or Socket creation will fail later on
 							String ipport = clientSock.getInetAddress().toString().substring(1) + ":" + port;
-							_besLogger.info("Attempting to set new IPPORT column for "+toks[0] + " to " + ipport);
+							_besLogger.info("Attempting to set new IPPORT column for " +toks[0] + " to " + ipport);
 							try {
 								activity.updateIPPort(ipport);
 								// Expected result to send back to pwrapper: "<activityid> OK"

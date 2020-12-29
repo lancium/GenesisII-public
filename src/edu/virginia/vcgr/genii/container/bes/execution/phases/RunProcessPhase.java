@@ -369,7 +369,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		history.info("Terminating Activity Per Request");
 
 		synchronized (_processLock) {
-			_hardTerminate = Boolean.TRUE;
+			_hardTerminate = true;
 			_countAsFailedAttempt = countAsFailedAttempt;
 			destroyProcess(_process);
 		}

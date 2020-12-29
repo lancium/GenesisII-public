@@ -25,6 +25,8 @@ import org.ggf.bes.factory.DestroyActivitiesResponseType;
 import org.ggf.bes.factory.DestroyActivitiesType;
 import org.ggf.bes.factory.DestroyActivityResponseType;
 import org.ggf.bes.factory.FactoryResourceAttributesDocumentType;
+import org.ggf.bes.factory.FreezeActivitiesResponseType;
+import org.ggf.bes.factory.FreezeActivitiesType;
 import org.ggf.bes.factory.GetActivityDocumentResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsType;
@@ -33,12 +35,20 @@ import org.ggf.bes.factory.GetActivityStatusesResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
+import org.ggf.bes.factory.GetStatePathsResponseType;
+import org.ggf.bes.factory.GetStatePathsType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
+import org.ggf.bes.factory.PersistActivitiesResponseType;
+import org.ggf.bes.factory.PersistActivitiesType;
+import org.ggf.bes.factory.RestartActivitiesResponseType;
+import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.TerminateActivityResponseType;
+import org.ggf.bes.factory.ThawActivitiesResponseType;
+import org.ggf.bes.factory.ThawActivitiesType;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.bes.management.StartAcceptingNewActivitiesResponseType;
@@ -107,6 +117,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
+import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.jsdl.JobDefinition;
@@ -738,6 +749,72 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	@Override
 	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest) throws RemoteException
 	{
+		return null;
+	}
+
+	@Override
+	public EndpointReferenceType createForkEPR(String forkPath,
+			ResourceForkInformation rif) throws ResourceUnknownFaultType {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PersistActivitiesResponseType persistActivities(PersistActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GetStatePathsResponseType getStatePaths(GetStatePathsType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RestartActivitiesResponseType restartActivities(RestartActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ThawActivitiesResponseType thawActivities(ThawActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FreezeActivitiesResponseType freezeActivities(FreezeActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object thawJobs(String[] thawRequest) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object restartJobs(String[] restartRequest) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object freezeJobs(String[] freezeRequest) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object persistJobs(String[] persistRequest) throws RemoteException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

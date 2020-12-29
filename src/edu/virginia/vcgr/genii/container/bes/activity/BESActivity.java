@@ -33,6 +33,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.QueueResultsException;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -42,8 +43,8 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityStateChangedContents;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.BES;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.AbstractRunProcessPhase;
@@ -548,9 +549,7 @@ public class BESActivity implements Closeable
 			TopicPath topicPath;
 
 			if (state.isFinalState())
-			{
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC;
-			}
 			else
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TOPIC;
 
@@ -791,6 +790,7 @@ public class BESActivity implements Closeable
 	public void setGPUCount(int gpuCount) {
 		this._gpuCount = gpuCount;
 	}
+	
 	public String getLanciumEnvironment() {
 		return _lanciumEnvironment;
 	}

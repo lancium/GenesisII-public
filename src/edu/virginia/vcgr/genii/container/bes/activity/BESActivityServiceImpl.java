@@ -42,7 +42,6 @@ import edu.virginia.vcgr.genii.bes.activity.BESActivityGetErrorResponseType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -72,6 +71,7 @@ import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivi
 import edu.virginia.vcgr.genii.container.bes.activity.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.BESActivityDBResourceProvider;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.jsdl.personality.forkexec.ForkExecPersonalityProvider;
 import edu.virginia.vcgr.genii.container.jsdl.personality.qsub.QSubPersonalityProvider;

@@ -6,7 +6,7 @@ import org.ggf.jsdl.JobDefinition_Type;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
 public interface ExecutionUnderstanding
 {
