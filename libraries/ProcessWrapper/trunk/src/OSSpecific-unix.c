@@ -278,9 +278,6 @@ int wrapJob(CommandLine *commandLine)
 
 	waitpid(pid, &exitCode, WUNTRACED);
 
-	//LAK: 29 Dec 2020: Tell the BES through our communication channel that we are terminating
-	_tellBESWeAreTerminating();
-
 	if (WIFSIGNALED(exitCode))
 		exitCode = 128 + WTERMSIG(exitCode);
 	else
@@ -292,6 +289,9 @@ int wrapJob(CommandLine *commandLine)
 	}
 
 	dumpStats(exitCode);
+
+	//LAK: 29 Dec 2020: Tell the BES through our communication channel that we are terminating
+	_tellBESWeAreTerminating();
 
 	pthread_cancel(bes_conn_pthread);
 
