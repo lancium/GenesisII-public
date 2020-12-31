@@ -901,10 +901,6 @@ int _startBesListener()
 
 int connectionSetup()
 {
-	int fd = open("pwrapper_out.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-	dup2(fd, STDERR_FILENO);
-	dup2(fd, STDOUT_FILENO);
-
 	//this is called once from the main thread, so this is ok
 	sem_init(&port_sem, 0, 0);
 
