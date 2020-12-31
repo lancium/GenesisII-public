@@ -1,60 +1,33 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
-import java.io.File;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.security.cert.X509Certificate;
-
-import javax.xml.namespace.QName;
-
-import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
-import org.morgan.util.io.DataTransferStatistics;
-import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
-import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
 import org.ws.addressing.EndpointReferenceType;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat; // Apache 2.0 License
-
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
-import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.CopyMachine;
 import edu.virginia.vcgr.genii.client.rns.PathOutcome;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.security.PreferredIdentity;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
-import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
-import edu.virginia.vcgr.genii.container.cservices.downloadmgr.DownloadManagerContainerService;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
-import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
-import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
 
-public class copyPersistedState extends AbstractExecutionPhase implements Serializable {
+public class CopyPersistedState extends AbstractExecutionPhase implements Serializable {
 	static final long serialVersionUID = 0L;
-	static private Log _logger = LogFactory.getLog(copyPersistedState.class);
+	static private Log _logger = LogFactory.getLog(CopyPersistedState.class);
 
 	static private final String COPY_PERSISTED_STATE = "copyPersistedState";
-	static private final long CLOCK_SHIFT_MARGIN = 600000; // 10 minutes
-
-	
 
 	private EndpointReferenceType _src=null;
 
-	public copyPersistedState(EndpointReferenceType src) {
+	public CopyPersistedState(EndpointReferenceType src) {
 		super(new ActivityState(ActivityStateEnumeration.Running, COPY_PERSISTED_STATE));
 		// 2020-09-01 ASG. This copies the persisted data of a job from a source EPR to the current container.
 		_src=src;

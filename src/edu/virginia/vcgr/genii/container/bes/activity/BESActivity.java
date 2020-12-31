@@ -904,8 +904,8 @@ public class BESActivity implements Closeable
 			}
 		}
 		
-		//This handles informing the execution environment that the pwrapper is terminating
-		public void notifiyPwrapperIsTerminating() //throws ExecutionException
+		//LAK: 31 Dec 2020 This handles informing the execution environment that the pwrapper is terminating
+		public void notifiyPwrapperIsTerminating()
 		{
 			synchronized(_phaseLock)
 			{

@@ -39,9 +39,6 @@ public class ActivityState implements Serializable, Cloneable
 	@XmlAttribute(name = "genii-state", required = false)
 	private String _geniiState;
 
-/*	@XmlAttribute(name = "is-suspended", required = false)
-	private boolean _isSuspended;*/
-
 	@SuppressWarnings("unused")
 	private ActivityState()
 	{
