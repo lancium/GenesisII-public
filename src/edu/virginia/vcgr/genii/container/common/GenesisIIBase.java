@@ -764,7 +764,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 						null));
 				}
 			} else {
-				_logger.debug("In createEPR 2 params, it is GeniiNoOutcalls");
+				
+				_logger.debug("In createEPR 2 params, class: " + this.getClass() +", it is GeniiNoOutcalls");
 			}
 
 			Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
