@@ -42,7 +42,6 @@ import edu.virginia.vcgr.genii.bes.activity.BESActivityGetErrorResponseType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisHashMap;
@@ -72,6 +71,7 @@ import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivi
 import edu.virginia.vcgr.genii.container.bes.activity.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.BESActivityDBResourceProvider;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.jsdl.personality.forkexec.ForkExecPersonalityProvider;
 import edu.virginia.vcgr.genii.container.jsdl.personality.qsub.QSubPersonalityProvider;
@@ -140,6 +140,25 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 		}
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
+		
+		// 2020-07-17 by ASG. This block of code moved here from further below so that the _ipaddr can be acquired.
+		BES bes = null;
+		try {
+			bes = BES.getBES(initInfo.getContainerID());
+			WSName wsname = new WSName(activityEPR);
+			if (wsname.isValidWSName())
+				_logger
+					.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(), _resource.getKey()));
+		} catch (IllegalStateException e) {
+			_logger.error("caught illegal state exception trying to get BES information on container " + initInfo.getContainerID());
+		}
+		if (bes == null) {
+			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
+				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
+				null));
+		}
+		// End of moved block of code.
+		
 
 		BESWorkingDirectory workingDirectory =
 			new BESWorkingDirectory(chooseDirectory((BESConstructionParameters) _resource.constructionParameters(getClass()), 5), true);
@@ -154,7 +173,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 			CloudConfiguration cConfig = ((BESConstructionParameters) cParams).getCloudConfiguration();
 
 			ExecutionUnderstanding executionUnderstanding = null;
-		
 			if (cConfig != null) {
 				PersonalityProvider provider = new ExecutionProvider();
 				JobRequest tJob = (JobRequest) JSDLInterpreter.interpretJSDL(provider, jsdl);
@@ -173,28 +191,13 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements B
 					executionUnderstanding = (ExecutionUnderstanding) understanding;
 				}
 
-				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl);
+				executionPlan = executionUnderstanding.createExecutionPlan((BESConstructionParameters) cParams, jsdl,bes.getBESipport(), _resource.getKey().toString());
 				jobName = executionUnderstanding.getJobName();
 				
 			}
 
 			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, fsManager);
-
-			BES bes = null;
-			try {
-				bes = BES.getBES(initInfo.getContainerID());
-				WSName wsname = new WSName(activityEPR);
-				if (wsname.isValidWSName())
-					_logger
-						.info(String.format("The EPI %s corresponds to activity id %s.", wsname.getEndpointIdentifier(), _resource.getKey()));
-			} catch (IllegalStateException e) {
-				_logger.error("caught illegal state exception trying to get BES information on container " + initInfo.getContainerID());
-			}
-			if (bes == null) {
-				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] { new BaseFaultTypeDescription("Unknown BES \"" + initInfo.getContainerID() + "\".") },
-					null));
-			}
+			// block of code getting the BES of the activity moved above.
 			String gpuType = null;
 			int gpuCount = 0;
 			JobDescription_Type jobDesc = jsdl.getJobDescription(0);

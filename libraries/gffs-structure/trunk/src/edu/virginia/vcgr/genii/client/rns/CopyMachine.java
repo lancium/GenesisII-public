@@ -4,12 +4,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.DataTransferStatistics;
 import org.morgan.util.io.StreamUtils;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.tools.MkdirTool;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
@@ -30,6 +32,7 @@ public class CopyMachine
 	static private Object mutex = new Object();
 
 	private String _source;
+	private EndpointReferenceType _rootEPR;
 	private String _target;
 	private String _currentTarget; // the directory we are currently targeting.
 	private PrintWriter _stderr; // gets error reports during the copy process.
@@ -43,10 +46,11 @@ public class CopyMachine
 	 * Constructs a copy machine for making a copy of the source to the target. If the sink is non-null, we will use it to record updates as
 	 * files and directories are seen.
 	 */
-	public CopyMachine(String sourceIn, String targetIn, TaskProgressListener updateSink, boolean force, PrintWriter stderrIn,
+	public CopyMachine(EndpointReferenceType  rootSrc, String sourceIn, String targetIn, TaskProgressListener updateSink, boolean force, PrintWriter stderrIn,
 		RNSPath logLocation)
 	{
 		_source = sourceIn;
+		_rootEPR = rootSrc;
 		_target = targetIn;
 		_currentTarget = targetIn;
 		_updates = updateSink;
@@ -56,7 +60,18 @@ public class CopyMachine
 		if (_logger.isDebugEnabled())
 			_logger.debug("built a CopyMachine: src=" + _source + " dest=" + _target + " force=" + _force);
 	}
-
+	
+	public CopyMachine(String sourceIn, String targetIn, TaskProgressListener updateSink, boolean force, PrintWriter stderrIn,
+		RNSPath logLocation)	
+	{
+		this(null, sourceIn, targetIn, updateSink, force, stderrIn, logLocation);
+		
+	}
+	public CopyMachine(EndpointReferenceType  rootSrc, String targetIn)
+	{
+		this(rootSrc, null, targetIn, null, true, null, null);
+	}
+	
 	public PrintWriter getStderr()
 	{
 		return _stderr;
@@ -68,12 +83,30 @@ public class CopyMachine
 	 */
 	public PathOutcome copyTree()
 	{
-		if ((_source == null) || (_target == null))
-			return PathOutcome.OUTCOME_NOTHING;
+		EndpointReferenceType epr;
+		if (_target == null ) return PathOutcome.OUTCOME_NOTHING;
+		if ((_source == null) && (_rootEPR == null)) return PathOutcome.OUTCOME_NOTHING;
+		if ((_source!=null) && (_rootEPR != null)) return PathOutcome.OUTCOME_NOTHING;
 		if (_logger.isDebugEnabled())
 			_logger.debug("into copyTree on " + _source);
 		_currentTarget = _target; // reset for this copy.
-		GeniiPath sourceCheck = new GeniiPath(_source);
+		RNSPath tsrc=null;
+		GeniiPath sourceCheck=null;
+		if (_source != null) {
+			sourceCheck = new GeniiPath(_source);
+		}
+		else  // _rootEPR!=null
+		{
+			try {
+				tsrc=new RNSPath(_rootEPR);
+				tsrc=tsrc.createSandbox();
+				sourceCheck = new GeniiPath(tsrc);
+			} catch (RNSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			
+		}
 		if (sourceCheck.isDirectory()) {
 			// our source is a directory, so we'll stuff things into it.
 			// we create paths in target on directory entry, and we copy files when

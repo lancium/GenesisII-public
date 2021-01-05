@@ -13,6 +13,7 @@
 package edu.virginia.vcgr.genii.container.bes.resource;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,7 +37,8 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 	static private Log _logger = LogFactory.getLog(DBBESResourceFactory.class);
 
 	static private final String[] _CREATE_STMTS = new String[] { "CREATE TABLE bespolicytable (" + "besid VARCHAR(256) NOT NULL PRIMARY KEY,"
-		+ "userloggedinaction VARCHAR(64) NOT NULL," + "screensaverinactiveaction VARCHAR(64) NOT NULL)" };
+		+ "userloggedinaction VARCHAR(64) NOT NULL," + "screensaverinactiveaction VARCHAR(64) NOT NULL," + "ipport VARCHAR(40) NOT NULL)" };
+	
 
 	public DBBESResourceFactory(ServerDatabaseConnectionPool pool) throws SQLException
 	{
@@ -57,6 +59,8 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 		Connection conn = null;
 		try {
 			conn = _pool.acquire(false);
+			if (_logger.isDebugEnabled())
+				_logger.debug("Creating bespolicy table with statement: " + _CREATE_STMTS[0]);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_STMTS);
 			conn.commit();
 		} finally {
@@ -72,6 +76,7 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 		PreparedStatement queryStmt = null;
 		PreparedStatement insertStmt = null;
 		PreparedStatement deleteStmt = null;
+		PreparedStatement alterStmt = null;
 		ResultSet rs = null;
 
 		try {
@@ -102,10 +107,27 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 					_logger.error(String.format("Unable to upgrade nativeq properties for resource %s.", resourceid), sqe);
 				}
 			}
+			
+			DatabaseMetaData md = conn.getMetaData();
+			ResultSet checkBESPolicyTable_rs = md.getColumns(null, null, "BESPOLICYTABLE", "IPPORT");
+			if (checkBESPolicyTable_rs.next()) {
+				// ipport column exists
+				_logger.info("ipport column exists in bespolicytable");
+			} else {
+				_logger.info("ipport column does not exist in bespolicytable");
+				 // ipport column does not exist
+				try {
+					alterStmt = conn.prepareStatement("ALTER TABLE " + "bespolicytable " + "ADD COLUMN " + "ipport " + "VARCHAR(40) NOT NULL " + "DEFAULT 'undefined'" );
+					alterStmt.execute();
+				} catch (SQLException sqe) {
+					_logger.error("Unable to upgrade bespolicytable with ipport column.", sqe);
+				}
+			}
 		} finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(queryStmt);
 			StreamUtils.close(insertStmt);
+			StreamUtils.close(alterStmt);
 		}
 	}
 }

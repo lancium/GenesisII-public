@@ -33,7 +33,7 @@ public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase implem
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "setting-permissions", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "setting-permissions");
 	}
 
 	@Override

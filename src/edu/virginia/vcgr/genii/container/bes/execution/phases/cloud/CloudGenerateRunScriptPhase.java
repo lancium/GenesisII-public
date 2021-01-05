@@ -11,11 +11,11 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
 public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 {
@@ -39,7 +39,7 @@ public class CloudGenerateRunScriptPhase implements ExecutionPhase, Serializable
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "generating-wrapper-scripts", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "generating-wrapper-scripts");
 	}
 
 	public CloudGenerateRunScriptPhase(String scratchDir, String runScript, String workingDir, String resourceFile, JobRequest job,

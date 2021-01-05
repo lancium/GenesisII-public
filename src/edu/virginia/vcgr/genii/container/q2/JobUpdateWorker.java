@@ -59,7 +59,6 @@ public class JobUpdateWorker implements OutcallHandler
 		_jobEndpointResolver = jobEndpointResolver;
 		_data = data;
 		_lastUpdate = lastUpdate;
-
 	}
 
 	public boolean equals(JobUpdateWorker other)

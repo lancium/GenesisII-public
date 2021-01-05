@@ -48,7 +48,7 @@ public class CloudCheckStatusPhase extends AbstractCloudExecutionPhase implement
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "polling-status-" + _checkPhase, false);
+		return new ActivityState(ActivityStateEnumeration.Running, "polling-status-" + _checkPhase);
 	}
 
 	@Override

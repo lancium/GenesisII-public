@@ -21,7 +21,7 @@ public class SetupOGRSHPhase extends AbstractExecutionPhase
 
 	public SetupOGRSHPhase(String storedContextFilename, String configFilename)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, "preparing-ogrsh", false));
+		super(new ActivityState(ActivityStateEnumeration.Running, "preparing-ogrsh"));
 
 		_storedContextFilename = storedContextFilename;
 		_configFilename = configFilename;

@@ -10,6 +10,14 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <errno.h>
+
+#include <pthread.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <semaphore.h>
 
 #include "Memory.h"
 #include "OSSpecific.h"
@@ -25,6 +33,8 @@
 #else
 	#define UNMOUNT_BINARY_NAME "fusermount"
 #endif
+
+#define VM_DEV_ENVIRONMENT 0
 
 // 2020-07-23 by JAA -- just a quick struct for the CPU info
 // This is currently designed around Intel processors.
@@ -52,6 +62,13 @@ static int findUnmountBinary(char **unmountBinary, char **errorMessage);
 static const char* getOverloadedEnvironment(const char *variableName,
 	HashMap *environmentOverload);
 
+int sendBesMessage(const char* message);
+int connectionSetup();
+int _tellBESWeAreTerminating();
+void freeze();
+void thaw();
+void persist();
+
 #ifndef PWRAP_macosx
 	static int verifyFuseDevice(char **errorMessage);
 #endif
@@ -61,7 +78,9 @@ CommandLine *CL=0;
 struct timeval start;
 struct timeval stop;
 pid_t pid;
+
 int externalKill = 0;
+static pthread_t bes_conn_pthread;
 
 procInfo getProcInfo(){
 	char * line = NULL;
@@ -137,6 +156,14 @@ void sig_handler(int signo)
 
 int wrapJob(CommandLine *commandLine)
 {
+	#if VM_DEV_ENVIRONMENT
+		int errorfd = open("/home/dev/pwrapper_error.txt", O_WRONLY|O_CREAT, 0666);
+		dup2(errorfd, STDERR_FILENO);
+
+		int stdoutfd = open("/home/dev/pwrapper_out.txt", O_WRONLY|O_CREAT, 0666);
+		dup2(stdoutfd, STDOUT_FILENO);
+	#endif
+
 	int exitCode;
 
 	FuseMounter *mounter = NULL;
@@ -195,6 +222,9 @@ int wrapJob(CommandLine *commandLine)
 			return -1;
 	}
 
+	// //LAK: Start up BES communication
+	connectionSetup();
+
 	gettimeofday(&start, NULL);
 	pid = fork();
 	if (pid < 0)
@@ -213,6 +243,11 @@ int wrapJob(CommandLine *commandLine)
 			commandLine->getStandardError(commandLine)))
 			return -1;
 		
+		// 2020-07-22 by JAA -- wait for cgroup to be setup
+		// this allows all children off of our child to be
+		// contained in freezer
+		raise(SIGSTOP);
+
 		execvp(cmdLine[0], cmdLine);
 
 		/* If we got this far, the something went wrong with the exec. */
@@ -225,6 +260,21 @@ int wrapJob(CommandLine *commandLine)
 	release(cmdLine);
 
 	dumpStats(228); //create empty rusage file
+
+	// 2020-07-22 by JAA -- create cgroup using secondary program
+	// should be set up in path, requires sudoers setup if not in same group
+	char freezeCMD[50] = "sudo freeze create ";
+	// PID to char*, buffer is size of length of pid_max
+	// We'll say 4194304 possible PIDs on 64-bit, so length is 7+1
+	char pidStr[8]; 
+	sprintf(pidStr, "%d", pid);
+	// Call "freeze" program with the PID and create param.
+	strcat(freezeCMD, pidStr);
+	system(freezeCMD);
+	// Wait for child to signal if it hasn't already
+	waitpid(pid, NULL, WUNTRACED);
+	// Signal child to continue
+	kill(pid, SIGCONT);
 
 	waitpid(pid, &exitCode, WUNTRACED);
 
@@ -239,6 +289,13 @@ int wrapJob(CommandLine *commandLine)
 	}
 
 	dumpStats(exitCode);
+
+	//LAK: 29 Dec 2020: Tell the BES through our communication channel that we are terminating
+	_tellBESWeAreTerminating();
+
+	pthread_cancel(bes_conn_pthread);
+
+	pthread_join(bes_conn_pthread, NULL);
 
 	if (mount)
 		mount->unmount(mount);
@@ -627,4 +684,341 @@ const char* getOverloadedEnvironment(const char *variableName,
 		result = getenv(variableName);
 
 	return result;
+}
+
+
+// NOTE: ALL OF THE SOCKET CODE IS NOT THREAD SAFE.
+
+//configuration about how to setup listerner
+static struct BESListenerParameters
+{
+    char hostmask[128];
+    int port;
+} bes_listener_params;
+
+//network information of the BES and our own listener information
+static struct BESConnectionParameters
+{
+    char host[128];
+    int port;
+} bes_conn_params;
+
+static char nonce[64];
+static int bes_listen_socket = -1;
+static int bes_send_socket = -1;
+
+static sem_t port_sem;
+
+void *_startBesListenerThread(void *arg)
+{
+	printf("starting bes listener\n");
+
+    // Open the main listener socket
+    struct sockaddr_in sa;
+    bes_listen_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (bes_listen_socket == -1)
+	{
+        printf("bes_listener: cannot create socket");
+		sem_post(&port_sem);
+        return NULL;
+    }
+
+    // Allow re-use of the port
+    const static int tr = 1;
+    setsockopt(bes_listen_socket,SOL_SOCKET,SO_REUSEADDR,&tr,sizeof(int));
+
+	// Set the host mask and port
+    memset(&sa, 0, sizeof sa);
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(bes_listener_params.port);
+    inet_pton(AF_INET, bes_listener_params.hostmask, &sa.sin_addr.s_addr);
+
+	// Bind to port
+    if(bind(bes_listen_socket, (struct sockaddr *)&sa, sizeof sa) == -1)
+	{
+        printf("bes_listener: bind failed");
+        close(bes_listen_socket);
+		sem_post(&port_sem);
+		return NULL;
+    }
+
+	// Listen for connections
+    if(listen(bes_listen_socket, 10) == -1)
+	{
+        perror("bes_listener: listen failed");
+        close(bes_listen_socket);
+    }
+
+	sem_post(&port_sem);
+
+	struct sockaddr_in client_addr;
+    socklen_t client_addr_size = sizeof(client_addr);
+	while (1)
+	{
+    	int connectfd = accept(bes_listen_socket, (struct sockaddr *)&client_addr,
+			&client_addr_size);
+
+		if(connectfd < 0)
+		{
+    	    perror("bes_listener: accept failed");
+    	    close(connectfd);
+    	}
+
+    	char ip[INET_ADDRSTRLEN];
+    	inet_ntop(AF_INET, &client_addr, ip, client_addr_size);
+		printf("bes_listener: established connection to %s:%hu\n",
+    	    ip, ntohs(client_addr.sin_port));
+
+		// read
+    	char buffer[256];
+		memset(&buffer, 0, 256);
+		int numread = read(connectfd, buffer, 256);
+		printf("bes_listener: got string %s\n", buffer);
+
+		//check if freeze command
+		char command[256];
+		memset(&command, 0, 256);
+		snprintf(command, 256, "%s freeze\n", nonce);
+		if(strncmp(buffer, command, 256) == 0)
+		{
+			//this is a freeze command
+			printf("this is a freeze command\n");
+			freeze();
+		}
+		//check if thaw command
+		memset(&command, 0, 256);
+		snprintf(command, 256, "%s thaw\n", nonce);
+		if(strncmp(buffer, command, 256) == 0)
+		{
+			//this is a thaw command
+			printf("this is a thaw command\n");
+			thaw();
+		}
+		//check if persist command
+		memset(&command, 0, 256);
+		snprintf(command, 256, "%s persist\n", nonce);
+		if(strncmp(buffer, command, 256) == 0)
+		{
+			//this is a persist command
+			printf("this is a persist command\n");
+			persist();
+		}
+
+		//clear buffer
+		memset(&command, 0, 256);
+		snprintf(command, 256, "%s OK\n", nonce);
+		write(connectfd, command, 256);
+
+		printf("bes_listener: closing connection socket...\n");
+    	close(connectfd);
+	}
+	close(bes_listen_socket);
+
+	return NULL;
+}
+
+void _pipefail(int sig)
+{
+    fprintf(stderr, "bes_connection: pipefail -- not exiting\n");
+}
+
+int _readBesInfo()
+{
+	FILE *bes_info_file;
+	char buff[256];
+	memset(&buff, 0, 256);
+
+	bes_info_file = fopen(".bes-info", "r");
+
+	fgets(buff, 256, bes_info_file);
+
+	//parse file
+	char *search_ptr;
+	char *ip = strtok_r(buff, ":\n", &search_ptr);
+	strncpy(bes_conn_params.host, ip, 128);
+	int port = (int)strtol(strtok_r(NULL, ":\n", &search_ptr), NULL, 10);
+	bes_conn_params.port = port;
+
+	//get second line
+	memset(&buff, 0, 256);
+	fgets(buff, 256, bes_info_file);
+	fclose(bes_info_file);
+
+	//read in nonce
+	strncpy(nonce, strtok(buff, "\n"), 64);
+
+	if (port == 0)
+	{
+		printf("set_bes_ip_info: Failed to parse port number\n");
+		return -1;
+	}
+
+	if (ip == NULL)
+	{
+        printf("set_bes_ip_info: Failed to parse IP address from bes info file\n");
+		return -1;
+	}
+	
+	printf("b.host is %s\n", bes_conn_params.host);
+	printf("b.port is %d\n", bes_conn_params.port);
+	printf("nonce is %s\n", nonce);
+}
+
+int _setLocalIPInfo()
+{
+	strncpy(bes_listener_params.hostmask, "0.0.0.0", 128); // default
+	bes_listener_params.port = 0; //random port
+	return 0;
+}
+
+int _registerWithBes(int port)
+{
+	char cmd[256];
+	memset(&cmd, 0, 256);
+	snprintf(cmd, 256, "register %d", port);
+	return sendBesMessage(cmd);
+}
+
+int _tellBESWeAreTerminating()
+{
+	return sendBesMessage("terminating");
+}
+
+int _startBesListener()
+{
+    printf("bes_listener: spawning bes listerner thread\n");
+	_setLocalIPInfo();
+    signal(SIGPIPE, &_pipefail);
+    int err = pthread_create(&bes_conn_pthread, NULL, &_startBesListenerThread, NULL);
+    if(err)
+	{
+        fprintf(stderr, "bes_listener: spawning bes listerner thread failed: %d\n", err);
+        bes_conn_pthread = 0;
+        return -1;
+    }
+    return 0;
+}
+
+int connectionSetup()
+{
+	//this is called once from the main thread, so this is ok
+	sem_init(&port_sem, 0, 0);
+
+	_readBesInfo();
+	_startBesListener();
+
+	sem_wait(&port_sem);
+
+	//now get our information
+	struct sockaddr_in sa;
+	int addrlen = sizeof(sa);
+	getsockname(bes_listen_socket, (struct sockaddr *)&sa, &addrlen);
+	int port = ntohs(sa.sin_port);
+	char ip[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &(sa.sin_addr), ip, INET_ADDRSTRLEN);
+
+	_registerWithBes(port);
+
+	sem_destroy(&port_sem);
+}
+
+int sendBesMessage(const char* message)
+{
+	struct sockaddr_in addr;
+    int port = bes_conn_params.port;
+    const char *ip = bes_conn_params.host;
+    memset(&addr, 0, sizeof(struct sockaddr_in));
+    inet_pton(AF_INET, ip, &addr.sin_addr);
+    addr.sin_port = htons(port);
+    addr.sin_family = AF_INET;
+
+	//if socket hasn't already been created, create
+	if (bes_send_socket == -1)
+	{
+		// Open the main outcall socket
+    	struct sockaddr_in sa;
+    	bes_send_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+   		if (bes_send_socket == -1)
+		{
+			printf("sendBesMessage: cannot create socket");
+			return -1;
+    	}
+
+		// Allow re-use of the port
+    	const static int tr = 1;
+    	setsockopt(bes_listen_socket,SOL_SOCKET,SO_REUSEADDR,&tr,sizeof(int));
+	}
+
+    if(connect(bes_send_socket, (const struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
+	{
+        fprintf(stderr, "sendBesMessage: could not connect to %s:%d with error: %s\n", ip, port, strerror(errno));
+        return -1;
+    }
+
+	if (snprintf(NULL, 0, "%s %s\n", nonce, message) >= 255)
+	{
+		fprintf(stderr, "sendBesMessage: message is too long for 256 byte buffer.\n");
+		return -1;
+	}
+
+	char command[256];
+	memset(&command, 0, 256);
+	snprintf(command, 256, "%s %s\n", nonce, message);
+	printf("sendBesMessage: sending %s to %s:%d\n", command, ip, port);
+	write(bes_send_socket, command, strlen(command));
+
+	memset(&command, 0, 256);
+	read(bes_send_socket, command, 256);
+
+	printf("got back from bes: %s\n", command);
+
+	char okMess[64];
+	memset(&okMess, 0, 64);
+	snprintf(okMess, 64, "%s %s\n", nonce, "OK");
+	if (strcmp(command, okMess) != 0)
+	{
+		fprintf(stderr, "sendBesMessage: response to command did not match expected acknowledgement. message: %s vs expected: %s\n", command, okMess);
+	}
+
+	close(bes_send_socket);
+	bes_send_socket = -1;
+
+	return 0;
+}
+
+void freeze()
+{
+	// 2020-07-22 by JAA -- freeze process's cgroup
+	// should be set up at fork
+	char freezeCMD[50] = "sudo freeze freeze ";
+	// PID to char*, buffer is size of length of pid_max
+	// We'll say 4194304 possible PIDs on 64-bit, so length is 7+1
+	char pidStr[8]; 
+	sprintf(pidStr, "%d", pid);
+	// Call "freeze" program with the PID and create param.
+	strcat(freezeCMD, pidStr);
+	system(freezeCMD);
+	return;
+}
+
+void thaw()
+{
+	// 2020-07-22 by JAA -- thaws process's cgroup
+	// should be set up at fork
+	char freezeCMD[50] = "sudo freeze thaw ";
+	char pidStr[8]; 
+	sprintf(pidStr, "%d", pid);
+	strcat(freezeCMD, pidStr);
+	system(freezeCMD);
+	return;
+}
+
+void persist()
+{
+	// 2020 Aug 04 by LAK: Added initial persist functionality
+	char cmd[256];
+	strcpy(cmd, "singularity checkpoint make instance://");
+	strncat(cmd, strrchr(CL->getWorkingDirectory(CL), '/')+1, 215); //get directory name which is the instance name
+	system(cmd);
+	return;
 }

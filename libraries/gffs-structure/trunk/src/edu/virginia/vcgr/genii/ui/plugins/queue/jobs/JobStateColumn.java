@@ -29,6 +29,11 @@ class JobStateColumn extends AbstractRowTableColumnDefinition<JobInformation, Pa
 
 			if (pair.first() == QueueStates.ERROR)
 				setForeground(Color.RED);
+			else if (pair.first() == QueueStates.FROZEN)
+			{
+				super.setValue("FROZEN on " + host);
+				setForeground(Color.ORANGE);
+			}
 			else if (host != null)
 				setForeground(Color.GREEN);
 			else

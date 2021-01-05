@@ -4,7 +4,7 @@ import java.util.Date;
 
 /**
  * This class is used to wait on, and notify threads about scheduling opportunities. An opportunity is not a guarantee that a job can be
- * schedule, but rather a strong suspician that one can. It's up to the scheduler to determine if this is true and to actually do the
+ * schedule, but rather a strong suspicion that one can. It's up to the scheduler to determine if this is true and to actually do the
  * matching.
  * 
  * @author mmm2a

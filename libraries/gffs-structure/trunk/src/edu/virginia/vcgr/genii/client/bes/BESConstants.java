@@ -70,7 +70,6 @@ public class BESConstants
 	public final QName GPU_COUNT_ATTR = new QName(GENII_BES_NS, "GPUCountPerNode");
 	public final QName GPU_MEMORY_ATTR = new QName(GENII_BES_NS, "GPUMemoryPerNode");
 	public final QName CPU_COUNT_ATTR = new QName(GENII_BES_NS, "CPUCount");
-	public final QName BES_POLICY_ATTR = new QName(GENII_BES_NS, POLICY_RESOURCE_PROPERTY_NAME);
 	public final QName BES_THRESHOLD_ATTR = new QName(GENII_BES_NS, THRESHOLD_RESOURCE_PROPERTY_NAME);
 	public final QName OGRSH_VERSIONS_ATTR = new QName(GENII_BES_NS, "OGRSHVersion");
 	public final QName SUPPORTS_FUSE_ATTR = new QName(GENII_BES_NS, "SupportsFuse");

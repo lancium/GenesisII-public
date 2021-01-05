@@ -20,6 +20,8 @@ import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.bes.factory.DestroyActivitiesResponseType;
 import org.ggf.bes.factory.DestroyActivitiesType;
+import org.ggf.bes.factory.FreezeActivitiesResponseType;
+import org.ggf.bes.factory.FreezeActivitiesType;
 import org.ggf.bes.factory.GetActivityDocumentResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsResponseType;
 import org.ggf.bes.factory.GetActivityDocumentsType;
@@ -28,12 +30,20 @@ import org.ggf.bes.factory.GetActivityStatusesResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
+import org.ggf.bes.factory.GetStatePathsResponseType;
+import org.ggf.bes.factory.GetStatePathsType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
+import org.ggf.bes.factory.PersistActivitiesResponseType;
+import org.ggf.bes.factory.PersistActivitiesType;
+import org.ggf.bes.factory.RestartActivitiesResponseType;
+import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.TerminateActivityResponseType;
+import org.ggf.bes.factory.ThawActivitiesResponseType;
+import org.ggf.bes.factory.ThawActivitiesType;
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.bes.management.StartAcceptingNewActivitiesResponseType;
@@ -200,6 +210,54 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			return null;
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to reset jobs in queue.", sqe);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public Object persistJobs(String[] jobs) throws RemoteException
+	{
+		try {
+			_queueMgr.persistJobs(jobs);
+			return null;
+		} catch (SQLException sqe) {
+			throw new RemoteException("Unable to persist jobs in queue.", sqe);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public Object restartJobs(String[] jobs) throws RemoteException
+	{
+		try {
+			_queueMgr.restartJobs(jobs);
+			return null;
+		} catch (SQLException sqe) {
+			throw new RemoteException("Unable to restart jobs in queue.", sqe);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public Object freezeJobs(String[] jobs) throws RemoteException
+	{
+		try {
+			_queueMgr.freezeJobs(jobs);
+			return null;
+		} catch (SQLException sqe) {
+			throw new RemoteException("Unable to freeze jobs in queue.", sqe);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public Object thawJobs(String[] jobs) throws RemoteException
+	{
+		try {
+			_queueMgr.thawJobs(jobs);
+			return null;
+		} catch (SQLException sqe) {
+			throw new RemoteException("Unable to thaw jobs in queue.", sqe);
 		}
 	}
 
@@ -687,6 +745,51 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		}
 		return AnyHelper.toAny(jit);
 
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public PersistActivitiesResponseType persistActivities(PersistActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType 
+	{
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public GetStatePathsResponseType getStatePaths(GetStatePathsType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public RestartActivitiesResponseType restartActivities(RestartActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public FreezeActivitiesResponseType freezeActivities(FreezeActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("freezeActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public ThawActivitiesResponseType thawActivities(ThawActivitiesType parameters)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		_logger.debug("thawActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
+		return null;
 	}
 	
 	//LAK 2020 Aug 13: This is a stub that should not be implemented in the queue.

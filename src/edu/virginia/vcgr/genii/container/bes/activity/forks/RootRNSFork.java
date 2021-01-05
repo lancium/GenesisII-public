@@ -18,5 +18,8 @@ public class RootRNSFork extends StaticRNSResourceFork
 	{
 		addDefaultEntry("status", ActivitySummaryResourceFork.class);
 		addDefaultEntry(WorkingDirectoryFork.FORK_BASE_PATH_NAME, WorkingDirectoryFork.class);
+		addDefaultEntry(AccountingDirectoryFork.FORK_BASE_PATH_NAME, AccountingDirectoryFork.class);
+		addDefaultEntry("JWD", ActivityJWDResourceFork.class);
+
 	}
 }

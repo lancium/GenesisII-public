@@ -39,4 +39,10 @@ public class JobStateCache
 			_logger.debug(String.format("Status of \"%s\" is %s.\n", token, state));
 		return state;
 	}
+	
+	//LAK 29 Dec 2020: Used for when the pwrapper tells the activity that the job is done
+	public void update(JobToken token, NativeQueueState state)
+	{
+		_cache.put(token, state);
+	}
 }

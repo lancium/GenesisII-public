@@ -1,10 +1,10 @@
 package edu.virginia.vcgr.genii.container.q2;
 
-import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
-import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
+import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 
 /**
  * This class matches job id's to bes id's. It's used during the scheduling phase.

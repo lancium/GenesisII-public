@@ -54,7 +54,7 @@ public class CloudProcessAccountingPhase extends AbstractCloudExecutionPhase imp
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "processing-accounting-data", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "processing-accounting-data");
 	}
 
 	@Override

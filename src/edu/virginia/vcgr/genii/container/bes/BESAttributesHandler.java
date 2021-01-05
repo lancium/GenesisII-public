@@ -35,7 +35,6 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
-import edu.virginia.vcgr.genii.client.bes.BESPolicy;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.configuration.ConfiguredHostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -88,7 +87,6 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(consts.CPU_COUNT_ATTR, "getCPUCountAttr");
 		addHandler(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
 		addHandler(consts.SPMD_PROVIDER_ATTR, "getSPMDProvidersAttr");
-		addHandler(consts.BES_POLICY_ATTR, "getBESPolicyAttr", "setBESPolicyAttr");
 		addHandler(consts.BES_THRESHOLD_ATTR, "getBESThresholdAttr", "setBESThresholdAttr");
 		addHandler(consts.CPU_SPEED_ATTR, "getCPUSpeedAttr");
 		addHandler(consts.PHYSICAL_MEMORY_ATTR, "getPhysicalMemoryAttr");
@@ -340,22 +338,6 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	public MessageElement getIsAcceptingNewActivitiesAttr() throws ResourceUnknownFaultType, ResourceException, RemoteException
 	{
 		return new MessageElement(consts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, getIsAcceptingNewActivities());
-	}
-
-	public MessageElement getBESPolicyAttr() throws ResourceUnknownFaultType, ResourceException, RemoteException
-	{
-		IBESResource resource;
-		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
-		return resource.getPolicy().toMessageElement(consts.BES_POLICY_ATTR);
-	}
-
-	public void setBESPolicyAttr(MessageElement policy) throws ResourceUnknownFaultType, ResourceException, RemoteException
-	{
-		BESPolicy p = BESPolicy.fromMessageElement(policy);
-		IBESResource resource;
-		resource = (IBESResource) ResourceManager.getCurrentResource().dereference();
-		resource.setPolicy(p);
-		resource.commit();
 	}
 
 	public MessageElement getBESThresholdAttr() throws ResourceUnknownFaultType, ResourceException, RemoteException

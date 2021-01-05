@@ -37,7 +37,7 @@ import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 
-abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
+public abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 {
 	static final long serialVersionUID = 0L;
 
@@ -65,6 +65,9 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 			}
 		}
 	}
+	
+	//LAK 29 Dec 2020: This function will handle actually updating the state
+	public abstract void notifyPwrapperIsTerminating();
 
 	// 2020 September 11 by CCH, as part of guaranteed correct JSON output
 	/*
