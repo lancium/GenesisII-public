@@ -8,6 +8,10 @@
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 
+# Allow coloring of echo commands
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
 user_password="$1"; shift
 
 if [ -z "$user_password" ]; then
@@ -52,6 +56,7 @@ echo "edu.virginia.vcgr.genii.container.trust-self-signed=true" >> "$wfile"
 echo "destroying contents of user dir $BACKUP_USER_DIR"
 \rm -rf "$BACKUP_USER_DIR"
 
+echo "${RED}Backup_USER_DIR is ${BACKUP_USER_DIR}${NC}"
 save_and_switch_userdir "$BACKUP_USER_DIR"
 
 # fix the logging for the mirror container.  saving this with the state is handled in save and switch now.
@@ -65,6 +70,7 @@ replace_phrase_in_file "$GENII_INSTALL_DIR/lib/build.container.log4j.properties"
 # clean up any old log.
 \rm -f "$(get_container_logfile "$BACKUP_DEPLOYMENT_NAME")"
 
+echo "${RED}Deployment name for backup is ${BACKUP_DEPLOYMENT_NAME}${NC}"
 launch_container "$BACKUP_DEPLOYMENT_NAME"
 
 restore_userdir

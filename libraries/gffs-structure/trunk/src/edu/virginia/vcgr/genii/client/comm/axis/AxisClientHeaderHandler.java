@@ -261,7 +261,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 			_logger.warn("could not find EPR target in message context; cannot use this for container id.");
 		} else {
 			containerGUID = EPRUtils.getGeniiContainerID(target);
-			delegate=delegateTo(target);
+			//delegate=delegateTo(target);
 		}
 
 		long beginTime = System.currentTimeMillis() - SecurityConstants.CredentialGoodFromOffset;

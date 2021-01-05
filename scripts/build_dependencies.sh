@@ -113,15 +113,21 @@ for subproject in \
             echo $PWD
             cd src
             make
-	    cp ../bin/linux/64/pwrapper ../../../../ext/pwrapper/bin/pwrapper-linux-64
+            retval=$?
+           	if [ $retval -ne 0 ]; then false; else true; fi
+    		check_result "make for $subproject"
+	    	cp ../bin/linux/64/pwrapper ../../../../ext/pwrapper/bin/pwrapper-linux-64
             )
+            retval=$?
+            if [ $retval -ne 0 ]; then false; else true; fi
+            check_result "make for $subproject"
     else
         ant build
     	retval=$?
     	if [ $retval -ne 0 -a $subproject == gffs-security ]; then
       		echo -e "\n======="
       		echo "Failures in gffs-security often result from not having the unlimited JCE jar"
-      		echo "files installed in the jre/lib/security folder.  These are available at:"
+    		echo "files installed in the jre/lib/security folder.  These are available at:"
       		echo "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
       		echo
       		echo "Often the command that will correct this build problem is:"
