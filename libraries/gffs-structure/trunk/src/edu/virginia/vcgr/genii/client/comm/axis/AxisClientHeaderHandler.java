@@ -36,8 +36,6 @@ import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
-import com.sun.prism.impl.Disposer.Target;
-
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher;
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
 import edu.virginia.vcgr.appmgr.version.Version;
