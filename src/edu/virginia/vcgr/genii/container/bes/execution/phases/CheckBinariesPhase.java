@@ -51,7 +51,7 @@ public class CheckBinariesPhase extends AbstractExecutionPhase implements Serial
 	private String _execName;
 
 	public CheckBinariesPhase(String execName) {
-		super(new ActivityState(ActivityStateEnumeration.Running, CHECKING_BINARIES_STATE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, CHECKING_BINARIES_STATE));
 		// CCH 2020-07-01
 		// This phase is only created once in CommonExecutionUnderstanding.java
 		// It is created only when the executable name is an image (.simg, .qcow2, .sif)

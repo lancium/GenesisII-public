@@ -585,9 +585,20 @@ public class JobManager implements Closeable
 			} else {
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Setting job %s to finished state without job killer (non-BES job).", job));
-			
-				_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
-					null);
+				
+				connection = _connectionPool.acquire(false);
+				
+				try {
+					_database.modifyJobState(connection, job.getJobID(), job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null,
+							null);
+					
+					connection.commit();
+				}
+				catch (SQLException sqe) {
+					_logger.warn("Unable to update job status in databse.", sqe);
+				} finally {
+					_connectionPool.release(connection);
+				}
 
 				job.setJobState(QueueStates.FINISHED);
 				job.history(HistoryEventCategory.Terminating).debug("Finishing non-BES Job without JobKiller");
@@ -1898,7 +1909,6 @@ public class JobManager implements Closeable
 			}
 			
 			// Now we need to move the job between queues
-
 			synchronized (jobData) {
 				HistoryContext history = jobData.history(HistoryEventCategory.ResetCount);
 				history.createTraceWriter("Resetting Job tries count to 0")
@@ -1910,19 +1920,174 @@ public class JobManager implements Closeable
 				SortableJobKey jobKey = new SortableJobKey(jobData);
 				_queuedJobs.put(jobKey, jobData);
 
-				Connection connection2 = _connectionPool.acquire(false);
-
 				/* Ask the database to update the job state */
-				_database.modifyJobState(connection, jobData.getJobID(), jobData.getRunAttempts(), QueueStates.REQUEUED, new Date(), null, null,
-						null);
-				connection2.commit();
-
-		
+				_database.modifyJobState(connection, jobData.getJobID(), jobData.getRunAttempts(), QueueStates.REQUEUED, new Date(), null, null, null);
+				connection.commit();
 			}
 			
 		}
 		_schedulingEvent.notifySchedulingEvent();
 	}
+	
+	synchronized public void persistJobs(Connection connection, String[] jobs) 
+			throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		int originalCount = _outcallThreadPool.size();
+		
+		for (String jobTicket : jobs) 
+		{
+			JobData jobData = _jobsByTicket.get(jobTicket);
+			if (jobData == null)
+				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+
+			if(jobData.getJobState() != QueueStates.RUNNING)
+			{
+				if(_logger.isErrorEnabled())
+					_logger.error(String.format("%s is not currently running, cannot persist.", jobData));
+				continue;
+			}
+
+			HistoryContext history = jobData.history(HistoryEventCategory.Persisting);
+
+			history.createTraceWriter("Persisting Job")
+			.format("Persisting the job due to request.").close();
+
+			Resolver resolver = new Resolver();
+
+			/* Enqueue the worker into the outcall thread pool */
+			_outcallThreadPool.enqueue(new JobPersistWorker(resolver, resolver, _connectionPool, jobData));
+		}
+
+		_schedulingEvent.notifySchedulingEvent();
+
+		int newCount = _outcallThreadPool.size();
+
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
+	}
+	
+	synchronized public void restartJobs(Connection connection, String[] jobs)
+			throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		int originalCount = _outcallThreadPool.size();
+
+		for (String jobTicket : jobs)
+		{
+			JobData jobData = _jobsByTicket.get(jobTicket);
+			if (jobData == null)
+				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+
+//			if(jobData.getJobState() != QueueStates.PERSISTED)
+//			{
+//				if(_logger.isErrorEnabled())
+//					_logger.error(String.format("%s is not currently persisted, cannot restart.", jobData));
+//				continue;
+//			}
+			
+			HistoryContext history = jobData.history(HistoryEventCategory.Restarting);
+
+			history.createTraceWriter("Restarting Execution of Job")
+			.format("Restarting execution of the job due to request.").close();
+
+			Resolver resolver = new Resolver();
+
+			/* Enqueue the worker into the outcall thread pool */
+			_outcallThreadPool.enqueue(new JobRestartWorker(resolver, resolver, _connectionPool, jobData));
+		}
+
+		_schedulingEvent.notifySchedulingEvent();
+
+		int newCount = _outcallThreadPool.size();
+
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
+	}
+	
+	synchronized public void freezeJobs(Connection connection, String[] jobs)
+			throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		int originalCount = _outcallThreadPool.size();
+		
+		for (String jobTicket : jobs)
+		{
+			JobData jobData = _jobsByTicket.get(jobTicket);
+			if (jobData == null)
+				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+
+			if(jobData.getJobState() != QueueStates.RUNNING)
+			{
+				if(_logger.isErrorEnabled())
+					_logger.error(String.format("%s is not currently running, cannot freeze.", jobData));
+				continue;
+			}
+			
+
+			HistoryContext history = jobData.history(HistoryEventCategory.Freezing);
+
+			history.createTraceWriter("Freezing Execution of Job")
+			.format("Freezing execution of the job due to request.").close();
+
+			Resolver resolver = new Resolver();
+
+			/* Enqueue the worker into the outcall thread pool */
+			_outcallThreadPool.enqueue(new JobFreezeWorker(resolver, resolver, _connectionPool, jobData));
+			
+			_database.markFrozen(connection, jobData.getJobID());
+			connection.commit();
+		}
+
+		_schedulingEvent.notifySchedulingEvent();
+		
+		int newCount = _outcallThreadPool.size();
+
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
+	}
+	
+	synchronized public void thawJobs(Connection connection, String[] jobs)
+			throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		int originalCount = _outcallThreadPool.size();
+		
+		for (String jobTicket : jobs)
+		{
+			JobData jobData = _jobsByTicket.get(jobTicket);
+			if (jobData == null)
+				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
+
+			if(jobData.getJobState() != QueueStates.FROZEN)
+			{
+				if(_logger.isErrorEnabled())
+					_logger.error(String.format("%s is not currently frozen, cannot thaw.", jobData));
+				continue;
+			}
+			
+			HistoryContext history = jobData.history(HistoryEventCategory.Thawing);
+			
+			history.createTraceWriter("Thawing Execution of Job")
+			.format("Thawing execution of the job due to request.").close();
+			
+			Resolver resolver = new Resolver();
+
+			/* Enqueue the worker into the outcall thread pool */
+			_outcallThreadPool.enqueue(new JobThawWorker(resolver, resolver, _connectionPool, jobData));
+			
+			_database.markThaw(connection, jobData.getJobID());
+			connection.commit();
+		}
+
+		_schedulingEvent.notifySchedulingEvent();
+		
+		int newCount = _outcallThreadPool.size();
+
+		if (_logger.isDebugEnabled() && (originalCount != newCount)) {
+			_logger.debug(String.format("%d jobs queued in thread pool (changed from %d).", newCount, originalCount));
+		}
+	}
+	
 	synchronized public void rescheduleJobs(Connection connection, String[] jobs)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
@@ -2003,9 +2168,11 @@ public class JobManager implements Closeable
 		long finished = 0;
 		long error = 0;
 		long requeued = 0;
+		long frozen = 0;
+		long persisted = 0;
+
 		//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
 		synchronized (_jobsByID) {
-
 			for (JobData jobData : _jobsByID.values()) {
 				QueueStates state = jobData.getJobState();
 				if (state == QueueStates.QUEUED)
@@ -2020,6 +2187,10 @@ public class JobManager implements Closeable
 					error++;
 				else if (state == QueueStates.FINISHED)
 					finished++;
+				else if (state == QueueStates.FROZEN)
+					frozen++;
+				else if (state == QueueStates.PERSISTED)
+					persisted++;
 			}
 		}
 
@@ -2029,6 +2200,8 @@ public class JobManager implements Closeable
 		ret.put("Running", running);
 		ret.put("Error", error);
 		ret.put("Finished", finished);
+		ret.put("Frozen", frozen);
+		ret.put("Persisted", persisted);
 
 		return ret;
 	}
@@ -2081,7 +2254,6 @@ public class JobManager implements Closeable
 							// Added 7/13/2017 by ASG  .. should have already been removed, but for some reason it is still there, so get rid of it.
 							if (job.getJobState()==QueueStates.FINISHED) {
 								SortableJobKey jobKey = new SortableJobKey(job);
-								//FIXME wants a long not a jobkey object
 								_runningJobs.remove(jobKey.getJobID());
 							}
 						}
@@ -2441,6 +2613,7 @@ public class JobManager implements Closeable
 			return;
 
 		Collection<Long> jobsToKill = new LinkedList<Long>();
+		ArrayList<String> jobsToResume = new ArrayList<String>(0);
 		HashMap<Long, PartialJobInfo> ownerMap;
 
 		/*
@@ -2468,7 +2641,14 @@ public class JobManager implements Closeable
 						.format("Request to terminate job from outside the queue").close();
 
 					jobsToKill.add(new Long(data.getJobID()));
+					if (data.getJobState() == QueueStates.FROZEN) {
+						jobsToResume.add(jobTicket);
+					}
 				}
+			}
+			
+			if (jobsToResume.size() > 0) {
+				thawJobs(connection, jobsToResume.toArray(new String[0]));
 			}
 		}
 

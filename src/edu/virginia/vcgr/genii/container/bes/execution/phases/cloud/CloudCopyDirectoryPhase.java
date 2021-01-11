@@ -37,7 +37,7 @@ public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase impleme
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "push-working-dir", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "push-working-dir");
 	}
 
 	@Override

@@ -36,7 +36,6 @@ public class BESManagerConfigurationTask implements ProgressTask<ManagementData>
 		BESRP rp = (BESRP) ResourcePropertyManager.createRPInterface(_callingContext, _target, new Class<?>[] { BESRP.class },
 			bconsts.IS_ACCEPTING_NEW_ACTIVITIES_ATTR, BESConstants.POLICY_RP, BESConstants.THRESHOLD_RP);
 
-		rp.setPolicy(_data.policy());
 		rp.setThreshold(_data.threshold());
 		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, _target, _callingContext);
 		if (_data.isAcceptingActivities())
@@ -44,7 +43,7 @@ public class BESManagerConfigurationTask implements ProgressTask<ManagementData>
 		else
 			bes.stopAcceptingNewActivities(new StopAcceptingNewActivitiesType());
 
-		return new ManagementData(rp.getPolicy(), rp.getThreshold(), rp.isAcceptingNewActivities());
+		return new ManagementData(rp.getThreshold(), rp.isAcceptingNewActivities());
 	}
 
 	@Override

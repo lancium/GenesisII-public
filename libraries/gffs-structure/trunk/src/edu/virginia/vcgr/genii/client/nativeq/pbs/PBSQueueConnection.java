@@ -310,4 +310,9 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 			throw new NativeQueueException("Unable to determine application exit status.", ioe);
 		}
 	}
+
+	@Override
+	public void updateStatusToTerminated(JobToken token) throws NativeQueueException {
+		throw new UnsupportedOperationException("Not implemented");
+	}
 }

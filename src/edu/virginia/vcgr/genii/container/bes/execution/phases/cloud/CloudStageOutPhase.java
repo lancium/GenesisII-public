@@ -35,7 +35,7 @@ public class CloudStageOutPhase extends AbstractCloudExecutionPhase implements S
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "staging-out", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "staging-out");
 	}
 
 	@Override

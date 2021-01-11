@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.jsdl.personality.common;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -13,11 +14,9 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
 import org.ggf.jsdl.JobIdentification_Type;
-import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.invoke.handlers.MyProxyCertificate;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
@@ -35,6 +34,7 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CheckBinariesPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CompleteAccountingPhase;
@@ -89,7 +89,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	{
 		_jobName = jobName;
 	}
-
+	
 	public String getJobAnnotation()
 	{
 		return _jobAnnotation;
@@ -99,7 +99,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 	{
 		return _jobName;
 	}
-
+	
 	public void setFuseMountDirectory(String fuseDirectory)
 	{
 		_fuseDirectory = fuseDirectory;
@@ -225,7 +225,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
  		_GPUMemoryPerNode = GPUMemoryPerNode;
      	}
 
-	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl) throws JSDLException
+	final public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties, JobDefinition_Type jsdl, String BESipaddr, String activityid) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
@@ -398,6 +398,26 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		// CompleteAccountingPhase(File accountingDirectory, File finishedDir)
 		ret.add(new CompleteAccountingPhase(accountingDirectory,finishedDir));
 		// End of accounting dir updates
+		
+		// 2020-07-14 by CCH
+		// Adding code to print out IP and assigned port so pwrapper can talk to it
+		// Part of the migration/persist project
+		File besIPPortInformation = new File (f, ".bes-info");
+		try {
+			// At this point, the JWD has been calculated but not yet created. 
+			// Creating it earlier than normal so I am able create .bes-info file
+			besIPPortInformation.getParentFile().mkdirs();
+			if (besIPPortInformation.createNewFile()) {
+				FileWriter myWriter = new FileWriter(besIPPortInformation);
+				myWriter.write(BESipaddr+"\n");
+				myWriter.write(activityid+"\n");
+				myWriter.close();
+			}
+		} catch (IOException e) {
+			System.out.println("An error occurred .bes-info file.");
+			e.printStackTrace();
+		}
+		// end of updates 2020-07-14
 		
 		//LAK: Delete job working directory
 		cleanups.add(new CleanupPhase(new File(getWorkingDirectory().getWorkingDirectory().toString())));

@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		Integer threadsPerProcess, File commonDirectory, File executable, String[] arguments, Map<String, String> environment,
 		PassiveStreamRedirectionDescription redirects, BESConstructionParameters constructionParameters)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE, false), constructionParameters);
+		super(new ActivityState(ActivityStateEnumeration.Running, EXECUTING_STAGE), constructionParameters);
 
 		_spmdVariation = spmdVariation;
 		_memory=memory;
@@ -370,9 +369,15 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 		history.info("Terminating Activity Per Request");
 
 		synchronized (_processLock) {
-			_hardTerminate = Boolean.TRUE;
+			_hardTerminate = true;
 			_countAsFailedAttempt = countAsFailedAttempt;
 			destroyProcess(_process);
 		}
+	}
+
+	@Override
+	public void notifyPwrapperIsTerminating() {
+		//LAK 29 Dec 2020: We don't have to do anything with this information since we will know when the process fully quits
+		return;
 	}
 }

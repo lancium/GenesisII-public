@@ -21,7 +21,7 @@ public class SetupFUSEPhase extends AbstractFUSEPhases
 
 	public SetupFUSEPhase(String mountPoint, String sandbox)
 	{
-		super(mountPoint, new ActivityState(ActivityStateEnumeration.Running, "fuse-setup", false));
+		super(mountPoint, new ActivityState(ActivityStateEnumeration.Running, "fuse-setup"));
 
 		_sandbox = sandbox;
 	}

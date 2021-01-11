@@ -38,6 +38,8 @@
 			<xsd:enumeration value="RUNNING"/>
 			<xsd:enumeration value="FINISHED"/>
 			<xsd:enumeration value="ERROR"/>
+			<xsd:enumeration value="FROZEN"/>
+			<xsd:enumeration value="PERSISTED"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 
@@ -149,6 +151,45 @@
 		type="job-management:CompleteRequestType"/>
 	<xsd:element name="CompleteResponse"/>
 
+	<xsd:complexType name="PersistRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PersistRequestType"
+		type="job-management:PersistRequestType"/>
+	<xsd:element name="PersistResponse"/>
+	
+	<xsd:complexType name="RestartRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RestartRequestType"
+		type="job-management:RestartRequestType"/>
+	<xsd:element name="RestartResponse"/>
+	
+	<xsd:complexType name="FreezeRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="FreezeRequestType"
+		type="job-management:FreezeRequestType"/>
+	<xsd:element name="FreezeResponse"/>
+	
+	<xsd:complexType name="ThawRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ThawRequestType"
+		type="job-management:ThawRequestType"/>
+	<xsd:element name="ThawResponse"/>
 
 	<xsd:complexType name="ResetJobRequestType">
 		<xsd:sequence>

@@ -52,9 +52,9 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 import edu.virginia.vcgr.genii.container.exportdir.GffsExportConfiguration;
 import edu.virginia.vcgr.genii.security.credentials.CredentialWallet;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
-import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 public class QueueProcessPhase extends AbstractRunProcessPhase implements TerminateableExecutionPhase
 {
@@ -93,7 +93,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 		Integer threadsPerProcess, File executable, Collection<String> arguments, Map<String, String> environment, File stdin, File stdout,
 		File stderr, BESConstructionParameters constructionParameters, ResourceConstraints resourceConstraints)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing", false), constructionParameters);
+		super(new ActivityState(ActivityStateEnumeration.Running, "Enqueing"), constructionParameters);
 
 		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
@@ -217,7 +217,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
                 		e.printStackTrace();
                 	}
                 }
-                // End jobName updates
+                // End jobName updates			
+                
                 resourceUsageFile =tmp.getNewResourceUsageFile();  // This should point to the accounting directory, not create a properties file.
 				if (_logger.isDebugEnabled()) {
 					_logger.debug("Generate Properties Constructor tmp: " + tmp);
@@ -344,7 +345,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					_logger.error("caught exception while asking for queue state; ignoring result", e);
 				}
 				if (stateIsUsable) {
-					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
+					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString()));
 					if (lastState == null || !lastState.equals(_state.toString())) {
 						if (_logger.isDebugEnabled())
 							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
@@ -391,7 +392,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						// available we will pick it up in getExitCode.
 						jobDisapparedFromQueue=true;
 						exitCode=143;
-						context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
+						context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString()));
 						if (lastState == null || !lastState.equals(_state.toString())) {
 							if (_logger.isDebugEnabled())
 								_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
@@ -403,7 +404,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					// See comments for catch above, they are the same
 					jobDisapparedFromQueue=true;
 					exitCode=143;
-					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false));
+					context.updateState(new ActivityState(ActivityStateEnumeration.Running, _state.toString()));
 					if (lastState == null || !lastState.equals(_state.toString())) {
 						if (_logger.isDebugEnabled())
 							_logger.debug("queue job '" + _jobToken.toString() + "' updated to state: " + _state);
@@ -494,7 +495,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			if (_state == null)
 				return super.getPhaseState();
 
-			return new ActivityState(ActivityStateEnumeration.Running, _state.toString(), false);
+			return new ActivityState(ActivityStateEnumeration.Running, _state.toString());
 		}
 	}
 
@@ -512,6 +513,17 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 				workingDirectory);
 		} catch (NativeQueueException nqe) {
 			throw new RuntimeException("Unable to acquire connection to native queue.", nqe);
+		}
+	}
+
+	@Override
+	public void notifyPwrapperIsTerminating() {
+		NativeQueueConnection queue = connectQueue(_workingDirectory.getWorkingDirectory());
+		try {
+			queue.updateStatusToTerminated(_jobToken);
+		} catch (NativeQueueException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

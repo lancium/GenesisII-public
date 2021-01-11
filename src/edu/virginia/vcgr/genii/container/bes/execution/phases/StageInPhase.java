@@ -41,7 +41,7 @@ public class StageInPhase extends AbstractExecutionPhase implements Serializable
 	public StageInPhase(URI source, File target, CreationFlagEnumeration creationFlag, boolean handleAsArchive,
 		UsernamePasswordIdentity usernamePassword)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, STAGING_IN_STATE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, STAGING_IN_STATE));
 
 		_usernamePassword = usernamePassword;
 

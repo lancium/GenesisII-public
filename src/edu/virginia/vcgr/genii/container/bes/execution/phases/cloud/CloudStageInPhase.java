@@ -35,7 +35,7 @@ public class CloudStageInPhase extends AbstractCloudExecutionPhase implements Se
 	@Override
 	public ActivityState getPhaseState()
 	{
-		return new ActivityState(ActivityStateEnumeration.Running, "staging-in", false);
+		return new ActivityState(ActivityStateEnumeration.Running, "staging-in");
 	}
 
 	@Override

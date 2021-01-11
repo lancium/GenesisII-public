@@ -31,7 +31,7 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 
 	public CreateWorkingDirectoryPhase(BESWorkingDirectory workingDirectory, File scratchDirectory)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, CREATE_WORKINGDIR_STATE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, CREATE_WORKINGDIR_STATE));
 		_workingDirectory = workingDirectory.getWorkingDirectory();
 		_scratchDirectory = scratchDirectory;
 	}

@@ -224,6 +224,102 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		}
 	}
 	
+	private class JobPersistAction extends AbstractAction
+	{
+		static final long serialVersionUID = 0L;
+
+		private JobPersistAction(int[] rows)
+		{
+			super("Persist Jobs");
+
+			setEnabled(rows.length > 0);
+		}
+
+		@Override
+		final public void actionPerformed(ActionEvent e)
+		{
+			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
+
+			Collection<String> jobTickets = new LinkedList<String>();
+			for (int row : _table.getSelectedRows())
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
+
+			QueueManipulation.JobPersistTask(_context, _table, _model, jobTickets);
+		}
+	}
+	
+	private class JobRestartAction extends AbstractAction
+	{
+		static final long serialVersionUID = 0L;
+
+		private JobRestartAction(int[] rows)
+		{
+			super("Restart Jobs");
+
+			setEnabled(rows.length > 0);
+		}
+
+		@Override
+		final public void actionPerformed(ActionEvent e)
+		{
+			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
+
+			Collection<String> jobTickets = new LinkedList<String>();
+			for (int row : _table.getSelectedRows())
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
+
+			QueueManipulation.JobRestartTask(_context, _table, _model, jobTickets);
+		}
+	}
+	
+	private class JobFreezeAction extends AbstractAction
+	{
+		static final long serialVersionUID = 0L;
+
+		private JobFreezeAction(int[] rows)
+		{
+			super("Freeze Jobs");
+
+			setEnabled(rows.length > 0);
+		}
+
+		@Override
+		final public void actionPerformed(ActionEvent e)
+		{
+			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
+
+			Collection<String> jobTickets = new LinkedList<String>();
+			for (int row : _table.getSelectedRows())
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
+
+			QueueManipulation.JobFreezeTask(_context, _table, _model, jobTickets);
+		}
+	}
+	
+	private class JobThawAction extends AbstractAction
+	{
+		static final long serialVersionUID = 0L;
+
+		private JobThawAction(int[] rows)
+		{
+			super("Thaw Jobs");
+
+			setEnabled(rows.length > 0);
+		}
+
+		@Override
+		final public void actionPerformed(ActionEvent e)
+		{
+			RowSorter<? extends TableModel> sorter = _table.getRowSorter();
+
+			Collection<String> jobTickets = new LinkedList<String>();
+			for (int row : _table.getSelectedRows())
+				jobTickets.add(_model.row(sorter == null ? row : sorter.convertRowIndexToModel(row)).getTicket().toString());
+
+			QueueManipulation.JobThawTask(_context, _table, _model, jobTickets);
+		}
+	}
+	
 	private UIPluginContext _context;
 	private JTable _table;
 	private QueueManagerTableModel _model;
@@ -240,6 +336,12 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		popup.add(new JobCompleterAction(rows));
 		popup.add(new JobRescheduleAction(rows));
 		popup.add(new JobResetAction(rows));
+		popup.addSeparator();
+		//LAK 18 Dec 2020: Temp disable persist and restart options in gui
+		/*popup.add(new JobPersistAction(rows));
+		popup.add(new JobRestartAction(rows));*/
+		popup.add(new JobFreezeAction(rows));
+		popup.add(new JobThawAction(rows));
 		popup.addSeparator();
 		popup.add(new RefreshAction());
 

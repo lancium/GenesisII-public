@@ -49,9 +49,9 @@ import edu.virginia.vcgr.genii.container.q2.summary.HostDescription;
 import edu.virginia.vcgr.genii.container.q2.summary.ResourceSummary;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
+import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
-import edu.virginia.vcgr.jsdl.GPUProcessorArchitecture;
 
 
 /**
@@ -577,6 +577,54 @@ public class QueueManager implements Closeable
 		try {
 			connection = _connectionPool.acquire(false);
 			_jobManager.resetJobs(connection, jobs);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public void persistJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			_jobManager.persistJobs(connection, jobs);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public void restartJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			_jobManager.restartJobs(connection, jobs);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public void freezeJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			_jobManager.freezeJobs(connection, jobs);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public void thawJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+
+		try {
+			connection = _connectionPool.acquire(true);
+			_jobManager.thawJobs(connection, jobs);
 		} finally {
 			_connectionPool.release(connection);
 		}

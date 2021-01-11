@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.container.bes.execution;
 
 import edu.virginia.vcgr.genii.client.bes.ExecutionException;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 
 public interface TerminateableExecutionPhase extends ExecutionPhase
 {

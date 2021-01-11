@@ -10,9 +10,9 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
 public class StoreContextPhase extends AbstractExecutionPhase implements ExecutionPhase, Serializable
 {
@@ -24,7 +24,7 @@ public class StoreContextPhase extends AbstractExecutionPhase implements Executi
 
 	public StoreContextPhase(String filename)
 	{
-		super(new ActivityState(ActivityStateEnumeration.Running, STORING_CONTEXT_PHASE, false));
+		super(new ActivityState(ActivityStateEnumeration.Running, STORING_CONTEXT_PHASE));
 
 		_filename = filename;
 	}

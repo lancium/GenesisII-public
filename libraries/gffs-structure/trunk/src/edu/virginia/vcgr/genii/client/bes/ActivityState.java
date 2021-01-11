@@ -33,41 +33,31 @@ public class ActivityState implements Serializable, Cloneable
 
 	static final public String _GENII_NS = "http://vcgr.cs.virginia.edu/genesisII/bes/activity-states";
 
-	static final private String _GENII_SUS_NS = "http://vcgr.cs.virginia.edu/genesisII/bes/activity-states/suspend";
-	static final private String _SUSPEND_STATE_ELEMENT_NAME = "suspended";
-	static final private QName _SUSPEND_STATE_ELEMENT_QNAME = new QName(_GENII_SUS_NS, _SUSPEND_STATE_ELEMENT_NAME);
-
 	@XmlAttribute(name = "bes-state", required = true)
 	private String _besState;
 
 	@XmlAttribute(name = "genii-state", required = false)
 	private String _geniiState;
 
-	@XmlAttribute(name = "is-suspended", required = false)
-	private boolean _isSuspended;
-
 	@SuppressWarnings("unused")
 	private ActivityState()
 	{
 		_besState = null;
 		_geniiState = null;
-		_isSuspended = false;
 	}
 
-	public ActivityState(ActivityStateEnumeration besState, String geniiState, boolean isSuspended)
+	public ActivityState(ActivityStateEnumeration besState, String geniiState)
 	{
 		if (besState == null)
 			throw new IllegalArgumentException("BESState cannot be null.");
 
 		_besState = besState.getValue();
 		_geniiState = geniiState;
-		_isSuspended = isSuspended;
 	}
 
 	public ActivityState(ActivityStatusType wireState)
 	{
 		_geniiState = null;
-		_isSuspended = false;
 
 		if (wireState == null) {
 			_besState = ActivityStateEnumeration._Failed;
@@ -78,8 +68,6 @@ public class ActivityState implements Serializable, Cloneable
 					QName eName = me.getQName();
 					if (eName.getNamespaceURI().equals(_GENII_NS))
 						_geniiState = eName.getLocalPart();
-					else if (eName.equals(_SUSPEND_STATE_ELEMENT_QNAME))
-						_isSuspended = true;
 				}
 			}
 
@@ -114,7 +102,7 @@ public class ActivityState implements Serializable, Cloneable
 
 	public boolean equals(ActivityState other)
 	{
-		return equals(_besState, other._besState) && equals(_geniiState, other._geniiState) && (_isSuspended == other._isSuspended);
+		return equals(_besState, other._besState) && equals(_geniiState, other._geniiState);
 	}
 
 	public boolean equals(Object other)
@@ -122,16 +110,6 @@ public class ActivityState implements Serializable, Cloneable
 		if (other instanceof ActivityState)
 			return equals((ActivityState) other);
 		return false;
-	}
-
-	public boolean isSuspended()
-	{
-		return _isSuspended;
-	}
-
-	public void suspend(boolean setSuspended)
-	{
-		_isSuspended = setSuspended;
 	}
 
 	public boolean isFinalState()
@@ -171,8 +149,6 @@ public class ActivityState implements Serializable, Cloneable
 		Collection<MessageElement> anyC = new Vector<MessageElement>(2);
 		if (_geniiState != null)
 			anyC.add(new MessageElement(new QName(_GENII_NS, _geniiState)));
-		if (_isSuspended)
-			anyC.add(new MessageElement(_SUSPEND_STATE_ELEMENT_QNAME));
 		return new ActivityStatusType((anyC.size() == 0) ? null : Elementals.toArray(anyC), ActivityStateEnumeration.fromValue(_besState));
 	}
 
@@ -184,14 +160,12 @@ public class ActivityState implements Serializable, Cloneable
 		builder.append(_besState);
 		if (_geniiState != null)
 			builder.append(":" + _geniiState);
-		if (_isSuspended)
-			builder.append("[suspended]");
 
 		return builder.toString();
 	}
 
 	public Object clone()
 	{
-		return new ActivityState(ActivityStateEnumeration.fromValue(_besState), _geniiState, _isSuspended);
+		return new ActivityState(ActivityStateEnumeration.fromValue(_besState), _geniiState);
 	}
 }

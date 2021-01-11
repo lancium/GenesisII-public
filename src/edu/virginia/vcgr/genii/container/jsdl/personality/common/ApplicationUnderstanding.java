@@ -8,7 +8,7 @@ import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.JobUnderstandingContext;
-import edu.virginia.vcgr.genii.container.bes.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
 public interface ApplicationUnderstanding
 {
