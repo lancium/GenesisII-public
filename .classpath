@@ -36,8 +36,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-structure"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gffs-webservices"/>
 	<classpathentry kind="lib" path="lib"/>
-	<classpathentry kind="lib" path="ext/bcpkix-jdk15on-149.jar"/>
-	<classpathentry kind="lib" path="ext/bcprov-jdk15on-149.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CmdLineManipulator"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DPage"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/FSViewII"/>
@@ -63,5 +61,7 @@
 	<classpathentry kind="lib" path="ext/jsoup-1.9.2.jar"/>
 	<classpathentry kind="lib" path="ext/jackson-annotations-2.7.0.jar"/>
 	<classpathentry kind="lib" path="ext/jackson-databind-2.7.0.jar"/>
+	<classpathentry kind="lib" path="ext/bcpkix-jdk15on-167.jar"/>
+	<classpathentry kind="lib" path="ext/bcprov-jdk15on-167.jar"/>
 	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>

@@ -13,7 +13,7 @@ import java.util.Map;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -300,7 +300,7 @@ public class ResourceKey implements Closeable, Rollbackable
 					if (additionalOrgs != null) {
 						orgs.addAll(Arrays.asList(additionalOrgs));
 					}
-					Map.Entry<List<DERObjectIdentifier>, List<String>> additionalFields =
+					Map.Entry<List<ASN1ObjectIdentifier>, List<String>> additionalFields =
 						CertTool.constructCommonDnFields(epi.toString(), orgs, CNs, null); // uid
 					consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM, CertTool.createResourceCertChain(spec, additionalFields));
 				} catch (GeneralSecurityException gse) {
