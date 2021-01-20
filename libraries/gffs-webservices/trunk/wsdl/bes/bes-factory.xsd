@@ -77,6 +77,9 @@
 			<xsd:enumeration value="Failed"/>
 			<xsd:enumeration value="Finished"/>
 			<xsd:enumeration value="Frozen"/>
+			<xsd:enumeration value="Persisted"/>
+			<xsd:enumeration value="Persisting"/>
+			<xsd:enumeration value="Restarting"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	
@@ -137,11 +140,11 @@
 		</xsd:sequence>
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
-	
+
 	<xsd:complexType name="RestartActivityResponseType">
 		<xsd:sequence>
 			<xsd:element name="ActivityIdentifier" type="xsd:string"/>
-			<xsd:element name="Path" type="xsd:string"/>
+			<xsd:element name="Restarting" type="xsd:boolean"/>
 			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>

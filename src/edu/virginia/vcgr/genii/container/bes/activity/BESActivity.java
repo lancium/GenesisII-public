@@ -340,7 +340,7 @@ public class BESActivity implements Closeable
 		if (_persistRequested)
 			return;
 
-		updateState(true, false, true);
+		updateState(new ActivityState(ActivityStateEnumeration.Persisting, null));
 		if (_runner != null)
 			_runner.requestPersist();
 	}
@@ -361,7 +361,7 @@ public class BESActivity implements Closeable
 			return;
 
 		// TODO: Handle restart state
-		//updateState(false, true);
+		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
 		if (_runner != null)
 			_runner.requestRestart();
 	}
@@ -986,8 +986,10 @@ public class BESActivity implements Closeable
 					{
 						// 2020 August 20 by CCH
 						// if we want to persist, we need to stop phase execution.
-						if(_destroyRequested || _persistRequested)
+						if(_destroyRequested || _persistRequested) {
+							updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
 							return;
+						}
 					}
 					
 					try {

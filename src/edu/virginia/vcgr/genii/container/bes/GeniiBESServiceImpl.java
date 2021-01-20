@@ -718,8 +718,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				try {	
 					activity.persist();	
 				} catch (ExecutionException | SQLException e) {	
-					// TODO Auto-generated catch block	
-					e.printStackTrace();	
+					_logger.error("Exception when trying to persist activityid " + activityid + ": ", e);
 					success = false;	
 				}	
 			}	
@@ -765,7 +764,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{	
 		BES bes = BES.findBESForActivity(activityid);	
 		if (bes == null)	
-			return new RestartActivityResponseType("", "", null, null);	
+			return new RestartActivityResponseType(activityid, false, null, null);	
 		BESActivity activity = bes.findActivity(activityid);	
 		if (activity!=null)	
 			try {	
@@ -775,7 +774,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				e.printStackTrace();	
 			}	
 		// TODO: Change RestartActivityResponseType to take (activityid, true, null, null); 	
-		return new RestartActivityResponseType("", "", null, null);	
+		return new RestartActivityResponseType(activityid, true, null, null);	
 	}	
 
 	@Override	

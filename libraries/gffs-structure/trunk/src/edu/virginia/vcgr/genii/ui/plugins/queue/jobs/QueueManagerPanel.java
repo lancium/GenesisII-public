@@ -338,8 +338,8 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		popup.add(new JobResetAction(rows));
 		popup.addSeparator();
 		//LAK 18 Dec 2020: Temp disable persist and restart options in gui
-		/*popup.add(new JobPersistAction(rows));
-		popup.add(new JobRestartAction(rows));*/
+		popup.add(new JobPersistAction(rows));
+		popup.add(new JobRestartAction(rows));
 		popup.add(new JobFreezeAction(rows));
 		popup.add(new JobThawAction(rows));
 		popup.addSeparator();
