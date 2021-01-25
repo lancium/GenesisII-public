@@ -38,7 +38,7 @@ function singularity-run() {
 	# -B specifies a bind point within container
 	# -W specifies current working directory within container (working dir on start).
 	# -H specifies home directory within container .
-        singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp \
+        singularity checkpoint run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp \
                 $BASEDIR/$SUBREPO/$CONTAINERSDIR/$image.simg \
                 $@
 }

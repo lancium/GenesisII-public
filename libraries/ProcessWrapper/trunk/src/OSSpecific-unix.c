@@ -1017,7 +1017,7 @@ void persist()
 {
 	// 2020 Aug 04 by LAK: Added initial persist functionality
 	char cmd[256];
-	strcpy(cmd, "singularity checkpoint make instance://");
+	strcpy(cmd, "singularity checkpoint stop ");
 	strncat(cmd, strrchr(CL->getWorkingDirectory(CL), '/')+1, 215); //get directory name which is the instance name
 	system(cmd);
 	return;

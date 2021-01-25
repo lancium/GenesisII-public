@@ -205,11 +205,15 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 	reti = regexec(&regex, *argv, 0, NULL, 0);
 	if (!reti)
 	{
-		// OLD: should build equivalent of : singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
+		// OLD: should build equivalent of : singularity checkpoint job_run <container> <working dir> --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
 		
 		impl->_executable = createStringFromCopy("singularity");
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("run")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--nv")));
+
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("checkpoint")));
+
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("job_run")));
+
+		//impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--nv")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-c")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--ipc")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--pid")));
@@ -219,7 +223,21 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-H")));
 		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
+
 		
+		//the first argument is the name of the image (executable place), the second is the path to the image. We need to skip over the name and use the path instead.
+		argc--;
+		argv++;
+
+		//this is the image path
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(*argv)));
+
+		//we don't want to add the above argument again, so move the argument pointer forward
+		argc--;
+		argv++;
+		
+		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(strrchr(impl->_workingDirectory, '/')+1)));
+
 		// NEW: should build equivalent of : singularity checkpoint job_start --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $instance_name $@
 		
 		//this should be renabled for when using the checkpoint enabled singularity plugin
@@ -244,16 +262,6 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-H")));
 		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
 
-		//the first argument is the name of the image (executable place), the second is the path to the image. We need to skip over the name and use the path instead.
-		argc--;
-		argv++;
-
-		//this is the image path
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(*argv)));
-
-		//we don't want to add the above argument again, so move the argument pointer forward
-		argc--;
-		argv++;
 
 		//NEW: this is the job working directory (the instance name)
 		// ENABLE THIS FOR THE PERSIST WORK
