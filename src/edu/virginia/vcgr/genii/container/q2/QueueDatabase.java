@@ -921,6 +921,22 @@ public class QueueDatabase
 	}
 	
 	/**
+	 * Mark in the database information about a job that is now persisting.
+	 * 
+	 * @param connection
+	 *            The database connection to use.
+	 * @param jobID
+	 *            The database key of the job.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
+	public void markPersisting(Connection connection, long jobID) throws SQLException, ResourceException
+	{
+		changeOnlyState(connection, jobID, QueueStates.PERSISTING.name());
+	}
+	
+	/**
 	 * Mark in the database information that a job has changed state. This is currently only used for freeze and thaw.
 	 * 
 	 * @param connection

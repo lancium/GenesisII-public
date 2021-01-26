@@ -340,9 +340,22 @@ public class BESActivity implements Closeable
 		if (_persistRequested)
 			return;
 
+		updateState(_terminateRequested, _destroyRequested, true);
 		updateState(new ActivityState(ActivityStateEnumeration.Persisting, null));
 		if (_runner != null)
 			_runner.requestPersist();
+	}
+	
+	synchronized public void restart() throws ExecutionException, SQLException
+	{
+		if (!_persistRequested)
+			return;
+
+		// TODO: Handle restart state
+		updateState(_terminateRequested, _destroyRequested, false);
+		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
+		if (_runner != null)
+			_runner.requestRestart();
 	}
 	
 	synchronized public void freeze() throws ExecutionException, SQLException
@@ -353,17 +366,6 @@ public class BESActivity implements Closeable
 	synchronized public void thaw() throws ExecutionException, SQLException
 	{
 		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
-	}
-	
-	synchronized public void restart() throws ExecutionException, SQLException
-	{
-		if (!_persistRequested)
-			return;
-
-		// TODO: Handle restart state
-		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
-		if (_runner != null)
-			_runner.requestRestart();
 	}
 	
 	synchronized public void stopExecutionThread() throws ExecutionException, SQLException
@@ -987,7 +989,7 @@ public class BESActivity implements Closeable
 						// 2020 August 20 by CCH
 						// if we want to persist, we need to stop phase execution.
 						if(_destroyRequested || _persistRequested) {
-							updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
+							//updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
 							return;
 						}
 					}

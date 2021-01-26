@@ -712,17 +712,17 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			return new PersistActivityResponseType(activityid, false, null, null);	
 		String commandToSend = activityid + " persist";	
 		boolean success = bes.sendCommand(activityid, commandToSend);	
-		if (success) {	
-			BESActivity activity = bes.findActivity(activityid);	
-			if (activity!=null) {	
-				try {	
+		if (success) {
+			BESActivity activity = bes.findActivity(activityid);
+			if (activity!=null) {
+				try {
 					activity.persist();	
 				} catch (ExecutionException | SQLException e) {	
 					_logger.error("Exception when trying to persist activityid " + activityid + ": ", e);
 					success = false;	
-				}	
-			}	
-		}	
+				}
+			}
+		}
 		return new PersistActivityResponseType(activityid, success, null, null);	
 	}	
 
@@ -799,7 +799,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		String commandToSend = activityid + " freeze";	
 
 		Boolean success = bes.sendCommand(activityid, commandToSend);	
-		if (success) {	
+		if (success) {
 			BESActivity activity = bes.findActivity(activityid);	
 			if (activity!=null) {	
 				try {	

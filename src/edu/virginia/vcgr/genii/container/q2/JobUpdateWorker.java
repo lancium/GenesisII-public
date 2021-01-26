@@ -244,7 +244,10 @@ public class JobUpdateWorker implements OutcallHandler
 					} else if (state.isFinishedState()) {
 						/* If the job finished on the bes, finish it here */
 						_jobManager.finishJob(_jobInfo.getJobID());
-					} else if(state.getGeniiState().equals("Queued") && _data.getBesQueueTime() == -1){
+					} else if(state.isPersistingOrPersisted()) {
+						_data.setBesStartTime(Calendar.getInstance().getTimeInMillis());
+						history.info("Job persisted on the BES between " + _lastUpdate + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());
+					} else if(state.getGeniiState().equals("Queued") && _data.getBesQueueTime() == -1) {
 						_data.setBesQueueTime(Calendar.getInstance().getTimeInMillis());
 						history.info("Job is queued on the BES @ " + Calendar.getInstance().getTime() + " in millis " + _data.getBesQueueTime());
 					} else if(!state.getGeniiState().equals("Queued") && _data.getBesQueueTime() != -1 && _data.getBesStartTime() == -1){
@@ -257,8 +260,6 @@ public class JobUpdateWorker implements OutcallHandler
 						history.info("Job was queued and executing on the BES between " + _lastUpdate.toString() + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());
 						history.info("Approximate queue delay for the job was zero");
 					}
-
-
 
 					//_lastUpdate = Calendar.getInstance().getTime();
 				}

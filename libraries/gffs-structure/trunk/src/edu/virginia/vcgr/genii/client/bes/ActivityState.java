@@ -138,6 +138,11 @@ public class ActivityState implements Serializable, Cloneable
 	{
 		return _besState.equals(ActivityStateEnumeration._Finished);
 	}
+	
+	public boolean isPersistingOrPersisted()
+	{
+		return _besState.equals(ActivityStateEnumeration._Persisting) || _besState.equals(ActivityStateEnumeration._Persisted);
+	}
 
 	public boolean isIgnoreable()
 	{

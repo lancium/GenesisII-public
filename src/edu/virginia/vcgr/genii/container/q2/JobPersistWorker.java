@@ -10,6 +10,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.container.db.ServerDatabaseConnectionPool;
 
@@ -71,6 +72,8 @@ public class JobPersistWorker implements OutcallHandler {
 						if(_logger.isErrorEnabled())
 							_logger.error(String.format("Request to persist job responded with a failure: %s", _data));
 					}
+					else
+						_data.setJobState(QueueStates.PERSISTING);
 				}
 			}
 			catch (Throwable cause) 

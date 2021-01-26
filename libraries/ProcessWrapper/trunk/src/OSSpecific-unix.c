@@ -82,6 +82,11 @@ pid_t pid;
 int externalKill = 0;
 static pthread_t bes_conn_pthread;
 
+//2021 Jan 26 LAK: this is a mutex to keep us from exiting while in communication with the BES
+// 					was added to handle the persist case where the job exits due a command. We want to wait to exit the pwrapper
+//					until we are done responding to to the command to keep the BES state in sync.
+pthread_mutex_t message_lock;
+
 procInfo getProcInfo(){
 	char * line = NULL;
 	size_t len = 0;
@@ -170,6 +175,12 @@ int wrapJob(CommandLine *commandLine)
 	FuseMount *mount = NULL;
 	char **cmdLine;
 	CL=commandLine;
+
+	if (pthread_mutex_init(&message_lock, NULL) != 0)
+    {
+        fprintf(stderr, "Message mutex init failed\n");
+        return 1;
+    }
 
 	if (signal(SIGTERM, sig_handler) == SIG_ERR)
   		fprintf(stderr, "Can't catch SIGTERM\n");
@@ -290,12 +301,18 @@ int wrapJob(CommandLine *commandLine)
 
 	dumpStats(exitCode);
 
+	//LAK: We want to wait for current communications to finish before terminating (for example, we want to make sure that:
+	//		the persist/restart state is correct in the BES before exiting as a missed or incomplete exchange could be difficult to handle/recover from)
+	pthread_mutex_lock(&message_lock);
+
 	//LAK: 29 Dec 2020: Tell the BES through our communication channel that we are terminating
 	_tellBESWeAreTerminating();
 
-	pthread_cancel(bes_conn_pthread);
+	pthread_mutex_unlock(&message_lock);
 
+	pthread_cancel(bes_conn_pthread);
 	pthread_join(bes_conn_pthread, NULL);
+	pthread_mutex_destroy(&message_lock);
 
 	if (mount)
 		mount->unmount(mount);
@@ -775,6 +792,9 @@ void *_startBesListenerThread(void *arg)
 		int numread = read(connectfd, buffer, 256);
 		printf("bes_listener: got string %s\n", buffer);
 
+		//LAK: at this point, we have gotten a command, we should lock the message_lock
+		pthread_mutex_lock(&message_lock);
+
 		//check if freeze command
 		char command[256];
 		memset(&command, 0, 256);
@@ -811,6 +831,8 @@ void *_startBesListenerThread(void *arg)
 
 		printf("bes_listener: closing connection socket...\n");
     	close(connectfd);
+
+		pthread_mutex_unlock(&message_lock);
 	}
 	close(bes_listen_socket);
 
@@ -961,6 +983,9 @@ int sendBesMessage(const char* message)
 		return -1;
 	}
 
+	//LAK: We are about to communicate with the BES
+	pthread_mutex_lock(&message_lock);
+
 	char command[256];
 	memset(&command, 0, 256);
 	snprintf(command, 256, "%s %s\n", nonce, message);
@@ -982,6 +1007,8 @@ int sendBesMessage(const char* message)
 
 	close(bes_send_socket);
 	bes_send_socket = -1;
+
+	pthread_mutex_unlock(&message_lock);
 
 	return 0;
 }
