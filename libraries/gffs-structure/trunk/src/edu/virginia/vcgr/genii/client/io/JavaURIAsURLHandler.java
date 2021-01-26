@@ -82,7 +82,10 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 	{
 		try {
 			URL url = swizzleURICredentials(uri, credential).toURL();
-			return url.openConnection().getInputStream();
+			Process curl = Runtime.getRuntime().exec(new String[]{
+				"curl", url.toString()
+			});
+			return curl.getInputStream();
 		} catch (URISyntaxException use) {
 			throw new IOException("Unable to parse URI.", use);
 		}
@@ -92,19 +95,10 @@ public class JavaURIAsURLHandler extends AbstractURIHandler implements IURIHandl
 	{
 		try {
 			URL url = swizzleURICredentials(uri, credential).toURL();
-			if (_logger.isTraceEnabled())
-				_logger.trace("seeing an output url of: " + url);
-			URLConnection conn = url.openConnection();
-			if (conn instanceof HttpURLConnection) {
-				HttpURLConnection hconn = (HttpURLConnection) conn;
-				hconn.setDoOutput(true);
-				hconn.setRequestMethod("PUT");
-				_activeConns.put(uri, hconn);
-			} else {
-				conn.setDoOutput(true);
-			}
-			conn.connect();
-			return conn.getOutputStream();
+			Process curl = Runtime.getRuntime().exec(new String[]{
+				"curl", "-X", "PUT", url.toString()
+			});
+			return curl.getOutputStream();
 		} catch (URISyntaxException use) {
 			throw new IOException("Unable to parse URI.", use);
 		}
