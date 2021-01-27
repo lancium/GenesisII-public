@@ -21,13 +21,15 @@ public class JobFreezeWorker implements OutcallHandler {
 	private IJobEndpointResolver _jobEndpointResolver;
 	private ServerDatabaseConnectionPool _connectionPool;
 	private JobData _data;
+	private QueueDatabase _queueDatabase;
 	
-	public JobFreezeWorker(IBESPortTypeResolver clientStubResolver, IJobEndpointResolver jobEndpointResolver, ServerDatabaseConnectionPool connectionPool, JobData data)
+	public JobFreezeWorker(IBESPortTypeResolver clientStubResolver, IJobEndpointResolver jobEndpointResolver, ServerDatabaseConnectionPool connectionPool, JobData data, QueueDatabase queueDatabase)
 		{
 			_clientStubResolver = clientStubResolver;
 			_jobEndpointResolver = jobEndpointResolver;
 			_connectionPool = connectionPool;
 			_data = data;
+			_queueDatabase = queueDatabase;
 		}
 	
 	@Override
@@ -70,7 +72,11 @@ public class JobFreezeWorker implements OutcallHandler {
 						_logger.error(String.format("Request to freeze job responded with a failure: %s", _data));
 					}
 					else
+					{
+						_queueDatabase.markFrozen(connection, _data.getJobID());
+						connection.commit();
 						_data.setJobState(QueueStates.FROZEN);
+					}
 				}
 			}
 			catch (Throwable cause) 

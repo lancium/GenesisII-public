@@ -2033,10 +2033,7 @@ public class JobManager implements Closeable
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobFreezeWorker(resolver, resolver, _connectionPool, jobData));
-			
-			_database.markFrozen(connection, jobData.getJobID());
-			connection.commit();
+			_outcallThreadPool.enqueue(new JobFreezeWorker(resolver, resolver, _connectionPool, jobData, _database));
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -2074,11 +2071,8 @@ public class JobManager implements Closeable
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobThawWorker(resolver, resolver, _connectionPool, jobData));
-			
-			_database.markThaw(connection, jobData.getJobID());
-			connection.commit();
-		}
+			_outcallThreadPool.enqueue(new JobThawWorker(resolver, resolver, _connectionPool, jobData, _database));
+	}
 
 		_schedulingEvent.notifySchedulingEvent();
 		
