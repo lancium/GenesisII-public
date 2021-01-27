@@ -248,6 +248,10 @@ public class JobUpdateWorker implements OutcallHandler
 					else if(state.isPersisted()) {
 						_data.setBesStartTime(Calendar.getInstance().getTimeInMillis());
 						history.info("Job persisted on the BES between " + _lastUpdate + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());
+					} 
+					else if(state.isFrozen()) {
+						_data.setBesStartTime(Calendar.getInstance().getTimeInMillis());
+						history.info("Job frozen on the BES between " + _lastUpdate + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());
 					} else if(state.getGeniiState().equals("Queued") && _data.getBesQueueTime() == -1) {
 						_data.setBesQueueTime(Calendar.getInstance().getTimeInMillis());
 						history.info("Job is queued on the BES @ " + Calendar.getInstance().getTime() + " in millis " + _data.getBesQueueTime());

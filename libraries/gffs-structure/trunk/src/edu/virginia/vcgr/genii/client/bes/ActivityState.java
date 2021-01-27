@@ -143,6 +143,11 @@ public class ActivityState implements Serializable, Cloneable
 	{
 		return _besState.equals(ActivityStateEnumeration._Persisted);
 	}
+	
+	public boolean isFrozen()
+	{
+		return _besState.equals(ActivityStateEnumeration._Frozen);
+	}
 
 	public boolean isIgnoreable()
 	{
