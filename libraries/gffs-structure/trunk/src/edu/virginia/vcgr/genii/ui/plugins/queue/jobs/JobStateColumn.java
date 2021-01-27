@@ -36,7 +36,7 @@ class JobStateColumn extends AbstractRowTableColumnDefinition<JobInformation, Pa
 			}
 			else if (pair.first() == QueueStates.PERSISTED)
 			{	
-				super.setValue("PERSITED on " + host);
+				super.setValue("PERSISTED on " + host);
 				setForeground(Color.MAGENTA);
 			}
 			else if (host != null)
