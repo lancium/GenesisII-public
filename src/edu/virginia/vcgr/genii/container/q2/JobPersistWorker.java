@@ -23,13 +23,15 @@ public class JobPersistWorker implements OutcallHandler {
 	private IJobEndpointResolver _jobEndpointResolver;
 	private ServerDatabaseConnectionPool _connectionPool;
 	private JobData _data;
+	private QueueDatabase _queueDatabase;
 	
-	public JobPersistWorker(IBESPortTypeResolver clientStubResolver, IJobEndpointResolver jobEndpointResolver, ServerDatabaseConnectionPool connectionPool, JobData data)
+	public JobPersistWorker(IBESPortTypeResolver clientStubResolver, IJobEndpointResolver jobEndpointResolver, ServerDatabaseConnectionPool connectionPool, JobData data, QueueDatabase queueDatabase)
 		{
 			_clientStubResolver = clientStubResolver;
 			_jobEndpointResolver = jobEndpointResolver;
 			_connectionPool = connectionPool;
 			_data = data;
+			_queueDatabase = queueDatabase;
 		}
 	
 	@Override
@@ -67,13 +69,17 @@ public class JobPersistWorker implements OutcallHandler {
 				
 				for(PersistActivityResponseType pRes : persistResponses)
 				{
-					if(pRes.isPersisting() == false)
+					if(pRes.isPersisted() == false)
 					{
 						if(_logger.isErrorEnabled())
 							_logger.error(String.format("Request to persist job responded with a failure: %s", _data));
 					}
 					else
-						_data.setJobState(QueueStates.PERSISTING);
+					{
+						_queueDatabase.markPersisted(connection, _data.getJobID());
+						connection.commit();
+						_data.setJobState(QueueStates.PERSISTED);
+					}
 				}
 			}
 			catch (Throwable cause) 

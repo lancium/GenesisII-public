@@ -341,9 +341,9 @@ public class BESActivity implements Closeable
 			return;
 
 		updateState(_terminateRequested, _destroyRequested, true);
-		updateState(new ActivityState(ActivityStateEnumeration.Persisting, null));
+		updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
 		if (_runner != null)
-			_runner.requestPersist();
+			_runner.setExecutionToPersisted();
 	}
 	
 	synchronized public void restart() throws ExecutionException, SQLException
@@ -355,14 +355,18 @@ public class BESActivity implements Closeable
 		updateState(_terminateRequested, _destroyRequested, false);
 		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
 		if (_runner != null)
-			_runner.requestRestart();
+			_runner.setExecutionToRestart();
 	}
 	
+	//LAK: Freeze/thaw is a little special in that the BESActivity doesn't do anything, this is just to alert to Activity
+	// to the new state
 	synchronized public void freeze() throws ExecutionException, SQLException
 	{
 		updateState(new ActivityState(ActivityStateEnumeration.Frozen, null));
 	}
 	
+	//LAK: Freeze/thaw is a little special in that the BESActivity doesn't do anything, this is just to alert to Activity
+	// to the new state
 	synchronized public void thaw() throws ExecutionException, SQLException
 	{
 		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
@@ -528,6 +532,10 @@ public class BESActivity implements Closeable
 		if(_logger.isDebugEnabled())
 			_logger.debug("BESActivity has been notified by pwrapper that it is terminating");
 		_runner.notifiyPwrapperIsTerminating();
+	}
+	
+	synchronized public void notifyPersistedSuceeded() throws SQLException {
+		updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
 	}
 
 	private void execute(ExecutionPhase phase) throws Throwable
@@ -875,7 +883,9 @@ public class BESActivity implements Closeable
 		// 2020 August 20 by CCH
 		// requestPersist sets a boolean, _persisted to true
 		// During the execution loop, if _persisted is true, we won't proceed to the next phase.
-		public void requestPersist() throws ExecutionException
+		// 2021 Jan 26 LAK
+		// changed to setExecutionToPersisted to reflect that this is not handling anything outside of execution context
+		public void setExecutionToPersisted() throws ExecutionException
 		{
 			synchronized (_phaseLock) {
 				if (_persistRequested)
@@ -887,7 +897,7 @@ public class BESActivity implements Closeable
 		}
 		
 		//LAK: WIP, does not work. Meant to handle restarting a persisted job.
-		public void requestRestart() throws ExecutionException
+		public void setExecutionToRestart() throws ExecutionException
 		{
 			synchronized (_phaseLock) {
 				if (!_persistRequested)

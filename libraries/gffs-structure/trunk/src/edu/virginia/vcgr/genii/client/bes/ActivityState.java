@@ -70,7 +70,7 @@ public class ActivityState implements Serializable, Cloneable
 						_geniiState = eName.getLocalPart();
 				}
 			}
-
+			
 			ActivityStateEnumeration stateE = wireState.getState();
 			if (stateE == null) {
 				_besState = ActivityStateEnumeration._Failed;
@@ -138,10 +138,10 @@ public class ActivityState implements Serializable, Cloneable
 	{
 		return _besState.equals(ActivityStateEnumeration._Finished);
 	}
-	
-	public boolean isPersistingOrPersisted()
+		
+	public boolean isPersisted()
 	{
-		return _besState.equals(ActivityStateEnumeration._Persisting) || _besState.equals(ActivityStateEnumeration._Persisted);
+		return _besState.equals(ActivityStateEnumeration._Persisted);
 	}
 
 	public boolean isIgnoreable()

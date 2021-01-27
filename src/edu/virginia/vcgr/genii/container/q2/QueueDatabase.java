@@ -931,9 +931,9 @@ public class QueueDatabase
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	public void markPersisting(Connection connection, long jobID) throws SQLException, ResourceException
+	public void markPersisted(Connection connection, long jobID) throws SQLException, ResourceException
 	{
-		changeOnlyState(connection, jobID, QueueStates.PERSISTING.name());
+		changeOnlyState(connection, jobID, QueueStates.PERSISTED.name());
 	}
 	
 	/**

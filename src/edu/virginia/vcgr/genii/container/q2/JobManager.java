@@ -1599,6 +1599,7 @@ public class JobManager implements Closeable
 				System.out.println("##### Not Defined on " + job.jobName() + " for jobid " + jobID);
 				continue;
 			}
+			
 			ret.add(new JobInformationType(job.getJobTicket(), owners, JobStateEnumerationType.fromString(job.getJobState().name()),
 				(byte) job.getPriority(), QueueUtils.convert(job.getSubmitTime()), QueueUtils.convert(job.getStartTime()),
 				QueueUtils.convert(job.getFinishTime()), new UnsignedShort(job.getRunAttempts()), scheduledOn, job.getBESActivityStatus(),
@@ -1955,10 +1956,7 @@ public class JobManager implements Closeable
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobPersistWorker(resolver, resolver, _connectionPool, jobData));
-			
-			_database.markPersisting(connection, jobData.getJobID());
-			connection.commit();
+			_outcallThreadPool.enqueue(new JobPersistWorker(resolver, resolver, _connectionPool, jobData, _database));
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -1981,12 +1979,12 @@ public class JobManager implements Closeable
 			if (jobData == null)
 				throw new ResourceException("Job \"" + jobTicket + "\" does not exist.");
 
-//			if(jobData.getJobState() != QueueStates.PERSISTED)
-//			{
-//				if(_logger.isErrorEnabled())
-//					_logger.error(String.format("%s is not currently persisted, cannot restart.", jobData));
-//				continue;
-//			}
+			if(jobData.getJobState() != QueueStates.PERSISTED)
+			{
+				if(_logger.isErrorEnabled())
+					_logger.error(String.format("%s is not currently persisted, cannot restart.", jobData));
+				continue;
+			}
 			
 			HistoryContext history = jobData.history(HistoryEventCategory.Restarting);
 
@@ -1996,10 +1994,7 @@ public class JobManager implements Closeable
 			Resolver resolver = new Resolver();
 
 			/* Enqueue the worker into the outcall thread pool */
-			_outcallThreadPool.enqueue(new JobRestartWorker(resolver, resolver, _connectionPool, jobData));
-			
-			_database.markRunning(connection, jobData.getJobID(), jobData.getJobEPR());
-			connection.commit();
+			_outcallThreadPool.enqueue(new JobRestartWorker(resolver, resolver, _connectionPool, jobData, _database));
 		}
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -2175,7 +2170,6 @@ public class JobManager implements Closeable
 		long error = 0;
 		long requeued = 0;
 		long frozen = 0;
-		long persisting = 0;
 		long persisted = 0;
 
 		//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
@@ -2196,8 +2190,6 @@ public class JobManager implements Closeable
 					finished++;
 				else if (state == QueueStates.FROZEN)
 					frozen++;
-				else if (state == QueueStates.PERSISTING)
-					persisting++;
 				else if (state == QueueStates.PERSISTED)
 					persisted++;
 			}
@@ -2210,7 +2202,6 @@ public class JobManager implements Closeable
 		ret.put("Error", error);
 		ret.put("Finished", finished);
 		ret.put("Frozen", frozen);
-		ret.put("Persisting", persisting);
 		ret.put("Persisted", persisted);
 
 		return ret;
@@ -2647,10 +2638,10 @@ public class JobManager implements Closeable
 						return;
 					}
 					
-					if(data.getJobState() == QueueStates.PERSISTING || data.getJobState() == QueueStates.PERSISTED)
+					if(data.getJobState() == QueueStates.PERSISTED)
 					{
-						_logger.debug("Job Termination requested while PERSISTING or PERSISTED. Currently, you must restart the job to terminate");
-						data.history(HistoryEventCategory.Terminating).createInfoWriter("Termination Requested When Persisting/Persisted")
+						_logger.debug("Job Termination requested while PERSISTED. Currently, you must restart the job to terminate");
+						data.history(HistoryEventCategory.Terminating).createInfoWriter("Termination Requested When Persisted")
 						.format("Request to terminate job from outside the queue came while we are persisting or persisted; currently, this is not supported."
 								+ " You must restart the job before termination.").close();
 						return;

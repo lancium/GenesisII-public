@@ -39,7 +39,6 @@
 			<xsd:enumeration value="FINISHED"/>
 			<xsd:enumeration value="ERROR"/>
 			<xsd:enumeration value="FROZEN"/>
-			<xsd:enumeration value="PERSISTING"/>
 			<xsd:enumeration value="PERSISTED"/>
 		</xsd:restriction>
 	</xsd:simpleType>

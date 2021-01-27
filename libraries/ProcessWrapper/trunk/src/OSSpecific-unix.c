@@ -65,9 +65,9 @@ static const char* getOverloadedEnvironment(const char *variableName,
 int sendBesMessage(const char* message);
 int connectionSetup();
 int _tellBESWeAreTerminating();
-void freeze();
-void thaw();
-void persist();
+int freeze();
+int thaw();
+int persist();
 
 #ifndef PWRAP_macosx
 	static int verifyFuseDevice(char **errorMessage);
@@ -301,14 +301,8 @@ int wrapJob(CommandLine *commandLine)
 
 	dumpStats(exitCode);
 
-	//LAK: We want to wait for current communications to finish before terminating (for example, we want to make sure that:
-	//		the persist/restart state is correct in the BES before exiting as a missed or incomplete exchange could be difficult to handle/recover from)
-	pthread_mutex_lock(&message_lock);
-
 	//LAK: 29 Dec 2020: Tell the BES through our communication channel that we are terminating
 	_tellBESWeAreTerminating();
-
-	pthread_mutex_unlock(&message_lock);
 
 	pthread_cancel(bes_conn_pthread);
 	pthread_join(bes_conn_pthread, NULL);
@@ -795,6 +789,8 @@ void *_startBesListenerThread(void *arg)
 		//LAK: at this point, we have gotten a command, we should lock the message_lock
 		pthread_mutex_lock(&message_lock);
 
+		int operationExitCode = -1;
+
 		//check if freeze command
 		char command[256];
 		memset(&command, 0, 256);
@@ -803,7 +799,7 @@ void *_startBesListenerThread(void *arg)
 		{
 			//this is a freeze command
 			printf("this is a freeze command\n");
-			freeze();
+			operationExitCode = freeze();
 		}
 		//check if thaw command
 		memset(&command, 0, 256);
@@ -812,7 +808,7 @@ void *_startBesListenerThread(void *arg)
 		{
 			//this is a thaw command
 			printf("this is a thaw command\n");
-			thaw();
+			operationExitCode = thaw();
 		}
 		//check if persist command
 		memset(&command, 0, 256);
@@ -821,13 +817,22 @@ void *_startBesListenerThread(void *arg)
 		{
 			//this is a persist command
 			printf("this is a persist command\n");
-			persist();
+			operationExitCode = persist();
 		}
 
 		//clear buffer
 		memset(&command, 0, 256);
-		snprintf(command, 256, "%s OK\n", nonce);
-		write(connectfd, command, 256);
+
+		if(operationExitCode == 0)
+		{
+			snprintf(command, 256, "%s OK\n", nonce);
+			write(connectfd, command, 256);
+		}
+		else
+		{
+			snprintf(command, 256, "%s FAILED\n", nonce);
+			write(connectfd, command, 256);
+		}
 
 		printf("bes_listener: closing connection socket...\n");
     	close(connectfd);
@@ -1013,7 +1018,7 @@ int sendBesMessage(const char* message)
 	return 0;
 }
 
-void freeze()
+int freeze()
 {
 	// 2020-07-22 by JAA -- freeze process's cgroup
 	// should be set up at fork
@@ -1024,11 +1029,10 @@ void freeze()
 	sprintf(pidStr, "%d", pid);
 	// Call "freeze" program with the PID and create param.
 	strcat(freezeCMD, pidStr);
-	system(freezeCMD);
-	return;
+	return system(freezeCMD);
 }
 
-void thaw()
+int thaw()
 {
 	// 2020-07-22 by JAA -- thaws process's cgroup
 	// should be set up at fork
@@ -1036,16 +1040,14 @@ void thaw()
 	char pidStr[8]; 
 	sprintf(pidStr, "%d", pid);
 	strcat(freezeCMD, pidStr);
-	system(freezeCMD);
-	return;
+	return system(freezeCMD);
 }
 
-void persist()
+int persist()
 {
 	// 2020 Aug 04 by LAK: Added initial persist functionality
 	char cmd[256];
 	strcpy(cmd, "singularity checkpoint stop ");
 	strncat(cmd, strrchr(CL->getWorkingDirectory(CL), '/')+1, 215); //get directory name which is the instance name
-	system(cmd);
-	return;
+	return system(cmd);
 }
