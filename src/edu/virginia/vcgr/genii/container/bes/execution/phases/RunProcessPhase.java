@@ -199,12 +199,26 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 					if (_logger.isDebugEnabled())
 						_logger.debug(imagePath + " does not exist.");
 				}
+				
+				//LAK 2021 Jan 27: Handle the case where we are restarting from a checkpoint
+				if(activity.hasBeenRestartedFromCheckpoint())
+				{
+					if (_logger.isDebugEnabled())
+						_logger.debug("Handling restarting from checkpoint - adding -R flag to pwrapper arguments");
+					
+					//LAK: This is the restart flag that pwrapper will use to switch to restarting the job
+					command.add("-R");
+				}
+				
 				command.add(execName);
 				command.add(imagePath);
 			}
 			else {
+				//not an image executable
 				command.add(execName);
 			}
+			
+			
 			for (String arg : _arguments)
 				command.add(arg);
 			

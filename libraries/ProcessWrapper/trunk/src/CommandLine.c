@@ -17,6 +17,7 @@ static const char* getStandardErrorImpl(struct CommandLine*);
 static HashMap* getEnvironmentVariablesImpl(struct CommandLine*);
 static const char* getExecutableImpl(struct CommandLine*);
 static LinkedList* getArgumentsImpl(struct CommandLine*);
+static const int getIsRestartImpl(struct CommandLine*);
 
 typedef struct CommandLineImpl
 {
@@ -30,6 +31,9 @@ typedef struct CommandLineImpl
 	char *_standardInput;
 	char *_standardOutput;
 	char *_standardError;
+
+	//LAK 2021 Jan 27: Added the -R flag to specify that this job is a restart for a persisted job
+	int _isRestart;
 
 	HashMap *_environmentVariables;
 
@@ -56,6 +60,7 @@ CommandLine* createCommandLineFromArguments(int argc, char **argv)
 	ret->iface.getEnvironmentVariables = getEnvironmentVariablesImpl;
 	ret->iface.getExecutable = getExecutableImpl;
 	ret->iface.getArguments = getArgumentsImpl;
+	ret->iface.getIsRestart = getIsRestartImpl;
 
 	ret->_resourceUsageFile = NULL;
 	ret->_gridMountPoint = NULL;
@@ -67,6 +72,9 @@ CommandLine* createCommandLineFromArguments(int argc, char **argv)
 		defaultStringHashFunction, defaultStringEqualsFunction);
 	ret->_executable = NULL;
 	ret->_arguments = createLinkedList();
+	
+	//LAK: default to false
+	ret->_isRestart = 0;
 
 	if (parseCommandLine(ret, argc, argv))
 	{
@@ -155,6 +163,13 @@ LinkedList* getArgumentsImpl(struct CommandLine *ptr)
 	return impl->_arguments;
 }
 
+const int getIsRestartImpl(struct CommandLine *ptr)
+{
+	CommandLineImpl *impl = (CommandLineImpl*)ptr;
+
+	return impl->_isRestart;
+}
+
 int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 {
 	while (argc > 0)
@@ -176,6 +191,8 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 			impl->_standardOutput = createStringFromCopy(*argv + 2);
 		else if (startsWith(*argv, "-e"))
 			impl->_standardError = createStringFromCopy(*argv + 2);
+		else if (startsWith(*argv, "-R"))
+			impl->_isRestart = 1;
 		else
 			break;
 
@@ -207,65 +224,68 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 	{
 		// OLD: should build equivalent of : singularity checkpoint job_run <container> <working dir> --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
 		
-		impl->_executable = createStringFromCopy("singularity");
+		if(impl->_isRestart)
+		{
+			fprintf(stdout, "In restart switch!\n");
+			//We are restarting from a persisted job, we should get the image name from the CL and then restart
+			impl->_executable = createStringFromCopy("singularity");
 
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("checkpoint")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("checkpoint")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("job_restart")));
 
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("job_run")));
+			//the first argument is the name of the image (executable place), the second is the path to the image. We need to skip over the name and use the path instead.
+			argc--;
+			argv++;
 
-		//impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--nv")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-c")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--ipc")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--pid")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-B")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(".:/tmp")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-W")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-H")));
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
+			//this is the container image path
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(*argv)));
+
+			//we don't want to add the above argument again, so move the argument pointer forward
+			argc--;
+			argv++;
+
+			//add the directory name
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(strrchr(impl->_workingDirectory, '/')+1)));
+
+			//we now throw away all other arguments
+			argc = 0;
+		}
+		else
+		{
+			//This is NOT a restart, we need to start from scratch
+			// NEW: should build equivalent of : singularity checkpoint job_start --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $instance_name $@
+
+			impl->_executable = createStringFromCopy("singularity");
+
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("checkpoint")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("job_run")));
+
+			//impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--nv")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-c")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--ipc")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--pid")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-B")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(".:/tmp")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-W")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-H")));
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
 
 		
-		//the first argument is the name of the image (executable place), the second is the path to the image. We need to skip over the name and use the path instead.
-		argc--;
-		argv++;
+			//the first argument is the name of the image (executable place), the second is the path to the image. We need to skip over the name and use the path instead.
+			argc--;
+			argv++;
 
-		//this is the image path
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(*argv)));
+			//this is the container image path
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(*argv)));
 
-		//we don't want to add the above argument again, so move the argument pointer forward
-		argc--;
-		argv++;
-		
-		impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(strrchr(impl->_workingDirectory, '/')+1)));
+			//we don't want to add the above argument again, so move the argument pointer forward
+			argc--;
+			argv++;
 
-		// NEW: should build equivalent of : singularity checkpoint job_start --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $instance_name $@
-		
-		//this should be renabled for when using the checkpoint enabled singularity plugin
-		// should build equivalent of : singularity run --nv -c --ipc --pid -B .:/tmp -W /tmp -H /tmp $image $@
-		// impl->_executable = createStringFromCopy("singularity");
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("checkpoint")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("job_run")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--ipc")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--pid")));
-		// // impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--nv")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-c")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--ipc")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("--pid")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-B")));
-		// char bindings[1024];
-		// strcpy(bindings, ".:/tmp,");
-		// strncat(bindings, impl->_workingDirectory, 997);
-		// strcat(bindings, ":/.checkpoint/");
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(bindings)));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-W")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("-H")));
-		// impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy("/tmp")));
-
-
-		//NEW: this is the job working directory (the instance name)
-		// ENABLE THIS FOR THE PERSIST WORK
-		//impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(strrchr(impl->_workingDirectory, '/')+1))); //get just the last part of the path
+			//add the directory name
+			impl->_arguments->addLast(impl->_arguments, autorelease(createStringFromCopy(strrchr(impl->_workingDirectory, '/')+1)));
+		}
 	}
 	else if (reti == REG_NOMATCH) {
 		impl->_executable = createStringFromCopy(*argv);

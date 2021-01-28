@@ -81,6 +81,7 @@ public class BESActivity implements Closeable
 	//LAK 2020 Aug 18: This is set to true when the execution environment is fully setup before the phase is executed
 	private boolean _executionContextSet = false;
 	private String _lanciumEnvironment;
+	private boolean _hasBeenRestartedFromCheckpoint = false;
 
 
 	public BESActivity(ServerDatabaseConnectionPool connectionPool, BES bes, String activityid, ActivityState state,
@@ -143,6 +144,11 @@ public class BESActivity implements Closeable
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);
 		}
+	}
+	
+	//LAK 2021 Jan 27: Has this activity been restarted from a checkpoint?
+	public boolean hasBeenRestartedFromCheckpoint() {
+		return _hasBeenRestartedFromCheckpoint;
 	}
 
 	public String getActivityID()
@@ -354,8 +360,11 @@ public class BESActivity implements Closeable
 		// TODO: Handle restart state
 		updateState(_terminateRequested, _destroyRequested, false);
 		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
-		if (_runner != null)
-			_runner.setExecutionToRestart();
+		
+		//setup state for runner thread
+		_nextPhase = _nextPhase - 1;
+		_hasBeenRestartedFromCheckpoint = true;
+		startRunner();
 	}
 	
 	//LAK: Freeze/thaw is a little special in that the BESActivity doesn't do anything, this is just to alert to Activity
@@ -896,25 +905,27 @@ public class BESActivity implements Closeable
 			}
 		}
 		
-		//LAK: WIP, does not work. Meant to handle restarting a persisted job.
-		public void setExecutionToRestart() throws ExecutionException
-		{
-			synchronized (_phaseLock) {
-				if (!_persistRequested)
-					return;
-
-				_persistRequested = false;
-				_terminateRequested = false;
-				
-				ExecutionPhase currentPhase = _runner._currentPhase;
-				
-				if (currentPhase instanceof AbstractRunProcessPhase) {
-					_executionPlan.insertElementAt(currentPhase, _nextPhase);
-				}
-				
-				startRunner();
-			}
-		}
+//		//LAK: WIP, does not work. Meant to handle restarting a persisted job.
+//		public void setExecutionToRestart() throws ExecutionException
+//		{
+//			synchronized (_phaseLock) {
+//				if (!_persistRequested)
+//					return;
+//
+//				_persistRequested = false;
+//				_terminateRequested = false;
+//				
+//				ExecutionPhase currentPhase = _runner._currentPhase;
+//				
+//				if (currentPhase instanceof AbstractRunProcessPhase) {
+//					_executionPlan.insertElementAt(currentPhase, _nextPhase);
+//				}
+//				else
+//					_logger.error("Trying to restart a job but the execution plan is not currently an AbstractRunProcessPhase - we don't know where we are in the excution plan!");
+//				
+//				startRunner();
+//			}
+//		}
 		
 		//LAK: 31 Dec 2020 This handles informing the execution environment that the pwrapper is terminating
 		public void notifiyPwrapperIsTerminating()

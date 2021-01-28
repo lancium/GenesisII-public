@@ -34,8 +34,6 @@
 	#define UNMOUNT_BINARY_NAME "fusermount"
 #endif
 
-#define VM_DEV_ENVIRONMENT 0
-
 // 2020-07-23 by JAA -- just a quick struct for the CPU info
 // This is currently designed around Intel processors.
 // AMD CPUs may not provide GHz, so changes will be necessary
@@ -161,14 +159,6 @@ void sig_handler(int signo)
 
 int wrapJob(CommandLine *commandLine)
 {
-	#if VM_DEV_ENVIRONMENT
-		int errorfd = open("/home/dev/pwrapper_error.txt", O_WRONLY|O_CREAT, 0666);
-		dup2(errorfd, STDERR_FILENO);
-
-		int stdoutfd = open("/home/dev/pwrapper_out.txt", O_WRONLY|O_CREAT, 0666);
-		dup2(stdoutfd, STDOUT_FILENO);
-	#endif
-
 	int exitCode;
 
 	FuseMounter *mounter = NULL;
@@ -232,6 +222,8 @@ int wrapJob(CommandLine *commandLine)
 		if (!mount)
 			return -1;
 	}
+
+	fprintf(stdout, "is restarting? %d\n", commandLine->getIsRestart(commandLine));
 
 	// //LAK: Start up BES communication
 	connectionSetup();

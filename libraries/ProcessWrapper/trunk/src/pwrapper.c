@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define VM_DEV_ENVIRONMENT 1
+
+#if VM_DEV_ENVIRONMENT
+	#include <fcntl.h>
+#endif
+
 #include "Memory.h"
 #include "StringFunctions.h"
 #include "CommandLine.h"
@@ -12,6 +18,14 @@ static void usage(const char *program);
 
 int main(int argc, char **argv)
 {
+	#if VM_DEV_ENVIRONMENT
+		int errorfd = open("/home/dev/pwrapper_error.txt", O_WRONLY|O_CREAT, 0666);
+		dup2(errorfd, STDERR_FILENO);
+
+		int stdoutfd = open("/home/dev/pwrapper_out.txt", O_WRONLY|O_CREAT, 0666);
+		dup2(stdoutfd, STDOUT_FILENO);
+	#endif
+
 	AutoreleasePool pool;
 	CommandLine *commandLine;
 	int exitCode;
@@ -68,6 +82,7 @@ void usage(const char *program)
 		"standard out is placed.\n");
 	fprintf(stderr, "        -e<error-file> the path to a file into which "
 		"standard error is placed.\n");
+	fprintf(stderr, "        -R Is a restart from persist job.\n");
 
 	exit(-1);
 }

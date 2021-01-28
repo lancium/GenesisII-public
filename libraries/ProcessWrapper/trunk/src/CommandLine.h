@@ -20,6 +20,7 @@ typedef struct CommandLine
 
 	const char* (*getExecutable)(struct CommandLine*);
 	LinkedList* (*getArguments)(struct CommandLine*);
+	const int (*getIsRestart)(struct CommandLine*);
 } CommandLine;
 
 CommandLine* createCommandLineFromArguments(int argc, char **argv);

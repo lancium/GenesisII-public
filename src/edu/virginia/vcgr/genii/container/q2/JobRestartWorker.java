@@ -4,9 +4,9 @@ import java.sql.Connection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.bes.factory.GetStatePathResponseType;
-import org.ggf.bes.factory.GetStatePathsType;
-import org.ggf.bes.factory.PersistActivityResponseType;
+//import org.ggf.bes.factory.GetStatePathResponseType;
+//import org.ggf.bes.factory.GetStatePathsType;
+//import org.ggf.bes.factory.PersistActivityResponseType;
 import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.RestartActivityResponseType;
 import org.ws.addressing.EndpointReferenceType;
@@ -64,23 +64,25 @@ public class JobRestartWorker implements OutcallHandler {
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Making grid outcall to restart job %s", _data));
 				
-				GetStatePathResponseType[] getStatePathResponses;
+//				GetStatePathResponseType[] getStatePathResponses;
 				
-				// call the BES container to get the location the job's persisted data is stored
-				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
-				String epi = aps.getResourceKey();
-				getStatePathResponses = clientStub.getStatePaths(new GetStatePathsType(new String[]{epi}, null)).getResponse();
-				
-				if(getStatePathResponses.length != 1)
-				{
-					if(_logger.isErrorEnabled())
-						_logger.error(String.format("GetStatePath returned an invalid number of responses for JobRestartWorker: %s", _data));
-				}
-				
-				GetStatePathResponseType stateRes = getStatePathResponses[0];
+//				// call the BES container to get the location the job's persisted data is stored
+//				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
+//				String epi = aps.getResourceKey();
+//				getStatePathResponses = clientStub.getStatePaths(new GetStatePathsType(new String[]{epi}, null)).getResponse();
+//				
+//				if(getStatePathResponses.length != 1)
+//				{
+//					if(_logger.isErrorEnabled())
+//						_logger.error(String.format("GetStatePath returned an invalid number of responses for JobRestartWorker: %s", _data));
+//				}
+//				
+//				GetStatePathResponseType stateRes = getStatePathResponses[0];
 				
 				/* call the BES container to start restarting the job. */
-				RestartActivityResponseType[] restartResponses = clientStub.restartActivities(new RestartActivitiesType(new String[] {stateRes.getPath()}, null)).getResponse();
+				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
+				String epi = aps.getResourceKey();
+				RestartActivityResponseType[] restartResponses = clientStub.restartActivities(new RestartActivitiesType(new String[] {epi}, null)).getResponse();
 				
 				for(RestartActivityResponseType pRes : restartResponses)
 				{

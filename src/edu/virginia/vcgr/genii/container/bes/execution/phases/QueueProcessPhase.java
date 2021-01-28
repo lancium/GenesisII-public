@@ -237,10 +237,12 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 
 				// End of updates 2020-04-18
 				
-				// CCH 2020 October 14
 				String execName = _executable.getAbsolutePath();
 				Vector<String> args = new Vector<String>(_arguments);
-				if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2")) {
+				
+				// CCH 2020 October 14
+				if (execName.endsWith(".simg") || execName.endsWith(".sif") || execName.endsWith(".qcow2"))
+				{			
 					if (_logger.isDebugEnabled())
 						_logger.debug("Handling image executable (.simg or .qcow2): " + execName);
 					String[] execNameArray = execName.split("/");
@@ -300,10 +302,20 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 						if (_logger.isDebugEnabled())
 							_logger.debug(fullPath + " does not exist.");
 					}
+					
 					args.add(0, imagePath);
+					
+					//LAK 2021 Jan 27: Handle the case where we are restarting from a checkpoint
+					if(activity.hasBeenRestartedFromCheckpoint())
+					{
+						if (_logger.isDebugEnabled())
+							_logger.debug("Handling restarting from checkpoint - adding -R flag to pwrapper arguments");
+						
+						//LAK: This is the restart flag that pwrapper will use to switch to restarting the job
+						args.add("-R");
+					}
 				}
 				// End of "if qcow2 or singularity
-
 
 				preDelay();
 				stderrPath = fileToPath(_stderr, null);

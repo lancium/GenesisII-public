@@ -36,9 +36,9 @@ import org.ggf.bes.factory.GetActivityStatusesResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
-import org.ggf.bes.factory.GetStatePathResponseType;
-import org.ggf.bes.factory.GetStatePathsResponseType;
-import org.ggf.bes.factory.GetStatePathsType;
+//import org.ggf.bes.factory.GetStatePathResponseType;
+//import org.ggf.bes.factory.GetStatePathsResponseType;
+//import org.ggf.bes.factory.GetStatePathsType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
@@ -726,25 +726,25 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 		return new PersistActivityResponseType(activityid, success, null, null);	
 	}	
 
-	@Override	
-	@RWXMapping(RWXCategory.EXECUTE)	
-	public GetStatePathsResponseType getStatePaths(GetStatePathsType parameters)	
-		throws RemoteException, UnknownActivityIdentifierFaultType	
-	{	
-		_logger.debug("getStatePaths called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");	
-		Collection<GetStatePathResponseType> responses = new LinkedList<GetStatePathResponseType>();	
-
-		for (String epi : parameters.getActivityIdentifier()) {	
-			responses.add(getStatePath(epi));	
-		}	
-
-		return new GetStatePathsResponseType(responses.toArray(new GetStatePathResponseType[0]), null);	
-	}	
-
-	static public GetStatePathResponseType getStatePath(String epi) throws RemoteException	
-	{	
-		return new GetStatePathResponseType("", "", null, null);	
-	}	
+//	@Override	
+//	@RWXMapping(RWXCategory.EXECUTE)	
+//	public GetStatePathsResponseType getStatePaths(GetStatePathsType parameters)	
+//		throws RemoteException, UnknownActivityIdentifierFaultType	
+//	{	
+//		_logger.debug("getStatePaths called on GeniiBESServiceImpl. This is currently not supported. Ignoring request.");	
+//		Collection<GetStatePathResponseType> responses = new LinkedList<GetStatePathResponseType>();	
+//
+//		for (String epi : parameters.getActivityIdentifier()) {	
+//			responses.add(getStatePath(epi));	
+//		}	
+//
+//		return new GetStatePathsResponseType(responses.toArray(new GetStatePathResponseType[0]), null);	
+//	}	
+//
+//	static public GetStatePathResponseType getStatePath(String epi) throws RemoteException	
+//	{	
+//		return new GetStatePathResponseType("", "", null, null);	
+//	}	
 
 	@Override	
 	@RWXMapping(RWXCategory.EXECUTE)	
@@ -753,8 +753,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{	
 		Collection<RestartActivityResponseType> responses = new LinkedList<RestartActivityResponseType>();	
 
-		for (String path : parameters.getPath()) {	
-			responses.add(restartActivity(path));	
+		for (String epi : parameters.getActivityIdentifier()) {	
+			responses.add(restartActivity(epi));
 		}	
 
 		return new RestartActivitiesResponseType(responses.toArray(new RestartActivityResponseType[0]), null);	
@@ -762,12 +762,12 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	static public RestartActivityResponseType restartActivity(String activityid) throws RemoteException	
 	{	
-		BES bes = BES.findBESForActivity(activityid);	
+		BES bes = BES.findBESForActivity(activityid);
 		if (bes == null)	
 			return new RestartActivityResponseType(activityid, false, null, null);	
 		BESActivity activity = bes.findActivity(activityid);	
 		if (activity!=null)	
-			try {	
+			try {
 				activity.restart();	
 			} catch (ExecutionException | SQLException e) {	
 				// TODO Auto-generated catch block	
