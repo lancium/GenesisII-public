@@ -4,9 +4,6 @@ import java.sql.Connection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.ggf.bes.factory.GetStatePathResponseType;
-//import org.ggf.bes.factory.GetStatePathsType;
-//import org.ggf.bes.factory.PersistActivityResponseType;
 import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.RestartActivityResponseType;
 import org.ws.addressing.EndpointReferenceType;
@@ -64,21 +61,6 @@ public class JobRestartWorker implements OutcallHandler {
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Making grid outcall to restart job %s", _data));
 				
-//				GetStatePathResponseType[] getStatePathResponses;
-				
-//				// call the BES container to get the location the job's persisted data is stored
-//				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
-//				String epi = aps.getResourceKey();
-//				getStatePathResponses = clientStub.getStatePaths(new GetStatePathsType(new String[]{epi}, null)).getResponse();
-//				
-//				if(getStatePathResponses.length != 1)
-//				{
-//					if(_logger.isErrorEnabled())
-//						_logger.error(String.format("GetStatePath returned an invalid number of responses for JobRestartWorker: %s", _data));
-//				}
-//				
-//				GetStatePathResponseType stateRes = getStatePathResponses[0];
-				
 				/* call the BES container to start restarting the job. */
 				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
 				String epi = aps.getResourceKey();
@@ -93,7 +75,7 @@ public class JobRestartWorker implements OutcallHandler {
 					}
 					else
 					{
-						_queueDatabase.markRunning(connection, _data.getJobID(), _data.getJobEPR());
+						_queueDatabase.markRunning(connection, _data.getJobID(), _queueDatabase.getJobStatusInformation(connection, _data.getJobID()).getJobEndpoint());
 						connection.commit();
 						_data.setJobState(QueueStates.RUNNING);
 					}

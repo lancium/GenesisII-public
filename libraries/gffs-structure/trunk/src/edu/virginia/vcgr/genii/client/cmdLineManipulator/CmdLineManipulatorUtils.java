@@ -42,6 +42,11 @@ public class CmdLineManipulatorUtils
 			jobProperties.put(CmdLineManipulatorConstants.THREADS_PER_PROCESS, threadsPerProcess);
 		}
 	}
+	
+	static public void addPersistProperties(Map<String, Object> jobProperties, boolean isRestartFromPersist)
+	{
+		jobProperties.put(CmdLineManipulatorConstants.IS_RESTART_FROM_PERSIST, isRestartFromPersist);
+	}
 
 	static public void addEnvProperties(Map<String, Object> jobProperties, File fuseMountPoint, Map<String, String> environment,
 		File workingDirectory, File stdinRedirect, File stdoutRedirect, File stderrRedirect, File resourceUsagePath, File pathToWrapper)
@@ -56,7 +61,6 @@ public class CmdLineManipulatorUtils
 		jobProperties.put(CmdLineManipulatorConstants.STDERR_REDIRECT, stderrRedirect);
 		jobProperties.put(CmdLineManipulatorConstants.RESOURCE_USAGE, resourceUsagePath);
 		jobProperties.put(CmdLineManipulatorConstants.WRAPPER_PATH, pathToWrapper);
-		return;
 	}
 
 	static public List<String> callCmdLineManipulators(Map<String, Object> jobProperties,

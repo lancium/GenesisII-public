@@ -139,23 +139,6 @@
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
 			</xsd:complexType>
 			
-<!-- 			<xsd:complexType name="GetStatePathsType"> -->
-<!-- 				<xsd:sequence> -->
-<!-- 					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/> -->
-<!-- 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/> -->
-<!-- 				</xsd:sequence> -->
-<!-- 				<xsd:anyAttribute namespace="##other" processContents="lax"/> -->
-<!-- 			</xsd:complexType> -->
-			
-<!-- 			<xsd:complexType name="GetStatePathsResponseType"> -->
-<!-- 				<xsd:sequence> -->
-<!-- 					<xsd:element name="Response" type="bes-factory:GetStatePathResponseType" -->
-<!-- 						minOccurs="0" maxOccurs="unbounded"/> -->
-<!-- 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/> -->
-<!-- 				</xsd:sequence> -->
-<!-- 				<xsd:anyAttribute namespace="##other" processContents="lax"/> -->
-<!-- 			</xsd:complexType> -->
-			
 			<xsd:complexType name="RestartActivitiesType">
 				<xsd:sequence>
 					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -296,11 +279,6 @@
 			<xsd:element name="PersistActivitiesResponse"
 				type="bes-factory:PersistActivitiesResponseType"/>
 
-<!-- 			<xsd:element name="GetStatePaths" -->
-<!-- 				type="bes-factory:GetStatePathsType"/> -->
-<!-- 			<xsd:element name="GetStatePathsResponse" -->
-<!-- 				type="bes-factory:GetStatePathsResponseType"/> -->
-				
 			<xsd:element name="RestartActivities"
 				type="bes-factory:RestartActivitiesType"/>
 			<xsd:element name="RestartActivitiesResponse"
@@ -315,7 +293,6 @@
 				type="bes-factory:ThawActivitiesType"/>
 			<xsd:element name="ThawActivitiesResponse"
 				type="bes-factory:ThawActivitiesResponseType"/>
-				
 				
 			<!-- Fault Elements -->
 			<xsd:element name="NotAuthorizedFault"
@@ -403,12 +380,6 @@
 	<wsdl:message name="PersistActivitiesResponse">
 		<wsdl:part name="parameters" element="bes-factory:PersistActivitiesResponse"></wsdl:part>
 	</wsdl:message>
-<!-- 	<wsdl:message name="GetStatePathsRequest"> -->
-<!-- 		<wsdl:part name="parameters" element="bes-factory:GetStatePaths"></wsdl:part> -->
-<!-- 	</wsdl:message> -->
-<!-- 	<wsdl:message name="GetStatePathsResponse"> -->
-<!-- 		<wsdl:part name="parameters" element="bes-factory:GetStatePathsResponse"></wsdl:part> -->
-<!-- 	</wsdl:message> -->
 	<wsdl:message name="RestartActivitiesRequest">
 		<wsdl:part name="parameters" element="bes-factory:RestartActivities"></wsdl:part>
 	</wsdl:message>
@@ -579,21 +550,6 @@
 				message="bes-factory:UnknownActivityIdentifierFault"
 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
 		</wsdl:operation>
-        
-<!--         <wsdl:operation name="GetStatePaths"> -->
-<!-- 			<wsdl:input -->
-<!-- 				name="GetStatePaths" -->
-<!-- 				message="bes-factory:GetStatePathsRequest" -->
-<!-- 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetStatePaths"/> -->
-<!-- 			<wsdl:output -->
-<!-- 				name="GetStatePathsResponse" -->
-<!-- 				message="bes-factory:GetStatePathsResponse" -->
-<!-- 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetStatePathsResponse"/> -->
-<!-- 			<wsdl:fault -->
-<!-- 				name="UnknownActivityIdentifierFault" -->
-<!-- 				message="bes-factory:UnknownActivityIdentifierFault" -->
-<!-- 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/> -->
-<!-- 		</wsdl:operation> -->
         
         <wsdl:operation name="RestartActivities">
 			<wsdl:input

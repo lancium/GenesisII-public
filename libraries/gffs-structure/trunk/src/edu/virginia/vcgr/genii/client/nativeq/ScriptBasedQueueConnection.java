@@ -266,6 +266,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				application.getResourceUsagePath(), wrapper.getPathToWrapper());
 			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, application.getSPMDVariation(), application.getNumProcesses(),
 				application.getNumProcessesPerHost(), application.getThreadsPerProcess());
+			CmdLineManipulatorUtils.addPersistProperties(jobProperties, application.getIsRestartFromPersist());
 
 			/* ASG 10-20-2018. Adding code to take care of MODULES
 			 	Get the environment strings; check for "MODULES_TO_LOAD".

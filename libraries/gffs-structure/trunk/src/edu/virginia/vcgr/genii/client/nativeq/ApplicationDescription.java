@@ -24,10 +24,11 @@ public class ApplicationDescription
 	private String _stderrRedirect;
 	private ResourceConstraints _resourceConstraints;
 	private File _resourceUsagePath;
+	private boolean _isRestartFromPersist;
 
 	public ApplicationDescription(File fuseMountPoint, URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		Integer threadsPerProcess, String executableName, Collection<String> arguments, Map<String, String> environment, String stdinRedirect,
-		String stdoutRedirect, String stderrRedirect, ResourceConstraints resourceConstraints, File resourceUsagePath)
+		String stdoutRedirect, String stderrRedirect, ResourceConstraints resourceConstraints, File resourceUsagePath, boolean isRestartFromPersist)
 	{
 		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
@@ -52,6 +53,9 @@ public class ApplicationDescription
 
 		_resourceConstraints = resourceConstraints;
 		_resourceUsagePath = resourceUsagePath;
+		
+		//LAK 2021 Jan 29
+		_isRestartFromPersist = isRestartFromPersist;
 	}
 
 	public URI getSPMDVariation()
@@ -153,5 +157,10 @@ public class ApplicationDescription
 	public File getResourceUsagePath()
 	{
 		return _resourceUsagePath;
+	}
+	
+	public boolean getIsRestartFromPersist()
+	{
+		return _isRestartFromPersist;
 	}
 }

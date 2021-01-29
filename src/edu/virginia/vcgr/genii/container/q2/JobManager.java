@@ -310,6 +310,7 @@ public class JobManager implements Closeable
 					putInUserBucket(_usersWithJobs, job, username);
 				} else if (jobState.equals(QueueStates.RUNNING) || job.getBESID() != null) {
 					// New by ASG, 2017-08-02
+					//LAK: This is the only time that JobData.EPR is actually set???
 					JobStatusInformation info = _database.getJobStatusInformation(connection, job.getJobID());
 					job.setJobEPR(info.getJobEndpoint());
 					// End new stuff
@@ -955,8 +956,8 @@ public class JobManager implements Closeable
 	public EndpointReferenceType getActivityEPR(Connection connection, String jobTicket) throws ResourceException, SQLException
 	{
 		JobData jData = _jobsByTicket.get(jobTicket);
-		// REMOVEJobStatusInformation info = _database.getJobStatusInformation(connection, jData.getJobID());
-		// REMOVE return info.getJobEndpoint();
+		//JobStatusInformation info = _database.getJobStatusInformation(connection, jData.getJobID());
+		//return info.getJobEndpoint();
 		return jData.getJobEPR();
 	}
 
@@ -1356,13 +1357,11 @@ public class JobManager implements Closeable
 	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection, String[] jobs)
 		throws GenesisIISecurityException, ResourceException, SQLException
 	{
-		_logger.debug("Entering jobManager::getIterableJobStatus new");
 		if (connection == null)
 			throw new ResourceException("Unable to query job status");
 
 		if (jobs == null || jobs.length == 0) {
 			QueueInMemoryIteratorEntry temp=getIterableJobStatus(connection);
-			_logger.debug("Exiting jobManager::getIterableJobStatus");
 			return temp;
 		}
 
@@ -1526,7 +1525,7 @@ public class JobManager implements Closeable
 		Iterator<Long> it;
 		if (connection == null)
 			throw new ResourceException("Unable to query job status");
-		_logger.debug("Entering jobManager::getIterableStatus-2");
+
 		boolean isAdmin = QueueSecurity.isQueueAdmin();
 		Collection<Long> batchSubset = new ArrayList<Long>(_jobsByID.size() + 1);
 
@@ -1611,7 +1610,7 @@ public class JobManager implements Closeable
 				toIterate.add(thisBatch.next().toString());
 			}
 		}
-		_logger.debug("Exiting jobManager::getIterableStatus-2");
+
 		if (toIterate.size() == 0) // no iterator
 			return new QueueInMemoryIteratorEntry(false, ret, toIterate);
 

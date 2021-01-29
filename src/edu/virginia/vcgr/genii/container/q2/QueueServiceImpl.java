@@ -30,8 +30,6 @@ import org.ggf.bes.factory.GetActivityStatusesResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
-//import org.ggf.bes.factory.GetStatePathsResponseType;
-//import org.ggf.bes.factory.GetStatePathsType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
@@ -755,15 +753,6 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
 		return null;
 	}
-	
-//	@Override
-//	@RWXMapping(RWXCategory.EXECUTE)
-//	public GetStatePathsResponseType getStatePaths(GetStatePathsType parameters)
-//		throws RemoteException, UnknownActivityIdentifierFaultType
-//	{
-//		_logger.debug("persistActivities called on QueueServiceImpl. This is currently not supported. Ignoring request.");
-//		return null;
-//	}
 	
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)

@@ -304,16 +304,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 					}
 					
 					args.add(0, imagePath);
-					
-					//LAK 2021 Jan 27: Handle the case where we are restarting from a checkpoint
-					if(activity.hasBeenRestartedFromCheckpoint())
-					{
-						if (_logger.isDebugEnabled())
-							_logger.debug("Handling restarting from checkpoint - adding -R flag to pwrapper arguments");
-						
-						//LAK: This is the restart flag that pwrapper will use to switch to restarting the job
-						args.add("-R");
-					}
 				}
 				// End of "if qcow2 or singularity
 
@@ -332,7 +322,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase implements Termin
 			*/
 				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint, _spmdVariation, _numProcesses, _numProcessesPerHost,
 						_threadsPerProcess, execName, args, _environment, fileToPath(_stdin, null),
-						fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile));
+						fileToPath(_stdout, null), stderrPath, _resourceConstraints, resourceUsageFile, activity.hasBeenRestartedFromCheckpoint()));
 
 				_logger.info(String.format("Queue submitted job '%s' for userID '%s' using command line:\n\t%s", _jobToken, userName,
 						_jobToken.getCmdLine()));

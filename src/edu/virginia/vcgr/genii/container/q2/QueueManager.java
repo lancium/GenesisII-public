@@ -499,11 +499,9 @@ public class QueueManager implements Closeable
 	public QueueInMemoryIteratorEntry getIterableJobStatus(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
-		_logger.debug("Entering QManager::getIterableJobStatus");
 		try {
 			connection = _connectionPool.acquire(true);
 			QueueInMemoryIteratorEntry temp=_jobManager.getIterableJobStatus(connection, jobs);
-			_logger.debug("Exiting QManager::getIterableJobStatus");
 			return temp;
 		} finally {
 			_connectionPool.release(connection);

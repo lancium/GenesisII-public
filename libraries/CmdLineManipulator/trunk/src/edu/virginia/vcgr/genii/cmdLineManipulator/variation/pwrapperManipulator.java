@@ -114,6 +114,10 @@ public class pwrapperManipulator extends AbstractCmdLineManipulator<PwrapperVari
 		File stderrRedirect = jobStderrRedirect(jobProperties);
 		if (stderrRedirect != null)
 			newArgs.add(String.format("-e%s", stderrRedirect.getAbsolutePath()));
+		
+		//LAK 2021 Jan 29
+		boolean isRestartFromPersist = isRestartFromPersist(jobProperties);
+		newArgs.add(String.format("-R%b", isRestartFromPersist));
 
 		// add job executable to args
 		newArgs.add(jobExectuable(jobProperties));
@@ -169,6 +173,12 @@ public class pwrapperManipulator extends AbstractCmdLineManipulator<PwrapperVari
 	private File jobWrapperPath(Map<String, Object> jobProperties)
 	{
 		return (File) jobProperties.get(CmdLineManipulatorConstants.WRAPPER_PATH);
+	}
+	
+	//LAK: 2021 Jan 29
+	private boolean isRestartFromPersist(Map<String, Object> jobProperties)
+	{
+		return (boolean) jobProperties.get(CmdLineManipulatorConstants.IS_RESTART_FROM_PERSIST);
 	}
 
 }

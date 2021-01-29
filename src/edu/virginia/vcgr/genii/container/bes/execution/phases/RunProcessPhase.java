@@ -200,16 +200,6 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 						_logger.debug(imagePath + " does not exist.");
 				}
 				
-				//LAK 2021 Jan 27: Handle the case where we are restarting from a checkpoint
-				if(activity.hasBeenRestartedFromCheckpoint())
-				{
-					if (_logger.isDebugEnabled())
-						_logger.debug("Handling restarting from checkpoint - adding -R flag to pwrapper arguments");
-					
-					//LAK: This is the restart flag that pwrapper will use to switch to restarting the job
-					command.add("-R");
-				}
-				
 				command.add(execName);
 				command.add(imagePath);
 			}
@@ -294,6 +284,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				_redirects.stdoutSink(), stderrFile, resourceUsageFile, wrapper.getPathToWrapper());
 			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, _spmdVariation, _numProcesses, _numProcessesPerHost,
 				_threadsPerProcess);
+			CmdLineManipulatorUtils.addPersistProperties(jobProperties, activity.hasBeenRestartedFromCheckpoint());
 
 			newCmdLine = new Vector<String>();
 			if (_logger.isDebugEnabled())
@@ -302,14 +293,14 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 				CmdLineManipulatorUtils.callCmdLineManipulators(jobProperties, _constructionParameters.getCmdLineManipulatorConfiguration());
 
 			// for testing only - use default cmdLine format to compare to transform
-			String[] arguments = new String[command.size() - 1];
-			for (int lcv = 1; lcv < command.size(); lcv++)
-				arguments[lcv - 1] = command.get(lcv);
-
-			Vector<String> testCmdLine = wrapper.formCommandLine(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(),
-				_redirects.stdoutSink(), stderrFile, resourceUsageFile, command.get(0), arguments);
-			if (_logger.isDebugEnabled())
-				_logger.debug(String.format("Previous cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
+//			String[] arguments = new String[command.size() - 1];
+//			for (int lcv = 1; lcv < command.size(); lcv++)
+//				arguments[lcv - 1] = command.get(lcv);
+//
+//			Vector<String> testCmdLine = wrapper.formCommandLine(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(),
+//				_redirects.stdoutSink(), stderrFile, resourceUsageFile, command.get(0), arguments);
+//			if (_logger.isDebugEnabled())
+//				_logger.debug(String.format("Previous cmdLine format with pwrapper only:\n %s", testCmdLine.toString()));
 
 			if (_logger.isDebugEnabled())
 				_logger.debug("Trying to start a new process on machine using fork/exec or spawn.");
@@ -319,7 +310,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 			for (String arg : newCmdLine)
 				hWriter.format(" %s", arg);
 			hWriter.close();
-			_logger.info(String.format("Executing job for userID '%s' using command line:\n\t%s", userName, testCmdLine.toString()));
+			_logger.info(String.format("Executing job for userID '%s' using command line:\n\t%s", userName, newCmdLine.toString()));
 
 			token = wrapper.execute(_fuseMountPoint, _environment, workingDirectory, _redirects.stdinSource(), resourceUsageFile, newCmdLine);
 			// ASG - TEST code remove if found

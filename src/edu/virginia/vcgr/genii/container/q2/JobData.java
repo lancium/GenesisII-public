@@ -156,13 +156,13 @@ public class JobData
 	}
 
 	public JobData(long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime, short runAttempts,
-		HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime,EndpointReferenceType EPR)
+		HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime, EndpointReferenceType EPR)
 	{
-		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime,EPR);
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime, EPR);
 	}
 
 	public JobData(SweepingJob sweep, long jobID, String jobName, String jobTicket, short priority, QueueStates jobState, Date submitTime,
-		short runAttempts, HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime,EndpointReferenceType EPR)
+		short runAttempts, HistoryContext history, int numOfCores,  long besQueueTime, long besStartTime, EndpointReferenceType EPR)
 	{
 		this(jobID, jobName, jobTicket, priority, jobState, submitTime, runAttempts, null, history, numOfCores, besQueueTime, besStartTime, EPR);
 		if (sweep == null) {
@@ -179,6 +179,9 @@ public class JobData
 		_userName = uname;
 	}
 	
+	//LAK: 2021 Jan 29 THIS IS NOT WRITTEN BY ME:
+	
+	//LAK: I THINK THIS IS NOT A GOOD FUNCTION, IT APPEARS TO ONLY BE SET IN EXTREMELY LIMITED CIRCUMSTANCES
 	public EndpointReferenceType getJobEPR() {
 		return _jobEPR;	
 	}
@@ -196,6 +199,7 @@ public class JobData
 	public void setJobEPR(EndpointReferenceType EPR) {
 		_jobEPR=EPR;
 	}
+	
 	public String getUserName()
 	{
 		return _userName;

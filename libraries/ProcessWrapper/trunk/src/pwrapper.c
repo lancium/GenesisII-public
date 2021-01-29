@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define VM_DEV_ENVIRONMENT 1
+#define VM_DEV_ENVIRONMENT 0
 
 #if VM_DEV_ENVIRONMENT
 	#include <fcntl.h>
@@ -12,7 +12,7 @@
 #include "CommandLine.h"
 #include "OSSpecific.h"
 
-const char* version="Version 1.4";
+const char* version="Version 1.5";
 
 static void usage(const char *program);
 
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 	int exitCode;
 
 	if ((argc==2) && strcmp(argv[1],"--version")==0) {
-		printf("%s\n",version);
+		printf("%s\n", version);
 		return 0;
 	}
 	if (argc < 2)

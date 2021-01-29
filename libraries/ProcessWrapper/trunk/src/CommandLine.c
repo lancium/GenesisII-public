@@ -170,6 +170,16 @@ const int getIsRestartImpl(struct CommandLine *ptr)
 	return impl->_isRestart;
 }
 
+int parseStringToBoolean(const char* string)
+{
+	if(strncmp(string, "true", 4) == 0)
+	{
+		return 1;
+	}
+	//anything else we just consider false
+	return 0;
+}
+
 int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 {
 	while (argc > 0)
@@ -192,7 +202,7 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 		else if (startsWith(*argv, "-e"))
 			impl->_standardError = createStringFromCopy(*argv + 2);
 		else if (startsWith(*argv, "-R"))
-			impl->_isRestart = 1;
+			impl->_isRestart = parseStringToBoolean(*argv + 2);
 		else
 			break;
 
@@ -226,7 +236,6 @@ int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
 		
 		if(impl->_isRestart)
 		{
-			fprintf(stdout, "In restart switch!\n");
 			//We are restarting from a persisted job, we should get the image name from the CL and then restart
 			impl->_executable = createStringFromCopy("singularity");
 
