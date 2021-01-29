@@ -4,12 +4,28 @@
 # it checks if it is running. If so it exits with an error message. If it already exists and is not running,
 # it wipes it out and builds a new one.
 # Usage: configure_container.sh deploymentName hostIPorDNS port
+# Author: ASG. 2021-01-28, based on configure_mirror_container.sh
+# This code will create a new deployment based on deploymentName, creating, and populating
+# the directories 
+#	~/.genesisII-2.0-deploymentName -- this is where the container database, rbyteio-data, 
+#		and the build.container.log4j.properties, an build.client.log4j.properties go
+#	$GENII_INSTALL_DIR/deployments/deploymentName - which includes sub-directories
+#		configuration - contains web-container-properties and security properties for the container
+#		security - contains admin, owner, TLS, and signing certs, as well sub dir of trusted certs
+# After file and directory setup the container will be spun up, and then linked into the gffs
+# at /resources/xsede.org/containrs/<deploymentName>.
+# Appropriate permissions will be configured.
+# Also, because this is intended for use primarily during testing, where the user /users/xsede.org/userX
+# we put the userX cer in security/default-owners/owner.cer
+# Note: since we are assuming the regression test grid, the admin.cer password is 'tester'
+
 
 export WORKDIR="$( \cd "$(\dirname "$0")" && \pwd )"  # obtain the script's working directory.
 cd "$WORKDIR"
 
 
 echo "Parameters are $1 $2 $3 $4"
+
 
 if [ "$#" -ne 4 ]; then
 	echo "****************** Error *******************"
@@ -23,13 +39,15 @@ export CONTAINER_NAME=$2
 export CONTAINER_IP=$3
 export CONTAINER_PORT=$4
 
-#user_password="$1"; shift
+#Let's first verify the grid is up, if not exit
+grid ls / &> /dev/null
 
-#if [ -z "$user_password" ]; then
-  #echo "This script requires the user's password (for the USERPATH specified"
-  #echo "in $GFFS_TOOLKIT_CONFIG_FILE)."
-  #exit 1
-#fi
+if [ $? -eq 0 ]; then
+   echo "OK, the grid is up."
+else
+   echo "The grid is not up ... aborting."
+   exit
+fi
 
 export SHOWED_SETTINGS_ALREADY=true
 if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
@@ -66,14 +84,15 @@ fi
 
 echo "Warning--Erasing deployment directory $ddir"
 \rm -rf "$ddir"
-\rm -rf $CONTAINER_USER_DIR
-
-
-# Now create the deployment directory
-mkdir "$ddir"
+\rm -rf "$CONTAINER_USER_DIR"
+# Now copy the current_grid deployment over into the deployments dir
+cp -r ${DEPLOYMENTS_ROOT}/current_grid $ddir
+# Make the deployments user dir. This is where stuff like the database, rbyteio dir, etc go
 mkdir "${CONTAINER_USER_DIR}"
+
+# Now we overwrite the deployment-conf.xml file with new information
+
 echo '<deployment-conf based-on="'${DEPLOYMENT_NAME}'"/>' > "${ddir}/deployment-conf.xml"
-mkdir "${ddir}/configuration"
 wfile="${ddir}/configuration/web-container.properties"
 echo "edu.virginia.vcgr.genii.container.listen-port=${CONTAINER_PORT}" > "$wfile"
 echo "edu.virginia.vcgr.genii.container.listen-port.use-ssl=true" >> "$wfile"
@@ -88,33 +107,50 @@ replace_phrase_in_file "${CONTAINER_USER_DIR}/build.container.log4j.properties" 
 replace_phrase_in_file "${CONTAINER_USER_DIR}/build.container.log4j.properties" ".GenesisII.logdb.container" ".GenesisII\/logdb.${CONTAINER_NAME}-container"
 
 # get rid of old log files
-echo "Executing \rm -r \GenesisII\/${CONTAINER_NAME}-container.log\.*"
-\rm -r "GenesisII\/${CONTAINER_NAME}-container.log\.*"
+echo "Executing rm $GENII_USER_DIR/${CONTAINER_NAME}-container.log"
+rm  "$GENII_USER_DIR/${CONTAINER_NAME}-container.log"
+
+# fix up the server config with our hostname.
+  replace_phrase_in_file "$ddir/configuration/server-config.xml" "\(name=.edu.virginia.vcgr.genii.container.external-hostname-override. value=\"\)[^\"]*\"" "\1$MACHINE_NAME\""
+
+
+echo "Deployment name is ${DEPLOYMENT_NAME}"
+
+# Ok, we are now ready to start the container.  
+#Let's figure out whether we are logged in as admin or userX, and save it so we can get back to the right id later
+
+tfile=$(mktemp /tmp/foo.XXXXXXXXX)
+grid whoami > $tfile
+cat $tfile | grep userX &> /dev/null
+if [ $? -eq 0 ]; then
+   	export AM_USERX='true'
+	echo "Am userX, switching to admin"
+multi_grid << eof
+	logout --all
+	login /users/xsede.org/admin --username=admin --password=admin
+eof
+else
+   	cat $tfile | grep admin &> /dev/null
+	if [ $? -eq 0 ]; then
+   		export AM_ADMIN='true'
+		echo "Am admin"
+	else
+		echo "Must be one of admin or userX to do this. Exiting. Have a nice day."
+		exit
+  	fi
+fi
+rm $tfile
 
 exit
 
-
-#save_and_switch_userdir "$CONTAINER_USER_DIR"
-
-# fix the logging for the mirror container.  saving this with the state is handled in save and switch now.
-#echo "Fixing log file and log db in mirror container logging properties."
-#replace_phrase_in_file "$GENII_INSTALL_DIR/lib/build.container.log4j.properties" ".GenesisII.container.log" ".GenesisII\/mirror-container.log"
-#replace_phrase_in_file "$GENII_INSTALL_DIR/lib/build.container.log4j.properties" ".GenesisII.logdb.container" ".GenesisII\/logdb.mirror-container"
-
-# make a copy available in the state directory too.
-#\cp -f "$GENII_INSTALL_DIR/lib/build.container.log4j.properties" "$BACKUP_USER_DIR"
-
-# clean up any old log.
-#\rm -f "$(get_container_logfile "$BACKUP_DEPLOYMENT_NAME")"
-
-echo "Deployment name for backup is ${DEPLOYMENT_NAME}"
 launch_container "$DEPLOYMENT_NAME"
+
 #echo "Deployment name for backup is ${BACKUP_DEPLOYMENT_NAME}"
 #launch_container "$BACKUP_DEPLOYMENT_NAME"
 
 #restore_userdir
 
-get_root_privileges
+#get_root_privileges
 
 multi_grid <<eof
   grid date
@@ -136,7 +172,7 @@ multi_grid <<eof
   chmod "$CONTAINER_NAME"/Services/EnhancedRNSPortType +rx --everyone
   onerror failed to chmod mirror container RNS port type for everyone
 
-  # permissions added in to enable ACL speedup code; probably not necessary.
+# permissions added in to enable ACL speedup code; probably not necessary.
 #  chmod "$CONTAINER_NAME"/Services/EnhancedNotificationBrokerFactoryPortType +rx --everyone
 #  onerror failed to chmod mirror container EnhancedNotificationBrokerFactoryPortType port type for everyone
 #  chmod "$CONTAINER_NAME"/Services/EnhancedNotificationBrokerPortType +rx --everyone
@@ -161,11 +197,4 @@ multi_grid <<eof
 
 eof
 
-
-  #logout --all 
-  #login --username=$(basename $USERPATH) --password=$user_password
-  #onerror failed to login as expected user
-  #grid date
-
-check_if_failed setting up mirror container deployment
 
