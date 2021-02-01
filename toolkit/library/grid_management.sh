@@ -77,6 +77,7 @@ function get_container_logfile()
     extra="_${DEP_NAME}"
   fi
   # log file for normal deployments.
+  #echo "get_container_logfile(): GENII_USER_DIR = $GENII_USER_DIR"
   local logprops="$GENII_INSTALL_DIR/lib/build.container.log4j.properties"
   if [ ! -f "$logprops" ]; then
     logprops="$GENII_INSTALL_DIR/lib/production.container.log4j.properties"
@@ -92,6 +93,11 @@ function get_container_logfile()
       return
     fi
   elif [ "$DEP_NAME" == "default" ]; then
+    if [ -f "$GENII_USER_DIR/build.container.log4j.properties" ]; then
+      logprops="$GENII_USER_DIR/build.container.log4j.properties"
+    fi
+  # Updated 2021-02-01 by ASG to allow any deployment name - but must have GENII_USER_DIR set
+  else
     if [ -f "$GENII_USER_DIR/build.container.log4j.properties" ]; then
       logprops="$GENII_USER_DIR/build.container.log4j.properties"
     fi
@@ -121,7 +127,9 @@ function launch_container()
 
   # move the log out of the way so we don't get fooled by old startup noise.
   containerlog="$(get_container_logfile "$DEP_NAME")"
-
+  echo "Launching Genesis II container for deployment \"$DEP_NAME\"..."
+  CONTAINERLOGFILE="$(get_container_logfile "$DEP_NAME")"
+  echo "$DEP_NAME container log stored at: $CONTAINERLOGFILE"
   # ensure that we have at least our scanning factor worth of lines in the buffer
   # that are not the restart phrase.
   local d;
@@ -139,9 +147,7 @@ function launch_container()
     export JAVA_DEBUG_PORT=$PRIMARY_DEBUG_PORT
   fi
 
-  echo "Launching Genesis II container for deployment \"$DEP_NAME\"..."
-  CONTAINERLOGFILE="$(get_container_logfile "$DEP_NAME")"
-  echo "$DEP_NAME container log stored at: $CONTAINERLOGFILE"
+
   extra_prefix=
   extra_suffix=
   use_shell=/bin/bash
@@ -173,11 +179,11 @@ function launch_container()
     exit 1
   fi
 
-#echo "path is currently: $PATH"
-#echo "decided runner is at: '$runner'"
-#echo "use shell is '$use_shell'"
-#echo "prefix is '$prefix'"
-#echo "suffix is '$extra_suffix'"
+echo "path is currently: $PATH"
+echo "decided runner is at: '$runner'"
+echo "use shell is '$use_shell'"
+echo "prefix is '$prefix'"
+echo "suffix is '$extra_suffix'"
 
   $use_shell $extra_prefix "$runner" $extra_suffix $DEP_NAME &>/dev/null &
 

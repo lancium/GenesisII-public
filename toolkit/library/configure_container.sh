@@ -38,6 +38,14 @@ export RESOURCE_DIR_PATH=$1
 export CONTAINER_NAME=$2
 export CONTAINER_IP=$3
 export CONTAINER_PORT=$4
+export DEPLOYMENT_NAME=$CONTAINER_NAME
+
+export SHOWED_SETTINGS_ALREADY=true
+if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
+  source ../prepare_tools.sh ../prepare_tools.sh 
+fi
+source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+
 
 #Let's first verify the grid is up, if not exit
 grid ls / &> /dev/null
@@ -49,16 +57,42 @@ else
    exit
 fi
 
-export SHOWED_SETTINGS_ALREADY=true
-if [ -z "$GFFS_TOOLKIT_SENTINEL" ]; then
-  source ../prepare_tools.sh ../prepare_tools.sh 
-fi
-source "$GFFS_TOOLKIT_ROOT/library/establish_environment.sh"
+#Let's figure out whether we are logged in as admin or userX, and save it so we can get back to the right id later
 
-echo -e "\nSetting up new container  $CONTAINER_NAME.\n"
+tfile=$(mktemp /tmp/foo.XXXXXXXXX)
+grid whoami > $tfile
+cat $tfile | grep userX &> /dev/null
+if [ $? -eq 0 ]; then
+   	export AM_USERX='true'
+	echo "Am userX, switching to admin"
+multi_grid << eof
+	logout --all
+	login /users/xsede.org/admin --username=admin --password=admin
+eof
+else
+   	cat $tfile | grep admin &> /dev/null
+	if [ $? -eq 0 ]; then
+   		export AM_ADMIN='true'
+		echo "Am admin"
+	else
+		echo "Must be one of admin or userX to do this. Exiting. Have a nice day."
+		cat $tfile
+		exit
+  	fi
+fi
+rm $tfile
+
+
+# Now grab the pwd so we have it for later
+export retDir=$(grid pwd)
+
+
+echo -e "\nSetting up new container $CONTAINER_NAME.\n"
 echo "Deployment root is ${DEPLOYMENTS_ROOT}"
 # Below we ASSUME that the prefix for GENII_USER_DIR should be used for the new working dir
 export CONTAINER_USER_DIR="$(dirname ${GENII_USER_DIR})/.genesisII-2.0-${CONTAINER_NAME}"
+export old_GENII_USER_DIR=${GENII_USER_DIR}
+export GENII_USER_DIR=$CONTAINER_USER_DIR
 echo "Container user directory is ${CONTAINER_USER_DIR}"
 ddir="${DEPLOYMENTS_ROOT}/${CONTAINER_NAME}"
 # Now check if the deployment already exists .. if so, nuke it.
@@ -92,7 +126,7 @@ mkdir "${CONTAINER_USER_DIR}"
 
 # Now we overwrite the deployment-conf.xml file with new information
 
-echo '<deployment-conf based-on="'${DEPLOYMENT_NAME}'"/>' > "${ddir}/deployment-conf.xml"
+echo '<deployment-conf based-on="default"/>' > "${ddir}/deployment-conf.xml"
 wfile="${ddir}/configuration/web-container.properties"
 echo "edu.virginia.vcgr.genii.container.listen-port=${CONTAINER_PORT}" > "$wfile"
 echo "edu.virginia.vcgr.genii.container.listen-port.use-ssl=true" >> "$wfile"
@@ -107,50 +141,35 @@ replace_phrase_in_file "${CONTAINER_USER_DIR}/build.container.log4j.properties" 
 replace_phrase_in_file "${CONTAINER_USER_DIR}/build.container.log4j.properties" ".GenesisII.logdb.container" ".GenesisII\/logdb.${CONTAINER_NAME}-container"
 
 # get rid of old log files
-echo "Executing rm $GENII_USER_DIR/${CONTAINER_NAME}-container.log"
-rm  "$GENII_USER_DIR/${CONTAINER_NAME}-container.log"
+echo "Executing rm ${GENII_USER_DIR}/${CONTAINER_NAME}-container.log"
+rm  "${GENII_USER_DIR}/${CONTAINER_NAME}-container.log"
 
 # fix up the server config with our hostname.
-  replace_phrase_in_file "$ddir/configuration/server-config.xml" "\(name=.edu.virginia.vcgr.genii.container.external-hostname-override. value=\"\)[^\"]*\"" "\1$MACHINE_NAME\""
+  replace_phrase_in_file "$ddir/configuration/server-config.xml" "\(name=.edu.virginia.vcgr.genii.container.external-hostname-override. value=\"\)[^\"]*\"" "\1$CONTAINER_IP\""
 
 
-echo "Deployment name is ${DEPLOYMENT_NAME}"
+
+#export RESOURCE_DIR_PATH=$1
+#export CONTAINER_NAME=$2
+#export CONTAINER_IP=$3
+#export CONTAINER_PORT=$4
+
 
 # Ok, we are now ready to start the container.  
-#Let's figure out whether we are logged in as admin or userX, and save it so we can get back to the right id later
 
-tfile=$(mktemp /tmp/foo.XXXXXXXXX)
-grid whoami > $tfile
-cat $tfile | grep userX &> /dev/null
-if [ $? -eq 0 ]; then
-   	export AM_USERX='true'
-	echo "Am userX, switching to admin"
-multi_grid << eof
-	logout --all
-	login /users/xsede.org/admin --username=admin --password=admin
-eof
-else
-   	cat $tfile | grep admin &> /dev/null
-	if [ $? -eq 0 ]; then
-   		export AM_ADMIN='true'
-		echo "Am admin"
-	else
-		echo "Must be one of admin or userX to do this. Exiting. Have a nice day."
-		exit
-  	fi
-fi
-rm $tfile
+
+echo "Launching container $CONTAINER_NAME"
+#launch_container "$CONTAINER_NAME"
+#$GENII_INSTALL_DIR/bin/runContainer.sh "$CONTAINER_NAME"
+
+
+# Restore user directory
+export GENII_USER_DIR=$old_GENII_USER_DIR
+grid cd ${RESOURCE_DIR_PATH}
+echo "grid  ln --service-url=https://${CONTAINER_IP}:${CONTAINER_PORT}/axis/services/VCGRContainerPortType $CONTAINER_NAME"
+grid  ln --service-url="https://${CONTAINER_IP}:${CONTAINER_PORT}/axis/services/VCGRContainerPortType" "$CONTAINER_NAME"
 
 exit
-
-launch_container "$DEPLOYMENT_NAME"
-
-#echo "Deployment name for backup is ${BACKUP_DEPLOYMENT_NAME}"
-#launch_container "$BACKUP_DEPLOYMENT_NAME"
-
-#restore_userdir
-
-#get_root_privileges
 
 multi_grid <<eof
   grid date
@@ -196,5 +215,6 @@ multi_grid <<eof
   grid date
 
 eof
+
 
 
