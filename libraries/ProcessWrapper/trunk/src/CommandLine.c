@@ -172,12 +172,7 @@ const int getIsRestartImpl(struct CommandLine *ptr)
 
 int parseStringToBoolean(const char* string)
 {
-	if(strncmp(string, "true", 4) == 0)
-	{
-		return 1;
-	}
-	//anything else we just consider false
-	return 0;
+	return strncmp(string, "true", 4) == 0;
 }
 
 int parseCommandLine(CommandLineImpl *impl, int argc, char **argv)
