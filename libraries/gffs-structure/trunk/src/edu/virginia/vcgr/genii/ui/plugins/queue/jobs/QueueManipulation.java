@@ -507,7 +507,7 @@ class QueueManipulation
 	
 	static void JobResetTask(UIPluginContext context, Component ownerComponent, QueueManagerTableModel model, Collection<String> jobTickets)
 	{
-		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Rescheduling Jobs", "Asking queue to reschedule jobs", 1000L,
+		context.uiContext().progressMonitorFactory().createMonitor(ownerComponent, "Resetting Jobs", "Asking queue to reset jobs", 1000L,
 			new JobResetTask(context, jobTickets), new JobRescheduleCompletionListener(ownerComponent, context, model)).start();
 	}
 	
