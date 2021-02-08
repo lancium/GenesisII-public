@@ -357,7 +357,6 @@ public class BESActivity implements Closeable
 		if (!_persistRequested)
 			return;
 
-		// TODO: Handle restart state
 		updateState(_terminateRequested, _destroyRequested, false);
 		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
 		
@@ -905,28 +904,6 @@ public class BESActivity implements Closeable
 			}
 		}
 		
-//		//LAK: WIP, does not work. Meant to handle restarting a persisted job.
-//		public void setExecutionToRestart() throws ExecutionException
-//		{
-//			synchronized (_phaseLock) {
-//				if (!_persistRequested)
-//					return;
-//
-//				_persistRequested = false;
-//				_terminateRequested = false;
-//				
-//				ExecutionPhase currentPhase = _runner._currentPhase;
-//				
-//				if (currentPhase instanceof AbstractRunProcessPhase) {
-//					_executionPlan.insertElementAt(currentPhase, _nextPhase);
-//				}
-//				else
-//					_logger.error("Trying to restart a job but the execution plan is not currently an AbstractRunProcessPhase - we don't know where we are in the excution plan!");
-//				
-//				startRunner();
-//			}
-//		}
-		
 		//LAK: 31 Dec 2020 This handles informing the execution environment that the pwrapper is terminating
 		public void notifiyPwrapperIsTerminating()
 		{
@@ -1010,7 +987,6 @@ public class BESActivity implements Closeable
 						// 2020 August 20 by CCH
 						// if we want to persist, we need to stop phase execution.
 						if(_destroyRequested || _persistRequested) {
-							//updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
 							return;
 						}
 					}
