@@ -33,7 +33,6 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.WorkingContext;
 import edu.virginia.vcgr.genii.client.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.QueueResultsException;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -336,34 +335,36 @@ public class BESActivity implements Closeable
 		if (_terminateRequested)
 			return;
 		
-		updateState(true, _destroyRequested, _persistRequested);
 		if (_runner != null)
 			_runner.requestTerminate(false);
+		
+		updateState(true, _destroyRequested, _persistRequested);
 	}
 
 	synchronized public void persist() throws ExecutionException, SQLException
 	{
 		if (_persistRequested)
 			return;
-
-		updateState(_terminateRequested, _destroyRequested, true);
-		updateState(new ActivityState(ActivityStateEnumeration.Persisting, null));
+		
 		if (_runner != null)
 			_runner.setExecutionToPersisted();
+		
+		updateState(_terminateRequested, _destroyRequested, true);
+		updateState(new ActivityState(ActivityStateEnumeration.Persisting, null));
 	}
 	
 	synchronized public void restart() throws ExecutionException, SQLException
 	{
 		if (!_persistRequested)
 			return;
-
-		updateState(_terminateRequested, _destroyRequested, false);
-		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
 		
 		//setup state for runner thread
 		_nextPhase = _nextPhase - 1;
 		_hasBeenRestartedFromCheckpoint = true;
 		startRunner();
+		
+		updateState(_terminateRequested, _destroyRequested, false);
+		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
 	}
 	
 	//LAK: Freeze/thaw is a little special in that the BESActivity doesn't do anything, this is just to alert to Activity
@@ -414,6 +415,12 @@ public class BESActivity implements Closeable
 			_terminateRequested = terminateRequested;
 			_destroyRequested = destroyRequested;
 			_persistRequested = persistRequested;
+			
+			notifyStateChange();
+		} catch (ResourceException e) {
+			_logger.warn("Unable to send notification for status change.", e);
+		} catch (ResourceUnknownFaultType e) {
+			_logger.warn("Unable to send notification for status change.", e);
 		} finally {
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);
@@ -544,6 +551,7 @@ public class BESActivity implements Closeable
 	
 	synchronized public void notifyPwrapperHasPersisted() {
 		try {
+			_logger.debug("updating besactivity state to persisted");
 			updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
 		} catch (SQLException e) {
 			_logger.error("SQLException: Trying to update state to be persisted.");
@@ -581,12 +589,12 @@ public class BESActivity implements Closeable
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC;
 			else if(state.isPersisted())
 			{
-				_logger.debug("LAK:::::: Sending persisted notification");
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_PERSISTED;
 			}
 			else
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TOPIC;
-
+			
+			_logger.debug("sending state notification");
 			PublisherTopic topic = space.createPublisherTopic(topicPath);
 			topic.publish(new BESActivityStateChangedContents(state));
 		} finally {

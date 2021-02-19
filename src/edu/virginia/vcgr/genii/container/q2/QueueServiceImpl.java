@@ -507,6 +507,11 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 			long jobid = userData.jobID();
 			ActivityState state = contents.activityState();
+			
+			_logger.debug("LAK::::::: got notification that pwrapper persisted");
+			_logger.debug(state.isPersisting());
+			_logger.debug(state.isPersisted());
+			
 			if (state.isPersisted())
 				_queueMgr.handlePwrapperPersistedNotification(jobid);
 			return NotificationConstants.OK;

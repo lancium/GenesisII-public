@@ -784,8 +784,6 @@ public class JobManager implements Closeable
 
 			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
 
-
-
 			/*
 			 * As jobs are added to the primary list, they are also added to the appropriate user list (newly created, if needed)
 			 */
@@ -2934,6 +2932,8 @@ public class JobManager implements Closeable
 						MyProxyCertificate.setPEMFormattedCertificate(header);
 
 					resp = bes.createActivity(new CreateActivityType(adt, null));
+					
+					data.setJobEPR(resp.getActivityIdentifier());
 
 					history.debug("CreateActivity Outcall Succeeded");
 
@@ -2948,18 +2948,13 @@ public class JobManager implements Closeable
 					data.clearJobAction();
 				}
 
-				// TEMP synchronized (_manager) {
-					/*
-					 * We successfully got back here, so mark the job as started in the database.
-					 */
-					_database.markRunning(connection, _jobID, resp.getActivityIdentifier());
-					connection.commit();
+				_database.markRunning(connection, _jobID, data.getJobEPR());
+				connection.commit();
 
-					/*
-					 * Now it's stored in the database. Note that it's started in memory as well.
-					 */
-					// TEMP data = _jobsByID.get(new Long(_jobID));
-					data.setJobState(QueueStates.RUNNING);
+				/*
+				 * Now it's stored in the database. Note that it's started in memory as well.
+				 */
+				data.setJobState(QueueStates.RUNNING);
 
 						
 					// TEMP }

@@ -85,6 +85,9 @@ static pthread_t bes_conn_pthread;
 //					until we are done responding to to the command to keep the BES state in sync.
 pthread_mutex_t message_lock;
 
+//2021 Feb 19: Boolean to see if we have exited due to persist
+int exitingDueToPersist = 0;
+
 procInfo getProcInfo(){
 	char * line = NULL;
 	size_t len = 0;
@@ -290,6 +293,10 @@ int wrapJob(CommandLine *commandLine)
 	}
 
 	dumpStats(exitCode);
+
+	if(exitingDueToPersist) {
+		sendBesMessage("PERSISTED");
+	}
 
 	//LAK: 29 Dec 2020: Tell the BES through our communication channel that we are terminating
 	_tellBESWeAreTerminating();
@@ -807,23 +814,15 @@ void *_startBesListenerThread(void *arg)
 			//printf("this is a persist command\n");
 			//we want to send a response before actually calling persist
 			memset(&command, 0, 256);
+			
 			snprintf(command, 256, "%s OK\n", nonce);
 			write(connectfd, command, 256);
 
 			close(connectfd);
 			pthread_mutex_unlock(&message_lock);
-
-			fprintf(stderr, "sent ack, about to call persist\n");
 			
+			exitingDueToPersist = 1;
 			operationExitCode = persist();
-
-			fprintf(stderr, "done calling persist\n");
-
-			fprintf(stderr, "%d", operationExitCode);
-
-			sendBesMessage("PERSISTED");
-
-			fprintf(stderr, "sent persisted message\n");
 
 			continue;
 		}
