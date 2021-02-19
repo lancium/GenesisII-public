@@ -245,10 +245,13 @@ public class JobUpdateWorker implements OutcallHandler
 						/* If the job finished on the bes, finish it here */
 						_jobManager.finishJob(_jobInfo.getJobID());
 					}
-					else if(state.isPersisted()) {
+					else if(state.isPersisting()) {
 						_data.setBesStartTime(Calendar.getInstance().getTimeInMillis());
-						history.info("Job persisted on the BES between " + _lastUpdate + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());
-					} 
+						history.info("Job persisting on the BES between " + _lastUpdate + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());
+					}
+					else if(state.isPersisted()) {
+						_jobManager.notifyJobHasFinishedPersisting(connection, _jobInfo.getJobID());
+					}
 					else if(state.isFrozen()) {
 						_data.setBesStartTime(Calendar.getInstance().getTimeInMillis());
 						history.info("Job frozen on the BES between " + _lastUpdate + " to " + Calendar.getInstance().getTime() + " in millis " + _data.getBesStartTime());

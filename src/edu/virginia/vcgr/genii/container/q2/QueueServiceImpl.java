@@ -484,6 +484,33 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 		multiplexer.registerNotificationHandler(BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(),
 			new LegacyBESActivityStateChangeFinalNotificationHandler());
+		
+		multiplexer.registerNotificationHandler(BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_PERSISTED.asConcreteQueryExpression(),
+				new BESActivityStateChangedToPersistedHandler());
+	}
+	
+	private class BESActivityStateChangedToPersistedHandler extends AbstractNotificationHandler<BESActivityStateChangedContents>
+	{
+		private BESActivityStateChangedToPersistedHandler()
+		{
+			super(BESActivityStateChangedContents.class);
+		}
+
+		@Override
+		public String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference, BESActivityStateChangedContents contents) throws Exception
+		{
+			JobCompletedAdditionUserData userData = contents.additionalUserData(JobCompletedAdditionUserData.class);
+
+			if (userData == null)
+				throw new RemoteException("Missing required user data for notification");
+
+			long jobid = userData.jobID();
+			ActivityState state = contents.activityState();
+			if (state.isPersisted())
+				_queueMgr.handlePwrapperPersistedNotification(jobid);
+			return NotificationConstants.OK;
+		}
 	}
 
 	private class LegacyBESActivityStateChangeFinalNotificationHandler extends AbstractNotificationHandler<BESActivityStateChangedContents>

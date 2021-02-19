@@ -167,6 +167,13 @@ public class BESPWrapperConnection {
 							output.println(activityid + " OK");
 							output.flush();
 						}
+						else if(toks[1].equalsIgnoreCase("persisted"))
+						{
+							_besLogger.info("PWrapper Connection Server: Got Persisted message");
+							activity.notifyPwrapperHasPersisted();
+							output.println(activityid + " OK");
+							output.flush();
+						}
 					}
 				}
 			} catch (IOException e) {

@@ -347,7 +347,7 @@ public class BESActivity implements Closeable
 			return;
 
 		updateState(_terminateRequested, _destroyRequested, true);
-		updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
+		updateState(new ActivityState(ActivityStateEnumeration.Persisting, null));
 		if (_runner != null)
 			_runner.setExecutionToPersisted();
 	}
@@ -542,8 +542,13 @@ public class BESActivity implements Closeable
 		_runner.notifiyPwrapperIsTerminating();
 	}
 	
-	synchronized public void notifyPersistedSuceeded() throws SQLException {
-		updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
+	synchronized public void notifyPwrapperHasPersisted() {
+		try {
+			updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
+		} catch (SQLException e) {
+			_logger.error("SQLException: Trying to update state to be persisted.");
+			_logger.error(e.toString());
+		}
 	}
 
 	private void execute(ExecutionPhase phase) throws Throwable
@@ -574,6 +579,11 @@ public class BESActivity implements Closeable
 
 			if (state.isFinalState())
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC;
+			else if(state.isPersisted())
+			{
+				_logger.debug("LAK:::::: Sending persisted notification");
+				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_PERSISTED;
+			}
 			else
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TOPIC;
 

@@ -592,6 +592,18 @@ public class QueueManager implements Closeable
 		}
 	}
 	
+	public void handlePwrapperPersistedNotification(long jobID) throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+		
+		try {
+			connection = _connectionPool.acquire(true);
+			_jobManager.notifyJobHasFinishedPersisting(connection, jobID);
+		} finally {
+			_connectionPool.release(connection);
+		}
+	}
+	
 	public void restartJobs(String[] jobs) throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;

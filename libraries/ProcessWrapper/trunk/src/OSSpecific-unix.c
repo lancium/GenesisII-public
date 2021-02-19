@@ -759,7 +759,7 @@ void *_startBesListenerThread(void *arg)
 
 		if(connectfd < 0)
 		{
-    	    perror("bes_listener: accept failed");
+    	    fprintf(stderr, "bes_listener: accept failed");
     	    close(connectfd);
     	}
 
@@ -805,7 +805,27 @@ void *_startBesListenerThread(void *arg)
 		{
 			//this is a persist command
 			//printf("this is a persist command\n");
+			//we want to send a response before actually calling persist
+			memset(&command, 0, 256);
+			snprintf(command, 256, "%s OK\n", nonce);
+			write(connectfd, command, 256);
+
+			close(connectfd);
+			pthread_mutex_unlock(&message_lock);
+
+			fprintf(stderr, "sent ack, about to call persist\n");
+			
 			operationExitCode = persist();
+
+			fprintf(stderr, "done calling persist\n");
+
+			fprintf(stderr, "%d", operationExitCode);
+
+			sendBesMessage("PERSISTED");
+
+			fprintf(stderr, "sent persisted message\n");
+
+			continue;
 		}
 
 		//clear buffer
@@ -897,7 +917,7 @@ int _tellBESWeAreTerminating()
 
 int _startBesListener()
 {
-    fprintf(stderr, "bes_listener: spawning bes listerner thread\n");
+    //fprintf(stdout, "bes_listener: spawning bes listerner thread\n");
 	_setLocalIPInfo();
     signal(SIGPIPE, &_pipefail);
     int err = pthread_create(&bes_conn_pthread, NULL, &_startBesListenerThread, NULL);

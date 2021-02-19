@@ -69,16 +69,16 @@ public class JobPersistWorker implements OutcallHandler {
 				
 				for(PersistActivityResponseType pRes : persistResponses)
 				{
-					if(pRes.isPersisted() == false)
+					if(pRes.isPersisting() == false)
 					{
 						if(_logger.isErrorEnabled())
 							_logger.error(String.format("Request to persist job responded with a failure: %s", _data));
 					}
 					else
 					{
-						_queueDatabase.markPersisted(connection, _data.getJobID());
+						_queueDatabase.markPersisting(connection, _data.getJobID());
 						connection.commit();
-						_data.setJobState(QueueStates.PERSISTED);
+						_data.setJobState(QueueStates.PERSISTING);
 					}
 				}
 			}

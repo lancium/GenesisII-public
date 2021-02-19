@@ -608,6 +608,35 @@ public class JobManager implements Closeable
 		//LAK 2020 Aug 13: Enabling scheduling event since this is where the job state will become FINISHED
 		_schedulingEvent.notifySchedulingEvent();
 	}
+	
+	public void notifyJobHasFinishedPersisting(Connection connection, long jobID) throws ResourceException, SQLException {
+		JobData _data = _jobsByID.get(new Long(jobID));
+		if (_data == null) {
+			// don't know where it went, but it's no longer our responsibility.
+			if (_logger.isDebugEnabled())
+				_logger.debug(String.format("Couldn't find job for id %d, so I can't finish it.", jobID));
+			return;
+		}
+		synchronized (_data) {
+			//LAK 2020 Aug 28: Added check that this is the first time we are finishing the job.
+			if(_data.getJobState() != QueueStates.PERSISTING)
+			{
+				if (_logger.isDebugEnabled())
+					_logger.debug("notifyJobHasFinishedPersisting on job that has not previously been marked as PERSISTING " + _data);
+				return;
+			}
+
+			_runningJobs.remove(new Long(jobID));
+			
+			_database.markPersisted(connection, _data.getJobID());
+			connection.commit();
+			_data.setJobState(QueueStates.PERSISTED);
+			_data.history(HistoryEventCategory.Persisting).debug("Finished persisting");
+		}
+		
+		//LAK 2020 Aug 13: Enabling scheduling event since this is where the job state will become FINISHED
+		_schedulingEvent.notifySchedulingEvent();
+	}
 
 	public void killJob(Connection connection, long jobID) throws SQLException, ResourceException
 	{
@@ -2163,6 +2192,7 @@ public class JobManager implements Closeable
 		long error = 0;
 		long requeued = 0;
 		long frozen = 0;
+		long persisting = 0;
 		long persisted = 0;
 
 		//2020-10-21 by ASG. We need to ensure that no one is messing with the jobByID
@@ -2183,6 +2213,8 @@ public class JobManager implements Closeable
 					finished++;
 				else if (state == QueueStates.FROZEN)
 					frozen++;
+				else if (state == QueueStates.PERSISTING)
+					persisting++;
 				else if (state == QueueStates.PERSISTED)
 					persisted++;
 			}
@@ -2195,6 +2227,7 @@ public class JobManager implements Closeable
 		ret.put("Error", error);
 		ret.put("Finished", finished);
 		ret.put("Frozen", frozen);
+		ret.put("Persisting", persisting);
 		ret.put("Persisted", persisted);
 
 		return ret;
