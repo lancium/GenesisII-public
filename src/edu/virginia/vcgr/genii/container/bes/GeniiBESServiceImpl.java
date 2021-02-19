@@ -945,11 +945,5 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 	{
 		return null;
 	}
-
-	@Override
-	public EndpointReferenceType createForkEPR(String forkPath,
-			ResourceForkInformation rif) throws ResourceUnknownFaultType {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }
