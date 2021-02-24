@@ -11,6 +11,18 @@ export LINE_COUNT_FOR_START_CHECK=400
 
 ##############
 
+function backtrace () {
+    local deptn=${#FUNCNAME[@]}
+
+    for ((i=1; i<$deptn; i++)); do
+        local func="${FUNCNAME[$i]}"
+        local line="${BASH_LINENO[$((i-1))]}"
+        local src="${BASH_SOURCE[$((i-1))]}"
+        printf '%*s' $i '' # indent
+        echo "at: $func(), $src, line $line"
+    done
+}
+
 # general functions that affect client and container.
 
 # this takes one argument, which is a new directory to use for the container
@@ -51,6 +63,7 @@ function restore_userdir()
 # takes an optional deployment name.  note that it is crucial that you have
 # switched to the right user directory if you are trying to launch a mirror
 # container; see the save_and_switch_userdir method.
+
 function launch_container_if_not_running()
 {
   dep="$1"; shift
@@ -67,7 +80,33 @@ function launch_container_if_not_running()
 
 # returns the standard location for the container log file, or if this
 # is the mirrored deployment, it returns a contrived log file.
+# 2021-02-02 by ASG. This code was never written to handle more than two deployments, current_grid (aka default) and backup.
+# Now we are going to support an arbitrary number of deployments.
 function get_container_logfile()
+{
+  local DEP_NAME="$1"; shift
+  local logprops
+  #echo $DEP_NAME >> /home/dev/bash-stack
+  #backtrace >> /home/dev/bash-stack
+#echo "parameter to get container logfile is $DEP_NAME, install dir is $GENII_INSTALL_DIR "
+  # Hack because "current_grid" is the name of the default container, stored in plain old ".geneisisII-2.0"
+  # and that is always the same as the one in $GENII_INSTALL_DIR/lib/build.container.log4j.properties
+  if [[ -z "DEP_NAME" || "$DEP_NAME" = "current_grid"  || "$DEP_NAME" = "default" ]]; then    
+    # The default is lib .. all others are in a ".genessisII-2.0" directory
+    logprops="$GENII_INSTALL_DIR/lib/build.container.log4j.properties"
+  else
+    #logprops="$GENII_USER_DIR/../.$DEP_NAME-genesisII-2.0/build.container.log4j.properties"
+    logprops="$(dirname $GENII_USER_DIR)/.$DEP_NAME-genesisII-2.0/build.container.log4j.properties"
+  fi
+  echo "logprops is $logprops" >> /home/dev/bash-stack
+  if [ ! -f "$logprops" ]; then
+    return "ERROR in get_container_logfile - no such deployment $DEP_NAME, logprops is $logprops"
+  fi
+  to_return="$(grep log4j.appender.LOGFILE.File "$logprops" | tr -d '\r\n' | sed -e 's/.*=\(.*\)/\1/' | sed -e "s%\${user.home}%$HOME%")"
+  echo "$to_return"
+}
+
+function get_container_logfile_old()
 {
   local DEP_NAME="$1"; shift
   local extra=
@@ -76,6 +115,7 @@ function get_container_logfile()
   else
     extra="_${DEP_NAME}"
   fi
+  
   # log file for normal deployments.
   #echo "get_container_logfile(): GENII_USER_DIR = $GENII_USER_DIR"
   local logprops="$GENII_INSTALL_DIR/lib/build.container.log4j.properties"
@@ -126,16 +166,18 @@ function launch_container()
   local DEP_NAME="$1"; shift
 
   # move the log out of the way so we don't get fooled by old startup noise.
-  containerlog="$(get_container_logfile "$DEP_NAME")"
+  #containerlog="$(get_container_logfile "$DEP_NAME")"
   echo "Launching Genesis II container for deployment \"$DEP_NAME\"..."
-  CONTAINERLOGFILE="$(get_container_logfile "$DEP_NAME")"
+  CONTAINERLOGFILE="$(get_container_logfile $DEP_NAME)"
   echo "$DEP_NAME container log stored at: $CONTAINERLOGFILE"
   # ensure that we have at least our scanning factor worth of lines in the buffer
   # that are not the restart phrase.
+  #echo $DEP_NAME >> /home/dev/bash-stack
+  #backtrace >> /home/dev/bash-stack
   local d;
-  if [ -f "$containerlog" ]; then
+  if [ -f "$CONTAINERLOGFILE" ]; then
     for ((d=0; d < $LINE_COUNT_FOR_START_CHECK; d++)); do
-      echo "-" >>"$containerlog"
+      echo "-" >>"$CONTAINERLOGFILE"
     done
   fi
 
@@ -192,6 +234,7 @@ echo "suffix is '$extra_suffix'"
   i=20
   while [ -z "$(if [ -f $CONTAINERLOGFILE ]; then tail -n $LINE_COUNT_FOR_START_CHECK < $CONTAINERLOGFILE | grep "Restarting all BES Managers"; fi)" ]; do
     if [ $i -le 0 ]; then
+echo "********Container logfile is $CONTAINERLOGFILE"
       echo "Failed to find proper phrasing in container log to indicate it started; continuing anyway."
       break;
     fi

@@ -90,18 +90,18 @@ fi
 
 # the standard set of tests for the global federated file system.
 GFFS_TESTS=( \
-  #GFFS_Tests/Functional_Tests/gffsFileOpsTest.sh \
-  #GFFS_Tests/Functional_Tests/gffsFuseCommands.sh \
-  #GFFS_Tests/Functional_Tests/testFuseFilePresence.sh \
-  #GFFS_Tests/Functional_Tests/gffsGridCommands.sh \
+  GFFS_Tests/Functional_Tests/gffsFileOpsTest.sh \
+  GFFS_Tests/Functional_Tests/gffsFuseCommands.sh \
+  GFFS_Tests/Functional_Tests/testFuseFilePresence.sh \
+  GFFS_Tests/Functional_Tests/gffsGridCommands.sh \
   GFFS_Tests/Functional_Tests/gffsReplCommands.sh \
-  #GFFS_Tests/Functional_Tests/rnsBearTrap.sh \
-  #GFFS_Tests/Functional_Tests/testRandomFileTransfers.sh \
-  #GFFS_Tests/Functional_Tests/testRandomFileTransfersOnFuse.sh \
-  #GFFS_Tests/Performance_Tests/directoryTree.sh \
-  #GFFS_Tests/Performance_Tests/gnuMake.sh \
-  #GFFS_Tests/Performance_Tests/localAndRemoteData.sh \
-  #GFFS_Tests/Performance_Tests/loadUpRNSDirectory.sh \
+  GFFS_Tests/Functional_Tests/rnsBearTrap.sh \
+  GFFS_Tests/Functional_Tests/testRandomFileTransfers.sh \
+  GFFS_Tests/Functional_Tests/testRandomFileTransfersOnFuse.sh \
+  GFFS_Tests/Performance_Tests/directoryTree.sh \
+  GFFS_Tests/Performance_Tests/gnuMake.sh \
+  GFFS_Tests/Performance_Tests/localAndRemoteData.sh \
+  GFFS_Tests/Performance_Tests/loadUpRNSDirectory.sh \
 )
 
 #if [ ! -z "$AUTOBUILD_RUNNING" ]; then

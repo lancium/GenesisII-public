@@ -334,3 +334,19 @@ fi
 
 #######
 
+# 2021-01-10 by ASG - method to find the pid of the process LISTENing on a port
+  function pidListeningOnPort() {
+	  lsof -i :$1 | grep LISTEN | awk '{ print $2 }' 
+  }
+
+  function getDeploymentPort() {
+	  #echo "inside getDeployment port for $1"
+	  if [ -d "$GENII_INSTALL_DIR/deployments/$1" ]; then
+		  # Ok the deployment exists
+		  grep "listen-port=" $GENII_INSTALL_DIR/deployments/$1/configuration/web-container.properties | cut -d "=" -f 2
+	  fi
+  }
+
+#######
+
+

@@ -57,30 +57,6 @@ else
    exit
 fi
 
-#Let's figure out whether we are logged in as admin or userX, and save it so we can get back to the right id later
-
-tfile=$(mktemp /tmp/foo.XXXXXXXXX)
-grid whoami > $tfile
-cat $tfile | grep userX &> /dev/null
-if [ $? -eq 0 ]; then
-   	export AM_USERX='true'
-	echo "Am userX, switching to admin"
-multi_grid << eof
-	logout --all
-	login /users/xsede.org/admin --username=admin --password=admin
-eof
-else
-   	cat $tfile | grep admin &> /dev/null
-	if [ $? -eq 0 ]; then
-   		export AM_ADMIN='true'
-		echo "Am admin"
-	else
-		echo "Must be one of admin or userX to do this. Exiting. Have a nice day."
-		cat $tfile
-		exit
-  	fi
-fi
-rm $tfile
 
 
 # Now grab the pwd so we have it for later
@@ -88,12 +64,13 @@ export retDir=$(grid pwd)
 
 
 echo -e "\nSetting up new container $CONTAINER_NAME.\n"
-echo "Deployment root is ${DEPLOYMENTS_ROOT}"
+#echo "GENII_USER_DIR is $GENII_USER_DIR"
+#echo "Deployment root is ${DEPLOYMENTS_ROOT}"
 # Below we ASSUME that the prefix for GENII_USER_DIR should be used for the new working dir
-export CONTAINER_USER_DIR="$(dirname ${GENII_USER_DIR})/.genesisII-2.0-${CONTAINER_NAME}"
+export CONTAINER_USER_DIR="$(dirname ${GENII_USER_DIR})/.${CONTAINER_NAME}-genesisII-2.0"
 export old_GENII_USER_DIR=${GENII_USER_DIR}
 export GENII_USER_DIR=$CONTAINER_USER_DIR
-echo "Container user directory is ${CONTAINER_USER_DIR}"
+#echo "Container user directory is ${CONTAINER_USER_DIR}"
 ddir="${DEPLOYMENTS_ROOT}/${CONTAINER_NAME}"
 # Now check if the deployment already exists .. if so, nuke it.
 if [ -d "$ddir" ]; then
@@ -116,7 +93,7 @@ if [ -d "$ddir" ]; then
 	fi
 fi
 
-echo "Warning--Erasing deployment directory $ddir"
+#echo "Warning--Erasing deployment directory $ddir"
 \rm -rf "$ddir"
 \rm -rf "$CONTAINER_USER_DIR"
 # Now copy the current_grid deployment over into the deployments dir
@@ -132,17 +109,21 @@ echo "edu.virginia.vcgr.genii.container.listen-port=${CONTAINER_PORT}" > "$wfile
 echo "edu.virginia.vcgr.genii.container.listen-port.use-ssl=true" >> "$wfile"
 echo "edu.virginia.vcgr.genii.container.trust-self-signed=true" >> "$wfile"
 
-echo "CONTAINER_USER_DIR is ${CONTAINER_USER_DIR}"
+#echo "CONTAINER_USER_DIR is ${CONTAINER_USER_DIR}"
 
-echo "GENII_USER_DIR is ${GENII_USER_DIR}"
+#echo "GENII_USER_DIR is ${GENII_USER_DIR}"
 cp -f "$GENII_INSTALL_DIR/lib/build.container.log4j.properties" "$CONTAINER_USER_DIR"
-echo "Fixing log file and log db in ${CONTAINER_NAME} container logging properties."
+#echo "Fixing log file and log db in ${CONTAINER_NAME} container logging properties."
 replace_phrase_in_file "${CONTAINER_USER_DIR}/build.container.log4j.properties" ".GenesisII.container.log" ".GenesisII\/${CONTAINER_NAME}-container.log"
 replace_phrase_in_file "${CONTAINER_USER_DIR}/build.container.log4j.properties" ".GenesisII.logdb.container" ".GenesisII\/logdb.${CONTAINER_NAME}-container"
 
+export logfile=$(get_container_logfile "$CONTAINER_NAME")
+echo "Container log file is $logfile, removing it"
+rm "$logfile"
+touch "$logfile"
 # get rid of old log files
-echo "Executing rm ${GENII_USER_DIR}/${CONTAINER_NAME}-container.log"
-rm  "${GENII_USER_DIR}/${CONTAINER_NAME}-container.log"
+#echo "Executing rm ${GENII_USER_DIR}/${CONTAINER_NAME}-container.log"
+#rm  "${GENII_USER_DIR}/${CONTAINER_NAME}-container.log"
 
 # fix up the server config with our hostname.
   replace_phrase_in_file "$ddir/configuration/server-config.xml" "\(name=.edu.virginia.vcgr.genii.container.external-hostname-override. value=\"\)[^\"]*\"" "\1$CONTAINER_IP\""
@@ -157,25 +138,57 @@ rm  "${GENII_USER_DIR}/${CONTAINER_NAME}-container.log"
 
 # Ok, we are now ready to start the container.  
 
+#Let's figure out whether we are logged in as admin or userX, and save it so we can get back to the right id later
+# We need to do some GENII_USER_DIR magic first
 
+export GENII_USER_DIR=$old_GENII_USER_DIR
+tfile=$(mktemp /tmp/foo.XXXXXXXXX)
+grid whoami > $tfile
+cat $tfile | grep userX &> /dev/null
+if [ $? -eq 0 ]; then
+   	export AM_USERX='true'
+	echo "Am userX, switching to admin"
+	grid logout --all
+        grid keystoreLogin --no-gui --password=admin --storetype=PKCS12 local:$GENII_INSTALL_DIR/deployments/sarah/security/admin.pfx
+	# grid login /users/xsede.org/admin --username=admin --password=admin
+        grid whoami
+else
+   	cat $tfile | grep admin &> /dev/null
+	if [ $? -eq 0 ]; then
+   		export AM_ADMIN='true'
+		echo "Am admin"
+	else
+		echo "Must be one of admin or userX to do this. Exiting. Have a nice day."
+		cat $tfile
+		exit
+  	fi
+fi
+rm $tfile
+# Now set GENNI_USER_DIR back
+export GENII_USER_DIR=$CONTAINER_USER_DIR
 echo "Launching container $CONTAINER_NAME"
-#launch_container "$CONTAINER_NAME"
+#echo "GENII_USER_DIR is ${GENII_USER_DIR}, hit <CR> to continue"
+#read
+launch_container "$CONTAINER_NAME"
 #$GENII_INSTALL_DIR/bin/runContainer.sh "$CONTAINER_NAME"
 
 
 # Restore user directory
 export GENII_USER_DIR=$old_GENII_USER_DIR
-grid cd ${RESOURCE_DIR_PATH}
-echo "grid  ln --service-url=https://${CONTAINER_IP}:${CONTAINER_PORT}/axis/services/VCGRContainerPortType $CONTAINER_NAME"
-grid  ln --service-url="https://${CONTAINER_IP}:${CONTAINER_PORT}/axis/services/VCGRContainerPortType" "$CONTAINER_NAME"
 
-exit
+
+
+#grid cd ${RESOURCE_DIR_PATH}
+#echo "grid  ln --service-url=https://${CONTAINER_IP}:${CONTAINER_PORT}/axis/services/VCGRContainerPortType $CONTAINER_NAME"
+#grid  ln --service-url="https://${CONTAINER_IP}:${CONTAINER_PORT}/axis/services/VCGRContainerPortType" "$CONTAINER_NAME"
+
+#exit
 
 multi_grid <<eof
   grid date
   cd ${RESOURCE_DIR_PATH}
   onerror failed to cd to RESOURCE_DIR_PATH
-  ln --service-url="https://127.0.0.1:${CONTAINER_PORT}/axis/services/VCGRContainerPortType" "$CONTAINER_NAME"
+  ln --service-url="https://${CONTAINER_IP}:${CONTAINER_PORT}/axis/services/VCGRContainerPortType" "$CONTAINER_NAME"
   onerror failed to link mirror container
 
   grid date
@@ -192,29 +205,39 @@ multi_grid <<eof
   onerror failed to chmod mirror container RNS port type for everyone
 
 # permissions added in to enable ACL speedup code; probably not necessary.
-#  chmod "$CONTAINER_NAME"/Services/EnhancedNotificationBrokerFactoryPortType +rx --everyone
-#  onerror failed to chmod mirror container EnhancedNotificationBrokerFactoryPortType port type for everyone
-#  chmod "$CONTAINER_NAME"/Services/EnhancedNotificationBrokerPortType +rx --everyone
-#  onerror failed to chmod mirror container EnhancedNotificationBrokerPortType port type for everyone
-#
-#  chmod "$CONTAINER_NAME"/Services/GeniiPublisherRegistrationPortType +rx --everyone
-#  onerror failed to chmod mirror container GeniiPublisherRegistrationPortType port type for everyone
-#  
-#  chmod "$CONTAINER_NAME"/Services/GeniiPullPointPortType +rx --everyone
-#  onerror failed to chmod mirror container GeniiPullPointPortType port type for everyone
-#  
-#  chmod "$CONTAINER_NAME"/Services/GeniiResolverPortType +rx --everyone
-#  onerror failed to chmod mirror container EnhancedNotificationBrokerPortType port type for everyone
-#
-#  chmod "$CONTAINER_NAME"/Services/GeniiSubscriptionPortType +rx --everyone
-#  onerror failed to chmod mirror container GeniiSubscriptionPortType port type for everyone
-#
-#  chmod "$CONTAINER_NAME"/Services/GeniiWSNBrokerPortType +rx --everyone
-#  onerror failed to chmod mirror container GeniiWSNBrokerPortType port type for everyone
+  chmod "$CONTAINER_NAME"/Services/EnhancedNotificationBrokerFactoryPortType +rx --everyone
+  onerror failed to chmod mirror container EnhancedNotificationBrokerFactoryPortType port type for everyone
+  chmod "$CONTAINER_NAME"/Services/EnhancedNotificationBrokerPortType +rx --everyone
+  onerror failed to chmod mirror container EnhancedNotificationBrokerPortType port type for everyone
+
+  chmod "$CONTAINER_NAME"/Services/GeniiPublisherRegistrationPortType +rx --everyone
+  onerror failed to chmod mirror container GeniiPublisherRegistrationPortType port type for everyone
+  
+  chmod "$CONTAINER_NAME"/Services/GeniiPullPointPortType +rx --everyone
+  onerror failed to chmod mirror container GeniiPullPointPortType port type for everyone
+  
+  chmod "$CONTAINER_NAME"/Services/GeniiResolverPortType +rx --everyone
+  onerror failed to chmod mirror container EnhancedNotificationBrokerPortType port type for everyone
+
+  chmod "$CONTAINER_NAME"/Services/GeniiSubscriptionPortType +rx --everyone
+  onerror failed to chmod mirror container GeniiSubscriptionPortType port type for everyone
+
+  chmod "$CONTAINER_NAME"/Services/GeniiWSNBrokerPortType +rx --everyone
+  onerror failed to chmod mirror container GeniiWSNBrokerPortType port type for everyone
 
   grid date
 
 eof
+if [ ! -z "$AM_USERX" ]; then
+	grid login /users/xsede.org/userX --username=userX --password=FOOP
+        grid whoami
+fi
+
+if [ ! -z "$AM_ADMIN" ]; then
+  	grid login /users/xsede.org/admin --username=admin --password=admin
+        grid whoami
+fi
+
 
 
 
