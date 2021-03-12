@@ -1,0 +1,18 @@
+Definitions:
+
+source-path 
+
+An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which refers to a directory or file (i.e. an RNS or ByteIO resource). To indicate a local path, begin the pathname with 'local:'. 
+
+target-path 
+
+An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which refers to a directory or file, or a non-existant resource (a path for which the final element of the path does not yet exist). To indicate a local path, begin the pathname with 'local:'. 
+
+offset
+
+The first byte in the source file that will be appended to the target file. In other words, all bytes up to the offset in the source file will be ignored.
+
+Description:
+
+Appends bytes from the source file, starting from the offset and continuing until EOF, to the target file.
+
