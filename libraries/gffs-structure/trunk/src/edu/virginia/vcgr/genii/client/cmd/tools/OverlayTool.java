@@ -1,8 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
 
@@ -21,8 +21,6 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.CopyMachine;
 import edu.virginia.vcgr.genii.client.rns.PathOutcome;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -30,7 +28,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
-import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 
 public class OverlayTool extends BaseGridTool
@@ -125,23 +122,61 @@ public class OverlayTool extends BaseGridTool
 	}
 	private static PathOutcome doAppend(GeniiPath source, GeniiPath target, int offset) throws RNSPathDoesNotExistException, RNSPathAlreadyExistsException, RemoteException, IOException
 	{
-		_logger.debug("Inside doAppend... Source: " + source + ", target: " + target + ", offset: " + offset);
-		// Get source EPR
-		RNSPath current = RNSPath.getCurrent();
-		RNSPath rnsSource = current.lookup(source.getName(), RNSPathQueryFlags.MUST_EXIST);
-		EndpointReferenceType sourceEPR = rnsSource.getEndpoint();
+		_logger.debug("Inside doAppend... Source: " + source.pathType().toString() + ":" + source.path() + ", target: " + target.pathType().toString() + ":" + target.path() + ", offset: " + offset);
 		
-		// Get Target EPR
-		RNSPath rnsTarget= current.lookup(target.getName(), RNSPathQueryFlags.MUST_EXIST);
-		EndpointReferenceType targetEPR = rnsTarget.getEndpoint();
+		int block_size = 32 * 1024 * 1024; // 32 MB blocks
 		
-		RandomByteIOPortType sourceStub = ClientUtils.createProxy(RandomByteIOPortType.class, sourceEPR);
-		RandomByteIOTransfererFactory sourceFactory = new RandomByteIOTransfererFactory(sourceStub);
-		RandomByteIOTransferer sourceTransferer = sourceFactory.createRandomByteIOTransferer();
-		RandomByteIOPortType targetStub = ClientUtils.createProxy(RandomByteIOPortType.class, targetEPR);
-		RandomByteIOTransfererFactory targetFactory = new RandomByteIOTransfererFactory(targetStub);
-		RandomByteIOTransferer targetTransferer = targetFactory.createRandomByteIOTransferer();
-		targetTransferer.append(sourceTransferer.read(offset, 10, 1, 0));
+		InputStream in = source.openInputStream();
+		in.skip(offset);
+		if (_logger.isDebugEnabled())
+			_logger.debug("Skipped " + offset + " bytes in input file");
+		byte[] buffer = new byte[block_size];
+		switch (target.pathType()) {
+			case Grid:
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling grid target");
+				RNSPath current = RNSPath.getCurrent();
+				RNSPath rnsTarget= current.lookup(target.path(), RNSPathQueryFlags.MUST_EXIST);
+				EndpointReferenceType targetEPR = rnsTarget.getEndpoint();
+				RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, targetEPR);
+				RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
+				RandomByteIOTransferer transferer = factory.createRandomByteIOTransferer();
+				while (true) {
+					int num_bytes = in.read(buffer, 0, block_size);
+					if (_logger.isDebugEnabled())
+						_logger.debug("Read " + num_bytes + " bytes from input file to buffer");
+					if (num_bytes <= 0) break;
+					if (_logger.isDebugEnabled())
+						_logger.debug("Wrote" + num_bytes + " bytes from buffer to output file");
+					transferer.append(buffer);
+				}
+				break;
+
+			case Local:
+				if (_logger.isDebugEnabled())
+					_logger.debug("Handling local target");
+				FileOutputStream out = new FileOutputStream(target.path(), true);
+				while (true) {
+					int num_bytes = in.read(buffer, 0, block_size);
+					if (_logger.isDebugEnabled())
+						_logger.debug("Read " + num_bytes + " bytes from input file to buffer");
+					if (num_bytes <= 0) break;
+					if (_logger.isDebugEnabled())
+						_logger.debug("Wrote" + num_bytes + " bytes from buffer to output file");
+					out.write(buffer);
+				}
+				out.write(0); // Adding EOF
+				if (_logger.isDebugEnabled())
+					_logger.debug("Wrote EOF to output file");
+				out.flush();
+				out.close();
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unexpected path type in GeniiPath.");
+		}
+		in.close();
+		_logger.info("Overlay transfer complete");
 		return PathOutcome.OUTCOME_SUCCESS;
 	}
 }
