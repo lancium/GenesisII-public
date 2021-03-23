@@ -13,10 +13,6 @@ public interface BESActivityTopics
 		TopicPath.createTopicPath(new QName(BESConstants.GENII_BES_NS, "ActivityStateChanged", "genii-bes"));
 
 	@WSNTopic(contentsType = BESActivityStateChangedContents.class)
-	static final public TopicPath ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC =
-		TopicPath.createTopicPath(ACTIVITY_STATE_CHANGED_TOPIC, "ReachedFinalState");
-	
-	@WSNTopic(contentsType = BESActivityStateChangedContents.class)
-	static final public TopicPath ACTIVITY_STATE_CHANGED_TO_PERSISTED =
-		TopicPath.createTopicPath(ACTIVITY_STATE_CHANGED_TOPIC, "ReachedPersistedState");
+	static final public TopicPath ACTIVITY_STATE_CHANGED_TO_FINAL_OR_PERSISTED_TOPIC =
+		TopicPath.createTopicPath(ACTIVITY_STATE_CHANGED_TOPIC, "ReachedFinalOrPersistedTopic");
 }

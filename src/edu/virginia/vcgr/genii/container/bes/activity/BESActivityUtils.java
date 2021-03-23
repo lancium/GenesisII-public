@@ -69,7 +69,7 @@ public class BESActivityUtils
 	}
 
 	static public MessageElement[] createCreationProperties(JobDefinition_Type jobDefinition, String containerID,
-		BESConstructionParameters nativeqProperties, MessageElement subscribe) throws RemoteException
+		BESConstructionParameters nativeqProperties, MessageElement subscription) throws RemoteException
 	{
 		Collection<MessageElement> ret = new LinkedList<MessageElement>();
 
@@ -78,8 +78,8 @@ public class BESActivityUtils
 
 		if (nativeqProperties != null)
 			ret.add(nativeqProperties.serializeToMessageElement());
-		if (subscribe != null)
-			ret.add(subscribe);
+		if (subscription != null)
+			ret.add(subscription);
 
 		return ret.toArray(new MessageElement[0]);
 	}

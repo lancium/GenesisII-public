@@ -330,15 +330,30 @@ public class BESActivity implements Closeable
 		return _jobAnnotation;
 	}
 
+
+	//LAK 2021 March 2nd: Need to restart the runner thread to carry out termination needs
+	synchronized private void softRestartForTermination() throws ExecutionException, SQLException
+	{
+		_logger.debug("LAK: soft retstart before termination");
+		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
+
+		_hasBeenRestartedFromCheckpoint = true;
+		startRunner();
+	}
+
 	synchronized public void terminate() throws ExecutionException, SQLException
 	{
 		if (_terminateRequested)
 			return;
-		
+
+		if(_persistRequested)
+			//need to restart the runner before handling this call
+			softRestartForTermination();
+
 		if (_runner != null)
 			_runner.requestTerminate(false);
-		
-		updateState(true, _destroyRequested, _persistRequested);
+
+		updateState(true, _destroyRequested, false);
 	}
 
 	synchronized public void persist() throws ExecutionException, SQLException
@@ -346,11 +361,11 @@ public class BESActivity implements Closeable
 		if (_persistRequested)
 			return;
 		
-		if (_runner != null)
-			_runner.setExecutionToPersisted();
-		
 		updateState(_terminateRequested, _destroyRequested, true);
 		updateState(new ActivityState(ActivityStateEnumeration.Persisting, null));
+
+		if (_runner != null)
+			_runner.setExecutionToPersisted();
 	}
 	
 	synchronized public void restart() throws ExecutionException, SQLException
@@ -358,13 +373,13 @@ public class BESActivity implements Closeable
 		if (!_persistRequested)
 			return;
 		
+		updateState(_terminateRequested, _destroyRequested, false);
+		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
+
 		//setup state for runner thread
 		_nextPhase = _nextPhase - 1;
 		_hasBeenRestartedFromCheckpoint = true;
 		startRunner();
-		
-		updateState(_terminateRequested, _destroyRequested, false);
-		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
 	}
 	
 	//LAK: Freeze/thaw is a little special in that the BESActivity doesn't do anything, this is just to alert to Activity
@@ -585,16 +600,11 @@ public class BESActivity implements Closeable
 			TopicSet space = TopicSet.forPublisher(BESActivityServiceImpl.class);
 			TopicPath topicPath;
 
-			if (state.isFinalState())
-				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC;
-			else if(state.isPersisted())
-			{
-				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_PERSISTED;
-			}
+			if (state.isFinalState() || state.isPersisted())
+				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_OR_PERSISTED_TOPIC;
 			else
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TOPIC;
 			
-			_logger.debug("sending state notification");
 			PublisherTopic topic = space.createPublisherTopic(topicPath);
 			topic.publish(new BESActivityStateChangedContents(state));
 		} finally {
@@ -767,7 +777,7 @@ public class BESActivity implements Closeable
 
 	final private boolean finishedExecution()
 	{
-		return _nextPhase >= _executionPlan.size();
+		return _executionPlan != null && (_nextPhase >= _executionPlan.size());
 	}
 
 	private boolean containsIgnoreableFault(Collection<Throwable> faults)
@@ -883,6 +893,7 @@ public class BESActivity implements Closeable
 
 				_terminateRequested = true;
 				_destroyRequested = false;
+				_persistRequested = false;
 
 				//LAK: 2020 Aug 13: We have to call this to interrupt any terminateable phase that is currently running.
 				if (_currentPhase != null && _currentPhase instanceof TerminateableExecutionPhase) {
@@ -970,7 +981,6 @@ public class BESActivity implements Closeable
 						if (_terminateRequested)
 						{
 							if (_currentPhase != null) {
-								_logger.debug("about to check if currentPhase=" + _currentPhase.getPhaseState() + " is a TerminateableExecutionPhase");
 								//LAK: we ONLY want to skip the phases that are marked as a TerminateableExecutionPhase
 								//CCH: Only skip this phase if we don't want to persist
 								if (_currentPhase instanceof TerminateableExecutionPhase) {
@@ -1010,7 +1020,8 @@ public class BESActivity implements Closeable
 					}
 					
 					try {
-						execute(_currentPhase);
+						if(_currentPhase != null)
+							execute(_currentPhase);
 					} catch (QueueResultsException qre) {
 						// Ok, the job terminated without a queue results file being generated, therefore the pwrapper did not complete.
 						// So, basically the system lost the job, the queue system killed it, the node died, something like that

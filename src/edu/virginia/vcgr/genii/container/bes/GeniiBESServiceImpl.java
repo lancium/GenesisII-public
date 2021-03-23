@@ -408,14 +408,14 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			// Ignore and hope that it still works out.
 		}
 
-		MessageElement subscribe = null;
+		MessageElement subscription = null;
 
 		MessageElement[] any = adt.get_any();
 		if (any != null) {
 			for (MessageElement a : any) {
 				QName name = a.getQName();
 				if (name.equals(bconsts.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME)) {
-					subscribe = a;
+					subscription = a;
 					_logger.info(String.format("BES with resource key \"%s\" received a subscription with job", _resource.getKey()));
 				}
 			}
@@ -441,7 +441,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 		EndpointReferenceType entryReference = new BESActivityServiceImpl().CreateEPR(
 			BESActivityUtils.createCreationProperties(jdt, _resource.getKey(),
-				(BESConstructionParameters) _resource.constructionParameters(getClass()), subscribe),
+				(BESConstructionParameters) _resource.constructionParameters(getClass()), subscription),
 			Container.getServiceURL("BESActivityPortType"));
 
 		return new CreateActivityResponseType(entryReference, adt, historySink.eventMessages());

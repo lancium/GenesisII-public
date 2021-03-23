@@ -482,16 +482,13 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	{
 		super.registerNotificationHandlers(multiplexer);
 
-		multiplexer.registerNotificationHandler(BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(),
-			new LegacyBESActivityStateChangeFinalNotificationHandler());
-		
-		multiplexer.registerNotificationHandler(BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_PERSISTED.asConcreteQueryExpression(),
-				new BESActivityStateChangedToPersistedHandler());
+		multiplexer.registerNotificationHandler(BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_OR_PERSISTED_TOPIC.asConcreteQueryExpression(),
+			new BESActivityStateChangedToImportantStateHandler());
 	}
 	
-	private class BESActivityStateChangedToPersistedHandler extends AbstractNotificationHandler<BESActivityStateChangedContents>
+	private class BESActivityStateChangedToImportantStateHandler extends AbstractNotificationHandler<BESActivityStateChangedContents>
 	{
-		private BESActivityStateChangedToPersistedHandler()
+		private BESActivityStateChangedToImportantStateHandler()
 		{
 			super(BESActivityStateChangedContents.class);
 		}
@@ -507,37 +504,12 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 			long jobid = userData.jobID();
 			ActivityState state = contents.activityState();
-			
-			_logger.debug("LAK::::::: got notification that pwrapper persisted");
-			_logger.debug(state.isPersisting());
-			_logger.debug(state.isPersisted());
 			
 			if (state.isPersisted())
 				_queueMgr.handlePwrapperPersistedNotification(jobid);
-			return NotificationConstants.OK;
-		}
-	}
-
-	private class LegacyBESActivityStateChangeFinalNotificationHandler extends AbstractNotificationHandler<BESActivityStateChangedContents>
-	{
-		private LegacyBESActivityStateChangeFinalNotificationHandler()
-		{
-			super(BESActivityStateChangedContents.class);
-		}
-
-		@Override
-		public String handleNotification(TopicPath topic, EndpointReferenceType producerReference,
-			EndpointReferenceType subscriptionReference, BESActivityStateChangedContents contents) throws Exception
-		{
-			JobCompletedAdditionUserData userData = contents.additionalUserData(JobCompletedAdditionUserData.class);
-
-			if (userData == null)
-				throw new RemoteException("Missing required user data for notification");
-
-			long jobid = userData.jobID();
-			ActivityState state = contents.activityState();
-			if (state.isFinalState())
+			else if (state.isFinalState())
 				_queueMgr.cleanUpJob(jobid);
+
 			return NotificationConstants.OK;
 		}
 	}

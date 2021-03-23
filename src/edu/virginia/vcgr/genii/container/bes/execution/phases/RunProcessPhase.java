@@ -70,7 +70,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase implements Terminat
 
 	static private void destroyProcess(ProcessWrapperToken process)
 	{
-		process.cancel();
+		if(process != null)
+			process.cancel();
 	}
 
 	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, Double memory, Integer numProcesses, Integer numProcessesPerHost,

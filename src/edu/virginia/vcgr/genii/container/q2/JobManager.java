@@ -61,12 +61,18 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLTransformer;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.client.jsdl.JobRequestParser;
+import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.axis.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.PersistentNotificationSubscriptionPolicy;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPolicy;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
@@ -618,7 +624,7 @@ public class JobManager implements Closeable
 			return;
 		}
 		synchronized (_data) {
-			//LAK 2020 Aug 28: Added check that this is the first time we are finishing the job.
+			//LAK 2020 Aug 28: Added check that this job is currently persisting
 			if(_data.getJobState() != QueueStates.PERSISTING)
 			{
 				if (_logger.isDebugEnabled())
@@ -657,7 +663,7 @@ public class JobManager implements Closeable
 		String besName = null;
 		if (besID != null)
 			besName = _besManager.getBESName(besID);
-
+		
 		_outcallThreadPool.enqueue(new JobKiller(job, job.getJobState(), besName, besID, true, false));
 
 		_schedulingEvent.notifySchedulingEvent();
@@ -2661,15 +2667,6 @@ public class JobManager implements Closeable
 						.format("Request to terminate job from outside the queue came while we are already terminating").close();
 						return;
 					}
-					
-					if(data.getJobState() == QueueStates.PERSISTED)
-					{
-						_logger.debug("Job Termination requested while PERSISTED. Currently, you must restart the job to terminate");
-						data.history(HistoryEventCategory.Terminating).createInfoWriter("Termination Requested When Persisted")
-						.format("Request to terminate job from outside the queue came while we are persisting or persisted; currently, this is not supported."
-								+ " You must restart the job before termination.").close();
-						return;
-					}
 
 					data.history(HistoryEventCategory.Terminating).createInfoWriter("Job Termination Requested")
 						.format("Request to terminate job from outside the queue").close();
@@ -2718,7 +2715,9 @@ public class JobManager implements Closeable
 					 * If the job is starting, we mark it as being killed. Starting implies that another thread is about to try and start the thing up
 					 * so it will have to check this flag and abort (or kill) as necessary.
 					 */
-					if (jobData.getJobState().equals(QueueStates.STARTING) || jobData.getJobState().equals(QueueStates.RUNNING)) {
+					if (jobData.getJobState().equals(QueueStates.STARTING) || jobData.getJobState().equals(QueueStates.RUNNING) ||
+							jobData.getJobState().equals(QueueStates.PERSISTED) || jobData.getJobState().equals(QueueStates.PERSISTING))
+					{
 						killJob(connection, jobID);
 					}
 					else if (jobData.getJobState().equals(QueueStates.QUEUED) || jobData.getJobState().equals(QueueStates.REQUEUED))
@@ -2908,13 +2907,17 @@ public class JobManager implements Closeable
 					GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, _besManager.getBESEPR(connection, _besID), startCtxt);
 
 					ClientUtils.setTimeout(bes, 120 * 1000);
+
 					ActivityDocumentType adt = new ActivityDocumentType(startInfo.getJSDL(), null);
 					EndpointReferenceType queueEPR = _database.getQueueEPR(connection);
+
 					if (queueEPR != null)
+					{
 						BESUtils.addSubscription(adt,
-							AbstractSubscriptionFactory.createRequest(queueEPR,
-								BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(), null,
-								new JobCompletedAdditionUserData(_jobID)));
+								AbstractSubscriptionFactory.createRequest(queueEPR,
+									BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_OR_PERSISTED_TOPIC.asConcreteQueryExpression(), null,
+									new JobCompletedAdditionUserData(_jobID)));
+					}
 
 					////////////////////////////////////////////////////////////////////
 					_logger.debug("Creating Activity");
