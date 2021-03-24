@@ -750,7 +750,6 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 				// TODO Auto-generated catch block	
 				e.printStackTrace();	
 			}	
-		// TODO: Change RestartActivityResponseType to take (activityid, true, null, null); 	
 		return new RestartActivityResponseType(activityid, true, null, null);	
 	}	
 

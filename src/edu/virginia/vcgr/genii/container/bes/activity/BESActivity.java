@@ -334,7 +334,6 @@ public class BESActivity implements Closeable
 	//LAK 2021 March 2nd: Need to restart the runner thread to carry out termination needs
 	synchronized private void softRestartForTermination() throws ExecutionException, SQLException
 	{
-		_logger.debug("LAK: soft retstart before termination");
 		updateState(new ActivityState(ActivityStateEnumeration.Running, null));
 
 		_hasBeenRestartedFromCheckpoint = true;
@@ -566,7 +565,6 @@ public class BESActivity implements Closeable
 	
 	synchronized public void notifyPwrapperHasPersisted() {
 		try {
-			_logger.debug("updating besactivity state to persisted");
 			updateState(new ActivityState(ActivityStateEnumeration.Persisted, null));
 		} catch (SQLException e) {
 			_logger.error("SQLException: Trying to update state to be persisted.");
