@@ -79,7 +79,6 @@
 			<xsd:enumeration value="Frozen"/>
 			<xsd:enumeration value="Persisting"/>
 			<xsd:enumeration value="Persisted"/>
-			<xsd:enumeration value="Restarted"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	

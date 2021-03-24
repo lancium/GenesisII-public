@@ -12,7 +12,7 @@
 #include "CommandLine.h"
 #include "OSSpecific.h"
 
-const char* version="Version 1.5";
+const char* version="Version 1.6";
 
 static void usage(const char *program);
 
