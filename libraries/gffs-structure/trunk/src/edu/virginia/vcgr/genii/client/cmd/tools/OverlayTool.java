@@ -1,9 +1,10 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +22,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.LoadFileResource;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.PathOutcome;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -102,34 +104,32 @@ public class OverlayTool extends BaseGridTool
 		}
 		GeniiPath target = new GeniiPath(targetPath);
 		if (!target.exists()) {
-			_logger.error(String.format("Unable to find source file %s!", source));
+			_logger.error(String.format("Unable to find target file %s!", source));
 			return PathOutcome.OUTCOME_NONEXISTENT;
 		}
 		if (!target.isFile()) {
-			_logger.error(String.format("Source path %s is not a file!", source));
+			_logger.error(String.format("Target path %s is not a file!", source));
 			return PathOutcome.OUTCOME_WRONG_TYPE;
 		}
 
 		// In verify() we checked that offset was numeric, so this shouldn't break
 		int num_offset = Integer.parseInt(offset);
 		try {
-			toReturn = doAppend(source, target, num_offset);
+			toReturn = doOverlay(source, target, num_offset);
 		} catch (RNSPathDoesNotExistException | RNSPathAlreadyExistsException | IOException e) {
 			_logger.error("Caught exception while trying to append", e);
 			return toReturn;
 		}
 		return toReturn;
 	}
-	private static PathOutcome doAppend(GeniiPath source, GeniiPath target, int offset) throws RNSPathDoesNotExistException, RNSPathAlreadyExistsException, RemoteException, IOException
+	private static PathOutcome doOverlay(GeniiPath source, GeniiPath target, int offset) throws RNSPathDoesNotExistException, RNSPathAlreadyExistsException, RemoteException, IOException
 	{
-		_logger.debug("Inside doAppend... Source: " + source.pathType().toString() + ":" + source.path() + ", target: " + target.pathType().toString() + ":" + target.path() + ", offset: " + offset);
+		if (_logger.isDebugEnabled())
+			_logger.debug("Inside doOverlay... Source: " + source.pathType().toString() + ":" + source.path() + ", target: " + target.pathType().toString() + ":" + target.path() + ", offset: " + offset);
 		
 		int block_size = 32 * 1024 * 1024; // 32 MB blocks
 		
 		InputStream in = source.openInputStream();
-		in.skip(offset);
-		if (_logger.isDebugEnabled())
-			_logger.debug("Skipped " + offset + " bytes in input file");
 		byte[] buffer = new byte[block_size];
 		switch (target.pathType()) {
 			case Grid:
@@ -137,38 +137,69 @@ public class OverlayTool extends BaseGridTool
 					_logger.debug("Handling grid target");
 				RNSPath current = RNSPath.getCurrent();
 				RNSPath rnsTarget= current.lookup(target.path(), RNSPathQueryFlags.MUST_EXIST);
+				
+				
 				EndpointReferenceType targetEPR = rnsTarget.getEndpoint();
+				/*
 				RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, targetEPR);
 				RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
 				RandomByteIOTransferer transferer = factory.createRandomByteIOTransferer();
+				*/
+				
+				RandomByteIOTransferer transferer = null;
+				TypeInformation info = new TypeInformation(targetEPR);
+				if (info.isRByteIO()) {
+					transferer = RandomByteIOTransfererFactory
+						.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class, targetEPR));
+				}
+				else {
+					_logger.error("Target is not an RByteio");
+				}
+				
+				/* GenesisIIFileSystem
+				TypeInformation info = new TypeInformation(target.getEndpoint());
+				if (info.isRByteIO()) {
+				
+					RandomByteIOTransferer transferer = RandomByteIOTransfererFactory
+						.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class, target.getEndpoint()));
+					transferer.truncAppend(newSize, new byte[0]);
+				 */
+				
+				//block_size = 16 * 1024; // 16K blocks
 				while (true) {
 					int num_bytes = in.read(buffer, 0, block_size);
-					if (_logger.isDebugEnabled())
-						_logger.debug("Read " + num_bytes + " bytes from input file to buffer");
 					if (num_bytes <= 0) break;
 					if (_logger.isDebugEnabled())
-						_logger.debug("Wrote" + num_bytes + " bytes from buffer to output file");
-					transferer.append(buffer);
+						_logger.debug("Read " + num_bytes + " bytes from input file to buffer");
+					
+					// This write (if > 16K) is failing because the Axis writes "big" files to disk
+					// Because the container (check TransferAgent.java, receiveIncomingAttachmentData) is unable to write that file to disk
+					// So the write fails with container-side FileNotFound
+					// i.e. This code is probably fine, but the container code or our Axis config is busted
+					transferer.write(offset, ByteBuffer.wrap(buffer, 0, num_bytes));
+					if (_logger.isDebugEnabled())
+						_logger.debug("Wrote " + num_bytes + " bytes from buffer to output file");
+					offset+=block_size;
 				}
 				break;
 
 			case Local:
 				if (_logger.isDebugEnabled())
 					_logger.debug("Handling local target");
-				FileOutputStream out = new FileOutputStream(target.path(), true);
+				RandomAccessFile out = new RandomAccessFile(target.path(), "rw");
 				while (true) {
+					out.seek(offset);
 					int num_bytes = in.read(buffer, 0, block_size);
-					if (_logger.isDebugEnabled())
-						_logger.debug("Read " + num_bytes + " bytes from input file to buffer");
 					if (num_bytes <= 0) break;
 					if (_logger.isDebugEnabled())
-						_logger.debug("Wrote" + num_bytes + " bytes from buffer to output file");
-					out.write(buffer);
+						_logger.debug("Read " + num_bytes + " bytes from input file to buffer");
+					out.write(buffer, 0, num_bytes);
+					if (_logger.isDebugEnabled())
+						_logger.debug("Wrote " + num_bytes + " bytes from buffer to output file");
+					offset+=block_size;
 				}
-				out.write(0); // Adding EOF
 				if (_logger.isDebugEnabled())
 					_logger.debug("Wrote EOF to output file");
-				out.flush();
 				out.close();
 				break;
 

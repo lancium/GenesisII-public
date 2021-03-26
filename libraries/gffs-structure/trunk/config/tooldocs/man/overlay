@@ -10,7 +10,7 @@ An absolute or relative path in the currently connected grid RNS namespace (unle
 
 offset
 
-The first byte in the source file that will be appended to the target file. In other words, all bytes up to the offset in the source file will be ignored.
+The location of the first byte in the target file where the contents of the source file will be overlayed.
 
 Description:
 
