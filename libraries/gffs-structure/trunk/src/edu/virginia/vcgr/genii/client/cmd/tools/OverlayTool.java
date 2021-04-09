@@ -81,7 +81,7 @@ public class OverlayTool extends BaseGridTool
 	}
 
 	/**
-	 * performs a copy operation from a source to a target. if the source or target mention grid: or local:, then those are used. otherwise
+	 * performs a overlay operation from a source to a target, starting at the offset in the target. if the source or target mention grid: or local:, then those are used. otherwise
 	 * this assumes both are in grid: space.
 	 */
 	public static PathOutcome overlay(String sourcePath, String targetPath, String offset, RNSPath logLocation,
@@ -89,8 +89,7 @@ public class OverlayTool extends BaseGridTool
 	{
 		if ((sourcePath == null) || (targetPath == null))
 			return PathOutcome.OUTCOME_NOTHING;
-		PathOutcome toReturn = PathOutcome.OUTCOME_ERROR; // until we know more specifically.
-		// do a recursive copy by traversing source.
+		PathOutcome toReturn = PathOutcome.OUTCOME_ERROR;
 		if (_logger.isDebugEnabled())
 			_logger.debug("copyOneFile from " + sourcePath + " to " + targetPath);
 		GeniiPath source = new GeniiPath(sourcePath);
@@ -154,18 +153,9 @@ public class OverlayTool extends BaseGridTool
 				}
 				else {
 					_logger.error("Target is not an RByteio");
+					return PathOutcome.OUTCOME_WRONG_TYPE;
 				}
 				
-				/* GenesisIIFileSystem
-				TypeInformation info = new TypeInformation(target.getEndpoint());
-				if (info.isRByteIO()) {
-				
-					RandomByteIOTransferer transferer = RandomByteIOTransfererFactory
-						.createRandomByteIOTransferer(ClientUtils.createProxy(RandomByteIOPortType.class, target.getEndpoint()));
-					transferer.truncAppend(newSize, new byte[0]);
-				 */
-				
-				//block_size = 16 * 1024; // 16K blocks
 				while (true) {
 					int num_bytes = in.read(buffer, 0, block_size);
 					if (num_bytes <= 0) break;
@@ -173,9 +163,11 @@ public class OverlayTool extends BaseGridTool
 						_logger.debug("Read " + num_bytes + " bytes from input file to buffer");
 					
 					// This write (if > 16K) is failing because the Axis writes "big" files to disk
-					// Because the container (check TransferAgent.java, receiveIncomingAttachmentData) is unable to write that file to disk
 					// So the write fails with container-side FileNotFound
-					// i.e. This code is probably fine, but the container code or our Axis config is busted
+					// i.e. This code is probably fine. If the problem comes up: check permissions for attachments directory
+					// which might be /home/dev/GenesisII/webapps/axis/WEB-INF/attachments
+					// This can be set in /home/dev/GenesisII/webapps/axis/WEB-INF/server-config.wsdd
+					// under the field: <parameter name="attachments.Directory" value="/my/dir/attachments"/>
 					transferer.write(offset, ByteBuffer.wrap(buffer, 0, num_bytes));
 					if (_logger.isDebugEnabled())
 						_logger.debug("Wrote " + num_bytes + " bytes from buffer to output file");
@@ -198,8 +190,6 @@ public class OverlayTool extends BaseGridTool
 						_logger.debug("Wrote " + num_bytes + " bytes from buffer to output file");
 					offset+=block_size;
 				}
-				if (_logger.isDebugEnabled())
-					_logger.debug("Wrote EOF to output file");
 				out.close();
 				break;
 
