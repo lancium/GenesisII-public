@@ -49,7 +49,9 @@ grid cp grid-grid.txt local:grid-grid.txt
 # grid -> local test
 grid overlay test.file local:grid-local.txt 0
 
-# Verify all hashes are equal, if not, overlay is busted...
+# Verify all sizes hashes are equal, if not, overlay is busted...
+du -b test.file local-local.txt local-grid.txt grid-grid.txt grid-local.txt
+du -h test.file local-local.txt local-grid.txt grid-grid.txt grid-local.txt
 md5sum test.file local-local.txt local-grid.txt grid-grid.txt grid-local.txt
 
 
