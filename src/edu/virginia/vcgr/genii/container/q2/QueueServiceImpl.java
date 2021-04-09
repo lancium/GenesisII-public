@@ -506,8 +506,15 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 
 			long jobid = userData.jobID();
 			ActivityState state = contents.activityState();
-			if (state.isFinalState())
-				_queueMgr.cleanUpJob(jobid);
+			if (state.isFinalState()) {
+				// 2021-04-08 by ASG, catch failed states and call failjob
+				if (state.isFailedState()) {
+					//_queueMgr.failjob(jobid, true);
+				}
+				else
+					_queueMgr.cleanUpJob(jobid);
+
+			}
 			return NotificationConstants.OK;
 		}
 	}

@@ -363,6 +363,7 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
+	// 2021-04-08 by ASG .. removed database connection parameter as it was not being used
 	public boolean failJob(Connection connection, long jobID, boolean countAsAnAttempt, boolean isPermanent, boolean attemptKill)
 		throws SQLException, ResourceException
 	{

@@ -490,6 +490,10 @@ public class QueueManager implements Closeable
 			e.printStackTrace();
 		}
 	}
+	
+	public void failjob(long jobID, boolean countAsAnAttempt ) {
+		//_jobManager.failJob(connection, jobID, countAsAnAttempt, isPermanent, attemptKill)
+	}
 
 	public JobInformationType getStatusFromID(Long jobID, Connection conn) throws ResourceException, GenesisIISecurityException, SQLException
 	{
