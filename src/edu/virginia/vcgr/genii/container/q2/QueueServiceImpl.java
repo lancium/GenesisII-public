@@ -509,6 +509,7 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 			if (state.isFinalState()) {
 				// 2021-04-08 by ASG, catch failed states and call failjob
 				if (state.isFailedState()) {
+					_logger.debug("HandleNotification::failed job");
 					//_queueMgr.failjob(jobid, true);
 				}
 				else
