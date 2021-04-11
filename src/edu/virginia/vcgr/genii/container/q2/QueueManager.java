@@ -492,7 +492,17 @@ public class QueueManager implements Closeable
 	}
 	
 	public void failjob(long jobID, boolean countAsAnAttempt ) {
-		//_jobManager.failJob(connection, jobID, countAsAnAttempt, isPermanent, attemptKill)
+		_logger.debug("QManager::failjob -  entering short "+jobID);
+		try {
+			_jobManager.failJob(null, jobID, true, false,false);
+		} catch (ResourceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		_logger.debug("QManager::failjob -  exiting short "+jobID);
 	}
 
 	public JobInformationType getStatusFromID(Long jobID, Connection conn) throws ResourceException, GenesisIISecurityException, SQLException
