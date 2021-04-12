@@ -347,7 +347,7 @@ public class JobManager implements Closeable
 		if (starting.size() > 0)
 			_logger.debug(String.format("Failing %d jobs that were marked as starting when the " + "container went down.", starting.size()));
 		for (JobData job : starting)
-			failJob(connection, job.getJobID(), false, false, true);
+			failJob(job.getJobID(), false, false, true);
 	}
 
 	/**
@@ -364,7 +364,7 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 */
 	// 2021-04-08 by ASG .. removed database connection parameter as it was not being used
-	public boolean failJob(Connection connection, long jobID, boolean countAsAnAttempt, boolean isPermanent, boolean attemptKill)
+	public boolean failJob(long jobID, boolean countAsAnAttempt, boolean isPermanent, boolean attemptKill)
 		throws SQLException, ResourceException
 	{
 		boolean ret = false;
@@ -1717,7 +1717,7 @@ public class JobManager implements Closeable
 			try {
 				if (_logger.isDebugEnabled())
 					_logger.debug(String.format("Rescheduling job %d.", jobID));
-				failJob(connection, jobID, false, false, true);
+				failJob(jobID, false, false, true);
 			} catch (Throwable cause) {
 				_logger.warn(String.format("Unable to \"reschedule\" job %d.", jobID), cause);
 			}
@@ -2710,7 +2710,7 @@ public class JobManager implements Closeable
 		int commAttempts = _database.getJobCommunicationAttempts(connection, jobid);
 		if (commAttempts > MAX_COMM_ATTEMPTS) {
 			_logger.error(String.format("Unable to communicate with job for %d attempts.  Re-starting it.", commAttempts));
-			failJob(connection, jobid, false, false, false);
+			failJob(jobid, false, false, false);
 			_besManager.markBESAsMissed(besid, "Couldn't get job status.");
 		} else {
 			_database.setJobCommunicationAttempts(connection, jobid, commAttempts + 1);
@@ -2979,7 +2979,7 @@ public class JobManager implements Closeable
 
 				try {
 					/* We got an exception, so fail the job. */
-					failJob(connection, _jobID, countAgainstJob, isPermanent, true);
+					failJob(_jobID, countAgainstJob, isPermanent, true);
 					_schedulingEvent.notifySchedulingEvent();
 				} catch (Throwable cause2) {
 					_logger.error("Unable to fail a job.", cause2);

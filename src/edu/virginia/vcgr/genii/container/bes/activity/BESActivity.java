@@ -554,8 +554,10 @@ public class BESActivity implements Closeable
 			TopicSet space = TopicSet.forPublisher(BESActivityServiceImpl.class);
 			TopicPath topicPath;
 
-			if (state.isFinalState())
+			if (state.isFinalState()) {
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC;
+				_logger.debug("notifyStateChange: for "+_activityid + " to "+ topicPath + " " + state);
+			}
 			else
 				topicPath = BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TOPIC;
 
