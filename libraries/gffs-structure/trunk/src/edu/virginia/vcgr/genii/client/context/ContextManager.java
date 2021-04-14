@@ -51,9 +51,9 @@ public class ContextManager
 {
 	static private final String _CONTEXT_RESOLVER_NAME = "context-resolver";
 	static private Log _logger = LogFactory.getLog(ContextManager.class);
-		
-	static private final int MAX_IDENTITIES  = 200;
-	static private final int LIFETIME = 1000*60*60*24; // 24 hours
+	// 2021-04-14 by ASG Increase the context size to 1000, and the timeout to a week.
+	static private final int MAX_IDENTITIES  = 100;
+	static private final int LIFETIME = 1000*60*60*24*7; // 24 hours
 	/* Added May 9, 2019 by ASG
 	 * _idMap holds a set of credentials from login sessions
 	 */

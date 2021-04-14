@@ -3096,7 +3096,13 @@ public class JobManager implements Closeable
 						String.format("JobKiller::terminateActivity killing request for %s a persistent outcall.", _jobData));
 				// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
 				BESActivityTerminatorActor firstTry=new BESActivityTerminatorActor(killInfo.getJobEndpoint());
-				if (!firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null)) {
+				boolean worked=firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null);
+				/*
+				 * if (!firstTry.enactOutcall(killInfo.getCallingContext(), killInfo.getBESEndpoint(), null)) {
+				 
+				*/
+				if (!worked) {
+				
 					if (_logger.isDebugEnabled())
 						_logger.debug(
 							String.format("JobKiller::terminateActivity making a request for %s a persistent outcall.", _jobData));
@@ -3128,8 +3134,11 @@ public class JobManager implements Closeable
 
 				ICallingContext ctxt = destroyInfo.getCallingContext();
 
+				
 				// New 7/22/2017 by ASG. Just try the RPC, if it fails, then put it into the persistent caller DB
 				BESActivityDestroyActor firstTry=new BESActivityDestroyActor(_database.historyKey(_jobData.getJobTicket()), _jobData.historyToken(), _besName, destroyInfo.getJobEndpoint());
+				//boolean worked=firstTry.enactOutcall(destroyInfo.getCallingContext(), destroyInfo.getBESEndpoint(), null);
+				//if (!worked) {
 				if (!firstTry.enactOutcall(destroyInfo.getCallingContext(), destroyInfo.getBESEndpoint(), null)) {
 						if (_logger.isDebugEnabled())
 							_logger.debug(
