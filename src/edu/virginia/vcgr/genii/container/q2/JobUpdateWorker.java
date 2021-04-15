@@ -146,7 +146,7 @@ public class JobUpdateWorker implements OutcallHandler
 						_logger.debug(
 							String.format("JSC:Asked to check status on job %s which is " + "no longer running according to the database.State is " + _data.getJobState(), _data));
 					_data.clearJobAction();
-					_jobManager.failJob(connection, _jobInfo.getJobID(), false, false, false);
+					_jobManager.failJob(_jobInfo.getJobID(), false, false, false);
 
 					return;
 				}
@@ -237,10 +237,10 @@ public class JobUpdateWorker implements OutcallHandler
 
 					if (state.isFailedState()) {
 						/* If the job failed in the BES, fail it in the queue */
-						_jobManager.failJob(connection, _jobInfo.getJobID(), !state.isIgnoreable(), false, true);
+						_jobManager.failJob(_jobInfo.getJobID(), !state.isIgnoreable(), false, true);
 					} else if (state.isCancelledState()) {
 						/* If the job was cancelled, then finish it here */
-						_jobManager.failJob(connection, _jobInfo.getJobID(), false, false, true);
+						_jobManager.failJob( _jobInfo.getJobID(), false, false, true);
 					} else if (state.isFinishedState()) {
 						/* If the job finished on the bes, finish it here */
 						_jobManager.finishJob(_jobInfo.getJobID());

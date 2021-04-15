@@ -100,6 +100,7 @@ fi
 cp -r ${DEPLOYMENTS_ROOT}/current_grid $ddir
 # Make the deployments user dir. This is where stuff like the database, rbyteio dir, etc go
 mkdir "${CONTAINER_USER_DIR}"
+chmod g+x "${CONTAINER_USER_DIR}" 
 
 # Now we overwrite the deployment-conf.xml file with new information
 

@@ -48,63 +48,25 @@ import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
 public class ClientServerSession extends ConnectionSession implements Runnable, Closeable
 {
 	static private Logger _logger = Logger.getLogger(FTPSession.class);
-	// 2020-10-10 by ASG. 
-	// We are having a race condition when multiple client server sessions are active at a time. We do not know why. We
-	// are looking into it. Until then we will serialize the sessions by performing a schronized block around the actual 
-	// implementation code.
-	static private String sync=new String("sync var");
-	// end of update
 
-//	private int _authAttemptCount = 0;
 	private FTPConfiguration _configuration;
 
 	private Socket _socket;
-	private HashMap<String, ICommand> _commands;
+
 	private FTPSessionState _sessionState;
 
 	private IdleTimer _idleTimer = new IdleTimer();
 
-	private void addCommand(ICommand handler)
-	{
-		for (String verb : handler.getHandledVerbs()) {
-			_commands.put(verb, handler);
-		}
-	}
 
-	private void addCommands() throws NoSuchMethodException
-	{
-		addCommand(new ReflectiveCommand(UserCommandHandler.class, "USER"));
-		addCommand(new ReflectiveCommand(PassCommandHandler.class, "PASS"));
-		addCommand(new ReflectiveCommand(PASVCommandHandler.class, "PASV"));
-		addCommand(new ReflectiveCommand(ListCommandHandler.class, "LIST"));
-		addCommand(new ReflectiveCommand(NLSTCommandHandler.class, "NLST"));
-		addCommand(new ReflectiveCommand(CWDCommandHandler.class, "CWD", "XCWD"));
-		addCommand(new ReflectiveCommand(QUITCommandHandler.class, "QUIT"));
-		addCommand(new ReflectiveCommand(MkdirCommandHandler.class, "MKD"));
-		addCommand(new ReflectiveCommand(PWDCommandHandler.class, "PWD"));
-		addCommand(new ReflectiveCommand(RetrieveCommandHandler.class, "RETR"));
-		addCommand(new ReflectiveCommand(TypeCommandHandler.class, "TYPE"));
-		addCommand(new ReflectiveCommand(StoreCommandHandler.class, "STOR"));
-		addCommand(new ReflectiveCommand(SizeCommandHandler.class, "SIZE"));
-		addCommand(new ReflectiveCommand(RmDirCommandHandler.class, "RMD"));
-		addCommand(new ReflectiveCommand(RenameFromCommandHandler.class, "RNFR"));
-		addCommand(new ReflectiveCommand(RenameToCommandHandler.class, "RNTO"));
-		addCommand(new ReflectiveCommand(DeleteCommandHandler.class, "DELE"));
-	}
+
+
 
 	ClientServerSession(FTPListenerManager manager, FTPConfiguration configuration, int sessionID, IBackend backend, Socket socket)
 	{
 		_configuration = configuration;
 		_socket = socket;
 
-		_commands = new HashMap<String, ICommand>();
 		_sessionState = new FTPSessionState(manager, _configuration, backend, sessionID);
-
-		try {
-			addCommands();
-		} catch (NoSuchMethodException nsme) {
-			_logger.error("Problem registering command handlers.", nsme);
-		}
 
 		manager.fireSessionOpened(sessionID);
 	}
@@ -124,9 +86,7 @@ public class ClientServerSession extends ConnectionSession implements Runnable, 
 		PrintWriter outwriter = null;
 
 		String line;
-		// 2020-10-10 by ASG. Added to serialize calls while we figure out the race.
-//		synchronized(sync) {
-			// End of update
+
 		try {
 			// get the local identity's key material (or create one if necessary)
 			ICallingContext initialCallingContext = ContextManager.getCurrentOrMakeNewContext();
