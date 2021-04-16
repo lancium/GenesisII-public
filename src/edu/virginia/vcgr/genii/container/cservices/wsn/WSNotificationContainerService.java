@@ -134,6 +134,7 @@ public class WSNotificationContainerService extends AbstractContainerService
 						new ExponentialBackoffScheduler(7L, TimeUnit.DAYS, null, null, 1L, TimeUnit.MINUTES, 30L, TimeUnit.MILLISECONDS),
 						subscription.consumerReference(), null, attachment);
 				} else {
+					_logger.debug("submitting a notification " + publisherKey + "topic: "+topic+" contents: "+contents);
 					_executor.submit(new NotificationWorker(subscription.consumerReference(), actor, attachment));
 				}
 			}
