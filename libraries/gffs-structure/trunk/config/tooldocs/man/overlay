@@ -14,5 +14,8 @@ The location of the first byte in the target file where the contents of the sour
 
 Description:
 
-Appends bytes from the source file, starting from the offset and continuing until EOF, to the target file.
+Overlays all bytes from the source file into target file, starting at an offset in the target file.
 
+If the source file length + offset is greater than the target file length, the target file will be extended to fit all new bytes.
+
+If the offset is greater than the target file length, 0s will be between the last real target byte and the first overlaid source byte.

@@ -139,12 +139,6 @@ public class OverlayTool extends BaseGridTool
 				
 				
 				EndpointReferenceType targetEPR = rnsTarget.getEndpoint();
-				/*
-				RandomByteIOPortType clientStub = ClientUtils.createProxy(RandomByteIOPortType.class, targetEPR);
-				RandomByteIOTransfererFactory factory = new RandomByteIOTransfererFactory(clientStub);
-				RandomByteIOTransferer transferer = factory.createRandomByteIOTransferer();
-				*/
-				
 				RandomByteIOTransferer transferer = null;
 				TypeInformation info = new TypeInformation(targetEPR);
 				if (info.isRByteIO()) {
@@ -162,12 +156,16 @@ public class OverlayTool extends BaseGridTool
 					if (_logger.isDebugEnabled())
 						_logger.debug("Read " + num_bytes + " bytes from input file to buffer");
 					
-					// This write (if > 16K) is failing because the Axis writes "big" files to disk
-					// So the write fails with container-side FileNotFound
-					// i.e. This code is probably fine. If the problem comes up: check permissions for attachments directory
-					// which might be /home/dev/GenesisII/webapps/axis/WEB-INF/attachments
-					// This can be set in /home/dev/GenesisII/webapps/axis/WEB-INF/server-config.wsdd
+					// 2021 April 16 - CCH
+					// THIS WRITE COULD FAIL IF NUM_BYTES > 16K!
+					// Axis writes "big" buffers to disk. If the write fails, you will see a FileNotFound exception in the log.
+					// This overlay code is probably fine. If the problem comes up: check permissions for attachments directory
+					// The attachments dir can be found and set in /home/dev/GenesisII/webapps/axis/WEB-INF/server-config.wsdd
 					// under the field: <parameter name="attachments.Directory" value="/my/dir/attachments"/>
+					// If this field is not set (like right now), the dir might be /home/dev/GenesisII/webapps/axis/WEB-INF/attachments
+					// The way I fixed this was by changing the permissions on that directory from 755 to 777.
+					// Every 'ant clean build' will cleanup and recreate the directory with 755 permissions, but overlay continued to work.
+					// Maybe give that a whirl or change the directory if you've run into the same problem.
 					transferer.write(offset, ByteBuffer.wrap(buffer, 0, num_bytes));
 					if (_logger.isDebugEnabled())
 						_logger.debug("Wrote " + num_bytes + " bytes from buffer to output file");
