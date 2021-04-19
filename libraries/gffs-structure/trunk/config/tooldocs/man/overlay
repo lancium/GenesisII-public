@@ -1,0 +1,21 @@
+Definitions:
+
+source-path 
+
+An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which refers to a directory or file (i.e. an RNS or ByteIO resource). To indicate a local path, begin the pathname with 'local:'. 
+
+target-path 
+
+An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which refers to a directory or file, or a non-existant resource (a path for which the final element of the path does not yet exist). To indicate a local path, begin the pathname with 'local:'. 
+
+offset
+
+The location of the first byte in the target file where the contents of the source file will be overlayed.
+
+Description:
+
+Overlays all bytes from the source file into target file, starting at an offset in the target file.
+
+If the source file length + offset is greater than the target file length, the target file will be extended to fit all new bytes.
+
+If the offset is greater than the target file length, 0s will be between the last real target byte and the first overlaid source byte.

@@ -98,6 +98,7 @@ GFFS_TESTS=( \
   GFFS_Tests/Functional_Tests/rnsBearTrap.sh \
   GFFS_Tests/Functional_Tests/testRandomFileTransfers.sh \
   GFFS_Tests/Functional_Tests/testRandomFileTransfersOnFuse.sh \
+  GFFS_Tests/Functional_Tests/testOverlayTool.sh \
   GFFS_Tests/Performance_Tests/directoryTree.sh \
   GFFS_Tests/Performance_Tests/gnuMake.sh \
   GFFS_Tests/Performance_Tests/localAndRemoteData.sh \

@@ -50,5 +50,5 @@ public interface StreamableByteIOTransferer extends ByteIOTransferer
 	 * 
 	 * @throws RemoteException
 	 */
-	public void seekWrite(SeekOrigin orgin, long offset, byte[] data) throws RemoteException;
+	public void seekWrite(SeekOrigin origin, long offset, byte[] data) throws RemoteException;
 }
