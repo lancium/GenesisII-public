@@ -173,13 +173,22 @@
 	</wsdl:message>
 	
 	<wsdl:message name="PersistRequest">
-		<wsdl:part name="PersistRequest"
-			element="job-management:PersistRequestType"/>
+		<wsdl:part name="PersistRequest" element="job-management:PersistRequestType"/>
 	</wsdl:message>
 
 	<wsdl:message name="PersistResponse">
 		<wsdl:part name="PersistResponse"
 			element="job-management:PersistResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="MigrateRequest">
+		<wsdl:part name="MigrateRequest"
+			element="job-management:MigrateRequestType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="MigrateResponse">
+		<wsdl:part name="MigrateResponse"
+			element="job-management:MigrateResponseType"/>
 	</wsdl:message>
 	
 	<wsdl:message name="RestartRequest">
@@ -307,6 +316,11 @@
 		<wsdl:operation name="persistJobs">
 			<wsdl:input message="job-management:PersistRequest"/>
 			<wsdl:output message="job-management:PersistResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="migrateJobs">
+			<wsdl:input message="job-management:MigrateRequest"/>
+			<wsdl:output message="job-management:MigrateResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="restartJobs">

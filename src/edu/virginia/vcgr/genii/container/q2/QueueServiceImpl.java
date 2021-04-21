@@ -31,6 +31,8 @@ import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
+import org.ggf.bes.factory.AcquireActivitiesResponseType;
+import org.ggf.bes.factory.AcquireActivitiesType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.PersistActivitiesResponseType;
@@ -63,6 +65,7 @@ import edu.virginia.cs.vcgr.genii.job_management.IterateListResponseType;
 import edu.virginia.cs.vcgr.genii.job_management.IterateStatusResponseType;
 import edu.virginia.cs.vcgr.genii.job_management.JobErrorPacket;
 import edu.virginia.cs.vcgr.genii.job_management.JobInformationType;
+import edu.virginia.cs.vcgr.genii.job_management.MigrateRequestType;
 import edu.virginia.cs.vcgr.genii.job_management.QueryErrorRequest;
 import edu.virginia.cs.vcgr.genii.job_management.ReducedJobInformationType;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
@@ -221,6 +224,12 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 		} catch (SQLException sqe) {
 			throw new RemoteException("Unable to persist jobs in queue.", sqe);
 		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public String[] migrateJobs(MigrateRequestType migrateRequest) throws RemoteException {
+		return null;
 	}
 	
 	@Override
@@ -787,9 +796,17 @@ public class QueueServiceImpl extends ResourceForkBaseService implements QueuePo
 	
 	//LAK 2020 Aug 13: This is a stub that should not be implemented in the queue.
 	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
 	public DestroyActivitiesResponseType destroyActivities(DestroyActivitiesType parameters)
 			throws RemoteException, UnknownActivityIdentifierFaultType {
-		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	//LAK 2021 April 21: This is a stub that should not be implemented in the queue.
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public AcquireActivitiesResponseType acquireActivities(AcquireActivitiesType parameters)
+			throws RemoteException, UnknownActivityIdentifierFaultType {
 		return null;
 	}
 }

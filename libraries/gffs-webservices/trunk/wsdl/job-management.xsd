@@ -162,6 +162,23 @@
 		type="job-management:PersistRequestType"/>
 	<xsd:element name="PersistResponse"/>
 	
+	<xsd:complexType name="MigrateRequestType">
+		<xsd:sequence>
+			<xsd:element name="targetBES" type="wsa:EndpointReferenceType"/>
+			<xsd:element name="job-tickets" type="xsd:string" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="MigrateRequestType"
+		type="job-management:MigrateRequestType"/>
+	
+	<xsd:complexType name="MigrateResponseType">
+		<xsd:sequence>
+			<xsd:element name="tickets" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="MigrateResponseType" type="job-management:MigrateResponseType"/>
+	
 	<xsd:complexType name="RestartRequestType">
 		<xsd:sequence>
 			<xsd:element name="job-ticket" type="xsd:string"

@@ -65,7 +65,7 @@ public class JobPersistWorker implements OutcallHandler {
 				/* call the BES container to start persisting the job. */
 				AddressingParameters aps = new AddressingParameters(jobEndpoint.getReferenceParameters());
 				String epi = aps.getResourceKey();
-				persistResponses = clientStub.persistActivities(new PersistActivitiesType(new String[]{epi}, false, null)).getResponse();
+				persistResponses = clientStub.persistActivities(new PersistActivitiesType(new String[]{epi}, false, false, null)).getResponse();
 				
 				for(PersistActivityResponseType pRes : persistResponses)
 				{

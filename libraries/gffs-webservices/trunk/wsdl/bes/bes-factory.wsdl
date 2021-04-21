@@ -125,6 +125,7 @@
 				<xsd:sequence>
 					<xsd:element name="ActivityIdentifier" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element name="onNode" type="xsd:boolean"/>
+					<xsd:element name="noAutoRestart" type="xsd:boolean"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 				<xsd:anyAttribute namespace="##other" processContents="lax"/>
@@ -133,6 +134,24 @@
 			<xsd:complexType name="PersistActivitiesResponseType">
 				<xsd:sequence>
 					<xsd:element name="Response" type="bes-factory:PersistActivityResponseType"
+						minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="AcquireActivitiesType">
+				<xsd:sequence>
+					<xsd:element name="activities" type="wsa:EndpointReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="BESes" type="wsa:EndpointReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:complexType>
+			
+			<xsd:complexType name="AcquireActivitiesResponseType">
+				<xsd:sequence>
+					<xsd:element name="Response" type="bes-factory:AcquireActivityResponseType"
 						minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
@@ -278,6 +297,11 @@
 				type="bes-factory:PersistActivitiesType"/>
 			<xsd:element name="PersistActivitiesResponse"
 				type="bes-factory:PersistActivitiesResponseType"/>
+				
+			<xsd:element name="AcquireActivities"
+				type="bes-factory:AcquireActivitiesType"/>
+			<xsd:element name="AcquireActivitiesResponse"
+				type="bes-factory:AcquireActivitiesResponseType"/>
 
 			<xsd:element name="RestartActivities"
 				type="bes-factory:RestartActivitiesType"/>
@@ -379,6 +403,12 @@
 	</wsdl:message>
 	<wsdl:message name="PersistActivitiesResponse">
 		<wsdl:part name="parameters" element="bes-factory:PersistActivitiesResponse"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="AcquireActivitiesRequest">
+		<wsdl:part name="parameters" element="bes-factory:AcquireActivities"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="AcquireActivitiesResponse">
+		<wsdl:part name="parameters" element="bes-factory:AcquireActivitiesResponse"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="RestartActivitiesRequest">
 		<wsdl:part name="parameters" element="bes-factory:RestartActivities"></wsdl:part>
@@ -545,6 +575,21 @@
 				name="PersistActivitiesResponse"
 				message="bes-factory:PersistActivitiesResponse"
 				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/PersistActivitiesResponse"/>
+			<wsdl:fault
+				name="UnknownActivityIdentifierFault"
+				message="bes-factory:UnknownActivityIdentifierFault"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/Fault"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="AcquireActivities">
+			<wsdl:input
+				name="AcquireActivities"
+				message="bes-factory:AcquireActivitiesRequest"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/AcquireActivities"/>
+			<wsdl:output
+				name="AcquireActivitiesResponse"
+				message="bes-factory:AcquireActivitiesResponse"
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/AcquireActivitiesResponse"/>
 			<wsdl:fault
 				name="UnknownActivityIdentifierFault"
 				message="bes-factory:UnknownActivityIdentifierFault"

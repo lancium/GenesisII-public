@@ -130,6 +130,16 @@
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
 	
+	<xsd:complexType name="AcquireActivityResponseType">
+		<xsd:sequence>
+			<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"/>
+			<xsd:element name="Aquired" type="xsd:boolean"/>
+			<xsd:element name="Fault" type="soap:Fault" minOccurs="0"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
 	<xsd:complexType name="RestartActivityResponseType">
 		<xsd:sequence>
 			<xsd:element name="ActivityIdentifier" type="xsd:string"/>

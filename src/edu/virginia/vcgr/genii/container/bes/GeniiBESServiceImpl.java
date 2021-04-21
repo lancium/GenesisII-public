@@ -42,6 +42,9 @@ import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.PersistActivitiesResponseType;
 import org.ggf.bes.factory.PersistActivitiesType;
 import org.ggf.bes.factory.PersistActivityResponseType;
+import org.ggf.bes.factory.AcquireActivitiesResponseType;
+import org.ggf.bes.factory.AcquireActivitiesType;
+import org.ggf.bes.factory.AcquireActivityResponseType;
 import org.ggf.bes.factory.RestartActivitiesResponseType;
 import org.ggf.bes.factory.RestartActivitiesType;
 import org.ggf.bes.factory.RestartActivityResponseType;
@@ -70,6 +73,7 @@ import edu.virginia.cs.vcgr.genii.job_management.GetJobLogResponse;
 import edu.virginia.cs.vcgr.genii.job_management.IterateListResponseType;
 import edu.virginia.cs.vcgr.genii.job_management.IterateStatusResponseType;
 import edu.virginia.cs.vcgr.genii.job_management.JobErrorPacket;
+import edu.virginia.cs.vcgr.genii.job_management.MigrateRequestType;
 import edu.virginia.cs.vcgr.genii.job_management.QueryErrorRequest;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
 import edu.virginia.cs.vcgr.genii.job_management.SubmitJobResponseType;
@@ -119,7 +123,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
-import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.rwx.RWXMapping;
 import edu.virginia.vcgr.jsdl.JobDefinition;
@@ -721,7 +724,26 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 			}
 		}
 		return new PersistActivityResponseType(activityid, success, null, null);	
-	}	
+	}
+	
+	@Override	
+	@RWXMapping(RWXCategory.EXECUTE)	
+	public AcquireActivitiesResponseType acquireActivities(AcquireActivitiesType parameters)	
+		throws RemoteException, UnknownActivityIdentifierFaultType	
+	{	
+		Collection<AcquireActivityResponseType> responses = new LinkedList<AcquireActivityResponseType>();	
+
+		for (EndpointReferenceType aepr : parameters.getActivities()) {	
+			responses.add(acquireActivity(null, aepr));
+		}	
+
+		return new AcquireActivitiesResponseType(responses.toArray(new AcquireActivityResponseType[0]), null);	
+	}
+
+	static public AcquireActivityResponseType acquireActivity(EndpointReferenceType fromBES, EndpointReferenceType activityepr) throws RemoteException	
+	{
+		return new AcquireActivityResponseType(activityepr, false, null, null);	
+	}
 
 	@Override	
 	@RWXMapping(RWXCategory.EXECUTE)	
@@ -917,6 +939,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements Geni
 
 	@Override
 	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest) throws RemoteException
+	{
+		return null;
+	}
+
+	//LAK: 2021 April 21: This is a stub, do not implement in BES
+	@Override
+	public String[] migrateJobs(MigrateRequestType migrateRequest) throws RemoteException
 	{
 		return null;
 	}
