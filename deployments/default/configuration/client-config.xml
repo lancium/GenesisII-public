@@ -347,6 +347,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.DateTool</mconf:class>
 		<mconf:class name="rmdir"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RmdirTool</mconf:class>
+		<mconf:class name="overlay"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.OverlayTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>
