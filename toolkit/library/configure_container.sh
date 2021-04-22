@@ -150,7 +150,7 @@ if [ $? -eq 0 ]; then
    	export AM_USERX='true'
 	echo "Am userX, switching to admin"
 	grid logout --all
-        grid keystoreLogin --no-gui --password=admin --storetype=PKCS12 local:$GENII_INSTALL_DIR/deployments/sarah/security/admin.pfx
+        grid keystoreLogin --no-gui --password=admin --storetype=PKCS12 local:$GENII_INSTALL_DIR/deployments/$CONTAINER_NAME/security/admin.pfx
 	# grid login /users/xsede.org/admin --username=admin --password=admin
         grid whoami
 else

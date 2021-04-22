@@ -98,7 +98,7 @@ function get_container_logfile()
     #logprops="$GENII_USER_DIR/../.$DEP_NAME-genesisII-2.0/build.container.log4j.properties"
     logprops="$(dirname $GENII_USER_DIR)/.$DEP_NAME-genesisII-2.0/build.container.log4j.properties"
   fi
-  echo "logprops is $logprops" >> /home/dev/bash-stack
+  #echo "logprops is $logprops" >> /home/dev/bash-stack
   if [ ! -f "$logprops" ]; then
     return "ERROR in get_container_logfile - no such deployment $DEP_NAME, logprops is $logprops"
   fi
