@@ -163,6 +163,22 @@ public class ResourceSummary
 			StreamUtils.close(stmt);
 		}
 	}
+	
+	static public void updateEPR(Connection connection, EndpointReferenceType epr, String resourceID) 
+			throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		
+		try {
+			stmt = connection.prepareStatement("UPDATE resources2 SET epr = ? WHERE resourceid = ?");
+			stmt.setBlob(1, EPRUtils.toBlob(epr, "resources2", "epr"));
+			stmt.setString(2, resourceID);
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException(String.format("Unable to update resource \"%s\" to resources2 table.", resourceID));
+		} finally {
+			StreamUtils.close(stmt);
+		}
+	}
 
 	static public void removeResources(Connection connection, String... resourceIDs) throws SQLException
 	{

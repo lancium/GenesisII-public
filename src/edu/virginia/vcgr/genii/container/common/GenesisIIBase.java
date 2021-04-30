@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.security.cert.X509Certificate;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,6 +29,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.UnsignedLong;
@@ -286,6 +288,53 @@ public abstract class GenesisIIBase implements GeniiCommon, IServiceWithCleanupH
 			_logger.error("Couldn't set attribute handlers.", nsme);
 			throw new RemoteException(nsme.getLocalizedMessage(), nsme);
 		}
+	}
+	
+	/**
+	 * The following function, ensureEPR, is to be called on a GenesisII object when
+	 * a certificate chain must exist before doing some operation.
+	 * The certificate chain can add substantial, unnecessary overhead (I believe it's 4K) for small messages.
+	 * Most objects do not need a certificate chain.
+	 * This method is being used to effectively make the default for all objects to not have a cert chain
+	 * and only acquire one when required (via this function).
+	 * 
+	 * If the EPR of the object already contains a cert chain, that EPR will be returned.
+	 * If not, the ResourceKey that was used to construct the EPR will be modified to add a cert chain.
+	 * Then, the modified ResourceKey will be used to construct a new EPR, which is returned.
+	 * This will also update the resources2 database table with the new EPR.
+	 * @return EPR
+	 * @throws AxisFault
+	 * Author: CCH
+	 * Date: 2021 April 30
+	 */
+	public EndpointReferenceType ensureEPRCertChain() throws AxisFault {
+		// If the EPR already contains a cert chain, return the EPR with no changes
+		EndpointReferenceType oldEPR = getMyEPR(true);
+		X509Certificate[] certs = EPRUtils.extractCertChain(oldEPR);
+		if (certs != null && certs.length > 0)
+			return oldEPR;
+		
+		// OK, the EPR does not contain a cert chain
+		ResourceKey rKey = ResourceManager.getTargetResource(oldEPR);
+		String targetServiceURL = rKey.getServiceName();
+		IResource resource = rKey.dereference();
+		resource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME, getChildCertSpec()); // Assign a cert chain to the resource
+		// It's a little unclear if by setting the CERTIFICATE_CHAIN_PROPERTY_NAME the cert chain will actually be used when creating the new EPR
+		// I think it'll work, because the all the way down in MetaDataSecurityToken in ResourceManager, it  uses the IResource that we've modified here.
+		// It gets that IResource by grabbing it out of the ResourceKey with dereference(), just as we do it here. Though it's in a higher-level function: createMetaData in ResourceManager.
+		EndpointReferenceType epr = ResourceManager.createEPR(rKey, targetServiceURL, getImplementedPortTypes(rKey), getMasterType(rKey));
+		
+		Connection connection = null;
+		try {
+			connection = ((BasicDBResource) resource).getConnection();
+			ResourceSummary.updateEPR(connection, epr, resource.getKey());
+		} catch (SQLException e) {
+			throw new ResourceException(String.format("Unable to lookup resource \"%s\".", epr), e);
+		} finally {
+			StreamUtils.close(connection);
+		}
+		return epr;
+		
 	}
 
 	protected ResourceKey createResource(GenesisHashMap creationParameters) throws ResourceException, BaseFaultType
