@@ -476,6 +476,8 @@ public class BasicDBResource implements IResource
 			stmt = connection.prepareStatement(_DELETE_ACL_ITEMS);
 			stmt.setString(1, EPI);
 			stmt.executeUpdate();
+			// 2021-04-16 by ASG. Seems like we should close this
+			stmt.close();
 
 		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
@@ -583,6 +585,8 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 		// ASG 2019-03-06. Need to update this to also remove accessMatrix entries, Resources entries, and resources2 entries.
 		try {
+			// 2021-04-16 by ASG. First get rid of the ACLS
+			BasicDBResource.removeAclMatrix(_connection, _resourceKey);
 			stmt = _connection.prepareStatement(_DESTROY_PROPERTIES_STMT);
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
