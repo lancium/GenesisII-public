@@ -42,6 +42,7 @@ public class SubscriptionsDatabase
 	static private void destroySubscription(Connection connection, String subscriptionkey) throws ResourceException
 	{
 		DBSubscriptionResource resource = new DBSubscriptionResource(subscriptionkey, connection);
+		_logger.debug("Destroying a subscription for "+subscriptionkey);
 		resource.destroy();
 		StreamUtils.close(resource);
 	}
@@ -56,7 +57,7 @@ public class SubscriptionsDatabase
 		Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies, AdditionalUserData additionalUserData) throws SQLException
 	{
 		PreparedStatement stmt = null;
-
+		_logger.debug("Creating a subscription for "+publisherResourceKey);
 		try {
 			stmt = connection
 				.prepareStatement("INSERT INTO wsnsubscriptions(subscriptionresourcekey," + "publisherresourcekey, subscriptionreference,"

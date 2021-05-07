@@ -338,9 +338,13 @@ public class AlarmManager
 
 			getInfoStmt = conn.prepareStatement(
 				"SELECT repeatinterval, callingcontext, target, " + "methodname, userdata " + "FROM alarmtable WHERE alarmid = ?");
+			getInfoStmt.setQueryTimeout(30);
 			removeStmt = conn.prepareStatement("DELETE FROM alarmtable WHERE alarmid = ?");
+			removeStmt.setQueryTimeout(30);
 			updateStmt = conn.prepareStatement("UPDATE alarmtable SET nextoccurance = ? WHERE alarmid = ?");
-			if (_logger.isTraceEnabled()) {
+			updateStmt.setQueryTimeout(30);
+			//if (_logger.isTraceEnabled()) {
+			if (_logger.isDebugEnabled()) {
 				/*
 				 * future: was debugging why we get this "ERROR 40XL1: A lock could not be obtained within the time requested" exception as a
 				 * failure in sql actions, mostly regarding alarms. all of these timeouts printed 0 as the current timeout for queries. so,
@@ -424,9 +428,9 @@ public class AlarmManager
 						if (sleepTime <= 0)
 							sleepTime = 1L;
 					} else {
-						sleepTime = 0;
+						sleepTime = 60000L;
 					}
-
+					_logger.debug("Alalarm Loop, sleep for  " + sleepTime);
 					try {
 						_alarms.wait(sleepTime);
 					} catch (InterruptedException ie) {
