@@ -1,0 +1,3 @@
+[submodule "libraries/gffs-structure/trunk/src/edu/virginia/vcgr/genii/client/nativeq/LanciumBES"]
+	path = libraries/gffs-structure/trunk/src/edu/virginia/vcgr/genii/client/nativeq/LanciumBES
+	url = https://github.com/lancium/LanciumBES.git

@@ -61,6 +61,7 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 		if (_any.size() == 0)
 			_providerConfiguration = null;
 		else {
+			System.err.println("Requesting a nativeq of type "+_providerName);
 			NativeQueue queue = NativeQueues.getNativeQueue(_providerName);
 			Class<?> configType = queue.providerConfigurationType();
 			JAXBContext context = JAXBContext.newInstance(configType);

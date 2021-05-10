@@ -1,3 +1,5 @@
 edu.virginia.vcgr.genii.client.nativeq.pbs.PBSQueue
 edu.virginia.vcgr.genii.client.nativeq.sge.SGEQueue
 edu.virginia.vcgr.genii.client.nativeq.slurm.SLURMQueue
+edu.virginia.vcgr.genii.client.nativeq.LanciumBES.LanciumBESQueue
+

@@ -50,7 +50,8 @@ public class BESConstants
 	static public final String LOCAL_RESOURCE_MANAGER_TYPE_SGE = LOCAL_RESOURCE_MANAGER_TYPE_BASE + "sge";
 	static public final String LOCAL_RESOURCE_MANAGER_TYPE_SLURM = LOCAL_RESOURCE_MANAGER_TYPE_BASE + "slurm";
 	static public final String LOCAL_RESOURCE_MANAGER_TYPE_GRID_QUEUE = LOCAL_RESOURCE_MANAGER_TYPE_BASE + "grid-queue";
-
+	static public final String LOCAL_RESOURCE_MANAGER_TYPE_LanciumBES = LOCAL_RESOURCE_MANAGER_TYPE_BASE + "LanciumBES";
+	
 	public final String CONFIG_PROPERTY_WORKER_DIR = "edu.virginia.vcgr.genii.container.bes.worker-dir";
 	public final String CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE = "edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override";
 

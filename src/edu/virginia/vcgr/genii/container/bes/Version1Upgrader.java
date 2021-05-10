@@ -17,6 +17,8 @@ import edu.virginia.vcgr.genii.client.nativeq.sge.SGEQueue;
 import edu.virginia.vcgr.genii.client.nativeq.sge.SGEQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.slurm.SLURMQueue;
 import edu.virginia.vcgr.genii.client.nativeq.slurm.SLURMQueueConfiguration;
+import edu.virginia.vcgr.genii.client.nativeq.LanciumBES.LanciumBESQueue;
+import edu.virginia.vcgr.genii.client.nativeq.LanciumBES.LanciumBESQueueConfiguration;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeed;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeedUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
